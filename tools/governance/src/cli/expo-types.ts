@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { readWorkspace } from '@huma/deps/workspace';
 import { expoRouterApps } from '@huma/expo/apps';
 import { loadExpoTooling } from '@huma/expo/expo';
 import { syncTypedRoutes } from '@huma/expo/typed-routes';
@@ -11,7 +12,7 @@ await runCommand(async () => {
   readArguments(USAGE, { options: {} });
   const root = await findWorkspaceRoot();
   let failed = false;
-  for (const app of await expoRouterApps(root)) {
+  for (const app of expoRouterApps(await readWorkspace(root))) {
     const report = await syncTypedRoutes(loadExpoTooling(join(root, app)), root, app);
     if (report.diagnostics.length > 0) {
       failed = true;

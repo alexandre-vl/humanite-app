@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { FileTree } from '@huma/fixtures';
 import { fixtureFactory, writeTree } from '@huma/fixtures';
+import { readWorkspace } from '@huma/deps/workspace';
 import { findWorkspaceRoot } from '@huma/kit/cli';
 import { temporaryDirectory } from '@huma/kit/fs';
 import { repoPath } from '@huma/kit/paths';
@@ -16,7 +17,7 @@ const define = fixtureFactory<ExpoCode>();
 /** Expo as the Expo Router app of the workspace installs it: fixtures apply it to their own app trees. */
 async function workspaceExpo(): Promise<ExpoTooling> {
   const root = await findWorkspaceRoot(import.meta.dirname);
-  const [app] = await expoRouterApps(root);
+  const [app] = expoRouterApps(await readWorkspace(root));
   if (app === undefined) {
     throw new Error('aucune app Expo Router dans le workspace : pas d’Expo à charger pour ces fixtures');
   }

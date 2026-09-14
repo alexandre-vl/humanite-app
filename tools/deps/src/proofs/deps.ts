@@ -1,6 +1,6 @@
 import { fixtureFactory } from '@huma/fixtures';
 import { repoPath } from '@huma/kit/paths';
-import type { DependencyPolicy } from '../check.ts';
+import type { DependencyPolicy, TestedRanges } from '../check.ts';
 import { checkWorkspace } from '../check.ts';
 import type { DepsCode } from '../checks.ts';
 import type { DependencyKind, Locked, Lockfile, Workspace, WorkspacePackage } from '../workspace.ts';
@@ -23,8 +23,8 @@ const locked = (entries: Readonly<Record<string, Locked>>): ReadonlyMap<string, 
 const resolved = (entries: Readonly<Record<string, string>>): ReadonlyMap<string, string> =>
   new Map(Object.entries(entries));
 
-/** What a fixture checks: a workspace and the policy it is held to. */
-type Scenario = Readonly<{ workspace: Workspace; policy: DependencyPolicy }>;
+/** What a fixture checks: a workspace, the policy it is held to and the ranges its compatibility tables tested. */
+type Scenario = Readonly<{ workspace: Workspace; policy: DependencyPolicy; tested: readonly TestedRanges[] }>;
 
 /** A root, a library `tools/kit` and a tool `tools/adr` that depends on it, all in step, under a policy they meet. */
 const VALID: Scenario = {
@@ -90,6 +90,7 @@ const VALID: Scenario = {
     singleInstance: ['prettier'],
     singleVersion: { typescript: [] },
   },
+  tested: [],
 };
 
 type Change = (scenario: Scenario) => Scenario;
@@ -97,8 +98,8 @@ type Change = (scenario: Scenario) => Scenario;
 const checked =
   (...changes: readonly Change[]) =>
   async (): Promise<readonly DepsCode[]> => {
-    const { workspace, policy } = changes.reduce((scenario, change) => change(scenario), VALID);
-    return Promise.resolve(checkWorkspace(workspace, policy).map((finding) => finding.code));
+    const { workspace, policy, tested } = changes.reduce((scenario, change) => change(scenario), VALID);
+    return Promise.resolve(checkWorkspace(workspace, policy, tested).map((finding) => finding.code));
   };
 
 const withWorkspace =
@@ -141,6 +142,32 @@ const withSnapshots = (entries: Readonly<Record<string, Readonly<Record<string, 
       ...Object.entries(entries).map(([key, dependencies]) => [key, resolved(dependencies)] as const),
     ]),
   }));
+
+/** `tools/kit` held to a table that tested `prettier` in `range`. */
+const withPrettierTested =
+  (range: string): Change =>
+  (scenario) => ({
+    ...scenario,
+    tested: [{ importer: 'tools/kit', source: 'kit-sdk 1.0.0', ranges: new Map([['prettier', range]]) }],
+  });
+
+/** `tools/adr` also declares `micromark` 4.0.2, while the `mdast-util-gfm` it declares loads 4.0.1. */
+const MICROMARK_SIBLING: readonly Change[] = [
+  withPackage('tools/adr', (each) => ({
+    ...each,
+    specifiers: specifiers({
+      dependencies: { '@huma/kit': 'workspace:*', 'mdast-util-gfm': 'catalog:', micromark: 'catalog:' },
+    }),
+  })),
+  withWorkspace((workspace) => ({ ...workspace, catalog: new Map([...workspace.catalog, ['micromark', '4.0.2']]) })),
+  withLockfile((lockfile) => ({
+    ...lockfile,
+    catalog: new Map([...lockfile.catalog, ['micromark', { specifier: '4.0.2', version: '4.0.2' }]]),
+    peers: new Map([...lockfile.peers, ['micromark@4.0.2', new Map()]]),
+  })),
+  withImporter('tools/adr', { micromark: { specifier: 'catalog:', version: '4.0.2' } }),
+  withSnapshots({ 'micromark@4.0.1': {}, 'micromark@4.0.2': {}, 'mdast-util-gfm@3.1.0': { micromark: '4.0.1' } }),
+];
 
 /** A tool whose own dependency resolved another `typescript`, as a transitive dependency would. */
 const TYPESCRIPT_COPY = withSnapshots({
@@ -357,6 +384,19 @@ export const DEPS_FIXTURES = [
     'une copie privée permise que plus aucun dépendant ne charge',
     ['deps/private-copy-unused'],
     checked(withPolicy({ singleVersion: { typescript: ['@feature-sliced/filesystem'] } })),
+  ),
+  define(
+    'deps/untested-version',
+    'une dépendance hors de la plage que la table de compatibilité de son paquet a testée',
+    ['deps/untested-version'],
+    checked(withPrettierTested('~3.8.0')),
+  ),
+  define('deps/tested-version', 'la même dépendance, dans la plage testée', [], checked(withPrettierTested('~3.9.0'))),
+  define(
+    'deps/sibling-version',
+    'un paquet qui déclare une autre version de micromark que celle que charge sa dépendance mdast-util-gfm',
+    ['deps/sibling-version'],
+    checked(...MICROMARK_SIBLING),
   ),
   define(
     'deps/policy-unknown',

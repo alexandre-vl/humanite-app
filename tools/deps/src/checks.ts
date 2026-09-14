@@ -72,6 +72,14 @@ const TABLE = {
     summary: 'chaque copie privée permise par la politique existe encore',
     message: '{dependent} ne charge plus de copie privée de {name} : retirer cette exception',
   },
+  'deps/sibling-version': {
+    summary: 'une dépendance directe résout la version que les autres dépendances directes du paquet chargent',
+    message: '{name} {version} déclaré, mais {dependent} charge {name} {loaded} : aligner les deux versions',
+  },
+  'deps/untested-version': {
+    summary: 'une dépendance reste dans la plage que sa table de compatibilité a testée',
+    message: '{name} {version} sort de la plage {range} testée par {source}',
+  },
   'deps/policy-unknown': {
     summary: 'la politique de dépendances ne nomme que des paquets installés',
     message: '{name} n’est pas installé : la politique ne protège rien sous ce nom',

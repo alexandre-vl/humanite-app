@@ -3,6 +3,7 @@ import { compareDiagnostics } from '@huma/kit/diagnostics';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath } from '@huma/kit/paths';
 import { compareText } from '@huma/kit/text';
+import { satisfies, valid } from 'semver';
 import type { DepsCode } from './checks.ts';
 import { depsFinding } from './checks.ts';
 import type { Locked, Workspace, WorkspacePackage } from './workspace.ts';
@@ -23,6 +24,19 @@ export type DependencyPolicy = Readonly<{
    * another version: a copy that only a listed dependent loads never meets the code of the workspace.
    */
   singleVersion: Readonly<Record<string, readonly string[]>>;
+}>;
+
+/**
+ * The versions a package that ships its own compatibility table tested together, which an importer's declared
+ * dependencies must stay within: the modules the Expo SDK of an app bundles, for instance.
+ */
+export type TestedRanges = Readonly<{
+  /** Directory of the importer whose dependencies the ranges bind. */
+  importer: string;
+  /** Who tested the ranges, as a finding names it: `expo 57.0.22`. */
+  source: string;
+  /** The range tested for each package name. */
+  ranges: ReadonlyMap<string, string>;
 }>;
 
 /** An exact semantic version, prerelease and build allowed: no range, no tag. */
@@ -150,6 +164,54 @@ function relativeDirectory(from: string, to: string): string {
   return [...up, ...(to === '.' ? [] : to.split('/'))].join('/');
 }
 
+/** Registry dependencies of an importer, by name, with the version they resolve to: workspace links and runtimes left out. */
+const registryDependencies = (locked: ReadonlyMap<string, Locked>): ReadonlyMap<string, string> =>
+  new Map(
+    [...locked]
+      .filter(([, entry]) => valid(resolvedVersion(entry.version)) !== null)
+      .map(([name, entry]) => [name, entry.version] as const),
+  );
+
+/**
+ * Each direct dependency of an importer resolves to the version its other direct dependencies load: otherwise the
+ * importer and its dependency each get their own copy, and configuration read by one never reaches the other.
+ */
+function checkSiblingVersions(workspace: Workspace): readonly Diagnostic<DepsCode>[] {
+  return [...workspace.lockfile.importers].flatMap(([directory, locked]) => {
+    const direct = registryDependencies(locked);
+    return [...direct].flatMap(([dependent, instance]) =>
+      [...(workspace.lockfile.snapshots.get(`${dependent}@${instance}`) ?? new Map<string, string>())].flatMap(
+        ([name, loaded]) => {
+          const declared = direct.get(name);
+          return declared === undefined || resolvedVersion(declared) === resolvedVersion(loaded)
+            ? []
+            : [
+                depsFinding('deps/sibling-version', fileOf(directory, 'package.json'), {
+                  name,
+                  version: resolvedVersion(declared),
+                  dependent,
+                  loaded: resolvedVersion(loaded),
+                }),
+              ];
+        },
+      ),
+    );
+  });
+}
+
+function checkTestedRanges(workspace: Workspace, tested: readonly TestedRanges[]): readonly Diagnostic<DepsCode>[] {
+  return tested.flatMap(({ importer, source, ranges }) => {
+    const direct = registryDependencies(workspace.lockfile.importers.get(importer) ?? new Map());
+    return [...direct].flatMap(([name, instance]) => {
+      const range = ranges.get(name);
+      const version = resolvedVersion(instance);
+      return range === undefined || satisfies(version, range)
+        ? []
+        : [depsFinding('deps/untested-version', fileOf(importer, 'package.json'), { name, version, range, source })];
+    });
+  });
+}
+
 /** The installed instances of each package name, as lockfile snapshot keys. */
 function instancesByName(workspace: Workspace): ReadonlyMap<string, readonly string[]> {
   const instances = new Map<string, string[]>();
@@ -235,8 +297,12 @@ function checkPolicyNames(
     .map((name) => depsFinding('deps/policy-unknown', policy.source, { name }));
 }
 
-/** Every dependency finding of a workspace. */
-export function checkWorkspace(workspace: Workspace, policy: DependencyPolicy): readonly Diagnostic<DepsCode>[] {
+/** Every dependency finding of a workspace, held to its policy and to the ranges its compatibility tables tested. */
+export function checkWorkspace(
+  workspace: Workspace,
+  policy: DependencyPolicy,
+  tested: readonly TestedRanges[] = [],
+): readonly Diagnostic<DepsCode>[] {
   const byName = new Map(
     workspace.packages.flatMap((each) => (each.name === null ? [] : [[each.name, each] as const])),
   );
@@ -248,5 +314,7 @@ export function checkWorkspace(workspace: Workspace, policy: DependencyPolicy): 
     ...checkSingleInstances(policy, instances),
     ...checkSingleVersions(workspace, policy, instances),
     ...checkPolicyNames(policy, instances),
+    ...checkSiblingVersions(workspace),
+    ...checkTestedRanges(workspace, tested),
   ].toSorted(compareDiagnostics);
 }

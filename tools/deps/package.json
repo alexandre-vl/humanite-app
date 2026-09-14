@@ -11,12 +11,14 @@
   "dependencies": {
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
+    "semver": "catalog:",
     "yaml": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@types/semver": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   }
