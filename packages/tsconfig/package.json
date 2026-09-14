@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./base.json": "./base.json",
-    "./node.json": "./node.json"
+    "./node.json": "./node.json",
+    "./project.json": "./project.json",
+    "./strict.json": "./strict.json"
   }
 }

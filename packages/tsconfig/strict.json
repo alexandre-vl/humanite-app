@@ -16,10 +16,6 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "libReplacement": false,
-    "skipLibCheck": true,
-    "composite": true,
-    "tsBuildInfoFile": "${configDir}/node_modules/.cache/tsconfig.tsbuildinfo",
-    "emitDeclarationOnly": true,
-    "outDir": "${configDir}/node_modules/.cache/tsc"
+    "skipLibCheck": true
   }
 }
