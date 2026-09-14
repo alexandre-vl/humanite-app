@@ -43,13 +43,38 @@ const TABLE = {
     summary: 'chaque référence TypeScript vers un paquet du workspace est une dépendance déclarée',
     message: 'référence vers {reference} sans dépendance workspace:* déclarée',
   },
-  'deps/single-version': {
-    summary: 'les paquets qui doivent être uniques n’ont qu’une version',
-    message: '{name} résolu en plusieurs versions : {versions}',
-  },
   'deps/peer-undeclared': {
     summary: 'un paquet déclare les pairs obligatoires de ses dépendances directes',
     message: '{dependency} exige {peer} en pair : le déclarer, sinon pnpm l’installe en silence',
+  },
+  'deps/root-dependency': {
+    summary: 'un paquet ne dépend que des paquets des dossiers que la politique ouvre à son dossier',
+    message: '{name} est rangé sous {target}/, dont les paquets de {root}/ ne peuvent pas dépendre',
+  },
+  'deps/root-unknown': {
+    summary: 'chaque paquet est rangé sous un dossier de la politique',
+    message: '{directory} n’est sous aucun dossier de la politique de dépendances',
+  },
+  'deps/single-instance': {
+    summary: 'les paquets à instance unique ne sont installés qu’une fois',
+    message: '{name} installé en {count} instances ({instances}) : aligner leurs pairs pour n’en garder qu’une',
+  },
+  'deps/single-version': {
+    summary: 'les paquets à version unique sont déclarés en une seule version',
+    message: '{name} résolu en plusieurs versions : {versions}',
+  },
+  'deps/private-copy': {
+    summary:
+      'une autre version d’un paquet à version unique n’est chargée que par les dépendants que la politique permet',
+    message: '{name} {version} est chargé par {dependents} : seule la version du workspace est permise',
+  },
+  'deps/private-copy-unused': {
+    summary: 'chaque copie privée permise par la politique existe encore',
+    message: '{dependent} ne charge plus de copie privée de {name} : retirer cette exception',
+  },
+  'deps/policy-unknown': {
+    summary: 'la politique de dépendances ne nomme que des paquets installés',
+    message: '{name} n’est pas installé : la politique ne protège rien sous ce nom',
   },
 } as const;
 

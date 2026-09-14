@@ -6,10 +6,13 @@ packages:
 nodeLinker: isolated
 enableGlobalVirtualStore: false
 strictDepBuilds: true
+strictPeerDependencies: true
 pmOnFail: error
 verifyDepsBeforeRun: error
 minimumReleaseAge: 1440
 catalogMode: strict
+peerDependencyRules:
+  ignoreMissing: []
 catalog:
   '@eslint/js': 10.0.1
   '@types/mdast': 4.0.4

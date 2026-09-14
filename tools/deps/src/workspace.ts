@@ -38,7 +38,29 @@ export type Lockfile = Readonly<{
   importers: ReadonlyMap<string, ReadonlyMap<string, Locked>>;
   /** Peer dependencies of each resolved package `name@version`: `true` for an optional peer. */
   peers: ReadonlyMap<string, ReadonlyMap<string, boolean>>;
+  /**
+   * Each installed instance, keyed `name@version` followed by the peers it was resolved with, and the resolved version
+   * of each of its dependencies, optional ones included: one package gets one instance per distinct set of peers.
+   */
+  snapshots: ReadonlyMap<string, ReadonlyMap<string, string>>;
 }>;
+
+/** A package of the lockfile: `name` and `version` of a key such as `@expo/cli@57.0.24(zod@3.25.76)`. */
+export type PackageKey = Readonly<{ name: string; version: string }>;
+
+/** A lockfile key: a name, scoped or not, `@`, then a version, possibly followed by the peers of an instance. */
+const PACKAGE_KEY = /^(?<name>(?:@[^@/]+\/)?[^@/]+)@(?<version>[^(]+)(?:\(.*\))?$/u;
+
+/** The name and version of a lockfile key, the peers of an instance dropped. */
+export function parsePackageKey(key: string): PackageKey {
+  const groups = PACKAGE_KEY.exec(key)?.groups;
+  const name = groups?.['name'];
+  const version = groups?.['version'];
+  if (name === undefined || version === undefined) {
+    throw new Error(`clé de lockfile illisible : ${key}`);
+  }
+  return { name, version };
+}
 
 export type Workspace = Readonly<{
   packages: readonly WorkspacePackage[];
@@ -68,6 +90,10 @@ const LOCKED = z.object({ specifier: z.string(), version: z.string() });
 
 const LOCKED_GROUP = z.record(z.string(), LOCKED).optional();
 
+const RESOLVED_GROUP = z.record(z.string(), z.string()).optional();
+
+const KEY = z.string().regex(PACKAGE_KEY);
+
 const LOCKFILE = z.object({
   lockfileVersion: z.string(),
   catalogs: z.object({ default: z.record(z.string(), LOCKED).optional() }).optional(),
@@ -77,13 +103,14 @@ const LOCKFILE = z.object({
   ),
   packages: z
     .record(
-      z.string(),
+      KEY,
       z.object({
         peerDependencies: z.record(z.string(), z.string()).optional(),
         peerDependenciesMeta: z.record(z.string(), z.object({ optional: z.boolean().optional() })).optional(),
       }),
     )
     .optional(),
+  snapshots: z.record(KEY, z.object({ dependencies: RESOLVED_GROUP, optionalDependencies: RESOLVED_GROUP })).optional(),
 });
 
 export const WORKSPACE_FILE_NAME = 'pnpm-workspace.yaml';
@@ -118,6 +145,15 @@ export function readLockfile(text: string): Lockfile {
             entry.peerDependenciesMeta?.[peer]?.optional === true,
           ]),
         ),
+      ]),
+    ),
+    snapshots: new Map(
+      Object.entries(lockfile.snapshots ?? {}).map(([key, snapshot]) => [
+        key,
+        new Map([
+          ...Object.entries(snapshot.dependencies ?? {}),
+          ...Object.entries(snapshot.optionalDependencies ?? {}),
+        ]),
       ]),
     ),
   };
@@ -165,10 +201,30 @@ async function readPackage(root: string, directory: string): Promise<WorkspacePa
   };
 }
 
+/**
+ * The pnpm settings a workspace may write, with the values pnpm 11 accepts: a setting outside this type cannot be
+ * written, so a misspelt one is never silently ignored by pnpm.
+ */
+export type PnpmSettings = Readonly<{
+  nodeLinker: 'isolated' | 'hoisted' | 'pnp';
+  enableGlobalVirtualStore: boolean;
+  strictDepBuilds: boolean;
+  strictPeerDependencies: boolean;
+  pmOnFail: 'download' | 'error' | 'warn' | 'ignore';
+  verifyDepsBeforeRun: 'install' | 'warn' | 'error' | 'prompt' | false;
+  /** Minutes since publication before a version can be installed. */
+  minimumReleaseAge: number;
+  catalogMode: 'strict' | 'prefer' | 'manual';
+  peerDependencyRules: Readonly<{
+    /** Peers an instance may lack without pnpm warning or failing. */
+    ignoreMissing: readonly string[];
+  }>;
+}>;
+
 /** What `pnpm-workspace.yaml` holds: package globs, pnpm settings and the default catalog. */
 export type WorkspaceFile = Readonly<{
   packages: readonly string[];
-  settings: Readonly<Record<string, string | number | boolean>>;
+  settings: PnpmSettings;
   catalog: Readonly<Record<string, string>>;
 }>;
 

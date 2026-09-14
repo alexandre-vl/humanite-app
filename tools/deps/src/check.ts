@@ -6,11 +6,23 @@ import { compareText } from '@huma/kit/text';
 import type { DepsCode } from './checks.ts';
 import { depsFinding } from './checks.ts';
 import type { Locked, Workspace, WorkspacePackage } from './workspace.ts';
-import { DEPENDENCY_KINDS, LOCKFILE_NAME, WORKSPACE_FILE_NAME } from './workspace.ts';
+import { DEPENDENCY_KINDS, LOCKFILE_NAME, parsePackageKey, WORKSPACE_FILE_NAME } from './workspace.ts';
 
 export type DependencyPolicy = Readonly<{
-  /** Packages the whole workspace resolves to a single version. */
-  singleVersion: readonly string[];
+  /** Where the policy is written: findings about the policy itself point there. */
+  source: RepoPath;
+  /**
+   * The directories holding the packages of the workspace, each with the directories whose packages its own may depend
+   * on: a dependency outside that list is on the wrong package, or the package is in the wrong directory.
+   */
+  roots: Readonly<Record<string, readonly string[]>>;
+  /** Packages installed once: another instance, even of the same version, resolved with other peers, is a second copy. */
+  singleInstance: readonly string[];
+  /**
+   * Packages resolved to the version the workspace declares, each with the dependents allowed to keep a private copy of
+   * another version: a copy that only a listed dependent loads never meets the code of the workspace.
+   */
+  singleVersion: Readonly<Record<string, readonly string[]>>;
 }>;
 
 /** An exact semantic version, prerelease and build allowed: no range, no tag. */
@@ -25,6 +37,8 @@ const fileOf = (directory: string, name: string): RepoPath =>
 
 /** The version a locked entry resolves to, peer suffix removed: `57.0.22(@babel/core@7.29.7)` gives `57.0.22`. */
 const resolvedVersion = (locked: string): string => locked.split('(')[0] ?? locked;
+
+const sortedList = (values: Iterable<string>): string => [...new Set(values)].toSorted(compareText).join(', ');
 
 function checkLockfile(workspace: Workspace): readonly Diagnostic<DepsCode>[] {
   const { lockfile } = workspace;
@@ -62,19 +76,26 @@ function checkCatalog(workspace: Workspace): readonly Diagnostic<DepsCode>[] {
   });
 }
 
+/** The root of `roots` a package directory sits in: `tools` for `tools/kit`, `null` for the workspace root. */
+const rootOf = (directory: string, roots: DependencyPolicy['roots']): string | null =>
+  Object.keys(roots).find((root) => directory.startsWith(`${root}/`)) ?? null;
+
 function checkPackage(
   each: WorkspacePackage,
   workspace: Workspace,
   byName: ReadonlyMap<string, WorkspacePackage>,
+  policy: DependencyPolicy,
 ): readonly Diagnostic<DepsCode>[] {
   const manifest = fileOf(each.directory, 'package.json');
   const findings: Diagnostic<DepsCode>[] = [];
   const locked: ReadonlyMap<string, Locked> = workspace.lockfile.importers.get(each.directory) ?? new Map();
   const declared = new Set<string>();
+  const root = rootOf(each.directory, policy.roots);
   for (const kind of DEPENDENCY_KINDS) {
     for (const [name, specifier] of each.specifiers[kind]) {
       declared.add(name);
-      const expected = byName.has(name) ? 'workspace:*' : 'catalog:';
+      const target = byName.get(name);
+      const expected = target === undefined ? 'catalog:' : 'workspace:*';
       if (specifier !== expected) {
         findings.push(depsFinding('deps/specifier-form', manifest, { name, specifier, expected }));
       }
@@ -82,7 +103,14 @@ function checkPackage(
       if (kind !== 'peerDependencies' && entry !== undefined && entry.specifier !== specifier) {
         findings.push(depsFinding('deps/importer-stale', manifest, { name, specifier, locked: entry.specifier }));
       }
+      const targetRoot = target === undefined ? null : rootOf(target.directory, policy.roots);
+      if (root !== null && targetRoot !== null && !(policy.roots[root] ?? []).includes(targetRoot)) {
+        findings.push(depsFinding('deps/root-dependency', manifest, { name, root, target: targetRoot }));
+      }
     }
+  }
+  if (each.directory !== '.' && root === null) {
+    findings.push(depsFinding('deps/root-unknown', manifest, { directory: each.directory }));
   }
   for (const [name, entry] of locked) {
     const peers: ReadonlyMap<string, boolean> =
@@ -122,16 +150,89 @@ function relativeDirectory(from: string, to: string): string {
   return [...up, ...(to === '.' ? [] : to.split('/'))].join('/');
 }
 
-function checkSingleVersions(workspace: Workspace, policy: DependencyPolicy): readonly Diagnostic<DepsCode>[] {
-  return policy.singleVersion.flatMap((name) => {
-    const versions = [...workspace.lockfile.peers.keys()]
-      .filter((key) => key.startsWith(`${name}@`) && !key.slice(name.length + 1).includes('@'))
-      .map((key) => key.slice(name.length + 1))
-      .toSorted(compareText);
-    return versions.length <= 1
+/** The installed instances of each package name, as lockfile snapshot keys. */
+function instancesByName(workspace: Workspace): ReadonlyMap<string, readonly string[]> {
+  const instances = new Map<string, string[]>();
+  for (const key of workspace.lockfile.snapshots.keys()) {
+    const { name } = parsePackageKey(key);
+    instances.set(name, [...(instances.get(name) ?? []), key]);
+  }
+  return instances;
+}
+
+function checkSingleInstances(
+  policy: DependencyPolicy,
+  instances: ReadonlyMap<string, readonly string[]>,
+): readonly Diagnostic<DepsCode>[] {
+  return policy.singleInstance.flatMap((name) => {
+    const keys = instances.get(name) ?? [];
+    return keys.length <= 1
       ? []
-      : [depsFinding('deps/single-version', LOCKFILE, { name, versions: versions.join(', ') })];
+      : [
+          depsFinding('deps/single-instance', LOCKFILE, {
+            name,
+            count: String(keys.length),
+            instances: sortedList(keys),
+          }),
+        ];
   });
+}
+
+/** The names of the instances that depend on `name` at `version`. */
+function dependentsOf(workspace: Workspace, name: string, version: string): ReadonlySet<string> {
+  return new Set(
+    [...workspace.lockfile.snapshots]
+      .filter(([, dependencies]) => {
+        const resolved = dependencies.get(name);
+        return resolved !== undefined && resolvedVersion(resolved) === version;
+      })
+      .map(([key]) => parsePackageKey(key).name),
+  );
+}
+
+function checkSingleVersions(
+  workspace: Workspace,
+  policy: DependencyPolicy,
+  instances: ReadonlyMap<string, readonly string[]>,
+): readonly Diagnostic<DepsCode>[] {
+  return Object.entries(policy.singleVersion).flatMap(([name, privateTo]) => {
+    const declared = new Set(
+      [...workspace.lockfile.importers.values()].flatMap((dependencies) => {
+        const entry = dependencies.get(name);
+        return entry === undefined ? [] : [resolvedVersion(entry.version)];
+      }),
+    );
+    const versions = new Set((instances.get(name) ?? []).map((key) => parsePackageKey(key).version));
+    const findings: Diagnostic<DepsCode>[] = [];
+    if (declared.size > 1 || (declared.size === 0 && versions.size > 1)) {
+      const conflicting = declared.size > 1 ? declared : versions;
+      findings.push(depsFinding('deps/single-version', LOCKFILE, { name, versions: sortedList(conflicting) }));
+    }
+    const holders = new Set<string>();
+    const copies = declared.size === 0 ? [] : [...versions].filter((version) => !declared.has(version));
+    for (const version of copies.toSorted(compareText)) {
+      const dependents = [...dependentsOf(workspace, name, version)];
+      const others = dependents.filter((dependent) => !privateTo.includes(dependent));
+      dependents.filter((dependent) => privateTo.includes(dependent)).forEach((dependent) => holders.add(dependent));
+      if (others.length > 0) {
+        findings.push(depsFinding('deps/private-copy', LOCKFILE, { name, version, dependents: sortedList(others) }));
+      }
+    }
+    for (const dependent of privateTo.filter((candidate) => !holders.has(candidate))) {
+      findings.push(depsFinding('deps/private-copy-unused', policy.source, { name, dependent }));
+    }
+    return findings;
+  });
+}
+
+function checkPolicyNames(
+  policy: DependencyPolicy,
+  instances: ReadonlyMap<string, readonly string[]>,
+): readonly Diagnostic<DepsCode>[] {
+  const names = new Set([...policy.singleInstance, ...Object.keys(policy.singleVersion)]);
+  return [...names]
+    .filter((name) => !instances.has(name))
+    .map((name) => depsFinding('deps/policy-unknown', policy.source, { name }));
 }
 
 /** Every dependency finding of a workspace. */
@@ -139,10 +240,13 @@ export function checkWorkspace(workspace: Workspace, policy: DependencyPolicy): 
   const byName = new Map(
     workspace.packages.flatMap((each) => (each.name === null ? [] : [[each.name, each] as const])),
   );
+  const instances = instancesByName(workspace);
   return [
     ...checkLockfile(workspace),
     ...checkCatalog(workspace),
-    ...workspace.packages.flatMap((each) => checkPackage(each, workspace, byName)),
-    ...checkSingleVersions(workspace, policy),
+    ...workspace.packages.flatMap((each) => checkPackage(each, workspace, byName, policy)),
+    ...checkSingleInstances(policy, instances),
+    ...checkSingleVersions(workspace, policy, instances),
+    ...checkPolicyNames(policy, instances),
   ].toSorted(compareDiagnostics);
 }
