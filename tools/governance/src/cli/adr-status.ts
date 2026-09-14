@@ -38,7 +38,7 @@ function since(document: AdrDocument, states: readonly CommittedState[]): string
     ({ state }) =>
       state.kind === 'present' &&
       state.document.kind === 'readable' &&
-      state.document.frontMatter.status === document.frontMatter.status,
+      state.document.header.status === document.header.status,
   );
   return first === undefined
     ? 'non commité'
@@ -56,8 +56,8 @@ function details(document: AdrDocument): readonly string[] {
     return lines;
   }
   lines.push(
-    `Importance : ${document.frontMatter.significance.join(', ')}`,
-    `Remplace : ${document.frontMatter.supersedes.length === 0 ? 'rien' : document.frontMatter.supersedes.map(formatAdrId).join(', ')}`,
+    `Importance : ${document.header.significance.join(', ')}`,
+    `Remplace : ${document.header.supersedes.length === 0 ? 'rien' : document.header.supersedes.map(formatAdrId).join(', ')}`,
   );
   for (const rule of document.rules ?? []) {
     const bound = binding?.rules[rule.id];

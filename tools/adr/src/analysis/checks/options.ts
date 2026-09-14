@@ -1,6 +1,6 @@
 import type { BodyContext } from '../body.ts';
 import { plainText } from '../markdown.ts';
-import { singleList, singleParagraph } from '../outline.ts';
+import { listedTitles, singleList, singleParagraph } from '../outline.ts';
 
 /** Names of the studied options, each with its own argument subsection in the same order; `null` when unreadable. */
 export function readOptions({ sections, spec, report }: BodyContext): readonly string[] | null {
@@ -10,12 +10,13 @@ export function readOptions({ sections, spec, report }: BodyContext): readonly s
     report('adr/options-list', found.at, {});
     return null;
   }
+  const quotes = [spec.punctuation.quoteOpen.trim(), spec.punctuation.quoteClose.trim()];
   const names: string[] = [];
   let readable = true;
   for (const item of found.list.children) {
     const paragraph = singleParagraph(item);
     const name = paragraph === null ? '' : plainText(paragraph, 'keep');
-    if (name === '' || /[«»]/u.test(name)) {
+    if (name === '' || quotes.some((quote) => name.includes(quote))) {
       report('adr/options-name', item, {});
       readable = false;
     } else if (names.includes(name)) {
@@ -36,7 +37,7 @@ export function readOptions({ sections, spec, report }: BodyContext): readonly s
   const mismatch = names.findIndex((name, index) => titles[index] !== name);
   if (mismatch !== -1 || titles.length !== names.length) {
     const at = subsections[mismatch === -1 ? names.length : mismatch]?.heading ?? sections.prosAndCons.heading;
-    report('adr/options-subsections', at, { found: titles, expected: names });
+    report('adr/options-subsections', at, { found: listedTitles(titles), expected: names });
   }
   return names;
 }

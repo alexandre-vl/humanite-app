@@ -1,9 +1,22 @@
 import { describe, expect, test } from 'vitest';
 import { FORMAT_1 } from '../spec/formats/v1.ts';
 import { grammarOf } from './grammar.ts';
-import { CODE_MASK } from './markdown.ts';
+import { CODE_MASK } from './mask.ts';
 
 const grammar = grammarOf(FORMAT_1);
+
+describe('sentences', () => {
+  test('each built sentence is read back by its matcher', () => {
+    expect(grammar.matchValence(grammar.argumentLine('bad', grammar.because('aucune locale', true)))).toBe('bad');
+    expect(grammar.matchChosenOption(grammar.chosenOptionLine('MADR 4', grammar.because('il vérifie (C1).')))).toBe(
+      'MADR 4',
+    );
+    expect(grammar.isReevaluation(grammar.reevaluationLine('Zod cesse de publier.'))).toBe(true);
+    expect(grammar.labelledLine(grammar.ruleLabel(2), 'Texte.')).toBe('**R2** — Texte.');
+    expect(grammar.citation([1, 3])).toBe('(C1, C3)');
+    expect(grammar.chosenOptionTemplate).toBe('Option retenue : « option », parce que … (C1)');
+  });
+});
 
 describe('matchValence', () => {
   test.each([
@@ -28,9 +41,6 @@ describe('matchValence', () => {
 describe('matchChosenOption', () => {
   test('reads the option name', () => {
     expect(grammar.matchChosenOption('Option retenue : « Zod », parce que sa locale existe (C1).')).toBe('Zod');
-    expect(grammar.matchChosenOption('Option retenue : « MADR 4 vérifié », parce qu’elle seule vérifie (C1).')).toBe(
-      'MADR 4 vérifié',
-    );
   });
 
   test.each([
@@ -73,21 +83,28 @@ describe('scanKeywords', () => {
     expect(levels('Un agent NE PEUT PAS décider.')).toEqual([]);
   });
 
-  test('reports forbidden modal words, with or without accents, in French or English', () => {
-    expect(forbidden('Un test DEVRAIT passer, OBLIGATOIRE et RECOMMANDÉ, voire RECOMMANDE ; it MUST pass.')).toEqual([
-      'DEVRAIT',
-      'OBLIGATOIRE',
-      'RECOMMANDÉ',
-      'RECOMMANDE',
-      'MUST',
-    ]);
+  test('reports forbidden modal words, with or without accents or a hyphen, in French or English', () => {
+    expect(
+      forbidden(
+        'Un test DEVRAIT passer, OBLIGATOIRE et RECOMMANDÉ, voire RECOMMANDE ; FAUT-IL, DEVRA-T-ON ; it MUST pass.',
+      ),
+    ).toEqual(['DEVRAIT', 'OBLIGATOIRE', 'RECOMMANDÉ', 'RECOMMANDE', 'FAUT', 'DEVRA', 'MUST']);
   });
 
-  test('reports negations that mix case or miss a word, with the expected spelling', () => {
+  test('reports every negation of a keyword that is not an exact negative form, with the spelling to write', () => {
     expect(negations('Un agent ne DOIT pas décider.')).toEqual(['ne DOIT pas → NE DOIT PAS']);
-    expect(negations('Un agent NE DOIT JAMAIS décider.')).toEqual(['NE DOIT → NE DOIT PAS']);
+    expect(negations('Un agent NE DOIT JAMAIS décider.')).toEqual(['NE DOIT JAMAIS → NE DOIT PAS']);
     expect(negations('Les agents DOIVENT pas décider.')).toEqual(['DOIVENT pas → NE DOIVENT PAS']);
-    expect(levels('Un agent ne DOIT pas décider.')).toEqual([]);
+    expect(negations('Un agent ne PEUT pas décider.')).toEqual(['ne PEUT pas → NE DOIT PAS']);
+    expect(negations('Un agent Ne PEUT jamais décider.')).toEqual(['Ne PEUT jamais → NE DOIT PAS']);
+    expect(negations('Les agents PEUVENT plus décider.')).toEqual(['PEUVENT plus → NE DOIVENT PAS']);
+    expect(negations('Un agent N’DOIT rien.')).toEqual(['N’DOIT rien → NE DOIT PAS']);
+    expect(levels('Un agent ne PEUT pas décider.')).toEqual([]);
+  });
+
+  test('keeps affirmative keywords next to ordinary words', () => {
+    expect(negations('Un agent DOIT, pas seulement, citer.')).toEqual([]);
+    expect(levels('Le schéma PEUT pousser plus loin.')).toEqual(['may']);
   });
 
   test('ignores lowercase words, keywords glued to letters or hyphens, and masked inline code', () => {
@@ -96,8 +113,10 @@ describe('scanKeywords', () => {
 });
 
 describe('scanCitations', () => {
-  test('reads single and grouped citations', () => {
-    expect(grammar.scanCitations('rapide (C1) et sûr (C2, C3).').numbers).toEqual([1, 2, 3]);
+  test('reads single and grouped citations with their positions', () => {
+    const scan = grammar.scanCitations('rapide (C1) et sûr (C2, C3).');
+    expect(scan.numbers).toEqual([1, 2, 3]);
+    expect(scan.citations.map((citation) => citation.index)).toEqual([7, 19]);
   });
 
   test('reports malformed citations and keeps strict ones', () => {
@@ -107,7 +126,7 @@ describe('scanCitations', () => {
   });
 
   test('ignores parentheses that are not citations', () => {
-    expect(grammar.scanCitations('(C) ni (critère 1) ni (Cn)')).toEqual({ numbers: [], malformed: [] });
+    expect(grammar.scanCitations('(C) ni (critère 1) ni (Cn)')).toEqual({ citations: [], numbers: [], malformed: [] });
   });
 });
 

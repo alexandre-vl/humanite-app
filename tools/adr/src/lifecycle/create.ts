@@ -1,22 +1,21 @@
-import { readFile, readdir, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { hostname } from 'node:os';
 import { join } from 'node:path';
 import { errnoCode } from '@huma/kit/errors';
 import type { GitRepository } from '@huma/kit/git';
 import { commonDirectory, git, worktreeRoots } from '@huma/kit/git';
+import { isJsonObject, parseJson } from '@huma/kit/json';
 import type { RepoPath } from '@huma/kit/paths';
-import { parseJson, isJsonObject } from '@huma/kit/json';
-import { mkdir } from 'node:fs/promises';
 import { grammarOf } from '../analysis/grammar.ts';
-import { titleProblems } from '../analysis/title.ts';
-import { frontMatterBlock } from '../analysis/frontmatter.ts';
-import { slugify } from '../analysis/slug.ts';
+import { readTitleArgument } from '../analysis/title.ts';
+import { renderHeader } from '../model/header.ts';
 import type { AdrNumber } from '../model/identifiers.ts';
 import { adrNumber, adrPath } from '../model/identifiers.ts';
-import type { FormatSpec } from '../spec/formats/types.ts';
-import { ADR_DIRECTORY, NUMBERED_NAME } from '../spec/layout.ts';
+import { numberOfPath } from '../model/paths.ts';
+import type { FormatSpec, SectionKey } from '../spec/formats/types.ts';
+import { ADR_DIRECTORY } from '../spec/layout.ts';
 import type { Significance } from '../spec/significance.ts';
-import { SIGNIFICANCES } from '../spec/significance.ts';
+import { INITIAL_STATUS } from '../spec/statuses.ts';
 
 const note = (text: string): string => `<!-- ${text} -->`;
 
@@ -25,29 +24,23 @@ const note = (text: string): string => `<!-- ${text} -->`;
  * `adr:check` rejects until it is replaced.
  */
 export function skeleton(spec: FormatSpec, title: string, significance: readonly Significance[]): string {
-  const { labels, valences } = spec;
-  const option = (name: string): string => note(`option ${name}`);
-  const section = (key: FormatSpec['sections'][number]['key']): string =>
-    spec.sections.find((candidate) => candidate.key === key)?.title ?? key;
   const grammar = grammarOf(spec);
+  const option = (name: string): string => note(`option ${name}`);
+  const section = (key: SectionKey): string => spec.sections.find((candidate) => candidate.key === key)?.title ?? key;
+  const citing = (what: string): string => note(`${what} qui cite un critère ${grammar.citation([1])}`);
   return [
-    frontMatterBlock({
-      format: spec.version,
-      status: 'proposed',
-      significance: SIGNIFICANCES.filter((key) => significance.includes(key)),
-      supersedes: [],
-    }),
+    renderHeader({ format: spec.version, status: INITIAL_STATUS, significance, supersedes: [] }),
     `# ${title}`,
     '',
     `## ${section('context')}`,
     '',
     `- ${note('fait vérifiable, avec sa source : lien, commande en code en ligne ou ADR-NNNN')}`,
     '',
-    note('le problème, en une seule question terminée par un point d’interrogation'),
+    note(`le problème, en une seule question terminée par « ${spec.punctuation.questionMark} »`),
     '',
     `## ${section('criteria')}`,
     '',
-    `- **${labels.criterionPrefix}1**${labels.separator}${note('critère le plus important ; l’ordre des critères est leur priorité')}`,
+    `- ${grammar.labelledLine(grammar.criterionLabel(1), note('critère le plus important ; l’ordre des critères est leur priorité'))}`,
     '',
     `## ${section('options')}`,
     '',
@@ -56,28 +49,28 @@ export function skeleton(spec: FormatSpec, title: string, significance: readonly
     '',
     `## ${section('decision')}`,
     '',
-    `${labels.chosenOption} : « ${option('A')} », ${labels.because} ${note('justification qui cite un critère (C1)')}`,
+    grammar.chosenOptionLine(option('A'), grammar.because(citing('justification'))),
     '',
-    `- **${labels.rulePrefix}1**${labels.separator}${note(`règle avec un seul mot-clé en capitales : ${grammar.keywordList}`)}`,
+    `- ${grammar.labelledLine(grammar.ruleLabel(1), note(`règle avec un seul mot-clé en capitales : ${grammar.keywordList}`))}`,
     '',
     `### ${spec.consequences}`,
     '',
-    `- ${valences.good}, ${labels.because} ${note('effet positif')}`,
-    `- ${valences.bad}, ${labels.because} ${note('coût de la décision')}`,
+    `- ${grammar.argumentLine('good', grammar.because(note('effet positif')))}`,
+    `- ${grammar.argumentLine('bad', grammar.because(note('coût de la décision')))}`,
     '',
     `## ${section('prosAndCons')}`,
     '',
     `### ${option('A')}`,
     '',
-    `- ${valences.good}, ${labels.because} ${note('argument qui cite un critère (C1)')}`,
+    `- ${grammar.argumentLine('good', grammar.because(citing('argument')))}`,
     '',
     `### ${option('B')}`,
     '',
-    `- ${valences.bad}, ${labels.because} ${note('argument qui cite un critère (C1)')}`,
+    `- ${grammar.argumentLine('bad', grammar.because(citing('argument')))}`,
     '',
     `## ${section('moreInformation')}`,
     '',
-    `- ${labels.reevaluation} : ${note('fait observable qui imposerait de revoir la décision')}`,
+    `- ${grammar.reevaluationLine(note('fait observable qui imposerait de revoir la décision'))}`,
     '',
   ].join('\n');
 }
@@ -140,11 +133,6 @@ async function withLock<Result>(repository: GitRepository, body: () => Promise<R
   }
 }
 
-const numberOf = (name: string): number | null => {
-  const digits = NUMBERED_NAME.exec(name.split('/').at(-1) ?? '')?.groups?.['number'];
-  return digits === undefined ? null : Number(digits);
-};
-
 async function directoryNames(directory: string): Promise<readonly string[]> {
   try {
     return await readdir(directory);
@@ -158,14 +146,14 @@ async function directoryNames(directory: string): Promise<readonly string[]> {
  * number is never given twice, even to an ADR deleted or waiting on another branch.
  */
 export async function nextNumber(repository: GitRepository): Promise<AdrNumber> {
-  const names: string[] = [];
+  const paths: string[] = [];
   for (const root of new Set([repository.root, ...(await worktreeRoots(repository))])) {
-    names.push(...(await directoryNames(join(root, ADR_DIRECTORY))));
+    paths.push(...(await directoryNames(join(root, ADR_DIRECTORY))).map((name) => `${ADR_DIRECTORY}/${name}`));
   }
   const logged = await git(repository, ['log', '--all', '--format=', '--name-only', '-z', '--', ADR_DIRECTORY]);
-  names.push(...logged.split('\0').map((entry) => entry.trim()));
-  const numbers = names.flatMap((name) => {
-    const number = numberOf(name);
+  paths.push(...logged.split('\0').map((entry) => entry.trim()));
+  const numbers = paths.flatMap((path) => {
+    const number = numberOfPath(path);
     return number === null ? [] : [number];
   });
   return adrNumber(numbers.length === 0 ? 0 : Math.max(...numbers) + 1);
@@ -184,13 +172,13 @@ export type CreationRequest = Readonly<{
 
 /** Checks the title, allocates a number under the lock and writes a formatted skeleton. */
 export async function createAdr(request: CreationRequest): Promise<Creation> {
-  const problems = titleProblems(request.title, request.spec);
-  if (problems.length > 0) {
-    throw new Error(`Titre refusé : ${problems.join(' ; ')}`);
+  const title = readTitleArgument(request.title, request.spec);
+  if (title.problems.length > 0) {
+    throw new Error(`Titre refusé : ${title.problems.join(' ; ')}`);
   }
   return withLock(request.repository, async () => {
     const number = await nextNumber(request.repository);
-    const path = adrPath(number, slugify(request.title));
+    const path = adrPath(number, title.slug);
     const content = await request.format(path, skeleton(request.spec, request.title, request.significance));
     await mkdir(join(request.repository.root, ADR_DIRECTORY), { recursive: true });
     await writeFile(join(request.repository.root, path), content, { encoding: 'utf8', flag: 'wx' });

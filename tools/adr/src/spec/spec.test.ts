@@ -2,7 +2,7 @@ import { expect, expectTypeOf, test } from 'vitest';
 import { CHECK_CODES, checkMessage, CHECKS } from './checks.ts';
 import { FORMAT_REGISTRY } from './formats/registry.ts';
 import type { SectionKey } from './formats/types.ts';
-import { SECTION_KEYS } from './formats/types.ts';
+import { RULE_LEVELS, SECTION_KEYS } from './formats/types.ts';
 import { FORMAT_1 } from './formats/v1.ts';
 
 test('format 1 lists every section exactly once', () => {
@@ -10,13 +10,27 @@ test('format 1 lists every section exactly once', () => {
   expect(FORMAT_1.sections.map((section) => section.key).toSorted()).toEqual([...SECTION_KEYS].toSorted());
 });
 
-test('published formats have distinct versions and the latest is published', () => {
+test('formats have increasing versions, the latest is the last, and a format cannot be changed at run time', () => {
   const versions = FORMAT_REGISTRY.formats.map((format) => format.version);
+  expect(versions).toEqual(versions.toSorted((left, right) => left - right));
   expect(new Set(versions).size).toBe(versions.length);
-  expect(FORMAT_REGISTRY.formats).toContain(FORMAT_REGISTRY.latest);
+  expect(FORMAT_REGISTRY.formats.at(-1)).toBe(FORMAT_REGISTRY.latest);
+  expect(Object.isFrozen(FORMAT_1.limits)).toBe(true);
+  expect(Reflect.set(FORMAT_1.limits, 'words', 1)).toBe(false);
 });
 
-test('every message placeholder is a word and every code is namespaced', () => {
+test('every keyword level has its singular and plural forms, and the negative forms read NE verb PAS', () => {
+  for (const format of FORMAT_REGISTRY.formats) {
+    for (const level of RULE_LEVELS) {
+      expect(format.keywords[level].forms).toHaveLength(2);
+    }
+    format.keywords.mustNot.forms.forEach((negative, number) => {
+      expect(negative).toBe(`NE ${format.keywords.must.forms[number] ?? ''} PAS`);
+    });
+  }
+});
+
+test('every code is namespaced, and every message renders once its placeholders are filled', () => {
   for (const code of CHECK_CODES) {
     expect(code).toMatch(/^adr\/[a-z0-9]+(?:-[a-z0-9]+)*$/u);
     expect(CHECKS[code].message.replaceAll(/\{\w+\}/gu, '')).not.toMatch(/[{}]/u);

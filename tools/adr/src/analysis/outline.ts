@@ -16,6 +16,10 @@ type MutableSection = { heading: Heading; title: string; blocks: RootContent[]; 
 
 type MutableSubsection = { heading: Heading; title: string; blocks: RootContent[] };
 
+/** Titles as a message lists them; `aucune` when there is none. */
+export const listedTitles = (titles: readonly string[]): string | readonly string[] =>
+  titles.length === 0 ? 'aucune' : titles;
+
 /** The title heading and the level 2 sections of a body, with the structural findings on the way. */
 export function outline(
   nodes: readonly RootContent[],
@@ -72,7 +76,7 @@ export function mapSections(
   const mismatch = expected.findIndex((title, index) => found[index] !== title);
   if (mismatch !== -1 || found.length !== expected.length) {
     const at = sections[mismatch === -1 ? expected.length : mismatch]?.heading ?? anchor;
-    report('adr/section-order', at, { found, expected });
+    report('adr/section-order', at, { found: listedTitles(found), expected });
     return null;
   }
   const byKey = new Map(spec.sections.map((definition, index) => [definition.key, sections[index]] as const));
@@ -104,10 +108,7 @@ export function mapSections(
     report(
       'adr/section-consequences',
       result.decision.subsections[1]?.heading ?? result.decision.subsections[0]?.heading ?? result.decision.heading,
-      {
-        found: decisionSubsections,
-        expected: spec.consequences,
-      },
+      { found: listedTitles(decisionSubsections), expected: spec.consequences },
     );
   }
   const [stray] = result.prosAndCons.blocks;
@@ -119,6 +120,12 @@ export function mapSections(
 
 const TITLE_CONTENT = new Set(['text', 'inlineCode']);
 
+/** Text of a title heading and the slug of its file name: the analysis and `adr:new` read titles the same way. */
+export const titleText = (heading: Heading): Readonly<{ text: string; slug: string }> => {
+  const text = plainText(heading, 'keep');
+  return { text, slug: slugify(text) };
+};
+
 /** The title text, with its shape checked and the file name compared with its slug. */
 export function readTitle(
   heading: Heading,
@@ -129,9 +136,8 @@ export function readTitle(
   if (!heading.children.every((child) => TITLE_CONTENT.has(child.type))) {
     report('adr/title-rich', heading, {});
   }
-  const title = plainText(heading, 'keep');
+  const { text: title, slug } = titleText(heading);
   const prose = plainText(heading, 'mask');
-  const slug = slugify(title);
   const length = Array.from(title).length;
   if (slug === '') {
     report('adr/title-no-letter', heading, {});
@@ -142,7 +148,7 @@ export function readTitle(
   for (const character of spec.title.forbiddenCharacters.filter((candidate) => prose.includes(candidate))) {
     report('adr/title-forbidden-character', heading, { character });
   }
-  const last = Array.from(title).at(-1);
+  const last = Array.from(prose).at(-1);
   if (last !== undefined && spec.title.finalPunctuation.includes(last)) {
     report('adr/title-final-punctuation', heading, { character: last });
   }
@@ -174,12 +180,12 @@ export type Labelled = Readonly<{ number: number; paragraph: Paragraph; item: Li
 /** Items labelled `**P1** — text`, `**P2** — text`… in order; the items whose label is wrong are passed to `onWrong`. */
 export function readLabelledItems(
   items: readonly ListItem[],
-  prefix: string,
+  labelOf: (number: number) => string,
   labelledText: (text: string, label: string) => string | null,
   onWrong: (item: ListItem, label: string) => void,
 ): readonly Labelled[] | null {
   const labelled = items.flatMap((item, index): Labelled[] => {
-    const label = `${prefix}${String(index + 1)}`;
+    const label = labelOf(index + 1);
     const paragraph = singleParagraph(item);
     const [first] = paragraph?.children ?? [];
     if (

@@ -102,7 +102,7 @@ export function renderIndexPage(model: IndexModel): string {
         `[${formatAdrId(document.number)}](${fileName(document)})`,
         document.kind === 'readable' ? cell(document.title) : 'illisible',
         statusCell(model.statuses.get(document.number), byNumber),
-        document.kind === 'readable' ? document.frontMatter.significance.map(code).join(', ') : '',
+        document.kind === 'readable' ? document.header.significance.map(code).join(', ') : '',
       ]),
     ),
     '',

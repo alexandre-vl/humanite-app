@@ -86,11 +86,7 @@ async function judgeFile(tool: string, input: JsonObject, cwd: string, context: 
     return ALLOW;
   }
   const before = await context.readFile(absolute);
-  const after = await contentAfter(tool, input, async () => Promise.resolve(before));
-  if (after === null) {
-    return before === null ? ALLOW : judgeAdrWrite(before, before);
-  }
-  return judgeAdrWrite(before, after);
+  return judgeAdrWrite(before, await contentAfter(tool, input, async () => Promise.resolve(before)));
 }
 
 /**

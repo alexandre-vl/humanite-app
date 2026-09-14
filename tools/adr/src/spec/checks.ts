@@ -1,9 +1,5 @@
-import type { Diagnostic, Position } from '@huma/kit/diagnostics';
-import { diagnostic, START } from '@huma/kit/diagnostics';
-import type { MessageDetails } from '@huma/kit/messages';
-import { renderMessage } from '@huma/kit/messages';
-import type { RepoPath } from '@huma/kit/paths';
-import { keysOf } from '@huma/kit/records';
+import type { CheckDetailsOf } from '@huma/kit/checks';
+import { defineChecks } from '@huma/kit/checks';
 
 /**
  * Every finding `adr:check` can report, one code per rule. A message says what was found, then what is expected;
@@ -59,7 +55,7 @@ export const CHECKS = {
   'adr/frontmatter-format-unknown': {
     scope: 'file',
     summary: 'version de format connue',
-    message: 'format {found} inconnu : formats publiés {known}',
+    message: 'format {found} : versions connues {known}',
   },
   'adr/frontmatter-format-outdated': {
     scope: 'file',
@@ -84,7 +80,7 @@ export const CHECKS = {
   },
   'adr/markdown-heading-depth': {
     scope: 'file',
-    summary: 'titres de trois niveaux au plus',
+    summary: 'titres limités à la profondeur du format',
     message: 'titre de niveau {depth} : {max} niveaux au plus',
   },
   'adr/markdown-task-list': {
@@ -100,7 +96,7 @@ export const CHECKS = {
   'adr/markdown-indented-code': {
     scope: 'file',
     summary: 'blocs de code clôturés',
-    message: 'bloc de code indenté : le clôturer par ```',
+    message: 'bloc de code indenté : le clôturer par {fence}',
   },
   'adr/markdown-code-language': {
     scope: 'file',
@@ -140,7 +136,7 @@ export const CHECKS = {
   },
   'adr/title-forbidden-character': {
     scope: 'file',
-    summary: 'titre sans deux-points : un groupe nominal',
+    summary: 'titre sans caractère refusé : un groupe nominal',
     message: 'titre avec « {character} » : un groupe nominal qui énonce la décision',
   },
   'adr/title-final-punctuation': {
@@ -166,12 +162,12 @@ export const CHECKS = {
   },
   'adr/section-subsection': {
     scope: 'file',
-    summary: 'sous-sections seulement dans Décision et Avantages et inconvénients des options',
+    summary: 'sous-sections seulement dans les sections qui en prévoient',
     message: 'sous-section « {subsection} » dans « {section} » : cette section n’en a pas',
   },
   'adr/section-consequences': {
     scope: 'file',
-    summary: 'une seule sous-section Conséquences dans Décision',
+    summary: 'la décision a pour seule sous-section ses conséquences',
     message: 'sous-sections de la décision {found} : une seule, « {expected} »',
   },
   'adr/section-pros-and-cons-text': {
@@ -188,7 +184,7 @@ export const CHECKS = {
   'adr/context-question-shape': {
     scope: 'file',
     summary: 'une seule question, terminée par un point d’interrogation',
-    message: 'paragraphe final qui n’est pas une question unique : une seule phrase terminée par « ? »',
+    message: 'paragraphe final qui n’est pas une question unique : une seule phrase terminée par « {questionMark} »',
   },
   'adr/context-facts-missing': {
     scope: 'file',
@@ -218,8 +214,8 @@ export const CHECKS = {
   },
   'adr/criteria-label': {
     scope: 'file',
-    summary: 'critères numérotés C1 à Cn sans trou',
-    message: 'puce de critère mal libellée : **{label}**{separator}texte',
+    summary: 'critères numérotés à partir de 1, sans trou',
+    message: 'puce de critère mal libellée : {line}',
   },
 
   'adr/options-list': {
@@ -230,7 +226,7 @@ export const CHECKS = {
   'adr/options-name': {
     scope: 'file',
     summary: 'une option est un nom seul',
-    message: 'option qui n’est pas un nom seul : un paragraphe, sans guillemets « »',
+    message: 'option qui n’est pas un nom seul : un paragraphe, sans les guillemets de l’option retenue',
   },
   'adr/options-duplicate': {
     scope: 'file',
@@ -239,7 +235,7 @@ export const CHECKS = {
   },
   'adr/options-too-few': {
     scope: 'file',
-    summary: 'au moins deux options étudiées',
+    summary: 'assez d’options étudiées',
     message: 'options étudiées au nombre de {count} : au moins {min}',
   },
   'adr/options-subsections': {
@@ -266,12 +262,12 @@ export const CHECKS = {
   'adr/decision-rules-missing': {
     scope: 'file',
     summary: 'liste des règles après l’option retenue',
-    message: 'aucune liste de règles après l’option retenue : lister **{label}**{separator}…',
+    message: 'aucune liste de règles après l’option retenue : lister {line}',
   },
   'adr/decision-rule-label': {
     scope: 'file',
-    summary: 'règles numérotées R1 à Rn sans trou',
-    message: 'puce de règle mal libellée : **{label}**{separator}texte',
+    summary: 'règles numérotées à partir de 1, sans trou',
+    message: 'puce de règle mal libellée : {line}',
   },
   'adr/decision-trailing-block': {
     scope: 'file',
@@ -291,7 +287,7 @@ export const CHECKS = {
   },
   'adr/keyword-negation': {
     scope: 'file',
-    summary: 'négation tout en capitales',
+    summary: 'négation seulement sous la forme exacte du format',
     message: 'négation « {text} » : écrire {expected}',
   },
   'adr/keyword-count': {
@@ -333,23 +329,23 @@ export const CHECKS = {
 
   'adr/citation-malformed': {
     scope: 'file',
-    summary: 'citations écrites (C1) ou (C1, C2)',
-    message: 'citation « {text} » : écrire (C1) ou (C1, C2)',
+    summary: 'citations de critères bien écrites',
+    message: 'citation « {text} » : écrire {example}',
   },
   'adr/citation-unknown': {
     scope: 'file',
     summary: 'chaque critère cité existe',
-    message: 'critère {label} cité mais inexistant : de C1 à {last}',
+    message: 'critère {label} cité mais inexistant : de {first} à {last}',
   },
   'adr/citation-chosen-missing': {
     scope: 'file',
     summary: 'l’option retenue cite un critère',
-    message: 'justification de l’option retenue sans critère cité : citer (Cn)',
+    message: 'justification de l’option retenue sans critère cité : citer {example}',
   },
   'adr/citation-argument-missing': {
     scope: 'file',
     summary: 'chaque argument cite un critère',
-    message: 'argument sans critère cité : citer (Cn)',
+    message: 'argument sans critère cité : citer {example}',
   },
   'adr/citation-criterion-unused': {
     scope: 'file',
@@ -365,7 +361,7 @@ export const CHECKS = {
   'adr/reevaluation-count': {
     scope: 'file',
     summary: 'exactement un déclencheur de réévaluation',
-    message: 'puces « {label} : » au nombre de {count} : exactement une, avec un fait observable',
+    message: 'puces « {label} » au nombre de {count} : exactement une, avec un fait observable',
   },
 
   'adr/words-limit': {
@@ -376,13 +372,18 @@ export const CHECKS = {
 
   'adr/link-scheme': {
     scope: 'file',
-    summary: 'liens externes en https',
-    message: 'lien {url} : adresse https attendue',
+    summary: 'liens externes avec un protocole du format',
+    message: 'lien {url} : adresse absolue attendue, protocole {schemes}',
   },
   'adr/link-malformed': {
     scope: 'file',
     summary: 'liens relatifs bien encodés',
     message: 'lien {url} mal encodé : corriger ses séquences %',
+  },
+  'adr/link-empty': {
+    scope: 'file',
+    summary: 'chaque lien a une adresse',
+    message: 'lien « {text} » sans adresse : écrire son adresse ou retirer le lien',
   },
   'adr/mention-malformed': {
     scope: 'file',
@@ -540,7 +541,7 @@ export const CHECKS = {
   'adr/accept-proof-failing': {
     scope: 'history',
     summary: 'une acceptation a des preuves qui passent',
-    message: '{id} passe à accepted mais sa preuve {proof} échoue',
+    message: '{id} accepté dans l’index mais sa preuve {proof} échoue',
   },
   'adr/decision-by-agent': {
     scope: 'history',
@@ -554,25 +555,20 @@ export const CHECKS = {
   },
 } as const satisfies Readonly<Record<string, CheckDefinition>>;
 
+const ADR_CHECKS = defineChecks(CHECKS);
+
 export type CheckCode = keyof typeof CHECKS;
 
-export const CHECK_CODES: readonly CheckCode[] = keysOf(CHECKS);
+export const CHECK_CODES: readonly CheckCode[] = ADR_CHECKS.codes;
 
 export type ScopedCode<Scope extends CheckScope> = {
   [Code in CheckCode]: (typeof CHECKS)[Code]['scope'] extends Scope ? Code : never;
 }[CheckCode];
 
-/** Values of the `{name}` placeholders of a code's message; `{}` for a message without placeholder. */
-export type CheckDetails<Code extends CheckCode> = MessageDetails<(typeof CHECKS)[Code]['message']>;
+/** Values of the `{name}` placeholders of a code's message; none for a message without placeholder. */
+export type CheckDetails<Code extends CheckCode> = CheckDetailsOf<typeof CHECKS, Code>;
 
-export const checkMessage = <Code extends CheckCode>(code: Code, details: CheckDetails<Code>): string =>
-  renderMessage(code, CHECKS[code].message, details);
+export const checkMessage = ADR_CHECKS.message;
 
 /** A diagnostic of `code` with its message rendered. */
-export const finding = <Code extends CheckCode>(
-  code: Code,
-  path: RepoPath,
-  details: CheckDetails<Code>,
-  position: Position = START,
-  commit: string | null = null,
-): Diagnostic<Code> => diagnostic(code, path, position, checkMessage(code, details), commit);
+export const finding = ADR_CHECKS.finding;

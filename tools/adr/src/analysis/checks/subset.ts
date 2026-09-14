@@ -6,6 +6,7 @@ import type { FileReport } from '../report.ts';
 /** Markdown elements, heading depths, fences and code languages allowed by the format. */
 export function checkMarkdownSubset(tree: Root, source: string, spec: FormatSpec, report: FileReport): void {
   const allowed = new Set<string>(spec.markdown.nodes);
+  const [fence = ''] = spec.markdown.fences;
   for (const node of walk(tree)) {
     if (!allowed.has(node.type)) {
       report('adr/markdown-node', node, { node: node.type });
@@ -17,9 +18,8 @@ export function checkMarkdownSubset(tree: Root, source: string, spec: FormatSpec
       report('adr/markdown-link-title', node, {});
     } else if (node.type === 'code') {
       const offset = node.position?.start.offset ?? 0;
-      const fenced = spec.markdown.fences.some((fence) => source.startsWith(fence, offset));
-      if (!fenced) {
-        report('adr/markdown-indented-code', node, {});
+      if (!spec.markdown.fences.some((candidate) => source.startsWith(candidate, offset))) {
+        report('adr/markdown-indented-code', node, { fence });
       } else if (typeof node.lang !== 'string' || node.lang === '') {
         report('adr/markdown-code-language', node, {});
       }

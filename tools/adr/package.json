@@ -31,6 +31,7 @@
     "mdast-util-gfm": "catalog:",
     "micromark-extension-frontmatter": "catalog:",
     "micromark-extension-gfm": "catalog:",
+    "prettier": "catalog:",
     "yaml": "catalog:",
     "zod": "catalog:"
   },

@@ -5,12 +5,13 @@ import type { AdrAnalysis } from '../analysis/analyze.ts';
 import { analyzeAdr } from '../analysis/analyze.ts';
 import type { AdrDocument } from '../model/document.ts';
 import type { AdrNumber } from '../model/identifiers.ts';
-import { adrNumber, formatAdrId } from '../model/identifiers.ts';
+import { formatAdrId } from '../model/identifiers.ts';
 import type { CheckCode, ScopedCode } from '../spec/checks.ts';
 import { finding } from '../spec/checks.ts';
 import type { FormatRegistry } from '../spec/formats/registry.ts';
 import { FORMAT_REGISTRY } from '../spec/formats/registry.ts';
-import { ADR_DIRECTORY, ADR_FILE_NAME, INDEX_FILE_NAME } from '../spec/layout.ts';
+import { classifyAdrPath } from '../model/paths.ts';
+import { ADR_DIRECTORY } from '../spec/layout.ts';
 import type { EffectiveStatus } from '../spec/statuses.ts';
 import { STATUS_LABELS } from '../spec/statuses.ts';
 import type { Snapshot } from './snapshot.ts';
@@ -32,18 +33,16 @@ export function readCollection(snapshot: Snapshot, registry: FormatRegistry = FO
       diagnostics.push(finding('adr/path-directory', path, {}));
       continue;
     }
-    if (entry.name === INDEX_FILE_NAME) {
+    const classified = classifyAdrPath(path);
+    if (classified.kind === 'index') {
       continue;
     }
-    const match = ADR_FILE_NAME.exec(entry.name)?.groups;
-    const number = match?.['number'];
-    const slug = match?.['slug'];
-    if (number === undefined || slug === undefined) {
+    if (classified.kind !== 'adr') {
       diagnostics.push(finding('adr/path-name', path, {}));
       continue;
     }
     const analysis: AdrAnalysis = analyzeAdr(
-      { path, number: adrNumber(Number(number)), slug, bytes: entry.bytes },
+      { path, number: classified.number, slug: classified.slug, bytes: entry.bytes },
       registry,
     );
     diagnostics.push(...analysis.diagnostics);
@@ -57,14 +56,14 @@ export function effectiveStatuses(documents: readonly AdrDocument[]): ReadonlyMa
   const statuses = new Map<AdrNumber, EffectiveStatus>();
   for (const document of documents) {
     if (document.kind === 'readable') {
-      statuses.set(document.number, { kind: document.frontMatter.status });
+      statuses.set(document.number, { kind: document.header.status });
     }
   }
   for (const successor of documents) {
-    if (successor.kind !== 'readable' || successor.frontMatter.status !== 'accepted') {
+    if (successor.kind !== 'readable' || successor.header.status !== 'accepted') {
       continue;
     }
-    for (const target of successor.frontMatter.supersedes) {
+    for (const target of successor.header.supersedes) {
       if (statuses.get(target)?.kind === 'accepted') {
         statuses.set(target, { kind: 'superseded', by: successor.number });
       }
@@ -100,21 +99,21 @@ export function checkReferences(documents: readonly AdrDocument[]): readonly Dia
     if (document.kind !== 'readable') {
       continue;
     }
-    for (const target of document.frontMatter.supersedes) {
+    for (const target of document.header.supersedes) {
       const id = formatAdrId(target);
       const replaced = byNumber.get(target);
       if (replaced === undefined) {
         diagnostics.push(finding('adr/supersedes-unknown', document.path, { id }));
       } else if (target >= document.number) {
         diagnostics.push(finding('adr/supersedes-newer', document.path, { id }));
-      } else if (replaced.kind === 'readable' && replaced.frontMatter.status !== 'accepted') {
+      } else if (replaced.kind === 'readable' && replaced.header.status !== 'accepted') {
         diagnostics.push(
           finding('adr/supersedes-not-accepted', document.path, {
             id,
-            status: STATUS_LABELS[replaced.frontMatter.status],
+            status: STATUS_LABELS[replaced.header.status],
           }),
         );
-      } else if (document.frontMatter.status === 'accepted') {
+      } else if (document.header.status === 'accepted') {
         acceptedSuccessors.set(target, [...(acceptedSuccessors.get(target) ?? []), document.number]);
       }
     }
@@ -143,8 +142,7 @@ export function checkLinkTargets(
   }
   return documents.flatMap((document) =>
     document.links.flatMap((link) => {
-      const target = link.target?.replace(/\/$/u, '') ?? null;
-      if (target === null || paths.has(target) || directories.has(target)) {
+      if (link.target.kind !== 'repository' || paths.has(link.target.path) || directories.has(link.target.path)) {
         return [];
       }
       return [finding('adr/link-target-missing', document.path, { url: link.url }, link.position)];

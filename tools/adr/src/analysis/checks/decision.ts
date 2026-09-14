@@ -44,13 +44,12 @@ export function readDecision(context: BodyContext, options: readonly string[] | 
         ruleParagraphs.add(paragraph);
       }
     }
-    rules = readLabelledItems(rulesBlock.children, spec.labels.rulePrefix, grammar.labelledText, (item, label) => {
-      report('adr/decision-rule-label', item, { label, separator: spec.labels.separator });
+    rules = readLabelledItems(rulesBlock.children, grammar.ruleLabel, grammar.labelledText, (item, label) => {
+      report('adr/decision-rule-label', item, { line: grammar.labelledLine(label, 'texte') });
     });
   } else {
     report('adr/decision-rules-missing', rulesBlock ?? first ?? section.heading, {
-      label: `${spec.labels.rulePrefix}1`,
-      separator: spec.labels.separator,
+      line: grammar.labelledLine(grammar.ruleLabel(1), '…'),
     });
   }
   for (const block of rest) {

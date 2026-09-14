@@ -9,7 +9,7 @@ import type { Environment } from '@huma/kit/process';
 import type { RepoPath } from '@huma/kit/paths';
 import { agentSessionMarkers } from '@huma/kit/session';
 import { analyzeAdr } from '../analysis/analyze.ts';
-import { frontMatterBlock } from '../analysis/frontmatter.ts';
+import { readCanonicalHeader, renderHeader } from '../model/header.ts';
 import type { BindingsSource, ProofRunner } from '../model/bindings.ts';
 import { proofsOf } from '../model/bindings.ts';
 import type { AdrNumber } from '../model/identifiers.ts';
@@ -71,17 +71,17 @@ export async function decide(request: DecisionRequest): Promise<DecisionOutcome>
   if (document.kind !== 'readable') {
     return refused(`${id} illisible`);
   }
-  if (document.frontMatter.status !== 'proposed') {
-    return refused(`${id} est déjà ${document.frontMatter.status} : un ADR décidé ne change plus`);
+  if (document.header.status !== 'proposed') {
+    return refused(`${id} est déjà ${document.header.status} : un ADR décidé ne change plus`);
   }
 
   const absolute = join(request.repository.root, document.path);
   const text = await readFile(absolute, 'utf8');
-  const currentBlock = frontMatterBlock(document.frontMatter);
-  if (!text.startsWith(currentBlock)) {
+  const canonical = readCanonicalHeader(text);
+  if (canonical === null) {
     return refused(`${id} : en-tête non canonique`);
   }
-  const decidedText = `${frontMatterBlock({ ...document.frontMatter, status: request.status })}${text.slice(currentBlock.length)}`;
+  const decidedText = `${renderHeader({ ...canonical.header, status: request.status })}${text.slice(canonical.length)}`;
   const decided = analyzeAdr({
     path: document.path,
     number: document.number,

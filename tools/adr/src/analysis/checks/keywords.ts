@@ -5,10 +5,10 @@ import { textSpan, walk } from '../markdown.ts';
 
 /**
  * Capitalised BCP 14 keywords: exactly one in each rule, none elsewhere, never a forbidden modal word nor a negation
- * that mixes case. Returns the level of every rule paragraph that carries exactly one keyword.
+ * outside the exact negative forms. Returns the level of every rule paragraph that carries exactly one keyword.
  */
 export function checkKeywords(
-  { tree, grammar, report }: BodyContext,
+  { tree, source, grammar, report }: BodyContext,
   ruleParagraphs: ReadonlySet<Paragraph>,
 ): ReadonlyMap<Paragraph, RuleLevel> {
   const levels = new Map<Paragraph, RuleLevel>();
@@ -16,7 +16,7 @@ export function checkKeywords(
     if (node.type !== 'paragraph' && node.type !== 'heading' && node.type !== 'tableCell') {
       continue;
     }
-    const span = textSpan(node, 'mask');
+    const span = textSpan(node, 'mask', source);
     const scan = grammar.scanKeywords(span.text);
     for (const match of scan.forbidden) {
       report('adr/keyword-forbidden', span.locate(match.index), { word: match.text, keywords: grammar.keywordList });

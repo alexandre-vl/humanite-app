@@ -1,10 +1,11 @@
+import { deepFreeze } from '@huma/kit/records';
 import type { FormatSpec } from './types.ts';
 
 /**
- * Format 1: MADR 4.0.0 translated into French, every section required, rules stated with the BCP 14 keywords.
- * Published: an ADR decided in this format is checked against these values forever, so they never change.
+ * Format 1: MADR 4.0.0 translated into French, every section required, rules stated with the BCP 14 keywords. Once an
+ * ADR is decided in this format, a change of these values or of their reading that refuses it is a new format.
  */
-export const FORMAT_1 = {
+export const FORMAT_1 = deepFreeze({
   version: 1,
   sections: [
     { key: 'context', title: 'Contexte et problème' },
@@ -20,6 +21,7 @@ export const FORMAT_1 = {
     mustNot: { label: 'NE DOIT PAS', forms: ['NE DOIT PAS', 'NE DOIVENT PAS'], binding: true },
     may: { label: 'PEUT', forms: ['PEUT', 'PEUVENT'], binding: false },
   },
+  negation: { before: ['NE', 'N’', "N'"], after: ['PAS', 'JAMAIS', 'PLUS', 'POINT', 'RIEN'] },
   forbiddenWords: [
     'NE DEVRAIENT PAS',
     'NE DEVRAIT PAS',
@@ -84,9 +86,18 @@ export const FORMAT_1 = {
     becauseElided: 'parce qu’',
     chosenOption: 'Option retenue',
     reevaluation: 'Réévaluation',
-    separator: ' — ',
     criterionPrefix: 'C',
     rulePrefix: 'R',
+  },
+  punctuation: {
+    labelSeparator: ' — ',
+    colon: ' : ',
+    comma: ', ',
+    quoteOpen: '« ',
+    quoteClose: ' »',
+    citationOpen: '(',
+    citationClose: ')',
+    questionMark: '?',
   },
   title: { maxCodePoints: 60, forbiddenCharacters: [':'], finalPunctuation: ['.', '!', '?', ';', ',', '…'] },
   limits: { words: 900, minOptions: 2, maxSupersedes: 8, headingDepth: 3 },
@@ -110,4 +121,5 @@ export const FORMAT_1 = {
     ],
     fences: ['```', '~~~'],
   },
-} as const satisfies FormatSpec;
+  links: { schemes: ['https:'] },
+} as const satisfies FormatSpec);

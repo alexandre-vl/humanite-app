@@ -441,6 +441,24 @@ export const CHECK_FIXTURES = [
     ['adr/keyword-outside-rule'],
     inMemory(mutated('les types découlent du schéma', 'les types DOIT découler du schéma')),
   ),
+  define(
+    'adr/keyword-negation-may',
+    'une permission niée en minuscules',
+    ['adr/keyword-negation'],
+    inMemory(mutated('Un schéma PEUT être partagé', 'Un schéma ne PEUT pas être partagé')),
+  ),
+  define(
+    'adr/keyword-negation-without-ne',
+    'une négation sans « NE »',
+    ['adr/keyword-negation'],
+    inMemory(mutated('reçue DOIT être', 'reçue DOIT jamais être')),
+  ),
+  define(
+    'adr/keyword-forbidden-hyphenated',
+    'un FAUT-IL dans une conséquence',
+    ['adr/keyword-forbidden'],
+    inMemory(mutated('les types découlent du schéma', 'les types découlent du schéma, FAUT-IL le rappeler')),
+  ),
 
   define(
     'adr/argument-list',
@@ -551,6 +569,24 @@ export const CHECK_FIXTURES = [
     inMemory(mutated('sur [zod.dev](https://zod.dev).', 'sur [zod.dev](https://zod.dev) et [notes](caf%E9.md).')),
   ),
   define(
+    'adr/link-empty',
+    'un lien sans adresse',
+    ['adr/link-empty'],
+    inMemory(mutated('sur [zod.dev](https://zod.dev).', 'sur [zod.dev](https://zod.dev) et [la documentation]().')),
+  ),
+  define(
+    'adr/link-scheme-protocol-relative',
+    'une source sans protocole',
+    ['adr/link-scheme'],
+    inMemory(mutated('(https://zod.dev)', '(//zod.dev)')),
+  ),
+  define(
+    'adr/context-fact-fragment-only',
+    'une source réduite à une ancre',
+    ['adr/context-fact-unsourced'],
+    inMemory(mutated('(https://zod.dev)', '(#locale)')),
+  ),
+  define(
     'adr/mention-malformed',
     'une mention à cinq chiffres',
     ['adr/mention-malformed'],
@@ -585,6 +621,15 @@ export const CHECK_FIXTURES = [
         'sur [zod.dev](https://zod.dev) et [le journal](../spikes/absent.md).',
       ),
     ),
+  ),
+  define(
+    'adr/valid-root-link-target',
+    'un lien vers un fichier présent, relatif à la racine du dépôt',
+    [],
+    inMemory({
+      ...mutated('sur [zod.dev](https://zod.dev).', 'sur [le journal](/docs/spikes/journal.md).'),
+      'docs/spikes/journal.md': 'journal',
+    }),
   ),
   define(
     'adr/valid-link-target',
@@ -819,15 +864,11 @@ export const CHECK_FIXTURES = [
         Promise.resolve([{ code: 'adr/frozen-modified', commit: '0'.repeat(40), reason: 'fixture' }]),
     }),
   ),
-  define(
-    'adr/transition-forbidden',
-    'un ADR rejeté puis accepté',
-    ['adr/transition-forbidden', 'adr/frozen-modified'],
-    async () =>
-      checkHistoryFixture({
-        commits: [only(PROPOSED), only(adrDocument({ status: 'rejected' })), only(ACCEPTED)],
-        bindings: proven,
-      }),
+  define('adr/transition-forbidden', 'un ADR rejeté puis accepté', ['adr/transition-forbidden'], async () =>
+    checkHistoryFixture({
+      commits: [only(PROPOSED), only(adrDocument({ status: 'rejected' })), only(ACCEPTED)],
+      bindings: proven,
+    }),
   ),
   define(
     'adr/transition-uncommitted',

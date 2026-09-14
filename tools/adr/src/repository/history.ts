@@ -12,12 +12,13 @@ import type { Bindings, ProofRunner } from '../model/bindings.ts';
 import { proofsOf } from '../model/bindings.ts';
 import type { AdrDocument, ReadableAdr } from '../model/document.ts';
 import type { AdrNumber } from '../model/identifiers.ts';
-import { adrNumber, formatAdrId } from '../model/identifiers.ts';
+import { formatAdrId } from '../model/identifiers.ts';
 import type { CheckCode, ScopedCode } from '../spec/checks.ts';
 import { finding } from '../spec/checks.ts';
 import type { FormatRegistry } from '../spec/formats/registry.ts';
 import { FORMAT_REGISTRY } from '../spec/formats/registry.ts';
-import { ADR_DIRECTORY, ADR_FILE_NAME, NUMBERED_NAME } from '../spec/layout.ts';
+import { classifyAdrPath } from '../model/paths.ts';
+import { ADR_DIRECTORY } from '../spec/layout.ts';
 import type { Status } from '../spec/statuses.ts';
 import { canTransition, INITIAL_STATUS, isDecided, TRANSITIONS } from '../spec/statuses.ts';
 
@@ -37,23 +38,11 @@ const PROOF_CONCURRENCY = 4;
 const DIRECTORY = repoPath(ADR_DIRECTORY);
 
 function numberedFile(path: RepoPath): Readonly<{ number: AdrNumber; slug: string }> | null {
-  if (!path.startsWith(`${ADR_DIRECTORY}/`)) {
-    return null;
+  const classified = classifyAdrPath(path);
+  if (classified.kind === 'adr') {
+    return { number: classified.number, slug: classified.slug };
   }
-  const name = path.slice(ADR_DIRECTORY.length + 1);
-  if (name.includes('/')) {
-    return null;
-  }
-  const strict = ADR_FILE_NAME.exec(name)?.groups;
-  const loose = NUMBERED_NAME.exec(name)?.groups;
-  const digits = strict?.['number'] ?? loose?.['number'];
-  if (digits === undefined) {
-    return null;
-  }
-  return {
-    number: adrNumber(Number(digits)),
-    slug: strict?.['slug'] ?? name.slice(digits.length + 1).replace(/\.md$/u, ''),
-  };
+  return classified.kind === 'numbered' ? { number: classified.number, slug: '' } : null;
 }
 
 /** Every committed state of every ADR number along the first-parent chain of `HEAD`, oldest first. */
@@ -106,7 +95,7 @@ export async function committedStates(
 }
 
 const readableStatus = (state: AdrState): Status | null =>
-  state.kind === 'present' && state.document.kind === 'readable' ? state.document.frontMatter.status : null;
+  state.kind === 'present' && state.document.kind === 'readable' ? state.document.header.status : null;
 
 function checkTimeline(
   number: AdrNumber,
@@ -198,11 +187,11 @@ function stagedDecisions(
   committed: ReadonlyMap<AdrNumber, readonly CommittedState[]>,
 ): readonly ReadableAdr[] {
   return documents.flatMap((document) => {
-    if (document.kind !== 'readable' || !isDecided(document.frontMatter.status)) {
+    if (document.kind !== 'readable' || !isDecided(document.header.status)) {
       return [];
     }
     const last = committed.get(document.number)?.at(-1);
-    return last !== undefined && readableStatus(last.state) === document.frontMatter.status ? [] : [document];
+    return last !== undefined && readableStatus(last.state) === document.header.status ? [] : [document];
   });
 }
 
@@ -241,7 +230,7 @@ export async function checkHistory(input: HistoryInput): Promise<readonly Diagno
         );
       }
     }
-    const acceptances = staged.filter((document) => document.frontMatter.status === 'accepted');
+    const acceptances = staged.filter((document) => document.header.status === 'accepted');
     for (const document of acceptances) {
       const id = formatAdrId(document.number);
       const proofs = proofsOf(input.bindings[id]);

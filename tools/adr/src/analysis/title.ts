@@ -2,12 +2,18 @@ import { checkMessage } from '../spec/checks.ts';
 import type { FormatSpec } from '../spec/formats/types.ts';
 import { decodeSource } from './encoding.ts';
 import { parseMarkdown } from './markdown.ts';
-import { readTitle } from './outline.ts';
+import { readTitle, titleText } from './outline.ts';
 import type { FileReport } from './report.ts';
-import { slugify } from './slug.ts';
 
-/** Messages of the title rules of `spec` that `title` breaks, before any file is written. */
-export function titleProblems(title: string, spec: FormatSpec): readonly string[] {
+export type TitleReading = Readonly<{
+  /** Messages of the title rules of the format that the title breaks. */
+  problems: readonly string[];
+  /** Slug of the file name, as the analysis derives it from the title. */
+  slug: string;
+}>;
+
+/** How a title typed on the command line reads as the title heading of an ADR, before any file is written. */
+export function readTitleArgument(title: string, spec: FormatSpec): TitleReading {
   const problems: string[] = [];
   const report: FileReport = (code, at, details) => {
     problems.push(checkMessage(code, details));
@@ -16,8 +22,9 @@ export function titleProblems(title: string, spec: FormatSpec): readonly string[
   const [heading] = parseMarkdown(`# ${text ?? title}\n`).children;
   if (heading?.type !== 'heading' || heading.depth !== 1 || text === null || text.includes('\n')) {
     problems.push(checkMessage('adr/title-missing', {}));
-    return problems;
+    return { problems, slug: '' };
   }
-  readTitle(heading, { slug: slugify(title), expectedName: (slug) => slug }, spec, report);
-  return problems;
+  const { slug } = titleText(heading);
+  readTitle(heading, { slug, expectedName: (expected) => expected }, spec, report);
+  return { problems, slug };
 }

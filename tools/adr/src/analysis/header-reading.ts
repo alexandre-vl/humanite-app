@@ -1,57 +1,60 @@
 import type { Position } from '@huma/kit/diagnostics';
 import type { Yaml } from 'mdast';
-import type { Document, YAMLError } from 'yaml';
+import type { Document, ErrorCode, YAMLError } from 'yaml';
 import { isMap, isScalar, LineCounter, parseDocument } from 'yaml';
 import { z } from 'zod';
-import type { AdrNumber } from '../model/identifiers.ts';
-import { formatAdrId, parseAdrId } from '../model/identifiers.ts';
-import type { FormatSpec } from '../spec/formats/types.ts';
+import type { Header } from '../model/header.ts';
+import { HEADER_DELIMITER, headerLines, renderHeader } from '../model/header.ts';
+import { parseAdrId } from '../model/identifiers.ts';
 import type { FormatRegistry } from '../spec/formats/registry.ts';
 import { formatSpec } from '../spec/formats/registry.ts';
-import type { Significance } from '../spec/significance.ts';
+import type { FormatSpec } from '../spec/formats/types.ts';
 import { SIGNIFICANCES } from '../spec/significance.ts';
-import type { Status } from '../spec/statuses.ts';
-import { STATUSES } from '../spec/statuses.ts';
-import type { FileReport } from './report.ts';
+import { INITIAL_STATUS, STATUSES } from '../spec/statuses.ts';
 import { positionOf } from './markdown.ts';
+import type { FileReport } from './report.ts';
 
-export type FrontMatter = Readonly<{
-  format: number;
-  status: Status;
-  /** In canonical order, without duplicates. */
-  significance: readonly Significance[];
-  /** Older ADRs this one replaces once accepted, ascending; empty when the field is absent. */
-  supersedes: readonly AdrNumber[];
-}>;
-
-/** The only accepted spelling of a front matter: fixed key order, flow sequences in canonical order, no comment. */
-export function serializeFrontMatter(frontMatter: FrontMatter): string {
-  const significance = SIGNIFICANCES.filter((key) => frontMatter.significance.includes(key));
-  const supersedes = [...new Set(frontMatter.supersedes)].toSorted((left, right) => left - right).map(formatAdrId);
-  return [
-    `format: ${String(frontMatter.format)}`,
-    `status: ${frontMatter.status}`,
-    `significance: [${significance.join(', ')}]`,
-    ...(supersedes.length === 0 ? [] : [`supersedes: [${supersedes.join(', ')}]`]),
-  ].join('\n');
-}
-
-export const frontMatterBlock = (frontMatter: FrontMatter): string =>
-  `---\n${serializeFrontMatter(frontMatter)}\n---\n`;
-
-export type FrontMatterReading =
+export type HeaderReading =
   /** No usable header: the body is still checked against the latest format. */
-  | Readonly<{ kind: 'unreadable'; spec: FormatSpec }>
-  | Readonly<{ kind: 'readable'; spec: FormatSpec; frontMatter: FrontMatter }>;
+  Readonly<{ kind: 'unreadable'; spec: FormatSpec }> | Readonly<{ kind: 'readable'; spec: FormatSpec; header: Header }>;
+
+/** What each problem the YAML reader reports means, in the words of the messages. */
+const YAML_PROBLEMS = {
+  ALIAS_PROPS: 'propriétés sur un alias',
+  BAD_ALIAS: 'alias invalide',
+  BAD_COLLECTION_TYPE: 'type de collection invalide',
+  BAD_DIRECTIVE: 'directive invalide',
+  BAD_DQ_ESCAPE: 'échappement invalide entre guillemets doubles',
+  BAD_INDENT: 'indentation incohérente',
+  BAD_PROP_ORDER: 'ancre et étiquette dans le mauvais ordre',
+  BAD_SCALAR_START: 'valeur qui commence par un caractère réservé',
+  BLOCK_AS_IMPLICIT_KEY: 'bloc utilisé comme clé implicite',
+  BLOCK_IN_FLOW: 'bloc dans une collection en ligne',
+  DUPLICATE_KEY: 'clé en double',
+  IMPOSSIBLE: 'lecture impossible',
+  KEY_OVER_1024_CHARS: 'clé de plus de 1024 caractères',
+  MISSING_CHAR: 'caractère manquant',
+  MULTILINE_IMPLICIT_KEY: 'clé implicite sur plusieurs lignes',
+  MULTIPLE_ANCHORS: 'plusieurs ancres sur un nœud',
+  MULTIPLE_DOCS: 'plusieurs documents',
+  MULTIPLE_TAGS: 'plusieurs étiquettes sur un nœud',
+  NON_STRING_KEY: 'clé qui n’est pas une chaîne',
+  RESOURCE_EXHAUSTION: 'document trop coûteux à lire',
+  TAB_AS_INDENT: 'tabulation en guise d’indentation',
+  TAG_RESOLVE_FAILED: 'étiquette inconnue',
+  UNEXPECTED_TOKEN: 'élément inattendu',
+} as const satisfies Readonly<Record<ErrorCode, string>>;
+
+const ALIAS_PROBLEM = 'alias interdit';
 
 const french = z.locales.fr().localeError;
 
 /** The header as the schema reads it, before `supersedes` identifiers become numbers. */
-type ParsedFrontMatter = Readonly<Omit<FrontMatter, 'supersedes'> & { supersedes: readonly string[] }>;
+type ParsedHeader = Readonly<Omit<Header, 'supersedes'> & { supersedes: readonly string[] }>;
 
-const schemaCache = new WeakMap<FormatSpec, z.ZodType<ParsedFrontMatter>>();
+const schemaCache = new WeakMap<FormatSpec, z.ZodType<ParsedHeader>>();
 
-function schemaOf(spec: FormatSpec): z.ZodType<ParsedFrontMatter> {
+function schemaOf(spec: FormatSpec): z.ZodType<ParsedHeader> {
   const cached = schemaCache.get(spec);
   if (cached !== undefined) {
     return cached;
@@ -80,8 +83,6 @@ function locate(node: Yaml, lineCounter: LineCounter, offset: number): Position 
   return { line: positionOf(node).line + line, column: col };
 }
 
-const firstLine = (error: YAMLError): string => error.message.split('\n', 1)[0] ?? error.code;
-
 function keyOffset(document: Document, key: PropertyKey | undefined): number | null {
   if (typeof key !== 'string' || !isMap(document.contents)) {
     return null;
@@ -91,13 +92,17 @@ function keyOffset(document: Document, key: PropertyKey | undefined): number | n
 }
 
 const describePath = (path: readonly PropertyKey[]): string =>
-  path.map((key) => (typeof key === 'number' ? `[${String(key)}]` : String(key))).join('.');
+  path
+    .map((key, index) => (typeof key === 'number' ? `[${String(key)}]` : `${index === 0 ? '' : '.'}${String(key)}`))
+    .join('');
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const problemOf = (error: YAMLError): string => YAML_PROBLEMS[error.code];
+
 /** Reads the header of an ADR: YAML, then format version, then the schema of that version, then canonical form. */
-export function readFrontMatter(node: Yaml, registry: FormatRegistry, report: FileReport): FrontMatterReading {
+export function readHeader(node: Yaml, registry: FormatRegistry, report: FileReport): HeaderReading {
   const latest = registry.latest;
   const lineCounter = new LineCounter();
   const document = parseDocument(node.value, {
@@ -110,7 +115,7 @@ export function readFrontMatter(node: Yaml, registry: FormatRegistry, report: Fi
   });
   const problems = [...document.errors, ...document.warnings];
   for (const problem of problems) {
-    report('adr/frontmatter-yaml', locate(node, lineCounter, problem.pos[0]), { problem: firstLine(problem) });
+    report('adr/frontmatter-yaml', locate(node, lineCounter, problem.pos[0]), { problem: problemOf(problem) });
   }
   if (problems.length > 0) {
     return { kind: 'unreadable', spec: latest };
@@ -119,7 +124,7 @@ export function readFrontMatter(node: Yaml, registry: FormatRegistry, report: Fi
   try {
     value = document.toJS({ maxAliasCount: 0 });
   } catch {
-    report('adr/frontmatter-yaml', positionOf(node), { problem: 'alias interdits' });
+    report('adr/frontmatter-yaml', positionOf(node), { problem: ALIAS_PROBLEM });
     return { kind: 'unreadable', spec: latest };
   }
   const version = isRecord(value) ? value['format'] : undefined;
@@ -127,7 +132,7 @@ export function readFrontMatter(node: Yaml, registry: FormatRegistry, report: Fi
   if (spec === null) {
     const offset = keyOffset(document, 'format');
     report('adr/frontmatter-format-unknown', offset === null ? positionOf(node) : locate(node, lineCounter, offset), {
-      found: version === undefined ? 'absent' : JSON.stringify(version),
+      found: version === undefined ? 'absent' : `« ${JSON.stringify(version)} »`,
       known: registry.formats.map((format) => format.version),
     });
     return { kind: 'unreadable', spec: latest };
@@ -143,19 +148,18 @@ export function readFrontMatter(node: Yaml, registry: FormatRegistry, report: Fi
     }
     return { kind: 'unreadable', spec };
   }
-  const frontMatter: FrontMatter = {
+  const header: Header = {
     ...parsed.data,
     supersedes: parsed.data.supersedes.flatMap((id) => {
       const number = parseAdrId(id);
       return number === null ? [] : [number];
     }),
   };
-  const canonical = serializeFrontMatter(frontMatter);
-  if (canonical !== node.value) {
-    report('adr/frontmatter-not-canonical', positionOf(node), { expected: canonical.replaceAll('\n', ' ⏎ ') });
+  if (renderHeader(header) !== `${HEADER_DELIMITER}\n${node.value}\n${HEADER_DELIMITER}\n`) {
+    report('adr/frontmatter-not-canonical', positionOf(node), { expected: headerLines(header).join(' ⏎ ') });
   }
-  if (frontMatter.status === 'proposed' && spec.version !== latest.version) {
+  if (header.status === INITIAL_STATUS && spec.version !== latest.version) {
     report('adr/frontmatter-format-outdated', positionOf(node), { found: spec.version, latest: latest.version });
   }
-  return { kind: 'readable', spec, frontMatter };
+  return { kind: 'readable', spec, header };
 }

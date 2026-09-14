@@ -1,25 +1,25 @@
 import type { Paragraph } from 'mdast';
 import type { BodyContext } from '../body.ts';
-import type { Grammar } from '../grammar.ts';
 import { plainText, walk } from '../markdown.ts';
 import { singleParagraph } from '../outline.ts';
+import { namesSource, readLink } from './references.ts';
 
-const isSourced = (paragraph: Paragraph, grammar: Grammar): boolean =>
+/** A fact names its source: a link a reader can follow, a command in inline code, or an ADR. */
+const isSourced = (paragraph: Paragraph, { directory, spec, grammar }: BodyContext): boolean =>
   [...walk(paragraph)].some(
-    (node) =>
-      node.type === 'link' ||
-      node.type === 'inlineCode' ||
-      (node.type === 'text' && grammar.scanMentions(node.value).valid.length > 0),
-  );
+    (node) => node.type === 'inlineCode' || (node.type === 'link' && namesSource(readLink(node.url, directory, spec))),
+  ) || grammar.scanMentions(plainText(paragraph, 'keep')).valid.length > 0;
 
 /** Sourced facts in bullet lists, then the problem as a single question. */
-export function checkContext({ sections, grammar, report }: BodyContext): void {
+export function checkContext(context: BodyContext): void {
+  const { sections, spec, report } = context;
   const section = sections.context;
   const last = section.blocks.at(-1);
+  const questionMark = spec.punctuation.questionMark;
   if (last?.type === 'paragraph') {
     const question = plainText(last, 'keep');
-    if (!question.endsWith('?') || question.split('?').length !== 2) {
-      report('adr/context-question-shape', last, {});
+    if (!question.endsWith(questionMark) || question.split(questionMark).length !== 2) {
+      report('adr/context-question-shape', last, { questionMark });
     }
   } else {
     report('adr/context-question-missing', last ?? section.heading, {});
@@ -33,7 +33,7 @@ export function checkContext({ sections, grammar, report }: BodyContext): void {
         const paragraph = singleParagraph(item);
         if (paragraph === null) {
           report('adr/context-fact-shape', item, {});
-        } else if (!isSourced(paragraph, grammar)) {
+        } else if (!isSourced(paragraph, context)) {
           report('adr/context-fact-unsourced', item, {});
         }
       }
