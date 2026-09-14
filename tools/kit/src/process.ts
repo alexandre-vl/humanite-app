@@ -82,11 +82,19 @@ export const describeExit = (exit: Exit): string => {
   }
 };
 
+/** Where the outputs of a child go: collected for the caller, or written to the caller's own terminal. */
+type OutputMode = 'captured' | 'attached';
+
 /**
- * Runs `command` without a shell, feeds it `input` and collects both outputs; never rejects. A child with a time budget
- * or an abort signal leads its own process group, so stopping it also stops what it started: SIGTERM, then SIGKILL.
+ * Runs `command` without a shell and resolves how it ended; never rejects. A child with a time budget or an abort signal
+ * leads its own process group, so stopping it also stops what it started: SIGTERM, then SIGKILL.
  */
-export async function capture(command: string, args: readonly string[], options: ProcessOptions): Promise<Captured> {
+async function supervise(
+  command: string,
+  args: readonly string[],
+  options: ProcessOptions,
+  mode: OutputMode,
+): Promise<Captured> {
   const empty = Buffer.alloc(0);
   if (options.signal?.aborted === true) {
     return { exit: { kind: 'aborted' }, stdout: empty, stderr: empty };
@@ -97,7 +105,8 @@ export async function capture(command: string, args: readonly string[], options:
     const child = spawn(command, args, {
       cwd: options.cwd,
       env: options.env ?? process.env,
-      stdio: ['pipe', 'pipe', 'pipe'],
+      // An attached child in its own process group must not read the terminal, which would stop it.
+      stdio: mode === 'captured' ? ['pipe', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'],
       detached: stoppable,
     });
     const stdout: Buffer[] = [];
@@ -150,10 +159,10 @@ export async function capture(command: string, args: readonly string[], options:
       );
     }
     options.signal?.addEventListener('abort', abort, { once: true });
-    child.stdout.on('data', (chunk: Buffer) => stdout.push(chunk));
-    child.stderr.on('data', (chunk: Buffer) => stderr.push(chunk));
+    child.stdout?.on('data', (chunk: Buffer) => stdout.push(chunk));
+    child.stderr?.on('data', (chunk: Buffer) => stderr.push(chunk));
     // A child that exits before reading its whole input is judged on how it ended, not on the broken pipe.
-    child.stdin.on('error', () => undefined);
+    child.stdin?.on('error', () => undefined);
     child.on('error', (error: Error) => {
       if (child.pid === undefined) {
         settle({ kind: 'unstartable', reason: error.message });
@@ -162,8 +171,8 @@ export async function capture(command: string, args: readonly string[], options:
     child.on('exit', () => {
       timers.push(
         setTimeout(() => {
-          child.stdout.destroy();
-          child.stderr.destroy();
+          child.stdout?.destroy();
+          child.stderr?.destroy();
         }, DRAIN_MS),
       );
     });
@@ -171,12 +180,16 @@ export async function capture(command: string, args: readonly string[], options:
       settle(stopped ?? (code === null ? { kind: 'killed', signal: signal ?? 'SIGKILL' } : { kind: 'exited', code }));
     });
     if (options.input === undefined) {
-      child.stdin.end();
+      child.stdin?.end();
     } else {
-      child.stdin.end(options.input);
+      child.stdin?.end(options.input);
     }
   });
 }
+
+/** Runs `command` without a shell, feeds it `input` and collects both outputs; never rejects. */
+export const capture = async (command: string, args: readonly string[], options: ProcessOptions): Promise<Captured> =>
+  supervise(command, args, options, 'captured');
 
 export type RunOptions = ProcessOptions &
   Readonly<{
@@ -226,21 +239,14 @@ export async function runText(command: string, args: readonly string[], options:
   return text;
 }
 
-/** Runs `command` on the terminal of the caller, for checks whose output a person reads live. */
+/**
+ * Runs `command` on the terminal of the caller, for checks whose output a person reads live; its input is closed. A time
+ * budget or an abort stops it as `capture` would.
+ */
 export async function runAttached(
   command: string,
   args: readonly string[],
-  options: Readonly<{ cwd: string; env?: Environment }>,
+  options: Omit<ProcessOptions, 'input'>,
 ): Promise<Exit> {
-  return new Promise<Exit>((resolve) => {
-    const child = spawn(command, args, { cwd: options.cwd, env: options.env ?? process.env, stdio: 'inherit' });
-    child.on('error', (error: Error) => {
-      if (child.pid === undefined) {
-        resolve({ kind: 'unstartable', reason: error.message });
-      }
-    });
-    child.on('close', (code: number | null, signal: NodeJS.Signals | null) => {
-      resolve(code === null ? { kind: 'killed', signal: signal ?? 'SIGKILL' } : { kind: 'exited', code });
-    });
-  });
+  return (await supervise(command, args, options, 'attached')).exit;
 }

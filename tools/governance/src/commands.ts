@@ -134,6 +134,26 @@ export const VERIFY_STEPS = [
   'adr:check',
 ] as const satisfies readonly CommandName[];
 
+export type VerifyStep = (typeof VERIFY_STEPS)[number];
+
+/**
+ * Time each step of `pnpm verify` may take before it is stopped, generous for a loaded shared host: a check that hangs,
+ * as typescript-eslint once did on a circular re-export, then fails instead of holding a commit or an agent.
+ */
+export const VERIFY_BUDGETS_MS = {
+  'gen:check': 120_000,
+  'hooks:check': 120_000,
+  'deps:check': 120_000,
+  'format:check': 180_000,
+  'expo:types': 120_000,
+  'structure:check': 180_000,
+  knip: 180_000,
+  lint: 600_000,
+  typecheck: 600_000,
+  test: 900_000,
+  'adr:check': 300_000,
+} as const satisfies Readonly<Record<VerifyStep, number>>;
+
 /** Arguments a step takes when verify checks the index about to be committed, from pre-commit. */
 export const STAGED_ARGUMENTS: Readonly<Partial<Record<CommandName, readonly string[]>>> = {
   'adr:check': ['--source', 'index'],

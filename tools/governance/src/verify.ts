@@ -7,7 +7,7 @@ import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
 import type { Environment } from '@huma/kit/process';
 import { capture, describeExit, runAttached } from '@huma/kit/process';
 import type { CommandName } from './commands.ts';
-import { BIN_DIRECTORY, COMMANDS, STAGED_ARGUMENTS, VERIFY_STEPS } from './commands.ts';
+import { BIN_DIRECTORY, COMMANDS, STAGED_ARGUMENTS, VERIFY_BUDGETS_MS, VERIFY_STEPS } from './commands.ts';
 
 /** Records the tree the last successful `pnpm verify` saw; the stop hook compares the working tree with it. */
 const STAMP_PATH = 'node_modules/.cache/huma/verify.json';
@@ -50,7 +50,7 @@ export async function runVerify(root: string, options: VerifyOptions): Promise<V
     const args = stepArguments(step, options.staged);
     if (options.output === 'attached') {
       print(`▶ ${step}`);
-      const exit = await runAttached(program(root, name), args, { cwd: root, env });
+      const exit = await runAttached(program(root, name), args, { cwd: root, env, timeoutMs: VERIFY_BUDGETS_MS[step] });
       if (exit.kind !== 'exited' || exit.code !== 0) {
         return { kind: 'failed', step, ending: describeExit(exit), output: '' };
       }
@@ -59,6 +59,7 @@ export async function runVerify(root: string, options: VerifyOptions): Promise<V
     const result = await capture(program(root, name), args, {
       cwd: root,
       env,
+      timeoutMs: VERIFY_BUDGETS_MS[step],
       ...(options.signal === undefined ? {} : { signal: options.signal }),
     });
     if (result.exit.kind !== 'exited' || result.exit.code !== 0) {

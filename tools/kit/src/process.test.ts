@@ -93,6 +93,10 @@ describe('run', () => {
   });
 });
 
+test('runAttached stops a child that exceeds its time budget', async () => {
+  expect(await runAttached('sleep', ['30'], { cwd, timeoutMs: 100 })).toEqual({ kind: 'timed-out', afterMs: 100 });
+});
+
 test('runAttached reports how the child ended', async () => {
   expect(await runAttached('sh', ['-c', 'exit 5'], { cwd })).toEqual({ kind: 'exited', code: 5 });
   expect(await runAttached('sh', ['-c', 'kill -TERM $$'], { cwd })).toEqual({ kind: 'killed', signal: 'SIGTERM' });
