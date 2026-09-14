@@ -6,8 +6,14 @@ import { keysOf } from '@huma/kit/records';
  * commands reserved to the human decision maker are all derived from this table.
  */
 
-/** `everyone` and `human` commands become package scripts; `hook` commands are run by Claude Code only. */
-export type Audience = 'everyone' | 'human' | 'hook';
+/**
+ * `everyone` and `human` commands become package scripts; `claude-hook` commands are run by Claude Code and
+ * `git-hook` commands by the git hook shims, never by hand.
+ */
+export type Audience = 'everyone' | 'human' | 'claude-hook' | 'git-hook';
+
+/** Audiences whose commands are package scripts. */
+export const SCRIPT_AUDIENCES: readonly Audience[] = ['everyone', 'human'];
 
 export type CommandSpec = Readonly<{
   /** Program and arguments; `node` is the runtime pinned by `devEngines`. */
@@ -39,17 +45,32 @@ export const COMMANDS = {
   },
   'agent:guard': {
     argv: ['node', cli('agent-guard')],
-    audience: 'hook',
+    audience: 'claude-hook',
     summary: 'refuse les appels d’outils interdits aux agents',
   },
   'agent:stop': {
     argv: ['node', cli('agent-stop')],
-    audience: 'hook',
+    audience: 'claude-hook',
     summary: 'lance pnpm verify avant qu’un agent s’arrête',
   },
   format: { argv: ['prettier', '--write', '.'], audience: 'everyone', summary: 'formate le dépôt' },
   'format:check': { argv: ['prettier', '--check', '.'], audience: 'everyone', summary: 'vérifie le formatage' },
   gen: { argv: ['node', cli('gen')], audience: 'everyone', summary: 'régénère les fichiers dérivés' },
+  'git:hook': {
+    argv: ['node', cli('git-hook')],
+    audience: 'git-hook',
+    summary: 'exécute un hook git : index complet, pnpm verify, message et citations d’ADR',
+  },
+  'hooks:check': {
+    argv: ['node', cli('hooks-check')],
+    audience: 'everyone',
+    summary: 'vérifie les hooks git et Claude Code installés, et l’historique des messages',
+  },
+  'hooks:install': {
+    argv: ['node', cli('hooks-install')],
+    audience: 'everyone',
+    summary: 'installe les hooks git du dépôt',
+  },
   'gen:check': {
     argv: ['node', cli('gen'), '--check'],
     audience: 'everyone',
@@ -77,6 +98,12 @@ export const VERIFY_STEPS = [
   'adr:check',
 ] as const satisfies readonly CommandName[];
 
+/** Arguments a step takes when verify checks the index about to be committed, from pre-commit. */
+export const STAGED_ARGUMENTS: Readonly<Partial<Record<CommandName, readonly string[]>>> = {
+  'adr:check': ['--source', 'index'],
+  'hooks:check': ['--staged'],
+};
+
 export const COMMAND_NAMES: readonly CommandName[] = keysOf(COMMANDS);
 
 /** The command as a line for `package.json` scripts or a shell. */
@@ -85,3 +112,12 @@ export const commandLine = (spec: CommandSpec): string => shellLine(spec.argv);
 /** The TypeScript file a `node` command runs, `null` for other programs. */
 export const entryFile = (spec: CommandSpec): string | null =>
   spec.argv[0] === 'node' ? (spec.argv[1] ?? null) : null;
+
+/** The TypeScript file of a command that must run with `node`: hooks start it without a package script. */
+export function nodeEntry(name: CommandName): string {
+  const entry = entryFile(COMMANDS[name]);
+  if (entry === null) {
+    throw new Error(`${name} n’est pas une commande node`);
+  }
+  return entry;
+}

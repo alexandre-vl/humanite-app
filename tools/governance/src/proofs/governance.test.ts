@@ -67,13 +67,17 @@ const AWAITING_FOUNDATION_ADRS = [
   'agent/shell-unknown-file',
   'agent/edit-git-config',
   'agent/write-source',
-  'hook/stop-unverifiable-blocks',
-  'hook/stop-unverifiable-once',
+  'claude-hook/stop-unverifiable-blocks',
+  'claude-hook/stop-unverifiable-once',
 ];
+
+/** Whether a proof awaits an ADR of the foundations: every git hook proof, and the agent proofs listed above. */
+const awaitsFoundationAdr = (id: string): boolean => id.startsWith('git/') || AWAITING_FOUNDATION_ADRS.includes(id);
 
 test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
-  expect(PROOFS.map((fixture) => fixture.id).filter((id) => !bound.has(id))).toEqual(AWAITING_FOUNDATION_ADRS);
+  const ids = PROOFS.map((fixture) => fixture.id);
+  expect(ids.filter((id) => !bound.has(id))).toEqual(ids.filter(awaitsFoundationAdr));
 });
 
 describe.concurrent('each governance fixture reports exactly its expected codes', () => {

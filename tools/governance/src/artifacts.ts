@@ -19,7 +19,7 @@ import { firstDifferentLine } from '@huma/kit/text';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
-import { COMMAND_NAMES, COMMANDS, commandLine } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, commandLine, SCRIPT_AUDIENCES } from './commands.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
 
 /** A file derived from typed sources: `pnpm gen` writes it, `pnpm gen:check` compares it without writing. */
@@ -64,7 +64,7 @@ const manifest: Artifact = {
       throw new Error('package.json illisible');
     }
     const scripts = Object.fromEntries(
-      COMMAND_NAMES.filter((name) => COMMANDS[name].audience !== 'hook').map((name) => [
+      COMMAND_NAMES.filter((name) => SCRIPT_AUDIENCES.includes(COMMANDS[name].audience)).map((name) => [
         name,
         commandLine(COMMANDS[name]),
       ]),

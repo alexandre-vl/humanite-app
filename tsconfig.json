@@ -20,6 +20,9 @@
       "path": "./tools/agents"
     },
     {
+      "path": "./tools/git-hooks"
+    },
+    {
       "path": "./tools/governance"
     }
   ]

@@ -7,7 +7,7 @@ import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
 import type { Environment } from '@huma/kit/process';
 import { capture, describeExit, runAttached } from '@huma/kit/process';
 import type { CommandName } from './commands.ts';
-import { BIN_DIRECTORY, COMMANDS, VERIFY_STEPS } from './commands.ts';
+import { BIN_DIRECTORY, COMMANDS, STAGED_ARGUMENTS, VERIFY_STEPS } from './commands.ts';
 
 /** Records the tree the last successful `pnpm verify` saw; the stop hook compares the working tree with it. */
 export const STAMP_PATH = 'node_modules/.cache/huma/verify.json';
@@ -28,7 +28,7 @@ export type VerifyOptions = Readonly<{
 
 const stepArguments = (step: CommandName, staged: boolean): readonly string[] => {
   const [, ...args] = COMMANDS[step].argv;
-  return step === 'adr:check' && staged ? [...args, '--source', 'index'] : args;
+  return staged ? [...args, ...(STAGED_ARGUMENTS[step] ?? [])] : args;
 };
 
 const program = (root: string, name: string): string =>

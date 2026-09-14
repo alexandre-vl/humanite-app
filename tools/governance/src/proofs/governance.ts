@@ -13,9 +13,9 @@ import type { GovernanceCode } from '../checks.ts';
 import { guardFailureOutput } from '../hooks/fallback.ts';
 import { HOOK_COMMANDS, POLICY } from '../policy.ts';
 
-export const HOOK_CODES = ['hook/denied', 'hook/blocked'] as const;
+export const CLAUDE_HOOK_CODES = ['claude-hook/denied', 'claude-hook/blocked'] as const;
 
-export type GovernanceProofCode = GovernanceCode | (typeof HOOK_CODES)[number];
+export type GovernanceProofCode = GovernanceCode | (typeof CLAUDE_HOOK_CODES)[number];
 
 const define = fixtureFactory<GovernanceProofCode>();
 
@@ -65,10 +65,10 @@ async function hookCommand(
   const answer = parseJson(output);
   const specific = isJsonObject(answer) ? objectField(answer, 'hookSpecificOutput') : null;
   if (specific !== null && stringField(specific, 'permissionDecision') === 'deny') {
-    return ['hook/denied'];
+    return ['claude-hook/denied'];
   }
   if (isJsonObject(answer) && stringField(answer, 'decision') === 'block') {
-    return ['hook/blocked'];
+    return ['claude-hook/blocked'];
   }
   throw new Error(`Réponse inattendue du hook : ${output}`);
 }
@@ -85,41 +85,47 @@ export const GOVERNANCE_FIXTURES = [
   ),
   define('gen/missing-index', 'un index des ADR absent', ['gen/missing'], async () => indexCheck(() => ({}))),
   define(
-    'hook/settings-command-denies',
+    'claude-hook/settings-command-denies',
     'la commande du hook des réglages refuse adr:decide',
-    ['hook/denied'],
+    ['claude-hook/denied'],
     async ({ signal }) => toolCall('pnpm adr:decide ADR-0000 accepted', signal),
   ),
   define(
-    'hook/settings-command-allows',
+    'claude-hook/settings-command-allows',
     'la commande du hook des réglages laisse passer adr:check',
     [],
     async ({ signal }) => toolCall('pnpm adr:check', signal),
   ),
   define(
-    'hook/failure-denies-sensitive',
+    'claude-hook/failure-denies-sensitive',
     'une garde en échec refuse ce qui touche une zone protégée',
-    ['hook/denied'],
+    ['claude-hook/denied'],
     async () =>
       Promise.resolve(
         guardFailureOutput('{"tool_input":{"command":"pnpm adr:decide ADR-0000 accepted"}}', new Error('panne')) === ''
           ? []
-          : ['hook/denied'],
+          : ['claude-hook/denied'],
       ),
   ),
-  define('hook/failure-allows-innocuous', 'une garde en échec laisse passer une lecture ordinaire', [], async () =>
-    Promise.resolve(
-      guardFailureOutput('{"tool_input":{"command":"ls tools"}}', new Error('panne')) === '' ? [] : ['hook/denied'],
-    ),
+  define(
+    'claude-hook/failure-allows-innocuous',
+    'une garde en échec laisse passer une lecture ordinaire',
+    [],
+    async () =>
+      Promise.resolve(
+        guardFailureOutput('{"tool_input":{"command":"ls tools"}}', new Error('panne')) === ''
+          ? []
+          : ['claude-hook/denied'],
+      ),
   ),
   define(
-    'hook/stop-unverifiable-blocks',
+    'claude-hook/stop-unverifiable-blocks',
     'un hook Stop qui ne peut pas lancer les contrôles garde l’agent au travail',
-    ['hook/blocked'],
+    ['claude-hook/blocked'],
     async ({ signal }) => hookCommand('Stop', { cwd: '/nonexistent/huma-workspace', stop_hook_active: false }, signal),
   ),
   define(
-    'hook/stop-unverifiable-once',
+    'claude-hook/stop-unverifiable-once',
     'le même échec ne bloque pas un second arrêt, pour éviter une boucle',
     [],
     async ({ signal }) => hookCommand('Stop', { cwd: '/nonexistent/huma-workspace', stop_hook_active: true }, signal),

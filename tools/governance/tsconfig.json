@@ -1,5 +1,11 @@
 {
   "extends": "@huma/tsconfig/node.json",
   "include": ["src"],
-  "references": [{ "path": "../adr" }, { "path": "../agents" }, { "path": "../fixtures" }, { "path": "../kit" }]
+  "references": [
+    { "path": "../adr" },
+    { "path": "../agents" },
+    { "path": "../fixtures" },
+    { "path": "../git-hooks" },
+    { "path": "../kit" }
+  ]
 }

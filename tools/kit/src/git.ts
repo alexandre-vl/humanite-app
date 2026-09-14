@@ -266,6 +266,12 @@ export async function refNames(repository: GitRepository, prefix: string): Promi
   return splitLines(await git(repository, ['for-each-ref', '--format=%(refname)', '--sort=refname', prefix]));
 }
 
+/** Short name of the branch `HEAD` is on, `null` when it is detached. */
+export async function currentBranch(repository: GitRepository): Promise<string | null> {
+  const name = (await git(repository, ['symbolic-ref', '--quiet', '--short', 'HEAD'], { successCodes: [0, 1] })).trim();
+  return name === '' ? null : name;
+}
+
 export const commonDirectory = async (repository: GitRepository): Promise<string> =>
   (await git(repository, ['rev-parse', '--path-format=absolute', '--git-common-dir'])).trim();
 
@@ -313,10 +319,130 @@ export async function unstagedPaths(repository: GitRepository): Promise<readonly
   return repoPaths([...new Set([...modified, ...untracked])]);
 }
 
-/** Paths the index changes compared with `HEAD`, or with the empty tree before the first commit. */
-export async function stagedPaths(repository: GitRepository): Promise<readonly RepoPath[]> {
-  const base = (await resolveCommit(repository, 'HEAD')) ?? (await emptyTree(repository));
-  return repoPaths(splitNul(await git(repository, ['diff', '--cached', '--name-only', '-z', '--no-renames', base])));
+/** Paths the index changes compared with `base` (`HEAD` by default), or with the empty tree before the first commit. */
+export async function stagedPaths(repository: GitRepository, base = 'HEAD'): Promise<readonly RepoPath[]> {
+  const from = (await resolveCommit(repository, base)) ?? (await emptyTree(repository));
+  return repoPaths(splitNul(await git(repository, ['diff', '--cached', '--name-only', '-z', '--no-renames', from])));
+}
+
+/** Id of the tree the index would commit, written to the object store as `git commit` would. */
+export const writeTree = async (repository: GitRepository): Promise<string> =>
+  objectId((await git(repository, ['write-tree'])).trim());
+
+/** An index entry flagged skip-worktree (`S`) or assume-unchanged (lowercase tag) by `ls-files -v`. */
+export type FlaggedEntry = Readonly<{ tag: string; path: RepoPath }>;
+
+/** Index entries whose changes `git status` hides: skip-worktree and assume-unchanged ones. */
+export async function flaggedIndexEntries(repository: GitRepository): Promise<readonly FlaggedEntry[]> {
+  const entries = splitNul(await git(repository, ['-c', 'core.fileMode=true', 'ls-files', '-z', '-v']));
+  return entries.flatMap((entry) => {
+    const space = entry.indexOf(' ');
+    const tag = entry.slice(0, space);
+    const hidden = tag === 'S' || /^[a-z]$/u.test(tag);
+    return hidden ? [{ tag, path: repoPathOf(entry.slice(space + 1)) }] : [];
+  });
+}
+
+export type StatusEntry =
+  /** A tracked path; `staged` and `unstaged` are the X and Y letters of `status`, `.` when unchanged. */
+  | Readonly<{ kind: 'tracked'; staged: string; unstaged: string; path: RepoPath }>
+  | Readonly<{ kind: 'unmerged'; path: RepoPath }>
+  | Readonly<{ kind: 'untracked'; path: RepoPath }>;
+
+/** Status of every changed, unmerged or untracked path, renames split and file modes compared. */
+export async function statusEntries(repository: GitRepository): Promise<readonly StatusEntry[]> {
+  const records = splitNul(
+    await git(repository, [
+      '-c',
+      'core.fileMode=true',
+      'status',
+      '--porcelain=v2',
+      '-z',
+      '--untracked-files=all',
+      '--no-renames',
+      '--ignore-submodules=none',
+    ]),
+  );
+  return records.flatMap((record): readonly StatusEntry[] => {
+    const fields = record.split(' ');
+    switch (fields[0] ?? '') {
+      case '1':
+        return [
+          {
+            kind: 'tracked',
+            staged: fields[1]?.charAt(0) ?? '.',
+            unstaged: fields[1]?.charAt(1) ?? '.',
+            path: repoPathOf(fields.slice(8).join(' ')),
+          },
+        ];
+      case 'u':
+        return [{ kind: 'unmerged', path: repoPathOf(fields.slice(10).join(' ')) }];
+      case '?':
+        return [{ kind: 'untracked', path: repoPathOf(record.slice(2)) }];
+      default:
+        throw new Error(`Entrée de git status inattendue : ${JSON.stringify(record)}`);
+    }
+  });
+}
+
+/** One value of a configuration variable, with the scope and the file or command that set it. */
+export type ConfigEntry = Readonly<{ scope: string; origin: string; key: string; value: string }>;
+
+/**
+ * Every value, in every scope, of the configuration variables whose lowercase key matches `pattern`, includes
+ * followed as git follows them for this repository.
+ */
+export async function configEntries(repository: GitRepository, pattern: string): Promise<readonly ConfigEntry[]> {
+  const fields = (
+    await git(repository, ['config', '-z', '--show-scope', '--show-origin', '--get-regexp', pattern], {
+      successCodes: [0, 1],
+    })
+  ).split('\0');
+  const entries: ConfigEntry[] = [];
+  for (let index = 0; index + 2 < fields.length; index += 3) {
+    const [scope = '', origin = '', pair = ''] = fields.slice(index, index + 3);
+    const newline = pair.indexOf('\n');
+    entries.push({
+      scope,
+      origin,
+      key: newline === -1 ? pair : pair.slice(0, newline),
+      value: newline === -1 ? '' : pair.slice(newline + 1),
+    });
+  }
+  return entries;
+}
+
+export type Trailer = Readonly<{ key: string; value: string }>;
+
+const parseTrailerLines = (text: string): readonly Trailer[] =>
+  splitLines(text).map((line) => {
+    const colon = line.indexOf(':');
+    return { key: line.slice(0, colon), value: line.slice(colon + 1).trim() };
+  });
+
+/** Trailers of a commit message as git reads them: its last paragraph, continuation lines unfolded. */
+export const messageTrailers = async (repository: GitRepository, message: string): Promise<readonly Trailer[]> =>
+  parseTrailerLines(await git(repository, ['interpret-trailers', '--parse', '--no-divider'], { input: message }));
+
+/** Trailers of each commit of `ids`, read by one `git log` as `messageTrailers` reads a message. */
+export async function commitTrailers(
+  repository: GitRepository,
+  ids: readonly string[],
+): Promise<ReadonlyMap<string, readonly Trailer[]>> {
+  if (ids.length === 0) {
+    return new Map();
+  }
+  const records = splitNul(
+    await git(repository, ['log', '--no-walk=unsorted', '--stdin', '-z', '--format=%H%x1f%(trailers:unfold,only)'], {
+      input: `${objectIds(ids).join('\n')}\n`,
+    }),
+  );
+  return new Map(
+    records.map((record) => {
+      const separator = record.indexOf('\x1f');
+      return [objectId(record.slice(0, separator)), parseTrailerLines(record.slice(separator + 1))];
+    }),
+  );
 }
 
 const emptyTree = async (repository: GitRepository): Promise<string> =>

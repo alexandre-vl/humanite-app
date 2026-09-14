@@ -11,6 +11,7 @@
     "@huma/adr": "workspace:*",
     "@huma/agents": "workspace:*",
     "@huma/fixtures": "workspace:*",
+    "@huma/git-hooks": "workspace:*",
     "@huma/kit": "workspace:*",
     "typescript": "catalog:"
   },

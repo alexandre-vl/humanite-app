@@ -4,7 +4,10 @@ import { describe, expect, test } from 'vitest';
 import { temporaryDirectory } from './fs.ts';
 import type { GitRepository } from './git.ts';
 import {
+  commitTrailers,
+  configEntries,
   firstParentHistory,
+  flaggedIndexEntries,
   git,
   GIT_LOCAL_VARIABLES,
   gitPaths,
@@ -13,12 +16,15 @@ import {
   isWorkTree,
   listFiles,
   listIndexEntries,
+  messageTrailers,
   ownRepository,
   readObjects,
   resolveCommit,
   stagedPaths,
+  statusEntries,
   unstagedPaths,
   worktreeTreeId,
+  writeTree,
 } from './git.ts';
 
 const IDENTITY = {
@@ -210,7 +216,7 @@ describe('firstParentHistory', () => {
     await git(repo, ['switch', '--quiet', 'main']);
     await writeFiles(root, { 'docs/a.md': '2', 'other.md': 'hors docs' });
     await git(repo, ['add', '--all']);
-    await git(repo, ['commit', '--quiet', '-m', 'feat: main\n\nCorps  avec séparateurs\n\nRefs: ADR-0001']);
+    await git(repo, ['commit', '--quiet', '-m', 'feat: main\n\nCorps \x1e avec séparateurs\n\nRefs: ADR-0001']);
     await git(repo, ['merge', '--quiet', '--no-ff', '-m', 'merge', 'side']);
     return repo;
   }
@@ -226,7 +232,7 @@ describe('firstParentHistory', () => {
     ]);
     expect(history.map((commit) => commit.parents.length)).toEqual([0, 1, 2]);
     expect(history[0]?.authorDate).toBe('2026-09-14T12:00:00+02:00');
-    expect(history[1]?.message).toBe('feat: main\n\nCorps  avec séparateurs\n\nRefs: ADR-0001\n');
+    expect(history[1]?.message).toBe('feat: main\n\nCorps \x1e avec séparateurs\n\nRefs: ADR-0001\n');
   });
 
   test('restricts commits and paths to a pathspec, and starts after a given commit', async () => {
@@ -270,6 +276,69 @@ test('worktreeTreeId matches a commit of the whole working tree and writes neith
   expect(await looseObjectCount(root)).toBe(objectsBefore);
   await git(repo, ['add', '--all']);
   expect((await git(repo, ['write-tree'])).trim()).toBe(treeId);
+});
+
+test('statusEntries and flaggedIndexEntries show every difference between the index and the working tree', async () => {
+  await using directory = await temporaryDirectory('kit-git');
+  const root = join(directory.path, 'repo');
+  const repo = await repository(root, [{ 'a b.md': '1', 'c.md': '1', 'd.md': '1', 'e.sh': '1' }]);
+  await writeFile(join(root, 'a b.md'), '2');
+  await writeFile(join(root, 'c.md'), '2');
+  await git(repo, ['add', 'c.md']);
+  await writeFile(join(root, 'nouveau é.md'), 'x');
+  await git(repo, ['update-index', '--skip-worktree', 'd.md']);
+  await writeFile(join(root, 'd.md'), 'caché');
+  await git(repo, ['-c', 'core.fileMode=false', 'update-index', '--chmod=+x', 'e.sh']);
+  expect(await statusEntries(repo)).toEqual([
+    { kind: 'tracked', staged: '.', unstaged: 'M', path: 'a b.md' },
+    { kind: 'tracked', staged: 'M', unstaged: '.', path: 'c.md' },
+    { kind: 'tracked', staged: 'M', unstaged: 'M', path: 'e.sh' },
+    { kind: 'untracked', path: 'nouveau é.md' },
+  ]);
+  expect(await flaggedIndexEntries(repo)).toEqual([{ tag: 'S', path: 'd.md' }]);
+  expect(await writeTree(repo)).toMatch(/^[0-9a-f]{40}$/u);
+});
+
+test('configEntries reads every scope and origin, and nothing when unset', async () => {
+  await using directory = await temporaryDirectory('kit-git');
+  const root = join(directory.path, 'repo');
+  await repository(root, []);
+  const repo = isolatedRepository(root, { hooks: 'enabled' });
+  expect(await configEntries(repo, String.raw`^core\.hookspath$`)).toEqual([]);
+  await git(repo, ['config', 'core.hooksPath', '/tmp/a b']);
+  await git(repo, ['config', 'includeIf.onbranch:x.path', 'autre.cfg']);
+  expect(await configEntries(repo, String.raw`^core\.hookspath$`)).toEqual([
+    { scope: 'local', origin: 'file:.git/config', key: 'core.hookspath', value: '/tmp/a b' },
+  ]);
+  expect((await configEntries(repo, String.raw`^includeif\.`)).map((entry) => entry.key)).toEqual([
+    'includeif.onbranch:x.path',
+  ]);
+  expect(await configEntries(isolatedRepository(root), String.raw`^core\.hookspath$`)).toEqual([
+    { scope: 'local', origin: 'file:.git/config', key: 'core.hookspath', value: '/tmp/a b' },
+    { scope: 'command', origin: 'command line:', key: 'core.hookspath', value: '/dev/null' },
+  ]);
+});
+
+test('messageTrailers and commitTrailers read trailers as git does', async () => {
+  await using directory = await temporaryDirectory('kit-git');
+  const root = join(directory.path, 'repo');
+  const repo = await repository(root, []);
+  const message = 'feat: x\n\nCorps.\n\nRefs: ADR-0001\nRefs: ADR-0002\nCo-authored-by: A <a@example.org>\n';
+  expect(await messageTrailers(repo, message)).toEqual([
+    { key: 'Refs', value: 'ADR-0001' },
+    { key: 'Refs', value: 'ADR-0002' },
+    { key: 'Co-authored-by', value: 'A <a@example.org>' },
+  ]);
+  expect(await messageTrailers(repo, 'feat: x\n\nTrois lignes\nde prose\nRefs: ADR-0001\n')).toEqual([]);
+  await git(repo, ['commit', '--quiet', '--allow-empty', '-m', message]);
+  await git(repo, ['commit', '--quiet', '--allow-empty', '-m', 'fix: y']);
+  const [first = '', second = ''] = (await git(repo, ['rev-list', '--reverse', 'HEAD'])).trim().split('\n');
+  expect(await commitTrailers(repo, [second, first])).toEqual(
+    new Map([
+      [second, []],
+      [first, await messageTrailers(repo, message)],
+    ]),
+  );
 });
 
 test('isAncestor, isWorkTree and gitPaths', async () => {

@@ -4,9 +4,10 @@
   "type": "module",
   "exports": {
     "./guard": "./src/guard.ts",
+    "./local-settings": "./src/local-settings.ts",
     "./policy": "./src/policy.ts",
+    "./proofs": "./src/proofs/registry.ts",
     "./protocol": "./src/protocol.ts",
-    "./proofs": "./src/proofs/guard.ts",
     "./settings": "./src/settings.ts",
     "./stop": "./src/stop.ts"
   },

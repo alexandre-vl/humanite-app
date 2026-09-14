@@ -1,0 +1,25 @@
+{
+  "name": "@huma/git-hooks",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./checks": "./src/checks.ts",
+    "./flows": "./src/flows.ts",
+    "./history": "./src/history.ts",
+    "./installation": "./src/installation.ts",
+    "./message": "./src/message.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./shims": "./src/shims.ts",
+    "./staging": "./src/staging.ts",
+    "./tripwire": "./src/tripwire.ts"
+  },
+  "dependencies": {
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

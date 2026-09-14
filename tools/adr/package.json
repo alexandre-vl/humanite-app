@@ -17,6 +17,7 @@
     "./identifiers": "./src/model/identifiers.ts",
     "./index-page": "./src/lifecycle/index-page.ts",
     "./layout": "./src/spec/layout.ts",
+    "./paths": "./src/model/paths.ts",
     "./proof-documents": "./src/proofs/documents.ts",
     "./proofs": "./src/proofs/registry.ts",
     "./significance": "./src/spec/significance.ts",

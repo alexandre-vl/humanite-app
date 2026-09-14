@@ -693,5 +693,3 @@ export const AGENT_FIXTURES = [
   ...FILE_TOOLS,
   ...CALL_SHAPES,
 ] as const;
-
-export type AgentProofId = (typeof AGENT_FIXTURES)[number]['id'];
