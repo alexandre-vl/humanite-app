@@ -1,11 +1,19 @@
 import js from '@eslint/js';
-import { CONFINED_MODULES, ENTRY_FILES, HERMES_FILES, ROUTE_FILES } from '@huma/architecture';
+import type { HermesGap } from '@huma/architecture';
+import {
+  CONFINED_MODULES,
+  ENTRY_FILES,
+  HERMES_FILES,
+  HERMES_GAP_NAMES,
+  HERMES_GAPS,
+  ROUTE_FILES,
+} from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import { boundariesConfig } from './boundaries.ts';
 import type { PolicyId } from './policies.ts';
-import { modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
+import { hermesPolicy, modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
 
 export type WorkspaceConfigOptions = Readonly<{
   /** The workspace root, which holds the solution `tsconfig.json` that references every TypeScript project. */
@@ -25,8 +33,11 @@ type RuleEntry = Linter.RuleEntry;
 /** A restriction of `no-restricted-syntax`: the policy it enforces and the AST selector it refuses. */
 type SyntaxRestriction = Readonly<{ policy: PolicyId; selector: string }>;
 
-/** A restriction of `no-restricted-properties`: the policy it enforces and the `object.property` it refuses. */
-type PropertyRestriction = Readonly<{ policy: PolicyId; object: string; property: string }>;
+/** A restriction of `no-restricted-properties`: the policy it enforces and the property it refuses, on any object when `null`. */
+type PropertyRestriction = Readonly<{ policy: PolicyId; object: string | null; property: string }>;
+
+/** A restriction of `no-restricted-globals`: the policy it enforces and the global it refuses. */
+type GlobalRestriction = Readonly<{ policy: PolicyId; name: string }>;
 
 /** An option of `@typescript-eslint/naming-convention`. */
 type NamingRule = Readonly<Record<string, unknown>>;
@@ -93,19 +104,72 @@ const restrictedSyntax = (
 const restrictedProperties = (
   properties: readonly PropertyRestriction[],
   enabled: ReadonlySet<PolicyId>,
-): readonly Readonly<{ object: string; property: string; message: string }>[] =>
+): readonly Readonly<{ object?: string; property: string; message: string }>[] =>
   properties
     .filter(({ policy }) => enabled.has(policy))
-    .map(({ policy, object, property }) => ({ object, property, message: policyMessage(policy) }));
+    .map(({ policy, object, property }) => ({
+      ...(object === null ? {} : { object }),
+      property,
+      message: policyMessage(policy),
+    }));
+
+const restrictedGlobals = (
+  globals: readonly GlobalRestriction[],
+  enabled: ReadonlySet<PolicyId>,
+): readonly Readonly<{ name: string; message: string }>[] =>
+  globals
+    .filter(({ policy }) => enabled.has(policy))
+    .map(({ policy, name }) => ({ name, message: policyMessage(policy) }));
 
 /** The restrictions of a kind of file, on top of the core ones. */
 type Runtime = Readonly<{
   syntax: readonly SyntaxRestriction[];
   properties: readonly PropertyRestriction[];
+  globals: readonly GlobalRestriction[];
   naming: readonly NamingRule[];
 }>;
 
-const NODE: Runtime = { syntax: NODE_SYNTAX, properties: NODE_PROPERTIES, naming: NODE_NAMING };
+const NODE: Runtime = { syntax: NODE_SYNTAX, properties: NODE_PROPERTIES, globals: [], naming: NODE_NAMING };
+
+/** The restrictions that refuse a Hermes gap, however the code reaches it: directly or through `globalThis`. */
+function gapRestrictions(name: (typeof HERMES_GAP_NAMES)[number]): Pick<Runtime, 'syntax' | 'properties' | 'globals'> {
+  const gap: HermesGap = HERMES_GAPS[name];
+  const policy = hermesPolicy(name);
+  switch (gap.kind) {
+    case 'property':
+      return {
+        syntax:
+          gap.object === null
+            ? []
+            : [
+                {
+                  policy,
+                  selector: `MemberExpression[object.object.name='globalThis'][object.property.name='${gap.object}'][property.name='${gap.property}']`,
+                },
+              ],
+        properties: [{ policy, object: gap.object, property: gap.property }],
+        globals: [],
+      };
+    case 'global':
+      return {
+        syntax: [{ policy, selector: `MemberExpression[object.name='globalThis'][property.name='${gap.name}']` }],
+        properties: [],
+        globals: [{ policy, name: gap.name }],
+      };
+    case 'regex-flag':
+      return {
+        syntax: [
+          { policy, selector: `Literal[regex.flags=/${gap.flag}/]` },
+          { policy, selector: `NewExpression[callee.name='RegExp'] > Literal:nth-child(2)[value=/${gap.flag}/]` },
+          { policy, selector: `CallExpression[callee.name='RegExp'] > Literal:nth-child(2)[value=/${gap.flag}/]` },
+        ],
+        properties: [],
+        globals: [],
+      };
+  }
+}
+
+const HERMES_GAP_RESTRICTIONS = HERMES_GAP_NAMES.map(gapRestrictions);
 
 /**
  * A namespace import of a confined package takes every name at once: boundaries only judges named imports, so the
@@ -116,7 +180,12 @@ const CONFINED_NAMESPACES: readonly SyntaxRestriction[] = CONFINED_MODULES.map((
   selector: `ImportDeclaration[source.value='${name}'] > ImportNamespaceSpecifier`,
 }));
 
-const HERMES: Runtime = { syntax: CONFINED_NAMESPACES, properties: [], naming: HERMES_NAMING };
+const HERMES: Runtime = {
+  syntax: [...CONFINED_NAMESPACES, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax)],
+  properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),
+  globals: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.globals),
+  naming: HERMES_NAMING,
+};
 
 /** The restrictions of `runtime` for files of a narrower role, a route or a public entry. */
 const narrowed = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runtime => ({
@@ -131,6 +200,7 @@ const narrowed = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runti
 const restrictions = (runtime: Runtime, enabled: ReadonlySet<PolicyId>): Readonly<Record<string, RuleEntry>> => ({
   'no-restricted-syntax': ['error', ...restrictedSyntax([...CORE_SYNTAX, ...runtime.syntax], enabled)],
   'no-restricted-properties': ['error', ...restrictedProperties([...FOCUSED_TESTS, ...runtime.properties], enabled)],
+  'no-restricted-globals': ['error', ...restrictedGlobals(runtime.globals, enabled)],
   '@typescript-eslint/naming-convention': ['error', ...runtime.naming],
 });
 

@@ -1,5 +1,14 @@
-import type { ConfinedModule, Place } from '@huma/architecture';
-import { CONFINED_MODULES, IMPORTS, MODULES, PLACE_NAMES, PLACES } from '@huma/architecture';
+import type { ConfinedModule, HermesGapName, Place } from '@huma/architecture';
+import {
+  CONFINED_MODULES,
+  describeGap,
+  HERMES_GAP_NAMES,
+  HERMES_GAPS,
+  IMPORTS,
+  MODULES,
+  PLACE_NAMES,
+  PLACES,
+} from '@huma/architecture';
 
 /**
  * The restrictions the workspace writes itself, by policy id. Each message carries its id between brackets, which is how
@@ -31,11 +40,16 @@ export type ImportPolicy = `import/${Place}`;
 /** The policy of the places a confined package may be imported from. */
 export type ModulePolicy = `module/${ConfinedModule}`;
 
-export type PolicyId = WrittenPolicy | ImportPolicy | ModulePolicy;
+/** The policy of a JavaScript API Hermes lacks. */
+export type HermesPolicy = `hermes/${HermesGapName}`;
+
+export type PolicyId = WrittenPolicy | ImportPolicy | ModulePolicy | HermesPolicy;
 
 export const importPolicy = (place: Place): ImportPolicy => `import/${place}`;
 
 export const modulePolicy = (name: ConfinedModule): ModulePolicy => `module/${name}`;
+
+export const hermesPolicy = (name: HermesGapName): HermesPolicy => `hermes/${name}`;
 
 const isWrittenPolicy = (id: string): id is WrittenPolicy => Object.hasOwn(WRITTEN, id);
 
@@ -45,6 +59,7 @@ export const POLICY_IDS: readonly PolicyId[] = [
   ...WRITTEN_IDS,
   ...PLACE_NAMES.map(importPolicy),
   ...CONFINED_MODULES.map(modulePolicy),
+  ...HERMES_GAP_NAMES.map(hermesPolicy),
 ];
 
 /** Rules whose message cannot be chosen, with the policy each one enforces. */
@@ -78,10 +93,14 @@ export function policyMessage(id: PolicyId): string {
     return `[${id}] ${describeImports(place)}`;
   }
   const confined = CONFINED_MODULES.find((name) => modulePolicy(name) === id);
-  if (confined === undefined) {
+  if (confined !== undefined) {
+    return `[${id}] ${describeModule(confined)}`;
+  }
+  const gap = HERMES_GAP_NAMES.find((name) => hermesPolicy(name) === id);
+  if (gap === undefined) {
     throw new Error(`politique inconnue : ${id}`);
   }
-  return `[${id}] ${describeModule(confined)}`;
+  return `[${id}] ${describeGap(HERMES_GAPS[gap])} n’existe pas dans Hermes V1 (journal 0a, vérification 15)`;
 }
 
 const TAG = /\[(?<id>[a-z0-9-]+\/[a-z0-9-]+)\]/u;

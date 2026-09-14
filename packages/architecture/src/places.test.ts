@@ -1,5 +1,6 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import { ENTRY_FILES, HERMES_FILES, packageImports, ROUTE_FILES } from './app.ts';
+import { HERMES_GAP_NAMES } from './hermes.ts';
 import type { Importable, Place } from './places.ts';
 import { IMPORTS, ORDER, PLACE_NAMES, PLACES } from './places.ts';
 
@@ -83,5 +84,11 @@ describe('what the tools derive from the places', () => {
       'apps/mobile/src/shared/config/index.ts',
       'apps/mobile/src/shared/api/index.ts',
     ]);
+  });
+});
+
+describe('the Hermes gaps', () => {
+  test('the 19 APIs measured absent are all listed', () => {
+    expect(HERMES_GAP_NAMES).toHaveLength(19);
   });
 });
