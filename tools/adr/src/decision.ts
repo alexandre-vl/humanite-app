@@ -30,6 +30,28 @@ export type DecisionOutcome =
 
 const refused = (...reasons: string[]): DecisionOutcome => ({ kind: 'refused', reasons });
 
+const PROOF_CONCURRENCY = 4;
+
+/** Proofs that do not pass, run at most `PROOF_CONCURRENCY` at a time. */
+async function failingProofs(
+  proofs: readonly string[],
+  runProof: (proof: string) => Promise<boolean>,
+): Promise<string[]> {
+  const failing = new Set<string>();
+  let cursor = 0;
+  const work = async (): Promise<void> => {
+    while (cursor < proofs.length) {
+      const proof = proofs[cursor];
+      cursor += 1;
+      if (proof !== undefined && !(await runProof(proof))) {
+        failing.add(proof);
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: PROOF_CONCURRENCY }, work));
+  return proofs.filter((proof) => failing.has(proof));
+}
+
 /** Markers that Claude Code and other agent runners set in the environment of the commands they launch. */
 export const AGENT_ENVIRONMENT_VARIABLES = ['CLAUDECODE', 'AI_AGENT'] as const;
 
@@ -109,12 +131,7 @@ export async function decide(request: DecisionRequest): Promise<DecisionOutcome>
         ),
       ),
     ];
-    const failing: string[] = [];
-    for (const proof of proofs) {
-      if (!(await request.runProof(proof))) {
-        failing.push(proof);
-      }
-    }
+    const failing = await failingProofs(proofs, request.runProof);
     if (failing.length > 0) {
       return refused(`${id} ne peut pas être accepté : preuves en échec ${failing.join(', ')}`);
     }
