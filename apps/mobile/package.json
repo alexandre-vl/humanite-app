@@ -5,10 +5,15 @@
   "main": "expo-router/entry",
   "imports": {
     "#app": "./src/_app/index.ts",
-    "#entities/*": "./src/entities/*/index.ts",
-    "#features/*": "./src/features/*/index.ts",
     "#pages/*": "./src/pages/*/index.ts",
-    "#shared/*": "./src/shared/*/index.ts"
+    "#features/*": "./src/features/*/index.ts",
+    "#entities/*": "./src/entities/*/index.ts",
+    "#components/*": "./src/shared/ui/components/*/index.ts",
+    "#primitives/*": "./src/shared/ui/primitives/*/index.ts",
+    "#lib/*": "./src/shared/lib/*/index.ts",
+    "#i18n": "./src/shared/i18n/index.ts",
+    "#config": "./src/shared/config/index.ts",
+    "#api": "./src/shared/api/index.ts"
   },
   "dependencies": {
     "@expo/dom-webview": "catalog:",

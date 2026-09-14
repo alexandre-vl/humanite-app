@@ -1,0 +1,14 @@
+{
+  "name": "@huma/architecture",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

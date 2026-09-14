@@ -43,7 +43,7 @@ const synced =
   async (): Promise<readonly ExpoCode[]> => {
     await using directory = await temporaryDirectory('expo-fixture');
     await writeTree(join(directory.path, APP), tree);
-    const report = await syncTypedRoutes(await workspaceExpo(), directory.path, APP);
+    const report = await syncTypedRoutes(await workspaceExpo(), { root: directory.path, app: APP, routes: 'app' });
     if (
       expectArticleHref &&
       !(await readFile(join(directory.path, APP, ROUTE_TYPES_FILE), 'utf8')).includes(ARTICLE_HREF)

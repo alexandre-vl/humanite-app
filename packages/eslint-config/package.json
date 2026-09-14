@@ -6,6 +6,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@huma/architecture": "workspace:*",
     "@eslint/js": "catalog:",
     "typescript-eslint": "catalog:"
   },

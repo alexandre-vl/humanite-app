@@ -4,6 +4,7 @@
   "references": [
     { "path": "../adr" },
     { "path": "../agents" },
+    { "path": "../../packages/architecture" },
     { "path": "../deps" },
     { "path": "../expo" },
     { "path": "../fixtures" },

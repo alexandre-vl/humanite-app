@@ -1,13 +1,12 @@
 import js from '@eslint/js';
+import { HERMES_FILES } from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export type WorkspaceConfigOptions = Readonly<{
-  /** Directory holding the solution `tsconfig.json` that references every TypeScript project. */
+  /** The workspace root, which holds the solution `tsconfig.json` that references every TypeScript project. */
   tsconfigRootDir: string;
-  /** Globs of the code Metro bundles for Hermes, relative to that directory; any other TypeScript runs in Node. */
-  hermesFiles: readonly string[];
 }>;
 
 const TYPESCRIPT_FILES = ['**/*.ts', '**/*.tsx'];
@@ -137,7 +136,7 @@ const TYPESCRIPT_RULES: Readonly<Record<string, RuleEntry>> = {
  * Lint rules of the workspace: every TypeScript file gets the strict typed rules, then the restrictions of the runtime
  * that executes it, Node or Hermes; JavaScript configuration files get the rules that need no types.
  */
-export function defineWorkspaceConfig({ tsconfigRootDir, hermesFiles }: WorkspaceConfigOptions): Linter.Config[] {
+export function defineWorkspaceConfig({ tsconfigRootDir }: WorkspaceConfigOptions): Linter.Config[] {
   return defineConfig(
     globalIgnores(['**/node_modules/']),
     {
@@ -160,11 +159,11 @@ export function defineWorkspaceConfig({ tsconfigRootDir, hermesFiles }: Workspac
     },
     {
       files: TYPESCRIPT_FILES,
-      ignores: [...hermesFiles],
+      ignores: [...HERMES_FILES],
       rules: restrictions(NODE_SYNTAX, NODE_PROPERTIES, NODE_NAMING),
     },
     {
-      files: [...hermesFiles],
+      files: [...HERMES_FILES],
       rules: restrictions([], [], HERMES_NAMING),
     },
   );

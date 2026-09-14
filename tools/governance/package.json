@@ -10,6 +10,7 @@
   "dependencies": {
     "@huma/adr": "workspace:*",
     "@huma/agents": "workspace:*",
+    "@huma/architecture": "workspace:*",
     "@huma/deps": "workspace:*",
     "@huma/expo": "workspace:*",
     "@huma/fixtures": "workspace:*",

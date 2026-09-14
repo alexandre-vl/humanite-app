@@ -11,6 +11,9 @@
       "path": "./apps/mobile/tsconfig.node.json"
     },
     {
+      "path": "./packages/architecture"
+    },
+    {
       "path": "./packages/eslint-config"
     },
     {

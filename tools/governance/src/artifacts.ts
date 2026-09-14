@@ -8,6 +8,7 @@ import { INDEX_FILE } from '@huma/adr/layout';
 import { readSnapshot } from '@huma/adr/snapshot';
 import { CLAUDE_SETTINGS_PATH } from '@huma/agents/policy';
 import { renderClaudeSettings } from '@huma/agents/settings';
+import { APP_DIRECTORY, packageImports } from '@huma/architecture';
 import { packageDirectories, renderWorkspaceFile, WORKSPACE_FILE_NAME } from '@huma/deps/workspace';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
@@ -57,24 +58,30 @@ const claudeSettings: Artifact = {
   render: async (root) => formatForPath(root, CLAUDE_SETTINGS, renderClaudeSettings(POLICY, HOOK_COMMANDS)),
 };
 
-const MANIFEST = repoPath('package.json');
-
-const manifest: Artifact = {
-  path: MANIFEST,
+/** A `package.json` whose field `field` is derived: every other field stays as written, in its place. */
+const manifestField = (path: RepoPath, field: string, value: () => unknown): Artifact => ({
+  path,
   render: async (root) => {
-    const current = parseJson(await readFile(join(root, MANIFEST), 'utf8'));
+    const current = parseJson(await readFile(join(root, path), 'utf8'));
     if (!isJsonObject(current)) {
-      throw new Error('package.json illisible');
+      throw new Error(`${path} illisible`);
     }
-    const scripts = Object.fromEntries(
-      COMMAND_NAMES.filter((name) => SCRIPT_AUDIENCES.includes(COMMANDS[name].audience)).map((name) => [
-        name,
-        commandLine(COMMANDS[name]),
-      ]),
-    );
-    return formatForPath(root, MANIFEST, `${JSON.stringify({ ...current, scripts }, null, 2)}\n`);
+    return formatForPath(root, path, `${JSON.stringify({ ...current, [field]: value() }, null, 2)}\n`);
   },
-};
+});
+
+/** The scripts of the root manifest: the commands a person runs. */
+const manifest = manifestField(repoPath('package.json'), 'scripts', () =>
+  Object.fromEntries(
+    COMMAND_NAMES.filter((name) => SCRIPT_AUDIENCES.includes(COMMANDS[name].audience)).map((name) => [
+      name,
+      commandLine(COMMANDS[name]),
+    ]),
+  ),
+);
+
+/** The `#` imports of the app, one per place of the architecture. */
+const appImports = manifestField(repoPath(`${APP_DIRECTORY}/package.json`), 'imports', packageImports);
 
 const AGENTS_GUIDE = repoPath('AGENTS.md');
 
@@ -132,6 +139,7 @@ export const ARTIFACTS: readonly Artifact[] = [
   ADR_INDEX_ARTIFACT,
   claudeSettings,
   manifest,
+  appImports,
   agentsGuide,
   claudeMemory,
   workspaceFile,

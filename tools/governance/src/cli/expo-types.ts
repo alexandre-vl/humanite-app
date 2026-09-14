@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import { PLACES } from '@huma/architecture';
 import { readWorkspace } from '@huma/deps/workspace';
 import { expoRouterApps } from '@huma/expo/apps';
 import { loadExpoTooling } from '@huma/expo/expo';
@@ -13,7 +14,8 @@ await runCommand(async () => {
   const root = await findWorkspaceRoot();
   let failed = false;
   for (const app of expoRouterApps(await readWorkspace(root))) {
-    const report = await syncTypedRoutes(loadExpoTooling(join(root, app)), root, app);
+    const routes = PLACES.route.directory;
+    const report = await syncTypedRoutes(loadExpoTooling(join(root, app)), { root, app, routes });
     if (report.diagnostics.length > 0) {
       failed = true;
       print(renderDiagnostics(report.diagnostics, 'text'));

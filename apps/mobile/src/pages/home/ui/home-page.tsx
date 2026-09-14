@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Surface } from '#shared/ui/primitives/surface';
-import { Text } from '#shared/ui/primitives/text';
+import { Surface } from '#primitives/surface';
+import { Text } from '#primitives/text';
 
 export function HomePage(): ReactNode {
   return (

@@ -9,9 +9,6 @@ import type { ExpoCode } from './checks.ts';
 import { expoFinding } from './checks.ts';
 import type { ExpoTooling } from './expo.ts';
 
-/** Where the routes of an app live: every file below is a route, and no other directory holds any. */
-export const ROUTES_DIRECTORY = 'app';
-
 /** Where Expo writes the route types, which git ignores: generated before every check that reads types. */
 export const ROUTE_TYPES_FILE = '.expo/types/router.d.ts';
 
@@ -25,16 +22,27 @@ export type TypedRoutesReport = Readonly<{
 
 const within = (app: RepoPath, path: string): RepoPath => repoPath(`${app}/${path}`);
 
+export type TypedRoutesRequest = Readonly<{
+  /** The workspace root. */
+  root: string;
+  /** The app, relative to the root. */
+  app: RepoPath;
+  /** The directory of the app that holds its routes, and no other directory does. */
+  routes: string;
+}>;
+
 /**
- * Checks that Expo, setting typed routes up for the app `app` of the workspace at `root`, would read routes from
- * `ROUTES_DIRECTORY` and rewrite no tracked file; then writes the route types exactly as Expo writes them. Nothing is
- * written when a check fails.
+ * Checks that Expo, setting typed routes up for an app, would read them from its routes directory and rewrite no
+ * tracked file; then writes the route types exactly as Expo writes them. Nothing is written when a check fails.
  */
-export async function syncTypedRoutes(tooling: ExpoTooling, root: string, app: RepoPath): Promise<TypedRoutesReport> {
+export async function syncTypedRoutes(
+  tooling: ExpoTooling,
+  { root, app, routes: expected }: TypedRoutesRequest,
+): Promise<TypedRoutesReport> {
   const appRoot = join(root, app);
   const directory = tooling.routesDirectory(appRoot);
-  if (directory !== ROUTES_DIRECTORY) {
-    const details = { directory, expected: ROUTES_DIRECTORY };
+  if (directory !== expected) {
+    const details = { directory, expected };
     return {
       routes: 0,
       written: false,
