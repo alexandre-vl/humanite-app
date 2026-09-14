@@ -2,7 +2,8 @@ import { writeFile } from 'node:fs/promises';
 import { hostname } from 'node:os';
 import { join } from 'node:path';
 import type { FileTree } from '@huma/fixtures';
-import { createRepository, createTemporaryDirectory, fixtureFactory } from '@huma/fixtures';
+import { createRepository, fixtureFactory } from '@huma/fixtures';
+import { temporaryDirectory } from '@huma/kit/fs';
 import type { GitRepository } from '@huma/kit/git';
 import { commonDirectory, git } from '@huma/kit/git';
 import type { RepoPath } from '@huma/kit/paths';
@@ -50,7 +51,7 @@ type DecisionFixture = Readonly<{
 }>;
 
 async function decision(fixture: DecisionFixture): Promise<readonly LifecycleCode[]> {
-  await using directory = await createTemporaryDirectory('adr-decide');
+  await using directory = await temporaryDirectory('adr-decide');
   const repository = await createRepository(directory.path, {
     commits: (fixture.commits ?? []).map((files) => ({ files })),
     ...(fixture.worktree === undefined ? {} : { worktree: fixture.worktree }),
@@ -187,7 +188,7 @@ export const LIFECYCLE_FIXTURES = [
   ),
 
   define('new/parallel-worktrees', 'deux worktrees créent un ADR en même temps', [], async () => {
-    await using directory = await createTemporaryDirectory('adr-new');
+    await using directory = await temporaryDirectory('adr-new');
     const { main, other } = await twoWorktrees(directory.path);
     const [first, second] = await Promise.all([
       createAdr({
@@ -208,13 +209,13 @@ export const LIFECYCLE_FIXTURES = [
     return first.number === second.number ? ['new/duplicate-number'] : [];
   }),
   define('new/unlocked-race', 'deux lectures du prochain numéro sans verrou', ['new/duplicate-number'], async () => {
-    await using directory = await createTemporaryDirectory('adr-race');
+    await using directory = await temporaryDirectory('adr-race');
     const { main, other } = await twoWorktrees(directory.path);
     const [first, second] = await Promise.all([nextNumber(main), nextNumber(other)]);
     return first === second ? ['new/duplicate-number'] : [];
   }),
   define('new/stale-lock', 'un verrou laissé par un processus arrêté', [], async () => {
-    await using directory = await createTemporaryDirectory('adr-lock');
+    await using directory = await temporaryDirectory('adr-lock');
     const repository = await createRepository(directory.path, { commits: [{ files: { [ZERO]: PROPOSED } }] });
     const deadPid = 2 ** 22 + 1;
     await writeFile(
@@ -231,7 +232,7 @@ export const LIFECYCLE_FIXTURES = [
     return creation.number === adrNumber(1) ? [] : ['new/duplicate-number'];
   }),
   define('new/title-refused', 'un titre avec deux-points', ['new/title-refused'], async () => {
-    await using directory = await createTemporaryDirectory('adr-title');
+    await using directory = await temporaryDirectory('adr-title');
     const repository = await createRepository(directory.path, { commits: [{ files: { [ZERO]: PROPOSED } }] });
     try {
       await createAdr({

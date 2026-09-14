@@ -1,6 +1,6 @@
-import { chmod, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { chmod, mkdir, rm, rmdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
+import { errnoCode } from '@huma/kit/errors';
 import { toRepoPath } from '@huma/kit/paths';
 
 /** Content of a fixture file; `mode` sets permission bits, `0o755` for an executable. */
@@ -8,8 +8,6 @@ export type FileContent = string | Uint8Array | Readonly<{ content: string | Uin
 
 /** Repository-relative POSIX path → content. */
 export type FileTree = Readonly<Record<string, FileContent>>;
-
-export type TemporaryDirectory = AsyncDisposable & Readonly<{ path: string }>;
 
 const encoder = new TextEncoder();
 
@@ -22,17 +20,6 @@ export function fileBytes(file: FileContent): Uint8Array {
     return file;
   }
   return typeof file.content === 'string' ? encoder.encode(file.content) : file.content;
-}
-
-/** Creates an empty directory under the OS temporary directory, removed on `await using` disposal. */
-export async function createTemporaryDirectory(prefix: string): Promise<TemporaryDirectory> {
-  const path = await mkdtemp(join(tmpdir(), `${prefix}-`));
-  return {
-    path,
-    [Symbol.asyncDispose]: async () => {
-      await rm(path, { recursive: true, force: true, maxRetries: 3 });
-    },
-  };
 }
 
 /** Writes every file of `tree` under `root`, creating parent directories; a path may not leave `root`. */
@@ -52,10 +39,34 @@ export async function writeTree(root: string, tree: FileTree): Promise<void> {
   }
 }
 
-/** Deletes the files of `previous` that `next` does not keep, then writes `next`. */
+/** Parent directories of `path` inside the tree, deepest first. */
+const parentsOf = (path: string): readonly string[] =>
+  path
+    .split('/')
+    .slice(0, -1)
+    .map((segment, index, segments) => segments.slice(0, index + 1).join('/'))
+    .toReversed();
+
+/**
+ * Deletes the files of `previous` that `next` does not keep and the directories they leave empty, then writes `next`:
+ * the directory on disk holds exactly the files of `next`.
+ */
 export async function replaceTree(root: string, previous: FileTree, next: FileTree): Promise<void> {
-  for (const path of Object.keys(previous).filter((known) => !Object.hasOwn(next, known))) {
+  const dropped = Object.keys(previous).filter((known) => !Object.hasOwn(next, known));
+  for (const path of dropped) {
     await rm(join(root, path), { force: true });
+  }
+  const directories = [...new Set(dropped.flatMap(parentsOf))].toSorted(
+    (left, right) => right.split('/').length - left.split('/').length,
+  );
+  for (const directory of directories) {
+    try {
+      await rmdir(join(root, directory));
+    } catch (error) {
+      if (errnoCode(error) !== 'ENOTEMPTY' && errnoCode(error) !== 'ENOENT') {
+        throw error;
+      }
+    }
   }
   await writeTree(root, next);
 }

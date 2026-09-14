@@ -1,5 +1,6 @@
 import { access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import { stopLiveProcessesOnSignals } from './process.ts';
 
 /** File that marks the root of the workspace. */
 export const WORKSPACE_MARKER = 'pnpm-workspace.yaml';
@@ -20,8 +21,12 @@ export const printError = (text: string): void => {
 /** 0: success · 1: findings or a refusal. Misuse and crashes exit with 2 through `runCommand`. */
 export type ExitCode = 0 | 1;
 
-/** Runs a command body and sets `process.exitCode`, so pending output is flushed before Node exits. */
+/**
+ * Runs a command body and sets `process.exitCode`, so pending output is flushed before Node exits; an interrupted
+ * command stops the processes it started.
+ */
 export async function runCommand(body: () => Promise<ExitCode>): Promise<void> {
+  stopLiveProcessesOnSignals();
   try {
     process.exitCode = await body();
   } catch (error) {

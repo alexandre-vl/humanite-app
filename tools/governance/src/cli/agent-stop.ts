@@ -1,11 +1,17 @@
-/** Claude Code `Stop` hook: runs `pnpm verify` when the working tree changed since the last green run. */
+/**
+ * Claude Code `Stop` hook: runs `pnpm verify` when the working tree changed since the last green run. The checks are
+ * loaded inside a `try`, so a hook that fails to load or crashes still keeps the agent working, with the reason.
+ */
 import { text } from 'node:stream/consumers';
-import { findWorkspaceRoot, printError } from '@huma/kit/cli';
-import { respondToStop } from '../hooks/stop.ts';
+import { stopLiveProcessesOnSignals } from '@huma/kit/process';
+import { stopFailureOutput } from '../hooks/fallback.ts';
 
+stopLiveProcessesOnSignals();
+let rawInput = '';
 try {
-  const rawInput = await text(process.stdin);
-  process.stdout.write(await respondToStop(rawInput, await findWorkspaceRoot()));
+  rawInput = await text(process.stdin);
+  const { respondToStop } = await import('../hooks/stop.ts');
+  process.stdout.write(await respondToStop(rawInput));
 } catch (error) {
-  printError(`Hook Stop en échec : ${Error.isError(error) ? error.message : typeof error}`);
+  process.stdout.write(stopFailureOutput(rawInput, error));
 }

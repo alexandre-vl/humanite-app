@@ -1,5 +1,5 @@
 import type { Coverage } from '@huma/fixtures';
-import { findDuplicateIds, runFixture } from '@huma/fixtures';
+import { findDuplicateIds, FIXTURE_TEST_TIMEOUT_MS, runFixture, uncoveredCodes } from '@huma/fixtures';
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import type { CheckCode } from '../spec/checks.ts';
 import { CHECK_CODES } from '../spec/checks.ts';
@@ -7,8 +7,7 @@ import { CHECK_FIXTURES } from './checks.ts';
 
 test('every check code is proven by at least one fixture', () => {
   expectTypeOf<Coverage<CheckCode, typeof CHECK_FIXTURES>>().toEqualTypeOf<true>();
-  const expected = new Set(CHECK_FIXTURES.flatMap((fixture) => fixture.expected));
-  expect(CHECK_CODES.filter((code) => !expected.has(code))).toEqual([]);
+  expect(uncoveredCodes(CHECK_CODES, CHECK_FIXTURES)).toEqual([]);
 });
 
 test('fixture ids are unique', () => {
@@ -33,6 +32,6 @@ describe.concurrent('each fixture reports exactly its expected codes', () => {
     async (fixture) => {
       expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
     },
-    60_000,
+    FIXTURE_TEST_TIMEOUT_MS,
   );
 });

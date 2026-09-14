@@ -1,5 +1,5 @@
 import type { Coverage } from '@huma/fixtures';
-import { findDuplicateIds, runFixture } from '@huma/fixtures';
+import { findDuplicateIds, FIXTURE_TEST_TIMEOUT_MS, runFixture } from '@huma/fixtures';
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import { BINDINGS } from '../bindings.ts';
 import { PROOFS } from '../proofs.ts';
@@ -45,6 +45,8 @@ test('every proof of the ADR process is bound to a rule of ADR-0000, except the 
     'agent/other-tool',
     'hook/settings-command-allows',
     'hook/failure-allows-innocuous',
+    'hook/stop-unverifiable-blocks',
+    'hook/stop-unverifiable-once',
   ]);
 });
 
@@ -54,6 +56,6 @@ describe.concurrent('each governance fixture reports exactly its expected codes'
     async (fixture) => {
       expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
     },
-    60_000,
+    FIXTURE_TEST_TIMEOUT_MS,
   );
 });

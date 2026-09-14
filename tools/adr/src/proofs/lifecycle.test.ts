@@ -1,5 +1,5 @@
 import type { Coverage } from '@huma/fixtures';
-import { findDuplicateIds, runFixture } from '@huma/fixtures';
+import { findDuplicateIds, FIXTURE_TEST_TIMEOUT_MS, runFixture, uncoveredCodes } from '@huma/fixtures';
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import { CHECK_FIXTURES } from './checks.ts';
 import type { LifecycleCode } from './lifecycle.ts';
@@ -7,8 +7,7 @@ import { LIFECYCLE_CODES, LIFECYCLE_FIXTURES } from './lifecycle.ts';
 
 test('every lifecycle code is reached by at least one fixture', () => {
   expectTypeOf<Coverage<LifecycleCode, typeof LIFECYCLE_FIXTURES>>().toEqualTypeOf<true>();
-  const expected = new Set(LIFECYCLE_FIXTURES.flatMap((fixture) => fixture.expected));
-  expect(LIFECYCLE_CODES.filter((code) => !expected.has(code))).toEqual([]);
+  expect(uncoveredCodes(LIFECYCLE_CODES, LIFECYCLE_FIXTURES)).toEqual([]);
 });
 
 test('proof ids are unique across the check and lifecycle fixtures', () => {
@@ -21,6 +20,6 @@ describe.concurrent('each lifecycle fixture reports exactly its expected codes',
     async (fixture) => {
       expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
     },
-    60_000,
+    FIXTURE_TEST_TIMEOUT_MS,
   );
 });

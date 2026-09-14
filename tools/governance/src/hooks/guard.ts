@@ -1,20 +1,9 @@
-import { readFile } from 'node:fs/promises';
 import { judgeToolCall } from '@huma/agents/guard';
+import { denyOutput } from '@huma/agents/protocol';
 import { findWorkspaceRoot } from '@huma/kit/cli';
+import { readTextIfExists } from '@huma/kit/fs';
 import { parseJson } from '@huma/kit/json';
 import { POLICY } from '../policy.ts';
-import { denyOutput } from './fallback.ts';
-
-async function readOptional(path: string): Promise<string | null> {
-  try {
-    return await readFile(path, 'utf8');
-  } catch (error) {
-    if (Error.isError(error) && 'code' in error && error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
-  }
-}
 
 const rootOf = async (path: string): Promise<string | null> => findWorkspaceRoot(path).catch(() => null);
 
@@ -23,7 +12,7 @@ export async function respondToToolCall(rawInput: string): Promise<string> {
   const verdict = await judgeToolCall(parseJson(rawInput), {
     policy: POLICY,
     findRoot: rootOf,
-    readFile: readOptional,
+    readFile: readTextIfExists,
   });
   return verdict.kind === 'deny' ? denyOutput(verdict.reason) : '';
 }

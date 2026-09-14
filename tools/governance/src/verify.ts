@@ -1,10 +1,11 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { print } from '@huma/kit/cli';
+import { readTextIfExists } from '@huma/kit/fs';
 import { ownRepository, worktreeTreeId } from '@huma/kit/git';
 import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
 import type { Environment } from '@huma/kit/process';
-import { run, runAttached } from '@huma/kit/process';
+import { capture, describeExit, runAttached } from '@huma/kit/process';
 import type { CommandName } from './commands.ts';
 import { COMMANDS, VERIFY_STEPS } from './commands.ts';
 
@@ -13,10 +14,9 @@ export const STAMP_PATH = 'node_modules/.cache/huma/verify.json';
 
 const BIN = 'node_modules/.bin';
 
-const EVERY_EXIT_CODE = Array.from({ length: 256 }, (value, code) => code);
-
 export type VerifyOutcome =
-  Readonly<{ kind: 'passed'; tree: string }> | Readonly<{ kind: 'failed'; step: CommandName; output: string }>;
+  | Readonly<{ kind: 'passed'; tree: string }>
+  | Readonly<{ kind: 'failed'; step: CommandName; ending: string; output: string }>;
 
 export type VerifyOptions = Readonly<{
   /** Checks the index being committed: `adr:check` reads the index and the acceptance proofs run. */
@@ -24,6 +24,8 @@ export type VerifyOptions = Readonly<{
   /** `attached` streams each step to the terminal; `captured` keeps the output for a hook to report. */
   output: 'attached' | 'captured';
   env: Environment;
+  /** Aborting it stops the captured step in flight, which then fails: a caller with a deadline sets it. */
+  signal?: AbortSignal;
 }>;
 
 const stepArguments = (step: CommandName, staged: boolean): readonly string[] => {
@@ -34,12 +36,9 @@ const stepArguments = (step: CommandName, staged: boolean): readonly string[] =>
 const program = (root: string, name: string): string => (name === 'node' ? process.execPath : join(root, BIN, name));
 
 export async function readVerifiedTree(root: string): Promise<string | null> {
-  try {
-    const stamp = parseJson(await readFile(join(root, STAMP_PATH), 'utf8'));
-    return isJsonObject(stamp) ? stringField(stamp, 'tree') : null;
-  } catch {
-    return null;
-  }
+  const text = await readTextIfExists(join(root, STAMP_PATH));
+  const stamp = text === null ? null : parseJson(text);
+  return isJsonObject(stamp) ? stringField(stamp, 'tree') : null;
 }
 
 /** Runs every step of `VERIFY_STEPS` in order, stopping at the first failure; a success records the verified tree. */
@@ -52,15 +51,24 @@ export async function runVerify(root: string, options: VerifyOptions): Promise<V
     const args = stepArguments(step, options.staged);
     if (options.output === 'attached') {
       print(`▶ ${step}`);
-      const code = await runAttached(program(root, name), args, { cwd: root, env });
-      if (code !== 0) {
-        return { kind: 'failed', step, output: '' };
+      const exit = await runAttached(program(root, name), args, { cwd: root, env });
+      if (exit.kind !== 'exited' || exit.code !== 0) {
+        return { kind: 'failed', step, ending: describeExit(exit), output: '' };
       }
       continue;
     }
-    const result = await run(program(root, name), args, { cwd: root, env, successCodes: EVERY_EXIT_CODE });
-    if (result.exitCode !== 0) {
-      return { kind: 'failed', step, output: `${result.stdout.toString('utf8')}${result.stderr.toString('utf8')}` };
+    const result = await capture(program(root, name), args, {
+      cwd: root,
+      env,
+      ...(options.signal === undefined ? {} : { signal: options.signal }),
+    });
+    if (result.exit.kind !== 'exited' || result.exit.code !== 0) {
+      return {
+        kind: 'failed',
+        step,
+        ending: describeExit(result.exit),
+        output: `${result.stdout.toString('utf8')}${result.stderr.toString('utf8')}`,
+      };
     }
   }
   const treeAfter = await worktreeTreeId(repository);

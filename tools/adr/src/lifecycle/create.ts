@@ -1,6 +1,7 @@
 import { readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import { hostname } from 'node:os';
 import { join } from 'node:path';
+import { errnoCode } from '@huma/kit/errors';
 import type { GitRepository } from '@huma/kit/git';
 import { commonDirectory, git, worktreeRoots } from '@huma/kit/git';
 import type { RepoPath } from '@huma/kit/paths';
@@ -94,7 +95,7 @@ const isAlive = (pid: number): boolean => {
     process.kill(pid, 0);
     return true;
   } catch (error) {
-    return Error.isError(error) && 'code' in error && error.code === 'EPERM';
+    return errnoCode(error) === 'EPERM';
   }
 };
 
@@ -117,7 +118,7 @@ async function withLock<Result>(repository: GitRepository, body: () => Promise<R
       await writeFile(lock, owner, { flag: 'wx' });
       break;
     } catch (error) {
-      if (!(Error.isError(error) && 'code' in error && error.code === 'EEXIST')) {
+      if (errnoCode(error) !== 'EEXIST') {
         throw error;
       }
       if (await isStale(lock)) {

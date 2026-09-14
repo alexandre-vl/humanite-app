@@ -5,6 +5,7 @@
   "exports": {
     "./guard": "./src/guard.ts",
     "./policy": "./src/policy.ts",
+    "./protocol": "./src/protocol.ts",
     "./proofs": "./src/proofs/guard.ts",
     "./settings": "./src/settings.ts",
     "./stop": "./src/stop.ts"

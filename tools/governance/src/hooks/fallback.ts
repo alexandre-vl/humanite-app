@@ -1,8 +1,9 @@
 /**
- * What the agent guard answers when its own code fails to load or crashes. It imports nothing, so a broken tool
- * still refuses the calls that touch what the guard protects, and lets the others through so that an agent can
- * repair it.
+ * What the agent hooks answer when their own code fails to load or crashes. It imports only the hook protocol, so a
+ * broken tool still refuses the calls that touch what the guard protects, lets the others through so that an agent
+ * can repair it, and keeps an agent working rather than let it stop on an unverified tree.
  */
+import { blockOutput, denyOutput, readHookInput } from '@huma/agents/protocol';
 
 const SENSITIVE = [
   'docs/adr',
@@ -21,8 +22,7 @@ const SENSITIVE = [
   'claude_code_child_session',
 ];
 
-export const guardFailureReason = (detail: string): string =>
-  `Garde des agents en échec (${detail}) : appel refusé par prudence, car il touche une zone protégée.`;
+const describe = (error: unknown): string => (Error.isError(error) ? error.message : typeof error);
 
 /** `true` when a raw hook input mentions a protected area and must be refused without further analysis. */
 export const touchesProtectedArea = (rawInput: string): boolean => {
@@ -30,7 +30,18 @@ export const touchesProtectedArea = (rawInput: string): boolean => {
   return rawInput.trim() === '' || SENSITIVE.some((token) => lowered.includes(token));
 };
 
-export const denyOutput = (reason: string): string =>
-  `${JSON.stringify({
-    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason },
-  })}\n`;
+/** Output of the `PreToolUse` hook when the guard failed: a refusal when the call touches a protected area. */
+export const guardFailureOutput = (rawInput: string, error: unknown): string =>
+  touchesProtectedArea(rawInput)
+    ? denyOutput(
+        `Garde des agents en échec (${describe(error)}) : appel refusé par prudence, car il touche une zone protégée.`,
+      )
+    : '';
+
+/** Output of the `Stop` hook when the checks could not conclude: the agent keeps working, once. */
+export const stopFailureOutput = (rawInput: string, error: unknown): string =>
+  readHookInput(rawInput)?.stopHookActive === true
+    ? ''
+    : blockOutput(
+        `Hook Stop en échec (${describe(error)}) : pnpm verify n’a pas pu conclure. Corriger l’outillage avant de terminer, ou dire pourquoi c’est impossible.`,
+      );

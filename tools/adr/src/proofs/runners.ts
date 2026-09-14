@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 import type { FileTree } from '@huma/fixtures';
-import { createRepository, createTemporaryDirectory, fileBytes, writeTree } from '@huma/fixtures';
+import { createRepository, fileBytes, writeTree } from '@huma/fixtures';
+import { temporaryDirectory } from '@huma/kit/fs';
 import type { FileSource, GitRepository } from '@huma/kit/git';
 import { git, isolatedRepository } from '@huma/kit/git';
 import type { Environment } from '@huma/kit/process';
@@ -93,7 +94,7 @@ export type HistoryFixture = Readonly<{
 
 /** Codes of every check, history included, on a fresh repository built from `fixture`. */
 export async function checkHistoryFixture(fixture: HistoryFixture): Promise<readonly CheckCode[]> {
-  await using directory = await createTemporaryDirectory('adr-history');
+  await using directory = await temporaryDirectory('adr-history');
   const origin = join(directory.path, 'origin');
   let repository = await createRepository(origin, {
     commits: (fixture.commits ?? []).map((files) => ({ files })),
@@ -119,7 +120,7 @@ export async function checkHistoryFixture(fixture: HistoryFixture): Promise<read
 
 /** Codes of every check on a plain directory that is not a git repository. */
 export async function checkPlainDirectory(files: FileTree): Promise<readonly CheckCode[]> {
-  await using directory = await createTemporaryDirectory('adr-plain');
+  await using directory = await temporaryDirectory('adr-plain');
   await writeTree(directory.path, files);
   const report = await runChecks({
     repository: isolatedRepository(directory.path),

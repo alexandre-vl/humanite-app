@@ -33,36 +33,40 @@ export type RepositoryOptions = Readonly<{
   prepare?: (files: FileTree) => Promise<FileTree>;
   /** Hooks stay disabled unless a fixture tests them; the commits of the plan never run them. */
   hooks?: 'disabled' | 'enabled';
+  /** The fixture signal: aborting it stops every git call on the repository. */
+  signal?: AbortSignal;
 }>;
 
 const identity = async (files: FileTree): Promise<FileTree> => Promise.resolve(files);
 
 /**
  * Creates at `root` a git repository that goes through the states of `plan`. It is isolated from the calling
- * process: no git variable of a hook, no user configuration, fixed identity and dates.
+ * process: no git variable of a hook, no user or system configuration, fixed identity and dates.
  */
 export async function createRepository(
   root: string,
   plan: RepositoryPlan,
   options: RepositoryOptions = {},
 ): Promise<GitRepository> {
-  const repository = isolatedRepository(root, { ...process.env, ...FIXTURE_IDENTITY });
+  const repository = isolatedRepository(root, {
+    env: FIXTURE_IDENTITY,
+    hooks: options.hooks ?? 'disabled',
+    ...(options.signal === undefined ? {} : { signal: options.signal }),
+  });
   const prepare = options.prepare ?? identity;
   await mkdir(root, { recursive: true });
   await git(repository, ['init', '--quiet', '--initial-branch=main']);
-  if (options.hooks !== 'enabled') {
-    await git(repository, ['config', 'core.hooksPath', '/dev/null']);
-  }
   let previous: FileTree = {};
   for (const [index, commit] of (plan.commits ?? []).entries()) {
     const files = await prepare(commit.files);
     await replaceTree(root, previous, files);
     await git(repository, ['add', '--all']);
     await git(repository, [
+      '-c',
+      'core.hooksPath=/dev/null',
       'commit',
       '--quiet',
       '--allow-empty',
-      '--no-verify',
       '-m',
       commit.message ?? `état ${String(index + 1)}`,
     ]);

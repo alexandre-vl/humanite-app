@@ -1,6 +1,15 @@
+import { capture } from '@huma/kit/process';
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import type { Coverage, Fixture } from './bench.ts';
-import { findDuplicateIds, fixtureFactory, formatReports, runFixture, runFixtures } from './bench.ts';
+import {
+  findDuplicateIds,
+  fixtureFactory,
+  formatReports,
+  runFixture,
+  runFixtures,
+  SETTLE_MS,
+  uncoveredCodes,
+} from './bench.ts';
 
 type Code = 'a/one' | 'a/two';
 
@@ -50,22 +59,33 @@ describe('runFixture', () => {
     expect(report).toMatchObject({ outcome: 'crashed', error: 'valeur non Error levée (object)' });
   });
 
-  test('crashes a fixture that exceeds its time budget and aborts its signal', async () => {
-    let aborted = false;
+  test('a fixture over its budget is aborted, and its report waits until the work it started has stopped', async () => {
+    let stopped = false;
     const report = await runFixture(
       define('slow', 'lente', [], async ({ signal }) => {
-        signal.addEventListener('abort', () => {
-          aborted = true;
-        });
-        await waiting(1_000);
+        const result = await capture('sleep', ['30'], { cwd: process.cwd(), signal });
+        stopped = result.exit.kind === 'aborted';
+        return [];
+      }),
+      { timeoutMs: 50 },
+    );
+    expect(report).toMatchObject({ outcome: 'crashed', error: 'délai de 50 ms dépassé' });
+    expect(stopped).toBe(true);
+    expect(report.durationMs).toBeLessThan(SETTLE_MS);
+  });
+
+  test('a fixture that ignores its signal is reported once the settling time is over', async () => {
+    const report = await runFixture(
+      define('stubborn', 'têtue', [], async () => {
+        await waiting(SETTLE_MS + 2_000);
         return [];
       }),
       { timeoutMs: 20 },
     );
     expect(report).toMatchObject({ outcome: 'crashed' });
-    expect(report.outcome === 'crashed' ? report.error : '').toContain('délai de 20 ms dépassé');
-    expect(aborted).toBe(true);
-  });
+    expect(report.durationMs).toBeGreaterThanOrEqual(SETTLE_MS);
+    expect(report.durationMs).toBeLessThan(SETTLE_MS + 1_500);
+  }, 15_000);
 });
 
 describe('runFixtures', () => {
@@ -106,9 +126,11 @@ describe('Coverage', () => {
   const both = define('both', 'deux', ['a/one', 'a/two'], observing(['a/one', 'a/two']));
   const widened: readonly Code[] = ['a/one'];
   const loose = define('loose', 'élargi', widened, observing(widened));
+  const flag = Math.random() < 2;
+  const branchy = define('branchy', 'selon un drapeau', flag ? ['a/one'] : ['a/two'], observing(['a/one']));
 
   test('resolves to true once every code is expected by a literal tuple', () => {
-    expect([one, both, loose].map((fixture) => fixture.id)).toEqual(['one', 'both', 'loose']);
+    expect([one, both, loose, branchy].map((fixture) => fixture.id)).toEqual(['one', 'both', 'loose', 'branchy']);
     expectTypeOf<Coverage<Code, readonly [typeof one, typeof both]>>().toEqualTypeOf<true>();
   });
 
@@ -120,5 +142,16 @@ describe('Coverage', () => {
     expectTypeOf<Coverage<Code, readonly [typeof both, typeof loose]>>().toEqualTypeOf<
       Readonly<{ notLiteral: 'loose' }>
     >();
+  });
+
+  test('refuses a fixture whose expected codes are a union of tuples', () => {
+    expectTypeOf<Coverage<Code, readonly [typeof both, typeof branchy]>>().toEqualTypeOf<
+      Readonly<{ notLiteral: 'branchy' }>
+    >();
+  });
+
+  test('uncoveredCodes gives the same answer at run time', () => {
+    expect(uncoveredCodes<Code>(['a/one', 'a/two'], [one])).toEqual(['a/two']);
+    expect(uncoveredCodes<Code>(['a/one', 'a/two'], [one, both])).toEqual([]);
   });
 });

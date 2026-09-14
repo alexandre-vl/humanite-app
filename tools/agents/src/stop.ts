@@ -1,5 +1,3 @@
-import { isJsonObject } from '@huma/kit/json';
-
 /** What the `Stop` hook does: let the agent stop, or run the checks first. */
 export type StopAction = 'allow' | 'verify';
 
@@ -14,9 +12,3 @@ export type StopInput = Readonly<{
 
 export const decideStop = (input: StopInput): StopAction =>
   input.stopHookActive || input.currentTree === input.verifiedTree ? 'allow' : 'verify';
-
-export const isStopHookActive = (hookInput: unknown): boolean =>
-  isJsonObject(hookInput) && hookInput['stop_hook_active'] === true;
-
-/** Output that keeps the agent working, with the failing check as the reason. */
-export const blockStop = (reason: string): string => `${JSON.stringify({ decision: 'block', reason })}\n`;

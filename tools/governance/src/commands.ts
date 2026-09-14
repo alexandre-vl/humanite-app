@@ -1,3 +1,5 @@
+import { keysOf } from '@huma/kit/records';
+
 /**
  * Every command of the workspace, once: `package.json` scripts, the steps of `pnpm verify`, the agent hooks and the
  * commands reserved to the human decision maker are all derived from this table.
@@ -68,9 +70,7 @@ export const VERIFY_STEPS = [
   'adr:check',
 ] as const satisfies readonly CommandName[];
 
-export const COMMAND_NAMES: readonly CommandName[] = Object.keys(COMMANDS).filter((name): name is CommandName =>
-  Object.hasOwn(COMMANDS, name),
-);
+export const COMMAND_NAMES: readonly CommandName[] = keysOf(COMMANDS);
 
 const SAFE_WORD = /^[\w@%+=:,./-]+$/u;
 

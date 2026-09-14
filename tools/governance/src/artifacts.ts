@@ -8,6 +8,7 @@ import { readSnapshot } from '@huma/adr/snapshot';
 import { renderClaudeSettings } from '@huma/agents/settings';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
+import { readTextIfExists } from '@huma/kit/fs';
 import { ownRepository } from '@huma/kit/git';
 import { isJsonObject, parseJson } from '@huma/kit/json';
 import type { RepoPath } from '@huma/kit/paths';
@@ -72,24 +73,13 @@ const manifest: Artifact = {
 
 export const ARTIFACTS: readonly Artifact[] = [ADR_INDEX_ARTIFACT, claudeSettings, manifest];
 
-async function readOptional(path: string): Promise<string | null> {
-  try {
-    return await readFile(path, 'utf8');
-  } catch (error) {
-    if (Error.isError(error) && 'code' in error && error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
-  }
-}
-
 export async function checkArtifacts(
   root: string,
   artifacts: readonly Artifact[] = ARTIFACTS,
 ): Promise<readonly Diagnostic<GovernanceCode>[]> {
   const diagnostics: Diagnostic<GovernanceCode>[] = [];
   for (const artifact of artifacts) {
-    const actual = await readOptional(join(root, artifact.path));
+    const actual = await readTextIfExists(join(root, artifact.path));
     if (actual === null) {
       diagnostics.push(governanceFinding('gen/missing', artifact.path, {}));
       continue;
@@ -112,7 +102,7 @@ export async function writeArtifacts(
   for (const artifact of artifacts) {
     const target = join(root, artifact.path);
     const expected = await artifact.render(root);
-    if ((await readOptional(target)) !== expected) {
+    if ((await readTextIfExists(target)) !== expected) {
       await mkdir(dirname(target), { recursive: true });
       await writeFile(target, expected, 'utf8');
       written.push(artifact.path);

@@ -64,8 +64,8 @@ export async function committedStates(
   if ((await resolveCommit(repository, 'HEAD')) === null) {
     return new Map();
   }
-  const changes = await firstParentHistory(repository, ADR_DIRECTORY);
-  const reads = changes.flatMap(({ commit, paths }) =>
+  const changes = await firstParentHistory(repository, { pathspec: ADR_DIRECTORY });
+  const reads = changes.flatMap(({ id: commit, paths }) =>
     paths.flatMap((path) => {
       const file = numberedFile(path);
       return file === null ? [] : [{ commit, path, ...file }];
@@ -77,7 +77,7 @@ export async function committedStates(
   );
   const present = new Map<AdrNumber, Map<RepoPath, AdrDocument>>();
   const timelines = new Map<AdrNumber, CommittedState[]>();
-  for (const { commit, authorDate } of changes) {
+  for (const { id: commit, authorDate } of changes) {
     const touched = new Set<AdrNumber>();
     for (const read of reads.filter((candidate) => candidate.commit === commit)) {
       const bytes = objects.get(`${read.commit}:${read.path}`) ?? null;

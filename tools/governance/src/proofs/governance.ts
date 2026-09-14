@@ -4,15 +4,16 @@ import { INDEX_FILE } from '@huma/adr/layout';
 import { PROPOSED, ZERO } from '@huma/adr/proof-documents';
 import { renderClaudeSettings } from '@huma/agents/settings';
 import type { FileTree } from '@huma/fixtures';
-import { createRepository, createTemporaryDirectory, fixtureFactory } from '@huma/fixtures';
+import { createRepository, fixtureFactory } from '@huma/fixtures';
+import { temporaryDirectory } from '@huma/kit/fs';
 import { arrayField, isJsonObject, objectField, parseJson, stringField } from '@huma/kit/json';
 import { runText } from '@huma/kit/process';
 import { ADR_INDEX_ARTIFACT, checkArtifacts } from '../artifacts.ts';
 import type { GovernanceCode } from '../checks.ts';
-import { touchesProtectedArea } from '../hooks/fallback.ts';
+import { guardFailureOutput } from '../hooks/fallback.ts';
 import { HOOK_COMMANDS, POLICY } from '../policy.ts';
 
-export const HOOK_CODES = ['hook/denied'] as const;
+export const HOOK_CODES = ['hook/denied', 'hook/blocked'] as const;
 
 export type GovernanceProofCode = GovernanceCode | (typeof HOOK_CODES)[number];
 
@@ -22,7 +23,7 @@ const REPOSITORY_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 
 /** Codes of the index check on a repository holding a valid ADR and the files `files` derives from the right index. */
 async function indexCheck(files: (index: string) => FileTree): Promise<readonly GovernanceProofCode[]> {
-  await using directory = await createTemporaryDirectory('governance-gen');
+  await using directory = await temporaryDirectory('governance-gen');
   const reference = join(directory.path, 'reference');
   await createRepository(reference, { commits: [{ files: { [ZERO]: PROPOSED } }] });
   const expected = await ADR_INDEX_ARTIFACT.render(reference);
@@ -31,25 +32,32 @@ async function indexCheck(files: (index: string) => FileTree): Promise<readonly 
   return (await checkArtifacts(checked, [ADR_INDEX_ARTIFACT])).map((item) => item.code);
 }
 
-/** Runs the exact `PreToolUse` command of the rendered settings on a tool call; codes from its answer. */
-async function hookCommand(toolInput: Readonly<Record<string, unknown>>): Promise<readonly GovernanceProofCode[]> {
+type HookEvent = 'PreToolUse' | 'Stop';
+
+/** The command line the rendered settings give to the first hook of `event`. */
+function settingsCommand(event: HookEvent): string {
   const settings = parseJson(renderClaudeSettings(POLICY, HOOK_COMMANDS));
-  const preToolUse = isJsonObject(settings) ? arrayField(objectField(settings, 'hooks') ?? {}, 'PreToolUse') : null;
-  const [entry] = preToolUse ?? [];
+  const entries = isJsonObject(settings) ? arrayField(objectField(settings, 'hooks') ?? {}, event) : null;
+  const [entry] = entries ?? [];
   const [hook] = isJsonObject(entry) ? (arrayField(entry, 'hooks') ?? []) : [];
   const command = isJsonObject(hook) ? stringField(hook, 'command') : null;
   if (command === null) {
-    throw new Error('Commande PreToolUse absente des réglages rendus');
+    throw new Error(`Commande ${event} absente des réglages rendus`);
   }
-  const output = await runText('sh', ['-c', command], {
+  return command;
+}
+
+/** Runs the exact command of the rendered settings for `event` on `input`, as Claude Code does; codes from its answer. */
+async function hookCommand(
+  event: HookEvent,
+  input: Readonly<Record<string, unknown>>,
+  signal: AbortSignal,
+): Promise<readonly GovernanceProofCode[]> {
+  const output = await runText('sh', ['-c', settingsCommand(event)], {
     cwd: REPOSITORY_ROOT,
     env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT.replace(/\/$/u, '') },
-    input: JSON.stringify({
-      hook_event_name: 'PreToolUse',
-      tool_name: 'Bash',
-      tool_input: toolInput,
-      cwd: REPOSITORY_ROOT,
-    }),
+    input: JSON.stringify({ hook_event_name: event, cwd: REPOSITORY_ROOT, ...input }),
+    signal,
   });
   if (output.trim() === '') {
     return [];
@@ -59,8 +67,14 @@ async function hookCommand(toolInput: Readonly<Record<string, unknown>>): Promis
   if (specific !== null && stringField(specific, 'permissionDecision') === 'deny') {
     return ['hook/denied'];
   }
+  if (isJsonObject(answer) && stringField(answer, 'decision') === 'block') {
+    return ['hook/blocked'];
+  }
   throw new Error(`Réponse inattendue du hook : ${output}`);
 }
+
+const toolCall = async (command: string, signal: AbortSignal): Promise<readonly GovernanceProofCode[]> =>
+  hookCommand('PreToolUse', { tool_name: 'Bash', tool_input: { command } }, signal);
 
 export const GOVERNANCE_FIXTURES = [
   define('gen/in-step', 'un index des ADR régénéré à l’identique', [], async () =>
@@ -74,10 +88,13 @@ export const GOVERNANCE_FIXTURES = [
     'hook/settings-command-denies',
     'la commande du hook des réglages refuse adr:decide',
     ['hook/denied'],
-    async () => hookCommand({ command: 'pnpm adr:decide ADR-0000 accepted' }),
+    async ({ signal }) => toolCall('pnpm adr:decide ADR-0000 accepted', signal),
   ),
-  define('hook/settings-command-allows', 'la commande du hook des réglages laisse passer adr:check', [], async () =>
-    hookCommand({ command: 'pnpm adr:check' }),
+  define(
+    'hook/settings-command-allows',
+    'la commande du hook des réglages laisse passer adr:check',
+    [],
+    async ({ signal }) => toolCall('pnpm adr:check', signal),
   ),
   define(
     'hook/failure-denies-sensitive',
@@ -85,11 +102,27 @@ export const GOVERNANCE_FIXTURES = [
     ['hook/denied'],
     async () =>
       Promise.resolve(
-        touchesProtectedArea('{"tool_input":{"command":"pnpm adr:decide ADR-0000 accepted"}}') ? ['hook/denied'] : [],
+        guardFailureOutput('{"tool_input":{"command":"pnpm adr:decide ADR-0000 accepted"}}', new Error('panne')) === ''
+          ? []
+          : ['hook/denied'],
       ),
   ),
   define('hook/failure-allows-innocuous', 'une garde en échec laisse passer une lecture ordinaire', [], async () =>
-    Promise.resolve(touchesProtectedArea('{"tool_input":{"command":"ls tools"}}') ? ['hook/denied'] : []),
+    Promise.resolve(
+      guardFailureOutput('{"tool_input":{"command":"ls tools"}}', new Error('panne')) === '' ? [] : ['hook/denied'],
+    ),
+  ),
+  define(
+    'hook/stop-unverifiable-blocks',
+    'un hook Stop qui ne peut pas lancer les contrôles garde l’agent au travail',
+    ['hook/blocked'],
+    async ({ signal }) => hookCommand('Stop', { cwd: '/nonexistent/huma-workspace', stop_hook_active: false }, signal),
+  ),
+  define(
+    'hook/stop-unverifiable-once',
+    'le même échec ne bloque pas un second arrêt, pour éviter une boucle',
+    [],
+    async ({ signal }) => hookCommand('Stop', { cwd: '/nonexistent/huma-workspace', stop_hook_active: true }, signal),
   ),
 ] as const;
 

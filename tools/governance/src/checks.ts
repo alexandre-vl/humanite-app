@@ -1,11 +1,8 @@
-import type { Diagnostic, Position } from '@huma/kit/diagnostics';
-import { diagnostic, START } from '@huma/kit/diagnostics';
-import type { MessageDetails } from '@huma/kit/messages';
-import { renderMessage } from '@huma/kit/messages';
-import type { RepoPath } from '@huma/kit/paths';
+import type { CheckCodeOf } from '@huma/kit/checks';
+import { defineChecks } from '@huma/kit/checks';
 
 /** Findings of the workspace checks that no single tool owns. Each code is proven by a governance fixture. */
-export const GOVERNANCE_CHECKS = {
+const TABLE = {
   'gen/missing': {
     summary: 'chaque fichier dérivé existe',
     message: 'fichier dérivé absent : lancer pnpm gen',
@@ -14,13 +11,10 @@ export const GOVERNANCE_CHECKS = {
     summary: 'chaque fichier dérivé est identique à sa source',
     message: 'fichier dérivé périmé à partir de la ligne {line} : lancer pnpm gen',
   },
-} as const satisfies Readonly<Record<string, Readonly<{ summary: string; message: string }>>>;
+} as const;
 
-export type GovernanceCode = keyof typeof GOVERNANCE_CHECKS;
+export const GOVERNANCE_CHECKS = defineChecks(TABLE);
 
-export const governanceFinding = <Code extends GovernanceCode>(
-  code: Code,
-  path: RepoPath,
-  details: MessageDetails<(typeof GOVERNANCE_CHECKS)[Code]['message']>,
-  position: Position = START,
-): Diagnostic<Code> => diagnostic(code, path, position, renderMessage(code, GOVERNANCE_CHECKS[code].message, details));
+export type GovernanceCode = CheckCodeOf<typeof TABLE>;
+
+export const governanceFinding = GOVERNANCE_CHECKS.finding;

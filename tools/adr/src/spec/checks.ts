@@ -3,6 +3,7 @@ import { diagnostic, START } from '@huma/kit/diagnostics';
 import type { MessageDetails } from '@huma/kit/messages';
 import { renderMessage } from '@huma/kit/messages';
 import type { RepoPath } from '@huma/kit/paths';
+import { keysOf } from '@huma/kit/records';
 
 /**
  * Every finding `adr:check` can report, one code per rule. A message says what was found, then what is expected;
@@ -555,9 +556,7 @@ export const CHECKS = {
 
 export type CheckCode = keyof typeof CHECKS;
 
-export const CHECK_CODES: readonly CheckCode[] = Object.keys(CHECKS).filter((key): key is CheckCode =>
-  Object.hasOwn(CHECKS, key),
-);
+export const CHECK_CODES: readonly CheckCode[] = keysOf(CHECKS);
 
 export type ScopedCode<Scope extends CheckScope> = {
   [Code in CheckCode]: (typeof CHECKS)[Code]['scope'] extends Scope ? Code : never;
