@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": ["./strict.json", "./project.json"],
+  "compilerOptions": {
+    "noEmit": false,
+    "allowJs": false,
+    "lib": ["ESNext"],
+    "types": []
+  }
+}

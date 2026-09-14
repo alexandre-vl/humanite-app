@@ -1,0 +1,23 @@
+{
+  "name": "@huma/expo",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./apps": "./src/apps.ts",
+    "./checks": "./src/checks.ts",
+    "./expo": "./src/expo.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./typed-routes": "./src/typed-routes.ts"
+  },
+  "dependencies": {
+    "@huma/deps": "workspace:*",
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

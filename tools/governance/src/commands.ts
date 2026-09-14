@@ -65,6 +65,11 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'vérifie manifestes, catalog, références TypeScript et lockfile',
   },
+  'expo:types': {
+    argv: ['node', cli('expo-types')],
+    audience: 'everyone',
+    summary: 'génère les types de routes de chaque app Expo, sans qu’Expo réécrive un fichier suivi',
+  },
   format: { argv: ['node', cli('format')], audience: 'everyone', summary: 'formate les fichiers du dépôt' },
   'format:check': {
     argv: ['node', cli('format'), '--check'],
@@ -110,6 +115,7 @@ export const VERIFY_STEPS = [
   'hooks:check',
   'deps:check',
   'format:check',
+  'expo:types',
   'lint',
   'typecheck',
   'test',

@@ -1,0 +1,42 @@
+{
+  "name": "@huma/mobile",
+  "private": true,
+  "type": "module",
+  "main": "expo-router/entry",
+  "imports": {
+    "#app": "./src/_app/index.ts",
+    "#entities/*": "./src/entities/*/index.ts",
+    "#features/*": "./src/features/*/index.ts",
+    "#pages/*": "./src/pages/*/index.ts",
+    "#shared/*": "./src/shared/*/index.ts"
+  },
+  "dependencies": {
+    "@expo/dom-webview": "catalog:",
+    "@expo/log-box": "catalog:",
+    "@expo/metro-runtime": "catalog:",
+    "expo": "catalog:",
+    "expo-constants": "catalog:",
+    "expo-dev-client": "catalog:",
+    "expo-font": "catalog:",
+    "expo-linking": "catalog:",
+    "expo-router": "catalog:",
+    "react": "catalog:",
+    "react-native": "catalog:",
+    "react-native-gesture-handler": "catalog:",
+    "react-native-reanimated": "catalog:",
+    "react-native-safe-area-context": "catalog:",
+    "react-native-screens": "catalog:",
+    "react-native-worklets": "catalog:"
+  },
+  "devDependencies": {
+    "@babel/core": "catalog:",
+    "@expo/metro-config": "catalog:",
+    "@huma/tsconfig": "workspace:*",
+    "@react-native/metro-config": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "babel-preset-expo": "catalog:",
+    "react-refresh": "catalog:",
+    "typescript": "catalog:"
+  }
+}

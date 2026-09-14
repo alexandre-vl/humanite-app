@@ -6,7 +6,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 
 ## Avant de terminer
 
-- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `deps:check`, `format:check`, `lint`, `typecheck`, `test`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
+- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `deps:check`, `format:check`, `expo:types`, `lint`, `typecheck`, `test`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
 - Les sessions de Claude Code démarrent à la racine du dépôt : les réglages et les hooks du projet ne sont lus que depuis le `.claude/` du dossier de démarrage.
 
 ## Commandes
@@ -18,6 +18,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm adr:new`       | crée un ADR proposé au dernier format                                                   |
 | `pnpm adr:status`    | liste les ADR, leur statut et leurs preuves                                             |
 | `pnpm deps:check`    | vérifie manifestes, catalog, références TypeScript et lockfile                          |
+| `pnpm expo:types`    | génère les types de routes de chaque app Expo, sans qu’Expo réécrive un fichier suivi   |
 | `pnpm format`        | formate les fichiers du dépôt                                                           |
 | `pnpm format:check`  | vérifie le formatage des fichiers du dépôt                                              |
 | `pnpm gen`           | régénère les fichiers dérivés                                                           |

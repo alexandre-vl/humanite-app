@@ -8,22 +8,22 @@ import { INDEX_FILE } from '@huma/adr/layout';
 import { readSnapshot } from '@huma/adr/snapshot';
 import { CLAUDE_SETTINGS_PATH } from '@huma/agents/policy';
 import { renderClaudeSettings } from '@huma/agents/settings';
+import { packageDirectories, renderWorkspaceFile, WORKSPACE_FILE_NAME } from '@huma/deps/workspace';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
-import { readTextIfExists } from '@huma/kit/fs';
+import { directoryNames, readTextIfExists } from '@huma/kit/fs';
 import { ownRepository } from '@huma/kit/git';
 import { isJsonObject, parseJson } from '@huma/kit/json';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath } from '@huma/kit/paths';
-import { firstDifferentLine } from '@huma/kit/text';
+import { compareText, firstDifferentLine } from '@huma/kit/text';
+import { renderAgentsGuide } from './agents-guide.ts';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
 import { COMMAND_NAMES, COMMANDS, commandLine, SCRIPT_AUDIENCES } from './commands.ts';
-import { packageDirectories, renderWorkspaceFile, WORKSPACE_FILE_NAME } from '@huma/deps/workspace';
-import { renderAgentsGuide } from './agents-guide.ts';
-import { WORKSPACE_FILE } from './workspace-manifest.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
+import { WORKSPACE_FILE } from './workspace-manifest.ts';
 
 /** A file derived from typed sources: `pnpm gen` writes it, `pnpm gen:check` compares it without writing. */
 export type Artifact = Readonly<{
@@ -100,18 +100,31 @@ const workspaceFile: Artifact = {
 
 const SOLUTION = repoPath('tsconfig.json');
 
-/** The solution project: the configuration files, then every package of the workspace that has a TypeScript project. */
+/** A secondary TypeScript project beside a package's `tsconfig.json`: `tsconfig.node.json` for its Node files. */
+const SECONDARY_PROJECT = /^tsconfig\.[a-z]+\.json$/u;
+
+/** The TypeScript projects of `directory`, as references of the solution: `tsconfig.json` first, then the others. */
+async function projectsOf(root: string, directory: string): Promise<readonly string[]> {
+  const names = (await directoryNames(join(root, directory))) ?? [];
+  const prefix = directory === '.' ? '.' : `./${directory}`;
+  const main = directory !== '.' && names.includes('tsconfig.json') ? [prefix] : [];
+  const secondary = names.filter((name) => SECONDARY_PROJECT.test(name)).toSorted(compareText);
+  return [...main, ...secondary.map((name) => `${prefix}/${name}`)];
+}
+
+/**
+ * The solution project, which `tsc --build` and the editors start from: every TypeScript project of the root and of
+ * the packages. A file no project includes would be checked by nothing, and linted without types.
+ */
 const solution: Artifact = {
   path: SOLUTION,
   render: async (root) => {
-    const projects: string[] = [];
-    for (const directory of await packageDirectories(root, WORKSPACE_FILE.packages)) {
-      if ((await readTextIfExists(join(root, directory, 'tsconfig.json'))) !== null) {
-        projects.push(`./${directory}`);
-      }
+    const references: string[] = [];
+    for (const directory of ['.', ...(await packageDirectories(root, WORKSPACE_FILE.packages))]) {
+      references.push(...(await projectsOf(root, directory)));
     }
-    const references = ['./tsconfig.config.json', ...projects].map((path) => ({ path }));
-    return formatForPath(root, SOLUTION, `${JSON.stringify({ files: [], references }, null, 2)}\n`);
+    const text = JSON.stringify({ files: [], references: references.map((path) => ({ path })) }, null, 2);
+    return formatForPath(root, SOLUTION, `${text}\n`);
   },
 };
 

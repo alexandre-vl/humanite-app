@@ -5,6 +5,12 @@
       "path": "./tsconfig.config.json"
     },
     {
+      "path": "./apps/mobile"
+    },
+    {
+      "path": "./apps/mobile/tsconfig.node.json"
+    },
+    {
       "path": "./packages/eslint-config"
     },
     {
@@ -15,6 +21,9 @@
     },
     {
       "path": "./tools/deps"
+    },
+    {
+      "path": "./tools/expo"
     },
     {
       "path": "./tools/fixtures"

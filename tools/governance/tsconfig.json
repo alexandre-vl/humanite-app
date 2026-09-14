@@ -5,6 +5,7 @@
     { "path": "../adr" },
     { "path": "../agents" },
     { "path": "../deps" },
+    { "path": "../expo" },
     { "path": "../fixtures" },
     { "path": "../git-hooks" },
     { "path": "../kit" },
