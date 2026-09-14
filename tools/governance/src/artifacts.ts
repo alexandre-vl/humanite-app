@@ -20,6 +20,7 @@ import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
 import { COMMAND_NAMES, COMMANDS, commandLine, SCRIPT_AUDIENCES } from './commands.ts';
+import { renderAgentsGuide } from './agents-guide.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
 
 /** A file derived from typed sources: `pnpm gen` writes it, `pnpm gen:check` compares it without writing. */
@@ -73,7 +74,22 @@ const manifest: Artifact = {
   },
 };
 
-export const ARTIFACTS: readonly Artifact[] = [ADR_INDEX_ARTIFACT, claudeSettings, manifest];
+const AGENTS_GUIDE = repoPath('AGENTS.md');
+
+const agentsGuide: Artifact = {
+  path: AGENTS_GUIDE,
+  render: async (root) => formatForPath(root, AGENTS_GUIDE, renderAgentsGuide(POLICY, GENERATOR)),
+};
+
+const CLAUDE_MEMORY = repoPath('CLAUDE.md');
+
+/** Claude Code reads `CLAUDE.md`, not `AGENTS.md`: it imports the guide. */
+const claudeMemory: Artifact = {
+  path: CLAUDE_MEMORY,
+  render: async (root) => formatForPath(root, CLAUDE_MEMORY, `@${AGENTS_GUIDE}\n`),
+};
+
+export const ARTIFACTS: readonly Artifact[] = [ADR_INDEX_ARTIFACT, claudeSettings, manifest, agentsGuide, claudeMemory];
 
 export async function checkArtifacts(
   root: string,

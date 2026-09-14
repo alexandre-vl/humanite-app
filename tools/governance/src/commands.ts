@@ -1,4 +1,5 @@
 import { shellLine } from '@huma/kit/cli';
+import { repoPath } from '@huma/kit/paths';
 import { keysOf } from '@huma/kit/records';
 
 /**
@@ -21,6 +22,9 @@ export type CommandSpec = Readonly<{
   audience: Audience;
   summary: string;
 }>;
+
+/** Where the table of commands lives, as guides name it. */
+export const COMMANDS_PATH = repoPath('tools/governance/src/commands.ts');
 
 /** Where pnpm links the binaries of the workspace, `node` pinned by `devEngines` included. */
 export const BIN_DIRECTORY = 'node_modules/.bin';
@@ -56,6 +60,11 @@ export const COMMANDS = {
   format: { argv: ['prettier', '--write', '.'], audience: 'everyone', summary: 'formate le dépôt' },
   'format:check': { argv: ['prettier', '--check', '.'], audience: 'everyone', summary: 'vérifie le formatage' },
   gen: { argv: ['node', cli('gen')], audience: 'everyone', summary: 'régénère les fichiers dérivés' },
+  'gen:check': {
+    argv: ['node', cli('gen'), '--check'],
+    audience: 'everyone',
+    summary: 'vérifie que les fichiers dérivés sont à jour',
+  },
   'git:hook': {
     argv: ['node', cli('git-hook')],
     audience: 'git-hook',
@@ -70,11 +79,6 @@ export const COMMANDS = {
     argv: ['node', cli('hooks-install')],
     audience: 'everyone',
     summary: 'installe les hooks git du dépôt',
-  },
-  'gen:check': {
-    argv: ['node', cli('gen'), '--check'],
-    audience: 'everyone',
-    summary: 'vérifie que les fichiers dérivés sont à jour',
   },
   lint: {
     argv: ['eslint', '--flag', 'unstable_native_nodejs_ts_config', '--max-warnings', '0', '.'],

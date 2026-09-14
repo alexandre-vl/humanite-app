@@ -1,0 +1,53 @@
+<!-- Généré par pnpm gen : ne pas modifier à la main. -->
+
+# Guide des agents
+
+Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil la fait respecter. Ce guide dit où les trouver ; il n’en ajoute aucune.
+
+## Avant de terminer
+
+- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `format:check`, `lint`, `typecheck`, `test`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
+- Les sessions de Claude Code démarrent à la racine du dépôt : les réglages et les hooks du projet ne sont lus que depuis le `.claude/` du dossier de démarrage.
+
+## Commandes
+
+| Commande             | Rôle                                                                                    |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| `pnpm adr:check`     | vérifie les ADR, leurs liens et leur historique                                         |
+| `pnpm adr:decide`    | accepte ou rejette un ADR proposé (décideur humain seulement, dans son propre terminal) |
+| `pnpm adr:new`       | crée un ADR proposé au dernier format                                                   |
+| `pnpm adr:status`    | liste les ADR, leur statut et leurs preuves                                             |
+| `pnpm format`        | formate le dépôt                                                                        |
+| `pnpm format:check`  | vérifie le formatage                                                                    |
+| `pnpm gen`           | régénère les fichiers dérivés                                                           |
+| `pnpm gen:check`     | vérifie que les fichiers dérivés sont à jour                                            |
+| `pnpm hooks:check`   | vérifie les hooks git et Claude Code installés, et l’historique des messages            |
+| `pnpm hooks:install` | installe les hooks git du dépôt                                                         |
+| `pnpm lint`          | lint sans cache, aucun avertissement toléré                                             |
+| `pnpm test`          | tests et fixtures des outils                                                            |
+| `pnpm typecheck`     | vérification des types de chaque projet                                                 |
+| `pnpm verify`        | tous les contrôles du dépôt, dans l’ordre                                               |
+
+## Ce que la garde des agents refuse
+
+- Décider d’un ADR (accepted, rejected) revient au décideur humain : il lance la décision dans son propre terminal.
+- Un ADR décidé est figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).
+- Les hooks git du dépôt ne se contournent pas : ni --no-verify, ni core.hooksPath ou alias, ni dépôt ou arbre désigné ailleurs, ni plomberie qui écrit sans hooks.
+- Les commandes root sont lancées par l’utilisateur lui-même, jamais par un agent.
+- Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.
+- adr:decide revient au décideur humain : il le lance dans son propre terminal.
+- `.git` : Le dossier .git ne s’écrit qu’à travers git.
+- `.claude/settings.json` : Les réglages Claude Code du dépôt sont générés par pnpm gen depuis leur source typée.
+- `.claude/settings.local.json` : Des réglages locaux pourraient désactiver les hooks du dépôt.
+
+## Commits
+
+- Un commit passe par les hooks git : l’index contient tout l’arbre de travail, `pnpm verify` passe sur lui, le message suit Conventional Commits.
+- Types : `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `chore`, `revert`, `style`. Portées : le nom d’un paquet sous `apps/`, `infra/`, `packages/`, `tools/`, ou `deps`, `repo`, `spikes`.
+- Un trailer `Refs: ADR-NNNN` par ligne cite chaque ADR accepté dont le périmètre contient un chemin du commit, et chaque ADR dont le fichier change.
+
+## Où lire
+
+- `docs/adr/README.md` : ADR en vigueur, formats, contrôles et preuves de chaque règle.
+- `tools/governance/src/bindings.ts` : preuves et périmètre de chaque ADR.
+- `tools/governance/src/commands.ts` : chaque commande et chaque étape de `pnpm verify`.

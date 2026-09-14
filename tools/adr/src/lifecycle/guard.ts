@@ -41,7 +41,7 @@ export function looksDecided(text: string): boolean {
 }
 
 export const DECIDED_FROZEN =
-  'Cet ADR est décidé, donc figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).';
+  'Un ADR décidé est figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).';
 
 export const UNKNOWN_RESULT =
   'Contenu de l’ADR après cette modification incalculable (texte à remplacer absent tel quel) : reprendre le texte exact, ou modifier l’en-tête dans un appel séparé.';

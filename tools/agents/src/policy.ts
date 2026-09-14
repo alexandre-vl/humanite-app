@@ -240,7 +240,7 @@ export function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRul
   const namesOne = (text: string): boolean => [...scripts, ...entries].some((token) => text.includes(token));
   return {
     id: 'human-only-command',
-    reason: 'Cette commande revient au décideur humain : il la lance dans son propre terminal.',
+    reason: `${commands.map((command) => command.script).join(', ')} revient au décideur humain : il le lance dans son propre terminal.`,
     permissions: commands.flatMap((command) => [
       `Bash(pnpm ${command.script} *)`,
       `Bash(pnpm run ${command.script} *)`,
