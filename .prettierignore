@@ -1,0 +1,5 @@
+# Written by pnpm.
+pnpm-lock.yaml
+
+# Frozen spike reports: their long table cells would be padded to 3 526-character lines (41 kB → 131 kB for phase 0a).
+docs/spikes/

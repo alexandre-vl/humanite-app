@@ -1,0 +1,9 @@
+{
+  "name": "@huma/tsconfig",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./node.json": "./node.json"
+  }
+}

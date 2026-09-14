@@ -1,0 +1,4 @@
+{
+  "extends": "@huma/tsconfig/node.json",
+  "include": ["*.config.ts"]
+}

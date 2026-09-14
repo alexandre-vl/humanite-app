@@ -1,0 +1,28 @@
+{
+  "name": "@huma/workspace",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.26.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.17.0",
+      "onFail": "download"
+    }
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/ .",
+    "typecheck": "tsc --build",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck"
+  },
+  "devDependencies": {
+    "@huma/eslint-config": "workspace:*",
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}
