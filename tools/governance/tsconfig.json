@@ -7,6 +7,7 @@
     { "path": "../deps" },
     { "path": "../fixtures" },
     { "path": "../git-hooks" },
-    { "path": "../kit" }
+    { "path": "../kit" },
+    { "path": "../lint" }
   ]
 }

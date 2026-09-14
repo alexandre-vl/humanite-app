@@ -26,6 +26,9 @@ export type CommandSpec = Readonly<{
 /** Where the table of commands lives, as guides name it. */
 export const COMMANDS_PATH = repoPath('tools/governance/src/commands.ts');
 
+/** The ESLint flat configuration of the repository, which editors, the ESLint CLI and `pnpm lint` all load. */
+export const ESLINT_CONFIG_FILE = repoPath('eslint.config.ts');
+
 /** Where pnpm links the binaries of the workspace, `node` pinned by `devEngines` included. */
 export const BIN_DIRECTORY = 'node_modules/.bin';
 
@@ -62,8 +65,12 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'vérifie manifestes, catalog, références TypeScript et lockfile',
   },
-  format: { argv: ['prettier', '--write', '.'], audience: 'everyone', summary: 'formate le dépôt' },
-  'format:check': { argv: ['prettier', '--check', '.'], audience: 'everyone', summary: 'vérifie le formatage' },
+  format: { argv: ['node', cli('format')], audience: 'everyone', summary: 'formate les fichiers du dépôt' },
+  'format:check': {
+    argv: ['node', cli('format'), '--check'],
+    audience: 'everyone',
+    summary: 'vérifie le formatage des fichiers du dépôt',
+  },
   gen: { argv: ['node', cli('gen')], audience: 'everyone', summary: 'régénère les fichiers dérivés' },
   'gen:check': {
     argv: ['node', cli('gen'), '--check'],
@@ -86,9 +93,9 @@ export const COMMANDS = {
     summary: 'installe les hooks git du dépôt',
   },
   lint: {
-    argv: ['eslint', '--flag', 'unstable_native_nodejs_ts_config', '--max-warnings', '0', '.'],
+    argv: ['node', cli('lint')],
     audience: 'everyone',
-    summary: 'lint sans cache, aucun avertissement toléré',
+    summary: 'ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré',
   },
   test: { argv: ['vitest', 'run'], audience: 'everyone', summary: 'tests et fixtures des outils' },
   typecheck: { argv: ['tsc', '--build'], audience: 'everyone', summary: 'vérification des types de chaque projet' },

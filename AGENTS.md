@@ -18,13 +18,13 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm adr:new`       | crée un ADR proposé au dernier format                                                   |
 | `pnpm adr:status`    | liste les ADR, leur statut et leurs preuves                                             |
 | `pnpm deps:check`    | vérifie manifestes, catalog, références TypeScript et lockfile                          |
-| `pnpm format`        | formate le dépôt                                                                        |
-| `pnpm format:check`  | vérifie le formatage                                                                    |
+| `pnpm format`        | formate les fichiers du dépôt                                                           |
+| `pnpm format:check`  | vérifie le formatage des fichiers du dépôt                                              |
 | `pnpm gen`           | régénère les fichiers dérivés                                                           |
 | `pnpm gen:check`     | vérifie que les fichiers dérivés sont à jour                                            |
 | `pnpm hooks:check`   | vérifie les hooks git et Claude Code installés, et l’historique des messages            |
 | `pnpm hooks:install` | installe les hooks git du dépôt                                                         |
-| `pnpm lint`          | lint sans cache, aucun avertissement toléré                                             |
+| `pnpm lint`          | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré     |
 | `pnpm test`          | tests et fixtures des outils                                                            |
 | `pnpm typecheck`     | vérification des types de chaque projet                                                 |
 | `pnpm verify`        | tous les contrôles du dépôt, dans l’ordre                                               |

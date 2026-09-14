@@ -14,6 +14,7 @@
     "@huma/fixtures": "workspace:*",
     "@huma/git-hooks": "workspace:*",
     "@huma/kit": "workspace:*",
+    "@huma/lint": "workspace:*",
     "typescript": "catalog:"
   },
   "devDependencies": {

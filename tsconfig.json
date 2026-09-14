@@ -27,6 +27,9 @@
     },
     {
       "path": "./tools/kit"
+    },
+    {
+      "path": "./tools/lint"
     }
   ]
 }

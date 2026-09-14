@@ -3,6 +3,7 @@ import { AGENT_PROOFS } from '@huma/agents/proofs';
 import { DEPS_PROOFS } from '@huma/deps/proofs';
 import { runFixture } from '@huma/fixtures';
 import { GIT_HOOK_PROOFS } from '@huma/git-hooks/proofs';
+import { LINT_PROOFS } from '@huma/lint/proofs';
 import { COMMIT_REFS_FIXTURES } from './proofs/commit-refs.ts';
 import { GOVERNANCE_FIXTURES } from './proofs/governance.ts';
 
@@ -12,6 +13,7 @@ export const PROOFS = [
   ...AGENT_PROOFS,
   ...DEPS_PROOFS,
   ...GIT_HOOK_PROOFS,
+  ...LINT_PROOFS,
   ...GOVERNANCE_FIXTURES,
   ...COMMIT_REFS_FIXTURES,
 ] as const;

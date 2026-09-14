@@ -274,6 +274,9 @@ importers:
       '@huma/kit':
         specifier: workspace:*
         version: link:../kit
+      '@huma/lint':
+        specifier: workspace:*
+        version: link:../lint
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -293,6 +296,34 @@ importers:
 
   tools/kit:
     dependencies:
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
+
+  tools/lint:
+    dependencies:
+      '@huma/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
+      '@huma/kit':
+        specifier: workspace:*
+        version: link:../kit
+      eslint:
+        specifier: 'catalog:'
+        version: 10.10.0
       prettier:
         specifier: 'catalog:'
         version: 3.9.6

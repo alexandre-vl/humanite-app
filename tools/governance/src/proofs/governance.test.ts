@@ -71,9 +71,9 @@ const AWAITING_FOUNDATION_ADRS = [
   'claude-hook/stop-unverifiable-once',
 ];
 
-/** Whether a proof awaits an ADR of the foundations: every git hook and dependency proof, and the agent proofs above. */
+/** Whether a proof awaits an ADR of the foundations: every git hook, dependency and lint proof, and the agent proofs above. */
 const awaitsFoundationAdr = (id: string): boolean =>
-  id.startsWith('git/') || id.startsWith('deps/') || AWAITING_FOUNDATION_ADRS.includes(id);
+  id.startsWith('git/') || id.startsWith('deps/') || id.startsWith('lint/') || AWAITING_FOUNDATION_ADRS.includes(id);
 
 test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
