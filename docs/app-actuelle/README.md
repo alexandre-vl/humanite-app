@@ -9,28 +9,28 @@ Référence pour la refonte React Native. 20 captures Android (1080×2412) prise
 
 ## Sommaire
 
-| #   | Écran                                        | Heure    | Fichier d'origine                |
-| --- | -------------------------------------------- | -------- | -------------------------------- |
-| 01  | Splash                                       | 09:24:53 | `Screenshot_20260913-092453.png` |
-| 02  | À la une                                     | 09:24:58 | `Screenshot_20260913-092458.png` |
-| 03  | En continu                                   | 09:25:00 | `Screenshot_20260913-092500.png` |
-| 04  | Kiosque                                      | 09:25:06 | `Screenshot_20260913-092506.png` |
-| 05  | Mon compte                                   | 09:25:09 | `Screenshot_20260913-092509.png` |
-| 06  | Favoris (vide)                               | 09:25:15 | `Screenshot_20260913-092515.png` |
-| 07  | Recherche — saisie                           | 09:25:20 | `Screenshot_20260913-092520.png` |
-| 08  | Recherche — chargement                       | 09:25:34 | `Screenshot_20260913-092534.png` |
-| 09  | Recherche — résultats                        | 09:25:37 | `Screenshot_20260913-092537.png` |
-| 10  | Préférences d'affichage                      | 09:25:46 | `Screenshot_20260913-092546.png` |
-| 11  | Article vidéo — haut                         | 09:26:29 | `Screenshot_20260913-092629.png` |
-| 12  | Article vidéo — bas                          | 09:26:34 | `Screenshot_20260913-092634.png` |
-| 13  | Article texte — haut                         | 09:26:43 | `Screenshot_20260913-092643.png` |
-| 14  | Article texte — corps                        | 09:26:46 | `Screenshot_20260913-092646.png` |
-| 15  | Article texte — intertitre                   | 09:26:50 | `Screenshot_20260913-092650.png` |
-| 16  | Article texte — fin                          | 09:26:56 | `Screenshot_20260913-092656.png` |
-| 17  | Rubrique Monde — haut                        | 10:04:35 | `Screenshot_20260913-100435.png` |
-| 18  | Rubrique Monde — cartes empilée et chronique | 10:04:39 | `Screenshot_20260913-100439.png` |
-| 19  | Rubrique Monde — cartes ligne                | 10:04:42 | `Screenshot_20260913-100442.png` |
-| 20  | Mon compte — déconnecté (connexion)          | 10:04:49 | `Screenshot_20260913-100449.png` |
+| #   | Écran                                        | Heure    | Nom d'origine, renommé dans `screens/` |
+| --- | -------------------------------------------- | -------- | -------------------------------------- |
+| 01  | Splash                                       | 09:24:53 | `Screenshot_20260913-092453.png`       |
+| 02  | À la une                                     | 09:24:58 | `Screenshot_20260913-092458.png`       |
+| 03  | En continu                                   | 09:25:00 | `Screenshot_20260913-092500.png`       |
+| 04  | Kiosque                                      | 09:25:06 | `Screenshot_20260913-092506.png`       |
+| 05  | Mon compte                                   | 09:25:09 | `Screenshot_20260913-092509.png`       |
+| 06  | Favoris (vide)                               | 09:25:15 | `Screenshot_20260913-092515.png`       |
+| 07  | Recherche — saisie                           | 09:25:20 | `Screenshot_20260913-092520.png`       |
+| 08  | Recherche — chargement                       | 09:25:34 | `Screenshot_20260913-092534.png`       |
+| 09  | Recherche — résultats                        | 09:25:37 | `Screenshot_20260913-092537.png`       |
+| 10  | Préférences d'affichage                      | 09:25:46 | `Screenshot_20260913-092546.png`       |
+| 11  | Article vidéo — haut                         | 09:26:29 | `Screenshot_20260913-092629.png`       |
+| 12  | Article vidéo — bas                          | 09:26:34 | `Screenshot_20260913-092634.png`       |
+| 13  | Article texte — haut                         | 09:26:43 | `Screenshot_20260913-092643.png`       |
+| 14  | Article texte — corps                        | 09:26:46 | `Screenshot_20260913-092646.png`       |
+| 15  | Article texte — intertitre                   | 09:26:50 | `Screenshot_20260913-092650.png`       |
+| 16  | Article texte — fin                          | 09:26:56 | `Screenshot_20260913-092656.png`       |
+| 17  | Rubrique Monde — haut                        | 10:04:35 | `Screenshot_20260913-100435.png`       |
+| 18  | Rubrique Monde — cartes empilée et chronique | 10:04:39 | `Screenshot_20260913-100439.png`       |
+| 19  | Rubrique Monde — cartes ligne                | 10:04:42 | `Screenshot_20260913-100442.png`       |
+| 20  | Mon compte — déconnecté (connexion)          | 10:04:49 | `Screenshot_20260913-100449.png`       |
 
 ## Carte de navigation
 

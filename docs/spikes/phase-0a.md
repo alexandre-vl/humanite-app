@@ -48,7 +48,7 @@
 | 8 | eslint-plugin-boundaries : règles `element-types`, `entry-point` | `boundaries/dependencies` avec `policies` et `fileInternalPath` | eslint-plugin-boundaries 7.2.0 `Rules.js` |
 | 9 | couche `_app` compatible Steiger | `fsd/typo-in-layer-name` signale `_app` → règle désactivée | steiger 0.6.0 source |
 | 10 | APIs Hermes non supportées : `Intl.RelativeTimeFormat`, `PluralRules` | liste complète : `toSorted`, `Object.groupBy`, `Map.groupBy`, `Array.fromAsync`, `Intl.{RelativeTimeFormat,PluralRules,Segmenter,ListFormat}`, drapeau regex `v`, Iterator helpers, `Temporal` | facebook/hermes `hermes-v250829098.0.17` |
-| 11 | React Compiler `panicThreshold: 'all_errors'` | `all_errors` en développement, `none` en production (recommandation React) | babel-preset-expo 57.0.11 ; react.dev |
+| 11 | React Compiler `panicThreshold: 'all_errors'` | `all_errors` en développement, `none` en production (recommandation React) ; **remplacée par la correction 16** | babel-preset-expo 57.0.11 ; react.dev |
 | 12 | alias `@/` du template | fuit dans les packages et n'est pas supporté par Node → remplacé par des imports `#` de `package.json` qui ne pointent **que** vers les `index.ts` publics (`"#shared/*": "./src/shared/*/index.ts"`) : l'API publique d'un slice est imposée dès la résolution | `@expo/metro-config` ; nodejs.org TypeScript ; vérification 6 |
 | 13 | fichiers `.ios.tsx` / `.android.tsx` | fichier par défaut `surface.tsx` + variante `surface.ios.tsx` : TS résout le défaut sans `moduleSuffixes`, Metro choisit la variante par plateforme | vérification 6 |
 | 14 | — | `create-expo-app` lance `git init` dans `apps/mobile` si la racine n'est pas un dépôt git → la racine est initialisée **avant** la génération | journal `02-create-expo-app` |
