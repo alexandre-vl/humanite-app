@@ -6,12 +6,28 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 
 ## Registre
 
-| ADR | Titre | Statut | Importance |
-| --- | ----- | ------ | ---------- |
+| ADR                                                                       | Titre                                                 | Statut  | Importance                                                  |
+| ------------------------------------------------------------------------- | ----------------------------------------------------- | ------- | ----------------------------------------------------------- |
+| [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md) | Décisions structurantes en ADR MADR vérifiés et figés | proposé | `dependency`, `guarded-config`, `boundary`, `reversal-cost` |
 
 ## Confirmation
 
-Aucun ADR n’a encore de liens vers ses preuves.
+### ADR-0000 · Décisions structurantes en ADR MADR vérifiés et figés
+
+Statut : proposé. Périmètre : `docs/adr/**`, `tools/adr/**`, `tools/fixtures/**`, `.claude/settings.json`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                         |
+| ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | `adr/valid`, `adr/path`, `adr/encoding`, `adr/frontmatter-yaml`, `adr/frontmatter-schema`, `adr/frontmatter-canonical`, `adr/markdown-subset`, `adr/title`, `adr/slug`, `adr/sections`, `adr/words`, `adr/valid-words-limit`, `adr/link-target` |
+| R2    | DOIT        | `adr/context`, `adr/criteria`, `adr/options`, `adr/decision`, `adr/valence`, `adr/criteria-cited`, `adr/reevaluation`                                                                                                                           |
+| R3    | DOIT        | `adr/keywords`                                                                                                                                                                                                                                  |
+| R4    | NE DOIT PAS | `adr/number-unique`, `adr/no-deletion`, `new/parallel-worktrees`, `new/unlocked-race`                                                                                                                                                           |
+| R5    | DOIT        | `adr/transitions`, `decide/uncommitted-refused`, `decide/rejects`                                                                                                                                                                               |
+| R6    | NE DOIT PAS | `adr/frozen`, `adr/frozen-renamed`, `adr/history`, `adr/valid-accepted`, `adr/valid-code-block-status`                                                                                                                                          |
+| R7    | NE DOIT PAS | `guard/decided-write`, `guard/status-change`, `guard/new-decided-file`, `guard/decide-command`, `guard/proposed-edit`, `guard/other-file`, `decide/agent-refused`, `hook/settings-wired`, `hook/settings-without-bash`                          |
+| R8    | DOIT        | `adr/bindings`, `adr/scope`, `adr/accept-proofs`, `adr/valid-staged-acceptance`, `decide/failing-proof-refused`, `decide/accepts`                                                                                                               |
+| R9    | DOIT        | `adr/index`                                                                                                                                                                                                                                     |
+| R10   | DOIT        | `adr/references`, `adr/valid-superseded`                                                                                                                                                                                                        |
 
 ## Référentiel
 
