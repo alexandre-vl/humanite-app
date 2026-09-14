@@ -43,7 +43,8 @@ const GIT_ENVIRONMENT = {
   GIT_COMMITTER_DATE: '2026-09-14T12:00:00+02:00',
 };
 
-async function gitIn(root: string, args: readonly string[]): Promise<void> {
+/** Runs git in a fixture repository, isolated from the user's configuration and hooks. */
+export async function gitIn(root: string, args: readonly string[]): Promise<void> {
   await execFileAsync('git', ['-C', root, ...args], { env: GIT_ENVIRONMENT });
 }
 

@@ -11,12 +11,17 @@
     }
   },
   "scripts": {
+    "adr:check": "node tools/adr/src/cli/check.ts",
+    "adr:decide": "node tools/adr/src/cli/decide.ts",
+    "adr:index": "node tools/adr/src/cli/write-index.ts",
+    "adr:new": "node tools/adr/src/cli/new.ts",
+    "adr:status": "node tools/adr/src/cli/status.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint --flag unstable_native_nodejs_ts_config --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/ .",
     "typecheck": "tsc --build",
     "test": "vitest run",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm adr:check"
   },
   "devDependencies": {
     "@huma/eslint-config": "workspace:*",

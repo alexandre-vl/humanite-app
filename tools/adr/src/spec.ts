@@ -4,6 +4,8 @@
  */
 
 export const ADR_DIRECTORY = 'docs/adr';
+/** `NNNN-slug.md`: four digits, then the slug of the title in lowercase letters, digits and hyphens. */
+export const ADR_FILE_NAME = /^(\d{4})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$/u;
 export const INDEX_FILE = 'docs/adr/README.md';
 export const FORMAT = 1;
 export const TIME_ZONE = 'Europe/Paris';

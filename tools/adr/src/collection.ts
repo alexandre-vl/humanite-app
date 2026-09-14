@@ -6,9 +6,7 @@ import { analyzeAdr, isExternalLink } from './document.ts';
 import type { AdrNumber } from './model.ts';
 import { adrNumber, formatAdrId, repoPath } from './model.ts';
 import type { Snapshot } from './snapshot.ts';
-import { ADR_DIRECTORY, INDEX_FILE } from './spec.ts';
-
-export const ADR_FILE_NAME = /^(\d{4})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$/u;
+import { ADR_DIRECTORY, ADR_FILE_NAME, INDEX_FILE } from './spec.ts';
 
 export type Collection = Readonly<{
   documents: readonly AdrDocument[];

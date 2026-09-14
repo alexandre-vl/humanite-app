@@ -1,4 +1,3 @@
-import { ADR_FILE_NAME } from './collection.ts';
 import type { Diagnostic } from './diagnostics.ts';
 import { diagnostic, START } from './diagnostics.ts';
 import type { AdrDocument } from './document.ts';
@@ -9,10 +8,12 @@ import type { AdrNumber, Bindings, RepoPath } from './model.ts';
 import { adrNumber, formatAdrId, isConvention, repoPath } from './model.ts';
 import type { Source } from './snapshot.ts';
 import type { Status } from './spec.ts';
-import { ADR_DIRECTORY, isDecided } from './spec.ts';
+import { ADR_DIRECTORY, ADR_FILE_NAME, isDecided } from './spec.ts';
 
-type Observation = Readonly<{
+export type Observation = Readonly<{
   commit: string;
+  /** ISO 8601 author date of the commit. */
+  authorDate: string;
   path: RepoPath;
   number: AdrNumber;
   /** `null` when the file is deleted in this commit. */
@@ -31,13 +32,14 @@ export type HistoryInput = Readonly<{
 
 const DIRECTORY = repoPath(ADR_DIRECTORY);
 
-async function observe(root: string): Promise<readonly Observation[]> {
+/** Every committed version of every ADR, oldest first, with its parsed status; a deletion has a `null` status. */
+export async function observe(root: string): Promise<readonly Observation[]> {
   const changes = await directoryHistory(root, ADR_DIRECTORY);
-  const versions = changes.flatMap(({ commit, paths }) =>
+  const versions = changes.flatMap(({ commit, authorDate, paths }) =>
     paths.flatMap((path) => {
       const match = ADR_FILE_NAME.exec(path.slice(ADR_DIRECTORY.length + 1));
       return path.startsWith(`${ADR_DIRECTORY}/`) && match?.[1] !== undefined && match[2] !== undefined
-        ? [{ commit, path: repoPath(path), number: adrNumber(Number(match[1])), slug: match[2] }]
+        ? [{ commit, authorDate, path: repoPath(path), number: adrNumber(Number(match[1])), slug: match[2] }]
         : [];
     }),
   );
@@ -45,14 +47,15 @@ async function observe(root: string): Promise<readonly Observation[]> {
     root,
     versions.map(({ commit, path }) => `${commit}:${path}`),
   );
-  return versions.map(({ commit, path, number, slug }) => {
+  return versions.map(({ commit, authorDate, path, number, slug }) => {
     const bytes = objects.get(`${commit}:${path}`) ?? null;
     if (bytes === null) {
-      return { commit, path, number, status: null, fingerprint: null };
+      return { commit, authorDate, path, number, status: null, fingerprint: null };
     }
     const { document } = analyzeAdr({ path, number, slug, bytes });
     return {
       commit,
+      authorDate,
       path,
       number,
       status: document?.frontMatter?.status ?? null,

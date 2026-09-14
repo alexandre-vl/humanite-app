@@ -1,5 +1,5 @@
-import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import type { Collection, EffectiveStatus } from './collection.ts';
 import { checkLinkTargets, checkNumbers, checkReferences, effectiveStatuses, readCollection } from './collection.ts';
 import type { Diagnostic } from './diagnostics.ts';
@@ -91,5 +91,6 @@ export async function writeIndex(root: string, bindings: Bindings): Promise<void
     throw new Error('Index non régénéré : un ADR a un en-tête ou un titre illisible (voir pnpm adr:check)');
   }
   const content = await renderIndex(root, collection.documents, effectiveStatuses(collection.documents), bindings);
+  await mkdir(dirname(join(root, INDEX_FILE)), { recursive: true });
   await writeFile(join(root, INDEX_FILE), content, 'utf8');
 }

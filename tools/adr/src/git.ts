@@ -98,7 +98,7 @@ export async function readObjects(
   return contents;
 }
 
-export type CommitChange = Readonly<{ commit: string; paths: readonly string[] }>;
+export type CommitChange = Readonly<{ commit: string; authorDate: string; paths: readonly string[] }>;
 
 /** Commits reachable from HEAD that touch `directory`, oldest first, with the paths they add, modify or delete. */
 export async function directoryHistory(root: string, directory: string): Promise<readonly CommitChange[]> {
@@ -107,7 +107,9 @@ export async function directoryHistory(root: string, directory: string): Promise
     '--reverse',
     '--topo-order',
     '--no-renames',
-    '--format=%x1e%H',
+    '--no-color',
+    '--no-show-signature',
+    '--format=%x1e%H%x1f%aI',
     '--name-only',
     '-z',
     'HEAD',
@@ -118,7 +120,8 @@ export async function directoryHistory(root: string, directory: string): Promise
     .split('\x1e')
     .filter((record) => record.trim() !== '')
     .map((record) => {
-      const [commit = '', ...paths] = record.split(/[\n\0]/u).filter((part) => part !== '');
-      return { commit, paths };
+      const [header = '', ...paths] = record.split(/[\n\0]/u).filter((part) => part !== '');
+      const [commit = '', authorDate = ''] = header.split('\x1f');
+      return { commit, authorDate, paths };
     });
 }
