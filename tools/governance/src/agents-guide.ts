@@ -3,7 +3,8 @@ import { DECIDED_FROZEN, HUMAN_ONLY_DECISION } from '@huma/adr/guard';
 import { ADR_DIRECTORY, INDEX_FILE } from '@huma/adr/layout';
 import { compareText } from '@huma/kit/text';
 import { BINDINGS_PATH } from './bindings.ts';
-import { COMMIT_TYPES, EXTRA_SCOPES, REFS_TRAILER, WORKSPACE_ROOTS } from './commit-policy.ts';
+import { COMMIT_TYPES, EXTRA_SCOPES, REFS_TRAILER } from './commit-policy.ts';
+import { WORKSPACE_ROOTS } from './workspace-manifest.ts';
 import type { CommandName } from './commands.ts';
 import { COMMAND_NAMES, COMMANDS, COMMANDS_PATH, SCRIPT_AUDIENCES, VERIFY_STEPS } from './commands.ts';
 

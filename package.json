@@ -15,6 +15,7 @@
     "adr:decide": "node tools/governance/src/cli/adr-decide.ts",
     "adr:new": "node tools/governance/src/cli/adr-new.ts",
     "adr:status": "node tools/governance/src/cli/adr-status.ts",
+    "deps:check": "node tools/governance/src/cli/deps-check.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "gen": "node tools/governance/src/cli/gen.ts",
@@ -33,6 +34,7 @@
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

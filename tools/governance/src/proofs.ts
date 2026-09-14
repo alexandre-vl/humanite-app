@@ -1,5 +1,6 @@
 import { ADR_PROOFS } from '@huma/adr/proofs';
 import { AGENT_PROOFS } from '@huma/agents/proofs';
+import { DEPS_PROOFS } from '@huma/deps/proofs';
 import { runFixture } from '@huma/fixtures';
 import { GIT_HOOK_PROOFS } from '@huma/git-hooks/proofs';
 import { COMMIT_REFS_FIXTURES } from './proofs/commit-refs.ts';
@@ -9,6 +10,7 @@ import { GOVERNANCE_FIXTURES } from './proofs/governance.ts';
 export const PROOFS = [
   ...ADR_PROOFS,
   ...AGENT_PROOFS,
+  ...DEPS_PROOFS,
   ...GIT_HOOK_PROOFS,
   ...GOVERNANCE_FIXTURES,
   ...COMMIT_REFS_FIXTURES,

@@ -40,6 +40,7 @@
     "@huma/tsconfig": "workspace:*",
     "@types/mdast": "catalog:",
     "@types/node": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

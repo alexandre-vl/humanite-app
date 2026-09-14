@@ -57,6 +57,11 @@ export const COMMANDS = {
     audience: 'claude-hook',
     summary: 'lance pnpm verify avant qu’un agent s’arrête',
   },
+  'deps:check': {
+    argv: ['node', cli('deps-check')],
+    audience: 'everyone',
+    summary: 'vérifie manifestes, catalog, références TypeScript et lockfile',
+  },
   format: { argv: ['prettier', '--write', '.'], audience: 'everyone', summary: 'formate le dépôt' },
   'format:check': { argv: ['prettier', '--check', '.'], audience: 'everyone', summary: 'vérifie le formatage' },
   gen: { argv: ['node', cli('gen')], audience: 'everyone', summary: 'régénère les fichiers dérivés' },
@@ -96,6 +101,7 @@ export type CommandName = keyof typeof COMMANDS;
 export const VERIFY_STEPS = [
   'gen:check',
   'hooks:check',
+  'deps:check',
   'format:check',
   'lint',
   'typecheck',

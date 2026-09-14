@@ -20,7 +20,9 @@ import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
 import { COMMAND_NAMES, COMMANDS, commandLine, SCRIPT_AUDIENCES } from './commands.ts';
+import { packageDirectories, renderWorkspaceFile, WORKSPACE_FILE_NAME } from '@huma/deps/workspace';
 import { renderAgentsGuide } from './agents-guide.ts';
+import { WORKSPACE_FILE } from './workspace-manifest.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
 
 /** A file derived from typed sources: `pnpm gen` writes it, `pnpm gen:check` compares it without writing. */
@@ -89,7 +91,39 @@ const claudeMemory: Artifact = {
   render: async (root) => formatForPath(root, CLAUDE_MEMORY, `@${AGENTS_GUIDE}\n`),
 };
 
-export const ARTIFACTS: readonly Artifact[] = [ADR_INDEX_ARTIFACT, claudeSettings, manifest, agentsGuide, claudeMemory];
+const WORKSPACE = repoPath(WORKSPACE_FILE_NAME);
+
+const workspaceFile: Artifact = {
+  path: WORKSPACE,
+  render: async (root) => formatForPath(root, WORKSPACE, renderWorkspaceFile(WORKSPACE_FILE)),
+};
+
+const SOLUTION = repoPath('tsconfig.json');
+
+/** The solution project: the configuration files, then every package of the workspace that has a TypeScript project. */
+const solution: Artifact = {
+  path: SOLUTION,
+  render: async (root) => {
+    const projects: string[] = [];
+    for (const directory of await packageDirectories(root, WORKSPACE_FILE.packages)) {
+      if ((await readTextIfExists(join(root, directory, 'tsconfig.json'))) !== null) {
+        projects.push(`./${directory}`);
+      }
+    }
+    const references = ['./tsconfig.config.json', ...projects].map((path) => ({ path }));
+    return formatForPath(root, SOLUTION, `${JSON.stringify({ files: [], references }, null, 2)}\n`);
+  },
+};
+
+export const ARTIFACTS: readonly Artifact[] = [
+  ADR_INDEX_ARTIFACT,
+  claudeSettings,
+  manifest,
+  agentsGuide,
+  claudeMemory,
+  workspaceFile,
+  solution,
+];
 
 export async function checkArtifacts(
   root: string,

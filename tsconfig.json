@@ -8,22 +8,25 @@
       "path": "./packages/eslint-config"
     },
     {
-      "path": "./tools/kit"
-    },
-    {
-      "path": "./tools/fixtures"
-    },
-    {
       "path": "./tools/adr"
     },
     {
       "path": "./tools/agents"
     },
     {
+      "path": "./tools/deps"
+    },
+    {
+      "path": "./tools/fixtures"
+    },
+    {
       "path": "./tools/git-hooks"
     },
     {
       "path": "./tools/governance"
+    },
+    {
+      "path": "./tools/kit"
     }
   ]
 }

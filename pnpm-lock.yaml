@@ -42,6 +42,9 @@ catalogs:
     typescript-eslint:
       specifier: 8.70.0
       version: 8.70.0
+    vite:
+      specifier: 8.3.0
+      version: 8.3.0
     vitest:
       specifier: 5.0.0
       version: 5.0.0
@@ -77,6 +80,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
@@ -147,6 +153,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
@@ -169,6 +178,37 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
+
+  tools/deps:
+    dependencies:
+      '@huma/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
+      '@huma/kit':
+        specifier: workspace:*
+        version: link:../kit
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.1
+      zod:
+        specifier: 'catalog:'
+        version: 4.5.4
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
@@ -185,6 +225,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
@@ -204,6 +247,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
@@ -216,6 +262,9 @@ importers:
       '@huma/agents':
         specifier: workspace:*
         version: link:../agents
+      '@huma/deps':
+        specifier: workspace:*
+        version: link:../deps
       '@huma/fixtures':
         specifier: workspace:*
         version: link:../fixtures
@@ -235,6 +284,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
@@ -251,6 +303,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(yaml@2.9.1)
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))

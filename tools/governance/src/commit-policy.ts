@@ -2,6 +2,7 @@ import type { CommitPolicy } from '@huma/git-hooks/message';
 import type { GitRepository } from '@huma/kit/git';
 import { listFiles } from '@huma/kit/git';
 import { isOneOf } from '@huma/kit/records';
+import { WORKSPACE_ROOTS } from './workspace-manifest.ts';
 
 /** Commit types of Conventional Commits the repository uses. */
 export const COMMIT_TYPES = [
@@ -16,9 +17,6 @@ export const COMMIT_TYPES = [
   'revert',
   'style',
 ] as const;
-
-/** Directories whose subdirectories are the packages of the workspace; each package name is a commit scope. */
-export const WORKSPACE_ROOTS = ['apps', 'infra', 'packages', 'tools'] as const;
 
 /** Scopes that name no package. */
 export const EXTRA_SCOPES = ['deps', 'repo', 'spikes'] as const;

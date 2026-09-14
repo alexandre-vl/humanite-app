@@ -26,6 +26,7 @@
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

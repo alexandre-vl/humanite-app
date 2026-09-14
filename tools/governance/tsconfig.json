@@ -4,6 +4,7 @@
   "references": [
     { "path": "../adr" },
     { "path": "../agents" },
+    { "path": "../deps" },
     { "path": "../fixtures" },
     { "path": "../git-hooks" },
     { "path": "../kit" }

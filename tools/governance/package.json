@@ -10,6 +10,7 @@
   "dependencies": {
     "@huma/adr": "workspace:*",
     "@huma/agents": "workspace:*",
+    "@huma/deps": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/git-hooks": "workspace:*",
     "@huma/kit": "workspace:*",
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }
