@@ -15,7 +15,8 @@
     "format:check": "prettier --check .",
     "lint": "eslint --flag unstable_native_nodejs_ts_config --max-warnings 0 --cache --cache-location node_modules/.cache/eslint/ .",
     "typecheck": "tsc --build",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck"
+    "test": "vitest run",
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
   },
   "devDependencies": {
     "@huma/eslint-config": "workspace:*",
@@ -23,6 +24,7 @@
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
