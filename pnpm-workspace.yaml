@@ -1,6 +1,5 @@
 packages:
   - apps/*
-  - infra/*
   - packages/*
   - tools/*
 nodeLinker: isolated

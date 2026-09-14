@@ -47,7 +47,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 ## Commits
 
 - Un commit passe par les hooks git : l’index contient tout l’arbre de travail, `pnpm verify` passe sur lui, le message suit Conventional Commits.
-- Types : `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `chore`, `revert`, `style`. Portées : le nom d’un paquet sous `apps/`, `infra/`, `packages/`, `tools/`, ou `deps`, `repo`, `spikes`.
+- Types : `feat`, `fix`, `perf`, `refactor`, `docs`, `test`, `build`, `chore`, `revert`, `style`. Portées : le nom d’un paquet sous `apps/`, `packages/`, `tools/`, ou `deps`, `repo`, `spikes`.
 - Un trailer `Refs: ADR-NNNN` par ligne cite chaque ADR accepté dont le périmètre contient un chemin du commit, et chaque ADR dont le fichier change.
 
 ## Où lire

@@ -3,14 +3,13 @@ import type { WorkspaceFile } from '@huma/deps/workspace';
 import { repoPath } from '@huma/kit/paths';
 
 /** Directories whose subdirectories are the packages of the workspace; each package name is also a commit scope. */
-export const WORKSPACE_ROOTS = ['apps', 'infra', 'packages', 'tools'] as const;
+export const WORKSPACE_ROOTS = ['apps', 'packages', 'tools'] as const;
 
 type WorkspaceRoot = (typeof WORKSPACE_ROOTS)[number];
 
 /** The roots whose packages the packages of each root may depend on: tools serve the workspace, nothing ships them. */
 const ROOT_DEPENDENCIES: Readonly<Record<WorkspaceRoot, readonly WorkspaceRoot[]>> = {
   apps: ['packages'],
-  infra: ['packages', 'tools'],
   packages: ['packages'],
   tools: ['packages', 'tools'],
 };
