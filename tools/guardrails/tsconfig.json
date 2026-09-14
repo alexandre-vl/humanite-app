@@ -1,5 +1,10 @@
 {
   "extends": "@huma/tsconfig/node.json",
   "include": ["src"],
-  "references": [{ "path": "../../packages/eslint-config" }, { "path": "../fixtures" }, { "path": "../kit" }]
+  "references": [
+    { "path": "../../packages/architecture" },
+    { "path": "../../packages/eslint-config" },
+    { "path": "../fixtures" },
+    { "path": "../kit" }
+  ]
 }

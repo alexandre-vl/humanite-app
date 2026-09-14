@@ -25,6 +25,8 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     nodeLinker: 'isolated',
     enableGlobalVirtualStore: false,
     strictDepBuilds: true,
+    // The resolver ships prebuilt bindings as optional dependencies: its postinstall would only rebuild them.
+    allowBuilds: { 'unrs-resolver': false },
     strictPeerDependencies: true,
     pmOnFail: 'error',
     verifyDepsBeforeRun: 'error',
@@ -49,6 +51,8 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     '@types/semver': '7.8.0',
     'babel-preset-expo': '57.0.11',
     eslint: '10.10.0',
+    'eslint-import-resolver-typescript': '4.4.5',
+    'eslint-plugin-boundaries': '7.2.0',
     expo: '57.0.22',
     'expo-constants': '57.0.18',
     'expo-dev-client': '57.0.19',

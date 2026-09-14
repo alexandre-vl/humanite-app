@@ -24,7 +24,7 @@ export async function lintPolicies(
   const observed: PolicyId[] = [];
   for (const result of await eslint.lintFiles(paths.map((path) => join(root, path)))) {
     for (const message of result.messages) {
-      const policy = policyOf(message.message);
+      const policy = policyOf(message.ruleId, message.message);
       if (policy === null) {
         const rule = message.ruleId ?? 'ESLint';
         throw new Error(

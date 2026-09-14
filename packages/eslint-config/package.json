@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@huma/architecture": "workspace:*",
+    "eslint-import-resolver-typescript": "catalog:",
+    "eslint-plugin-boundaries": "catalog:",
     "@eslint/js": "catalog:",
     "typescript-eslint": "catalog:"
   },

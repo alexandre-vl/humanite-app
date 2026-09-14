@@ -209,6 +209,8 @@ export type PnpmSettings = Readonly<{
   nodeLinker: 'isolated' | 'hoisted' | 'pnp';
   enableGlobalVirtualStore: boolean;
   strictDepBuilds: boolean;
+  /** Packages whose install scripts run (`true`) or are skipped (`false`); any other script fails the install. */
+  allowBuilds: Readonly<Record<string, boolean>>;
   strictPeerDependencies: boolean;
   pmOnFail: 'download' | 'error' | 'warn' | 'ignore';
   verifyDepsBeforeRun: 'install' | 'warn' | 'error' | 'prompt' | false;

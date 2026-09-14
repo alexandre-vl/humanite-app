@@ -3,6 +3,7 @@ import { HERMES_FILES } from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import { boundariesConfig } from './boundaries.ts';
 import type { PolicyId } from './policies.ts';
 import { POLICY_IDS, policyMessage } from './policies.ts';
 
@@ -188,5 +189,6 @@ export function defineWorkspaceConfig({
       files: [...HERMES_FILES],
       rules: restrictions({ syntax: [], properties: [], naming: HERMES_NAMING }, policies),
     },
+    boundariesConfig(tsconfigRootDir, policies),
   );
 }

@@ -8,6 +8,7 @@
     "./workspace-copy": "./src/workspace-copy.ts"
   },
   "dependencies": {
+    "@huma/architecture": "workspace:*",
     "@huma/eslint-config": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
