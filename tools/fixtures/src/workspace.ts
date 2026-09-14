@@ -1,9 +1,13 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { toRepoPath } from '@huma/kit/paths';
 
-/** Repository-relative POSIX path → UTF-8 content. */
-export type FileTree = Readonly<Record<string, string>>;
+/** Content of a fixture file; `mode` sets permission bits, `0o755` for an executable. */
+export type FileContent = string | Uint8Array | Readonly<{ content: string | Uint8Array; mode: number }>;
+
+/** Repository-relative POSIX path → content. */
+export type FileTree = Readonly<Record<string, FileContent>>;
 
 export type TemporaryDirectory = AsyncDisposable & Readonly<{ path: string }>;
 
@@ -13,20 +17,32 @@ export async function createTemporaryDirectory(prefix: string): Promise<Temporar
   return {
     path,
     [Symbol.asyncDispose]: async () => {
-      await rm(path, { recursive: true, force: true });
+      await rm(path, { recursive: true, force: true, maxRetries: 3 });
     },
   };
 }
 
-/** Writes every file of `tree` under `root`, creating parent directories; paths may not leave `root`. */
+/** Writes every file of `tree` under `root`, creating parent directories; a path may not leave `root`. */
 export async function writeTree(root: string, tree: FileTree): Promise<void> {
-  for (const [path, content] of Object.entries(tree)) {
+  for (const [path, file] of Object.entries(tree)) {
     const target = resolve(root, path);
-    const inside = relative(root, target);
-    if (inside === '' || inside.startsWith('..') || isAbsolute(inside)) {
+    if (toRepoPath(root, target) === null) {
       throw new Error(`Chemin hors de la racine de la fixture : ${path}`);
     }
     await mkdir(dirname(target), { recursive: true });
-    await writeFile(target, content, 'utf8');
+    if (typeof file === 'string' || file instanceof Uint8Array) {
+      await writeFile(target, file);
+    } else {
+      await writeFile(target, file.content);
+      await chmod(target, file.mode);
+    }
   }
+}
+
+/** Deletes the files of `previous` that `next` does not keep, then writes `next`. */
+export async function replaceTree(root: string, previous: FileTree, next: FileTree): Promise<void> {
+  for (const path of Object.keys(previous).filter((known) => !Object.hasOwn(next, known))) {
+    await rm(join(root, path), { force: true });
+  }
+  await writeTree(root, next);
 }

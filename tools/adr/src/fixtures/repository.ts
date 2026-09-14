@@ -1,9 +1,7 @@
-import { execFile } from 'node:child_process';
-import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { promisify } from 'node:util';
-import type { FileTree } from '@huma/fixtures';
-import { createTemporaryDirectory, writeTree } from '@huma/fixtures';
+import type { FileContent, FileTree } from '@huma/fixtures';
+import { createRepository, createTemporaryDirectory, FIXTURE_IDENTITY } from '@huma/fixtures';
+import { git, isolatedRepository } from '@huma/kit/git';
 import { runChecks } from '../check.ts';
 import { effectiveStatuses, readCollection } from '../collection.ts';
 import type { CheckCode } from '../diagnostics.ts';
@@ -12,8 +10,6 @@ import { repoPath } from '../model.ts';
 import { renderIndex } from '../readme.ts';
 import type { Snapshot, SnapshotEntry, Source } from '../snapshot.ts';
 import { ADR_DIRECTORY, INDEX_FILE } from '../spec.ts';
-
-const execFileAsync = promisify(execFile);
 
 /** Proof ids understood by fixture repositories: one that always passes, one that always fails. */
 export const FAKE_PROOFS = { passing: 'fake/passing', failing: 'fake/failing' } as const;
@@ -31,29 +27,28 @@ export type FixtureRepository = Readonly<{
   shallow?: boolean;
 }>;
 
-const GIT_ENVIRONMENT = {
-  ...process.env,
-  GIT_CONFIG_GLOBAL: '/dev/null',
-  GIT_CONFIG_NOSYSTEM: '1',
-  GIT_AUTHOR_NAME: 'Fixture',
-  GIT_AUTHOR_EMAIL: 'fixture@example.org',
-  GIT_AUTHOR_DATE: '2026-09-14T12:00:00+02:00',
-  GIT_COMMITTER_NAME: 'Fixture',
-  GIT_COMMITTER_EMAIL: 'fixture@example.org',
-  GIT_COMMITTER_DATE: '2026-09-14T12:00:00+02:00',
-};
-
-/** Runs git in a fixture repository, isolated from the user's configuration and hooks. */
+/** Runs git in a fixture repository, isolated from the calling process and the user's configuration. */
 export async function gitIn(root: string, args: readonly string[]): Promise<void> {
-  await execFileAsync('git', ['-C', root, ...args], { env: GIT_ENVIRONMENT });
+  await git(isolatedRepository(root, { ...process.env, ...FIXTURE_IDENTITY }), args);
+}
+
+const encoder = new TextEncoder();
+
+function bytesOf(file: FileContent): Uint8Array {
+  if (typeof file === 'string') {
+    return encoder.encode(file);
+  }
+  if (file instanceof Uint8Array) {
+    return file;
+  }
+  return typeof file.content === 'string' ? encoder.encode(file.content) : file.content;
 }
 
 function snapshotOf(tree: FileTree): Snapshot {
-  const encoder = new TextEncoder();
   const entries = Object.entries(tree).flatMap(([path, content]): SnapshotEntry[] => {
     const name = path.slice(ADR_DIRECTORY.length + 1);
     return path.startsWith(`${ADR_DIRECTORY}/`) && !name.includes('/')
-      ? [{ name, kind: 'file', bytes: encoder.encode(content) }]
+      ? [{ name, kind: 'file', bytes: bytesOf(content) }]
       : [];
   });
   return { source: 'worktree', entries, files: new Set(Object.keys(tree)) };
@@ -72,35 +67,17 @@ async function withIndex(root: string, tree: FileTree, bindings: Bindings): Prom
   return { ...tree, [INDEX_FILE]: index };
 }
 
-/** Makes the working tree equal to `tree`: files written by an earlier state and absent from `tree` are removed. */
-async function replaceTree(root: string, previous: FileTree, tree: FileTree): Promise<void> {
-  for (const path of Object.keys(previous).filter((known) => !Object.hasOwn(tree, known))) {
-    await rm(join(root, path), { force: true });
-  }
-  await writeTree(root, tree);
-}
-
 export async function materialize(root: string, repository: FixtureRepository): Promise<void> {
   const bindings = repository.bindings ?? {};
-  await mkdir(root, { recursive: true });
-  await gitIn(root, ['init', '--quiet', '--initial-branch=main']);
-  let previous: FileTree = {};
-  for (const [index, commit] of (repository.commits ?? []).entries()) {
-    const tree = await withIndex(root, commit, bindings);
-    await replaceTree(root, previous, tree);
-    await gitIn(root, ['add', '--all']);
-    await gitIn(root, ['commit', '--quiet', '--allow-empty', '--no-verify', '-m', `état ${String(index + 1)}`]);
-    previous = tree;
-  }
-  if (repository.staged !== undefined) {
-    const tree = await withIndex(root, repository.staged, bindings);
-    await replaceTree(root, previous, tree);
-    await gitIn(root, ['add', '--all']);
-    previous = tree;
-  }
-  if (repository.worktree !== undefined) {
-    await replaceTree(root, previous, await withIndex(root, repository.worktree, bindings));
-  }
+  await createRepository(
+    root,
+    {
+      commits: (repository.commits ?? []).map((files) => ({ files })),
+      ...(repository.staged === undefined ? {} : { staged: repository.staged }),
+      ...(repository.worktree === undefined ? {} : { worktree: repository.worktree }),
+    },
+    { prepare: async (tree) => withIndex(root, tree, bindings) },
+  );
 }
 
 /** Codes reported by `adr:check` on a freshly built fixture repository. */
@@ -111,9 +88,7 @@ export async function checkFixture(repository: FixtureRepository): Promise<reado
   let root = origin;
   if (repository.shallow === true) {
     root = join(directory.path, 'shallow');
-    await execFileAsync('git', ['clone', '--quiet', '--depth', '1', `file://${origin}`, root], {
-      env: GIT_ENVIRONMENT,
-    });
+    await git(isolatedRepository(directory.path), ['clone', '--quiet', '--depth', '1', `file://${origin}`, root]);
   }
   const report = await runChecks({
     root,
@@ -124,10 +99,7 @@ export async function checkFixture(repository: FixtureRepository): Promise<reado
       text: null,
       knownProofs: new Set(Object.values(FAKE_PROOFS)),
     },
-    runProof: async (proof) => {
-      await Promise.resolve();
-      return proof === FAKE_PROOFS.passing;
-    },
+    runProof: async (proof) => Promise.resolve(proof === FAKE_PROOFS.passing),
   });
   return report.diagnostics.map((diagnostic) => diagnostic.code);
 }

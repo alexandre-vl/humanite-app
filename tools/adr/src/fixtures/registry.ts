@@ -1,4 +1,5 @@
-import type { FileTree, Fixture } from '@huma/fixtures';
+import type { FileTree } from '@huma/fixtures';
+import { fixtureFactory } from '@huma/fixtures';
 import type { CheckCode } from '../diagnostics.ts';
 import { countWords, parseMarkdown } from '../markdown.ts';
 import type { Bindings } from '../model.ts';
@@ -8,15 +9,14 @@ import { adrDocument, BASE_TITLE, pathFor, replaceOnce } from './documents.ts';
 import type { FixtureRepository } from './repository.ts';
 import { checkFixture, FAKE_PROOFS } from './repository.ts';
 
-type AdrFixture<Id extends string, Expected extends readonly CheckCode[]> = Fixture<Id, CheckCode> &
-  Readonly<{ expected: Expected }>;
+const defineFixture = fixtureFactory<CheckCode>();
 
 const define = <const Id extends string, const Expected extends readonly CheckCode[]>(
   id: Id,
   description: string,
   expected: Expected,
   repository: FixtureRepository,
-): AdrFixture<Id, Expected> => ({ id, description, expected, run: async () => checkFixture(repository) });
+) => defineFixture(id, description, expected, async () => checkFixture(repository));
 
 const ZERO = pathFor(adrNumber(0));
 const ONE = pathFor(adrNumber(1), 'Validation des données par Valibot');

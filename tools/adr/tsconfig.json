@@ -1,5 +1,12 @@
 {
   "extends": "@huma/tsconfig/node.json",
   "include": ["src"],
-  "references": [{ "path": "../fixtures" }]
+  "references": [
+    {
+      "path": "../fixtures"
+    },
+    {
+      "path": "../kit"
+    }
+  ]
 }

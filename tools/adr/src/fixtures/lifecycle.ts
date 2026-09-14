@@ -2,8 +2,8 @@ import { spawn } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { FileTree, Fixture } from '@huma/fixtures';
-import { createTemporaryDirectory, writeTree } from '@huma/fixtures';
+import type { FileTree } from '@huma/fixtures';
+import { createTemporaryDirectory, fixtureFactory, writeTree } from '@huma/fixtures';
 import { createAdr, nextNumber } from '../creation.ts';
 import { decide } from '../decision.ts';
 import type { Bindings } from '../model.ts';
@@ -16,15 +16,7 @@ import { FAKE_PROOFS, gitIn, materialize } from './repository.ts';
 export type LifecycleCode =
   'guard/denied' | 'decide/refused' | 'decide/decided' | 'new/duplicate-number' | 'hook/not-wired';
 
-type LifecycleFixture<Id extends string, Expected extends readonly LifecycleCode[]> = Fixture<Id, LifecycleCode> &
-  Readonly<{ expected: Expected }>;
-
-const define = <const Id extends string, const Expected extends readonly LifecycleCode[]>(
-  id: Id,
-  description: string,
-  expected: Expected,
-  run: () => Promise<readonly LifecycleCode[]>,
-): LifecycleFixture<Id, Expected> => ({ id, description, expected, run });
+const define = fixtureFactory<LifecycleCode>();
 
 const GUARD_SCRIPT = fileURLToPath(new URL('../cli/agent-guard.ts', import.meta.url));
 const REPOSITORY_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));

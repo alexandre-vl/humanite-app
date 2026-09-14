@@ -19,14 +19,19 @@ test('a fixture expecting another code fails with both codes named', async () =>
     return;
   }
   const report = await runFixture({ ...slug, expected: ['adr/title'] });
-  expect(report).toEqual({ id: 'adr/slug', outcome: 'failed', missing: ['adr/title'], unexpected: ['adr/slug'] });
+  expect(report).toMatchObject({
+    id: 'adr/slug',
+    outcome: 'failed',
+    missing: ['adr/title'],
+    unexpected: ['adr/slug'],
+  });
 }, 60_000);
 
 describe.concurrent('each fixture reports exactly its expected codes', () => {
   test.each(ADR_FIXTURES)(
     '$id',
     async (fixture) => {
-      expect(await runFixture(fixture)).toEqual({ id: fixture.id, outcome: 'passed' });
+      expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
     },
     60_000,
   );

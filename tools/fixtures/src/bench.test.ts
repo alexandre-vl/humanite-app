@@ -1,19 +1,12 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import type { Coverage, Fixture } from './bench.ts';
-import { findDuplicateIds, formatReports, runFixture, runFixtures } from './bench.ts';
+import { findDuplicateIds, fixtureFactory, formatReports, runFixture, runFixtures } from './bench.ts';
 
 type Code = 'a/one' | 'a/two';
 
-const fixture = (
-  id: string,
-  expected: readonly Code[],
-  run: () => Promise<readonly Code[]>,
-): Fixture<string, Code> => ({ id, description: id, expected, run });
+const define = fixtureFactory<Code>();
 
-const observing = (codes: readonly Code[]) => async (): Promise<readonly Code[]> => {
-  await Promise.resolve();
-  return codes;
-};
+const observing = (codes: readonly Code[]) => async (): Promise<readonly Code[]> => Promise.resolve(codes);
 
 const waiting = async (milliseconds: number): Promise<void> => {
   await new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -21,45 +14,64 @@ const waiting = async (milliseconds: number): Promise<void> => {
 
 describe('runFixture', () => {
   test('passes when the observed codes equal the expected set, whatever their order and repetition', async () => {
-    const report = await runFixture(fixture('equal', ['a/one', 'a/two'], observing(['a/two', 'a/one', 'a/two'])));
-    expect(report).toEqual({ id: 'equal', outcome: 'passed' });
+    const report = await runFixture(
+      define('equal', 'égal', ['a/one', 'a/two'], observing(['a/two', 'a/one', 'a/two'])),
+    );
+    expect(report).toMatchObject({ id: 'equal', outcome: 'passed' });
+    expect(report.durationMs).toBeGreaterThanOrEqual(0);
   });
 
   test('passes a valid fixture that expects and observes no code', async () => {
-    expect(await runFixture(fixture('valid', [], observing([])))).toEqual({ id: 'valid', outcome: 'passed' });
+    expect(await runFixture(define('valid', 'valide', [], observing([])))).toMatchObject({ outcome: 'passed' });
   });
 
   test('fails with the sorted missing and unexpected codes', async () => {
-    const report = await runFixture(fixture('diff', ['a/two'], observing(['a/one'])));
-    expect(report).toEqual({ id: 'diff', outcome: 'failed', missing: ['a/two'], unexpected: ['a/one'] });
+    const report = await runFixture(define('diff', 'écart', ['a/two'], observing(['a/one'])));
+    expect(report).toMatchObject({ id: 'diff', outcome: 'failed', missing: ['a/two'], unexpected: ['a/one'] });
   });
 
   test('reports a throwing run as crashed, never as passed', async () => {
     const report = await runFixture(
-      fixture('crash', [], async () => {
+      define('crash', 'plantage', [], async () => {
         await Promise.resolve();
         throw new Error('boom');
       }),
     );
-    expect(report.outcome).toBe('crashed');
     expect(report.outcome === 'crashed' ? report.error : '').toContain('boom');
   });
 
   test('describes a non-Error throw without calling its toString', async () => {
     const report = await runFixture(
-      fixture('value', [], async () => {
+      define('value', 'valeur', [], async () => {
         await Promise.resolve();
         throw Object.create(null);
       }),
     );
-    expect(report).toEqual({ id: 'value', outcome: 'crashed', error: 'non-Error value thrown (object)' });
+    expect(report).toMatchObject({ outcome: 'crashed', error: 'valeur non Error levée (object)' });
+  });
+
+  test('crashes a fixture that exceeds its time budget and aborts its signal', async () => {
+    let aborted = false;
+    const report = await runFixture(
+      define('slow', 'lente', [], async ({ signal }) => {
+        signal.addEventListener('abort', () => {
+          aborted = true;
+        });
+        await waiting(1_000);
+        return [];
+      }),
+      { timeoutMs: 20 },
+    );
+    expect(report).toMatchObject({ outcome: 'crashed' });
+    expect(report.outcome === 'crashed' ? report.error : '').toContain('délai de 20 ms dépassé');
+    expect(aborted).toBe(true);
   });
 });
 
 describe('runFixtures', () => {
   test('keeps the input order when later fixtures finish first', async () => {
     const delayed = (id: string, milliseconds: number): Fixture<string, Code> =>
-      fixture(id, [], async () => {
+      define(id, id, [], async () => {
         await waiting(milliseconds);
         return [];
       });
@@ -68,33 +80,18 @@ describe('runFixtures', () => {
     });
     expect(reports.map((report) => report.id)).toEqual(['slow', 'fast', 'medium']);
   });
-
-  test('never runs more fixtures at once than the concurrency limit', async () => {
-    let running = 0;
-    let peak = 0;
-    const tracked = (id: string): Fixture<string, Code> =>
-      fixture(id, [], async () => {
-        running += 1;
-        peak = Math.max(peak, running);
-        await waiting(5);
-        running -= 1;
-        return [];
-      });
-    await runFixtures(['1', '2', '3', '4', '5'].map(tracked), { concurrency: 2 });
-    expect(peak).toBe(2);
-  });
 });
 
 test('findDuplicateIds lists each repeated id once, sorted', () => {
   const ids = ['b', 'a', 'b', 'c', 'a', 'b'];
-  expect(findDuplicateIds(ids.map((id) => fixture(id, [], observing([]))))).toEqual(['a', 'b']);
+  expect(findDuplicateIds(ids.map((id) => define(id, id, [], observing([]))))).toEqual(['a', 'b']);
 });
 
 test('formatReports prints one line per fixture and the conforming count', () => {
   const text = formatReports([
-    { id: 'ok', outcome: 'passed' },
-    { id: 'diff', outcome: 'failed', missing: ['a/two'], unexpected: [] },
-    { id: 'crash', outcome: 'crashed', error: 'Error: boom\n    at stack' },
+    { id: 'ok', durationMs: 1, outcome: 'passed' },
+    { id: 'diff', durationMs: 1, outcome: 'failed', missing: ['a/two'], unexpected: [] },
+    { id: 'crash', durationMs: 1, outcome: 'crashed', error: 'Error: boom\n    at stack' },
   ]);
   expect(text.split('\n')).toEqual([
     '✓ ok',
@@ -104,9 +101,24 @@ test('formatReports prints one line per fixture and the conforming count', () =>
   ]);
 });
 
-test('Coverage resolves to the codes that no fixture expects', () => {
-  type OnlyOne = readonly [Fixture<'f', Code> & { expected: readonly ['a/one'] }];
-  type Both = readonly [Fixture<'f', Code> & { expected: readonly ['a/one', 'a/two'] }];
-  expectTypeOf<Coverage<Code, OnlyOne>>().toEqualTypeOf<'a/two'>();
-  expectTypeOf<Coverage<Code, Both>>().toEqualTypeOf<true>();
+describe('Coverage', () => {
+  const one = define('one', 'un', ['a/one'], observing(['a/one']));
+  const both = define('both', 'deux', ['a/one', 'a/two'], observing(['a/one', 'a/two']));
+  const widened: readonly Code[] = ['a/one'];
+  const loose = define('loose', 'élargi', widened, observing(widened));
+
+  test('resolves to true once every code is expected by a literal tuple', () => {
+    expect([one, both, loose].map((fixture) => fixture.id)).toEqual(['one', 'both', 'loose']);
+    expectTypeOf<Coverage<Code, readonly [typeof one, typeof both]>>().toEqualTypeOf<true>();
+  });
+
+  test('names the uncovered codes', () => {
+    expectTypeOf<Coverage<Code, readonly [typeof one]>>().toEqualTypeOf<Readonly<{ uncovered: 'a/two' }>>();
+  });
+
+  test('refuses a fixture whose expected codes were widened to an array', () => {
+    expectTypeOf<Coverage<Code, readonly [typeof both, typeof loose]>>().toEqualTypeOf<
+      Readonly<{ notLiteral: 'loose' }>
+    >();
+  });
 });

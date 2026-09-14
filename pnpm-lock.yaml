@@ -110,6 +110,9 @@ importers:
       '@huma/fixtures':
         specifier: workspace:*
         version: link:../fixtures
+      '@huma/kit':
+        specifier: workspace:*
+        version: link:../kit
       mdast-util-from-markdown:
         specifier: 'catalog:'
         version: 2.0.3
@@ -149,6 +152,10 @@ importers:
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
 
   tools/fixtures:
+    dependencies:
+      '@huma/kit':
+        specifier: workspace:*
+        version: link:../kit
     devDependencies:
       '@huma/tsconfig':
         specifier: workspace:*

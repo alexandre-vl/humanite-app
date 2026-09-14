@@ -5,6 +5,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "dependencies": {
+    "@huma/kit": "workspace:*"
+  },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",
     "@types/node": "catalog:",

@@ -1,4 +1,5 @@
 {
   "extends": "@huma/tsconfig/node.json",
-  "include": ["src"]
+  "include": ["src"],
+  "references": [{ "path": "../kit" }]
 }

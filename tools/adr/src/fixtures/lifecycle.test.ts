@@ -17,7 +17,7 @@ describe.concurrent('each lifecycle fixture reports exactly its expected codes',
   test.each(LIFECYCLE_FIXTURES)(
     '$id',
     async (fixture) => {
-      expect(await runFixture(fixture)).toEqual({ id: fixture.id, outcome: 'passed' });
+      expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
     },
     60_000,
   );

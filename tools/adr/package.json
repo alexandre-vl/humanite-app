@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*",
     "mdast-util-from-markdown": "catalog:",
     "mdast-util-frontmatter": "catalog:",
     "mdast-util-gfm": "catalog:",
