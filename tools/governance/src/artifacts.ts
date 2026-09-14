@@ -25,6 +25,7 @@ import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
 import { COMMAND_NAMES, COMMANDS, commandLine, entryFile, ESLINT_CONFIG_FILE, SCRIPT_AUDIENCES } from './commands.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
+import { renderEffectiveTsconfigs } from './tsconfig-snapshot.ts';
 import { WORKSPACE_FILE } from './workspace-manifest.ts';
 
 /** A file derived from typed sources: `pnpm gen` writes it, `pnpm gen:check` compares it without writing. */
@@ -164,6 +165,17 @@ const effectiveEslintConfig: Artifact = {
     ),
 };
 
+const EFFECTIVE_TSCONFIG = repoPath('packages/tsconfig/effective-config.json');
+
+/**
+ * How TypeScript builds each project of the solution, option by option: an option a project loosens, or a preset that
+ * changes with an upgrade of Expo or TypeScript, shows up in the diff of this file before it reaches a commit.
+ */
+const effectiveTsconfig: Artifact = {
+  path: EFFECTIVE_TSCONFIG,
+  render: async (root) => formatForPath(root, EFFECTIVE_TSCONFIG, await renderEffectiveTsconfigs(root)),
+};
+
 const KNIP_CONFIG = repoPath('knip.json');
 
 /**
@@ -210,6 +222,7 @@ export const ARTIFACTS: readonly Artifact[] = [
   workspaceFile,
   solution,
   effectiveEslintConfig,
+  effectiveTsconfig,
   knipConfig,
 ];
 
