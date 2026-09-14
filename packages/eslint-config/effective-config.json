@@ -1,6 +1,6 @@
 {
   "tools/sample/src/sample.ts": {
-    "plugins": ["@", "@typescript-eslint"],
+    "plugins": ["@", "@typescript-eslint", "check-file"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -200,6 +200,30 @@
       "@typescript-eslint/unbound-method": "error",
       "@typescript-eslint/unified-signatures": "error",
       "@typescript-eslint/use-unknown-in-catch-callback-variable": "error",
+      "check-file/filename-naming-convention": [
+        "error",
+        {
+          "**/*": "KEBAB_CASE"
+        },
+        {
+          "ignoreMiddleExtensions": true
+        }
+      ],
+      "check-file/folder-match-with-fex": [
+        "error",
+        {
+          "*.@(ios|android).@(ts|tsx)": "apps/mobile/src/shared/ui/primitives/*/"
+        }
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "**/": "KEBAB_CASE"
+        },
+        {
+          "ignoreWords": ["_app"]
+        }
+      ],
       "constructor-super": "off",
       "curly": ["error", "all"],
       "dot-notation": [
@@ -500,12 +524,36 @@
     }
   },
   "apps/mobile/babel.config.js": {
-    "plugins": ["@"],
+    "plugins": ["@", "check-file"],
     "parserOptions": {
       "sourceType": "module"
     },
     "settings": {},
     "rules": {
+      "check-file/filename-naming-convention": [
+        "error",
+        {
+          "**/*": "KEBAB_CASE"
+        },
+        {
+          "ignoreMiddleExtensions": true
+        }
+      ],
+      "check-file/folder-match-with-fex": [
+        "error",
+        {
+          "*.@(ios|android).@(ts|tsx)": "apps/mobile/src/shared/ui/primitives/*/"
+        }
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "**/": "KEBAB_CASE"
+        },
+        {
+          "ignoreWords": ["_app"]
+        }
+      ],
       "constructor-super": "error",
       "curly": ["error", "all"],
       "eqeqeq": ["error", "always"],
@@ -716,7 +764,7 @@
     }
   },
   "apps/mobile/app/sample.tsx": {
-    "plugins": ["@", "@typescript-eslint", "boundaries", "react-hooks", "react-x"],
+    "plugins": ["@", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -2129,6 +2177,27 @@
         }
       ],
       "boundaries/no-unknown-files": "error",
+      "check-file/filename-naming-convention": [
+        "error",
+        {
+          "**/*": "@(_layout|index|\\+not-found|+([a-z0-9])*(-+([a-z0-9]))|\\[+([a-z0-9])*(-+([a-z0-9]))\\]|\\[...+([a-z0-9])*(-+([a-z0-9]))\\])"
+        },
+        {
+          "ignoreMiddleExtensions": true
+        }
+      ],
+      "check-file/folder-match-with-fex": [
+        "error",
+        {
+          "*.@(ios|android).@(ts|tsx)": "apps/mobile/src/shared/ui/primitives/*/"
+        }
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "**/": "@(+([a-z0-9])*(-+([a-z0-9]))|\\(+([a-z0-9])*(-+([a-z0-9]))\\)|\\[+([a-z0-9])*(-+([a-z0-9]))\\])"
+        }
+      ],
       "constructor-super": "off",
       "curly": ["error", "all"],
       "dot-notation": [
@@ -2638,7 +2707,7 @@
     }
   },
   "apps/mobile/src/pages/sample/index.ts": {
-    "plugins": ["@", "@typescript-eslint", "boundaries", "react-hooks", "react-x"],
+    "plugins": ["@", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -4051,6 +4120,30 @@
         }
       ],
       "boundaries/no-unknown-files": "error",
+      "check-file/filename-naming-convention": [
+        "error",
+        {
+          "**/*": "KEBAB_CASE"
+        },
+        {
+          "ignoreMiddleExtensions": true
+        }
+      ],
+      "check-file/folder-match-with-fex": [
+        "error",
+        {
+          "*.@(ios|android).@(ts|tsx)": "apps/mobile/src/shared/ui/primitives/*/"
+        }
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "**/": "KEBAB_CASE"
+        },
+        {
+          "ignoreWords": ["_app"]
+        }
+      ],
       "constructor-super": "off",
       "curly": ["error", "all"],
       "dot-notation": [
@@ -4556,7 +4649,7 @@
     }
   },
   "apps/mobile/src/pages/sample/ui/sample.tsx": {
-    "plugins": ["@", "@typescript-eslint", "boundaries", "react-hooks", "react-x"],
+    "plugins": ["@", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -5969,6 +6062,30 @@
         }
       ],
       "boundaries/no-unknown-files": "error",
+      "check-file/filename-naming-convention": [
+        "error",
+        {
+          "**/*": "KEBAB_CASE"
+        },
+        {
+          "ignoreMiddleExtensions": true
+        }
+      ],
+      "check-file/folder-match-with-fex": [
+        "error",
+        {
+          "*.@(ios|android).@(ts|tsx)": "apps/mobile/src/shared/ui/primitives/*/"
+        }
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "**/": "KEBAB_CASE"
+        },
+        {
+          "ignoreWords": ["_app"]
+        }
+      ],
       "constructor-super": "off",
       "curly": ["error", "all"],
       "dot-notation": [

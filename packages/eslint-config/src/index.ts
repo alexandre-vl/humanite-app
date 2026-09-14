@@ -12,6 +12,7 @@ import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import { boundariesConfig } from './boundaries.ts';
+import { namingConfig } from './naming.ts';
 import type { PolicyId } from './policies.ts';
 import { hermesPolicy, modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
 import { reactConfig } from './react.ts';
@@ -297,6 +298,7 @@ export function defineWorkspaceConfig({
       files: [...ENTRY_FILES],
       rules: restrictions(narrowed(HERMES, ENTRY_SYNTAX), policies),
     },
+    ...namingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
     reactConfig(tsconfigRootDir),
     boundariesConfig(tsconfigRootDir, policies),
   );

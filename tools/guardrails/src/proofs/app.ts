@@ -192,6 +192,60 @@ export function useOpacity(): number {
       ['entry/re-export'],
       linted({ 'src/shared/config/index.ts': constant('APP_NAME', 'Humanité') }),
     ),
+    define(
+      'guardrail/naming-file',
+      'un fichier nommé en camelCase',
+      ['naming/file'],
+      linted({
+        'src/shared/lib/format/index.ts': "export { formatTitle } from './formatTitle';\n",
+        'src/shared/lib/format/formatTitle.ts': "export { APP_NAME as formatTitle } from '#config';\n",
+      }),
+    ),
+    define(
+      'guardrail/naming-folder',
+      'un module rangé dans un dossier en camelCase',
+      ['naming/folder'],
+      linted({
+        'src/shared/lib/dateFormat/index.ts': "export { dateFormat } from './date-format';\n",
+        'src/shared/lib/dateFormat/date-format.ts': constant('dateFormat', 'jour'),
+      }),
+    ),
+    define(
+      'guardrail/naming-route-file',
+      'une route nommée en PascalCase',
+      ['naming/file'],
+      linted({ 'app/Article.tsx': route('ArticlePage', '#pages/article') }),
+    ),
+    define(
+      'guardrail/naming-route-folder',
+      'un dossier de routes nommé en PascalCase',
+      ['naming/folder'],
+      linted({ 'app/Articles/index.tsx': route('ArticlePage', '#pages/article') }),
+    ),
+    define(
+      'guardrail/naming-route-conventions',
+      'les noms qu’Expo Router lit : mise en page, page introuvable, groupe, segments dynamique et attrape-tout',
+      [],
+      linted({
+        'app/_layout.tsx': "export { ErrorBoundary, RootLayout as default } from '#app';\n",
+        'app/+not-found.tsx': route('HomePage', '#pages/home'),
+        'app/(tabs)/news.tsx': route('HomePage', '#pages/home'),
+        'app/articles/[id].tsx': route('ArticlePage', '#pages/article'),
+        'app/archives/[...path].tsx': route('ArticlePage', '#pages/article'),
+      }),
+    ),
+    define(
+      'guardrail/platform-variant',
+      'une variante iOS dans une page',
+      ['place/platform-variant'],
+      linted({ 'src/pages/home/ui/home-page.ios.tsx': component('HomePage', '#components/badge', 'Badge') }),
+    ),
+    define(
+      'guardrail/platform-variant-primitive',
+      'une variante iOS dans une primitive, la place qui les permet',
+      [],
+      linted({ 'src/shared/ui/primitives/surface/surface.ios.tsx': component('Surface', 'react-native', 'View') }),
+    ),
   ] as const;
 };
 

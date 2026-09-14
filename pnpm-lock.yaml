@@ -51,6 +51,9 @@ catalogs:
     eslint-plugin-boundaries:
       specifier: 7.2.0
       version: 7.2.0
+    eslint-plugin-check-file:
+      specifier: 3.3.2
+      version: 3.3.2
     eslint-plugin-react-hooks:
       specifier: 7.1.1
       version: 7.1.1
@@ -279,6 +282,9 @@ importers:
       eslint-plugin-boundaries:
         specifier: 'catalog:'
         version: 7.2.0(@typescript-eslint/parser@8.70.0(eslint@10.10.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint-import-resolver-typescript@4.4.5(eslint@10.10.0(supports-color@8.1.1))(supports-color@8.1.1))(eslint@10.10.0(supports-color@8.1.1))(supports-color@8.1.1)
+      eslint-plugin-check-file:
+        specifier: 'catalog:'
+        version: 3.3.2(eslint@10.10.0(supports-color@8.1.1))
       eslint-plugin-react-hooks:
         specifier: 'catalog:'
         version: 7.1.1(eslint@10.10.0(supports-color@8.1.1))(supports-color@8.1.1)
@@ -2487,6 +2493,12 @@ packages:
     engines: {node: '>=18.18'}
     peerDependencies:
       eslint: '>=6.0.0'
+
+  eslint-plugin-check-file@3.3.2:
+    resolution: {integrity: sha512-X0yVi4vbV7pSxu00oAJiE8wcwAvIoU2YQKrkvRRLq+88i/cZNooOgAgjk2gOS03lKMsFMVusJLlqHNuAwduX2g==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      eslint: '>=9.0.0'
 
   eslint-plugin-react-hooks@7.1.1:
     resolution: {integrity: sha512-f2I7Gw6JbvCexzIInuSbZpfdQ44D7iqdWX01FKLvrPgqxoE7oMj8clOfto8U6vYiz4yd5oKu39rRSVOe1zRu0g==}
@@ -6642,6 +6654,12 @@ snapshots:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
       - supports-color
+
+  eslint-plugin-check-file@3.3.2(eslint@10.10.0(supports-color@8.1.1)):
+    dependencies:
+      eslint: 10.10.0(supports-color@8.1.1)
+      is-glob: 4.0.3
+      micromatch: 4.0.8
 
   eslint-plugin-react-hooks@7.1.1(eslint@10.10.0(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:

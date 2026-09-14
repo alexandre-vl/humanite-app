@@ -26,6 +26,9 @@ const WRITTEN = {
   'test/it-only': 'un it focalisé cache le reste de la suite',
   'test/test-only': 'un test focalisé cache le reste de la suite',
   'place/unknown-file': 'ce fichier n’appartient à aucune place de l’architecture',
+  'place/platform-variant': 'une variante de plateforme ne vit que dans une place qui les permet, les primitives L0',
+  'naming/file': 'un nom de fichier s’écrit en kebab-case, ou selon les conventions d’Expo Router pour une route',
+  'naming/folder': 'un nom de dossier s’écrit en kebab-case, ou selon les conventions d’Expo Router pour une route',
   'route/re-export': 'une route ne fait que réexporter : sa page, son ErrorBoundary et ses réglages vivent dans src',
   'route/error-boundary':
     'une route exporte un ErrorBoundary : sans lui, une erreur de rendu remonte jusqu’à la racine',
@@ -65,6 +68,9 @@ export const POLICY_IDS: readonly PolicyId[] = [
 /** Rules whose message cannot be chosen, with the policy each one enforces. */
 const RULE_POLICIES: Readonly<Record<string, PolicyId>> = {
   'boundaries/no-unknown-files': 'place/unknown-file',
+  'check-file/filename-naming-convention': 'naming/file',
+  'check-file/folder-naming-convention': 'naming/folder',
+  'check-file/folder-match-with-fex': 'place/platform-variant',
 };
 
 /** What a place may import, as its message says it. */
