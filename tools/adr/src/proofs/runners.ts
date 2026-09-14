@@ -7,20 +7,11 @@ import { git, isolatedRepository } from '@huma/kit/git';
 import type { Environment } from '@huma/kit/process';
 import { repoPath } from '@huma/kit/paths';
 import type { Bindings, BindingsSource, ProofRunner } from '../model/bindings.ts';
-import { checkBindings, checkScopes } from '../repository/bindings.ts';
-import { runChecks } from '../repository/check.ts';
-import {
-  checkLinkTargets,
-  checkNumbers,
-  checkReferences,
-  effectiveStatuses,
-  readCollection,
-} from '../repository/collection.ts';
+import { checkSnapshot, runChecks } from '../repository/check.ts';
 import type { Acknowledgment } from '../repository/history.ts';
 import type { Snapshot, SnapshotEntry } from '../repository/snapshot.ts';
 import type { CheckCode } from '../spec/checks.ts';
 import type { FormatRegistry } from '../spec/formats/registry.ts';
-import { FORMAT_REGISTRY } from '../spec/formats/registry.ts';
 import { ADR_DIRECTORY } from '../spec/layout.ts';
 
 /** Proof ids understood by the fixture runners: one that always passes, one that always fails. */
@@ -37,6 +28,7 @@ export const bindingsSource = (bindings: Bindings): BindingsSource => ({
 
 export const runFakeProof: ProofRunner = async (proof) => Promise.resolve(proof === FAKE_PROOFS.passing);
 
+/** A snapshot of a file tree, as `readSnapshot` would read it from a working tree. */
 function snapshotOf(files: FileTree): Snapshot {
   const directories = new Set<string>();
   const entries: SnapshotEntry[] = [];
@@ -62,18 +54,9 @@ export type FilesOptions = Readonly<{ bindings?: Bindings; formats?: FormatRegis
 
 /** Codes of every check that needs no git history, run in memory on `files`. */
 export function checkFiles(files: FileTree, options: FilesOptions = {}): readonly CheckCode[] {
-  const snapshot = snapshotOf(files);
-  const collection = readCollection(snapshot, options.formats ?? FORMAT_REGISTRY);
-  const statuses = effectiveStatuses(collection.documents);
-  const source = bindingsSource(options.bindings ?? {});
-  return [
-    ...collection.diagnostics,
-    ...checkNumbers(collection.documents),
-    ...checkReferences(collection.documents),
-    ...checkLinkTargets(collection.documents, snapshot.files),
-    ...checkBindings(collection.documents, statuses, source),
-    ...checkScopes(source, snapshot.files),
-  ].map((diagnostic) => diagnostic.code);
+  return checkSnapshot(snapshotOf(files), bindingsSource(options.bindings ?? {}), options.formats).diagnostics.map(
+    (diagnostic) => diagnostic.code,
+  );
 }
 
 export type HistoryFixture = Readonly<{
@@ -86,6 +69,7 @@ export type HistoryFixture = Readonly<{
   /** Check a `git clone --depth 1` of the repository. */
   shallow?: boolean;
   environment?: Environment;
+  formats?: FormatRegistry;
   /** Acknowledgments computed from the repository, once its commits exist. */
   acknowledgments?: (repository: GitRepository) => Promise<readonly Acknowledgment[]>;
   /** Git commands run after the plan, a merge for instance. */
@@ -114,6 +98,7 @@ export async function checkHistoryFixture(fixture: HistoryFixture): Promise<read
     runProof: runFakeProof,
     environment: fixture.environment ?? {},
     acknowledgments: (await fixture.acknowledgments?.(repository)) ?? [],
+    ...(fixture.formats === undefined ? {} : { formats: fixture.formats }),
   });
   return report.diagnostics.map((diagnostic) => diagnostic.code);
 }

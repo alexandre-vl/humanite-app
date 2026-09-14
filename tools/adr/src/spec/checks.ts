@@ -538,6 +538,23 @@ export const CHECKS = {
     summary: 'un ADR commité n’est jamais supprimé',
     message: '{id} commité puis supprimé : le garder, rejeté si besoin',
   },
+  'adr/number-reused': {
+    scope: 'history',
+    summary: 'un numéro libéré par une suppression n’est jamais repris',
+    message: '{id} repris par {path} après la suppression de {previous} : prendre un nouveau numéro',
+  },
+  'adr/decision-content-changed': {
+    scope: 'history',
+    summary: 'une décision garde le contenu de sa proposition commitée',
+    message:
+      '{id} décidé avec un contenu différent de sa proposition commitée : commiter d’abord la version proposée, puis la décision seule',
+  },
+  'adr/format-regression': {
+    scope: 'history',
+    summary: 'un ADR décidé reste conforme au format de son en-tête',
+    message:
+      '{id} décidé mais refusé par l’outillage actuel du format {format} ({codes}) : corriger l’outillage ou ajouter un format, sans modifier l’ADR',
+  },
   'adr/accept-proof-failing': {
     scope: 'history',
     summary: 'une acceptation a des preuves qui passent',
@@ -545,13 +562,14 @@ export const CHECKS = {
   },
   'adr/decision-by-agent': {
     scope: 'history',
-    summary: 'aucune décision indexée depuis une session d’agent',
-    message: '{id} décidé dans l’index depuis une session d’agent ({markers}) : décision réservée au décideur humain',
+    summary: 'aucune décision prise depuis une session d’agent',
+    message:
+      '{id} décidé depuis une session d’agent ({markers}) : décision réservée au décideur humain, dans son propre terminal',
   },
   'adr/acknowledgment-unused': {
     scope: 'history',
     summary: 'chaque écart d’historique reconnu correspond à un écart réel',
-    message: 'écart reconnu {code} au commit {commit} introuvable : retirer cette reconnaissance',
+    message: 'écart reconnu {code} pour {id} ({subject}) introuvable : retirer cette reconnaissance',
   },
 } as const satisfies Readonly<Record<string, CheckDefinition>>;
 

@@ -1,6 +1,7 @@
 import type { Position } from '@huma/kit/diagnostics';
 import type { RepoPath } from '@huma/kit/paths';
 import type { FormatSpec, RuleLevel } from '../spec/formats/types.ts';
+import type { Status } from '../spec/statuses.ts';
 import type { Header } from './header.ts';
 import type { AdrNumber, RuleId } from './identifiers.ts';
 
@@ -25,6 +26,13 @@ type AdrFile = Readonly<{
   path: RepoPath;
   number: AdrNumber;
   slug: string;
+  /** `sha256:` of the exact bytes of the file: what an acknowledgment of a modified decided ADR tolerates. */
+  digest: string;
+  /**
+   * The status line of the header, read even when the rest of the header is not valid, so that a decision stays known
+   * to the history when the tooling stops reading its format; `null` without a known status.
+   */
+  status: Status | null;
   /**
    * Equal for two versions that differ only by formatting or by their status: a decided ADR keeps it forever, and a
    * decision keeps the one of the proposal.

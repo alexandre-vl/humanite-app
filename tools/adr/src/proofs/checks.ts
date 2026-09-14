@@ -1,7 +1,8 @@
-import { fixtureFactory } from '@huma/fixtures';
-import { git, resolveCommit } from '@huma/kit/git';
+import { createHash } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { fixtureFactory } from '@huma/fixtures';
+import { git, resolveCommit } from '@huma/kit/git';
 import { countWords, parseMarkdown } from '../analysis/markdown.ts';
 import type { Bindings } from '../model/bindings.ts';
 import type { CheckCode } from '../spec/checks.ts';
@@ -60,6 +61,21 @@ const withInvalidByte = (): Uint8Array => {
 
 /** A second format that only raises the version: a proposed ADR in format 1 is then outdated. */
 const twoFormats = { formats: [FORMAT_1, { ...FORMAT_1, version: 2 }], latest: { ...FORMAT_1, version: 2 } };
+
+/** Format 1 as a tooling that became stricter would read it: the base ADR is now over its word limit. */
+const stricterFormat1 = { ...FORMAT_1, limits: { ...FORMAT_1.limits, words: 50 } };
+
+const stricter = { formats: [stricterFormat1], latest: stricterFormat1 };
+
+/** The accepted base ADR with one word of its body changed. */
+const EDITED_ACCEPTED = replaceOnce(ACCEPTED, 'alourdit le paquet', 'grossit le paquet');
+
+const acknowledgedEdit = {
+  code: 'adr/frozen-modified',
+  id: 'ADR-0000',
+  digest: `sha256:${createHash('sha256').update(EDITED_ACCEPTED).digest('hex')}`,
+  reason: 'fixture',
+} as const;
 
 const longTitle = 'Validation des données reçues par le service de publication des articles';
 
@@ -851,6 +867,7 @@ export const CHECK_FIXTURES = [
       acknowledgments: async (repository) => [
         {
           code: 'adr/transition-first-not-proposed',
+          id: 'ADR-0000',
           commit: (await resolveCommit(repository, 'HEAD')) ?? '',
           reason: 'fixture',
         },
@@ -861,8 +878,93 @@ export const CHECK_FIXTURES = [
     checkHistoryFixture({
       commits: [only(PROPOSED)],
       acknowledgments: async () =>
-        Promise.resolve([{ code: 'adr/frozen-modified', commit: '0'.repeat(40), reason: 'fixture' }]),
+        Promise.resolve([
+          { code: 'adr/frozen-modified', id: 'ADR-0000', digest: `sha256:${'0'.repeat(64)}`, reason: 'fixture' },
+        ]),
     }),
+  ),
+  define('adr/valid-frozen-acknowledged', 'un ADR décidé modifié, cette version-là reconnue', [], async () =>
+    checkHistoryFixture({
+      commits: [only(PROPOSED), only(ACCEPTED), only(EDITED_ACCEPTED)],
+      bindings: proven,
+      acknowledgments: async () => Promise.resolve([acknowledgedEdit]),
+    }),
+  ),
+  define(
+    'adr/frozen-acknowledged-then-edited',
+    'un ADR décidé modifié encore après la version reconnue',
+    ['adr/frozen-modified', 'adr/acknowledgment-unused'],
+    async () =>
+      checkHistoryFixture({
+        commits: [only(PROPOSED), only(ACCEPTED), only(EDITED_ACCEPTED)],
+        worktree: only(replaceOnce(EDITED_ACCEPTED, 'grossit le paquet', 'gonfle le paquet')),
+        bindings: proven,
+        acknowledgments: async () => Promise.resolve([acknowledgedEdit]),
+      }),
+  ),
+  define('adr/number-reused', 'un numéro supprimé puis repris par un autre ADR', ['adr/number-reused'], async () =>
+    checkHistoryFixture({
+      commits: [
+        only(PROPOSED),
+        { 'README.md': 'dépôt' },
+        { [pathFor(0, OTHER_TITLE)]: adrDocument({ title: OTHER_TITLE }) },
+      ],
+    }),
+  ),
+  define('adr/valid-restored', 'un ADR supprimé puis restauré sous le même nom', [], async () =>
+    checkHistoryFixture({ commits: [only(PROPOSED), { 'README.md': 'dépôt' }, only(PROPOSED)] }),
+  ),
+  define(
+    'adr/number-duplicate-keeps-lineage',
+    'un second fichier prend le numéro d’un ADR accepté',
+    ['adr/number-duplicate'],
+    async () =>
+      checkHistoryFixture({
+        commits: [
+          only(PROPOSED),
+          only(ACCEPTED),
+          { ...only(ACCEPTED), [pathFor(0, 'Autre titre choisi')]: adrDocument({ title: 'Autre titre choisi' }) },
+        ],
+        bindings: proven,
+      }),
+  ),
+  define(
+    'adr/decision-content-changed',
+    'une acceptation commitée avec un corps modifié',
+    ['adr/decision-content-changed'],
+    async () => checkHistoryFixture({ commits: [only(PROPOSED), only(EDITED_ACCEPTED)], bindings: proven }),
+  ),
+  define(
+    'adr/decision-content-changed-staged',
+    'une acceptation indexée avec un corps modifié',
+    ['adr/decision-content-changed'],
+    async () =>
+      checkHistoryFixture({
+        commits: [only(PROPOSED)],
+        staged: only(EDITED_ACCEPTED),
+        bindings: proven,
+        source: 'index',
+      }),
+  ),
+  define(
+    'adr/decision-supersedes-added',
+    'un remplacement déclaré seulement à l’acceptation',
+    ['adr/decision-content-changed'],
+    async () =>
+      checkHistoryFixture({
+        commits: [only(PROPOSED), only(ACCEPTED), { ...only(ACCEPTED), [ONE]: adrDocument({ title: OTHER_TITLE }) }],
+        worktree: {
+          ...only(ACCEPTED),
+          [ONE]: adrDocument({ title: OTHER_TITLE, status: 'accepted', supersedes: 'ADR-0000' }),
+        },
+        bindings: { 'ADR-0001': provenBinding },
+      }),
+  ),
+  define(
+    'adr/format-regression',
+    'un ADR accepté que l’outillage de son format refuse désormais',
+    ['adr/format-regression'],
+    async () => checkHistoryFixture({ commits: [only(PROPOSED), only(ACCEPTED)], bindings: proven, formats: stricter }),
   ),
   define('adr/transition-forbidden', 'un ADR rejeté puis accepté', ['adr/transition-forbidden'], async () =>
     checkHistoryFixture({
@@ -948,6 +1050,37 @@ export const CHECK_FIXTURES = [
         bindings: proven,
         source: 'index',
         environment: { CLAUDECODE: '1' },
+      }),
+  ),
+  define(
+    'adr/decision-by-agent-worktree',
+    'acceptation écrite dans l’arbre de travail depuis une session d’agent',
+    ['adr/decision-by-agent'],
+    async () =>
+      checkHistoryFixture({
+        commits: [only(PROPOSED)],
+        worktree: only(ACCEPTED),
+        bindings: proven,
+        environment: { CLAUDECODE: '1' },
+      }),
+  ),
+  define(
+    'adr/valid-agent-merges-human-decision',
+    'un agent fusionne une acceptation déjà commitée par l’humain sur une branche',
+    [],
+    async () =>
+      checkHistoryFixture({
+        commits: [only(PROPOSED)],
+        bindings: proven,
+        source: 'index',
+        environment: { CLAUDECODE: '1' },
+        afterwards: async (repository) => {
+          await git(repository, ['switch', '--quiet', '-c', 'decision']);
+          await writeFile(join(repository.root, ZERO), ACCEPTED);
+          await git(repository, ['commit', '--quiet', '-am', 'accepter']);
+          await git(repository, ['switch', '--quiet', 'main']);
+          await git(repository, ['merge', '--quiet', '--no-ff', '--no-commit', 'decision']);
+        },
       }),
   ),
 ] as const;

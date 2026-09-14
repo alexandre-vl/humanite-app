@@ -10,6 +10,8 @@ import { adrFileName, ruleIdAt } from '../model/identifiers.ts';
 import { checkMessage } from '../spec/checks.ts';
 import type { FormatRegistry } from '../spec/formats/registry.ts';
 import { FORMAT_REGISTRY } from '../spec/formats/registry.ts';
+import type { Status } from '../spec/statuses.ts';
+import { isStatus } from '../spec/statuses.ts';
 import { checkArguments } from './checks/arguments.ts';
 import { checkCitations } from './checks/citations.ts';
 import { checkContext } from './checks/context.ts';
@@ -58,18 +60,20 @@ export function analyzeAdr(source: AdrSource, registry: FormatRegistry = FORMAT_
   const report: FileReport = (code, at, details) => {
     diagnostics.push(diagnostic(code, source.path, isPosition(at) ? at : positionOf(at), checkMessage(code, details)));
   };
-  const file = { path: source.path, number: source.number, slug: source.slug };
+  const digest = `sha256:${sha256(source.bytes)}`;
+  const file = { path: source.path, number: source.number, slug: source.slug, digest };
 
   const text = decodeSource(source.bytes, report);
   if (text === null) {
     return {
-      document: { ...file, kind: 'unreadable', fingerprint: `bytes:${sha256(source.bytes)}`, links: [], mentions: [] },
+      document: { ...file, kind: 'unreadable', status: null, fingerprint: `bytes:${digest}`, links: [], mentions: [] },
       diagnostics,
     };
   }
   const sourceIndex = indexSource(text);
   const tree = parseMarkdown(text);
   const [head, ...rest] = tree.children;
+  const writtenStatus = head?.type === 'yaml' ? statusLine(head.value) : null;
   const body = head?.type === 'yaml' ? rest : tree.children;
   let reading: HeaderReading = { kind: 'unreadable', spec: registry.latest };
   if (head?.type === 'yaml') {
@@ -129,7 +133,24 @@ export function analyzeAdr(source: AdrSource, registry: FormatRegistry = FORMAT_
   const fingerprint = fingerprintOf(reading, head?.type === 'yaml' ? head.value : null, body);
   const document: AdrDocument =
     reading.kind === 'readable' && title !== null
-      ? { ...file, kind: 'readable', spec, header: reading.header, title, rules, fingerprint, links, mentions }
-      : { ...file, kind: 'unreadable', fingerprint, links, mentions };
+      ? {
+          ...file,
+          kind: 'readable',
+          status: reading.header.status,
+          spec,
+          header: reading.header,
+          title,
+          rules,
+          fingerprint,
+          links,
+          mentions,
+        }
+      : { ...file, kind: 'unreadable', status: writtenStatus, fingerprint, links, mentions };
   return { document, diagnostics };
+}
+
+/** The status of a `status: …` line of a header block, whatever the validity of the other lines. */
+function statusLine(header: string): Status | null {
+  const value = /^status: (\S+)$/mu.exec(header)?.[1] ?? '';
+  return isStatus(value) ? value : null;
 }
