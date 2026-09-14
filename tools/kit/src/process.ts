@@ -100,6 +100,21 @@ export async function run(command: string, args: readonly string[], options: Run
   });
 }
 
+/** Runs `command` with the terminal of the caller, for long checks whose output a person reads live; resolves to its exit code. */
+export async function runAttached(
+  command: string,
+  args: readonly string[],
+  options: Readonly<{ cwd: string; env?: Environment }>,
+): Promise<number> {
+  return new Promise<number>((resolve, reject) => {
+    const child = spawn(command, args, { cwd: options.cwd, env: options.env ?? process.env, stdio: 'inherit' });
+    child.on('error', reject);
+    child.on('close', (code: number | null) => {
+      resolve(code ?? 1);
+    });
+  });
+}
+
 /** Standard output of a successful run, decoded as UTF-8. */
 export async function runText(command: string, args: readonly string[], options: RunOptions): Promise<string> {
   return (await run(command, args, options)).stdout.toString('utf8');

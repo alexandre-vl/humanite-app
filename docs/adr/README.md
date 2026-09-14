@@ -1,8 +1,8 @@
-<!-- Généré par pnpm adr:index depuis docs/adr, tools/adr/src/spec.ts et tools/adr/src/bindings.ts : ne pas modifier à la main. -->
+<!-- Généré par pnpm gen : ne pas modifier à la main. -->
 
 # Décisions d’architecture
 
-Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rejeté ne change plus ; ses preuves et son périmètre, qui évoluent avec le code, sont tenus dans `tools/adr/src/bindings.ts`.
+Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rejeté ne change plus ; ses preuves et son périmètre, qui évoluent avec le code, sont tenus dans `tools/governance/src/bindings.ts`.
 
 ## Registre
 
@@ -14,24 +14,22 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 
 ### ADR-0000 · Décisions structurantes en ADR MADR vérifiés et figés
 
-Statut : proposé. Périmètre : `docs/adr/**`, `tools/adr/**`, `tools/fixtures/**`, `.claude/settings.json`.
+Statut : proposé. Périmètre : `docs/adr/**`, `tools/adr/**`, `tools/agents/**`, `tools/fixtures/**`, `tools/governance/**`, `tools/kit/**`, `.claude/settings.json`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                                                         |
-| ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | DOIT        | `adr/valid`, `adr/path`, `adr/encoding`, `adr/frontmatter-yaml`, `adr/frontmatter-schema`, `adr/frontmatter-canonical`, `adr/markdown-subset`, `adr/title`, `adr/slug`, `adr/sections`, `adr/words`, `adr/valid-words-limit`, `adr/link-target` |
-| R2    | DOIT        | `adr/context`, `adr/criteria`, `adr/options`, `adr/decision`, `adr/valence`, `adr/criteria-cited`, `adr/reevaluation`                                                                                                                           |
-| R3    | DOIT        | `adr/keywords`                                                                                                                                                                                                                                  |
-| R4    | NE DOIT PAS | `adr/number-unique`, `adr/no-deletion`, `new/parallel-worktrees`, `new/unlocked-race`                                                                                                                                                           |
-| R5    | DOIT        | `adr/transitions`, `decide/uncommitted-refused`, `decide/rejects`                                                                                                                                                                               |
-| R6    | NE DOIT PAS | `adr/frozen`, `adr/frozen-renamed`, `adr/history`, `adr/valid-accepted`, `adr/valid-code-block-status`                                                                                                                                          |
-| R7    | NE DOIT PAS | `guard/decided-write`, `guard/status-change`, `guard/new-decided-file`, `guard/decide-command`, `guard/proposed-edit`, `guard/other-file`, `decide/agent-refused`, `hook/settings-wired`, `hook/settings-without-bash`                          |
-| R8    | DOIT        | `adr/bindings`, `adr/scope`, `adr/accept-proofs`, `adr/valid-staged-acceptance`, `decide/failing-proof-refused`, `decide/accepts`                                                                                                               |
-| R9    | DOIT        | `adr/index`                                                                                                                                                                                                                                     |
-| R10   | DOIT        | `adr/references`, `adr/valid-superseded`                                                                                                                                                                                                        |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | `adr/valid`, `adr/valid-words-limit`, `adr/valid-nbsp`, `adr/valid-link-target`, `adr/encoding-invalid-utf8`, `adr/encoding-bom`, `adr/encoding-not-nfc`, `adr/encoding-invisible`, `adr/encoding-invisible-crlf`, `adr/frontmatter-missing`, `adr/frontmatter-yaml`, `adr/frontmatter-format-unknown`, `adr/frontmatter-format-outdated`, `adr/frontmatter-schema`, `adr/frontmatter-not-canonical`, `adr/markdown-node`, `adr/markdown-heading-depth`, `adr/markdown-task-list`, `adr/markdown-link-title`, `adr/markdown-indented-code`, `adr/markdown-code-language`, `adr/title-missing`, `adr/title-not-first`, `adr/title-duplicate`, `adr/title-rich`, `adr/title-no-letter`, `adr/title-too-long`, `adr/title-forbidden-character`, `adr/title-final-punctuation`, `adr/slug-mismatch`, `adr/section-content-before`, `adr/section-order`, `adr/section-subsection`, `adr/section-consequences`, `adr/section-pros-and-cons-text`, `adr/words-limit`, `adr/link-scheme`, `adr/link-malformed`, `adr/link-target-missing`, `adr/mention-malformed`, `adr/path-directory`, `adr/path-name`, `new/title-refused`, `guard/new-skeleton` |
+| R2    | DOIT        | `adr/context-question-missing`, `adr/context-question-shape`, `adr/context-facts-missing`, `adr/context-fact-shape`, `adr/context-fact-unsourced`, `adr/context-stray-block`, `adr/criteria-list`, `adr/criteria-label`, `adr/options-list`, `adr/options-name`, `adr/options-duplicate`, `adr/options-too-few`, `adr/options-subsections`, `adr/decision-chosen-shape`, `adr/decision-chosen-unknown`, `adr/decision-chosen-duplicate`, `adr/decision-rules-missing`, `adr/decision-rule-label`, `adr/decision-trailing-block`, `adr/decision-no-binding-rule`, `adr/argument-list`, `adr/argument-shape`, `adr/consequences-balance`, `adr/option-chosen-without-good`, `adr/option-rejected-without-bad`, `adr/citation-malformed`, `adr/citation-unknown`, `adr/citation-chosen-missing`, `adr/citation-argument-missing`, `adr/citation-criterion-unused`, `adr/reevaluation-list`, `adr/reevaluation-count`                                                                                                                                                                                                                            |
+| R3    | DOIT        | `adr/keyword-forbidden`, `adr/keyword-forbidden-unaccented`, `adr/keyword-negation`, `adr/keyword-count`, `adr/keyword-outside-rule`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| R4    | NE DOIT PAS | `adr/number-duplicate`, `adr/deleted`, `new/parallel-worktrees`, `new/unlocked-race`, `new/stale-lock`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| R5    | DOIT        | `adr/transition-first-not-proposed`, `adr/transition-forbidden`, `adr/transition-uncommitted`, `decide/uncommitted-refused`, `decide/dirty-tree-refused`, `decide/already-decided-refused`, `decide/rejects`, `adr/valid-merge-acceptance`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| R6    | NE DOIT PAS | `adr/frozen-modified`, `adr/frozen-after-unreadable`, `adr/frozen-renamed`, `adr/history-shallow`, `adr/history-not-repository`, `adr/valid-accepted`, `adr/valid-code-block-status`, `adr/valid-acknowledged`, `adr/acknowledgment-unused`, `guard/decided-write`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| R7    | NE DOIT PAS | `agent/decide-script`, `agent/decide-run-script`, `agent/decide-entry`, `agent/decide-masked-session`, `agent/decide-in-subshell`, `agent/decide-in-substitution`, `agent/decide-monitor`, `agent/unset-session`, `agent/status-edit`, `agent/decided-edit`, `agent/decided-multi-edit`, `agent/relative-status-write`, `agent/write-local-settings`, `agent/unreadable-input`, `guard/status-change`, `guard/new-decided-file`, `guard/tagged-status`, `guard/escaped-status`, `guard/non-canonical-proposed`, `decide/agent-refused`, `adr/decision-by-agent`, `hook/settings-command-denies`, `hook/failure-denies-sensitive`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| R8    | DOIT        | `adr/binding-malformed-id`, `adr/binding-unknown-adr`, `adr/binding-inactive`, `adr/binding-missing`, `adr/binding-rule-unbound`, `adr/binding-rule-extra`, `adr/binding-convention-empty`, `adr/binding-proof-unknown`, `adr/binding-no-proven-rule`, `adr/scope-glob-invalid`, `adr/scope-glob-duplicate`, `adr/scope-glob-empty`, `adr/accept-proof-failing`, `adr/valid-staged-acceptance`, `decide/failing-proof-refused`, `decide/accepts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| R9    | DOIT        | `gen/stale-index`, `gen/missing-index`, `gen/in-step`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| R10   | DOIT        | `adr/supersedes-unknown`, `adr/supersedes-newer`, `adr/supersedes-not-accepted`, `adr/supersedes-several`, `adr/mention-unknown`, `adr/valid-superseded`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ## Référentiel
-
-Valeurs en vigueur de `tools/adr/src/spec.ts`.
 
 ### Statuts
 
@@ -45,15 +43,19 @@ Un ADR accepté devient `superseded`, sans modification de son fichier, dès qu�
 
 ### Importance
 
-| Valeur           | Sens                                                                                                 | Détection   |
-| ---------------- | ---------------------------------------------------------------------------------------------------- | ----------- |
-| `dependency`     | ajoute, retire ou remplace une dépendance                                                            | automatique |
-| `guarded-config` | modifie une configuration gardée : TypeScript, ESLint, Prettier, catalog pnpm, hooks, .claude, tools | automatique |
-| `boundary`       | crée ou modifie une frontière : couche, package, champs exports ou imports                           | automatique |
-| `data-format`    | change un contrat de données ou un format persistant                                                 | automatique |
-| `reversal-cost`  | coûte plus d’une journée à défaire                                                                   | relecture   |
+| Valeur           | Sens                                                                      | Détection   |
+| ---------------- | ------------------------------------------------------------------------- | ----------- |
+| `dependency`     | ajoute, retire ou remplace une dépendance                                 | automatique |
+| `guarded-config` | modifie une configuration que les outils du dépôt font respecter          | automatique |
+| `boundary`       | crée ou déplace une frontière : couche, paquet, champs exports ou imports | automatique |
+| `data-format`    | change un contrat de données ou un format persistant                      | automatique |
+| `reversal-cost`  | coûte plus d’une journée à défaire                                        | relecture   |
 
-### Sections
+### Formats
+
+Un ADR proposé suit le format 1 ; un ADR décidé reste vérifié selon le format de son en-tête.
+
+#### Format 1
 
 1. Contexte et problème
 2. Critères de décision
@@ -62,42 +64,113 @@ Un ADR accepté devient `superseded`, sans modification de son fichier, dès qu�
 5. Avantages et inconvénients des options
 6. Informations complémentaires
 
-### Limites
-
-- 900 mots au plus, hors blocs de code.
-- Titre de 60 caractères au plus.
-- 2 options étudiées au moins.
+- Mots-clés des règles : DOIT, DOIVENT (contraignant) ; NE DOIT PAS, NE DOIVENT PAS (contraignant) ; PEUT, PEUVENT.
+- 900 mots au plus, hors blocs de code ; titre de 60 caractères au plus.
+- 2 options étudiées au moins ; 8 ADR remplacés au plus.
 
 ### Contrôles
 
-| Code                        | Portée     | Vérifie                                                               |
-| --------------------------- | ---------- | --------------------------------------------------------------------- |
-| `adr/path`                  | fichier    | fichier nommé docs/adr/NNNN-slug.md, aucun autre fichier ni dossier   |
-| `adr/encoding`              | fichier    | UTF-8 valide, sans BOM, normalisé NFC                                 |
-| `adr/frontmatter-yaml`      | fichier    | en-tête YAML 1.2 présent, sans erreur ni avertissement                |
-| `adr/frontmatter-schema`    | fichier    | en-tête conforme au schéma du format                                  |
-| `adr/frontmatter-canonical` | fichier    | en-tête écrit sous sa forme canonique unique                          |
-| `adr/markdown-subset`       | fichier    | seuls les éléments Markdown autorisés sont utilisés                   |
-| `adr/title`                 | fichier    | un seul titre de niveau 1, court, sans « : » ni ponctuation finale    |
-| `adr/slug`                  | fichier    | nom de fichier dérivé du titre                                        |
-| `adr/sections`              | fichier    | sections MADR traduites, toutes présentes, dans l’ordre               |
-| `adr/context`               | fichier    | faits sourcés puis une seule question                                 |
-| `adr/criteria`              | fichier    | critères C1…Cn numérotés sans trou                                    |
-| `adr/options`               | fichier    | au moins deux options, reprises à l’identique en section 5            |
-| `adr/decision`              | fichier    | option retenue parmi les options, règles R1…Rn dont une contraignante |
-| `adr/keywords`              | fichier    | un mot-clé DOIT, NE DOIT PAS ou PEUT par règle, aucun ailleurs        |
-| `adr/valence`               | fichier    | puces Bien, Neutre ou Mauvais « parce que », coûts nommés             |
-| `adr/criteria-cited`        | fichier    | chaque argument cite un critère existant, chaque critère est cité     |
-| `adr/reevaluation`          | fichier    | un déclencheur de réévaluation                                        |
-| `adr/words`                 | fichier    | 900 mots au plus, hors blocs de code                                  |
-| `adr/link-target`           | fichier    | les liens relatifs visent un fichier existant                         |
-| `adr/number-unique`         | collection | un numéro par ADR                                                     |
-| `adr/references`            | collection | remplacements et mentions visent des ADR existants et valides         |
-| `adr/index`                 | collection | index docs/adr/README.md régénéré à l’identique                       |
-| `adr/bindings`              | dépôt      | chaque règle contraignante acceptée est liée à des preuves            |
-| `adr/scope`                 | dépôt      | chaque périmètre couvre au moins un fichier                           |
-| `adr/history`               | historique | historique git complet disponible                                     |
-| `adr/transitions`           | historique | statuts : proposed d’abord, puis une seule décision définitive        |
-| `adr/frozen`                | historique | un ADR décidé ne change plus                                          |
-| `adr/no-deletion`           | historique | un ADR commité n’est jamais supprimé                                  |
-| `adr/accept-proofs`         | historique | un ADR accepté dans l’index a des preuves qui passent                 |
+| Code                                | Portée     | Vérifie                                                                         |
+| ----------------------------------- | ---------- | ------------------------------------------------------------------------------- |
+| `adr/encoding-invalid-utf8`         | fichier    | contenu en UTF-8 valide                                                         |
+| `adr/encoding-bom`                  | fichier    | pas de marque d’ordre des octets                                                |
+| `adr/encoding-not-nfc`              | fichier    | texte normalisé en NFC                                                          |
+| `adr/encoding-invisible`            | fichier    | ni retour chariot ni caractère de contrôle ou invisible                         |
+| `adr/frontmatter-missing`           | fichier    | en-tête YAML en tête du fichier                                                 |
+| `adr/frontmatter-yaml`              | fichier    | en-tête en YAML 1.2 sans erreur, avertissement ni alias                         |
+| `adr/frontmatter-format-unknown`    | fichier    | version de format connue                                                        |
+| `adr/frontmatter-format-outdated`   | fichier    | un ADR proposé suit le dernier format                                           |
+| `adr/frontmatter-schema`            | fichier    | en-tête conforme au schéma de son format                                        |
+| `adr/frontmatter-not-canonical`     | fichier    | en-tête écrit sous sa forme canonique unique                                    |
+| `adr/markdown-node`                 | fichier    | seuls les éléments Markdown du format                                           |
+| `adr/markdown-heading-depth`        | fichier    | titres de trois niveaux au plus                                                 |
+| `adr/markdown-task-list`            | fichier    | pas de case à cocher                                                            |
+| `adr/markdown-link-title`           | fichier    | pas de titre de lien                                                            |
+| `adr/markdown-indented-code`        | fichier    | blocs de code clôturés                                                          |
+| `adr/markdown-code-language`        | fichier    | blocs de code avec leur langage                                                 |
+| `adr/title-missing`                 | fichier    | un titre de niveau 1                                                            |
+| `adr/title-not-first`               | fichier    | le titre suit directement l’en-tête                                             |
+| `adr/title-duplicate`               | fichier    | un seul titre de niveau 1                                                       |
+| `adr/title-rich`                    | fichier    | titre en texte simple ou en code                                                |
+| `adr/title-no-letter`               | fichier    | titre avec au moins une lettre ou un chiffre                                    |
+| `adr/title-too-long`                | fichier    | titre court                                                                     |
+| `adr/title-forbidden-character`     | fichier    | titre sans deux-points : un groupe nominal                                      |
+| `adr/title-final-punctuation`       | fichier    | titre sans ponctuation finale                                                   |
+| `adr/slug-mismatch`                 | fichier    | nom de fichier dérivé du titre                                                  |
+| `adr/section-content-before`        | fichier    | rien entre le titre et la première section                                      |
+| `adr/section-order`                 | fichier    | sections du format, toutes présentes, dans l’ordre                              |
+| `adr/section-subsection`            | fichier    | sous-sections seulement dans Décision et Avantages et inconvénients des options |
+| `adr/section-consequences`          | fichier    | une seule sous-section Conséquences dans Décision                               |
+| `adr/section-pros-and-cons-text`    | fichier    | arguments rangés sous leur option                                               |
+| `adr/context-question-missing`      | fichier    | le contexte se termine par la question du problème                              |
+| `adr/context-question-shape`        | fichier    | une seule question, terminée par un point d’interrogation                       |
+| `adr/context-facts-missing`         | fichier    | au moins une liste de faits                                                     |
+| `adr/context-fact-shape`            | fichier    | un fait par puce, en un paragraphe                                              |
+| `adr/context-fact-unsourced`        | fichier    | chaque fait cite sa source                                                      |
+| `adr/context-stray-block`           | fichier    | faits en listes, question en paragraphe final                                   |
+| `adr/criteria-list`                 | fichier    | critères en une seule liste à puces                                             |
+| `adr/criteria-label`                | fichier    | critères numérotés C1 à Cn sans trou                                            |
+| `adr/options-list`                  | fichier    | options en une seule liste à puces                                              |
+| `adr/options-name`                  | fichier    | une option est un nom seul                                                      |
+| `adr/options-duplicate`             | fichier    | options toutes différentes                                                      |
+| `adr/options-too-few`               | fichier    | au moins deux options étudiées                                                  |
+| `adr/options-subsections`           | fichier    | une sous-section d’arguments par option, dans l’ordre des options               |
+| `adr/decision-chosen-shape`         | fichier    | la décision commence par l’option retenue et sa justification                   |
+| `adr/decision-chosen-unknown`       | fichier    | option retenue parmi les options étudiées                                       |
+| `adr/decision-chosen-duplicate`     | fichier    | une seule option retenue                                                        |
+| `adr/decision-rules-missing`        | fichier    | liste des règles après l’option retenue                                         |
+| `adr/decision-rule-label`           | fichier    | règles numérotées R1 à Rn sans trou                                             |
+| `adr/decision-trailing-block`       | fichier    | après les règles, seulement du code ou des tableaux                             |
+| `adr/decision-no-binding-rule`      | fichier    | au moins une règle contraignante                                                |
+| `adr/keyword-forbidden`             | fichier    | aucun autre mot modal en capitales                                              |
+| `adr/keyword-negation`              | fichier    | négation tout en capitales                                                      |
+| `adr/keyword-count`                 | fichier    | exactement un mot-clé par règle                                                 |
+| `adr/keyword-outside-rule`          | fichier    | mots-clés en capitales seulement dans les règles                                |
+| `adr/argument-list`                 | fichier    | arguments et conséquences en une seule liste à puces                            |
+| `adr/argument-shape`                | fichier    | chaque argument commence par sa valence et sa justification                     |
+| `adr/consequences-balance`          | fichier    | conséquences avec au moins un effet positif et un coût                          |
+| `adr/option-chosen-without-good`    | fichier    | l’option retenue a au moins un argument positif                                 |
+| `adr/option-rejected-without-bad`   | fichier    | chaque option écartée a au moins un argument négatif                            |
+| `adr/citation-malformed`            | fichier    | citations écrites (C1) ou (C1, C2)                                              |
+| `adr/citation-unknown`              | fichier    | chaque critère cité existe                                                      |
+| `adr/citation-chosen-missing`       | fichier    | l’option retenue cite un critère                                                |
+| `adr/citation-argument-missing`     | fichier    | chaque argument cite un critère                                                 |
+| `adr/citation-criterion-unused`     | fichier    | chaque critère est cité par un argument                                         |
+| `adr/reevaluation-list`             | fichier    | informations complémentaires en une seule liste à puces                         |
+| `adr/reevaluation-count`            | fichier    | exactement un déclencheur de réévaluation                                       |
+| `adr/words-limit`                   | fichier    | nombre de mots limité, hors blocs de code                                       |
+| `adr/link-scheme`                   | fichier    | liens externes en https                                                         |
+| `adr/link-malformed`                | fichier    | liens relatifs bien encodés                                                     |
+| `adr/mention-malformed`             | fichier    | mentions écrites ADR-NNNN                                                       |
+| `adr/path-directory`                | collection | aucun dossier parmi les ADR                                                     |
+| `adr/path-name`                     | collection | fichiers nommés NNNN-slug.md                                                    |
+| `adr/number-duplicate`              | collection | un numéro par ADR                                                               |
+| `adr/link-target-missing`           | collection | liens relatifs vers des fichiers du dépôt                                       |
+| `adr/mention-unknown`               | collection | chaque ADR mentionné existe                                                     |
+| `adr/supersedes-unknown`            | collection | chaque ADR remplacé existe                                                      |
+| `adr/supersedes-newer`              | collection | seul un ADR plus ancien est remplacé                                            |
+| `adr/supersedes-not-accepted`       | collection | seul un ADR accepté est remplacé                                                |
+| `adr/supersedes-several`            | collection | un ADR remplacé par un seul ADR accepté                                         |
+| `adr/binding-malformed-id`          | dépôt      | liens rangés par identifiant ADR-NNNN                                           |
+| `adr/binding-unknown-adr`           | dépôt      | liens seulement pour des ADR existants                                          |
+| `adr/binding-inactive`              | dépôt      | pas de liens pour un ADR rejeté ou remplacé                                     |
+| `adr/binding-missing`               | dépôt      | chaque ADR accepté a ses liens                                                  |
+| `adr/binding-rule-unbound`          | dépôt      | chaque règle contraignante est liée                                             |
+| `adr/binding-rule-extra`            | dépôt      | liens seulement pour les règles contraignantes                                  |
+| `adr/binding-convention-empty`      | dépôt      | chaque convention est justifiée                                                 |
+| `adr/binding-proof-unknown`         | dépôt      | chaque preuve désigne une fixture existante                                     |
+| `adr/binding-no-proven-rule`        | dépôt      | un ADR accepté a au moins une règle prouvée                                     |
+| `adr/scope-glob-invalid`            | dépôt      | motifs de périmètre relatifs à la racine                                        |
+| `adr/scope-glob-duplicate`          | dépôt      | motifs de périmètre tous différents                                             |
+| `adr/scope-glob-empty`              | dépôt      | chaque motif de périmètre couvre un fichier                                     |
+| `adr/history-not-repository`        | historique | vérification dans un dépôt git                                                  |
+| `adr/history-shallow`               | historique | historique git complet                                                          |
+| `adr/transition-first-not-proposed` | historique | un ADR est d’abord commité proposé                                              |
+| `adr/transition-forbidden`          | historique | seules les transitions du processus                                             |
+| `adr/transition-uncommitted`        | historique | la version proposée est commitée avant la décision                              |
+| `adr/frozen-modified`               | historique | un ADR décidé ne change plus                                                    |
+| `adr/frozen-renamed`                | historique | un ADR décidé garde son nom                                                     |
+| `adr/deleted`                       | historique | un ADR commité n’est jamais supprimé                                            |
+| `adr/accept-proof-failing`          | historique | une acceptation a des preuves qui passent                                       |
+| `adr/decision-by-agent`             | historique | aucune décision indexée depuis une session d’agent                              |
+| `adr/acknowledgment-unused`         | historique | chaque écart d’historique reconnu correspond à un écart réel                    |

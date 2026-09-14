@@ -9,9 +9,11 @@
     "./format": "./src/format.ts",
     "./git": "./src/git.ts",
     "./json": "./src/json.ts",
+    "./messages": "./src/messages.ts",
     "./paths": "./src/paths.ts",
     "./pool": "./src/pool.ts",
     "./process": "./src/process.ts",
+    "./session": "./src/session.ts",
     "./text": "./src/text.ts"
   },
   "dependencies": {

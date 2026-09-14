@@ -1,0 +1,122 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { effectiveStatuses, readCollection } from '@huma/adr/collection';
+import { FORMAT_REGISTRY } from '@huma/adr/formats';
+import { renderIndexPage } from '@huma/adr/index-page';
+import { INDEX_FILE } from '@huma/adr/layout';
+import { readSnapshot } from '@huma/adr/snapshot';
+import { renderClaudeSettings } from '@huma/agents/settings';
+import type { Diagnostic } from '@huma/kit/diagnostics';
+import { formatForPath } from '@huma/kit/format';
+import { ownRepository } from '@huma/kit/git';
+import { isJsonObject, parseJson } from '@huma/kit/json';
+import type { RepoPath } from '@huma/kit/paths';
+import { repoPath } from '@huma/kit/paths';
+import { firstDifferentLine } from '@huma/kit/text';
+import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
+import type { GovernanceCode } from './checks.ts';
+import { governanceFinding } from './checks.ts';
+import { COMMAND_NAMES, COMMANDS, commandLine } from './commands.ts';
+import { HOOK_COMMANDS, POLICY } from './policy.ts';
+
+/** A file derived from typed sources: `pnpm gen` writes it, `pnpm gen:check` compares it without writing. */
+export type Artifact = Readonly<{
+  path: RepoPath;
+  /** Content of the file, formatted as Prettier would leave it. */
+  render: (root: string) => Promise<string>;
+}>;
+
+const GENERATOR = 'pnpm gen';
+
+export const ADR_INDEX_ARTIFACT: Artifact = {
+  path: repoPath(INDEX_FILE),
+  render: async (root) => {
+    const collection = readCollection(await readSnapshot(ownRepository(root), 'worktree'));
+    const markdown = renderIndexPage({
+      documents: collection.documents,
+      statuses: effectiveStatuses(collection.documents),
+      bindings: BINDINGS,
+      generator: GENERATOR,
+      bindingsPath: BINDINGS_PATH,
+      formats: FORMAT_REGISTRY,
+    });
+    return formatForPath(root, repoPath(INDEX_FILE), markdown);
+  },
+};
+
+const CLAUDE_SETTINGS = repoPath('.claude/settings.json');
+
+const claudeSettings: Artifact = {
+  path: CLAUDE_SETTINGS,
+  render: async (root) => formatForPath(root, CLAUDE_SETTINGS, renderClaudeSettings(POLICY, HOOK_COMMANDS)),
+};
+
+const MANIFEST = repoPath('package.json');
+
+const manifest: Artifact = {
+  path: MANIFEST,
+  render: async (root) => {
+    const current = parseJson(await readFile(join(root, MANIFEST), 'utf8'));
+    if (!isJsonObject(current)) {
+      throw new Error('package.json illisible');
+    }
+    const scripts = Object.fromEntries(
+      COMMAND_NAMES.filter((name) => COMMANDS[name].audience !== 'hook').map((name) => [
+        name,
+        commandLine(COMMANDS[name]),
+      ]),
+    );
+    return formatForPath(root, MANIFEST, `${JSON.stringify({ ...current, scripts }, null, 2)}\n`);
+  },
+};
+
+export const ARTIFACTS: readonly Artifact[] = [ADR_INDEX_ARTIFACT, claudeSettings, manifest];
+
+async function readOptional(path: string): Promise<string | null> {
+  try {
+    return await readFile(path, 'utf8');
+  } catch (error) {
+    if (Error.isError(error) && 'code' in error && error.code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+export async function checkArtifacts(
+  root: string,
+  artifacts: readonly Artifact[] = ARTIFACTS,
+): Promise<readonly Diagnostic<GovernanceCode>[]> {
+  const diagnostics: Diagnostic<GovernanceCode>[] = [];
+  for (const artifact of artifacts) {
+    const actual = await readOptional(join(root, artifact.path));
+    if (actual === null) {
+      diagnostics.push(governanceFinding('gen/missing', artifact.path, {}));
+      continue;
+    }
+    const expected = await artifact.render(root);
+    if (actual !== expected) {
+      const line = firstDifferentLine(actual, expected);
+      diagnostics.push(governanceFinding('gen/stale', artifact.path, { line }, { line, column: 1 }));
+    }
+  }
+  return diagnostics;
+}
+
+/** Writes every artifact whose content changed; returns their paths. */
+export async function writeArtifacts(
+  root: string,
+  artifacts: readonly Artifact[] = ARTIFACTS,
+): Promise<readonly RepoPath[]> {
+  const written: RepoPath[] = [];
+  for (const artifact of artifacts) {
+    const target = join(root, artifact.path);
+    const expected = await artifact.render(root);
+    if ((await readOptional(target)) !== expected) {
+      await mkdir(dirname(target), { recursive: true });
+      await writeFile(target, expected, 'utf8');
+      written.push(artifact.path);
+    }
+  }
+  return written;
+}

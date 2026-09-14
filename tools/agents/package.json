@@ -1,0 +1,22 @@
+{
+  "name": "@huma/agents",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./guard": "./src/guard.ts",
+    "./policy": "./src/policy.ts",
+    "./proofs": "./src/proofs/guard.ts",
+    "./settings": "./src/settings.ts",
+    "./stop": "./src/stop.ts"
+  },
+  "dependencies": {
+    "@huma/adr": "workspace:*",
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@huma/governance",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./bindings": "./src/bindings.ts",
+    "./commands": "./src/commands.ts",
+    "./proofs": "./src/proofs.ts"
+  },
+  "dependencies": {
+    "@huma/adr": "workspace:*",
+    "@huma/agents": "workspace:*",
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

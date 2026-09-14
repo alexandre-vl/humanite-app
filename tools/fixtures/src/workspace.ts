@@ -11,6 +11,19 @@ export type FileTree = Readonly<Record<string, FileContent>>;
 
 export type TemporaryDirectory = AsyncDisposable & Readonly<{ path: string }>;
 
+const encoder = new TextEncoder();
+
+/** Bytes a fixture file holds, text encoded as UTF-8. */
+export function fileBytes(file: FileContent): Uint8Array {
+  if (typeof file === 'string') {
+    return encoder.encode(file);
+  }
+  if (file instanceof Uint8Array) {
+    return file;
+  }
+  return typeof file.content === 'string' ? encoder.encode(file.content) : file.content;
+}
+
 /** Creates an empty directory under the OS temporary directory, removed on `await using` disposal. */
 export async function createTemporaryDirectory(prefix: string): Promise<TemporaryDirectory> {
   const path = await mkdtemp(join(tmpdir(), `${prefix}-`));

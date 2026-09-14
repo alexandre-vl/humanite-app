@@ -3,7 +3,25 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    "./bindings": "./src/model/bindings.ts",
+    "./check": "./src/repository/check.ts",
+    "./checks": "./src/spec/checks.ts",
+    "./collection": "./src/repository/collection.ts",
+    "./create": "./src/lifecycle/create.ts",
+    "./decide": "./src/lifecycle/decide.ts",
+    "./document": "./src/model/document.ts",
+    "./formats": "./src/spec/formats/registry.ts",
+    "./globs": "./src/repository/globs.ts",
+    "./guard": "./src/lifecycle/guard.ts",
+    "./history": "./src/repository/history.ts",
+    "./identifiers": "./src/model/identifiers.ts",
+    "./index-page": "./src/lifecycle/index-page.ts",
+    "./layout": "./src/spec/layout.ts",
+    "./proof-documents": "./src/proofs/documents.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./significance": "./src/spec/significance.ts",
+    "./snapshot": "./src/repository/snapshot.ts",
+    "./statuses": "./src/spec/statuses.ts"
   },
   "dependencies": {
     "@huma/fixtures": "workspace:*",
@@ -13,7 +31,6 @@
     "mdast-util-gfm": "catalog:",
     "micromark-extension-frontmatter": "catalog:",
     "micromark-extension-gfm": "catalog:",
-    "prettier": "catalog:",
     "yaml": "catalog:",
     "zod": "catalog:"
   },

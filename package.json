@@ -11,17 +11,18 @@
     }
   },
   "scripts": {
-    "adr:check": "node tools/adr/src/cli/check.ts",
-    "adr:decide": "node tools/adr/src/cli/decide.ts",
-    "adr:index": "node tools/adr/src/cli/write-index.ts",
-    "adr:new": "node tools/adr/src/cli/new.ts",
-    "adr:status": "node tools/adr/src/cli/status.ts",
+    "adr:check": "node tools/governance/src/cli/adr-check.ts",
+    "adr:decide": "node tools/governance/src/cli/adr-decide.ts",
+    "adr:new": "node tools/governance/src/cli/adr-new.ts",
+    "adr:status": "node tools/governance/src/cli/adr-status.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "gen": "node tools/governance/src/cli/gen.ts",
+    "gen:check": "node tools/governance/src/cli/gen.ts --check",
     "lint": "eslint --flag unstable_native_nodejs_ts_config --max-warnings 0 .",
-    "typecheck": "tsc --build",
     "test": "vitest run",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm adr:check"
+    "typecheck": "tsc --build",
+    "verify": "node tools/governance/src/cli/verify.ts"
   },
   "devDependencies": {
     "@huma/eslint-config": "workspace:*",
