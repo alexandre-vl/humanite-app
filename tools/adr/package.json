@@ -1,0 +1,25 @@
+{
+  "name": "@huma/adr",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@huma/fixtures": "workspace:*",
+    "mdast-util-from-markdown": "catalog:",
+    "mdast-util-frontmatter": "catalog:",
+    "mdast-util-gfm": "catalog:",
+    "micromark-extension-frontmatter": "catalog:",
+    "micromark-extension-gfm": "catalog:",
+    "prettier": "catalog:",
+    "yaml": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/mdast": "catalog:",
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

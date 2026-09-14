@@ -3,6 +3,7 @@
   "references": [
     { "path": "./tsconfig.config.json" },
     { "path": "./packages/eslint-config" },
-    { "path": "./tools/fixtures" }
+    { "path": "./tools/fixtures" },
+    { "path": "./tools/adr" }
   ]
 }
