@@ -63,11 +63,3 @@ export function judgeAdrWrite(before: string | null, after: string | null): Guar
   }
   return ALLOW;
 }
-
-/** Content of a file after an `Edit`, or `null` when `oldString` is absent as written. */
-export function applyEdit(before: string, oldString: string, newString: string, replaceAll: boolean): string | null {
-  if (oldString === '' || !before.includes(oldString)) {
-    return null;
-  }
-  return replaceAll ? before.split(oldString).join(newString) : before.replace(oldString, () => newString);
-}

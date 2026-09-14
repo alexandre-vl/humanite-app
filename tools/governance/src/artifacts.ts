@@ -6,6 +6,7 @@ import { FORMAT_REGISTRY } from '@huma/adr/formats';
 import { renderIndexPage } from '@huma/adr/index-page';
 import { INDEX_FILE } from '@huma/adr/layout';
 import { readSnapshot } from '@huma/adr/snapshot';
+import { CLAUDE_SETTINGS_PATH } from '@huma/agents/policy';
 import { renderClaudeSettings } from '@huma/agents/settings';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
@@ -46,7 +47,7 @@ export const ADR_INDEX_ARTIFACT: Artifact = {
   },
 };
 
-const CLAUDE_SETTINGS = repoPath('.claude/settings.json');
+const CLAUDE_SETTINGS = repoPath(CLAUDE_SETTINGS_PATH);
 
 const claudeSettings: Artifact = {
   path: CLAUDE_SETTINGS,

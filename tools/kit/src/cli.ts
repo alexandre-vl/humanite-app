@@ -1,5 +1,8 @@
 import { access } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
+import type { ParseArgsConfig } from 'node:util';
+import { parseArgs } from 'node:util';
+import { errnoCode } from './errors.ts';
 import { stopLiveProcessesOnSignals } from './process.ts';
 
 /** File that marks the root of the workspace. */
@@ -8,6 +11,24 @@ export const WORKSPACE_MARKER = 'pnpm-workspace.yaml';
 /** A wrong invocation: its message is printed as is and the command exits with 2. */
 export class UsageError extends Error {
   override readonly name = 'UsageError';
+}
+
+/**
+ * The arguments of a command, read strictly by `parseArgs`: an unknown option, a missing value or an unexpected
+ * positional is a `UsageError` that shows what went wrong and the usage line.
+ */
+export function readArguments<const Config extends ParseArgsConfig>(
+  usage: string,
+  config: Config,
+): ReturnType<typeof parseArgs<Config>> {
+  try {
+    return parseArgs(config);
+  } catch (error) {
+    if (Error.isError(error) && errnoCode(error)?.startsWith('ERR_PARSE_ARGS_') === true) {
+      throw new UsageError(`${error.message}\n${usage}`);
+    }
+    throw error;
+  }
 }
 
 const SAFE_WORD = /^[\w@%+=:,./-]+$/u;

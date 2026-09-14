@@ -1,7 +1,7 @@
 import type { AgentPolicy } from '@huma/agents/policy';
 import { agentPolicy } from '@huma/agents/policy';
 import type { HookCommands } from '@huma/agents/settings';
-import { COMMAND_NAMES, COMMANDS, entryFile } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, entryFile, PINNED_NODE } from './commands.ts';
 
 /** The agent policy of this workspace: the fixed rules, plus every command reserved to the human decision maker. */
 export const POLICY: AgentPolicy = agentPolicy(
@@ -11,9 +11,6 @@ export const POLICY: AgentPolicy = agentPolicy(
     return spec.audience === 'human' && entry !== null ? [{ script, entry }] : [];
   }),
 );
-
-/** Node pinned by `devEngines`, linked by pnpm into the workspace. */
-export const PINNED_NODE = 'node_modules/.bin/node';
 
 const inProject = (path: string): string => `"\${CLAUDE_PROJECT_DIR}/${path}"`;
 

@@ -19,7 +19,7 @@ export function renderClaudeSettings(policy: AgentPolicy, hooks: HookCommands): 
     hooks: {
       PreToolUse: [
         {
-          matcher: [...policy.shellTools, ...policy.fileTools].join('|'),
+          matcher: [...policy.shellTools, ...policy.fileTools, ...policy.codeTools].join('|'),
           hooks: [{ type: 'command', command: hooks.guard }],
         },
       ],

@@ -1,10 +1,9 @@
-import { parseArgs } from 'node:util';
 import { createAdr } from '@huma/adr/create';
 import { FORMAT_REGISTRY } from '@huma/adr/formats';
 import { formatAdrId } from '@huma/adr/identifiers';
 import type { Significance } from '@huma/adr/significance';
 import { isSignificance, SIGNIFICANCES } from '@huma/adr/significance';
-import { findWorkspaceRoot, print, runCommand, UsageError } from '@huma/kit/cli';
+import { findWorkspaceRoot, print, readArguments, runCommand, UsageError } from '@huma/kit/cli';
 import { formatForPath } from '@huma/kit/format';
 import { ownRepository } from '@huma/kit/git';
 import { writeArtifacts } from '../artifacts.ts';
@@ -12,9 +11,8 @@ import { writeArtifacts } from '../artifacts.ts';
 const USAGE = `Usage : pnpm adr:new "<titre>" --significance ${SIGNIFICANCES.join('|')}[,…]`;
 
 await runCommand(async () => {
-  const { positionals, values } = parseArgs({
+  const { positionals, values } = readArguments(USAGE, {
     allowPositionals: true,
-    strict: true,
     options: { significance: { type: 'string' } },
   });
   const [title, ...rest] = positionals;

@@ -7,12 +7,10 @@ import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
 import type { Environment } from '@huma/kit/process';
 import { capture, describeExit, runAttached } from '@huma/kit/process';
 import type { CommandName } from './commands.ts';
-import { COMMANDS, VERIFY_STEPS } from './commands.ts';
+import { BIN_DIRECTORY, COMMANDS, VERIFY_STEPS } from './commands.ts';
 
 /** Records the tree the last successful `pnpm verify` saw; the stop hook compares the working tree with it. */
 export const STAMP_PATH = 'node_modules/.cache/huma/verify.json';
-
-const BIN = 'node_modules/.bin';
 
 export type VerifyOutcome =
   | Readonly<{ kind: 'passed'; tree: string }>
@@ -33,7 +31,8 @@ const stepArguments = (step: CommandName, staged: boolean): readonly string[] =>
   return step === 'adr:check' && staged ? [...args, '--source', 'index'] : args;
 };
 
-const program = (root: string, name: string): string => (name === 'node' ? process.execPath : join(root, BIN, name));
+const program = (root: string, name: string): string =>
+  name === 'node' ? process.execPath : join(root, BIN_DIRECTORY, name);
 
 export async function readVerifiedTree(root: string): Promise<string | null> {
   const text = await readTextIfExists(join(root, STAMP_PATH));
@@ -45,7 +44,7 @@ export async function readVerifiedTree(root: string): Promise<string | null> {
 export async function runVerify(root: string, options: VerifyOptions): Promise<VerifyOutcome> {
   const repository = ownRepository(root, options.env);
   const treeBefore = await worktreeTreeId(repository);
-  const env = { ...options.env, PATH: `${join(root, BIN)}:${options.env['PATH'] ?? ''}` };
+  const env = { ...options.env, PATH: `${join(root, BIN_DIRECTORY)}:${options.env['PATH'] ?? ''}` };
   for (const step of VERIFY_STEPS) {
     const [name] = COMMANDS[step].argv;
     const args = stepArguments(step, options.staged);

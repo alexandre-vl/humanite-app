@@ -1,6 +1,5 @@
-import { parseArgs } from 'node:util';
 import { parseAdrId } from '@huma/adr/identifiers';
-import { findWorkspaceRoot, print, printError, runCommand, shellLine, UsageError } from '@huma/kit/cli';
+import { findWorkspaceRoot, print, printError, readArguments, runCommand, shellLine, UsageError } from '@huma/kit/cli';
 import { ownRepository } from '@huma/kit/git';
 import { decideInWorkspace } from '../decision.ts';
 
@@ -9,7 +8,7 @@ const USAGE = 'Usage : pnpm adr:decide ADR-NNNN accepted|rejected   (décideur h
 const VERBS = { accepted: 'accepter', rejected: 'rejeter' } as const;
 
 await runCommand(async () => {
-  const { positionals } = parseArgs({ allowPositionals: true, strict: true, options: {} });
+  const { positionals } = readArguments(USAGE, { allowPositionals: true, options: {} });
   const [id = '', status, ...rest] = positionals;
   const number = parseAdrId(id);
   if (number === null || (status !== 'accepted' && status !== 'rejected') || rest.length > 0) {

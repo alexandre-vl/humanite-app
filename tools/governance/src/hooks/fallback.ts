@@ -5,18 +5,33 @@
  */
 import { blockOutput, denyOutput, readHookInput } from '@huma/agents/protocol';
 
-const SENSITIVE = [
+/**
+ * Lowercase tokens whose mention refuses a call while the guard is down. Written out rather than imported, so that
+ * nothing the guard loads can break it; a test checks it covers every token of the policy.
+ */
+export const FALLBACK_TOKENS = [
   'docs/adr',
   'adr:decide',
   'adr-decide',
   '--no-veri',
   'hookspath',
   'git_config',
+  'git_dir',
+  'git_work_tree',
+  '--work-tree',
+  '--git-dir',
+  '-c alias.',
+  'config alias.',
   '.git/',
   '.claude/',
   'commit-tree',
   'update-ref',
+  'fast-import',
+  'git replace',
   'sudo',
+  'doas',
+  'pkexec',
+  'run0',
   'claudecode',
   'ai_agent',
   'claude_code_child_session',
@@ -27,7 +42,7 @@ const describe = (error: unknown): string => (Error.isError(error) ? error.messa
 /** `true` when a raw hook input mentions a protected area and must be refused without further analysis. */
 export const touchesProtectedArea = (rawInput: string): boolean => {
   const lowered = rawInput.toLowerCase();
-  return rawInput.trim() === '' || SENSITIVE.some((token) => lowered.includes(token));
+  return rawInput.trim() === '' || FALLBACK_TOKENS.some((token) => lowered.includes(token));
 };
 
 /** Output of the `PreToolUse` hook when the guard failed: a refusal when the call touches a protected area. */

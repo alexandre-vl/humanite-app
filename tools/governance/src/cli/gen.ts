@@ -1,14 +1,11 @@
-import { parseArgs } from 'node:util';
-import { findWorkspaceRoot, print, runCommand } from '@huma/kit/cli';
+import { findWorkspaceRoot, print, readArguments, runCommand } from '@huma/kit/cli';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
 import { ARTIFACTS, checkArtifacts, writeArtifacts } from '../artifacts.ts';
 
+const USAGE = 'Usage : pnpm gen [--check]';
+
 await runCommand(async () => {
-  const { values } = parseArgs({
-    options: { check: { type: 'boolean', default: false } },
-    strict: true,
-    allowPositionals: false,
-  });
+  const { values } = readArguments(USAGE, { options: { check: { type: 'boolean', default: false } } });
   const root = await findWorkspaceRoot();
   if (values.check) {
     const diagnostics = await checkArtifacts(root);

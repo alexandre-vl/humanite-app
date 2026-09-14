@@ -1,8 +1,26 @@
-import { access, mkdir, writeFile } from 'node:fs/promises';
+import { access, mkdir, realpath, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, test } from 'vitest';
 import { describeError, errnoCode } from './errors.ts';
-import { readTextIfExists, temporaryDirectory } from './fs.ts';
+import { directoryNames, readTextIfExists, resolveExistingPath, temporaryDirectory } from './fs.ts';
+
+test('directoryNames lists a directory and returns null for a file or a missing path', async () => {
+  await using directory = await temporaryDirectory('kit-fs');
+  await writeFile(join(directory.path, 'a.txt'), 'x');
+  expect(await directoryNames(directory.path)).toEqual(['a.txt']);
+  expect(await directoryNames(join(directory.path, 'a.txt'))).toBeNull();
+  expect(await directoryNames(join(directory.path, 'absent'))).toBeNull();
+});
+
+test('resolveExistingPath follows the links of the existing part and keeps the missing rest', async () => {
+  await using directory = await temporaryDirectory('kit-fs');
+  const root = await realpath(directory.path);
+  await mkdir(join(root, 'real/inner'), { recursive: true });
+  await symlink(join(root, 'real'), join(root, 'link'));
+  expect(await resolveExistingPath(join(root, 'link/inner/new/file.txt'))).toBe(join(root, 'real/inner/new/file.txt'));
+  expect(await resolveExistingPath(join(root, 'link'))).toBe(join(root, 'real'));
+  expect(await resolveExistingPath('/nonexistent/huma/a')).toBe('/nonexistent/huma/a');
+});
 
 test('temporaryDirectory is removed with its content on disposal', async () => {
   let path: string;

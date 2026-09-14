@@ -1,5 +1,4 @@
-import { parseArgs } from 'node:util';
-import { findWorkspaceRoot, print, runCommand, UsageError } from '@huma/kit/cli';
+import { findWorkspaceRoot, print, readArguments, runCommand, UsageError } from '@huma/kit/cli';
 import { isOutputFormat, OUTPUT_FORMATS, renderDiagnostics } from '@huma/kit/diagnostics';
 import { FILE_SOURCES, isFileSource, ownRepository } from '@huma/kit/git';
 import { checkWorkspaceAdrs } from '../workspace.ts';
@@ -7,10 +6,8 @@ import { checkWorkspaceAdrs } from '../workspace.ts';
 const USAGE = `Usage : pnpm adr:check [--source ${FILE_SOURCES.join('|')}] [--format ${OUTPUT_FORMATS.join('|')}]`;
 
 await runCommand(async () => {
-  const { values } = parseArgs({
+  const { values } = readArguments(USAGE, {
     options: { source: { type: 'string', default: 'worktree' }, format: { type: 'string', default: 'text' } },
-    strict: true,
-    allowPositionals: false,
   });
   const { source, format } = values;
   if (!isFileSource(source) || !isOutputFormat(format)) {

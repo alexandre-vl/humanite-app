@@ -14,29 +14,66 @@ test('proof ids are unique across the whole workspace', () => {
   expect(findDuplicateIds(PROOFS)).toEqual([]);
 });
 
+/** Proofs no ADR binds yet: git hooks, root commands, the Stop hook and writes that touch no ADR. */
+const AWAITING_FOUNDATION_ADRS = [
+  'agent/no-verify',
+  'agent/no-verify-abbreviated',
+  'agent/short-n-cluster',
+  'agent/no-verify-split-string',
+  'agent/no-verify-ansi-quoted',
+  'agent/no-verify-braces',
+  'agent/no-verify-ifs',
+  'agent/no-verify-variable',
+  'agent/no-verify-unknown-subcommand',
+  'agent/no-verify-function',
+  'agent/no-verify-heredoc-shell',
+  'agent/no-verify-find-exec',
+  'agent/message-with-n',
+  'agent/commit-message-heredoc',
+  'agent/log-n',
+  'agent/grep-no-verify',
+  'agent/hooks-path-option',
+  'agent/hooks-path-config',
+  'agent/hooks-path-read',
+  'agent/config-environment',
+  'agent/alias-option',
+  'agent/alias-config',
+  'agent/work-tree-option',
+  'agent/git-dir-variable',
+  'agent/commit-tree',
+  'agent/update-ref',
+  'agent/fast-import',
+  'agent/replace',
+  'agent/merge-no-verify',
+  'agent/rebase-no-verify',
+  'agent/cherry-pick-no-verify',
+  'agent/revert-no-verify',
+  'agent/am-no-verify',
+  'agent/pull-no-verify',
+  'agent/push-no-verify',
+  'agent/plain-commit',
+  'agent/sudo',
+  'agent/sudo-wrapped',
+  'agent/doas',
+  'agent/pkexec',
+  'agent/su',
+  'agent/run0',
+  'agent/hooks-directory',
+  'agent/shell-chmod-hook',
+  'agent/shell-unknown-directory',
+  'agent/shell-partly-known-path',
+  'agent/shell-write-source',
+  'agent/shell-error-log',
+  'agent/shell-unknown-file',
+  'agent/edit-git-config',
+  'agent/write-source',
+  'hook/stop-unverifiable-blocks',
+  'hook/stop-unverifiable-once',
+];
+
 test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
-  const unbound = PROOFS.map((fixture) => fixture.id).filter((id) => !bound.has(id));
-  expect(unbound).toEqual([
-    'agent/no-verify',
-    'agent/no-verify-abbreviated',
-    'agent/short-n-cluster',
-    'agent/message-with-n',
-    'agent/log-n',
-    'agent/hooks-path-option',
-    'agent/hooks-path-config',
-    'agent/config-environment',
-    'agent/commit-tree',
-    'agent/hooks-directory',
-    'agent/push-no-verify',
-    'agent/plain-commit',
-    'agent/sudo',
-    'agent/sudo-wrapped',
-    'agent/edit-git-config',
-    'agent/write-source',
-    'hook/stop-unverifiable-blocks',
-    'hook/stop-unverifiable-once',
-  ]);
+  expect(PROOFS.map((fixture) => fixture.id).filter((id) => !bound.has(id))).toEqual(AWAITING_FOUNDATION_ADRS);
 });
 
 describe.concurrent('each governance fixture reports exactly its expected codes', () => {

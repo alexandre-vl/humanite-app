@@ -3,7 +3,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash|Monitor|PowerShell|Edit|Write|NotebookEdit|MultiEdit",
+        "matcher": "Bash|Monitor|PowerShell|Edit|Write|NotebookEdit|MultiEdit|REPL",
         "hooks": [
           {
             "type": "command",
@@ -32,6 +32,8 @@
       "Bash(sudo *)",
       "Bash(doas *)",
       "Bash(pkexec *)",
+      "Bash(su *)",
+      "Bash(run0 *)",
       "Bash(unset CLAUDECODE*)",
       "Bash(unset CLAUDE_CODE_CHILD_SESSION*)",
       "Bash(unset AI_AGENT*)",

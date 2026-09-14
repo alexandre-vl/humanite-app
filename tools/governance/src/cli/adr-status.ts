@@ -1,4 +1,3 @@
-import { parseArgs } from 'node:util';
 import type { Bindings } from '@huma/adr/bindings';
 import { isConvention } from '@huma/adr/bindings';
 import { effectiveStatuses, readCollection } from '@huma/adr/collection';
@@ -10,7 +9,7 @@ import { formatAdrId, parseAdrId } from '@huma/adr/identifiers';
 import { readSnapshot } from '@huma/adr/snapshot';
 import type { EffectiveStatus } from '@huma/adr/statuses';
 import { STATUS_LABELS } from '@huma/adr/statuses';
-import { findWorkspaceRoot, print, runCommand, UsageError } from '@huma/kit/cli';
+import { findWorkspaceRoot, print, readArguments, runCommand, UsageError } from '@huma/kit/cli';
 import { ownRepository } from '@huma/kit/git';
 import { BINDINGS } from '../bindings.ts';
 
@@ -69,7 +68,7 @@ function details(document: AdrDocument): readonly string[] {
 }
 
 await runCommand(async () => {
-  const { positionals } = parseArgs({ allowPositionals: true, strict: true, options: {} });
+  const { positionals } = readArguments(USAGE, { allowPositionals: true, options: {} });
   const [id, ...rest] = positionals;
   const wanted: AdrNumber | null = id === undefined ? null : parseAdrId(id);
   if (rest.length > 0 || (id !== undefined && wanted === null)) {

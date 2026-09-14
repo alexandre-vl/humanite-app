@@ -1,13 +1,10 @@
-import { parseArgs } from 'node:util';
-import { findWorkspaceRoot, print, printError, runCommand } from '@huma/kit/cli';
+import { findWorkspaceRoot, print, printError, readArguments, runCommand } from '@huma/kit/cli';
 import { runVerify } from '../verify.ts';
 
+const USAGE = 'Usage : pnpm verify [--staged]';
+
 await runCommand(async () => {
-  const { values } = parseArgs({
-    options: { staged: { type: 'boolean', default: false } },
-    strict: true,
-    allowPositionals: false,
-  });
+  const { values } = readArguments(USAGE, { options: { staged: { type: 'boolean', default: false } } });
   const started = performance.now();
   const outcome = await runVerify(await findWorkspaceRoot(), {
     staged: values.staged,

@@ -16,6 +16,12 @@ export type CommandSpec = Readonly<{
   summary: string;
 }>;
 
+/** Where pnpm links the binaries of the workspace, `node` pinned by `devEngines` included. */
+export const BIN_DIRECTORY = 'node_modules/.bin';
+
+/** The pinned Node, for commands that run outside a package script: agent hooks and git hooks. */
+export const PINNED_NODE = `${BIN_DIRECTORY}/node`;
+
 const cli = (name: string): string => `tools/governance/src/cli/${name}.ts`;
 
 export const COMMANDS = {
