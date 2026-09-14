@@ -1,8 +1,8 @@
 import type { FileTree } from '@huma/fixtures';
+import { workspaceCopy } from '@huma/fixtures';
 import type { PolicyId } from '@huma/eslint-config/policies';
 import { findWorkspaceRoot } from '@huma/kit/cli';
 import { lintPolicies } from './eslint.ts';
-import { workspaceCopy } from './workspace-copy.ts';
 
 const LINTED = /\.(?:ts|tsx|js|mjs|cjs)$/u;
 

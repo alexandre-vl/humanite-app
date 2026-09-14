@@ -45,12 +45,14 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     '@expo/log-box': '57.0.4',
     '@expo/metro-config': '57.0.12',
     '@expo/metro-runtime': '57.0.15',
+    '@feature-sliced/steiger-plugin': '0.7.0',
     '@react-native/metro-config': '0.86.3',
     '@types/mdast': '4.0.4',
     '@types/node': '24.13.4',
     '@types/react': '19.2.18',
     '@types/semver': '7.8.0',
     'babel-preset-expo': '57.0.11',
+    'dependency-cruiser': '18.3.0',
     eslint: '10.10.0',
     'eslint-import-resolver-typescript': '4.4.5',
     'eslint-plugin-boundaries': '7.2.0',
@@ -78,6 +80,7 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     'react-native-worklets': '0.10.1',
     'react-refresh': '0.14.2',
     semver: '7.8.5',
+    steiger: '0.6.0',
     typescript: '6.0.3',
     'typescript-eslint': '8.70.0',
     vite: '8.3.0',
@@ -103,8 +106,9 @@ export const DEPENDENCY_POLICY: DependencyPolicy = {
     'react-native-worklets',
   ],
   singleVersion: {
-    typescript: [],
-    // @expo/cli validates its own inputs with zod 3: the CLI runs in Node beside the app, never inside it.
-    zod: ['@expo/cli'],
+    // Steiger resolves imports and reads tsconfig files with the TypeScript 5 it declares: its copy never checks types.
+    typescript: ['@feature-sliced/filesystem', 'cosmiconfig', 'tsconfck'],
+    // @expo/cli and Steiger validate their own inputs with zod 3: both run in Node beside the app, never inside it.
+    zod: ['@expo/cli', 'steiger', 'zod-validation-error'],
   },
 };

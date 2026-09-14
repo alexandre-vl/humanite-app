@@ -1,18 +1,20 @@
 {
-  "name": "@huma/guardrails",
+  "name": "@huma/structure",
   "private": true,
   "type": "module",
   "exports": {
-    "./eslint": "./src/eslint.ts",
-    "./proofs": "./src/proofs/registry.ts"
+    "./checks": "./src/checks.ts",
+    "./cycles": "./src/cycles.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./steiger": "./src/steiger.ts"
   },
   "dependencies": {
+    "@feature-sliced/steiger-plugin": "catalog:",
     "@huma/architecture": "workspace:*",
-    "@huma/eslint-config": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
-    "eslint": "catalog:",
-    "typescript": "catalog:"
+    "dependency-cruiser": "catalog:",
+    "steiger": "catalog:"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",

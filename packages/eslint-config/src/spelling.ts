@@ -26,6 +26,7 @@ const WORDS = [
   'punct',
   'redirections',
   'setsid',
+  'steiger',
   'stripspace',
   'taskset',
   'worktree',

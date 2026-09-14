@@ -18,6 +18,7 @@
     "@huma/guardrails": "workspace:*",
     "@huma/kit": "workspace:*",
     "@huma/lint": "workspace:*",
+    "@huma/structure": "workspace:*",
     "typescript": "catalog:"
   },
   "devDependencies": {

@@ -12,5 +12,7 @@ export {
 } from './bench.ts';
 export type { FixtureCommit, RepositoryOptions, RepositoryPlan } from './repository.ts';
 export { createRepository, FIXTURE_IDENTITY } from './repository.ts';
+export type { WorkspaceCopy } from './workspace-copy.ts';
+export { workspaceCopy } from './workspace-copy.ts';
 export type { FileContent, FileTree } from './workspace.ts';
 export { fileBytes, replaceTree, writeTree } from './workspace.ts';

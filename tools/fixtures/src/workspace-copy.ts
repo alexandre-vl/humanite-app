@@ -1,9 +1,9 @@
 import { access, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { FileTree } from '@huma/fixtures';
-import { writeTree } from '@huma/fixtures';
 import { temporaryDirectory } from '@huma/kit/fs';
 import { compareText } from '@huma/kit/text';
+import type { FileTree } from './workspace.ts';
+import { writeTree } from './workspace.ts';
 
 /**
  * A temporary directory laid out like the workspace, holding only the files of a fixture: its packages resolve through

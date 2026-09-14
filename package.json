@@ -24,6 +24,7 @@
     "hooks:check": "node tools/governance/src/cli/hooks-check.ts",
     "hooks:install": "node tools/governance/src/cli/hooks-install.ts",
     "lint": "node tools/governance/src/cli/lint.ts",
+    "structure:check": "node tools/governance/src/cli/structure-check.ts",
     "test": "vitest run",
     "typecheck": "tsc --build",
     "verify": "node tools/governance/src/cli/verify.ts"

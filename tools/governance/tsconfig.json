@@ -11,6 +11,7 @@
     { "path": "../git-hooks" },
     { "path": "../guardrails" },
     { "path": "../kit" },
-    { "path": "../lint" }
+    { "path": "../lint" },
+    { "path": "../structure" }
   ]
 }

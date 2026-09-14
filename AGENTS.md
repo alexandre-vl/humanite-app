@@ -6,29 +6,30 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 
 ## Avant de terminer
 
-- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `deps:check`, `format:check`, `expo:types`, `lint`, `typecheck`, `test`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
+- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `deps:check`, `format:check`, `expo:types`, `structure:check`, `lint`, `typecheck`, `test`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
 - Les sessions de Claude Code démarrent à la racine du dépôt : les réglages et les hooks du projet ne sont lus que depuis le `.claude/` du dossier de démarrage.
 
 ## Commandes
 
-| Commande             | Rôle                                                                                    |
-| -------------------- | --------------------------------------------------------------------------------------- |
-| `pnpm adr:check`     | vérifie les ADR, leurs liens et leur historique                                         |
-| `pnpm adr:decide`    | accepte ou rejette un ADR proposé (décideur humain seulement, dans son propre terminal) |
-| `pnpm adr:new`       | crée un ADR proposé au dernier format                                                   |
-| `pnpm adr:status`    | liste les ADR, leur statut et leurs preuves                                             |
-| `pnpm deps:check`    | vérifie manifestes, catalog, références TypeScript et lockfile                          |
-| `pnpm expo:types`    | génère les types de routes de chaque app Expo, sans qu’Expo réécrive un fichier suivi   |
-| `pnpm format`        | formate les fichiers du dépôt                                                           |
-| `pnpm format:check`  | vérifie le formatage des fichiers du dépôt                                              |
-| `pnpm gen`           | régénère les fichiers dérivés                                                           |
-| `pnpm gen:check`     | vérifie que les fichiers dérivés sont à jour                                            |
-| `pnpm hooks:check`   | vérifie les hooks git et Claude Code installés, et l’historique des messages            |
-| `pnpm hooks:install` | installe les hooks git du dépôt                                                         |
-| `pnpm lint`          | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré     |
-| `pnpm test`          | tests et fixtures des outils                                                            |
-| `pnpm typecheck`     | vérification des types de chaque projet                                                 |
-| `pnpm verify`        | tous les contrôles du dépôt, dans l’ordre                                               |
+| Commande               | Rôle                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------ |
+| `pnpm adr:check`       | vérifie les ADR, leurs liens et leur historique                                                  |
+| `pnpm adr:decide`      | accepte ou rejette un ADR proposé (décideur humain seulement, dans son propre terminal)          |
+| `pnpm adr:new`         | crée un ADR proposé au dernier format                                                            |
+| `pnpm adr:status`      | liste les ADR, leur statut et leurs preuves                                                      |
+| `pnpm deps:check`      | vérifie manifestes, catalog, références TypeScript et lockfile                                   |
+| `pnpm expo:types`      | génère les types de routes de chaque app Expo, sans qu’Expo réécrive un fichier suivi            |
+| `pnpm format`          | formate les fichiers du dépôt                                                                    |
+| `pnpm format:check`    | vérifie le formatage des fichiers du dépôt                                                       |
+| `pnpm gen`             | régénère les fichiers dérivés                                                                    |
+| `pnpm gen:check`       | vérifie que les fichiers dérivés sont à jour                                                     |
+| `pnpm hooks:check`     | vérifie les hooks git et Claude Code installés, et l’historique des messages                     |
+| `pnpm hooks:install`   | installe les hooks git du dépôt                                                                  |
+| `pnpm lint`            | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré              |
+| `pnpm structure:check` | vérifie la structure Feature-Sliced de chaque app avec Steiger et y cherche les cycles d’imports |
+| `pnpm test`            | tests et fixtures des outils                                                                     |
+| `pnpm typecheck`       | vérification des types de chaque projet                                                          |
+| `pnpm verify`          | tous les contrôles du dépôt, dans l’ordre                                                        |
 
 ## Ce que la garde des agents refuse
 

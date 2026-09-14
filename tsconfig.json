@@ -45,6 +45,9 @@
     },
     {
       "path": "./tools/lint"
+    },
+    {
+      "path": "./tools/structure"
     }
   ]
 }
