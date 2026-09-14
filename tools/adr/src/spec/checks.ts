@@ -464,8 +464,8 @@ export const CHECKS = {
   },
   'adr/binding-rule-extra': {
     scope: 'repository',
-    summary: 'liens seulement pour les règles contraignantes',
-    message: '{id} {rule} : pas une règle contraignante de l’ADR',
+    summary: 'liens seulement pour des règles de l’ADR',
+    message: '{id} {rule} : aucune règle de l’ADR ne porte cet identifiant',
   },
   'adr/binding-convention-empty': {
     scope: 'repository',

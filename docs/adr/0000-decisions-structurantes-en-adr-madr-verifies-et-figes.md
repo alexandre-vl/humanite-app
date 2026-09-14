@@ -37,24 +37,24 @@ Comment consigner chaque décision structurante pour qu’elle reste vérifiable
 Option retenue : « MADR 4 traduit et vérifié par l’outillage du dépôt », parce que c’est la seule option qui vérifie chaque règle en local (C1), garde une source par information (C2) et laisse la décision à l’humain (C3).
 
 - **R1** — Un ADR DOIT suivre le format de la version écrite dans son en-tête, tel que le vérifie `pnpm adr:check`.
-- **R2** — Un format publié NE DOIT PAS changer : une grammaire plus stricte devient une nouvelle version, que suit tout ADR proposé.
+- **R2** — Un ADR décidé DOIT rester conforme au format de son en-tête : une grammaire qui le refuserait devient une nouvelle version, que suit tout ADR proposé.
 - **R3** — Un ADR DOIT argumenter sa décision : faits sourcés, critères numérotés, deux options au moins, option retenue parmi elles, arguments qui citent un critère, coût nommé et déclencheur de réévaluation.
 - **R4** — Une règle DOIT porter un identifiant et un seul mot-clé en capitales, au singulier ou au pluriel ; ailleurs, ces mots s’écrivent en minuscules ou en code, et les autres modaux en capitales sont refusés.
 - **R5** — Un ADR commité NE DOIT PAS être supprimé ni céder son numéro à un autre ADR.
-- **R6** — Un ADR DOIT être commité en `proposed` avant d’être accepté ou rejeté.
+- **R6** — Un ADR DOIT être commité en `proposed`, puis accepté ou rejeté sans autre changement que son statut.
 - **R7** — Un ADR accepté ou rejeté NE DOIT PAS changer, ni de contenu ni de nom.
-- **R8** — Un agent NE DOIT PAS décider d’un ADR : ni statut décidé écrit, ni ADR décidé modifié, ni commande de décision lancée.
+- **R8** — Un agent NE DOIT PAS décider d’un ADR : ni statut décidé écrit ou commité, ni ADR décidé modifié, ni commande de décision lancée.
 - **R9** — Chaque règle contraignante d’un ADR accepté DOIT être liée à des preuves ou à une convention justifiée, avec au moins une règle prouvée, un périmètre et des preuves qui passent à l’acceptation.
 - **R10** — L’index des ADR DOIT être généré par l’outillage, jamais écrit à la main.
 - **R11** — Un ADR DOIT déclarer dès sa proposition, dans `supersedes`, les ADR acceptés plus anciens qu’il remplace ; le remplacement prend effet à son acceptation, sans modifier les fichiers remplacés.
-- **R12** — Un écart d’historique PEUT être reconnu avec sa raison dans la liste des écarts reconnus, plutôt que corrigé en réécrivant git.
+- **R12** — Un écart d’historique PEUT être reconnu pour un ADR et un commit, un contenu ou un nom précis, avec sa raison, plutôt que corrigé en réécrivant git.
 - **R13** — Un ADR proposé PEUT être modifié, renommé ou rejeté.
 
 ### Conséquences
 
 - Bien, parce qu’une règle contraignante sans preuve ni convention bloque l’acceptation.
 - Bien, parce que preuves et périmètres vivent dans du TypeScript typé, pas dans un document figé.
-- Mauvais, parce que chaque contrôle, ses fixtures et chaque format publié restent à maintenir dans l’outillage.
+- Mauvais, parce que chaque contrôle, ses fixtures et chaque format suivi par un ADR décidé restent à maintenir dans l’outillage.
 - Mauvais, parce que la confirmation MADR sort du fichier : l’index dit comment chaque règle est prouvée.
 - Mauvais, parce qu’un script peut encore contourner les hooks : la relecture des commits reste nécessaire pour R8.
 

@@ -14,15 +14,10 @@ test('proof ids are unique across the whole workspace', () => {
   expect(findDuplicateIds(PROOFS)).toEqual([]);
 });
 
-test('every proof of the ADR process is bound to a rule of ADR-0000, except the lifecycle helpers', () => {
+test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
   const unbound = PROOFS.map((fixture) => fixture.id).filter((id) => !bound.has(id));
   expect(unbound).toEqual([
-    'adr/valid-history',
-    'adr/valid-renamed-proposed',
-    'guard/proposed-edit',
-    'agent/decide-mentioned',
-    'agent/adr-check',
     'agent/no-verify',
     'agent/no-verify-abbreviated',
     'agent/short-n-cluster',
@@ -38,13 +33,7 @@ test('every proof of the ADR process is bound to a rule of ADR-0000, except the 
     'agent/sudo',
     'agent/sudo-wrapped',
     'agent/edit-git-config',
-    'agent/write-settings',
     'agent/write-source',
-    'agent/write-outside',
-    'agent/proposed-edit',
-    'agent/other-tool',
-    'hook/settings-command-allows',
-    'hook/failure-allows-innocuous',
     'hook/stop-unverifiable-blocks',
     'hook/stop-unverifiable-once',
   ]);

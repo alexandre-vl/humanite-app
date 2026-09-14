@@ -728,8 +728,21 @@ export const CHECK_FIXTURES = [
   ),
   define(
     'adr/binding-rule-extra',
-    'une preuve pour une règle PEUT',
+    'une preuve pour une règle R3 que l’ADR n’a pas',
     ['adr/binding-rule-extra'],
+    inMemory(only(PROPOSED), {
+      bindings: {
+        'ADR-0000': {
+          scope: { paths: ['docs/adr/**'] },
+          rules: { R1: [FAKE_PROOFS.passing], R3: [FAKE_PROOFS.passing] },
+        },
+      },
+    }),
+  ),
+  define(
+    'adr/valid-optional-binding',
+    'une preuve facultative pour une règle PEUT',
+    [],
     inMemory(only(PROPOSED), {
       bindings: {
         'ADR-0000': {
@@ -737,6 +750,14 @@ export const CHECK_FIXTURES = [
           rules: { R1: [FAKE_PROOFS.passing], R2: [FAKE_PROOFS.passing] },
         },
       },
+    }),
+  ),
+  define(
+    'adr/binding-optional-only',
+    'un ADR accepté dont seule la règle PEUT est prouvée',
+    ['adr/binding-rule-unbound', 'adr/binding-no-proven-rule'],
+    inMemory(only(ACCEPTED), {
+      bindings: { 'ADR-0000': { scope: { paths: ['docs/adr/**'] }, rules: { R2: [FAKE_PROOFS.passing] } } },
     }),
   ),
   define(

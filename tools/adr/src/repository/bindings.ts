@@ -5,7 +5,7 @@ import type { BindingsSource } from '../model/bindings.ts';
 import { isConvention } from '../model/bindings.ts';
 import type { AdrDocument } from '../model/document.ts';
 import type { AdrNumber } from '../model/identifiers.ts';
-import { formatAdrId, parseAdrId, parseRuleId } from '../model/identifiers.ts';
+import { formatAdrId, parseAdrId } from '../model/identifiers.ts';
 import type { ScopedCode } from '../spec/checks.ts';
 import { finding } from '../spec/checks.ts';
 import type { EffectiveStatus } from '../spec/statuses.ts';
@@ -59,6 +59,7 @@ export function checkBindings(
       continue;
     }
     const bindingLevels = grammarOf(document.spec).bindingLevels;
+    const ruleIds = new Set<string>(document.rules.map((rule) => rule.id));
     const expected = new Set<string>(
       document.rules.filter((rule) => bindingLevels.includes(rule.level)).map((rule) => rule.id),
     );
@@ -68,7 +69,7 @@ export function checkBindings(
     }
     let proven = false;
     for (const [rule, ruleBinding] of Object.entries(binding.rules)) {
-      if (parseRuleId(rule) === null || !expected.has(rule)) {
+      if (!ruleIds.has(rule)) {
         diagnostics.push(finding('adr/binding-rule-extra', source.path, { id, rule }, at(key)));
         continue;
       }
@@ -78,7 +79,7 @@ export function checkBindings(
         }
         continue;
       }
-      proven = true;
+      proven ||= expected.has(rule);
       for (const proof of ruleBinding.filter((proofId) => !source.proofs.has(proofId))) {
         diagnostics.push(
           finding('adr/binding-proof-unknown', source.path, { id, rule, proof }, lineOf(source.text, proof)),

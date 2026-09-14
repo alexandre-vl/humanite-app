@@ -52,8 +52,6 @@ const RULE_ID = /^R[1-9]\d*$/u;
 
 const isRuleId = (value: string): value is RuleId => RULE_ID.test(value);
 
-export const parseRuleId = (value: string): RuleId | null => (isRuleId(value) ? value : null);
-
 /** Identifier of the rule at `index` (0-based) in the decision list. */
 export function ruleIdAt(index: number): RuleId {
   const id = `R${String(index + 1)}`;
