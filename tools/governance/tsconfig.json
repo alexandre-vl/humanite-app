@@ -9,6 +9,7 @@
     { "path": "../expo" },
     { "path": "../fixtures" },
     { "path": "../git-hooks" },
+    { "path": "../guardrails" },
     { "path": "../kit" },
     { "path": "../lint" }
   ]

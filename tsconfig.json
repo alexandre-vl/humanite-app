@@ -38,6 +38,9 @@
       "path": "./tools/governance"
     },
     {
+      "path": "./tools/guardrails"
+    },
+    {
       "path": "./tools/kit"
     },
     {

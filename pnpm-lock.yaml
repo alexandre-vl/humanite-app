@@ -477,12 +477,46 @@ importers:
       '@huma/git-hooks':
         specifier: workspace:*
         version: link:../git-hooks
+      '@huma/guardrails':
+        specifier: workspace:*
+        version: link:../guardrails
       '@huma/kit':
         specifier: workspace:*
         version: link:../kit
       '@huma/lint':
         specifier: workspace:*
         version: link:../lint
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(terser@5.51.2)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(terser@5.51.2)(yaml@2.9.1))
+
+  tools/guardrails:
+    dependencies:
+      '@huma/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@huma/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
+      '@huma/kit':
+        specifier: workspace:*
+        version: link:../kit
+      eslint:
+        specifier: 'catalog:'
+        version: 10.10.0(supports-color@8.1.1)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

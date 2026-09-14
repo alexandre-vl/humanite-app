@@ -1,0 +1,23 @@
+{
+  "name": "@huma/guardrails",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": "./src/eslint.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./workspace-copy": "./src/workspace-copy.ts"
+  },
+  "dependencies": {
+    "@huma/eslint-config": "workspace:*",
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

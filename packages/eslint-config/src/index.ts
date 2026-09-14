@@ -3,51 +3,51 @@ import { HERMES_FILES } from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import type { PolicyId } from './policies.ts';
+import { POLICY_IDS, policyMessage } from './policies.ts';
 
 export type WorkspaceConfigOptions = Readonly<{
   /** The workspace root, which holds the solution `tsconfig.json` that references every TypeScript project. */
   tsconfigRootDir: string;
+  /** The policies to enforce, all by default: a guardrail leaves one out to prove its fixtures then fail. */
+  policies?: ReadonlySet<PolicyId>;
 }>;
 
 const TYPESCRIPT_FILES = ['**/*.ts', '**/*.tsx'];
 
 const JAVASCRIPT_FILES = ['**/*.js', '**/*.mjs', '**/*.cjs'];
 
-const STRIP_ONLY = 'Node runs TypeScript by stripping types: this syntax fails at runtime';
-
 const RELATIVE_JS = String.raw`/^\.{1,2}\/.*\.js$/`;
 
 type RuleEntry = Linter.RuleEntry;
 
-/** A restriction of `no-restricted-syntax`: an AST selector and why it is refused. */
-type SyntaxRestriction = Readonly<{ selector: string; message: string }>;
+/** A restriction of `no-restricted-syntax`: the policy it enforces and the AST selector it refuses. */
+type SyntaxRestriction = Readonly<{ policy: PolicyId; selector: string }>;
 
-/** A restriction of `no-restricted-properties`: `object.property` and why it is refused. */
-type PropertyRestriction = Readonly<{ object: string; property: string; message: string }>;
+/** A restriction of `no-restricted-properties`: the policy it enforces and the `object.property` it refuses. */
+type PropertyRestriction = Readonly<{ policy: PolicyId; object: string; property: string }>;
 
 /** An option of `@typescript-eslint/naming-convention`. */
 type NamingRule = Readonly<Record<string, unknown>>;
 
-const CORE_SYNTAX: readonly SyntaxRestriction[] = [
-  { selector: 'ExportAllDeclaration', message: 'Export each name explicitly' },
-];
+const CORE_SYNTAX: readonly SyntaxRestriction[] = [{ policy: 'export/all', selector: 'ExportAllDeclaration' }];
 
 const NODE_SYNTAX: readonly SyntaxRestriction[] = [
-  { selector: 'Decorator', message: STRIP_ONLY },
-  { selector: 'AccessorProperty, TSAbstractAccessorProperty', message: STRIP_ONLY },
-  { selector: `ImportDeclaration[source.value=${RELATIVE_JS}]`, message: 'Import the .ts file' },
-  { selector: `ExportNamedDeclaration[source.value=${RELATIVE_JS}]`, message: 'Export from the .ts file' },
-  { selector: `ImportExpression[source.value=${RELATIVE_JS}]`, message: 'Import the .ts file' },
+  { policy: 'node/decorator', selector: 'Decorator' },
+  { policy: 'node/accessor', selector: 'AccessorProperty, TSAbstractAccessorProperty' },
+  { policy: 'node/import-js', selector: `ImportDeclaration[source.value=${RELATIVE_JS}]` },
+  { policy: 'node/export-js', selector: `ExportNamedDeclaration[source.value=${RELATIVE_JS}]` },
+  { policy: 'node/dynamic-import-js', selector: `ImportExpression[source.value=${RELATIVE_JS}]` },
 ];
 
-const FOCUSED_TESTS: readonly PropertyRestriction[] = ['describe', 'it', 'test'].map((object) => ({
-  object,
-  property: 'only',
-  message: 'Focused tests hide the rest of the suite',
-}));
+const FOCUSED_TESTS: readonly PropertyRestriction[] = [
+  { policy: 'test/describe-only', object: 'describe', property: 'only' },
+  { policy: 'test/it-only', object: 'it', property: 'only' },
+  { policy: 'test/test-only', object: 'test', property: 'only' },
+];
 
 const NODE_PROPERTIES: readonly PropertyRestriction[] = [
-  { object: 'process', property: 'exit', message: 'Set process.exitCode so pending output is flushed' },
+  { policy: 'node/process-exit', object: 'process', property: 'exit' },
 ];
 
 const NAMING_BASE: readonly NamingRule[] = [
@@ -70,35 +70,54 @@ const HERMES_NAMING: readonly NamingRule[] = [
   { selector: 'variable', modifiers: ['const'], format: ['camelCase', 'PascalCase', 'UPPER_CASE'] },
 ];
 
+/** The restrictions of the enabled policies, as the options of `no-restricted-syntax` and `no-restricted-properties`. */
+const restrictedSyntax = (
+  syntax: readonly SyntaxRestriction[],
+  enabled: ReadonlySet<PolicyId>,
+): readonly Readonly<{ selector: string; message: string }>[] =>
+  syntax
+    .filter(({ policy }) => enabled.has(policy))
+    .map(({ policy, selector }) => ({ selector, message: policyMessage(policy) }));
+
+const restrictedProperties = (
+  properties: readonly PropertyRestriction[],
+  enabled: ReadonlySet<PolicyId>,
+): readonly Readonly<{ object: string; property: string; message: string }>[] =>
+  properties
+    .filter(({ policy }) => enabled.has(policy))
+    .map(({ policy, object, property }) => ({ object, property, message: policyMessage(policy) }));
+
 /**
  * The rules whose options a runtime extends. ESLint replaces the options of a rule set again by a later block, so each
  * runtime gets the complete lists instead of adding to the core ones.
  */
 const restrictions = (
-  syntax: readonly SyntaxRestriction[],
-  properties: readonly PropertyRestriction[],
-  naming: readonly NamingRule[],
+  runtime: Readonly<{
+    syntax: readonly SyntaxRestriction[];
+    properties: readonly PropertyRestriction[];
+    naming: readonly NamingRule[];
+  }>,
+  enabled: ReadonlySet<PolicyId>,
 ): Readonly<Record<string, RuleEntry>> => ({
-  'no-restricted-syntax': ['error', ...CORE_SYNTAX, ...syntax],
-  'no-restricted-properties': ['error', ...FOCUSED_TESTS, ...properties],
-  '@typescript-eslint/naming-convention': ['error', ...naming],
+  'no-restricted-syntax': ['error', ...restrictedSyntax([...CORE_SYNTAX, ...runtime.syntax], enabled)],
+  'no-restricted-properties': ['error', ...restrictedProperties([...FOCUSED_TESTS, ...runtime.properties], enabled)],
+  '@typescript-eslint/naming-convention': ['error', ...runtime.naming],
 });
 
 /** Rules that need no type information, for every file ESLint reads. */
-const UNTYPED_RULES: Readonly<Record<string, RuleEntry>> = {
+const untypedRules = (enabled: ReadonlySet<PolicyId>): Readonly<Record<string, RuleEntry>> => ({
   curly: ['error', 'all'],
   eqeqeq: 'error',
   'no-console': 'error',
   'no-implicit-coercion': 'error',
   'no-param-reassign': 'error',
-  'no-restricted-syntax': ['error', ...CORE_SYNTAX],
+  'no-restricted-syntax': ['error', ...restrictedSyntax(CORE_SYNTAX, enabled)],
   'no-warning-comments': 'error',
   'object-shorthand': 'error',
   'prefer-template': 'error',
-};
+});
 
 const TYPESCRIPT_RULES: Readonly<Record<string, RuleEntry>> = {
-  ...UNTYPED_RULES,
   '@typescript-eslint/ban-ts-comment': [
     'error',
     {
@@ -136,7 +155,10 @@ const TYPESCRIPT_RULES: Readonly<Record<string, RuleEntry>> = {
  * Lint rules of the workspace: every TypeScript file gets the strict typed rules, then the restrictions of the runtime
  * that executes it, Node or Hermes; JavaScript configuration files get the rules that need no types.
  */
-export function defineWorkspaceConfig({ tsconfigRootDir }: WorkspaceConfigOptions): Linter.Config[] {
+export function defineWorkspaceConfig({
+  tsconfigRootDir,
+  policies = new Set(POLICY_IDS),
+}: WorkspaceConfigOptions): Linter.Config[] {
   return defineConfig(
     globalIgnores(['**/node_modules/']),
     {
@@ -149,22 +171,22 @@ export function defineWorkspaceConfig({ tsconfigRootDir }: WorkspaceConfigOption
     {
       files: JAVASCRIPT_FILES,
       extends: [js.configs.recommended],
-      rules: UNTYPED_RULES,
+      rules: untypedRules(policies),
     },
     {
       files: TYPESCRIPT_FILES,
       extends: [js.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
       languageOptions: { parserOptions: { projectService: true, tsconfigRootDir } },
-      rules: TYPESCRIPT_RULES,
+      rules: { ...untypedRules(policies), ...TYPESCRIPT_RULES },
     },
     {
       files: TYPESCRIPT_FILES,
       ignores: [...HERMES_FILES],
-      rules: restrictions(NODE_SYNTAX, NODE_PROPERTIES, NODE_NAMING),
+      rules: restrictions({ syntax: NODE_SYNTAX, properties: NODE_PROPERTIES, naming: NODE_NAMING }, policies),
     },
     {
       files: [...HERMES_FILES],
-      rules: restrictions([], [], HERMES_NAMING),
+      rules: restrictions({ syntax: [], properties: [], naming: HERMES_NAMING }, policies),
     },
   );
 }

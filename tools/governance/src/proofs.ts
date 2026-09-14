@@ -4,6 +4,7 @@ import { DEPS_PROOFS } from '@huma/deps/proofs';
 import { EXPO_PROOFS } from '@huma/expo/proofs';
 import { runFixture } from '@huma/fixtures';
 import { GIT_HOOK_PROOFS } from '@huma/git-hooks/proofs';
+import { GUARDRAIL_PROOFS } from '@huma/guardrails/proofs';
 import { LINT_PROOFS } from '@huma/lint/proofs';
 import { COMMIT_REFS_FIXTURES } from './proofs/commit-refs.ts';
 import { GOVERNANCE_FIXTURES } from './proofs/governance.ts';
@@ -15,6 +16,7 @@ export const PROOFS = [
   ...DEPS_PROOFS,
   ...EXPO_PROOFS,
   ...GIT_HOOK_PROOFS,
+  ...GUARDRAIL_PROOFS,
   ...LINT_PROOFS,
   ...GOVERNANCE_FIXTURES,
   ...COMMIT_REFS_FIXTURES,
