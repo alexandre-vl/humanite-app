@@ -174,3 +174,30 @@ export const IMPORTS = {
 
 /** Every place, top to bottom. */
 export const PLACE_NAMES: readonly Place[] = ORDER.flat();
+
+/** A package only some places may import: the rest of the app reaches it through them. */
+export type ModulePolicy = Readonly<{
+  /** Places that may import the package. */
+  places: readonly Place[];
+  /** Names every place may import from it anyway. */
+  except: readonly string[];
+}>;
+
+/**
+ * Packages whose use the component levels confine: native views, animations and gestures live in L0 primitives,
+ * which alone touch the native layer; `Platform` answers a question, not a view, and stays open to every place.
+ */
+export const MODULES = {
+  'react-native': { places: ['primitive'], except: ['Platform'] },
+  'react-native-gesture-handler': { places: ['primitive'], except: [] },
+  'react-native-reanimated': { places: ['primitive'], except: [] },
+} as const satisfies Readonly<Record<string, ModulePolicy>>;
+
+export type ConfinedModule = keyof typeof MODULES;
+
+export const CONFINED_MODULES = Object.keys(MODULES).filter((name): name is ConfinedModule =>
+  Object.hasOwn(MODULES, name),
+);
+
+/** The name of every public entry, which only re-exports what the files of its unit define. */
+export const ENTRY_FILE = 'index.ts';

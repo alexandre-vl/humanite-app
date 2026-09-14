@@ -21,7 +21,7 @@ export function ${name}(): ReactNode {
 /** A module exporting one constant. */
 const constant = (name: string, value: string): string => `export const ${name} = '${value}';\n`;
 
-/** A component rendering nothing but a native view, or one of the app's own components. */
+/** A component rendering one component, imported from `source`. */
 const component = (name: string, source: string, rendered: string): string => `import type { ReactNode } from 'react';
 import { ${rendered} } from '${source}';
 
@@ -30,15 +30,21 @@ export function ${name}(): ReactNode {
 }
 `;
 
+/** A route of the app: its error boundary, then its page. */
+const route = (page: string, source: string): string =>
+  `export { ErrorBoundary } from '#app';\nexport { ${page} as default } from '${source}';\n`;
+
 /**
  * An app in which every place holds a module that respects its imports: a route, the root layout, two pages, a
- * feature, an entity, a component, a primitive and the four places of the shared kernel. A fixture that adds an import
- * against the order also cuts the edge that would close a cycle: typescript-eslint 8.70's no-deprecated loops forever
- * on a circular re-export.
+ * feature, an entity, a component, a primitive and the four places of the shared kernel, each behind its entry. A
+ * fixture that adds an import against the order also cuts the edge that would close a cycle: typescript-eslint 8.70's
+ * no-deprecated loops forever on a circular re-export.
  */
 const APP_FILES: FileTree = {
-  'app/index.tsx': "export { HomePage as default } from '#pages/home';\n",
-  'src/_app/index.ts': "export { RootLayout } from './routes/root-layout';\n",
+  'app/index.tsx': route('HomePage', '#pages/home'),
+  'src/_app/index.ts':
+    "export { ErrorBoundary } from './routes/error-boundary';\nexport { RootLayout } from './routes/root-layout';\n",
+  'src/_app/routes/error-boundary.tsx': emptyComponent('ErrorBoundary'),
   'src/_app/routes/root-layout.tsx': component('RootLayout', '#primitives/surface', 'Surface'),
   'src/pages/home/index.ts': "export { HomePage } from './ui/home-page';\n",
   'src/pages/home/ui/home-page.tsx': component('HomePage', '#components/badge', 'Badge'),
@@ -54,9 +60,12 @@ const APP_FILES: FileTree = {
   'src/shared/ui/primitives/surface/surface.tsx': component('Surface', 'react-native', 'View'),
   'src/shared/lib/format/index.ts': "export { formatTitle } from './format';\n",
   'src/shared/lib/format/format.ts': "export { APP_NAME as formatTitle } from '#config';\n",
-  'src/shared/i18n/index.ts': "export { formatTitle as translate } from '#lib/format';\n",
-  'src/shared/config/index.ts': constant('APP_NAME', 'Humanité'),
-  'src/shared/api/index.ts': "export { APP_NAME as API_NAME } from '#config';\n",
+  'src/shared/i18n/index.ts': "export { translate } from './translate';\n",
+  'src/shared/i18n/translate.ts': "export { formatTitle as translate } from '#lib/format';\n",
+  'src/shared/config/index.ts': "export { APP_NAME } from './app-name';\n",
+  'src/shared/config/app-name.ts': constant('APP_NAME', 'Humanité'),
+  'src/shared/api/index.ts': "export { API_NAME } from './api-name';\n",
+  'src/shared/api/api-name.ts': "export { APP_NAME as API_NAME } from '#config';\n",
 };
 
 /** The app of the workspace, as git holds its manifest and tsconfig, with `files` laid over `APP_FILES`. */
@@ -70,6 +79,11 @@ async function appTree(files: FileTree): Promise<FileTree> {
   };
 }
 
+/** A model file of the home page that reads the platform through `importLine`. */
+const platformModel = (importLine: string, expression: string): FileTree => ({
+  'src/pages/home/model/platform.ts': `${importLine}\n\nexport const platformName = ${expression};\n`,
+});
+
 /** The fixtures of the policies of the app's places, linted with the policies of `enabled` only. */
 const appFixtures = (enabled: ReadonlySet<PolicyId>) => {
   const linted = (files: FileTree) => async (): Promise<readonly PolicyId[]> => lintTree(await appTree(files), enabled);
@@ -79,7 +93,7 @@ const appFixtures = (enabled: ReadonlySet<PolicyId>) => {
       'guardrail/import-route',
       'une route qui réexporte une primitive',
       ['import/route'],
-      linted({ 'app/index.tsx': "export { Surface as default } from '#primitives/surface';\n" }),
+      linted({ 'app/index.tsx': route('Surface', '#primitives/surface') }),
     ),
     define(
       'guardrail/import-app',
@@ -145,21 +159,21 @@ export const pageTitle = articleTitle;
       ['import/lib'],
       linted({
         'src/shared/lib/format/format.ts': "export { translate as formatTitle } from '#i18n';\n",
-        'src/shared/i18n/index.ts': constant('translate', 'traduire'),
+        'src/shared/i18n/translate.ts': constant('translate', 'traduire'),
       }),
     ),
     define(
       'guardrail/import-i18n',
       'les textes qui importent la configuration',
       ['import/i18n'],
-      linted({ 'src/shared/i18n/index.ts': "export { APP_NAME as translate } from '#config';\n" }),
+      linted({ 'src/shared/i18n/translate.ts': "export { APP_NAME as translate } from '#config';\n" }),
     ),
     define(
       'guardrail/import-config',
       'la configuration qui importe une bibliothèque',
       ['import/config'],
       linted({
-        'src/shared/config/index.ts': "export { formatTitle as APP_NAME } from '#lib/format';\n",
+        'src/shared/config/app-name.ts': "export { formatTitle as APP_NAME } from '#lib/format';\n",
         'src/shared/lib/format/format.ts': constant('formatTitle', 'titre'),
       }),
     ),
@@ -167,7 +181,7 @@ export const pageTitle = articleTitle;
       'guardrail/import-api',
       'le client d’API qui importe les textes',
       ['import/api'],
-      linted({ 'src/shared/api/index.ts': "export { translate as API_NAME } from '#i18n';\n" }),
+      linted({ 'src/shared/api/api-name.ts': "export { translate as API_NAME } from '#i18n';\n" }),
     ),
     define(
       'guardrail/place-unknown-file',
@@ -180,6 +194,75 @@ export const pageTitle = articleTitle;
       'un fichier hors de toute place qui importe la configuration : seul le fichier est refusé',
       ['place/unknown-file'],
       linted({ 'src/utils/helper.ts': "export { APP_NAME as helper } from '#config';\n" }),
+    ),
+    define(
+      'guardrail/module-react-native',
+      'une page qui rend une vue native',
+      ['module/react-native'],
+      linted({ 'src/pages/home/ui/home-page.tsx': component('HomePage', 'react-native', 'View') }),
+    ),
+    define(
+      'guardrail/module-react-native-entry',
+      'l’entrée d’une page qui réexporte une vue native',
+      ['module/react-native'],
+      linted({
+        'src/pages/home/index.ts': "export { HomePage } from './ui/home-page';\nexport { View } from 'react-native';\n",
+      }),
+    ),
+    define(
+      'guardrail/module-react-native-namespace',
+      'une page qui importe tout react-native d’un coup',
+      ['module/react-native'],
+      linted(platformModel("import * as ReactNative from 'react-native';", 'ReactNative.Platform.OS')),
+    ),
+    define(
+      'guardrail/module-react-native-platform',
+      'une page qui ne lit que la plateforme, ouverte à toutes les places',
+      [],
+      linted(platformModel("import { Platform } from 'react-native';", 'Platform.OS')),
+    ),
+    define(
+      'guardrail/module-react-native-gesture-handler',
+      'une page qui déclare un geste',
+      ['module/react-native-gesture-handler'],
+      linted({
+        'src/pages/home/model/tap.ts':
+          "import { Gesture } from 'react-native-gesture-handler';\n\nexport const tap = Gesture.Tap();\n",
+      }),
+    ),
+    define(
+      'guardrail/module-react-native-reanimated',
+      'un composant qui anime une valeur partagée',
+      ['module/react-native-reanimated'],
+      linted({
+        'src/shared/ui/components/badge/use-opacity.ts': `import { useSharedValue } from 'react-native-reanimated';
+
+export function useOpacity(): number {
+  return useSharedValue(1).get();
+}
+`,
+      }),
+    ),
+    define(
+      'guardrail/route-re-export',
+      'une route qui importe sa page puis l’exporte elle-même',
+      ['route/re-export'],
+      linted({
+        'app/index.tsx':
+          "import { HomePage } from '#pages/home';\n\nexport { ErrorBoundary } from '#app';\nexport default HomePage;\n",
+      }),
+    ),
+    define(
+      'guardrail/route-error-boundary',
+      'une route sans ErrorBoundary',
+      ['route/error-boundary'],
+      linted({ 'app/index.tsx': "export { HomePage as default } from '#pages/home';\n" }),
+    ),
+    define(
+      'guardrail/entry-re-export',
+      'une entrée publique qui définit sa constante au lieu de la réexporter',
+      ['entry/re-export'],
+      linted({ 'src/shared/config/index.ts': constant('APP_NAME', 'Humanité') }),
     ),
   ] as const;
 };

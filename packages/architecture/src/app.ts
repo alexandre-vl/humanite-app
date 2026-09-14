@@ -1,5 +1,5 @@
 import type { PlaceSpec } from './places.ts';
-import { PLACE_NAMES, PLACES } from './places.ts';
+import { ENTRY_FILE, PLACE_NAMES, PLACES } from './places.ts';
 
 /** The mobile app, relative to the workspace root. */
 export const APP_DIRECTORY = 'apps/mobile';
@@ -13,18 +13,27 @@ export const HERMES_FILES: readonly string[] = HERMES_DIRECTORIES.map(
 );
 
 /** The public entries of a place, relative to the app, `*` standing for a slice or a module; `null` for routes. */
-function entryOf({ directory, layout }: PlaceSpec): string | null {
+export function entryOf({ directory, layout }: PlaceSpec): string | null {
   switch (layout) {
     case 'routes':
       return null;
     case 'segments':
     case 'module':
-      return `./${directory}/index.ts`;
+      return `${directory}/${ENTRY_FILE}`;
     case 'slices':
     case 'modules':
-      return `./${directory}/*/index.ts`;
+      return `${directory}/*/${ENTRY_FILE}`;
   }
 }
+
+/** Route files, as globs relative to the workspace root. */
+export const ROUTE_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.route.directory}/**/*.{ts,tsx}`];
+
+/** Public entries of every place, as globs relative to the workspace root. */
+export const ENTRY_FILES: readonly string[] = PLACE_NAMES.flatMap((name) => {
+  const entry = entryOf(PLACES[name]);
+  return entry === null ? [] : [`${APP_DIRECTORY}/${entry}`];
+});
 
 /**
  * The `imports` field of the app's `package.json`: one `#` alias per importable place, pointing at public entries only,
@@ -35,7 +44,7 @@ export function packageImports(): Readonly<Record<string, string>> {
     PLACE_NAMES.flatMap((name) => {
       const spec: PlaceSpec = PLACES[name];
       const entry = entryOf(spec);
-      return spec.alias === null || entry === null ? [] : [[spec.alias, entry] as const];
+      return spec.alias === null || entry === null ? [] : [[spec.alias, `./${entry}`] as const];
     }),
   );
 }

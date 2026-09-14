@@ -1,11 +1,11 @@
 import js from '@eslint/js';
-import { HERMES_FILES } from '@huma/architecture';
+import { CONFINED_MODULES, ENTRY_FILES, HERMES_FILES, ROUTE_FILES } from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import { boundariesConfig } from './boundaries.ts';
 import type { PolicyId } from './policies.ts';
-import { POLICY_IDS, policyMessage } from './policies.ts';
+import { modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
 
 export type WorkspaceConfigOptions = Readonly<{
   /** The workspace root, which holds the solution `tsconfig.json` that references every TypeScript project. */
@@ -45,6 +45,16 @@ const FOCUSED_TESTS: readonly PropertyRestriction[] = [
   { policy: 'test/describe-only', object: 'describe', property: 'only' },
   { policy: 'test/it-only', object: 'it', property: 'only' },
   { policy: 'test/test-only', object: 'test', property: 'only' },
+];
+
+/** A route re-exports its page and its error boundary: Expo Router treats every file of the directory as a route. */
+const ROUTE_SYNTAX: readonly SyntaxRestriction[] = [
+  { policy: 'route/re-export', selector: 'Program > :not(ExportNamedDeclaration[source])' },
+  { policy: 'route/error-boundary', selector: 'Program:not(:has(ExportSpecifier[exported.name="ErrorBoundary"]))' },
+];
+
+const ENTRY_SYNTAX: readonly SyntaxRestriction[] = [
+  { policy: 'entry/re-export', selector: 'Program > :not(ExportNamedDeclaration[source])' },
 ];
 
 const NODE_PROPERTIES: readonly PropertyRestriction[] = [
@@ -88,18 +98,37 @@ const restrictedProperties = (
     .filter(({ policy }) => enabled.has(policy))
     .map(({ policy, object, property }) => ({ object, property, message: policyMessage(policy) }));
 
+/** The restrictions of a kind of file, on top of the core ones. */
+type Runtime = Readonly<{
+  syntax: readonly SyntaxRestriction[];
+  properties: readonly PropertyRestriction[];
+  naming: readonly NamingRule[];
+}>;
+
+const NODE: Runtime = { syntax: NODE_SYNTAX, properties: NODE_PROPERTIES, naming: NODE_NAMING };
+
+/**
+ * A namespace import of a confined package takes every name at once: boundaries only judges named imports, so the
+ * policy of the package also refuses this form, in every place.
+ */
+const CONFINED_NAMESPACES: readonly SyntaxRestriction[] = CONFINED_MODULES.map((name) => ({
+  policy: modulePolicy(name),
+  selector: `ImportDeclaration[source.value='${name}'] > ImportNamespaceSpecifier`,
+}));
+
+const HERMES: Runtime = { syntax: CONFINED_NAMESPACES, properties: [], naming: HERMES_NAMING };
+
+/** The restrictions of `runtime` for files of a narrower role, a route or a public entry. */
+const narrowed = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runtime => ({
+  ...runtime,
+  syntax: [...runtime.syntax, ...syntax],
+});
+
 /**
  * The rules whose options a runtime extends. ESLint replaces the options of a rule set again by a later block, so each
  * runtime gets the complete lists instead of adding to the core ones.
  */
-const restrictions = (
-  runtime: Readonly<{
-    syntax: readonly SyntaxRestriction[];
-    properties: readonly PropertyRestriction[];
-    naming: readonly NamingRule[];
-  }>,
-  enabled: ReadonlySet<PolicyId>,
-): Readonly<Record<string, RuleEntry>> => ({
+const restrictions = (runtime: Runtime, enabled: ReadonlySet<PolicyId>): Readonly<Record<string, RuleEntry>> => ({
   'no-restricted-syntax': ['error', ...restrictedSyntax([...CORE_SYNTAX, ...runtime.syntax], enabled)],
   'no-restricted-properties': ['error', ...restrictedProperties([...FOCUSED_TESTS, ...runtime.properties], enabled)],
   '@typescript-eslint/naming-convention': ['error', ...runtime.naming],
@@ -183,11 +212,19 @@ export function defineWorkspaceConfig({
     {
       files: TYPESCRIPT_FILES,
       ignores: [...HERMES_FILES],
-      rules: restrictions({ syntax: NODE_SYNTAX, properties: NODE_PROPERTIES, naming: NODE_NAMING }, policies),
+      rules: restrictions(NODE, policies),
     },
     {
       files: [...HERMES_FILES],
-      rules: restrictions({ syntax: [], properties: [], naming: HERMES_NAMING }, policies),
+      rules: restrictions(HERMES, policies),
+    },
+    {
+      files: [...ROUTE_FILES],
+      rules: restrictions(narrowed(HERMES, ROUTE_SYNTAX), policies),
+    },
+    {
+      files: [...ENTRY_FILES],
+      rules: restrictions(narrowed(HERMES, ENTRY_SYNTAX), policies),
     },
     boundariesConfig(tsconfigRootDir, policies),
   );

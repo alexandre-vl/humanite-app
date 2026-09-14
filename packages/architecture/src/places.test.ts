@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
-import { HERMES_FILES, packageImports } from './app.ts';
+import { ENTRY_FILES, HERMES_FILES, packageImports, ROUTE_FILES } from './app.ts';
 import type { Importable, Place } from './places.ts';
 import { IMPORTS, ORDER, PLACE_NAMES, PLACES } from './places.ts';
 
@@ -67,5 +67,21 @@ describe('what the tools derive from the places', () => {
 
   test('Hermes runs the routes and the layers of src', () => {
     expect(HERMES_FILES).toEqual(['apps/mobile/app/**/*.{ts,tsx}', 'apps/mobile/src/**/*.{ts,tsx}']);
+    expect(ROUTE_FILES).toEqual(['apps/mobile/app/**/*.{ts,tsx}']);
+  });
+
+  test('every place but the routes has public entries', () => {
+    expect(ENTRY_FILES).toEqual([
+      'apps/mobile/src/_app/index.ts',
+      'apps/mobile/src/pages/*/index.ts',
+      'apps/mobile/src/features/*/index.ts',
+      'apps/mobile/src/entities/*/index.ts',
+      'apps/mobile/src/shared/ui/components/*/index.ts',
+      'apps/mobile/src/shared/ui/primitives/*/index.ts',
+      'apps/mobile/src/shared/lib/*/index.ts',
+      'apps/mobile/src/shared/i18n/index.ts',
+      'apps/mobile/src/shared/config/index.ts',
+      'apps/mobile/src/shared/api/index.ts',
+    ]);
   });
 });

@@ -1,5 +1,5 @@
-import type { Place } from '@huma/architecture';
-import { IMPORTS, PLACE_NAMES, PLACES } from '@huma/architecture';
+import type { ConfinedModule, Place } from '@huma/architecture';
+import { CONFINED_MODULES, IMPORTS, MODULES, PLACE_NAMES, PLACES } from '@huma/architecture';
 
 /**
  * The restrictions the workspace writes itself, by policy id. Each message carries its id between brackets, which is how
@@ -17,6 +17,10 @@ const WRITTEN = {
   'test/it-only': 'un it focalisé cache le reste de la suite',
   'test/test-only': 'un test focalisé cache le reste de la suite',
   'place/unknown-file': 'ce fichier n’appartient à aucune place de l’architecture',
+  'route/re-export': 'une route ne fait que réexporter : sa page, son ErrorBoundary et ses réglages vivent dans src',
+  'route/error-boundary':
+    'une route exporte un ErrorBoundary : sans lui, une erreur de rendu remonte jusqu’à la racine',
+  'entry/re-export': 'une entrée publique ne fait que réexporter ce que les fichiers de son unité définissent',
 } as const satisfies Readonly<Record<`${string}/${string}`, string>>;
 
 type WrittenPolicy = keyof typeof WRITTEN;
@@ -24,15 +28,24 @@ type WrittenPolicy = keyof typeof WRITTEN;
 /** The policy of what a place imports, derived from the table of the architecture. */
 export type ImportPolicy = `import/${Place}`;
 
-export type PolicyId = WrittenPolicy | ImportPolicy;
+/** The policy of the places a confined package may be imported from. */
+export type ModulePolicy = `module/${ConfinedModule}`;
+
+export type PolicyId = WrittenPolicy | ImportPolicy | ModulePolicy;
 
 export const importPolicy = (place: Place): ImportPolicy => `import/${place}`;
+
+export const modulePolicy = (name: ConfinedModule): ModulePolicy => `module/${name}`;
 
 const isWrittenPolicy = (id: string): id is WrittenPolicy => Object.hasOwn(WRITTEN, id);
 
 const WRITTEN_IDS = Object.keys(WRITTEN).filter(isWrittenPolicy);
 
-export const POLICY_IDS: readonly PolicyId[] = [...WRITTEN_IDS, ...PLACE_NAMES.map(importPolicy)];
+export const POLICY_IDS: readonly PolicyId[] = [
+  ...WRITTEN_IDS,
+  ...PLACE_NAMES.map(importPolicy),
+  ...CONFINED_MODULES.map(modulePolicy),
+];
 
 /** Rules whose message cannot be chosen, with the policy each one enforces. */
 const RULE_POLICIES: Readonly<Record<string, PolicyId>> = {
@@ -48,16 +61,27 @@ function describeImports(place: Place): string {
   return `${place} n’importe que ${own}${siblings} et ${entries}`;
 }
 
+/** Where a confined package may be imported, as its message says it. */
+function describeModule(name: ConfinedModule): string {
+  const { places, except }: Readonly<{ places: readonly Place[]; except: readonly string[] }> = MODULES[name];
+  const open = except.length === 0 ? '' : `, sauf ${except.join(', ')}, ouvert à toutes`;
+  return `${name} ne s’importe que depuis : ${places.join(', ')}${open}`;
+}
+
 /** The message of a policy, its id first: `[export/all] nommer chaque export…`. */
 export function policyMessage(id: PolicyId): string {
   if (isWrittenPolicy(id)) {
     return `[${id}] ${WRITTEN[id]}`;
   }
   const place = PLACE_NAMES.find((candidate) => importPolicy(candidate) === id);
-  if (place === undefined) {
-    throw new Error(`politique sans place : ${id}`);
+  if (place !== undefined) {
+    return `[${id}] ${describeImports(place)}`;
   }
-  return `[${id}] ${describeImports(place)}`;
+  const confined = CONFINED_MODULES.find((name) => modulePolicy(name) === id);
+  if (confined === undefined) {
+    throw new Error(`politique inconnue : ${id}`);
+  }
+  return `[${id}] ${describeModule(confined)}`;
 }
 
 const TAG = /\[(?<id>[a-z0-9-]+\/[a-z0-9-]+)\]/u;

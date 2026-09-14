@@ -1,12 +1,22 @@
 import { fileURLToPath } from 'node:url';
 import type { Place } from '@huma/architecture';
-import { APP_DIRECTORY, HERMES_FILES, IMPORTS, PLACE_NAMES, PLACES, RESOLUTION } from '@huma/architecture';
+import {
+  APP_DIRECTORY,
+  CONFINED_MODULES,
+  entryOf as entryPattern,
+  HERMES_FILES,
+  IMPORTS,
+  MODULES,
+  PLACE_NAMES,
+  PLACES,
+  RESOLUTION,
+} from '@huma/architecture';
 import type { Linter } from 'eslint';
 import type { TypeScriptResolverOptions } from 'eslint-import-resolver-typescript';
 import type { DependenciesPolicy, DependenciesRuleOptions, Settings } from 'eslint-plugin-boundaries';
 import { commonJsPlugin } from './plugins.ts';
 import type { PolicyId } from './policies.ts';
-import { importPolicy, policyMessage } from './policies.ts';
+import { importPolicy, modulePolicy, policyMessage } from './policies.ts';
 
 /** The resolver, by absolute path: the isolated linker keeps it out of reach of the plugin's own lookup by name. */
 const RESOLVER = fileURLToPath(import.meta.resolve('eslint-import-resolver-typescript'));
@@ -47,17 +57,19 @@ const entryCategory = (place: Place): string => `${place}-entry`;
 
 /** The public entry of a place as a file category, `null` for routes, which nothing imports. */
 function entryOf(place: Place): FileDescriptor | null {
-  const { directory, layout } = PLACES[place];
-  switch (layout) {
+  const spec = PLACES[place];
+  const pattern = entryPattern(spec);
+  const category = entryCategory(place);
+  switch (spec.layout) {
     case 'routes':
       return null;
     case 'segments':
     case 'module':
-      return { category: entryCategory(place), pattern: `${directory}/index.ts` };
+      return pattern === null ? null : { category, pattern };
     case 'slices':
-      return { category: entryCategory(place), pattern: `${directory}/*/index.ts`, capture: ['slice'] };
+      return pattern === null ? null : { category, pattern, capture: ['slice'] };
     case 'modules':
-      return { category: entryCategory(place), pattern: `${directory}/*/index.ts`, capture: ['module'] };
+      return pattern === null ? null : { category, pattern, capture: ['module'] };
   }
 }
 
@@ -79,17 +91,37 @@ function ownFiles(place: Place): readonly EntitySelector[] {
   }
 }
 
+/** The files of a place as the importer of a dependency: its element, and its public entries. */
+function importersOf(place: Place): EntitySelector[] {
+  return [
+    { element: { type: place } },
+    ...(entryOf(place) === null ? [] : [{ file: { categories: entryCategory(place) } }]),
+  ];
+}
+
+/**
+ * The policies of a confined package: from any place outside those it is open to, importing it is refused, save the
+ * names every place may take from it. Placed after the policies of the places, which allow every external package.
+ */
+function modulePolicies(enabled: ReadonlySet<PolicyId>): readonly DependenciesPolicy[] {
+  return CONFINED_MODULES.filter((name) => enabled.has(modulePolicy(name))).map((name) => {
+    const { places, except }: Readonly<{ places: readonly Place[]; except: readonly string[] }> = MODULES[name];
+    return {
+      from: PLACE_NAMES.filter((place) => !places.includes(place)).flatMap(importersOf),
+      disallow: { to: { module: { source: name } } },
+      ...(except.length === 0 ? {} : { dependency: { specifiers: `!(${except.join('|')})` } }),
+      message: policyMessage(modulePolicy(name)),
+    };
+  });
+}
+
 /**
  * The policies of an importer place. The first refuses any local import with the message of the place, the second
  * allows its own files and the entries of the places it imports: the last matching policy wins, so a refused import
  * names the place whose rule it breaks. Without its policy, a place imports any local file.
  */
 function placePolicies(place: Place, enabled: ReadonlySet<PolicyId>): readonly DependenciesPolicy[] {
-  const entry = entryOf(place);
-  const from: EntitySelector[] = [
-    { element: { type: place } },
-    ...(entry === null ? [] : [{ file: { categories: entryCategory(place) } }]),
-  ];
+  const from = importersOf(place);
   const allowed: EntitySelector[] = [
     ...ownFiles(place),
     ...IMPORTS[place].map((target: Place) => ({ file: { categories: entryCategory(target) } })),
@@ -136,6 +168,7 @@ export function boundariesConfig(root: string, enabled: ReadonlySet<PolicyId>): 
     policies: [
       { allow: { to: { module: { origin: ['external', 'core'] } } } },
       ...PLACE_NAMES.flatMap((place) => placePolicies(place, enabled)),
+      ...modulePolicies(enabled),
     ],
   };
   return {
