@@ -1,9 +1,10 @@
 import { parseArgs } from 'node:util';
 import { findWorkspaceRoot, print, runCommand, UsageError } from '@huma/kit/cli';
-import { isOutputFormat, renderDiagnostics } from '@huma/kit/diagnostics';
+import { isOutputFormat, OUTPUT_FORMATS, renderDiagnostics } from '@huma/kit/diagnostics';
+import { FILE_SOURCES, isFileSource, ownRepository } from '@huma/kit/git';
 import { checkWorkspaceAdrs } from '../workspace.ts';
 
-const USAGE = 'Usage : pnpm adr:check [--source worktree|index] [--format text|json]';
+const USAGE = `Usage : pnpm adr:check [--source ${FILE_SOURCES.join('|')}] [--format ${OUTPUT_FORMATS.join('|')}]`;
 
 await runCommand(async () => {
   const { values } = parseArgs({
@@ -12,10 +13,14 @@ await runCommand(async () => {
     allowPositionals: false,
   });
   const { source, format } = values;
-  if ((source !== 'worktree' && source !== 'index') || !isOutputFormat(format)) {
+  if (!isFileSource(source) || !isOutputFormat(format)) {
     throw new UsageError(USAGE);
   }
-  const report = await checkWorkspaceAdrs(await findWorkspaceRoot(), source);
+  const report = await checkWorkspaceAdrs({
+    repository: ownRepository(await findWorkspaceRoot()),
+    source,
+    environment: process.env,
+  });
   if (format === 'json' || report.diagnostics.length > 0) {
     print(renderDiagnostics(report.diagnostics, format));
   }

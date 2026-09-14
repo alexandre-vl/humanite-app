@@ -1,4 +1,5 @@
 import type { RepoPath } from './paths.ts';
+import { isOneOf } from './records.ts';
 import { compareText } from './text.ts';
 
 export type Position = Readonly<{ line: number; column: number }>;
@@ -44,8 +45,7 @@ export const OUTPUT_FORMATS = ['text', 'json'] as const;
 
 export type OutputFormat = (typeof OUTPUT_FORMATS)[number];
 
-export const isOutputFormat = (value: string): value is OutputFormat =>
-  OUTPUT_FORMATS.some((format) => format === value);
+export const isOutputFormat = (value: string): value is OutputFormat => isOneOf(OUTPUT_FORMATS, value);
 
 /** Sorted diagnostics, one line each in `text`, a JSON array in `json`. */
 export function renderDiagnostics(diagnostics: readonly Diagnostic<string>[], format: OutputFormat): string {

@@ -1,9 +1,11 @@
+import { isOneOf } from '@huma/kit/records';
+
 /** Why a change deserves an ADR, in the canonical order of the `significance` field. */
 export const SIGNIFICANCES = ['dependency', 'guarded-config', 'boundary', 'data-format', 'reversal-cost'] as const;
 
 export type Significance = (typeof SIGNIFICANCES)[number];
 
-export const isSignificance = (value: string): value is Significance => SIGNIFICANCES.some((key) => key === value);
+export const isSignificance = (value: string): value is Significance => isOneOf(SIGNIFICANCES, value);
 
 /** `automatic` criteria can be detected from a diff; `review` ones only by reading the change. */
 export const SIGNIFICANCE = {

@@ -3,8 +3,8 @@ import { join } from 'node:path';
 import type { BindingsSource } from '@huma/adr/bindings';
 import type { CheckReport } from '@huma/adr/check';
 import { runChecks } from '@huma/adr/check';
-import type { FileSource } from '@huma/kit/git';
-import { ownRepository } from '@huma/kit/git';
+import type { FileSource, GitRepository } from '@huma/kit/git';
+import type { Environment } from '@huma/kit/process';
 import { ACKNOWLEDGMENTS } from './acknowledgments.ts';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import { PROOF_IDS, runProof } from './proofs.ts';
@@ -19,18 +19,23 @@ export async function workspaceBindings(root: string): Promise<BindingsSource> {
   };
 }
 
+/** Which files to check, in which repository, for which caller; the bindings default to those of the workspace. */
+export type WorkspaceCheck = Readonly<{
+  repository: GitRepository;
+  source: FileSource;
+  /** Environment of the caller: a decision pending from an agent session is reported. */
+  environment: Environment;
+  bindings?: BindingsSource;
+}>;
+
 /** Every ADR check of this workspace, from one source, with its proofs and acknowledgments. */
-export async function checkWorkspaceAdrs(
-  root: string,
-  source: FileSource,
-  bindings?: BindingsSource,
-): Promise<CheckReport> {
+export async function checkWorkspaceAdrs(request: WorkspaceCheck): Promise<CheckReport> {
   return runChecks({
-    repository: ownRepository(root),
-    source,
-    bindings: bindings ?? (await workspaceBindings(root)),
+    repository: request.repository,
+    source: request.source,
+    bindings: request.bindings ?? (await workspaceBindings(request.repository.root)),
     runProof,
-    environment: process.env,
+    environment: request.environment,
     acknowledgments: ACKNOWLEDGMENTS,
   });
 }

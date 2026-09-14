@@ -7,6 +7,7 @@ import type { RepoPath } from './paths.ts';
 import { isRepoPath } from './paths.ts';
 import type { Environment, RunResult } from './process.ts';
 import { capture, ProcessError, run, runText } from './process.ts';
+import { isOneOf } from './records.ts';
 import { decodeUtf8 } from './text.ts';
 
 /**
@@ -41,7 +42,7 @@ const PATH_VARIABLES = [
 ] as const;
 
 const isInheritedGitVariable = (name: string): boolean =>
-  GIT_LOCAL_VARIABLES.some((variable) => variable === name) || /^GIT_CONFIG_(?:KEY|VALUE)_\d+$/u.test(name);
+  isOneOf(GIT_LOCAL_VARIABLES, name) || /^GIT_CONFIG_(?:KEY|VALUE)_\d+$/u.test(name);
 
 /**
  * Output that parses the same everywhere and history as it was committed: no translated message, no optional lock
@@ -276,7 +277,11 @@ export async function worktreeRoots(repository: GitRepository): Promise<readonly
 }
 
 /** Where the files of a check are read: the working tree as it is on disk, or the index about to be committed. */
-export type FileSource = 'worktree' | 'index';
+export const FILE_SOURCES = ['worktree', 'index'] as const;
+
+export type FileSource = (typeof FILE_SOURCES)[number];
+
+export const isFileSource = (value: string): value is FileSource => isOneOf(FILE_SOURCES, value);
 
 /** Tracked and untracked, non-ignored, non-deleted files of the working tree, or every file of the index. */
 export async function listFiles(repository: GitRepository, source: FileSource): Promise<ReadonlySet<RepoPath>> {

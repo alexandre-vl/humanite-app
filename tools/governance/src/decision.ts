@@ -11,13 +11,14 @@ export type WorkspaceDecision = Pick<DecisionRequest, 'repository' | 'number' | 
 
 /** Decides an ADR of the workspace at the root of `repository`, with its bindings, proofs, checks and derived files. */
 export async function decideInWorkspace(request: WorkspaceDecision): Promise<DecisionOutcome> {
-  const { root } = request.repository;
+  const { repository, environment } = request;
+  const { root } = repository;
   const bindings = await workspaceBindings(root);
   return decide({
     ...request,
     bindings,
     runProof,
-    check: async (source) => checkWorkspaceAdrs(root, 'worktree', source),
+    check: async (source) => checkWorkspaceAdrs({ repository, environment, source: 'worktree', bindings: source }),
     staleArtifacts: async () => (await checkArtifacts(root)).map((diagnostic) => diagnostic.path),
     withoutBindings: (ids) => withoutEntries(bindings, ids),
     removeBindings: async (ids) => removeBindingEntries(root, ids),
