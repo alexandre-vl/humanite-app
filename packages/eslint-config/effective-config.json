@@ -1,12 +1,76 @@
 {
   "tools/sample/src/sample.ts": {
-    "plugins": ["@", "@typescript-eslint", "check-file"],
+    "plugins": ["@", "@cspell", "@typescript-eslint", "check-file"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
     },
     "settings": {},
     "rules": {
+      "@cspell/spellchecker": [
+        "error",
+        {
+          "checkIdentifiers": true,
+          "checkComments": false,
+          "checkStrings": false,
+          "checkStringTemplates": false,
+          "checkJSXText": false,
+          "report": "all",
+          "configFile": "<racine>/packages/eslint-config/cspell.json",
+          "cspell": {
+            "language": "en",
+            "words": [
+              "adrs",
+              "alnum",
+              "backquoted",
+              "chattr",
+              "chgrp",
+              "chrt",
+              "claudecode",
+              "cntrl",
+              "dirents",
+              "doas",
+              "ionice",
+              "nohup",
+              "nosystem",
+              "pathspec",
+              "punct",
+              "redirections",
+              "setsid",
+              "stripspace",
+              "taskset",
+              "worktree",
+              "worktrees",
+              "xdigit"
+            ],
+            "flagWords": [
+              "abonne->subscriber",
+              "abonnement->subscription",
+              "breve->brief",
+              "chapo->standfirst",
+              "chapô->standfirst",
+              "favori->bookmark",
+              "favoris->bookmarks",
+              "favorite->bookmark",
+              "favorites->bookmarks",
+              "kiosk->newsstand",
+              "kiosque->newsstand",
+              "lede->standfirst",
+              "numero->issue",
+              "rubric->section",
+              "rubrique->section",
+              "rubriques->sections"
+            ],
+            "allowCompoundWords": false,
+            "caseSensitive": false,
+            "enabled": true
+          },
+          "autoFix": false,
+          "ignoreImportProperties": true,
+          "ignoreImports": true,
+          "numSuggestions": 8
+        }
+      ],
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",
@@ -524,12 +588,76 @@
     }
   },
   "apps/mobile/babel.config.js": {
-    "plugins": ["@", "check-file"],
+    "plugins": ["@", "@cspell", "check-file"],
     "parserOptions": {
       "sourceType": "module"
     },
     "settings": {},
     "rules": {
+      "@cspell/spellchecker": [
+        "error",
+        {
+          "checkIdentifiers": true,
+          "checkComments": false,
+          "checkStrings": false,
+          "checkStringTemplates": false,
+          "checkJSXText": false,
+          "report": "all",
+          "configFile": "<racine>/packages/eslint-config/cspell.json",
+          "cspell": {
+            "language": "en",
+            "words": [
+              "adrs",
+              "alnum",
+              "backquoted",
+              "chattr",
+              "chgrp",
+              "chrt",
+              "claudecode",
+              "cntrl",
+              "dirents",
+              "doas",
+              "ionice",
+              "nohup",
+              "nosystem",
+              "pathspec",
+              "punct",
+              "redirections",
+              "setsid",
+              "stripspace",
+              "taskset",
+              "worktree",
+              "worktrees",
+              "xdigit"
+            ],
+            "flagWords": [
+              "abonne->subscriber",
+              "abonnement->subscription",
+              "breve->brief",
+              "chapo->standfirst",
+              "chapô->standfirst",
+              "favori->bookmark",
+              "favoris->bookmarks",
+              "favorite->bookmark",
+              "favorites->bookmarks",
+              "kiosk->newsstand",
+              "kiosque->newsstand",
+              "lede->standfirst",
+              "numero->issue",
+              "rubric->section",
+              "rubrique->section",
+              "rubriques->sections"
+            ],
+            "allowCompoundWords": false,
+            "caseSensitive": false,
+            "enabled": true
+          },
+          "autoFix": false,
+          "ignoreImportProperties": true,
+          "ignoreImports": true,
+          "numSuggestions": 8
+        }
+      ],
       "check-file/filename-naming-convention": [
         "error",
         {
@@ -764,7 +892,7 @@
     }
   },
   "apps/mobile/app/sample.tsx": {
-    "plugins": ["@", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
+    "plugins": ["@", "@cspell", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -907,6 +1035,70 @@
       }
     },
     "rules": {
+      "@cspell/spellchecker": [
+        "error",
+        {
+          "checkIdentifiers": true,
+          "checkComments": false,
+          "checkStrings": false,
+          "checkStringTemplates": false,
+          "checkJSXText": false,
+          "report": "all",
+          "configFile": "<racine>/packages/eslint-config/cspell.json",
+          "cspell": {
+            "language": "en",
+            "words": [
+              "adrs",
+              "alnum",
+              "backquoted",
+              "chattr",
+              "chgrp",
+              "chrt",
+              "claudecode",
+              "cntrl",
+              "dirents",
+              "doas",
+              "ionice",
+              "nohup",
+              "nosystem",
+              "pathspec",
+              "punct",
+              "redirections",
+              "setsid",
+              "stripspace",
+              "taskset",
+              "worktree",
+              "worktrees",
+              "xdigit"
+            ],
+            "flagWords": [
+              "abonne->subscriber",
+              "abonnement->subscription",
+              "breve->brief",
+              "chapo->standfirst",
+              "chapô->standfirst",
+              "favori->bookmark",
+              "favoris->bookmarks",
+              "favorite->bookmark",
+              "favorites->bookmarks",
+              "kiosk->newsstand",
+              "kiosque->newsstand",
+              "lede->standfirst",
+              "numero->issue",
+              "rubric->section",
+              "rubrique->section",
+              "rubriques->sections"
+            ],
+            "allowCompoundWords": false,
+            "caseSensitive": false,
+            "enabled": true
+          },
+          "autoFix": false,
+          "ignoreImportProperties": true,
+          "ignoreImports": true,
+          "numSuggestions": 8
+        }
+      ],
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",
@@ -2707,7 +2899,7 @@
     }
   },
   "apps/mobile/src/pages/sample/index.ts": {
-    "plugins": ["@", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
+    "plugins": ["@", "@cspell", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -2850,6 +3042,70 @@
       }
     },
     "rules": {
+      "@cspell/spellchecker": [
+        "error",
+        {
+          "checkIdentifiers": true,
+          "checkComments": false,
+          "checkStrings": false,
+          "checkStringTemplates": false,
+          "checkJSXText": false,
+          "report": "all",
+          "configFile": "<racine>/packages/eslint-config/cspell.json",
+          "cspell": {
+            "language": "en",
+            "words": [
+              "adrs",
+              "alnum",
+              "backquoted",
+              "chattr",
+              "chgrp",
+              "chrt",
+              "claudecode",
+              "cntrl",
+              "dirents",
+              "doas",
+              "ionice",
+              "nohup",
+              "nosystem",
+              "pathspec",
+              "punct",
+              "redirections",
+              "setsid",
+              "stripspace",
+              "taskset",
+              "worktree",
+              "worktrees",
+              "xdigit"
+            ],
+            "flagWords": [
+              "abonne->subscriber",
+              "abonnement->subscription",
+              "breve->brief",
+              "chapo->standfirst",
+              "chapô->standfirst",
+              "favori->bookmark",
+              "favoris->bookmarks",
+              "favorite->bookmark",
+              "favorites->bookmarks",
+              "kiosk->newsstand",
+              "kiosque->newsstand",
+              "lede->standfirst",
+              "numero->issue",
+              "rubric->section",
+              "rubrique->section",
+              "rubriques->sections"
+            ],
+            "allowCompoundWords": false,
+            "caseSensitive": false,
+            "enabled": true
+          },
+          "autoFix": false,
+          "ignoreImportProperties": true,
+          "ignoreImports": true,
+          "numSuggestions": 8
+        }
+      ],
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",
@@ -4649,7 +4905,7 @@
     }
   },
   "apps/mobile/src/pages/sample/ui/sample.tsx": {
-    "plugins": ["@", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
+    "plugins": ["@", "@cspell", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -4792,6 +5048,70 @@
       }
     },
     "rules": {
+      "@cspell/spellchecker": [
+        "error",
+        {
+          "checkIdentifiers": true,
+          "checkComments": false,
+          "checkStrings": false,
+          "checkStringTemplates": false,
+          "checkJSXText": false,
+          "report": "all",
+          "configFile": "<racine>/packages/eslint-config/cspell.json",
+          "cspell": {
+            "language": "en",
+            "words": [
+              "adrs",
+              "alnum",
+              "backquoted",
+              "chattr",
+              "chgrp",
+              "chrt",
+              "claudecode",
+              "cntrl",
+              "dirents",
+              "doas",
+              "ionice",
+              "nohup",
+              "nosystem",
+              "pathspec",
+              "punct",
+              "redirections",
+              "setsid",
+              "stripspace",
+              "taskset",
+              "worktree",
+              "worktrees",
+              "xdigit"
+            ],
+            "flagWords": [
+              "abonne->subscriber",
+              "abonnement->subscription",
+              "breve->brief",
+              "chapo->standfirst",
+              "chapô->standfirst",
+              "favori->bookmark",
+              "favoris->bookmarks",
+              "favorite->bookmark",
+              "favorites->bookmarks",
+              "kiosk->newsstand",
+              "kiosque->newsstand",
+              "lede->standfirst",
+              "numero->issue",
+              "rubric->section",
+              "rubrique->section",
+              "rubriques->sections"
+            ],
+            "allowCompoundWords": false,
+            "caseSensitive": false,
+            "enabled": true
+          },
+          "autoFix": false,
+          "ignoreImportProperties": true,
+          "ignoreImports": true,
+          "numSuggestions": 8
+        }
+      ],
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",

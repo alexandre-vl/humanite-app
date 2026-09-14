@@ -29,6 +29,9 @@ const WRITTEN = {
   'place/platform-variant': 'une variante de plateforme ne vit que dans une place qui les permet, les primitives L0',
   'naming/file': 'un nom de fichier s’écrit en kebab-case, ou selon les conventions d’Expo Router pour une route',
   'naming/folder': 'un nom de dossier s’écrit en kebab-case, ou selon les conventions d’Expo Router pour une route',
+  'spelling/unknown':
+    'un identifiant s’écrit en mots anglais : un mot inconnu est une faute ou un mot à ajouter au vocabulaire',
+  'glossary/term': 'un identifiant emploie le mot anglais que le glossaire retient pour ce terme du journal',
   'route/re-export': 'une route ne fait que réexporter : sa page, son ErrorBoundary et ses réglages vivent dans src',
   'route/error-boundary':
     'une route exporte un ErrorBoundary : sans lui, une erreur de rendu remonte jusqu’à la racine',
@@ -113,6 +116,9 @@ const TAG = /\[(?<id>[a-z0-9-]+\/[a-z0-9-]+)\]/u;
 
 /** The policy a lint message comes from, `null` when neither its rule nor its text names a known policy. */
 export function policyOf(rule: string | null, message: string): PolicyId | null {
+  if (rule === '@cspell/spellchecker') {
+    return message.startsWith('Forbidden word') ? 'glossary/term' : 'spelling/unknown';
+  }
   const byRule = rule === null ? undefined : RULE_POLICIES[rule];
   if (byRule !== undefined) {
     return byRule;

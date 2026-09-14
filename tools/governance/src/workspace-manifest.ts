@@ -39,6 +39,7 @@ export const WORKSPACE_FILE: WorkspaceFile = {
   },
   catalog: {
     '@babel/core': '7.29.7',
+    '@cspell/eslint-plugin': '10.3.1',
     '@eslint/js': '10.0.1',
     '@expo/dom-webview': '57.0.1',
     '@expo/log-box': '57.0.4',

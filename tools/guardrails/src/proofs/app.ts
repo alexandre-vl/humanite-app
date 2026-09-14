@@ -246,6 +246,24 @@ export function useOpacity(): number {
       [],
       linted({ 'src/shared/ui/primitives/surface/surface.ios.tsx': component('Surface', 'react-native', 'View') }),
     ),
+    define(
+      'guardrail/glossary-term',
+      'un identifiant qui emploie le terme français au lieu du mot du glossaire',
+      ['glossary/term'],
+      linted({
+        'src/shared/lib/format/format.ts':
+          "export { APP_NAME as formatTitle } from '#config';\n\nexport const rubriqueLabel = 'Rubrique';\n",
+      }),
+    ),
+    define(
+      'guardrail/glossary-synonym',
+      'un identifiant qui emploie un synonyme anglais écarté par le glossaire',
+      ['glossary/term'],
+      linted({
+        'src/shared/lib/format/format.ts':
+          "export { APP_NAME as formatTitle } from '#config';\n\nexport const favoriteCount = 1;\n",
+      }),
+    ),
   ] as const;
 };
 

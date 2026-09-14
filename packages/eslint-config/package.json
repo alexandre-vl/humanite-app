@@ -7,6 +7,7 @@
     "./policies": "./src/policies.ts"
   },
   "dependencies": {
+    "@cspell/eslint-plugin": "catalog:",
     "@huma/architecture": "workspace:*",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-boundaries": "catalog:",

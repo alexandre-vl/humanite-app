@@ -12,12 +12,17 @@ import { lintFinding } from './checks.ts';
 /** The file the ESLint CLI would read suppressions from; the API never applies it, the repository never holds it. */
 export const SUPPRESSIONS_FILE = 'eslint-suppressions.json';
 
+/** A term code does not use, with the word it uses instead. */
+export type GlossaryEntry = readonly [term: string, english: string];
+
 export type LintRequest = Readonly<{
   root: string;
   /** The flat configuration, relative to the root: the one editors and the ESLint CLI load. */
   configFile: RepoPath;
   /** Files to consider: those no configuration matches are skipped, the others are all linted. */
   paths: readonly RepoPath[];
+  /** Terms the names of the linted files and of their folders may not hold, as a whole word. */
+  glossary: readonly GlossaryEntry[];
 }>;
 
 export type LintReport = Readonly<{
@@ -67,6 +72,23 @@ function messageFinding(path: RepoPath, message: Linter.LintMessage): Diagnostic
     : lintFinding('lint/rule', path, { rule: message.ruleId, text: message.message }, position);
 }
 
+/** The words of a path, lowercase: its folder names and its file name without extensions, split on separators. */
+const pathWords = (path: RepoPath): readonly string[] =>
+  path
+    .toLowerCase()
+    .replace(/\.[^/]*$/u, '')
+    .split(/[/._-]+/u)
+    .filter((word) => word !== '');
+
+/** Findings for linted files whose path holds a term of the glossary: spelling checks identifiers, never file names. */
+const glossaryFindings = (paths: readonly RepoPath[], glossary: readonly GlossaryEntry[]): Diagnostic<LintCode>[] =>
+  paths.flatMap((path) => {
+    const words = new Set(pathWords(path));
+    return glossary
+      .filter(([term]) => words.has(term))
+      .map(([term, english]) => lintFinding('lint/glossary-file-name', path, { term, english }));
+  });
+
 /**
  * Lints `paths` with the configuration of the repository through the ESLint API: unlike the CLI, it applies no
  * suppressions file, and every message fails, warnings and ignored inline configuration included.
@@ -111,6 +133,7 @@ export async function lintPaths(request: LintRequest): Promise<LintReport> {
   for (const rule of deprecated) {
     diagnostics.push(lintFinding('lint/deprecated-rule', request.configFile, { rule }));
   }
+  diagnostics.push(...glossaryFindings(linted, request.glossary));
   return { linted, diagnostics: diagnostics.toSorted(compareDiagnostics) };
 }
 

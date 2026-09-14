@@ -16,6 +16,7 @@ import { namingConfig } from './naming.ts';
 import type { PolicyId } from './policies.ts';
 import { hermesPolicy, modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
 import { reactConfig } from './react.ts';
+import { spellingConfig } from './spelling.ts';
 
 export type WorkspaceConfigOptions = Readonly<{
   /** The workspace root, which holds the solution `tsconfig.json` that references every TypeScript project. */
@@ -299,6 +300,7 @@ export function defineWorkspaceConfig({
       rules: restrictions(narrowed(HERMES, ENTRY_SYNTAX), policies),
     },
     ...namingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
+    spellingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
     reactConfig(tsconfigRootDir),
     boundariesConfig(tsconfigRootDir, policies),
   );

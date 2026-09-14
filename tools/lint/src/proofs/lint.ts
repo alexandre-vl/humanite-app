@@ -45,7 +45,7 @@ const checked =
     const root = join(directory.path, 'repository');
     const repository = await createRepository(root, { commits: [{ files: CLEAN }], worktree }, { signal });
     const paths = [...(await listFiles(repository, 'worktree'))];
-    const lint = await lintPaths({ root, configFile: CONFIG_FILE, paths });
+    const lint = await lintPaths({ root, configFile: CONFIG_FILE, paths, glossary: [['rubrique', 'section']] });
     const format = await checkFormatting(root, paths);
     return [...lint.diagnostics, ...format.diagnostics].map((finding) => finding.code);
   };
@@ -104,6 +104,18 @@ export const LINT_FIXTURES = [
     'une règle dépréciée activée',
     ['lint/deprecated-rule'],
     checked({ ...CLEAN, [CONFIG_FILE]: configWith("{ 'no-console': 'error', 'eol-last': 'error' }") }),
+  ),
+  define(
+    'lint/glossary-file-name',
+    'un module dont le nom emploie un terme que le glossaire remplace',
+    ['lint/glossary-file-name'],
+    checked({ ...CLEAN, 'src/rubrique-list.mjs': 'export const sections = [];\n' }),
+  ),
+  define(
+    'lint/glossary-word-inside',
+    'un nom qui ne contient le terme qu’à l’intérieur d’un mot : rien à signaler',
+    [],
+    checked({ ...CLEAN, 'src/rubriques.mjs': 'export const sections = [];\n' }),
   ),
   define(
     'lint/unformatted',

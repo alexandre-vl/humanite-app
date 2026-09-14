@@ -31,6 +31,10 @@ const TABLE = {
     summary: 'la configuration n’active aucune règle ESLint dépréciée',
     message: 'règle dépréciée {rule} active : la retirer ou la remplacer',
   },
+  'lint/glossary-file-name': {
+    summary: 'aucun nom de fichier ou de dossier du code n’emploie un terme que le glossaire remplace',
+    message: 'le chemin emploie « {term} » : le glossaire retient « {english} »',
+  },
   'lint/unformatted': {
     summary: 'chaque fichier que Prettier formate est formaté',
     message: 'fichier non formaté : lancer pnpm format',

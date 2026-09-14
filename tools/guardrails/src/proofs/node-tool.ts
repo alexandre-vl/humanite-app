@@ -86,6 +86,12 @@ export class Probe {
     define('guardrail/test-describe-only', 'un describe focalisé', ['test/describe-only'], linted(focused('describe'))),
     define('guardrail/test-it-only', 'un it focalisé', ['test/it-only'], linted(focused('it'))),
     define('guardrail/test-test-only', 'un test focalisé', ['test/test-only'], linted(focused('test'))),
+    define(
+      'guardrail/spelling-unknown',
+      'un identifiant qui n’est pas un mot anglais',
+      ['spelling/unknown'],
+      linted('export const qwxzvtrp = 1;\n'),
+    ),
   ] as const;
 };
 

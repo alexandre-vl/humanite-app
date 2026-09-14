@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { APP_DIRECTORY, HERMES_FILES } from '@huma/architecture';
@@ -22,11 +22,17 @@ const allErrors = (rules: Readonly<Partial<Record<string, RuleEntry>>>): Readonl
     Object.entries(rules).flatMap(([name, entry]) => (entry === undefined ? [] : [[name, asError(entry)] as const])),
   );
 
-/** The version of React the app installs, which react-x reads to know the APIs it may suggest. */
-function reactVersion(root: string): string {
-  const manifest: unknown = JSON.parse(
-    readFileSync(createRequire(join(root, APP_DIRECTORY, 'package.json')).resolve('react/package.json'), 'utf8'),
-  );
+/**
+ * The version of React the app installs, which react-x reads to know the APIs it may suggest; `null` in a workspace
+ * without the app, which holds no React code. Left to react-x, detection resolves React from the working directory,
+ * where it is not installed, and silently assumes a later version.
+ */
+function reactVersion(root: string): string | null {
+  const app = join(root, APP_DIRECTORY, 'package.json');
+  if (!existsSync(app)) {
+    return null;
+  }
+  const manifest: unknown = JSON.parse(readFileSync(createRequire(app).resolve('react/package.json'), 'utf8'));
   const version: unknown =
     typeof manifest === 'object' && manifest !== null ? Reflect.get(manifest, 'version') : undefined;
   if (typeof version !== 'string') {
@@ -51,13 +57,14 @@ export function reactConfig(root: string): Linter.Config {
     Object.entries(strict.rules ?? {}).filter(([name]) => !duplicated.includes(name)),
   );
   const presetSettings: unknown = strict.settings?.['react-x'];
+  const version = reactVersion(root);
   return {
     files: [...HERMES_FILES],
     plugins: { 'react-hooks': hooks, ...strict.plugins },
     settings: {
       'react-x': {
         ...(typeof presetSettings === 'object' && presetSettings !== null ? presetSettings : {}),
-        version: reactVersion(root),
+        ...(version === null ? {} : { version }),
       },
     },
     rules: { ...allErrors(hooksRules), ...allErrors(reactXRules) },

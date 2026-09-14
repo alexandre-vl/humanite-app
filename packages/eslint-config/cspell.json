@@ -1,0 +1,4 @@
+{
+  "version": "0.2",
+  "description": "Configuration vide imposée à cspell par le lint : sans fichier désigné, cspell en chercherait un dans l’arborescence, qui pourrait taire le glossaire."
+}

@@ -32,3 +32,5 @@ export {
 export { RESOLUTION } from './resolution.ts';
 export type { HermesGap, HermesGapName } from './hermes.ts';
 export { describeGap, HERMES_GAP_NAMES, HERMES_GAPS } from './hermes.ts';
+export type { GlossaryTerm } from './glossary.ts';
+export { GLOSSARY } from './glossary.ts';
