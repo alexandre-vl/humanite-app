@@ -160,6 +160,22 @@ importers:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
 
+  tools/kit:
+    dependencies:
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.4
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(yaml@2.9.1))
+
 packages:
 
   '@cacheable/memory@2.2.0':

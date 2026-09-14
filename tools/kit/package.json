@@ -1,0 +1,25 @@
+{
+  "name": "@huma/kit",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./brand": "./src/brand.ts",
+    "./cli": "./src/cli.ts",
+    "./diagnostics": "./src/diagnostics.ts",
+    "./format": "./src/format.ts",
+    "./git": "./src/git.ts",
+    "./json": "./src/json.ts",
+    "./paths": "./src/paths.ts",
+    "./pool": "./src/pool.ts",
+    "./process": "./src/process.ts",
+    "./text": "./src/text.ts"
+  },
+  "dependencies": {
+    "prettier": "catalog:"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

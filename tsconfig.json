@@ -1,9 +1,20 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.config.json" },
-    { "path": "./packages/eslint-config" },
-    { "path": "./tools/fixtures" },
-    { "path": "./tools/adr" }
+    {
+      "path": "./tsconfig.config.json"
+    },
+    {
+      "path": "./packages/eslint-config"
+    },
+    {
+      "path": "./tools/kit"
+    },
+    {
+      "path": "./tools/fixtures"
+    },
+    {
+      "path": "./tools/adr"
+    }
   ]
 }
