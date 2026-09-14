@@ -5,7 +5,7 @@ import { ownRepository } from '@huma/kit/git';
 import { nodeEntry, PINNED_NODE } from './commands.ts';
 
 /** What every git hook shim of the repository runs, and the command that installs them. */
-export const SHIM_COMMAND: ShimCommand = {
+const SHIM_COMMAND: ShimCommand = {
   node: PINNED_NODE,
   entry: nodeEntry('git:hook'),
   installer: 'pnpm hooks:install',

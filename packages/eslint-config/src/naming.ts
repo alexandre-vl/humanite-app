@@ -1,7 +1,8 @@
+import * as checkFileModule from 'eslint-plugin-check-file';
 import type { PlaceSpec } from '@huma/architecture';
 import { APP_DIRECTORY, PLACE_NAMES, PLACES, ROUTE_FILES } from '@huma/architecture';
 import type { Linter } from 'eslint';
-import { commonJsPlugin } from './plugins.ts';
+import { pluginOf } from './plugins.ts';
 import type { PolicyId } from './policies.ts';
 
 /** A kebab-case name, as check-file's micromatch reads a pattern: lowercase words joined by hyphens. */
@@ -31,7 +32,7 @@ const level = (enabled: ReadonlySet<PolicyId>, policy: PolicyId): Linter.RuleSev
  * part of the name.
  */
 export function namingConfig(files: readonly string[], enabled: ReadonlySet<PolicyId>): readonly Linter.Config[] {
-  const plugins = { 'check-file': commonJsPlugin('eslint-plugin-check-file') };
+  const plugins = { 'check-file': pluginOf(checkFileModule, 'eslint-plugin-check-file') };
   return [
     {
       files: [...files],

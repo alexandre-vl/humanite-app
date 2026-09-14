@@ -382,5 +382,3 @@ export const LIFECYCLE_FIXTURES = [
     }
   }),
 ] as const;
-
-export type LifecycleProofId = (typeof LIFECYCLE_FIXTURES)[number]['id'];

@@ -5,7 +5,7 @@ import { repoPath } from '@huma/kit/paths';
 /** Directories whose subdirectories are the packages of the workspace; each package name is also a commit scope. */
 export const WORKSPACE_ROOTS = ['apps', 'infra', 'packages', 'tools'] as const;
 
-export type WorkspaceRoot = (typeof WORKSPACE_ROOTS)[number];
+type WorkspaceRoot = (typeof WORKSPACE_ROOTS)[number];
 
 /** The roots whose packages the packages of each root may depend on: tools serve the workspace, nothing ships them. */
 const ROOT_DEPENDENCIES: Readonly<Record<WorkspaceRoot, readonly WorkspaceRoot[]>> = {
@@ -62,9 +62,10 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     expo: '57.0.22',
     'expo-constants': '57.0.18',
     'expo-dev-client': '57.0.19',
-    'expo-font': '57.0.4',
     'expo-linking': '57.0.10',
     'expo-router': '57.0.21',
+    'expo-system-ui': '57.0.4',
+    knip: '6.35.1',
     'mdast-util-from-markdown': '2.0.3',
     'mdast-util-frontmatter': '2.0.1',
     'mdast-util-gfm': '3.1.0',

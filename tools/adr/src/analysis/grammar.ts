@@ -5,9 +5,9 @@ import { NUMBER_DIGITS } from '../spec/layout.ts';
 import { CODE_MASK } from './mask.ts';
 
 /** A piece of a text found by a pattern, with its index in that text. */
-export type Match<Value extends string = string> = Readonly<{ text: string; index: number; value: Value }>;
+type Match<Value extends string = string> = Readonly<{ text: string; index: number; value: Value }>;
 
-export type KeywordScan = Readonly<{
+type KeywordScan = Readonly<{
   /** Capitalised modal words outside the format. */
   forbidden: readonly Match[];
   /** Keywords next to a negation word that is not an exact negative form, with the spelling to write instead. */
@@ -15,7 +15,7 @@ export type KeywordScan = Readonly<{
   levels: readonly Match<RuleLevel>[];
 }>;
 
-export type CitationScan = Readonly<{
+type CitationScan = Readonly<{
   /** Each well-written citation, with the criterion numbers it cites. */
   citations: readonly Readonly<{ index: number; numbers: readonly number[] }>[];
   /** Every cited criterion number, in order of appearance. */
@@ -24,7 +24,7 @@ export type CitationScan = Readonly<{
 }>;
 
 /** `valid` mentions carry their four digits as value. */
-export type MentionScan = Readonly<{ valid: readonly Match[]; malformed: readonly Match[] }>;
+type MentionScan = Readonly<{ valid: readonly Match[]; malformed: readonly Match[] }>;
 
 /**
  * The fixed sentences of one format, built from its labels and punctuation: the checker reads them, and the skeleton of

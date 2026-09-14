@@ -12,7 +12,7 @@ import type { FileReport } from '../report.ts';
 const SCHEME = /^[a-z][a-z0-9+.-]*:/iu;
 
 /** Why a link leads nowhere: no address, a scheme outside the format, or an encoding that cannot be read. */
-export type LinkProblem = 'empty' | 'scheme' | 'encoding';
+type LinkProblem = 'empty' | 'scheme' | 'encoding';
 
 export type LinkReading = Readonly<{ target: LinkTarget; problem: LinkProblem | null }>;
 

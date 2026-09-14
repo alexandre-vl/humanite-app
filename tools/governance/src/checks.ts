@@ -13,7 +13,7 @@ const TABLE = {
   },
 } as const;
 
-export const GOVERNANCE_CHECKS = defineChecks(TABLE);
+const GOVERNANCE_CHECKS = defineChecks(TABLE);
 
 export type GovernanceCode = CheckCodeOf<typeof TABLE>;
 

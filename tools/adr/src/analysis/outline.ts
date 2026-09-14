@@ -6,7 +6,7 @@ import { plainText } from './markdown.ts';
 import type { FileReport } from './report.ts';
 import { slugify } from './slug.ts';
 
-export type Subsection = Readonly<{ heading: Heading; title: string; blocks: readonly RootContent[] }>;
+type Subsection = Readonly<{ heading: Heading; title: string; blocks: readonly RootContent[] }>;
 
 export type Section = Subsection & Readonly<{ subsections: readonly Subsection[] }>;
 

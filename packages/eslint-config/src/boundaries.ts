@@ -1,3 +1,4 @@
+import * as boundariesModule from 'eslint-plugin-boundaries';
 import { fileURLToPath } from 'node:url';
 import type { Place } from '@huma/architecture';
 import {
@@ -14,7 +15,7 @@ import {
 import type { Linter } from 'eslint';
 import type { TypeScriptResolverOptions } from 'eslint-import-resolver-typescript';
 import type { DependenciesPolicy, DependenciesRuleOptions, Settings } from 'eslint-plugin-boundaries';
-import { commonJsPlugin } from './plugins.ts';
+import { pluginOf } from './plugins.ts';
 import type { PolicyId } from './policies.ts';
 import { importPolicy, modulePolicy, policyMessage } from './policies.ts';
 
@@ -173,7 +174,7 @@ export function boundariesConfig(root: string, enabled: ReadonlySet<PolicyId>): 
   };
   return {
     files: [...HERMES_FILES],
-    plugins: { boundaries: commonJsPlugin('eslint-plugin-boundaries') },
+    plugins: { boundaries: pluginOf(boundariesModule, 'eslint-plugin-boundaries') },
     settings: { ...settings, 'import/resolver': { [RESOLVER]: resolver } },
     rules: {
       'boundaries/no-unknown-files': enabled.has('place/unknown-file') ? 'error' : 'off',

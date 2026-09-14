@@ -1105,5 +1105,3 @@ export const CHECK_FIXTURES = [
       }),
   ),
 ] as const;
-
-export type CheckProofId = (typeof CHECK_FIXTURES)[number]['id'];

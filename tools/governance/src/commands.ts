@@ -97,6 +97,11 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'installe les hooks git du dépôt',
   },
+  knip: {
+    argv: ['knip', '--no-progress', '--no-config-hints'],
+    audience: 'everyone',
+    summary: 'cherche les fichiers, exports et dépendances que rien n’emploie',
+  },
   lint: {
     argv: ['node', cli('lint')],
     audience: 'everyone',
@@ -122,6 +127,7 @@ export const VERIFY_STEPS = [
   'format:check',
   'expo:types',
   'structure:check',
+  'knip',
   'lint',
   'typecheck',
   'test',

@@ -4,7 +4,7 @@ import type { BodyContext } from '../body.ts';
 import { plainText } from '../markdown.ts';
 import { singleList, singleParagraph } from '../outline.ts';
 
-export type Argument = Readonly<{ valence: Valence; paragraph: Paragraph; item: ListItem }>;
+type Argument = Readonly<{ valence: Valence; paragraph: Paragraph; item: ListItem }>;
 
 /** Bullets `Bien, parce que …`, `Neutre, parce que …` or `Mauvais, parce que …`; `null` when one cannot be read. */
 function readArguments(

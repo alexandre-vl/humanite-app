@@ -1,7 +1,8 @@
+import * as cspellModule from '@cspell/eslint-plugin';
 import { fileURLToPath } from 'node:url';
 import { GLOSSARY } from '@huma/architecture';
 import type { Linter } from 'eslint';
-import { commonJsPlugin } from './plugins.ts';
+import { pluginOf } from './plugins.ts';
 import type { PolicyId } from './policies.ts';
 
 /** The configuration cspell reads instead of searching the tree, where any file could silence a word. */
@@ -44,7 +45,7 @@ export function spellingConfig(files: readonly string[], enabled: ReadonlySet<Po
   const spelling = enabled.has('spelling/unknown');
   return {
     files: [...files],
-    plugins: { '@cspell': commonJsPlugin('@cspell/eslint-plugin') },
+    plugins: { '@cspell': pluginOf(cspellModule, '@cspell/eslint-plugin') },
     rules: {
       '@cspell/spellchecker': [
         glossary || spelling ? 'error' : 'off',

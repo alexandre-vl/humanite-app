@@ -5,9 +5,7 @@ import { judgeToolCall } from '../guard.ts';
 import type { AgentPolicy } from '../policy.ts';
 import { agentPolicy } from '../policy.ts';
 
-export const AGENT_CODES = ['agent/denied'] as const;
-
-export type AgentCode = (typeof AGENT_CODES)[number];
+export type AgentCode = 'agent/denied';
 
 const define = fixtureFactory<AgentCode>();
 

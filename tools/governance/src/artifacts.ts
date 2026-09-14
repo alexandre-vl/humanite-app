@@ -23,7 +23,7 @@ import { renderAgentsGuide } from './agents-guide.ts';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
-import { COMMAND_NAMES, COMMANDS, commandLine, ESLINT_CONFIG_FILE, SCRIPT_AUDIENCES } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, commandLine, entryFile, ESLINT_CONFIG_FILE, SCRIPT_AUDIENCES } from './commands.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
 import { WORKSPACE_FILE } from './workspace-manifest.ts';
 
@@ -164,6 +164,42 @@ const effectiveEslintConfig: Artifact = {
     ),
 };
 
+const KNIP_CONFIG = repoPath('knip.json');
+
+/**
+ * Files knip cannot find on its own: the entries of the commands hooks run, which no package script names, and the type
+ * guard of the routes, which nothing imports on purpose. Knip reads scripts, and its plugins find configurations, tests,
+ * routes and the exports of each package.
+ */
+const KNIP_ENTRIES: readonly string[] = [
+  ...COMMAND_NAMES.flatMap((name) => {
+    const entry = entryFile(COMMANDS[name]);
+    return entry === null || SCRIPT_AUDIENCES.includes(COMMANDS[name].audience) ? [] : [entry];
+  }),
+  `${APP_DIRECTORY}/${PLACES.app.directory}/routes/typed-routes.guard.ts`,
+];
+
+/** The package directory of a file of the workspace: `tools/governance` for `tools/governance/src/cli/gen.ts`. */
+const packageOf = (path: string): string => path.split('/').slice(0, 2).join('/');
+
+const knipConfig: Artifact = {
+  path: KNIP_CONFIG,
+  render: async (root) => {
+    const workspaces = Object.fromEntries(
+      [...new Set(KNIP_ENTRIES.map(packageOf))].toSorted(compareText).map((workspace) => [
+        workspace,
+        {
+          entry: [...new Set(KNIP_ENTRIES.filter((path) => packageOf(path) === workspace))]
+            .map((path) => path.slice(workspace.length + 1))
+            .toSorted(compareText),
+        },
+      ]),
+    );
+    const text = JSON.stringify({ $schema: 'https://unpkg.com/knip@6/schema.json', workspaces }, null, 2);
+    return formatForPath(root, KNIP_CONFIG, `${text}\n`);
+  },
+};
+
 export const ARTIFACTS: readonly Artifact[] = [
   ADR_INDEX_ARTIFACT,
   claudeSettings,
@@ -174,6 +210,7 @@ export const ARTIFACTS: readonly Artifact[] = [
   workspaceFile,
   solution,
   effectiveEslintConfig,
+  knipConfig,
 ];
 
 export async function checkArtifacts(

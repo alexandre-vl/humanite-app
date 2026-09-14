@@ -22,7 +22,7 @@ export type RawWord = readonly RawPart[];
 export type OutputOperator = '>' | '>>' | '>|' | '&>' | '&>>' | '<>';
 
 /** Standard input given by a here-document or a here-string. */
-export type RawText = Readonly<{
+type RawText = Readonly<{
   /** The text as written, for a shell that reads it as a script. */
   source: string;
   /** The text as parts, expansions included. */

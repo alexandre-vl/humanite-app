@@ -13,7 +13,7 @@ export const VALENCES = ['good', 'neutral', 'bad'] as const;
 export type Valence = (typeof VALENCES)[number];
 
 /** The spellings of a keyword by grammatical number: the singular, then the plural. */
-export type KeywordForms = readonly [singular: string, plural: string];
+type KeywordForms = readonly [singular: string, plural: string];
 
 /**
  * Grammar of an ADR document in one format version. A decided ADR is checked forever against the version written in

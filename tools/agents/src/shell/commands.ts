@@ -10,9 +10,9 @@ import { isKnown, makeWord } from './words.ts';
  * shell: a script can still hide a command from it, which is why the git hooks and `pnpm verify` check again.
  */
 
-export type Assignment = Readonly<{ name: string; value: Word }>;
+type Assignment = Readonly<{ name: string; value: Word }>;
 
-export type Redirection =
+type Redirection =
   /** `descriptor`: the file descriptor written before the operator, `null` when none is. */
   | Readonly<{ kind: 'output'; operator: OutputOperator; descriptor: number | null; target: Word }>
   | Readonly<{ kind: 'input'; target: Word }>

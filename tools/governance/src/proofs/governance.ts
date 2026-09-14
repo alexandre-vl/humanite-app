@@ -13,9 +13,7 @@ import type { GovernanceCode } from '../checks.ts';
 import { guardFailureOutput } from '../hooks/fallback.ts';
 import { HOOK_COMMANDS, POLICY } from '../policy.ts';
 
-export const CLAUDE_HOOK_CODES = ['claude-hook/denied', 'claude-hook/blocked'] as const;
-
-export type GovernanceProofCode = GovernanceCode | (typeof CLAUDE_HOOK_CODES)[number];
+export type GovernanceProofCode = GovernanceCode | 'claude-hook/denied' | 'claude-hook/blocked';
 
 const define = fixtureFactory<GovernanceProofCode>();
 
@@ -131,5 +129,3 @@ export const GOVERNANCE_FIXTURES = [
     async ({ signal }) => hookCommand('Stop', { cwd: '/nonexistent/huma-workspace', stop_hook_active: true }, signal),
   ),
 ] as const;
-
-export type GovernanceProofId = (typeof GOVERNANCE_FIXTURES)[number]['id'];
