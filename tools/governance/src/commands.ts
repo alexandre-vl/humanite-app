@@ -91,6 +91,7 @@ export type CommandName = keyof typeof COMMANDS;
 /** Steps of `pnpm verify`, cheapest first: the run stops at the first failure. */
 export const VERIFY_STEPS = [
   'gen:check',
+  'hooks:check',
   'format:check',
   'lint',
   'typecheck',
