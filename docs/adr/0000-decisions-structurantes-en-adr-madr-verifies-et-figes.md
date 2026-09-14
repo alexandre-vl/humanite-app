@@ -38,7 +38,7 @@ Option retenue : « MADR 4 traduit et vérifié par tools/adr », parce que c’
 
 - **R1** — Un ADR DOIT suivre le format que vérifie `pnpm adr:check` : fichier `docs/adr/NNNN-slug.md`, en-tête canonique, sections de MADR 4.0.0 traduites, titre de 60 caractères et 900 mots au plus.
 - **R2** — Un ADR DOIT argumenter sa décision : faits sourcés, critères numérotés, deux options au moins, option retenue parmi elles, arguments qui citent un critère, coût nommé et déclencheur de réévaluation.
-- **R3** — Une règle DOIT porter un identifiant et un seul mot-clé en capitales parmi `DOIT`, `NE DOIT PAS` et `PEUT` ; hors des règles, ces mots s’écrivent en minuscules.
+- **R3** — Une règle DOIT porter un identifiant et un seul mot-clé en capitales, `DOIT`, `NE DOIT PAS` ou `PEUT`, au singulier ou au pluriel ; hors des règles, ces mots s’écrivent en minuscules.
 - **R4** — Un numéro NE DOIT PAS servir à deux ADR ni disparaître de l’historique git.
 - **R5** — Un ADR DOIT être commité en `proposed` avant d’être accepté ou rejeté.
 - **R6** — Un ADR accepté ou rejeté NE DOIT PAS changer, ni de contenu ni de nom.
