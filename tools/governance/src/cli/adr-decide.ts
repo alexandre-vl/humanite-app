@@ -1,13 +1,8 @@
 import { parseArgs } from 'node:util';
-import { withoutEntries } from '@huma/adr/bindings';
-import { decide } from '@huma/adr/decide';
 import { parseAdrId } from '@huma/adr/identifiers';
 import { findWorkspaceRoot, print, printError, runCommand, shellLine, UsageError } from '@huma/kit/cli';
 import { ownRepository } from '@huma/kit/git';
-import { checkArtifacts, writeArtifacts } from '../artifacts.ts';
-import { removeBindingEntries } from '../bindings-file.ts';
-import { runProof } from '../proofs.ts';
-import { checkWorkspaceAdrs, workspaceBindings } from '../workspace.ts';
+import { decideInWorkspace } from '../decision.ts';
 
 const USAGE = 'Usage : pnpm adr:decide ADR-NNNN accepted|rejected   (décideur humain, dans son propre terminal)';
 
@@ -20,20 +15,11 @@ await runCommand(async () => {
   if (number === null || (status !== 'accepted' && status !== 'rejected') || rest.length > 0) {
     throw new UsageError(USAGE);
   }
-  const root = await findWorkspaceRoot();
-  const bindings = await workspaceBindings(root);
-  const outcome = await decide({
-    repository: ownRepository(root),
+  const outcome = await decideInWorkspace({
+    repository: ownRepository(await findWorkspaceRoot()),
     number,
     status,
-    bindings,
-    runProof,
     environment: process.env,
-    check: async (source) => checkWorkspaceAdrs(root, 'worktree', source),
-    staleArtifacts: async () => (await checkArtifacts(root)).map((diagnostic) => diagnostic.path),
-    withoutBindings: (ids) => withoutEntries(bindings, ids),
-    removeBindings: async (ids) => removeBindingEntries(root, ids),
-    regenerate: async () => writeArtifacts(root),
   });
   if (outcome.kind === 'refused') {
     printError(`✗ ${outcome.message}`);
