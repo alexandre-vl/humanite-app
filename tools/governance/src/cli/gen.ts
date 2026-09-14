@@ -20,6 +20,10 @@ await runCommand(async () => {
     return 0;
   }
   const written = await writeArtifacts(root);
-  print(written.length === 0 ? '✓ fichiers dérivés déjà à jour' : `✓ régénérés : ${written.join(', ')}`);
+  print(
+    written.length === 0
+      ? '✓ fichiers dérivés déjà à jour'
+      : `✓ régénérés : ${written.map((file) => file.path).join(', ')}`,
+  );
   return 0;
 });

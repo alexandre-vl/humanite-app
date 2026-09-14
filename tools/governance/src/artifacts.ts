@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { effectiveStatuses, readCollection } from '@huma/adr/collection';
+import type { WrittenFile } from '@huma/adr/decide';
 import { FORMAT_REGISTRY } from '@huma/adr/formats';
 import { renderIndexPage } from '@huma/adr/index-page';
 import { INDEX_FILE } from '@huma/adr/layout';
@@ -93,19 +94,20 @@ export async function checkArtifacts(
   return diagnostics;
 }
 
-/** Writes every artifact whose content changed; returns their paths. */
+/** Writes every artifact whose content changed; returns them with their previous content. */
 export async function writeArtifacts(
   root: string,
   artifacts: readonly Artifact[] = ARTIFACTS,
-): Promise<readonly RepoPath[]> {
-  const written: RepoPath[] = [];
+): Promise<readonly WrittenFile[]> {
+  const written: WrittenFile[] = [];
   for (const artifact of artifacts) {
     const target = join(root, artifact.path);
     const expected = await artifact.render(root);
-    if ((await readTextIfExists(target)) !== expected) {
+    const previous = await readTextIfExists(target);
+    if (previous !== expected) {
       await mkdir(dirname(target), { recursive: true });
       await writeFile(target, expected, 'utf8');
-      written.push(artifact.path);
+      written.push({ path: artifact.path, previous });
     }
   }
   return written;

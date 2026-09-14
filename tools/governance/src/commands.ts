@@ -1,3 +1,4 @@
+import { shellLine } from '@huma/kit/cli';
 import { keysOf } from '@huma/kit/records';
 
 /**
@@ -72,12 +73,8 @@ export const VERIFY_STEPS = [
 
 export const COMMAND_NAMES: readonly CommandName[] = keysOf(COMMANDS);
 
-const SAFE_WORD = /^[\w@%+=:,./-]+$/u;
-
-const quote = (word: string): string => (SAFE_WORD.test(word) ? word : `'${word.replaceAll("'", String.raw`'\''`)}'`);
-
 /** The command as a line for `package.json` scripts or a shell. */
-export const commandLine = (spec: CommandSpec): string => spec.argv.map(quote).join(' ');
+export const commandLine = (spec: CommandSpec): string => shellLine(spec.argv);
 
 /** The TypeScript file a `node` command runs, `null` for other programs. */
 export const entryFile = (spec: CommandSpec): string | null =>

@@ -1,15 +1,17 @@
 import { parseArgs } from 'node:util';
+import { withoutEntries } from '@huma/adr/bindings';
 import { decide } from '@huma/adr/decide';
-import { formatAdrId, parseAdrId } from '@huma/adr/identifiers';
-import { INDEX_FILE } from '@huma/adr/layout';
-import { findWorkspaceRoot, print, printError, runCommand, UsageError } from '@huma/kit/cli';
-import { formatDiagnostic } from '@huma/kit/diagnostics';
+import { parseAdrId } from '@huma/adr/identifiers';
+import { findWorkspaceRoot, print, printError, runCommand, shellLine, UsageError } from '@huma/kit/cli';
 import { ownRepository } from '@huma/kit/git';
-import { writeArtifacts } from '../artifacts.ts';
+import { checkArtifacts, writeArtifacts } from '../artifacts.ts';
+import { removeBindingEntries } from '../bindings-file.ts';
 import { runProof } from '../proofs.ts';
 import { checkWorkspaceAdrs, workspaceBindings } from '../workspace.ts';
 
 const USAGE = 'Usage : pnpm adr:decide ADR-NNNN accepted|rejected   (décideur humain, dans son propre terminal)';
+
+const VERBS = { accepted: 'accepter', rejected: 'rejeter' } as const;
 
 await runCommand(async () => {
   const { positionals } = parseArgs({ allowPositionals: true, strict: true, options: {} });
@@ -19,26 +21,35 @@ await runCommand(async () => {
     throw new UsageError(USAGE);
   }
   const root = await findWorkspaceRoot();
+  const bindings = await workspaceBindings(root);
   const outcome = await decide({
     repository: ownRepository(root),
     number,
     status,
-    bindings: await workspaceBindings(root),
+    bindings,
     runProof,
     environment: process.env,
-    check: async () => checkWorkspaceAdrs(root, 'worktree'),
-    regenerate: async () => {
-      await writeArtifacts(root);
-    },
+    check: async (source) => checkWorkspaceAdrs(root, 'worktree', source),
+    staleArtifacts: async () => (await checkArtifacts(root)).map((diagnostic) => diagnostic.path),
+    withoutBindings: (ids) => withoutEntries(bindings, ids),
+    removeBindings: async (ids) => removeBindingEntries(root, ids),
+    regenerate: async () => writeArtifacts(root),
   });
   if (outcome.kind === 'refused') {
-    outcome.reasons.forEach(printError);
+    printError(`✗ ${outcome.message}`);
+    outcome.details.forEach(printError);
     return 1;
   }
-  outcome.diagnostics.map(formatDiagnostic).forEach(printError);
-  const verb = status === 'accepted' ? 'accepter' : 'rejeter';
-  print(`✓ ${formatAdrId(number)} ${status}. Relire le diff, puis commiter la décision :`);
-  print(`git add ${outcome.path} ${INDEX_FILE}`);
-  print(`git commit -m "docs(adr): ${verb} ${formatAdrId(number)}"`);
-  return outcome.diagnostics.length === 0 ? 0 : 1;
+  print(`✓ ${outcome.id} ${status}. Relire le diff, puis commiter la décision depuis ce terminal :`);
+  print(shellLine(['git', 'add', '--', ...outcome.written]));
+  print(
+    shellLine([
+      'git',
+      'commit',
+      '-m',
+      `docs(adr): ${VERBS[status]} ${outcome.id}`,
+      ...[outcome.id, ...outcome.supersedes].flatMap((ref) => ['--trailer', `Refs: ${ref}`]),
+    ]),
+  );
+  return 0;
 });

@@ -1,33 +1,38 @@
-import { writeFile } from 'node:fs/promises';
-import { hostname } from 'node:os';
+import { readFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FileTree } from '@huma/fixtures';
-import { createRepository, fixtureFactory } from '@huma/fixtures';
+import { createRepository, fixtureFactory, writeTree } from '@huma/fixtures';
 import { formatForPath } from '@huma/kit/format';
-import { temporaryDirectory } from '@huma/kit/fs';
+import { readTextIfExists, temporaryDirectory } from '@huma/kit/fs';
+import type { GitRepository } from '@huma/kit/git';
+import { createRef, git } from '@huma/kit/git';
+import type { RepoPath } from '@huma/kit/paths';
+import { repoPath } from '@huma/kit/paths';
+import type { Environment } from '@huma/kit/process';
+import { keysOf } from '@huma/kit/records';
 import { format as prettierFormat } from 'prettier';
 import { analyzeAdr } from '../analysis/analyze.ts';
-import type { GitRepository } from '@huma/kit/git';
-import { commonDirectory, git } from '@huma/kit/git';
-import type { RepoPath } from '@huma/kit/paths';
-import type { Environment } from '@huma/kit/process';
+import { slugify } from '../analysis/slug.ts';
+import type { Creation } from '../lifecycle/create.ts';
+import { createAdr, nextNumber, RESERVATIONS, skeleton } from '../lifecycle/create.ts';
+import type { RefusalReason } from '../lifecycle/decide.ts';
+import { decide, REFUSALS } from '../lifecycle/decide.ts';
+import { judgeAdrWrite } from '../lifecycle/guard.ts';
 import type { Bindings } from '../model/bindings.ts';
+import { withoutEntries } from '../model/bindings.ts';
 import { adrNumber } from '../model/identifiers.ts';
 import { runChecks } from '../repository/check.ts';
 import { FORMAT_1 } from '../spec/formats/v1.ts';
 import type { DecidedStatus } from '../spec/statuses.ts';
-import { createAdr, nextNumber, skeleton } from '../lifecycle/create.ts';
-import { decide } from '../lifecycle/decide.ts';
-import { judgeAdrWrite } from '../lifecycle/guard.ts';
-import { slugify } from '../analysis/slug.ts';
-import { ACCEPTED, adrDocument, BASE_TITLE, PROPOSED, replaceOnce, ZERO } from './documents.ts';
+import { ACCEPTED, adrDocument, BASE_TITLE, ONE, OTHER_TITLE, PROPOSED, replaceOnce, ZERO } from './documents.ts';
 import { bindingsSource, FAKE_PROOFS, runFakeProof } from './runners.ts';
+
+const DECISION_CODES = [...keysOf(REFUSALS).map((reason) => `decide/${reason}` as const), 'decide/decided'] as const;
 
 export const LIFECYCLE_CODES = [
   'guard/denied',
-  'decide/refused',
-  'decide/decided',
+  ...DECISION_CODES,
   'new/duplicate-number',
   'new/title-refused',
   'format/fingerprint-changed',
@@ -66,14 +71,24 @@ async function formattedFingerprint(format: (text: string) => Promise<string>): 
   return fingerprintOf(formatted) === fingerprintOf(UNFORMATTED) ? [] : ['format/fingerprint-changed'];
 }
 
-const proven: Bindings = { 'ADR-0000': { scope: { paths: ['docs/adr/**'] }, rules: { R1: [FAKE_PROOFS.passing] } } };
+const provenBy = (proof: string) => ({ scope: { paths: ['docs/adr/**'] }, rules: { R1: [proof] } }) as const;
+
+const proven: Bindings = { 'ADR-0000': provenBy(FAKE_PROOFS.passing) };
 
 type DecisionFixture = Readonly<{
   commits?: readonly FileTree[];
   worktree?: FileTree;
   bindings?: Bindings;
+  number?: number;
   status?: DecidedStatus;
   environment?: Environment;
+  staleArtifacts?: readonly RepoPath[];
+  /** Runs during the first check: the repository changes between the checks and the write. */
+  duringFirstCheck?: (repository: GitRepository) => Promise<void>;
+  /** What the regeneration of derived files writes. */
+  regenerated?: FileTree;
+  /** Runs once the outcome is known, to verify what the decision left on disk. */
+  afterwards?: (repository: GitRepository, remainingBindings: Bindings) => Promise<void>;
 }>;
 
 async function decision(fixture: DecisionFixture): Promise<readonly LifecycleCode[]> {
@@ -82,35 +97,45 @@ async function decision(fixture: DecisionFixture): Promise<readonly LifecycleCod
     commits: (fixture.commits ?? []).map((files) => ({ files })),
     ...(fixture.worktree === undefined ? {} : { worktree: fixture.worktree }),
   });
-  const source = bindingsSource(fixture.bindings ?? {});
-  const check = async () =>
-    runChecks({
-      repository,
-      source: 'worktree',
-      bindings: source,
-      runProof: runFakeProof,
-      environment: {},
-      acknowledgments: [],
-    });
+  let bindings = bindingsSource(fixture.bindings ?? {});
+  let checks = 0;
   const outcome = await decide({
     repository,
-    number: adrNumber(0),
+    number: adrNumber(fixture.number ?? 0),
     status: fixture.status ?? 'accepted',
-    bindings: source,
+    bindings,
     runProof: runFakeProof,
     environment: fixture.environment ?? {},
-    check,
-    regenerate: async () => Promise.resolve(),
+    check: async (source) => {
+      checks += 1;
+      if (checks === 1) {
+        await fixture.duringFirstCheck?.(repository);
+      }
+      return runChecks({
+        repository,
+        source: 'worktree',
+        bindings: source,
+        runProof: runFakeProof,
+        environment: {},
+        acknowledgments: [],
+      });
+    },
+    staleArtifacts: async () => Promise.resolve(fixture.staleArtifacts ?? []),
+    withoutBindings: (ids) => withoutEntries(bindings, ids),
+    removeBindings: async (ids) => {
+      bindings = withoutEntries(bindings, ids);
+      return Promise.resolve([]);
+    },
+    regenerate: async () => {
+      const files = fixture.regenerated ?? {};
+      await writeTree(repository.root, files);
+      return Object.keys(files).map((path) => ({ path: repoPath(path), previous: null }));
+    },
   });
-  if (outcome.kind === 'refused') {
-    return ['decide/refused'];
-  }
-  if (outcome.diagnostics.length > 0) {
-    throw new Error(
-      `Décision écrite mais les contrôles échouent ensuite : ${outcome.diagnostics.map((item) => item.code).join(', ')}`,
-    );
-  }
-  return ['decide/decided'];
+  await fixture.afterwards?.(repository, bindings.bindings);
+  const code: `decide/${RefusalReason}` | 'decide/decided' =
+    outcome.kind === 'refused' ? `decide/${outcome.reason}` : 'decide/decided';
+  return [code];
 }
 
 async function twoWorktrees(path: string): Promise<Readonly<{ main: GitRepository; other: GitRepository }>> {
@@ -122,6 +147,9 @@ async function twoWorktrees(path: string): Promise<Readonly<{ main: GitRepositor
 
 /** Writes the skeleton as generated: fixture repositories have no formatter configuration. */
 const format = async (path: RepoPath, text: string): Promise<string> => Promise.resolve(text);
+
+const creation = async (repository: GitRepository, title: string): Promise<Creation> =>
+  createAdr({ repository, spec: FORMAT_1, title, significance: ['dependency'], format });
 
 export const LIFECYCLE_FIXTURES = [
   define(
@@ -197,31 +225,76 @@ export const LIFECYCLE_FIXTURES = [
       ),
   ),
 
-  define('decide/agent-refused', 'une décision depuis une session d’agent', ['decide/refused'], async () =>
+  define('decide/agent-refused', 'une décision depuis une session d’agent', ['decide/agent-session'], async () =>
     decision({ commits: [{ [ZERO]: PROPOSED }], bindings: proven, environment: { CLAUDECODE: '1' } }),
   ),
-  define('decide/dirty-tree-refused', 'une décision avec un fichier non commité', ['decide/refused'], async () =>
+  define('decide/dirty-tree-refused', 'une décision avec un fichier non commité', ['decide/dirty-tree'], async () =>
     decision({
       commits: [{ [ZERO]: PROPOSED }],
       worktree: { [ZERO]: PROPOSED, 'notes.md': 'brouillon' },
       bindings: proven,
     }),
   ),
-  define('decide/uncommitted-refused', 'une décision sur un ADR jamais commité', ['decide/refused'], async () =>
-    decision({
-      commits: [{ 'README.md': 'dépôt' }],
-      worktree: { 'README.md': 'dépôt', [ZERO]: PROPOSED },
-      bindings: proven,
-    }),
+  define(
+    'decide/stale-artifacts-refused',
+    'une décision avec des fichiers dérivés périmés',
+    ['decide/artifacts-stale'],
+    async () =>
+      decision({ commits: [{ [ZERO]: PROPOSED }], bindings: proven, staleArtifacts: [repoPath('docs/adr/README.md')] }),
   ),
-  define('decide/failing-proof-refused', 'une acceptation avec une preuve en échec', ['decide/refused'], async () =>
-    decision({
-      commits: [{ [ZERO]: PROPOSED }],
-      bindings: { 'ADR-0000': { scope: { paths: ['docs/adr/**'] }, rules: { R1: [FAKE_PROOFS.failing] } } },
-    }),
+  define('decide/failing-checks-refused', 'une décision sur un dépôt en erreur', ['decide/checks-failing'], async () =>
+    decision({ commits: [{ [ZERO]: PROPOSED }], bindings: { 'ADR-0000': provenBy('fake/inconnue') } }),
   ),
-  define('decide/already-decided-refused', 'une décision sur un ADR déjà accepté', ['decide/refused'], async () =>
-    decision({ commits: [{ [ZERO]: PROPOSED }, { [ZERO]: ACCEPTED }], bindings: proven }),
+  define('decide/unknown-adr-refused', 'une décision sur un numéro sans ADR', ['decide/not-found'], async () =>
+    decision({ commits: [{ [ZERO]: PROPOSED }], bindings: proven, number: 1 }),
+  ),
+  define(
+    'decide/already-decided-refused',
+    'une décision sur un ADR déjà accepté',
+    ['decide/already-decided'],
+    async () => decision({ commits: [{ [ZERO]: PROPOSED }, { [ZERO]: ACCEPTED }], bindings: proven }),
+  ),
+  define(
+    'decide/unbound-acceptance-refused',
+    'une acceptation sans liens vers des preuves',
+    ['decide/simulated-findings'],
+    async () => decision({ commits: [{ [ZERO]: PROPOSED }] }),
+  ),
+  define(
+    'decide/failing-proof-refused',
+    'une acceptation avec une preuve en échec',
+    ['decide/proofs-failing'],
+    async () => decision({ commits: [{ [ZERO]: PROPOSED }], bindings: { 'ADR-0000': provenBy(FAKE_PROOFS.failing) } }),
+  ),
+  define(
+    'decide/concurrent-change-refused',
+    'un fichier écrit pendant les vérifications',
+    ['decide/repository-changed'],
+    async () =>
+      decision({
+        commits: [{ [ZERO]: PROPOSED }],
+        bindings: proven,
+        duringFirstCheck: async (repository) => writeTree(repository.root, { 'notes.md': 'écrit entre-temps' }),
+      }),
+  ),
+  define(
+    'decide/failing-result-undone',
+    'une décision dont le résultat échoue aux contrôles est défaite',
+    ['decide/post-check-failing'],
+    async () =>
+      decision({
+        commits: [{ [ZERO]: PROPOSED }],
+        bindings: proven,
+        regenerated: { 'docs/adr/brouillon.md': 'fichier dérivé fautif' },
+        afterwards: async (repository) => {
+          if ((await readFile(join(repository.root, ZERO), 'utf8')) !== PROPOSED) {
+            throw new Error('ADR laissé décidé après une décision défaite');
+          }
+          if ((await readTextIfExists(join(repository.root, 'docs/adr/brouillon.md'))) !== null) {
+            throw new Error('fichier dérivé laissé après une décision défaite');
+          }
+        },
+      }),
   ),
   define('decide/accepts', 'une acceptation humaine aux preuves vertes', ['decide/decided'], async () =>
     decision({ commits: [{ [ZERO]: PROPOSED }], bindings: proven }),
@@ -229,62 +302,80 @@ export const LIFECYCLE_FIXTURES = [
   define('decide/rejects', 'un rejet humain sans liens', ['decide/decided'], async () =>
     decision({ commits: [{ [ZERO]: PROPOSED }], status: 'rejected' }),
   ),
+  define(
+    'decide/accepts-superseding',
+    'une acceptation qui remplace un ADR accepté retire ses liens',
+    ['decide/decided'],
+    async () =>
+      decision({
+        commits: [
+          { [ZERO]: PROPOSED },
+          { [ZERO]: ACCEPTED },
+          { [ZERO]: ACCEPTED, [ONE]: adrDocument({ title: OTHER_TITLE, supersedes: 'ADR-0000' }) },
+        ],
+        bindings: { 'ADR-0000': provenBy(FAKE_PROOFS.passing), 'ADR-0001': provenBy(FAKE_PROOFS.passing) },
+        number: 1,
+        afterwards: async (repository, remaining) => {
+          if (Object.hasOwn(remaining, 'ADR-0000') || !Object.hasOwn(remaining, 'ADR-0001')) {
+            throw new Error(`Liens restants inattendus : ${Object.keys(remaining).join(', ')}`);
+          }
+          if (!(await readFile(join(repository.root, ONE), 'utf8')).includes('status: accepted')) {
+            throw new Error('ADR-0001 non accepté');
+          }
+        },
+      }),
+  ),
 
   define('new/parallel-worktrees', 'deux worktrees créent un ADR en même temps', [], async () => {
     await using directory = await temporaryDirectory('adr-new');
     const { main, other } = await twoWorktrees(directory.path);
     const [first, second] = await Promise.all([
-      createAdr({
-        repository: main,
-        spec: FORMAT_1,
-        title: 'Premier sujet en parallèle',
-        significance: ['dependency'],
-        format,
-      }),
-      createAdr({
-        repository: other,
-        spec: FORMAT_1,
-        title: 'Second sujet en parallèle',
-        significance: ['dependency'],
-        format,
-      }),
+      creation(main, 'Premier sujet en parallèle'),
+      creation(other, 'Second sujet en parallèle'),
     ]);
     return first.number === second.number ? ['new/duplicate-number'] : [];
   }),
-  define('new/unlocked-race', 'deux lectures du prochain numéro sans verrou', ['new/duplicate-number'], async () => {
-    await using directory = await temporaryDirectory('adr-race');
-    const { main, other } = await twoWorktrees(directory.path);
-    const [first, second] = await Promise.all([nextNumber(main), nextNumber(other)]);
-    return first === second ? ['new/duplicate-number'] : [];
-  }),
-  define('new/stale-lock', 'un verrou laissé par un processus arrêté', [], async () => {
-    await using directory = await temporaryDirectory('adr-lock');
+  define('new/parallel-creations', 'six créations lancées ensemble dans un dépôt', [], async () => {
+    await using directory = await temporaryDirectory('adr-many');
     const repository = await createRepository(directory.path, { commits: [{ files: { [ZERO]: PROPOSED } }] });
-    const deadPid = 2 ** 22 + 1;
-    await writeFile(
-      join(await commonDirectory(repository), 'adr-new.lock'),
-      JSON.stringify({ pid: deadPid, host: hostname() }),
+    const titles = ['Sujet un', 'Sujet deux', 'Sujet trois', 'Sujet quatre', 'Sujet cinq', 'Sujet six'];
+    const numbers = (await Promise.all(titles.map(async (title) => creation(repository, title)))).map(
+      (created) => created.number,
     );
-    const creation = await createAdr({
-      repository,
-      spec: FORMAT_1,
-      title: 'Sujet après un arrêt brutal',
-      significance: ['dependency'],
-      format,
-    });
-    return creation.number === adrNumber(1) ? [] : ['new/duplicate-number'];
+    return new Set(numbers).size === numbers.length ? [] : ['new/duplicate-number'];
+  }),
+  define(
+    'new/unreserved-race',
+    'deux lectures du prochain numéro sans réservation',
+    ['new/duplicate-number'],
+    async () => {
+      await using directory = await temporaryDirectory('adr-race');
+      const { main, other } = await twoWorktrees(directory.path);
+      const [first, second] = await Promise.all([nextNumber(main), nextNumber(other)]);
+      return first === second ? ['new/duplicate-number'] : [];
+    },
+  ),
+  define('new/reserved-number-skipped', 'un numéro réservé sans fichier n’est pas redonné', [], async () => {
+    await using directory = await temporaryDirectory('adr-reserved');
+    const repository = await createRepository(directory.path, { commits: [{ files: { [ZERO]: PROPOSED } }] });
+    const note = (await git(repository, ['hash-object', '-w', '--stdin'], { input: 'réservé\n' })).trim();
+    await createRef(repository, `${RESERVATIONS}/ADR-0001`, note);
+    const created = await creation(repository, 'Sujet après une réservation');
+    return created.number === adrNumber(2) ? [] : ['new/duplicate-number'];
+  }),
+  define('new/abandoned-number-kept', 'un ADR créé puis effacé ne rend pas son numéro', [], async () => {
+    await using directory = await temporaryDirectory('adr-abandoned');
+    const repository = await createRepository(directory.path, { commits: [{ files: { [ZERO]: PROPOSED } }] });
+    const abandoned = await creation(repository, 'Sujet abandonné');
+    await rm(join(repository.root, abandoned.path));
+    const next = await creation(repository, 'Sujet suivant');
+    return next.number === abandoned.number ? ['new/duplicate-number'] : [];
   }),
   define('new/title-refused', 'un titre avec deux-points', ['new/title-refused'], async () => {
     await using directory = await temporaryDirectory('adr-title');
     const repository = await createRepository(directory.path, { commits: [{ files: { [ZERO]: PROPOSED } }] });
     try {
-      await createAdr({
-        repository,
-        spec: FORMAT_1,
-        title: 'Validation : données',
-        significance: ['dependency'],
-        format,
-      });
+      await creation(repository, 'Validation : données');
       return [];
     } catch (error) {
       return Error.isError(error) && error.message.startsWith('Titre refusé') ? ['new/title-refused'] : [];

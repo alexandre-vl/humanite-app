@@ -19,12 +19,16 @@ export async function workspaceBindings(root: string): Promise<BindingsSource> {
   };
 }
 
-/** Every ADR check of this workspace, from one source, with its bindings, proofs and acknowledgments. */
-export async function checkWorkspaceAdrs(root: string, source: FileSource): Promise<CheckReport> {
+/** Every ADR check of this workspace, from one source, with its proofs and acknowledgments. */
+export async function checkWorkspaceAdrs(
+  root: string,
+  source: FileSource,
+  bindings?: BindingsSource,
+): Promise<CheckReport> {
   return runChecks({
     repository: ownRepository(root),
     source,
-    bindings: await workspaceBindings(root),
+    bindings: bindings ?? (await workspaceBindings(root)),
     runProof,
     environment: process.env,
     acknowledgments: ACKNOWLEDGMENTS,

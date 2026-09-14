@@ -203,6 +203,9 @@ importers:
       '@huma/kit':
         specifier: workspace:*
         version: link:../kit
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
     devDependencies:
       '@huma/tsconfig':
         specifier: workspace:*

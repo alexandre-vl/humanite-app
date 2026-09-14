@@ -10,6 +10,15 @@ export class UsageError extends Error {
   override readonly name = 'UsageError';
 }
 
+const SAFE_WORD = /^[\w@%+=:,./-]+$/u;
+
+/** `word` as one word of a POSIX shell line: as is when it holds no special character, single-quoted otherwise. */
+export const shellWord = (word: string): string =>
+  SAFE_WORD.test(word) ? word : `'${word.replaceAll("'", String.raw`'\''`)}'`;
+
+/** A command a person can paste into a POSIX shell: each word quoted as needed. */
+export const shellLine = (words: readonly string[]): string => words.map(shellWord).join(' ');
+
 export const print = (text: string): void => {
   process.stdout.write(`${text}\n`);
 };

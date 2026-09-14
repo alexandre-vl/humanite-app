@@ -11,7 +11,8 @@
     "@huma/adr": "workspace:*",
     "@huma/agents": "workspace:*",
     "@huma/fixtures": "workspace:*",
-    "@huma/kit": "workspace:*"
+    "@huma/kit": "workspace:*",
+    "typescript": "catalog:"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",

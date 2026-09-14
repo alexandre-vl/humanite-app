@@ -33,5 +33,11 @@ export type BindingsSource = Readonly<{
   proofs: ReadonlySet<string>;
 }>;
 
+/** The bindings of `source` without the entries of `ids`, as they read once those entries are removed. */
+export const withoutEntries = (source: BindingsSource, ids: readonly string[]): BindingsSource => ({
+  ...source,
+  bindings: Object.fromEntries(Object.entries(source.bindings).filter(([key]) => !ids.includes(key))),
+});
+
 /** Runs one proof and tells whether it passed. */
 export type ProofRunner = (proof: string) => Promise<boolean>;

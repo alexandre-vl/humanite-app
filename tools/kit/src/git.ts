@@ -6,7 +6,7 @@ import { temporaryDirectory } from './fs.ts';
 import type { RepoPath } from './paths.ts';
 import { isRepoPath } from './paths.ts';
 import type { Environment, RunResult } from './process.ts';
-import { capture, run, runText } from './process.ts';
+import { capture, ProcessError, run, runText } from './process.ts';
 import { decodeUtf8 } from './text.ts';
 
 /**
@@ -239,6 +239,30 @@ export async function gitPaths(repository: GitRepository, names: readonly string
     throw new Error(`git rev-parse --git-path : ${String(names.length)} chemins attendus, ${String(paths.length)} lus`);
   }
   return paths;
+}
+
+/**
+ * Creates `ref` pointing at `object` only if no such ref exists: `false` when another process created it first. Refs
+ * live in the common directory, so every worktree of the repository sees the same ones.
+ */
+export async function createRef(repository: GitRepository, ref: string, object: string): Promise<boolean> {
+  const captured = await capture(
+    'git',
+    gitArguments(repository, ['update-ref', '--stdin']),
+    processOptions(repository, { input: `create ${ref} ${objectId(object)}\n` }),
+  );
+  if (captured.exit.kind === 'exited' && captured.exit.code === 0) {
+    return true;
+  }
+  if (captured.stderr.toString('utf8').includes('reference already exists')) {
+    return false;
+  }
+  throw new ProcessError(`git update-ref --stdin (create ${ref})`, captured);
+}
+
+/** Names of the refs under `prefix`, sorted. */
+export async function refNames(repository: GitRepository, prefix: string): Promise<readonly string[]> {
+  return splitLines(await git(repository, ['for-each-ref', '--format=%(refname)', '--sort=refname', prefix]));
 }
 
 export const commonDirectory = async (repository: GitRepository): Promise<string> =>
