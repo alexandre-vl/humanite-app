@@ -10,6 +10,8 @@ import type { Environment } from '@huma/kit/process';
 import type { Bindings } from '../model/bindings.ts';
 import { adrNumber } from '../model/identifiers.ts';
 import { runChecks } from '../repository/check.ts';
+import { formatDigest, PUBLISHED_DIGESTS } from '../spec/formats/registry.ts';
+import type { FormatSpec } from '../spec/formats/types.ts';
 import { FORMAT_1 } from '../spec/formats/v1.ts';
 import type { DecidedStatus } from '../spec/statuses.ts';
 import { createAdr, nextNumber, skeleton } from '../lifecycle/create.ts';
@@ -24,11 +26,15 @@ export const LIFECYCLE_CODES = [
   'decide/decided',
   'new/duplicate-number',
   'new/title-refused',
+  'format/changed',
 ] as const;
 
 export type LifecycleCode = (typeof LIFECYCLE_CODES)[number];
 
 const define = fixtureFactory<LifecycleCode>();
+
+const publishedFormat = (spec: FormatSpec) => async (): Promise<readonly LifecycleCode[]> =>
+  Promise.resolve(formatDigest(spec) === PUBLISHED_DIGESTS[spec.version] ? [] : ['format/changed']);
 
 const judged = (before: string | null, after: string) => async (): Promise<readonly LifecycleCode[]> =>
   Promise.resolve(judgeAdrWrite(before, after).kind === 'deny' ? ['guard/denied'] : []);
@@ -91,6 +97,13 @@ async function twoWorktrees(path: string): Promise<Readonly<{ main: GitRepositor
 const format = async (path: RepoPath, text: string): Promise<string> => Promise.resolve(text);
 
 export const LIFECYCLE_FIXTURES = [
+  define('format/published-unchanged', 'le format 1 publié garde son empreinte', [], publishedFormat(FORMAT_1)),
+  define(
+    'format/published-edited',
+    'un format 1 dont la limite de mots a changé',
+    ['format/changed'],
+    publishedFormat({ ...FORMAT_1, limits: { ...FORMAT_1.limits, words: FORMAT_1.limits.words + 1 } }),
+  ),
   define(
     'guard/decided-write',
     'un agent réécrit un ADR accepté',

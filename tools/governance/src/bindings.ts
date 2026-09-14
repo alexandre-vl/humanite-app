@@ -35,8 +35,6 @@ export const BINDINGS = {
         'adr/encoding-invisible-crlf',
         'adr/frontmatter-missing',
         'adr/frontmatter-yaml',
-        'adr/frontmatter-format-unknown',
-        'adr/frontmatter-format-outdated',
         'adr/frontmatter-schema',
         'adr/frontmatter-not-canonical',
         'adr/markdown-node',
@@ -70,6 +68,12 @@ export const BINDINGS = {
         'guard/new-skeleton',
       ],
       R2: [
+        'format/published-unchanged',
+        'format/published-edited',
+        'adr/frontmatter-format-unknown',
+        'adr/frontmatter-format-outdated',
+      ],
+      R3: [
         'adr/context-question-missing',
         'adr/context-question-shape',
         'adr/context-facts-missing',
@@ -103,15 +107,15 @@ export const BINDINGS = {
         'adr/reevaluation-list',
         'adr/reevaluation-count',
       ],
-      R3: [
+      R4: [
         'adr/keyword-forbidden',
         'adr/keyword-forbidden-unaccented',
         'adr/keyword-negation',
         'adr/keyword-count',
         'adr/keyword-outside-rule',
       ],
-      R4: ['adr/number-duplicate', 'adr/deleted', 'new/parallel-worktrees', 'new/unlocked-race', 'new/stale-lock'],
-      R5: [
+      R5: ['adr/number-duplicate', 'adr/deleted', 'new/parallel-worktrees', 'new/unlocked-race', 'new/stale-lock'],
+      R6: [
         'adr/transition-first-not-proposed',
         'adr/transition-forbidden',
         'adr/transition-uncommitted',
@@ -121,7 +125,7 @@ export const BINDINGS = {
         'decide/rejects',
         'adr/valid-merge-acceptance',
       ],
-      R6: [
+      R7: [
         'adr/frozen-modified',
         'adr/frozen-after-unreadable',
         'adr/frozen-renamed',
@@ -133,7 +137,7 @@ export const BINDINGS = {
         'adr/acknowledgment-unused',
         'guard/decided-write',
       ],
-      R7: [
+      R8: [
         'agent/decide-script',
         'agent/decide-run-script',
         'agent/decide-entry',
@@ -158,7 +162,7 @@ export const BINDINGS = {
         'hook/settings-command-denies',
         'hook/failure-denies-sensitive',
       ],
-      R8: [
+      R9: [
         'adr/binding-malformed-id',
         'adr/binding-unknown-adr',
         'adr/binding-inactive',
@@ -176,8 +180,8 @@ export const BINDINGS = {
         'decide/failing-proof-refused',
         'decide/accepts',
       ],
-      R9: ['gen/stale-index', 'gen/missing-index', 'gen/in-step'],
-      R10: [
+      R10: ['gen/stale-index', 'gen/missing-index', 'gen/in-step'],
+      R11: [
         'adr/supersedes-unknown',
         'adr/supersedes-newer',
         'adr/supersedes-not-accepted',
