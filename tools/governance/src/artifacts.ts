@@ -8,7 +8,7 @@ import { INDEX_FILE } from '@huma/adr/layout';
 import { readSnapshot } from '@huma/adr/snapshot';
 import { CLAUDE_SETTINGS_PATH } from '@huma/agents/policy';
 import { renderClaudeSettings } from '@huma/agents/settings';
-import { APP_DIRECTORY, packageImports } from '@huma/architecture';
+import { APP_DIRECTORY, packageImports, PLACES } from '@huma/architecture';
 import { packageDirectories, renderWorkspaceFile, WORKSPACE_FILE_NAME } from '@huma/deps/workspace';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
@@ -18,11 +18,12 @@ import { isJsonObject, parseJson } from '@huma/kit/json';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath } from '@huma/kit/paths';
 import { compareText, firstDifferentLine } from '@huma/kit/text';
+import { renderEffectiveConfigs } from '@huma/lint/eslint';
 import { renderAgentsGuide } from './agents-guide.ts';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
-import { COMMAND_NAMES, COMMANDS, commandLine, SCRIPT_AUDIENCES } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, commandLine, ESLINT_CONFIG_FILE, SCRIPT_AUDIENCES } from './commands.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
 import { WORKSPACE_FILE } from './workspace-manifest.ts';
 
@@ -135,6 +136,34 @@ const solution: Artifact = {
   },
 };
 
+const EFFECTIVE_ESLINT_CONFIG = repoPath('packages/eslint-config/effective-config.json');
+
+/**
+ * One file of each kind the ESLint configuration tells apart, none of which needs to exist: Node code, JavaScript
+ * configuration, then the routes, the public entries and the rest of the code Hermes runs.
+ */
+const ESLINT_SAMPLES = [
+  repoPath('tools/sample/src/sample.ts'),
+  repoPath(`${APP_DIRECTORY}/babel.config.js`),
+  repoPath(`${APP_DIRECTORY}/${PLACES.route.directory}/sample.tsx`),
+  repoPath(`${APP_DIRECTORY}/${PLACES.page.directory}/sample/index.ts`),
+  repoPath(`${APP_DIRECTORY}/${PLACES.page.directory}/sample/ui/sample.tsx`),
+];
+
+/**
+ * The configuration ESLint applies to each kind of file, rule by rule: a preset that changes on upgrade, or a policy
+ * that loosens, shows up in the diff of this file before it reaches a commit.
+ */
+const effectiveEslintConfig: Artifact = {
+  path: EFFECTIVE_ESLINT_CONFIG,
+  render: async (root) =>
+    formatForPath(
+      root,
+      EFFECTIVE_ESLINT_CONFIG,
+      await renderEffectiveConfigs(root, ESLINT_CONFIG_FILE, ESLINT_SAMPLES),
+    ),
+};
+
 export const ARTIFACTS: readonly Artifact[] = [
   ADR_INDEX_ARTIFACT,
   claudeSettings,
@@ -144,6 +173,7 @@ export const ARTIFACTS: readonly Artifact[] = [
   claudeMemory,
   workspaceFile,
   solution,
+  effectiveEslintConfig,
 ];
 
 export async function checkArtifacts(

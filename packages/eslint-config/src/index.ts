@@ -14,6 +14,7 @@ import tseslint from 'typescript-eslint';
 import { boundariesConfig } from './boundaries.ts';
 import type { PolicyId } from './policies.ts';
 import { hermesPolicy, modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
+import { reactConfig } from './react.ts';
 
 export type WorkspaceConfigOptions = Readonly<{
   /** The workspace root, which holds the solution `tsconfig.json` that references every TypeScript project. */
@@ -296,6 +297,7 @@ export function defineWorkspaceConfig({
       files: [...ENTRY_FILES],
       rules: restrictions(narrowed(HERMES, ENTRY_SYNTAX), policies),
     },
+    reactConfig(tsconfigRootDir),
     boundariesConfig(tsconfigRootDir, policies),
   );
 }

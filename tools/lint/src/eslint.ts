@@ -3,6 +3,7 @@ import type { Diagnostic } from '@huma/kit/diagnostics';
 import { compareDiagnostics } from '@huma/kit/diagnostics';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath, toRepoPath } from '@huma/kit/paths';
+import { compareText } from '@huma/kit/text';
 import type { Linter } from 'eslint';
 import { ESLint } from 'eslint';
 import type { LintCode } from './checks.ts';
@@ -111,4 +112,60 @@ export async function lintPaths(request: LintRequest): Promise<LintReport> {
     diagnostics.push(lintFinding('lint/deprecated-rule', request.configFile, { rule }));
   }
   return { linted, diagnostics: diagnostics.toSorted(compareDiagnostics) };
+}
+
+const SEVERITY_NAMES = ['off', 'warn', 'error'] as const;
+
+/** A rule entry of a computed configuration, its severity written as a name: `'error'`, or `['error', options…]`. */
+function normalizedEntry(entry: unknown): unknown {
+  const parts: readonly unknown[] = Array.isArray(entry) ? entry : [entry];
+  const [level, ...options] = parts;
+  const severity = typeof level === 'number' ? (SEVERITY_NAMES[level] ?? level) : level;
+  return options.length === 0 ? severity : [severity, ...options];
+}
+
+/** The keys and values of an object of a computed configuration, sorted by key; `{}` for anything else. */
+const sortedRecord = (value: unknown, map: (entry: unknown) => unknown = (entry) => entry): Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+    ? Object.fromEntries(
+        Reflect.ownKeys(value)
+          .filter((key): key is string => typeof key === 'string')
+          .toSorted(compareText)
+          .map((key) => [key, map(Reflect.get(value, key))]),
+      )
+    : {};
+
+/**
+ * The configuration ESLint applies to each of `paths`, which need not exist, as JSON: rules with their severity and
+ * options, settings, parser options and plugins, every key sorted and the workspace root written `<racine>`. Presets
+ * that change on upgrade then show up as a difference.
+ */
+export async function renderEffectiveConfigs(
+  root: string,
+  configFile: RepoPath,
+  paths: readonly RepoPath[],
+): Promise<string> {
+  const eslint = new ESLint({
+    cwd: root,
+    overrideConfigFile: join(root, configFile),
+    flags: ['unstable_native_nodejs_ts_config'],
+  });
+  const configs: Record<string, unknown> = {};
+  for (const path of paths) {
+    const config: unknown = await eslint.calculateConfigForFile(join(root, path));
+    const field = (name: string): unknown =>
+      typeof config === 'object' && config !== null ? Reflect.get(config, name) : undefined;
+    const languageOptions = field('languageOptions');
+    configs[path] = {
+      plugins: Object.keys(sortedRecord(field('plugins'))),
+      parserOptions: sortedRecord(
+        typeof languageOptions === 'object' && languageOptions !== null
+          ? Reflect.get(languageOptions, 'parserOptions')
+          : undefined,
+      ),
+      settings: sortedRecord(field('settings')),
+      rules: sortedRecord(field('rules'), normalizedEntry),
+    };
+  }
+  return `${JSON.stringify(configs, null, 2).replaceAll(root, '<racine>')}\n`;
 }

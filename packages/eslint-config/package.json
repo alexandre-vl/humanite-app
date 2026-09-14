@@ -10,6 +10,8 @@
     "@huma/architecture": "workspace:*",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-boundaries": "catalog:",
+    "eslint-plugin-react-hooks": "catalog:",
+    "eslint-plugin-react-x": "catalog:",
     "@eslint/js": "catalog:",
     "typescript-eslint": "catalog:"
   },
