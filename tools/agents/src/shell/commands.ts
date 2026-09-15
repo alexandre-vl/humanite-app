@@ -495,18 +495,24 @@ type Unwrapped = Readonly<{ command: SimpleCommand | null; scripts: readonly str
 const endsOnShortOption = (text: string, options: readonly string[]): boolean =>
   /^-[A-Za-z]{2,}$/u.test(text) && options.some((option) => option.length === 2 && text.endsWith(option.slice(1)));
 
-/** The command a wrapper runs, and the command lines its options carry. */
-function unwrap(command: SimpleCommand, spec: WrapperSpec): Unwrapped {
-  const words = command.words.slice(1);
+/** A run of wrapper options: where it ends, the command lines and variables it carries, and whether `--` closed it. */
+type Options = Readonly<{
+  end: number;
+  scripts: readonly string[];
+  assignments: readonly Assignment[];
+  closed: boolean;
+}>;
+
+/** The options of a wrapper from `start` on, up to the first word that is not one. */
+function readOptions(words: readonly Word[], start: number, spec: WrapperSpec): Options {
   const scripts: string[] = [];
-  const assignments: Assignment[] = [...command.assignments];
-  let index = 0;
+  const assignments: Assignment[] = [];
+  let index = start;
   for (let word = words[index]; word !== undefined; word = words[index]) {
     const { text } = word;
     const assignment = spec.assignments === true ? assignmentOf(word) : null;
     if (text === '--') {
-      index += 1;
-      break;
+      return { end: index + 1, scripts, assignments, closed: true };
     }
     if (assignment !== null) {
       assignments.push(assignment);
@@ -525,12 +531,36 @@ function unwrap(command: SimpleCommand, spec: WrapperSpec): Unwrapped {
       break;
     }
   }
-  const rest = words.slice(index + (spec.operands ?? 0));
+  return { end: index, scripts, assignments, closed: false };
+}
+
+/**
+ * The command a wrapper runs, and the command lines its options carry. Options are read again once the operands are
+ * passed: `flock FILE -c COMMAND`, `sg GROUP -c COMMAND`, `setarch ARCH -R COMMAND` and `ssh HOST -o X COMMAND` all
+ * take them there, and reading the first of them as the program would hide the command from every rule.
+ */
+function unwrap(command: SimpleCommand, spec: WrapperSpec): Unwrapped {
+  const words = command.words.slice(1);
+  const before = readOptions(words, 0, spec);
+  const operandsEnd = before.end + (spec.operands ?? 0);
+  const after =
+    before.closed || spec.operands === undefined
+      ? { end: operandsEnd, scripts: [], assignments: [] }
+      : readOptions(words, operandsEnd, spec);
+  const scripts = [...before.scripts, ...after.scripts];
+  const rest = words.slice(after.end);
   if (spec.joined === true) {
     return { command: null, scripts: [...scripts, rest.map((word) => word.text).join(' ')] };
   }
   return {
-    command: rest.length === 0 ? null : { assignments, words: rest, redirections: [] },
+    command:
+      rest.length === 0
+        ? null
+        : {
+            assignments: [...command.assignments, ...before.assignments, ...after.assignments],
+            words: rest,
+            redirections: [],
+          },
     scripts,
   };
 }
