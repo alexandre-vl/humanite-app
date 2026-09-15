@@ -8,6 +8,7 @@ import { GIT_HOOK_PROOFS } from '@huma/git-hooks/proofs';
 import { GUARDRAIL_PROOFS } from '@huma/guardrails/proofs';
 import { LINT_PROOFS } from '@huma/lint/proofs';
 import { STRUCTURE_PROOFS } from '@huma/structure/proofs';
+import { COMMIT_HISTORY_FIXTURES } from './proofs/commit-history.ts';
 import { COMMIT_REFS_FIXTURES } from './proofs/commit-refs.ts';
 import { GOVERNANCE_FIXTURES } from './proofs/governance.ts';
 
@@ -23,6 +24,7 @@ export const PROOFS = [
   ...LINT_PROOFS,
   ...STRUCTURE_PROOFS,
   ...GOVERNANCE_FIXTURES,
+  ...COMMIT_HISTORY_FIXTURES,
   ...COMMIT_REFS_FIXTURES,
 ] as const;
 

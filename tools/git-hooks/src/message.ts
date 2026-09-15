@@ -23,8 +23,6 @@ export type MessageInput = Readonly<{
   trailers: readonly Trailer[];
   /** An editor opened: git will strip the comment lines, which then may appear. */
   editor: boolean;
-  /** The branch receives commits that stay: `fixup!` and `squash!` messages are refused there. */
-  onDefaultBranch: boolean;
   path: RepoPath;
   commit: string | null;
 }>;
@@ -53,16 +51,15 @@ export function stripspace(text: string, stripComments = false): string {
 
 const HEADER = /^(?<type>[a-z]+)(?:\((?<scope>[a-z0-9]+(?:-[a-z0-9]+)*)\))?!?: \S/u;
 
-/** Messages git writes itself, and the kind each one is. */
-const GIT_MESSAGES: readonly Readonly<{ pattern: RegExp; kind: string; rewritable: boolean }>[] = [
-  {
-    pattern: /^Merge (?:branch|branches|remote-tracking branch|tag|commit|pull request) /u,
-    kind: 'fusion',
-    rewritable: false,
-  },
-  { pattern: /^Revert "/u, kind: 'annulation', rewritable: false },
-  { pattern: /^Squashed commit of the following:/u, kind: 'fusion écrasée', rewritable: false },
-  { pattern: /^(?:fixup|squash|amend)! /u, kind: 'correction à fusionner', rewritable: true },
+/**
+ * Messages git writes itself, and the kind each one is. A `fixup!` commit is refused on every branch: only a rebase
+ * could fold it, and a rebase replays commits without pre-commit, while a fast-forward would keep it in history for good.
+ */
+const GIT_MESSAGES: readonly Readonly<{ pattern: RegExp; kind: string }>[] = [
+  { pattern: /^Merge (?:branch|branches|remote-tracking branch|tag|commit|pull request) /u, kind: 'fusion' },
+  { pattern: /^Revert "/u, kind: 'annulation' },
+  { pattern: /^Squashed commit of the following:/u, kind: 'fusion écrasée' },
+  { pattern: /^(?:fixup|squash|amend)! /u, kind: 'correction à fusionner' },
 ];
 
 const REF_VALUE = /^ADR-\d{4}$/u;
@@ -102,10 +99,10 @@ export function checkMessage(input: MessageInput, policy: CommitPolicy): readonl
   }
   const [header = '', second] = effective.split('\n');
   const generated = GIT_MESSAGES.find(({ pattern }) => pattern.test(header));
-  if (generated !== undefined && !(generated.rewritable && !input.onDefaultBranch)) {
-    findings.push(finding('git/generated-message', input.path, { kind: generated.kind }, at(1), input.commit));
-  } else if (generated === undefined) {
+  if (generated === undefined) {
     findings.push(...checkHeader(header, input, policy));
+  } else {
+    findings.push(finding('git/generated-message', input.path, { kind: generated.kind }, at(1), input.commit));
   }
   if (second !== undefined && second !== '') {
     findings.push(finding('git/body-separator', input.path, {}, at(2), input.commit));

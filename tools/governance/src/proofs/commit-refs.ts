@@ -8,7 +8,7 @@ import type { GitHookCode } from '@huma/git-hooks/checks';
 import { commitMessage } from '@huma/git-hooks/flows';
 import { temporaryDirectory } from '@huma/kit/fs';
 import { isolatedRepository } from '@huma/kit/git';
-import { commitPolicy, DEFAULT_BRANCH } from '../commit-policy.ts';
+import { commitPolicy } from '../commit-policy.ts';
 import { expectedRefs } from '../commit-refs.ts';
 
 const define = fixtureFactory<GitHookCode>();
@@ -39,7 +39,6 @@ const citations =
       repository,
       messageFile,
       editor: false,
-      defaultBranch: DEFAULT_BRANCH,
       policy: await commitPolicy(repository),
       expectedRefs: async (base) => expectedRefs(repository, base, BINDINGS),
     });

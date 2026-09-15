@@ -22,6 +22,7 @@ import {
   resolveCommit,
   stagedPaths,
   statusEntries,
+  treeDirectories,
   unstagedPaths,
   worktreeTreeId,
   writeTree,
@@ -195,6 +196,16 @@ test('listFiles reads non-ASCII names, untracked files, skips deleted ones and r
   expect((await listIndexEntries(repo, '.')).map((entry) => entry.path).toSorted()).toEqual(['café é.md', 'gone.md']);
   await writeFile(join(root, 'back\\slash.md'), 'w');
   await expect(listFiles(repo, 'worktree')).rejects.toThrow('Chemin de fichier non portable : "back\\\\slash.md"');
+});
+
+test('treeDirectories lists the directories a commit holds directly under each parent, not files or deeper ones', async () => {
+  await using directory = await temporaryDirectory('kit-git');
+  const repo = await repository(join(directory.path, 'repo'), [
+    { 'tools/kit/a.ts': 'a', 'tools/kit/deep/b.ts': 'b', 'tools/README.md': 'r', 'apps/mobile/c.ts': 'c' },
+    { 'packages/tsconfig/d.json': 'd' },
+  ]);
+  expect(await treeDirectories(repo, 'HEAD~1', ['apps', 'packages', 'tools'])).toEqual(['apps/mobile', 'tools/kit']);
+  expect(await treeDirectories(repo, 'HEAD', ['packages', 'missing'])).toEqual(['packages/tsconfig']);
 });
 
 test('readObjects returns binary contents and null for missing objects', async () => {

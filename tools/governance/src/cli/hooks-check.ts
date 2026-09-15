@@ -6,7 +6,7 @@ import { checkInstallation } from '@huma/git-hooks/installation';
 import { findWorkspaceRoot, print, readArguments, runCommand } from '@huma/kit/cli';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
 import { readTextIfExists } from '@huma/kit/fs';
-import { commitPolicy, DEFAULT_BRANCH } from '../commit-policy.ts';
+import { historicalCommitPolicy } from '../commit-policy.ts';
 import { HISTORY_ANCHOR, installationContext, SHIMS } from '../git-hooks.ts';
 
 const USAGE = 'Usage : pnpm hooks:check [--staged]';
@@ -24,8 +24,7 @@ await runCommand(async () => {
       : await checkCommitHistory({
           repository,
           anchor: HISTORY_ANCHOR,
-          defaultBranch: DEFAULT_BRANCH,
-          policy: await commitPolicy(repository),
+          policyAt: historicalCommitPolicy(repository),
         })),
   ];
   if (findings.length > 0) {

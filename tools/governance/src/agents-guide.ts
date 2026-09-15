@@ -57,7 +57,7 @@ export function renderAgentsGuide(policy: AgentPolicy, generator: string): strin
     '## Commits',
     '',
     `- Un commit passe par les hooks git : l’index contient tout l’arbre de travail, ${code('pnpm verify')} passe sur lui, le message suit Conventional Commits.`,
-    `- Types : ${COMMIT_TYPES.map(code).join(', ')}. Portées : le nom d’un paquet sous ${WORKSPACE_ROOTS.map((root) => code(`${root}/`)).join(', ')}, ou ${EXTRA_SCOPES.map(code).join(', ')}.`,
+    `- Types : ${COMMIT_TYPES.map(code).join(', ')}. Portées : le dossier d’un paquet sous ${WORKSPACE_ROOTS.map((root) => code(`${root}/`)).join(', ')} présent dans le commit ou son parent, ou ${EXTRA_SCOPES.map(code).join(', ')}. Les messages ${code('fixup!')}, ${code('squash!')} et ${code('amend!')} sont refusés.`,
     `- Un trailer ${code(`${REFS_TRAILER}: ADR-NNNN`)} par ligne cite chaque ADR accepté dont le périmètre contient un chemin du commit, et chaque ADR dont le fichier change.`,
     '',
     '## Où lire',

@@ -299,6 +299,26 @@ export async function listFiles(repository: GitRepository, source: FileSource): 
   return new Set(repoPaths(present.filter((path) => !deleted.has(path))));
 }
 
+/** Directories the tree of `revision` holds directly under each directory of `parents`, as repository paths. */
+export async function treeDirectories(
+  repository: GitRepository,
+  revision: string,
+  parents: readonly string[],
+): Promise<readonly RepoPath[]> {
+  const output = await git(repository, [
+    'ls-tree',
+    '-d',
+    '-z',
+    '--name-only',
+    '--full-tree',
+    '--end-of-options',
+    revision,
+    '--',
+    ...parents.map((parent) => `${parent}/`),
+  ]);
+  return repoPaths(splitNul(output));
+}
+
 export type IndexEntry = Readonly<{ path: RepoPath; object: string }>;
 
 export async function listIndexEntries(repository: GitRepository, pathspec: string): Promise<readonly IndexEntry[]> {

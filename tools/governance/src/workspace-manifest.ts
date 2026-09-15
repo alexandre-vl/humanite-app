@@ -2,7 +2,7 @@ import type { DependencyPolicy } from '@huma/deps/check';
 import type { WorkspaceFile } from '@huma/deps/workspace';
 import { repoPath } from '@huma/kit/paths';
 
-/** Directories whose subdirectories are the packages of the workspace; each package name is also a commit scope. */
+/** Directories whose subdirectories are the packages of the workspace; each such directory name is a commit scope. */
 export const WORKSPACE_ROOTS = ['apps', 'packages', 'tools'] as const;
 
 type WorkspaceRoot = (typeof WORKSPACE_ROOTS)[number];

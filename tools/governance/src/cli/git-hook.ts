@@ -8,7 +8,7 @@ import { GIT_HOOK_NAMES, isGitHookName } from '@huma/git-hooks/shims';
 import { findWorkspaceRoot, printError, readArguments, runCommand, UsageError } from '@huma/kit/cli';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
 import { ownRepository } from '@huma/kit/git';
-import { commitPolicy, DEFAULT_BRANCH } from '../commit-policy.ts';
+import { commitPolicy } from '../commit-policy.ts';
 import { expectedRefs } from '../commit-refs.ts';
 import { runVerify } from '../verify.ts';
 
@@ -42,7 +42,6 @@ await runCommand(async () => {
           repository,
           messageFile,
           editor: process.env['GIT_EDITOR'] !== ':',
-          defaultBranch: DEFAULT_BRANCH,
           policy: await commitPolicy(repository),
           expectedRefs: async (base) => expectedRefs(repository, base),
         });

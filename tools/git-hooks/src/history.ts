@@ -1,6 +1,6 @@
 import type { Diagnostic } from '@huma/kit/diagnostics';
-import type { GitRepository } from '@huma/kit/git';
-import { commitTrailers, currentBranch, firstParentHistory, isAncestor, isShallow, resolveCommit } from '@huma/kit/git';
+import type { CommitObject, GitRepository } from '@huma/kit/git';
+import { commitTrailers, firstParentHistory, isAncestor, isShallow, resolveCommit } from '@huma/kit/git';
 import { repoPath } from '@huma/kit/paths';
 import type { GitHookCode } from './checks.ts';
 import { gitHookFinding } from './checks.ts';
@@ -11,16 +11,18 @@ export type HistoryContext = Readonly<{
   repository: GitRepository;
   /** Last commit before the hooks applied: the commits after it, along the first-parent chain, are checked. */
   anchor: string;
-  /** The branch whose commits stay: `fixup!` messages are refused on it. */
-  defaultBranch: string;
-  policy: CommitPolicy;
+  /**
+   * The policy a commit was made under: a package renamed or removed since must not turn the commits that named it
+   * into findings, since history is never rewritten.
+   */
+  policyAt: (commit: CommitObject) => Promise<CommitPolicy>;
 }>;
 
 /** Where history findings point; each also names its commit. */
 const HISTORY_PATH = repoPath('.git');
 
 /**
- * Every commit the branch gained since the anchor has a message the commit-msg hook accepts: a commit that went
+ * Every commit the branch gained since the anchor has a message the commit-msg hook accepted: a commit that went
  * around the hooks, by `core.hooksPath` or plumbing, still shows here. Replace refs and grafts are ignored.
  */
 export async function checkCommitHistory(context: HistoryContext): Promise<readonly Diagnostic<GitHookCode>[]> {
@@ -40,18 +42,16 @@ export async function checkCommitHistory(context: HistoryContext): Promise<reado
     repository,
     commits.map((each) => each.id),
   );
-  const onDefaultBranch = (await currentBranch(repository)) === context.defaultBranch;
-  return commits.flatMap((each) =>
-    checkMessage(
-      {
-        message: each.message ?? '',
-        trailers: trailers.get(each.id) ?? [],
-        editor: false,
-        onDefaultBranch,
-        path: HISTORY_PATH,
-        commit: each.id,
-      },
-      context.policy,
-    ),
-  );
+  const findings: Diagnostic<GitHookCode>[] = [];
+  for (const each of commits) {
+    const input = {
+      message: each.message ?? '',
+      trailers: trailers.get(each.id) ?? [],
+      editor: false,
+      path: HISTORY_PATH,
+      commit: each.id,
+    };
+    findings.push(...checkMessage(input, await context.policyAt(each)));
+  }
+  return findings;
 }

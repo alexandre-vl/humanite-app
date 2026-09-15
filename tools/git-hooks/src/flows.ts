@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import type { GitRepository } from '@huma/kit/git';
-import { currentBranch, messageTrailers, writeTree } from '@huma/kit/git';
+import { messageTrailers, writeTree } from '@huma/kit/git';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath } from '@huma/kit/paths';
 import type { GitHookCode } from './checks.ts';
@@ -56,7 +56,6 @@ export type CommitMessageContext = Readonly<{
   messageFile: string;
   /** `GIT_EDITOR` is not `:`: an editor wrote the message and git strips its comments. */
   editor: boolean;
-  defaultBranch: string;
   policy: CommitPolicy;
   /** The ADRs a commit of the index on top of `base` must and may cite. */
   expectedRefs: (base: 'HEAD' | 'HEAD^') => Promise<ExpectedRefs>;
@@ -75,7 +74,6 @@ export async function commitMessage(context: CommitMessageContext): Promise<read
     message,
     trailers: await messageTrailers(repository, message),
     editor: context.editor,
-    onDefaultBranch: (await currentBranch(repository)) === context.defaultBranch,
     path: MESSAGE_PATH,
     commit: null,
   };

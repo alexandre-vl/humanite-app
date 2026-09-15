@@ -177,9 +177,12 @@ const FIXTURE_COMMIT_POLICY: CommitPolicy = {
   otherTrailers: ['Co-authored-by', 'BREAKING-CHANGE'],
 };
 
+/** The same policy for every commit of a fixture history. */
+const FIXTURE_POLICY_AT = async (): Promise<CommitPolicy> => Promise.resolve(FIXTURE_COMMIT_POLICY);
+
 const MESSAGE_PATH = repoPath('.git/COMMIT_EDITMSG');
 
-type MessageOptions = Readonly<{ editor?: boolean; onDefaultBranch?: boolean; expected?: ExpectedRefs }>;
+type MessageOptions = Readonly<{ editor?: boolean; expected?: ExpectedRefs }>;
 
 /** Checks a message as the commit-msg hook does, its trailers parsed by git. */
 const checkedMessage =
@@ -191,7 +194,6 @@ const checkedMessage =
       message,
       trailers,
       editor: options.editor ?? false,
-      onDefaultBranch: options.onDefaultBranch ?? true,
       path: MESSAGE_PATH,
       commit: null,
     };
@@ -220,12 +222,6 @@ const MESSAGE_FIXTURES = [
     'un message d’éditeur dont git retirera les commentaires',
     [],
     checkedMessage('fix: corriger\n# Please enter the commit message\n#\n', { editor: true }),
-  ),
-  define(
-    'git/valid-fixup-off-default',
-    'une correction à fusionner hors de la branche principale',
-    [],
-    checkedMessage('fixup! feat: x\n', { onDefaultBranch: false }),
   ),
   define('git/header', 'un en-tête sans type', ['git/header'], checkedMessage('ajouter la garde\n')),
   define('git/type', 'un type inconnu', ['git/type'], checkedMessage('update: ajouter\n')),
@@ -262,8 +258,8 @@ const MESSAGE_FIXTURES = [
     checkedMessage("Merge branch 'autre'\n"),
   ),
   define(
-    'git/fixup-on-default',
-    'une correction à fusionner sur la branche principale',
+    'git/generated-fixup',
+    'une correction à fusionner, que seul un rebase sans pre-commit replierait',
     ['git/generated-message'],
     checkedMessage('fixup! feat: x\n'),
   ),
@@ -372,7 +368,6 @@ const FLOW_FIXTURES = [
           repository,
           messageFile,
           editor: false,
-          defaultBranch: 'main',
           policy: FIXTURE_COMMIT_POLICY,
           expectedRefs,
         }),
@@ -392,7 +387,6 @@ const FLOW_FIXTURES = [
           repository,
           messageFile,
           editor: false,
-          defaultBranch: 'main',
           policy: FIXTURE_COMMIT_POLICY,
           expectedRefs,
         }),
@@ -514,9 +508,7 @@ const history = (after: readonly string[], anchor: (repository: GitRepository) =
       await writeFile(join(repository.root, 'a.txt'), `${String(index + 3)}\n`);
       await git(repository, ['-c', 'core.hooksPath=/dev/null', 'commit', '--quiet', '-am', message]);
     }
-    return codes(
-      await checkCommitHistory({ repository, anchor: commit, defaultBranch: 'main', policy: FIXTURE_COMMIT_POLICY }),
-    );
+    return codes(await checkCommitHistory({ repository, anchor: commit, policyAt: FIXTURE_POLICY_AT }));
   });
 
 const headAnchor = async (repository: GitRepository): Promise<string> =>
@@ -573,9 +565,7 @@ const HISTORY_FIXTURES = [
         await git(repository, ['commit-tree', `${bad}^{tree}`, '-p', anchor, '-m', 'feat: remplaçant'])
       ).trim();
       await git(repository, ['replace', bad, good]);
-      return codes(
-        await checkCommitHistory({ repository, anchor, defaultBranch: 'main', policy: FIXTURE_COMMIT_POLICY }),
-      );
+      return codes(await checkCommitHistory({ repository, anchor, policyAt: FIXTURE_POLICY_AT }));
     }),
   ),
   define(
@@ -590,8 +580,7 @@ const HISTORY_FIXTURES = [
         await checkCommitHistory({
           repository: shallow,
           anchor: 'HEAD',
-          defaultBranch: 'main',
-          policy: FIXTURE_COMMIT_POLICY,
+          policyAt: FIXTURE_POLICY_AT,
         }),
       );
     }),
