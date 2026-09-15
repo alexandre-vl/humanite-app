@@ -12,6 +12,7 @@
     "@huma/agents": "workspace:*",
     "@huma/architecture": "workspace:*",
     "@huma/deps": "workspace:*",
+    "@huma/emulator": "workspace:*",
     "@huma/expo": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/git-hooks": "workspace:*",

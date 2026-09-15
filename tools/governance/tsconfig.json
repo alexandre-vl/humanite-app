@@ -2,16 +2,41 @@
   "extends": "@huma/tsconfig/node.json",
   "include": ["src"],
   "references": [
-    { "path": "../adr" },
-    { "path": "../agents" },
-    { "path": "../../packages/architecture" },
-    { "path": "../deps" },
-    { "path": "../expo" },
-    { "path": "../fixtures" },
-    { "path": "../git-hooks" },
-    { "path": "../guardrails" },
-    { "path": "../kit" },
-    { "path": "../lint" },
-    { "path": "../structure" }
+    {
+      "path": "../adr"
+    },
+    {
+      "path": "../agents"
+    },
+    {
+      "path": "../../packages/architecture"
+    },
+    {
+      "path": "../deps"
+    },
+    {
+      "path": "../emulator"
+    },
+    {
+      "path": "../expo"
+    },
+    {
+      "path": "../fixtures"
+    },
+    {
+      "path": "../git-hooks"
+    },
+    {
+      "path": "../guardrails"
+    },
+    {
+      "path": "../kit"
+    },
+    {
+      "path": "../lint"
+    },
+    {
+      "path": "../structure"
+    }
   ]
 }

@@ -439,6 +439,28 @@ importers:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
 
+  tools/emulator:
+    dependencies:
+      '@huma/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
+      '@huma/kit':
+        specifier: workspace:*
+        version: link:../kit
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
   tools/expo:
     dependencies:
       '@huma/deps':
@@ -519,6 +541,9 @@ importers:
       '@huma/deps':
         specifier: workspace:*
         version: link:../deps
+      '@huma/emulator':
+        specifier: workspace:*
+        version: link:../emulator
       '@huma/expo':
         specifier: workspace:*
         version: link:../expo

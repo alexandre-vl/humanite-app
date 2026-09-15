@@ -94,6 +94,7 @@ async function supervise(
   args: readonly string[],
   options: ProcessOptions,
   mode: OutputMode,
+  started: (pid: number) => void = () => undefined,
 ): Promise<Captured> {
   const empty = Buffer.alloc(0);
   if (options.signal?.aborted === true) {
@@ -149,6 +150,9 @@ async function supervise(
 
     if (group !== undefined) {
       liveGroups.add(group);
+    }
+    if (child.pid !== undefined) {
+      started(child.pid);
     }
     if (options.timeoutMs !== undefined) {
       const afterMs = options.timeoutMs;
@@ -249,4 +253,33 @@ export async function runAttached(
   options: Omit<ProcessOptions, 'input'>,
 ): Promise<Exit> {
   return (await supervise(command, args, options, 'attached')).exit;
+}
+
+/** A child that runs beside its caller, for as long as the caller needs its process: disposing it stops it. */
+export type Helper = AsyncDisposable & Readonly<{ pid: number }>;
+
+/**
+ * Starts `command` as a helper, its outputs collected and dropped. Disposing it stops the child and every process it
+ * started, as a time budget would, and waits until they have ended; so does the exit of this process.
+ */
+export async function startHelper(
+  command: string,
+  args: readonly string[],
+  options: Pick<ProcessOptions, 'cwd' | 'env' | 'killGraceMs'>,
+): Promise<Helper> {
+  const controller = new AbortController();
+  const { promise: spawned, resolve } = Promise.withResolvers<number | null>();
+  const ended = supervise(command, args, { ...options, signal: controller.signal }, 'captured', resolve);
+  const pid = await Promise.race([spawned, ended.then(() => null)]);
+  if (pid === null) {
+    const { exit } = await ended;
+    throw new Error(`${command} : ${describeExit(exit)}`);
+  }
+  return {
+    pid,
+    [Symbol.asyncDispose]: async () => {
+      controller.abort();
+      await ended;
+    },
+  };
 }

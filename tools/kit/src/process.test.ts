@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { temporaryDirectory } from './fs.ts';
-import { capture, ProcessError, run, runAttached, runText } from './process.ts';
+import { capture, ProcessError, run, runAttached, runText, startHelper } from './process.ts';
 
 const cwd = process.cwd();
 
@@ -101,4 +101,19 @@ test('runAttached reports how the child ended', async () => {
   expect(await runAttached('sh', ['-c', 'exit 5'], { cwd })).toEqual({ kind: 'exited', code: 5 });
   expect(await runAttached('sh', ['-c', 'kill -TERM $$'], { cwd })).toEqual({ kind: 'killed', signal: 'SIGTERM' });
   expect((await runAttached('commande-introuvable-huma', [], { cwd })).kind).toBe('unstartable');
+});
+
+describe('startHelper', () => {
+  test('runs a child until it is disposed, then waits for its end', async () => {
+    const pid = await (async () => {
+      await using helper = await startHelper('sleep', ['30'], { cwd, killGraceMs: 100 });
+      expect(isAlive(helper.pid)).toBe(true);
+      return helper.pid;
+    })();
+    expect(isAlive(pid)).toBe(false);
+  });
+
+  test('rejects a command that cannot start', async () => {
+    await expect(startHelper('commande-introuvable-huma', [], { cwd })).rejects.toThrow('lancement impossible');
+  });
 });

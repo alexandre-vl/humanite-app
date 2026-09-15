@@ -10,6 +10,8 @@ import { CLAUDE_SETTINGS_PATH } from '@huma/agents/policy';
 import { renderClaudeSettings } from '@huma/agents/settings';
 import { APP_DIRECTORY, packageImports, PLACES } from '@huma/architecture';
 import { packageDirectories, renderWorkspaceFile, WORKSPACE_FILE_NAME } from '@huma/deps/workspace';
+import { EMULATOR } from '@huma/emulator/config';
+import { renderTrackedTable, TRACKED_TABLE } from '@huma/emulator/tracked';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
 import { directoryNames, readTextIfExists } from '@huma/kit/fs';
@@ -212,6 +214,12 @@ const knipConfig: Artifact = {
   },
 };
 
+/** The table the root guard of the emulator reads: a tab-separated file Prettier has no parser for. */
+const trackedTable: Artifact = {
+  path: TRACKED_TABLE,
+  render: async () => Promise.resolve(renderTrackedTable(EMULATOR)),
+};
+
 export const ARTIFACTS: readonly Artifact[] = [
   ADR_INDEX_ARTIFACT,
   claudeSettings,
@@ -224,6 +232,7 @@ export const ARTIFACTS: readonly Artifact[] = [
   effectiveEslintConfig,
   effectiveTsconfig,
   knipConfig,
+  trackedTable,
 ];
 
 export async function checkArtifacts(

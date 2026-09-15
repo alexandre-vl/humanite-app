@@ -1,0 +1,22 @@
+{
+  "name": "@huma/emulator",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./checks": "./src/checks.ts",
+    "./config": "./src/config.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./status": "./src/status.ts",
+    "./tracked": "./src/guard/tracked.ts"
+  },
+  "dependencies": {
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

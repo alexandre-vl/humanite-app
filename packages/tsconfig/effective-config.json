@@ -248,6 +248,41 @@
     "include": ["src"],
     "exclude": ["<projet>/node_modules/.cache/tsc"]
   },
+  "tools/emulator/tsconfig.json": {
+    "compilerOptions": {
+      "allowImportingTsExtensions": true,
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "composite": true,
+      "declaration": true,
+      "emitDeclarationOnly": true,
+      "erasableSyntaxOnly": true,
+      "exactOptionalPropertyTypes": true,
+      "incremental": true,
+      "isolatedModules": true,
+      "lib": ["es2025", "esnext.array", "esnext.disposable", "esnext.error", "esnext.sharedmemory"],
+      "libReplacement": false,
+      "module": "nodenext",
+      "moduleDetection": "force",
+      "moduleResolution": "nodenext",
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noPropertyAccessFromIndexSignature": true,
+      "noUncheckedIndexedAccess": true,
+      "noUncheckedSideEffectImports": true,
+      "outDir": "./node_modules/.cache/tsc",
+      "preserveConstEnums": true,
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "target": "es2024",
+      "types": ["node"],
+      "verbatimModuleSyntax": true
+    },
+    "include": ["src"],
+    "exclude": ["<projet>/node_modules/.cache/tsc"]
+  },
   "tools/expo/tsconfig.json": {
     "compilerOptions": {
       "allowImportingTsExtensions": true,

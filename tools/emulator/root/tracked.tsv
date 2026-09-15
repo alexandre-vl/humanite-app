@@ -1,0 +1,84 @@
+# Généré par pnpm gen depuis tools/emulator/src/android-writes.ts et config.ts : ne pas modifier.
+setting	container	humanite-redroid15
+setting	unit	humanite-redroid-guard
+setting	tick_s	30
+setting	run_timeout_s	120
+setting	boot_deadline_s	180
+setting	boot_wait_s	60
+setting	idle_ttl_s	14400
+minimum	sysctl	100
+minimum	procattr	100
+minimum	sysfsattr	3
+minimum	sysfsval	1
+minimum	superopts	2
+minimum	mountroot	2
+minimum	tracefsattr	100
+minimum	tracefs-instance	0
+minimum	tracefsval	1
+android	sysctl	/proc/sys/kernel/sysrq	0
+android	sysctl	/proc/sys/kernel/modprobe	
+android	sysctl	/proc/sys/kernel/panic_on_oops	1
+android	sysctl	/proc/sys/kernel/hung_task_timeout_secs	*
+android	sysctl	/proc/sys/kernel/hung_task_warnings	65535
+android	sysctl	/proc/sys/kernel/hung_task_check_count	65535
+android	sysctl	/proc/sys/kernel/hung_task_panic	1
+android	sysctl	/proc/sys/kernel/randomize_va_space	2
+android	sysctl	/proc/sys/vm/mmap_min_addr	32768
+android	sysctl	/proc/sys/vm/watermark_boost_factor	0
+android	sysctl	/proc/sys/vm/overcommit_memory	1
+android	sysctl	/proc/sys/kernel/sched_schedstats	1
+android	sysctl	/proc/sys/kernel/perf_event_paranoid	*
+android	sysctl	/proc/sys/kernel/perf_event_max_sample_rate	*
+android	sysctl	/proc/sys/kernel/perf_cpu_time_max_percent	25
+android	sysctl	/proc/sys/kernel/perf_event_mlock_kb	516
+android	sysctl	/proc/sys/kernel/kptr_restrict	*
+android	sysctl	/proc/sys/vm/mmap_rnd_bits	*
+android	sysctl	/proc/sys/vm/mmap_rnd_compat_bits	*
+android	sysctl	/proc/sys/kernel/unprivileged_bpf_disabled	2
+android	sysctl	/proc/sys/vm/watermark_scale_factor	*
+android	procattr	/proc/sysrq-trigger	220 0 1000
+android	procattr	/proc/kmsg	440 0 1000
+android	procattr	/proc/pressure/memory	664 1000 1000
+android	procattr	/proc/slabinfo	440 0 1007
+android	procattr	/proc/pagetypeinfo	440 0 1007
+android	procattr	/proc/cmdline	440 0 1001
+android	procattr	/proc/vmallocinfo	440 0 1007
+android	sysfsattr	/sys/power/wakeup_count	644 1000 1000
+android	sysfsattr	/sys/power/state	660 1000 1000
+android	sysfsattr	/sys/firmware/acpi/tables	755 1000 1000
+android	sysfsval	/sys/kernel/mm/lru_gen/enabled	*
+android	superopts	/sys/kernel/debug	rw,mode=755
+android	superopts	/sys/kernel/tracing	rw,gid=3012
+android	mountroot	/sys/kernel/debug	755 0 0
+android	mountroot	/sys/kernel/tracing	*
+android	tracefsattr	*	*
+android	tracefsval	tracing_on	0
+android	tracefs-instance	bootreceiver	present
+android	tracefs-instance	wifi	present
+clean	sysctl	/proc/sys/kernel/modprobe	/sbin/modprobe
+clean	sysctl	/proc/sys/kernel/hung_task_timeout_secs	120
+clean	sysctl	/proc/sys/kernel/hung_task_warnings	10
+clean	sysctl	/proc/sys/kernel/hung_task_check_count	4194304
+clean	sysctl	/proc/sys/kernel/hung_task_panic	0
+clean	sysctl	/proc/sys/vm/mmap_min_addr	65536
+clean	sysctl	/proc/sys/vm/mmap_rnd_bits	28
+clean	sysctl	/proc/sys/vm/mmap_rnd_compat_bits	8
+clean	procattr	/proc/sysrq-trigger	200 0 0
+clean	procattr	/proc/kmsg	400 0 0
+clean	procattr	/proc/pressure/memory	666 0 0
+clean	procattr	/proc/slabinfo	400 0 0
+clean	procattr	/proc/pagetypeinfo	400 0 0
+clean	procattr	/proc/cmdline	444 0 0
+clean	procattr	/proc/vmallocinfo	400 0 0
+clean	sysfsattr	/sys/power/wakeup_count	644 0 0
+clean	sysfsattr	/sys/power/state	644 0 0
+clean	sysfsattr	/sys/firmware/acpi/tables	755 0 0
+clean	superopts	/sys/kernel/debug	rw
+clean	superopts	/sys/kernel/tracing	rw
+clean	mountroot	/sys/kernel/debug	700 0 0
+clean	mountroot	/sys/kernel/tracing	700 0 0
+clean	tracefsval	tracing_on	1
+clean	tracefs-instance	bootreceiver	<absent>
+clean	tracefs-instance	wifi	<absent>
+volatile	sysctl	/proc/sys/kernel/ns_last_pid
+skip	sysctl	/proc/sys/vm/stat_refresh

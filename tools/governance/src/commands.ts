@@ -65,6 +65,11 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'vérifie manifestes, catalog, références TypeScript et lockfile',
   },
+  'emulator:status': {
+    argv: ['node', cli('emulator-status')],
+    audience: 'everyone',
+    summary: 'vérifie sans rien changer ce que l’émulateur Android exige, et affiche les commandes root qui manquent',
+  },
   'expo:types': {
     argv: ['node', cli('expo-types')],
     audience: 'everyone',
