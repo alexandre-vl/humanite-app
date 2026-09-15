@@ -14,18 +14,34 @@ export type Exit =
   | Readonly<{ kind: 'aborted' }>
   | Readonly<{ kind: 'unstartable'; reason: string }>;
 
-export type ProcessOptions = Readonly<{
+/** What every child of this process is given, whatever ends it. */
+type ChildBase = Readonly<{
   cwd: string;
   /** Complete environment of the child; the current process environment when absent. */
   env?: Environment;
-  input?: string | Uint8Array;
-  /** Stops the child and every process it started once this budget is spent. */
-  timeoutMs?: number;
-  /** Stops the child and every process it started when aborted. */
-  signal?: AbortSignal;
   /** Delay between SIGTERM and SIGKILL when the child is stopped. */
   killGraceMs?: number;
 }>;
+
+/**
+ * What ends a child, and there is always something: a command with neither budget nor signal holds a hook, a fixture
+ * or a check forever the day it blocks on a lock or a stalled filesystem. A command that answers takes a budget; only
+ * a server its caller stops itself may rely on its signal alone.
+ */
+type Stopping =
+  /** Stops the child and every process it started once this budget is spent. */
+  | Readonly<{ timeoutMs: number; signal?: AbortSignal }>
+  /** Stops the child and every process it started when aborted. */
+  | Readonly<{ timeoutMs?: number; signal: AbortSignal }>;
+
+/** A child whose outputs the caller collects, and whose input it may write. */
+export type ProcessOptions = ChildBase & Stopping & Readonly<{ input?: string | Uint8Array }>;
+
+/** A child that writes on the caller's own terminal. */
+export type AttachedOptions = ChildBase & Stopping;
+
+/** A child that runs beside its caller: disposing it stops it, so it has no ending of its own. */
+export type HelperOptions = ChildBase;
 
 export type Captured = Readonly<{ exit: Exit; stdout: Buffer; stderr: Buffer }>;
 
@@ -86,13 +102,13 @@ export const describeExit = (exit: Exit): string => {
 type OutputMode = 'captured' | 'attached';
 
 /**
- * Runs `command` without a shell and resolves how it ended; never rejects. A child with a time budget or an abort signal
- * leads its own process group, so stopping it also stops what it started: SIGTERM, then SIGKILL.
+ * Runs `command` without a shell and resolves how it ended; never rejects. Every child leads its own process group, so
+ * stopping it also stops what it started: SIGTERM, then SIGKILL.
  */
 async function supervise(
   command: string,
   args: readonly string[],
-  options: ProcessOptions,
+  options: ChildBase & Readonly<{ input?: string | Uint8Array; timeoutMs?: number; signal?: AbortSignal }>,
   mode: OutputMode,
   started: (pid: number) => void = () => undefined,
 ): Promise<Captured> {
@@ -100,7 +116,6 @@ async function supervise(
   if (options.signal?.aborted === true) {
     return { exit: { kind: 'aborted' }, stdout: empty, stderr: empty };
   }
-  const stoppable = options.timeoutMs !== undefined || options.signal !== undefined;
   const graceMs = options.killGraceMs ?? KILL_GRACE_MS;
   return new Promise<Captured>((resolve) => {
     const child = spawn(command, args, {
@@ -108,12 +123,12 @@ async function supervise(
       env: options.env ?? process.env,
       // An attached child in its own process group must not read the terminal, which would stop it.
       stdio: mode === 'captured' ? ['pipe', 'pipe', 'pipe'] : ['ignore', 'inherit', 'inherit'],
-      detached: stoppable,
+      detached: true,
     });
     const stdout: Buffer[] = [];
     const stderr: Buffer[] = [];
     const timers: NodeJS.Timeout[] = [];
-    const group = stoppable ? child.pid : undefined;
+    const group = child.pid;
     let stopped: Exit | null = null;
     let settled = false;
 
@@ -247,36 +262,44 @@ export async function runText(command: string, args: readonly string[], options:
  * Runs `command` on the terminal of the caller, for checks whose output a person reads live; its input is closed. A time
  * budget or an abort stops it as `capture` would.
  */
-export async function runAttached(
-  command: string,
-  args: readonly string[],
-  options: Omit<ProcessOptions, 'input'>,
-): Promise<Exit> {
+export async function runAttached(command: string, args: readonly string[], options: AttachedOptions): Promise<Exit> {
   return (await supervise(command, args, options, 'attached')).exit;
 }
 
 /** A child that runs beside its caller, for as long as the caller needs its process: disposing it stops it. */
-export type Helper = AsyncDisposable & Readonly<{ pid: number }>;
+export type Helper = AsyncDisposable &
+  Readonly<{
+    pid: number;
+    /**
+     * Resolves `work`, unless the child ends first: waiting on a helper that is already gone would otherwise time out
+     * on a guess, while what the child wrote before dying says what happened.
+     */
+    whileAlive: <Result>(work: Promise<Result>) => Promise<Result>;
+  }>;
 
 /**
- * Starts `command` as a helper, its outputs collected and dropped. Disposing it stops the child and every process it
- * started, as a time budget would, and waits until they have ended; so does the exit of this process.
+ * Starts `command` as a helper, its outputs collected. Disposing it stops the child and every process it started, as a
+ * time budget would, and waits until they have ended; so does the exit of this process.
  */
-export async function startHelper(
-  command: string,
-  args: readonly string[],
-  options: Pick<ProcessOptions, 'cwd' | 'env' | 'killGraceMs'>,
-): Promise<Helper> {
+export async function startHelper(command: string, args: readonly string[], options: HelperOptions): Promise<Helper> {
   const controller = new AbortController();
   const { promise: spawned, resolve } = Promise.withResolvers<number | null>();
   const ended = supervise(command, args, { ...options, signal: controller.signal }, 'captured', resolve);
+  const name = describeCommand(command, args);
   const pid = await Promise.race([spawned, ended.then(() => null)]);
   if (pid === null) {
-    const { exit } = await ended;
-    throw new Error(`${command} : ${describeExit(exit)}`);
+    throw new ProcessError(name, await ended);
   }
   return {
     pid,
+    whileAlive: async <Result>(work: Promise<Result>): Promise<Result> => {
+      const died = ended.then((captured): never => {
+        throw new ProcessError(name, captured);
+      });
+      // The work usually wins the race; nothing else would then handle the rejection of the losing branch.
+      died.catch(() => undefined);
+      return Promise.race([work, died]);
+    },
     [Symbol.asyncDispose]: async () => {
       controller.abort();
       await ended;

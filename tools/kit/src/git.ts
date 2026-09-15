@@ -5,7 +5,7 @@ import { errnoCode } from './errors.ts';
 import { temporaryDirectory } from './fs.ts';
 import type { RepoPath } from './paths.ts';
 import { isRepoPath } from './paths.ts';
-import type { Environment, RunResult } from './process.ts';
+import type { Environment, ProcessOptions, RunResult } from './process.ts';
 import { capture, ProcessError, run, runText } from './process.ts';
 import { isOneOf } from './records.ts';
 import { decodeUtf8 } from './text.ts';
@@ -138,11 +138,23 @@ export function isolatedRepository(root: string, options: IsolationOptions = {})
   };
 }
 
-export type GitOptions = Readonly<{ input?: string | Uint8Array; successCodes?: readonly number[] }>;
+/**
+ * Time a git command may take before it is stopped, generous for a loaded shared host but finite: a git blocked on
+ * `index.lock` or on a stalled filesystem would otherwise hold a hook, a fixture or a check forever.
+ */
+const GIT_TIMEOUT_MS = 120_000;
 
-const processOptions = (repository: GitRepository, options: GitOptions) => ({
+export type GitOptions = Readonly<{
+  input?: string | Uint8Array;
+  successCodes?: readonly number[];
+  /** Raised only for a command that legitimately takes longer than `GIT_TIMEOUT_MS`. */
+  timeoutMs?: number;
+}>;
+
+const processOptions = (repository: GitRepository, options: GitOptions): ProcessOptions => ({
   cwd: repository.root,
   env: repository.env,
+  timeoutMs: GIT_TIMEOUT_MS,
   ...options,
   ...(repository.signal === undefined ? {} : { signal: repository.signal }),
 });
@@ -202,7 +214,10 @@ export async function isWorkTree(repository: GitRepository): Promise<boolean> {
     return false;
   }
   if (captured.exit.kind !== 'exited' || captured.exit.code !== 0) {
-    throw new Error(`git rev-parse --is-inside-work-tree : ${captured.stderr.toString('utf8')}`);
+    throw new ProcessError(
+      `git ${gitArguments(repository, ['rev-parse', '--is-inside-work-tree']).join(' ')}`,
+      captured,
+    );
   }
   return captured.stdout.toString('utf8').trim() === 'true';
 }

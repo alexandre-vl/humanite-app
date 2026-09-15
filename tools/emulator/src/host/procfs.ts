@@ -46,8 +46,11 @@ export async function withFreshProcfs<Result>(body: (procfs: string) => Promise<
     ['--user', '--map-current-user', '--pid', '--fork', '--kill-child', '--mount-proc', '--', 'sleep', 'infinity'],
     { cwd: '/', killGraceMs: 500 },
   );
+  // A host whose unprivileged user namespaces are off makes unshare exit at once, saying so: waiting for a child it
+  // never forked would time out on a guess instead.
+  const inner = await helper.whileAlive(innerProcess(helper.pid));
   // Awaited here: the helper, and the procfs it holds, must outlive the body.
-  return await body(`/proc/${String(await innerProcess(helper.pid))}/root/proc`);
+  return await body(`/proc/${String(inner)}/root/proc`);
 }
 
 /**

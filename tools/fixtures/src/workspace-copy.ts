@@ -1,6 +1,6 @@
 import { access, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { temporaryDirectory } from '@huma/kit/fs';
+import { temporaryDirectoryWith } from '@huma/kit/fs';
 import { compareText } from '@huma/kit/text';
 import type { FileTree } from './workspace.ts';
 import { writeTree } from './workspace.ts';
@@ -28,22 +28,22 @@ const packagesOf = (files: FileTree): readonly string[] =>
  * Writes `files` into a new copy of the workspace at `workspaceRoot`, with a solution `tsconfig.json` referencing the
  * TypeScript projects of the tree. Removing the copy removes the links, never what they point at.
  */
-export async function workspaceCopy(workspaceRoot: string, files: FileTree): Promise<WorkspaceCopy> {
-  const directory = await temporaryDirectory('guardrail');
-  const root = join(directory.path, 'workspace');
-  await writeTree(root, files);
-  await symlink(join(workspaceRoot, 'node_modules'), join(root, 'node_modules'), 'dir');
-  const projects: string[] = [];
-  for (const each of packagesOf(files)) {
-    const modules = join(workspaceRoot, each, 'node_modules');
-    if (await exists(modules)) {
-      await symlink(modules, join(root, each, 'node_modules'), 'dir');
+export const workspaceCopy = async (workspaceRoot: string, files: FileTree): Promise<WorkspaceCopy> =>
+  temporaryDirectoryWith('guardrail', async (path) => {
+    const root = join(path, 'workspace');
+    await writeTree(root, files);
+    await symlink(join(workspaceRoot, 'node_modules'), join(root, 'node_modules'), 'dir');
+    const projects: string[] = [];
+    for (const each of packagesOf(files)) {
+      const modules = join(workspaceRoot, each, 'node_modules');
+      if (await exists(modules)) {
+        await symlink(modules, join(root, each, 'node_modules'), 'dir');
+      }
+      if (Object.hasOwn(files, `${each}/tsconfig.json`)) {
+        projects.push(`./${each}`);
+      }
     }
-    if (Object.hasOwn(files, `${each}/tsconfig.json`)) {
-      projects.push(`./${each}`);
-    }
-  }
-  const solution = { files: [], references: projects.map((path) => ({ path })) };
-  await writeFile(join(root, 'tsconfig.json'), `${JSON.stringify(solution, null, 2)}\n`);
-  return { root, [Symbol.asyncDispose]: async () => directory[Symbol.asyncDispose]() };
-}
+    const solution = { files: [], references: projects.map((project) => ({ path: project })) };
+    await writeFile(join(root, 'tsconfig.json'), `${JSON.stringify(solution, null, 2)}\n`);
+    return { root };
+  });

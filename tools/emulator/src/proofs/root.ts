@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FileTree } from '@huma/fixtures';
 import { fixtureFactory, writeTree } from '@huma/fixtures';
-import { temporaryDirectory } from '@huma/kit/fs';
+import { temporaryDirectory, temporaryDirectoryWith } from '@huma/kit/fs';
 import { run } from '@huma/kit/process';
 import { isOneOf } from '@huma/kit/records';
 import type { GuardCode } from '../checks.ts';
@@ -287,32 +287,27 @@ async function guardScenario(
   commands: readonly GuardCommand[],
   extra: FileTree = {},
 ): Promise<Scenario> {
-  const directory = await temporaryDirectory('emulator-guard');
-  await writeTree(directory.path, {
-    ...INSTALLED,
-    ...Object.fromEntries(
-      snapshots.map((snapshot, index) => [`snapshots/${String(index + 1)}.tsv`, records(snapshot)]),
-    ),
-    ...extra,
+  return temporaryDirectoryWith('emulator-guard', async (directory) => {
+    await writeTree(directory, {
+      ...INSTALLED,
+      ...Object.fromEntries(
+        snapshots.map((snapshot, index) => [`snapshots/${String(index + 1)}.tsv`, records(snapshot)]),
+      ),
+      ...extra,
+    });
+    const exitCodes: number[] = [];
+    for (const step of commands) {
+      await writeFile(
+        join(directory, 'container'),
+        `${step.container} ${step.container === 'absent' ? '-' : STARTED_AT}\n`,
+      );
+      await step.before?.(directory);
+      exitCodes.push((await dash(directory, `${FAKES}\n${step.command}`, signal)).exitCode);
+    }
+    const status = parseGuardStatus(await readFile(join(directory, 'run/status'), 'utf8'));
+    const writes = await readFile(join(directory, 'writes'), 'utf8').catch(() => '');
+    return { status, directory, writes, exitCodes };
   });
-  const exitCodes: number[] = [];
-  for (const step of commands) {
-    await writeFile(
-      join(directory.path, 'container'),
-      `${step.container} ${step.container === 'absent' ? '-' : STARTED_AT}\n`,
-    );
-    await step.before?.(directory.path);
-    exitCodes.push((await dash(directory.path, `${FAKES}\n${step.command}`, signal)).exitCode);
-  }
-  const status = parseGuardStatus(await readFile(join(directory.path, 'run/status'), 'utf8'));
-  const writes = await readFile(join(directory.path, 'writes'), 'utf8').catch(() => '');
-  return {
-    status,
-    directory: directory.path,
-    writes,
-    exitCodes,
-    [Symbol.asyncDispose]: directory[Symbol.asyncDispose],
-  };
 }
 
 /** The codes of a status: the action of each change, then the reason of each failure. */

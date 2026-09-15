@@ -6,6 +6,12 @@ import { capture, ProcessError, run, runAttached, runText, startHelper } from '.
 
 const cwd = process.cwd();
 
+/** Every child of these tests answers at once: a budget keeps a broken one from holding the suite. */
+const TIMEOUT_MS = 10_000;
+
+/** Options of a child that runs here and answers at once. */
+const here = { cwd, timeoutMs: TIMEOUT_MS } as const;
+
 const isAlive = (pid: number): boolean => {
   try {
     process.kill(pid, 0);
@@ -17,7 +23,7 @@ const isAlive = (pid: number): boolean => {
 
 describe('capture', () => {
   test('collects both outputs and the exit code', async () => {
-    const result = await capture('sh', ['-c', 'printf out; printf err >&2; exit 3'], { cwd });
+    const result = await capture('sh', ['-c', 'printf out; printf err >&2; exit 3'], here);
     expect(result.exit).toEqual({ kind: 'exited', code: 3 });
     expect(result.stdout.toString('utf8')).toBe('out');
     expect(result.stderr.toString('utf8')).toBe('err');
@@ -25,11 +31,11 @@ describe('capture', () => {
 
   test('a child that exits without reading a large input is judged on its exit code', async () => {
     const input = 'x'.repeat(8 * 1024 * 1024);
-    expect((await capture('sh', ['-c', 'exit 4'], { cwd, input })).exit).toEqual({ kind: 'exited', code: 4 });
+    expect((await capture('sh', ['-c', 'exit 4'], { ...here, input })).exit).toEqual({ kind: 'exited', code: 4 });
   });
 
   test('reports a child killed by a signal as killed, never as exited', async () => {
-    expect((await capture('sh', ['-c', 'kill -9 $$'], { cwd })).exit).toEqual({ kind: 'killed', signal: 'SIGKILL' });
+    expect((await capture('sh', ['-c', 'kill -9 $$'], here)).exit).toEqual({ kind: 'killed', signal: 'SIGKILL' });
   });
 
   test('a time budget stops the child and the processes it started', async () => {
@@ -63,33 +69,35 @@ describe('capture', () => {
 
   test('outputs held open by a leftover process do not hold the result', async () => {
     const started = performance.now();
-    const result = await capture('sh', ['-c', 'sleep 5 & echo parti'], { cwd });
+    const result = await capture('sh', ['-c', 'sleep 5 & echo parti'], here);
     expect(result.exit).toEqual({ kind: 'exited', code: 0 });
     expect(result.stdout.toString('utf8')).toBe('parti\n');
     expect(performance.now() - started).toBeLessThan(4_000);
   });
 
   test('reports a command that cannot start', async () => {
-    const result = await capture('commande-introuvable-huma', [], { cwd });
+    const result = await capture('commande-introuvable-huma', [], here);
     expect(result.exit.kind).toBe('unstartable');
   });
 });
 
 describe('run', () => {
   test('resolves on a success code and rejects any other ending with the tail of stderr', async () => {
-    await expect(run('sh', ['-c', 'exit 3'], { cwd, successCodes: [0, 3] })).resolves.toMatchObject({ exitCode: 3 });
-    const failure = run('sh', ['-c', 'echo raison >&2; exit 3'], { cwd });
+    await expect(run('sh', ['-c', 'exit 3'], { ...here, successCodes: [0, 3] })).resolves.toMatchObject({
+      exitCode: 3,
+    });
+    const failure = run('sh', ['-c', 'echo raison >&2; exit 3'], here);
     await expect(failure).rejects.toBeInstanceOf(ProcessError);
     await expect(failure).rejects.toThrow('code de sortie 3\nraison');
-    await expect(run('sh', ['-c', 'kill -9 $$'], { cwd, successCodes: [0, 137] })).rejects.toThrow(
+    await expect(run('sh', ['-c', 'kill -9 $$'], { ...here, successCodes: [0, 137] })).rejects.toThrow(
       'tué par le signal SIGKILL',
     );
-    await expect(run('commande-introuvable-huma', [], { cwd })).rejects.toThrow('lancement impossible');
+    await expect(run('commande-introuvable-huma', [], here)).rejects.toThrow('lancement impossible');
   });
 
   test('runText passes the input and refuses output that is not UTF-8', async () => {
-    expect(await runText('cat', [], { cwd, input: 'entrée' })).toBe('entrée');
-    await expect(runText('printf', [String.raw`\377`], { cwd })).rejects.toThrow('pas de l’UTF-8 valide');
+    expect(await runText('cat', [], { ...here, input: 'entrée' })).toBe('entrée');
+    await expect(runText('printf', [String.raw`\377`], here)).rejects.toThrow('pas de l’UTF-8 valide');
   });
 });
 
@@ -98,9 +106,9 @@ test('runAttached stops a child that exceeds its time budget', async () => {
 });
 
 test('runAttached reports how the child ended', async () => {
-  expect(await runAttached('sh', ['-c', 'exit 5'], { cwd })).toEqual({ kind: 'exited', code: 5 });
-  expect(await runAttached('sh', ['-c', 'kill -TERM $$'], { cwd })).toEqual({ kind: 'killed', signal: 'SIGTERM' });
-  expect((await runAttached('commande-introuvable-huma', [], { cwd })).kind).toBe('unstartable');
+  expect(await runAttached('sh', ['-c', 'exit 5'], here)).toEqual({ kind: 'exited', code: 5 });
+  expect(await runAttached('sh', ['-c', 'kill -TERM $$'], here)).toEqual({ kind: 'killed', signal: 'SIGTERM' });
+  expect((await runAttached('commande-introuvable-huma', [], here)).kind).toBe('unstartable');
 });
 
 describe('startHelper', () => {
@@ -115,5 +123,12 @@ describe('startHelper', () => {
 
   test('rejects a command that cannot start', async () => {
     await expect(startHelper('commande-introuvable-huma', [], { cwd })).rejects.toThrow('lancement impossible');
+  });
+
+  test('a helper that dies first ends the work waiting on it, with what the child wrote', async () => {
+    await using helper = await startHelper('sh', ['-c', 'echo raison >&2; exit 7'], { cwd, killGraceMs: 100 });
+    // A caller that waits for a helper to be ready must not wait for its own timeout on a child that is already gone.
+    await expect(helper.whileAlive(new Promise(() => undefined))).rejects.toThrow('code de sortie 7\nraison');
+    await expect(helper.whileAlive(Promise.resolve('prêt'))).resolves.toBe('prêt');
   });
 });

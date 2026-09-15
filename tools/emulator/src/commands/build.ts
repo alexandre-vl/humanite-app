@@ -8,6 +8,7 @@ import { capture, describeExit, run, runAttached } from '@huma/kit/process';
 import type { EmulatorConfig } from '../config.ts';
 import type { Session } from '../session.ts';
 import { appRoot, cacheDirectory } from '../session.ts';
+import { QUERY_TIMEOUT_MS } from '../tools.ts';
 
 export type BuildOptions = Readonly<{
   clean: boolean;
@@ -61,7 +62,10 @@ async function changedAppPaths(session: Session): Promise<ReadonlySet<string>> {
 /** The user unit of the build still running, its watcher service or the scope of Gradle; `null` when none runs. */
 export async function runningBuildUnit(root: string, config: EmulatorConfig): Promise<string | null> {
   for (const unit of [`${config.build.serviceUnit}.service`, `${config.build.unit}.scope`]) {
-    const active = await capture('systemctl', ['--user', 'is-active', '--quiet', unit], { cwd: root });
+    const active = await capture('systemctl', ['--user', 'is-active', '--quiet', unit], {
+      cwd: root,
+      timeoutMs: QUERY_TIMEOUT_MS,
+    });
     if (active.exit.kind === 'exited' && active.exit.code === 0) {
       return unit;
     }

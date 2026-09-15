@@ -6,14 +6,15 @@ import { run, runText } from '@huma/kit/process';
 import { expect, test } from 'vitest';
 import { LIBRARY, records } from '../proofs/root.ts';
 
+/** Every snippet of the library these tests run answers at once. */
+const TIMEOUT_MS = 30_000;
+
 /** Runs `body` in dash after the library, its table moved to `directory/tracked.tsv`; resolves its output. */
 const library = async (directory: string, body: string): Promise<string> =>
   runText(
     'dash',
     ['-c', `set -eu\n. "$1"\nDIRECTORY=$2\nTRACKED=$DIRECTORY/tracked.tsv\n${body}`, 'dash', LIBRARY, directory],
-    {
-      cwd: directory,
-    },
+    { cwd: directory, timeoutMs: TIMEOUT_MS },
   );
 
 test('sysctl records join lines, turn tabs into spaces, mark what cannot be read or written back, and skip what they must', async () => {
@@ -72,6 +73,7 @@ test.skipIf(process.getuid?.() === 0)('every command of the guard refuses a user
   const result = await run('dash', ['-c', `. "$1"\nMODE=arm\nrequire_root`, 'dash', LIBRARY], {
     cwd: directory.path,
     successCodes: [0, 1],
+    timeoutMs: TIMEOUT_MS,
   });
   expect(result.exitCode).toBe(1);
   expect(result.stderr.toString('utf8')).toContain('arm: root only');

@@ -17,6 +17,23 @@ export async function temporaryDirectory(prefix: string): Promise<TemporaryDirec
   };
 }
 
+/**
+ * A temporary directory `fill` prepares before it reaches its caller, disposed with it afterwards. A failure while
+ * filling it removes it at once: between `mkdtemp` and the caller's `await using`, nothing else would.
+ */
+export async function temporaryDirectoryWith<Result extends object>(
+  prefix: string,
+  fill: (path: string) => Promise<Result>,
+): Promise<AsyncDisposable & Result> {
+  const directory = await temporaryDirectory(prefix);
+  try {
+    return { ...(await fill(directory.path)), [Symbol.asyncDispose]: directory[Symbol.asyncDispose] };
+  } catch (error) {
+    await directory[Symbol.asyncDispose]();
+    throw error;
+  }
+}
+
 /** Names in a directory, `null` when the path is not a directory that can be read. */
 export async function directoryNames(path: string): Promise<readonly string[] | null> {
   try {

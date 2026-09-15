@@ -7,6 +7,9 @@ import { GIT_HOOK_NAMES, isGitHookName, renderShim, renderShims } from './shims.
 
 const COMMAND = { node: 'node_modules/.bin/node', entry: 'tools/x/hook.ts', installer: 'pnpm hooks:install' };
 
+/** A shim without its entry refuses at once. */
+const SHIM_TIMEOUT_MS = 30_000;
+
 test('a shim execs the entry with the pinned node and the hook arguments, or refuses', () => {
   expect(renderShim('commit-msg', COMMAND)).toBe(
     [
@@ -29,7 +32,7 @@ test('a shim without its entry exits 1 with the reason on stderr', async () => {
   await using directory = await temporaryDirectory('hooks-shim');
   const shim = join(directory.path, 'pre-commit');
   await writeFile(shim, renderShim('pre-commit', COMMAND), { mode: 0o755 });
-  const result = await capture('sh', [shim], { cwd: directory.path });
+  const result = await capture('sh', [shim], { cwd: directory.path, timeoutMs: SHIM_TIMEOUT_MS });
   expect(result.exit).toEqual({ kind: 'exited', code: 1 });
   expect(result.stderr.toString('utf8')).toBe(
     `Hook git pre-commit refusé : node_modules/.bin/node ou tools/x/hook.ts introuvable dans ${directory.path}. Lancer pnpm install dans ce worktree.\n`,

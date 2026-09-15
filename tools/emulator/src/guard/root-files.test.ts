@@ -15,9 +15,14 @@ const read = async (file: string): Promise<string> => readFile(join(ROOT, file),
 
 const SCRIPTS = ROOT_FILE_NAMES.filter((file) => file.endsWith('.sh'));
 
+/** Parsing one script is immediate. */
+const PARSE_TIMEOUT_MS = 30_000;
+
 describe('the root scripts', () => {
   test.each(SCRIPTS)('%s is POSIX sh that dash reads', async (file) => {
-    await expect(run('dash', ['-n', join(ROOT, file)], { cwd: ROOT })).resolves.toMatchObject({ exitCode: 0 });
+    await expect(
+      run('dash', ['-n', join(ROOT, file)], { cwd: ROOT, timeoutMs: PARSE_TIMEOUT_MS }),
+    ).resolves.toMatchObject({ exitCode: 0 });
   });
 
   test.each(SCRIPTS.filter((file) => file !== 'lib.sh'))(

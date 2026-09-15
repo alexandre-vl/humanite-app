@@ -138,9 +138,11 @@ export async function runFixture<Id extends string, Code extends string>(
   });
   const ending = await Promise.race([running, timedOut]);
   clearTimeout(timer);
+  // However the run ended, nothing it started outlives it: a fixture that returned while a child of its own was still
+  // running leaves it to this abort, which every process and repository of the workspace takes.
+  controller.abort();
   switch (ending.kind) {
     case 'timeout':
-      controller.abort();
       await settleWithin(running, SETTLE_MS);
       return {
         id: fixture.id,

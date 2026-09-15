@@ -2,7 +2,14 @@ import { access, mkdir, realpath, symlink, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { expect, test } from 'vitest';
 import { describeError, errnoCode } from './errors.ts';
-import { directoryNames, readTextIfExists, resolveExistingPath, temporaryDirectory } from './fs.ts';
+import {
+  directoryNames,
+  isAccessible,
+  readTextIfExists,
+  resolveExistingPath,
+  temporaryDirectory,
+  temporaryDirectoryWith,
+} from './fs.ts';
 
 test('directoryNames lists a directory and returns null for a file or a missing path', async () => {
   await using directory = await temporaryDirectory('kit-fs');
@@ -48,4 +55,27 @@ test('errnoCode and describeError', async () => {
   expect(errnoCode('ENOENT')).toBeNull();
   expect(describeError(new Error('boom'))).toContain('Error: boom');
   expect(describeError(Object.create(null))).toBe('valeur non Error levée (object)');
+});
+
+test('a temporary directory filled before its caller holds it is removed when filling fails', async () => {
+  let attempted = '';
+  await expect(
+    temporaryDirectoryWith('kit-filled', async (path) => {
+      attempted = path;
+      await writeFile(join(path, 'a.txt'), 'x');
+      throw new Error('remplissage raté');
+    }),
+  ).rejects.toThrow('remplissage raté');
+  expect(await isAccessible(attempted)).toBe(false);
+
+  const kept = await (async () => {
+    await using filled = await temporaryDirectoryWith('kit-filled', async (path) => {
+      const inner = join(path, 'b');
+      await mkdir(inner);
+      return { inner };
+    });
+    expect(await isAccessible(filled.inner)).toBe(true);
+    return filled.inner;
+  })();
+  expect(await isAccessible(kept)).toBe(false);
 });

@@ -5,6 +5,7 @@ import { describeError, errnoCode } from '@huma/kit/errors';
 import { runText } from '@huma/kit/process';
 import type { EmulatorConfig } from '../config.ts';
 import { ROOT_SOURCE } from '../sources.ts';
+import { QUERY_TIMEOUT_MS } from '../tools.ts';
 import type { EmulatorCode, GuardCode } from '../checks.ts';
 import { emulatorFinding, guardFinding } from '../checks.ts';
 import type { RootFile } from './install.ts';
@@ -50,7 +51,7 @@ export async function observeGuard(config: EmulatorConfig): Promise<GuardObserva
   const timer = await runText(
     'systemctl',
     ['show', `${config.guard.unit}.timer`, '--property=LoadState', '--property=ActiveState'],
-    { cwd: '/' },
+    { cwd: '/', timeoutMs: QUERY_TIMEOUT_MS },
   );
   return {
     status,

@@ -69,6 +69,14 @@ export function devClientScheme(manifest: ApkManifest): string {
   return scheme;
 }
 
+/** Time aapt2 may take to read one manifest of an APK this workspace built. */
+const AAPT2_TIMEOUT_MS = 60_000;
+
 /** Reads the manifest of `apk` with the `aapt2` of the SDK's build tools. */
 export const readApkManifest = async (aapt2: string, apk: string, cwd: string): Promise<ApkManifest> =>
-  parseManifestTree(await runText(aapt2, ['dump', 'xmltree', '--file', 'AndroidManifest.xml', apk], { cwd }));
+  parseManifestTree(
+    await runText(aapt2, ['dump', 'xmltree', '--file', 'AndroidManifest.xml', apk], {
+      cwd,
+      timeoutMs: AAPT2_TIMEOUT_MS,
+    }),
+  );

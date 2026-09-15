@@ -5,6 +5,9 @@ import { runText } from '@huma/kit/process';
 import { compareText } from '@huma/kit/text';
 import { BIN_DIRECTORY } from './commands.ts';
 
+/** Time `tsc --showConfig` may take on one project of the solution, on a loaded shared host. */
+const SHOW_CONFIG_TIMEOUT_MS = 120_000;
+
 /** The projects the solution `tsconfig.json` at `root` references, as configuration files relative to the root. */
 async function solutionProjects(root: string): Promise<readonly string[]> {
   const solution = parseJson(await readFile(join(root, 'tsconfig.json'), 'utf8'));
@@ -36,7 +39,10 @@ export async function renderEffectiveTsconfigs(root: string): Promise<string> {
   const snapshot: Record<string, unknown> = {};
   for (const project of (await solutionProjects(root)).toSorted(compareText)) {
     const shown = parseJson(
-      await runText(join(root, BIN_DIRECTORY, 'tsc'), ['--showConfig', '--project', project], { cwd: root }),
+      await runText(join(root, BIN_DIRECTORY, 'tsc'), ['--showConfig', '--project', project], {
+        cwd: root,
+        timeoutMs: SHOW_CONFIG_TIMEOUT_MS,
+      }),
     );
     if (!isJsonObject(shown)) {
       throw new Error(`tsc --showConfig ${project} : sortie illisible`);
