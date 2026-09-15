@@ -1,10 +1,10 @@
 import type { FileTree, Fixture } from '@huma/fixtures';
-import { fixtureFactory } from '@huma/fixtures';
+import { fixtureFactory, IN_PROCESS } from '@huma/fixtures';
 import type { PolicyId } from '@huma/eslint-config/policies';
 import { lintTree } from '../lint-tree.ts';
 import { ALL_POLICIES, mutantsOf } from '../mutation.ts';
 
-const define = fixtureFactory<PolicyId>();
+const define = fixtureFactory<PolicyId>(IN_PROCESS);
 
 /** A Node tool of the workspace, whose `src/probe.ts` holds the code under test beside a helper module. */
 const nodeTool = (probe: string): FileTree => ({

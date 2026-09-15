@@ -1,13 +1,13 @@
 import { join } from 'node:path';
 import type { FileTree } from '@huma/fixtures';
-import { fixtureFactory, workspaceCopy } from '@huma/fixtures';
+import { fixtureFactory, IN_PROCESS, workspaceCopy } from '@huma/fixtures';
 import { findWorkspaceRoot } from '@huma/kit/cli';
 import { readFile } from 'node:fs/promises';
 import type { StructureCode } from '../checks.ts';
 import { cycleFindings } from '../cycles.ts';
 import { steigerFindings } from '../steiger.ts';
 
-const define = fixtureFactory<StructureCode>();
+const define = fixtureFactory<StructureCode>(IN_PROCESS);
 
 const APP = 'apps/mobile';
 

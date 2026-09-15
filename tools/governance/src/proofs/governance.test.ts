@@ -1,6 +1,7 @@
 import type { Coverage } from '@huma/fixtures';
-import { findDuplicateIds, FIXTURE_TEST_TIMEOUT_MS, runFixture } from '@huma/fixtures';
-import { describe, expect, expectTypeOf, test } from 'vitest';
+import { findDuplicateIds } from '@huma/fixtures';
+import { testFixtures } from '@huma/fixtures/vitest';
+import { expect, expectTypeOf, test } from 'vitest';
 import { BINDINGS } from '../bindings.ts';
 import { PROOFS } from '../proofs.ts';
 import type { GovernanceProofCode } from './governance.ts';
@@ -10,6 +11,7 @@ test('every governance code is reached by a fixture', () => {
   expectTypeOf<Coverage<GovernanceProofCode, typeof GOVERNANCE_FIXTURES>>().toEqualTypeOf<true>();
 });
 
+/** The only place proof ids are proven unique: every list of the workspace ends up in `PROOFS`. */
 test('proof ids are unique across the whole workspace', () => {
   expect(findDuplicateIds(PROOFS)).toEqual([]);
 });
@@ -97,12 +99,4 @@ test('every proof that touches an ADR is bound to a rule of ADR-0000; the others
   expect(ids.filter((id) => !bound.has(id))).toEqual(ids.filter(awaitsFoundationAdr));
 });
 
-describe.concurrent('each governance fixture reports exactly its expected codes', () => {
-  test.each(GOVERNANCE_FIXTURES)(
-    '$id',
-    async (fixture) => {
-      expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
-    },
-    FIXTURE_TEST_TIMEOUT_MS,
-  );
-});
+testFixtures('each governance fixture reports exactly its expected codes', GOVERNANCE_FIXTURES);

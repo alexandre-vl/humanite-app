@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import type { FileTree } from '@huma/fixtures';
-import { createRepository, fixtureFactory } from '@huma/fixtures';
+import { createRepository, fixtureFactory, IN_PROCESS } from '@huma/fixtures';
 import { temporaryDirectory } from '@huma/kit/fs';
 import { listFiles } from '@huma/kit/git';
 import { repoPath } from '@huma/kit/paths';
@@ -8,7 +8,7 @@ import type { LintCode } from '../checks.ts';
 import { lintPaths, SUPPRESSIONS_FILE } from '../eslint.ts';
 import { checkFormatting, PRETTIER_IGNORE_FILE } from '../prettier.ts';
 
-const define = fixtureFactory<LintCode>();
+const define = fixtureFactory<LintCode>(IN_PROCESS);
 
 const CONFIG_FILE = repoPath('eslint.config.mjs');
 

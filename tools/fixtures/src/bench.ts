@@ -17,6 +17,18 @@ export type Fixture<Id extends string, Code extends string> = Readonly<{
   description: string;
   /** Exact set of codes the run must report. */
   expected: readonly Code[];
+  /**
+   * Time the run gets before its signal is aborted, and what a test runner sizes its own budget on. A fixture whose
+   * work is synchronous in this process never reaches the point where it would see that signal: for it, the budget of
+   * the test around it is the only one.
+   */
+  timeoutMs: number;
+  /**
+   * Whether it may run at the same time as its siblings of the same file, which `testFixtures` obeys. The union is
+   * written out rather than named: every list of fixtures of the workspace names `Fixture` in what it emits, and a
+   * name only `@huma/fixtures` could reach would make none of them portable.
+   */
+  concurrency: 'concurrent' | 'serial';
   run: (context: FixtureContext) => Promise<readonly Code[]>;
 }>;
 
@@ -27,12 +39,31 @@ export type FixtureDefiner<Code extends string> = <const Id extends string, cons
   run: (context: FixtureContext) => Promise<readonly Code[]>,
 ) => Fixture<Id, Code> & Readonly<{ expected: Expected }>;
 
+/** What every fixture of a factory declares of the process that runs it. */
+export type FixtureDefaults = Pick<Fixture<string, string>, 'concurrency' | 'timeoutMs'>;
+
+/**
+ * A fixture that works in a child process or in a computation of its own: it shares nothing with its siblings, so it
+ * runs beside them, and its signal ends it. Its budget is what a hang looks like, not what it costs — the slowest of
+ * them measured 2,1 s on a host at load 20 with its swap full (15/09/2026).
+ */
+const OWN_WORK: FixtureDefaults = { timeoutMs: 30_000, concurrency: 'concurrent' };
+
+/**
+ * A fixture that lints or analyses in this very process: the typed linter keeps one project service per process and
+ * Steiger one configuration, so two of them beside each other would race for it. Its work is synchronous, so the
+ * signal of `runFixture` never reaches it: only the budget of the test around it ends it, and that budget is sized on
+ * what a hang looks like — the slowest of them measured 3,6 s on the same loaded host.
+ */
+export const IN_PROCESS: FixtureDefaults = { timeoutMs: 120_000, concurrency: 'serial' };
+
 /**
  * Builds fixtures whose `id` and `expected` keep their literal types, which `Coverage` needs:
- * `const define = fixtureFactory<CheckCode>()`, then `define('id', 'description', ['code'], run)`.
+ * `const define = fixtureFactory<CheckCode>()`, then `define('id', 'description', ['code'], run)`. Every fixture of
+ * one factory declares the same `defaults`, `OWN_WORK` unless the list says otherwise.
  */
-export function fixtureFactory<Code extends string>(): FixtureDefiner<Code> {
-  return (id, description, expected, run) => ({ id, description, expected, run });
+export function fixtureFactory<Code extends string>(defaults: FixtureDefaults = OWN_WORK): FixtureDefiner<Code> {
+  return (id, description, expected, run) => ({ ...defaults, id, description, expected, run });
 }
 
 type UnionToIntersection<Union> = (Union extends unknown ? (value: Union) => void : never) extends (
@@ -91,16 +122,8 @@ export type FixtureReport<Id extends string, Code extends string> = Readonly<{ i
     | Readonly<{ outcome: 'crashed'; error: string }>
   );
 
-export type RunOptions = Readonly<{ timeoutMs: number }>;
-
-/** Time budget of one fixture when the caller sets none: a fixture that hangs must not hang the check. */
-const DEFAULT_TIMEOUT_MS = 30_000;
-
 /** Time a fixture that exceeded its budget gets to stop what it started, once its signal is aborted. */
 export const SETTLE_MS = 5_000;
-
-/** Time a test runner gives a test that runs one fixture: the fixture budget, its settling time and a margin. */
-export const FIXTURE_TEST_TIMEOUT_MS = DEFAULT_TIMEOUT_MS + SETTLE_MS + 5_000;
 
 type RunEnding<Code extends string> =
   | Readonly<{ kind: 'codes'; codes: readonly Code[] }>
@@ -121,7 +144,6 @@ async function settleWithin(promise: Promise<unknown>, milliseconds: number): Pr
 
 export async function runFixture<Id extends string, Code extends string>(
   fixture: Fixture<Id, Code>,
-  options: RunOptions = { timeoutMs: DEFAULT_TIMEOUT_MS },
 ): Promise<FixtureReport<Id, Code>> {
   const started = performance.now();
   const elapsed = (): number => Math.round(performance.now() - started);
@@ -134,7 +156,7 @@ export async function runFixture<Id extends string, Code extends string>(
   const timedOut = new Promise<RunEnding<Code>>((resolve) => {
     timer = setTimeout(() => {
       resolve({ kind: 'timeout' });
-    }, options.timeoutMs);
+    }, fixture.timeoutMs);
   });
   const ending = await Promise.race([running, timedOut]);
   clearTimeout(timer);
@@ -148,7 +170,7 @@ export async function runFixture<Id extends string, Code extends string>(
         id: fixture.id,
         durationMs: elapsed(),
         outcome: 'crashed',
-        error: `délai de ${String(options.timeoutMs)} ms dépassé`,
+        error: `délai de ${String(fixture.timeoutMs)} ms dépassé`,
       };
     case 'error':
       return { id: fixture.id, durationMs: elapsed(), outcome: 'crashed', error: describeError(ending.error) };

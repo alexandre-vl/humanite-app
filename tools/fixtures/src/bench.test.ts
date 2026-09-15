@@ -1,11 +1,15 @@
 import { capture } from '@huma/kit/process';
 import { describe, expect, expectTypeOf, test } from 'vitest';
 import type { Coverage } from './bench.ts';
-import { findDuplicateIds, fixtureFactory, runFixture, SETTLE_MS, uncoveredCodes } from './bench.ts';
+import { findDuplicateIds, fixtureFactory, IN_PROCESS, runFixture, SETTLE_MS, uncoveredCodes } from './bench.ts';
+import { testTimeoutMs } from './vitest.ts';
 
 type Code = 'a/one' | 'a/two';
 
 const define = fixtureFactory<Code>();
+
+/** A factory whose fixtures run out of time at once, to observe what `runFixture` does when one does. */
+const impatient = (timeoutMs: number) => fixtureFactory<Code>({ timeoutMs, concurrency: 'concurrent' });
 
 const observing = (codes: readonly Code[]) => async (): Promise<readonly Code[]> => Promise.resolve(codes);
 
@@ -54,12 +58,11 @@ describe('runFixture', () => {
   test('a fixture over its budget is aborted, and its report waits until the work it started has stopped', async () => {
     let stopped = false;
     const report = await runFixture(
-      define('slow', 'lente', [], async ({ signal }) => {
+      impatient(50)('slow', 'lente', [], async ({ signal }) => {
         const result = await capture('sleep', ['30'], { cwd: process.cwd(), signal });
         stopped = result.exit.kind === 'aborted';
         return [];
       }),
-      { timeoutMs: 50 },
     );
     expect(report).toMatchObject({ outcome: 'crashed', error: 'délai de 50 ms dépassé' });
     expect(stopped).toBe(true);
@@ -68,16 +71,37 @@ describe('runFixture', () => {
 
   test('a fixture that ignores its signal is reported once the settling time is over', async () => {
     const report = await runFixture(
-      define('stubborn', 'têtue', [], async () => {
+      impatient(20)('stubborn', 'têtue', [], async () => {
         await waiting(SETTLE_MS + 2_000);
         return [];
       }),
-      { timeoutMs: 20 },
     );
     expect(report).toMatchObject({ outcome: 'crashed' });
     expect(report.durationMs).toBeGreaterThanOrEqual(SETTLE_MS);
     expect(report.durationMs).toBeLessThan(SETTLE_MS + 1_500);
   }, 15_000);
+});
+
+describe('what a fixture declares of the process that runs it', () => {
+  test('a factory without defaults gives every fixture its own process and a budget for a hang', () => {
+    expect(define('plain', 'simple', [], observing([]))).toMatchObject({
+      timeoutMs: 30_000,
+      concurrency: 'concurrent',
+    });
+  });
+
+  test('a fixture of IN_PROCESS runs alone, and long enough that only a hang ends it', () => {
+    const inProcess = fixtureFactory<Code>(IN_PROCESS);
+    expect(inProcess('linted', 'lintée', [], observing([]))).toMatchObject(IN_PROCESS);
+    expect(IN_PROCESS.concurrency).toBe('serial');
+  });
+
+  test('a test that runs fixtures one after the other gets every budget, plus the settling time', () => {
+    const first = impatient(1_000)('a', 'a', [], observing([]));
+    const second = impatient(2_000)('b', 'b', [], observing([]));
+    expect(testTimeoutMs([first, second])).toBeGreaterThan(1_000 + 2_000 + SETTLE_MS);
+    expect(testTimeoutMs([first, second]) - testTimeoutMs([first])).toBe(2_000);
+  });
 });
 
 test('findDuplicateIds lists each repeated id once, sorted', () => {

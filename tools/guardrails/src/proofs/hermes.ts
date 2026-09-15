@@ -1,11 +1,11 @@
 import type { FileTree, Fixture } from '@huma/fixtures';
-import { fixtureFactory } from '@huma/fixtures';
+import { fixtureFactory, IN_PROCESS } from '@huma/fixtures';
 import type { PolicyId } from '@huma/eslint-config/policies';
 import { lintTree } from '../lint-tree.ts';
 import { ALL_POLICIES, mutantsOf } from '../mutation.ts';
 import { appTree } from './app-tree.ts';
 
-const define = fixtureFactory<PolicyId>();
+const define = fixtureFactory<PolicyId>(IN_PROCESS);
 
 /** A model file of the home page, whose source reaches an API. */
 const probe = (source: string): FileTree => ({ 'src/pages/home/model/probe.ts': source });
