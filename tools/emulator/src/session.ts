@@ -1,6 +1,7 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { APP_DIRECTORY } from '@huma/architecture';
+import type { Environment } from '@huma/kit/process';
 import type { EmulatorConfig } from './config.ts';
 
 /** What every emulator command runs with: the workspace, the configuration, what stops it and where it reports. */
@@ -25,6 +26,12 @@ export const androidHome = (config: EmulatorConfig): string => sdkPath(config);
 export const adbSerial = (config: EmulatorConfig): string => `${config.adb.host}:${String(config.adb.port)}`;
 
 export const appRoot = (root: string): string => join(root, APP_DIRECTORY);
+
+/** The Expo CLI of the app, run from its own directory: the one binary every command that drives Expo invokes. */
+export const expoCli = (root: string): string => join(appRoot(root), 'node_modules', '.bin', 'expo');
+
+/** The environment Expo runs with, off telemetry: no version check reaches the network from a command of the emulator. */
+export const expoEnvironment = (environment: Environment): Environment => ({ ...environment, EXPO_NO_TELEMETRY: '1' });
 
 /** The APK of the dev client Gradle builds. */
 export const debugApk = (root: string): string =>

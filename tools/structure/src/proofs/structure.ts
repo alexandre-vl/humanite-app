@@ -1,15 +1,16 @@
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { APP_DIRECTORY } from '@huma/architecture';
 import type { FileTree } from '@huma/fixtures';
 import { fixtureFactory, IN_PROCESS, workspaceCopy } from '@huma/fixtures';
 import { findWorkspaceRoot } from '@huma/kit/cli';
-import { readFile } from 'node:fs/promises';
 import type { StructureCode } from '../checks.ts';
 import { cycleFindings } from '../cycles.ts';
 import { steigerFindings } from '../steiger.ts';
 
 const define = fixtureFactory<StructureCode>(IN_PROCESS);
 
-const APP = 'apps/mobile';
+const APP = APP_DIRECTORY;
 
 /** Several trees as one. */
 const merged = (trees: readonly FileTree[]): FileTree =>

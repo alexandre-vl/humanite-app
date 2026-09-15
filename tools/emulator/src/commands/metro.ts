@@ -1,10 +1,9 @@
-import { join } from 'node:path';
 import type { ExitCode } from '@huma/kit/cli';
 import type { Environment } from '@huma/kit/process';
 import { describeExit, runAttached } from '@huma/kit/process';
 import type { EmulatorConfig } from '../config.ts';
 import type { Session } from '../session.ts';
-import { appRoot } from '../session.ts';
+import { appRoot, expoCli, expoEnvironment } from '../session.ts';
 
 /** The answer of a running Metro to `GET /status`. */
 const RUNNING = 'packager-status:running';
@@ -42,8 +41,7 @@ export function metroEnvironment(environment: Environment): Environment {
     (option) => option !== undefined && option !== '',
   );
   return {
-    ...Object.fromEntries(Object.entries(environment).filter(([name]) => name !== 'CI')),
-    EXPO_NO_TELEMETRY: '1',
+    ...expoEnvironment(Object.fromEntries(Object.entries(environment).filter(([name]) => name !== 'CI'))),
     EXPO_OFFLINE: '1',
     NODE_OPTIONS: options.join(' '),
   };
@@ -55,8 +53,7 @@ export async function emulatorMetro(session: Session): Promise<ExitCode> {
     session.print(`✗ Metro répond déjà sur le port ${String(session.config.metroPort)}`);
     return 1;
   }
-  const expo = join(appRoot(session.root), 'node_modules', '.bin', 'expo');
-  const exit = await runAttached(expo, metroArguments(session.config), {
+  const exit = await runAttached(expoCli(session.root), metroArguments(session.config), {
     cwd: appRoot(session.root),
     env: metroEnvironment(process.env),
     signal: session.signal,

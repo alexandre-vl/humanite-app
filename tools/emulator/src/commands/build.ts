@@ -7,7 +7,7 @@ import type { Environment } from '@huma/kit/process';
 import { capture, describeExit, run, runAttached } from '@huma/kit/process';
 import type { EmulatorConfig } from '../config.ts';
 import type { Session } from '../session.ts';
-import { appRoot, cacheDirectory } from '../session.ts';
+import { appRoot, cacheDirectory, expoCli, expoEnvironment } from '../session.ts';
 import { QUERY_TIMEOUT_MS } from '../tools.ts';
 
 export type BuildOptions = Readonly<{
@@ -84,11 +84,10 @@ export async function emulatorBuild(session: Session, options: BuildOptions): Pr
     return 1;
   }
   const before = await changedAppPaths(session);
-  const expo = join(appRoot(session.root), 'node_modules', '.bin', 'expo');
   session.print(`▶ expo ${prebuildArguments(options).join(' ')}`);
-  const prebuild = await runAttached(expo, prebuildArguments(options), {
+  const prebuild = await runAttached(expoCli(session.root), prebuildArguments(options), {
     cwd: appRoot(session.root),
-    env: { ...process.env, EXPO_NO_TELEMETRY: '1' },
+    env: expoEnvironment(process.env),
     signal: session.signal,
     timeoutMs: 600_000,
   });
