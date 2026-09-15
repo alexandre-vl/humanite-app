@@ -4,15 +4,9 @@ import { DECIDED_STATUSES, INITIAL_STATUS, isDecided } from '../spec/statuses.ts
 
 /**
  * What an agent may write in an ADR file, judged from the text alone so that the hook stays fast: it imports no
- * parser. An agent writes only proposed ADRs with a canonical header and never touches a decided one.
+ * parser. An agent writes only proposed ADRs with a canonical header and never touches a decided one. This module
+ * says what is wrong with a write; the guard of the agents says it to them.
  */
-
-export type GuardVerdict = Readonly<{ kind: 'allow' }> | Readonly<{ kind: 'deny'; reason: string }>;
-
-export const ALLOW: GuardVerdict = { kind: 'allow' };
-
-export const HUMAN_ONLY_DECISION =
-  'Décider d’un ADR (accepted, rejected) revient au décideur humain : il lance la décision dans son propre terminal.';
 
 /** Any file directly in the ADR directory whose name starts with a number, even malformed: it holds an ADR. */
 export function isAdrFilePath(repositoryPath: string): boolean {
@@ -40,26 +34,24 @@ export function looksDecided(text: string): boolean {
   return block !== undefined && (DECIDED_WORD.test(block) || /\\[ux]|&#|!!/u.test(block));
 }
 
-export const DECIDED_FROZEN =
-  'Un ADR décidé est figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).';
+/**
+ * What can make a write to an ADR file one an agent may not make: the file holds a decided ADR, the write leaves
+ * something else than a canonical proposed header, or what it leaves cannot be computed from what it replaces.
+ */
+export const ADR_WRITE_PROBLEMS = ['decided', 'not-proposed', 'unknown-result'] as const;
 
-const UNKNOWN_RESULT =
-  'Contenu de l’ADR après cette modification incalculable (texte à remplacer absent tel quel) : reprendre le texte exact, ou modifier l’en-tête dans un appel séparé.';
+export type AdrWriteProblem = (typeof ADR_WRITE_PROBLEMS)[number];
 
-/** Verdict on a write that turns `before` (`null` for a new file) into `after` (`null` when it cannot be computed). */
-export function judgeAdrWrite(before: string | null, after: string | null): GuardVerdict {
+/**
+ * What is wrong with a write that turns `before` (`null` for a new file) into `after` (`null` when it cannot be
+ * computed), `null` when an agent may make it.
+ */
+export function adrWriteProblem(before: string | null, after: string | null): AdrWriteProblem | null {
   if (before !== null && looksDecided(before)) {
-    return { kind: 'deny', reason: DECIDED_FROZEN };
+    return 'decided';
   }
   if (after === null) {
-    return before === null ? ALLOW : { kind: 'deny', reason: UNKNOWN_RESULT };
+    return before === null ? null : 'unknown-result';
   }
-  const header = readCanonicalHeader(after)?.header;
-  if (header?.status !== INITIAL_STATUS) {
-    return {
-      kind: 'deny',
-      reason: `Un agent écrit un ADR avec l’en-tête canonique d’un ADR proposé (status: ${INITIAL_STATUS}). ${HUMAN_ONLY_DECISION}`,
-    };
-  }
-  return ALLOW;
+  return readCanonicalHeader(after)?.header.status === INITIAL_STATUS ? null : 'not-proposed';
 }

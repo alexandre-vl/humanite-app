@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./checks": "./src/checks.ts",
     "./guard": "./src/guard.ts",
     "./local-settings": "./src/local-settings.ts",
     "./policy": "./src/policy.ts",

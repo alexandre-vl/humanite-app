@@ -40,20 +40,33 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm typecheck`        | vérification des types de chaque projet                                                                |
 | `pnpm verify`           | tous les contrôles du dépôt, dans l’ordre                                                              |
 
-## Ce que la garde des agents refuse
+## Ce que la garde des agents fait respecter
 
-- Décider d’un ADR (accepted, rejected) revient au décideur humain : il lance la décision dans son propre terminal.
-- Un ADR décidé est figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).
-- Les commandes root, et celles qui prennent une autre identité ou les namespaces d’un autre processus, sont lancées par l’utilisateur lui-même, jamais par un agent.
-- Le programme de cette commande ne se lit pas dans la ligne : écrire son nom en clair, pour que la garde sache ce qu’elle laisse passer.
-- Les hooks git du dépôt ne se contournent pas : ni --no-verify, ni core.hooksPath ou alias, ni dépôt ou arbre désigné ailleurs, ni plomberie qui écrit sans hooks.
-- Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.
-- adr:decide revient au décideur humain : il le lance dans son propre terminal.
-- Le conteneur de l’émulateur ne se lance, ne s’ouvre et ne s’arrête que par pnpm emulator:up et pnpm emulator:down, qui attendent le garde root.
-- `.git` : Le dossier .git ne s’écrit qu’à travers git.
-- `.claude/settings.json` : Les réglages Claude Code du dépôt sont générés par pnpm gen depuis leur source typée.
-- `.claude/settings.local.json` : Des réglages locaux pourraient désactiver les hooks du dépôt.
-- `node_modules/.cache/huma/verify.json` : La trace de la dernière vérification verte est écrite par pnpm verify : l’écrire à la main ferait passer le hook Stop sur un arbre que rien n’a vérifié.
+Un appel refusé nomme chaque règle qu’il enfreint par son code, suivi de ce qu’il faut faire à la place.
+
+| Code                          | Règle                                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `agent/privilege-escalation`  | aucune commande root, sous une autre identité ou dans les namespaces d’un autre processus            |
+| `agent/opaque-program`        | le programme de chaque commande se lit en clair dans la ligne                                        |
+| `agent/git-hooks-bypass`      | les hooks git du dépôt s’exécutent à chaque écriture de l’historique                                 |
+| `agent/session-masking`       | une session d’agent reste visible aux outils du dépôt                                                |
+| `agent/human-only-command`    | les commandes du décideur humain ne sont lancées que par lui                                         |
+| `agent/emulator-direct`       | le conteneur de l’émulateur, son réseau, son volume et son image ne changent que par pnpm emulator:* |
+| `agent/git-directory`         | le dossier .git ne s’écrit qu’à travers git                                                          |
+| `agent/claude-settings`       | les réglages Claude Code du dépôt ne s’écrivent que par pnpm gen                                     |
+| `agent/claude-local-settings` | aucun réglage local de Claude Code                                                                   |
+| `agent/verify-stamp`          | la trace de la dernière vérification verte ne s’écrit que par pnpm verify                            |
+| `agent/adr-decided`           | un ADR décidé ne change plus                                                                         |
+| `agent/adr-not-proposed`      | un agent n’écrit que des ADR proposés, à l’en-tête canonique                                         |
+| `agent/adr-unknown-result`    | la garde calcule ce que la modification d’un ADR y laisse                                            |
+| `agent/adr-shell-unknown`     | la garde calcule ce qu’une commande écrit dans un ADR                                                |
+| `agent/adr-tree`              | rien n’écrit ni ne supprime en bloc dans le dossier des ADR                                          |
+| `agent/adr-alias`             | aucun lien vers un ADR                                                                               |
+| `agent/unreadable-call`       | l’entrée du hook est un objet JSON                                                                   |
+| `agent/call-without-tool`     | l’entrée du hook nomme un outil et ses paramètres                                                    |
+| `agent/call-without-command`  | un appel d’outil shell porte une commande lisible                                                    |
+| `agent/call-without-path`     | un appel d’outil de fichier porte un chemin lisible                                                  |
+| `agent/code-unjudgeable`      | le code qu’un outil exécute ne mentionne aucune zone protégée                                        |
 
 ## Commits
 

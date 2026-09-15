@@ -17,8 +17,11 @@ const CONTEXT: GuardContext = {
   realPath: resolveExistingPath,
 };
 
-/** Output of the `PreToolUse` hook for a raw input: a deny decision, or nothing to let the call through. */
+/**
+ * Output of the `PreToolUse` hook for a raw input: a deny decision naming each rule the call breaks, one per line
+ * under its code, or nothing to let the call through.
+ */
 export async function respondToToolCall(rawInput: string): Promise<string> {
-  const verdict = await judgeToolCall(parseJson(rawInput), CONTEXT);
-  return verdict.kind === 'deny' ? denyOutput(verdict.reason) : '';
+  const refusals = await judgeToolCall(parseJson(rawInput), CONTEXT);
+  return refusals.length === 0 ? '' : denyOutput(refusals.map(({ code, reason }) => `${code}: ${reason}`).join('\n'));
 }

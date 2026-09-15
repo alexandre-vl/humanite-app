@@ -28,6 +28,14 @@ test('finding renders the message at the given position and commit', () => {
   expect(checks.finding('demo/missing', repoPath('a.md'), {})).toMatchObject({ ...START, commit: null });
 });
 
+test('refusal renders the message for a call, under its code', () => {
+  expect(checks.refusal('demo/stale', { line: 3 })).toEqual({
+    code: 'demo/stale',
+    reason: 'périmé à partir de la ligne 3',
+  });
+  expectTypeOf(checks.refusal('demo/missing', {}).code).toEqualTypeOf<'demo/missing'>();
+});
+
 test('a malformed placeholder fails when the table is defined', () => {
   expect(() => defineChecks({ 'demo/bad': { summary: 's', message: 'fichier {file name}' } })).toThrow(
     'demo/bad : espace réservé invalide {file name}',

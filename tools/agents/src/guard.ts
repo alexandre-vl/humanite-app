@@ -1,10 +1,14 @@
 import { basename, dirname, join, resolve } from 'node:path';
-import type { GuardVerdict } from '@huma/adr/guard';
-import { ALLOW, DECIDED_FROZEN, isAdrFilePath, judgeAdrWrite, looksDecided } from '@huma/adr/guard';
+import type { AdrWriteProblem } from '@huma/adr/guard';
+import { adrWriteProblem, isAdrFilePath, looksDecided } from '@huma/adr/guard';
 import { ADR_DIRECTORY } from '@huma/adr/layout';
+import { DECIDED_STATUSES, INITIAL_STATUS } from '@huma/adr/statuses';
+import type { Refusal } from '@huma/kit/checks';
 import type { JsonObject } from '@huma/kit/json';
 import { arrayField, isJsonObject, objectField, stringField } from '@huma/kit/json';
 import { toRepoPath } from '@huma/kit/paths';
+import type { AgentCode } from './checks.ts';
+import { agentRefusal } from './checks.ts';
 import type { FileEdit } from './edit.ts';
 import { contentAfterEdit, contentAfterMultiEdit } from './edit.ts';
 import type { AgentPolicy, PathRule } from './policy.ts';
@@ -30,16 +34,22 @@ export type GuardContext = FileSystemView &
     realPath: (absolutePath: string) => Promise<string>;
   }>;
 
-const deny = (reason: string): GuardVerdict => ({ kind: 'deny', reason });
+/** Every reason to refuse a call, as far as the guard has looked: none lets it through. */
+type Refusals = readonly Refusal<AgentCode>[];
 
-const SHELL_UNKNOWN_CONTENT =
-  'Contenu de l’ADR après cette commande incalculable : écrire un ADR proposé avec les outils Write ou Edit, que la garde sait juger.';
+const NONE: Refusals = [];
 
-const ADR_TREE =
-  'Cette commande écrit ou supprime en bloc dans le dossier des ADR : un ADR décidé ne change plus et un ADR commité ne se supprime pas.';
+const ADR_REFUSALS: Readonly<Record<AdrWriteProblem, Refusal<AgentCode>>> = {
+  decided: agentRefusal('agent/adr-decided', {}),
+  'not-proposed': agentRefusal('agent/adr-not-proposed', { status: INITIAL_STATUS, decided: DECIDED_STATUSES }),
+  'unknown-result': agentRefusal('agent/adr-unknown-result', {}),
+};
 
-const ADR_ALIAS =
-  'Un lien vers un ADR permettrait de l’écrire sans que la garde le voie : modifier l’ADR lui-même avec Write ou Edit.';
+const ADR_SHELL_UNKNOWN = agentRefusal('agent/adr-shell-unknown', {});
+
+const ADR_TREE = agentRefusal('agent/adr-tree', {});
+
+const ADR_ALIAS = agentRefusal('agent/adr-alias', {});
 
 /** A path is the area or lies below it. */
 const within = (path: string, area: string): boolean => path === area || path.startsWith(`${area}/`);
@@ -66,12 +76,18 @@ const refuses = (rule: PathRule, effect: WriteEffect): boolean =>
 
 type Write = Readonly<{ root: string; path: string; absolute: string; effect: WriteEffect }>;
 
-/** Verdict on an ADR file receiving `after`, where `null` means content the command does not tell. */
-function judgeShellAdrWrite(before: string | null, after: string | null): GuardVerdict {
+/** What refuses a write that turns an ADR file `before` into `after`, both known but `after` possibly `null`. */
+function adrRefusals(before: string | null, after: string | null): Refusals {
+  const problem = adrWriteProblem(before, after);
+  return problem === null ? NONE : [ADR_REFUSALS[problem]];
+}
+
+/** What refuses a command writing `after` to an ADR file, where `null` means content the command does not tell. */
+function shellAdrRefusals(before: string | null, after: string | null): Refusals {
   if (after !== null) {
-    return judgeAdrWrite(before, after);
+    return adrRefusals(before, after);
   }
-  return deny(before !== null && looksDecided(before) ? DECIDED_FROZEN : SHELL_UNKNOWN_CONTENT);
+  return [before !== null && looksDecided(before) ? ADR_REFUSALS.decided : ADR_SHELL_UNKNOWN];
 }
 
 async function adrNames(root: string, context: GuardContext): Promise<readonly string[]> {
@@ -79,54 +95,65 @@ async function adrNames(root: string, context: GuardContext): Promise<readonly s
   return [...names.filter((name) => isAdrFilePath(`${ADR_DIRECTORY}/${name}`)), '0000-adr.md'];
 }
 
-/** Verdict on one write to a repository path (`''` for the root), whatever tool or command makes it. */
-async function judgeWrite(
+/** What refuses a write to an ADR file, by the effect it has there. */
+async function adrFileRefusals(
   write: Write,
   context: GuardContext,
   sourceContent: () => Promise<string | null>,
-): Promise<GuardVerdict> {
+): Promise<Refusals> {
   const { path, effect } = write;
-  const wide = effect.kind === 'remove' || effect.kind === 'tree';
-  for (const rule of context.policy.paths) {
-    const reached =
-      coversPath(rule, path) || (wide && holds(path, rule.path) && reachesNames(effect, sensitiveNames(rule)));
-    if (reached && refuses(rule, effect)) {
-      return deny(rule.reason);
-    }
-  }
-  if (wide && holds(path, ADR_DIRECTORY) && reachesNames(effect, await adrNames(write.root, context))) {
-    return deny(ADR_TREE);
-  }
   if (!isAdrFilePath(path)) {
-    return ALLOW;
+    return NONE;
   }
   const before = await context.readFile(write.absolute);
   switch (effect.kind) {
     case 'metadata':
-      return ALLOW;
+      return NONE;
     case 'alias':
-      return deny(ADR_ALIAS);
+      return [ADR_ALIAS];
     case 'remove':
-      return before !== null && looksDecided(before) ? deny(DECIDED_FROZEN) : ALLOW;
+      return before !== null && looksDecided(before) ? [ADR_REFUSALS.decided] : NONE;
     case 'tree':
-      return judgeShellAdrWrite(before, null);
+      return shellAdrRefusals(before, null);
     case 'content':
-      return judgeShellAdrWrite(
+      return shellAdrRefusals(
         before,
         effect.content === null ? null : `${effect.append ? (before ?? '') : ''}${effect.content}`,
       );
     case 'copy':
-      return judgeShellAdrWrite(before, await sourceContent());
+      return shellAdrRefusals(before, await sourceContent());
   }
 }
 
-/** Verdict on a write to an absolute path, judged at the path and, through symbolic links, where it really lands. */
+/** What refuses one write to a repository path (`''` for the root), whatever tool or command makes it. */
+async function judgeWrite(
+  write: Write,
+  context: GuardContext,
+  sourceContent: () => Promise<string | null>,
+): Promise<Refusals> {
+  const { path, effect } = write;
+  const wide = effect.kind === 'remove' || effect.kind === 'tree';
+  const areas = context.policy.paths.filter(
+    (rule) =>
+      (coversPath(rule, path) || (wide && holds(path, rule.path) && reachesNames(effect, sensitiveNames(rule)))) &&
+      refuses(rule, effect),
+  );
+  const tree = wide && holds(path, ADR_DIRECTORY) && reachesNames(effect, await adrNames(write.root, context));
+  return [
+    ...areas.map((rule) => rule.refusal),
+    ...(tree ? [ADR_TREE] : NONE),
+    ...(await adrFileRefusals(write, context, sourceContent)),
+  ];
+}
+
+/** What refuses a write to an absolute path, judged at the path and, through symbolic links, where it really lands. */
 async function judgeAbsoluteWrite(
   absolute: string,
   effect: WriteEffect,
   context: GuardContext,
   sourceContent: () => Promise<string | null>,
-): Promise<GuardVerdict> {
+): Promise<Refusals> {
+  const refusals: Refusal<AgentCode>[] = [];
   for (const candidate of new Set([absolute, await context.realPath(absolute)])) {
     const root = await context.findRoot(candidate);
     if (root === null) {
@@ -136,12 +163,9 @@ async function judgeAbsoluteWrite(
     if (path === null) {
       continue;
     }
-    const verdict = await judgeWrite({ root, path, absolute: candidate, effect }, context, sourceContent);
-    if (verdict.kind === 'deny') {
-      return verdict;
-    }
+    refusals.push(...(await judgeWrite({ root, path, absolute: candidate, effect }, context, sourceContent)));
   }
-  return ALLOW;
+  return refusals;
 }
 
 /** Absolute paths of the areas a pattern designation may reach in the workspaces the line runs in. */
@@ -170,12 +194,8 @@ async function sensitivePaths(directories: Directories, context: GuardContext): 
   return [...new Set(paths)];
 }
 
-/** Verdict on one write target of a command line. */
-async function judgeTarget(
-  written: WriteTarget,
-  directories: Directories,
-  context: GuardContext,
-): Promise<GuardVerdict> {
+/** What refuses one write target of a command line. */
+async function judgeTarget(written: WriteTarget, directories: Directories, context: GuardContext): Promise<Refusals> {
   const designation = await designate(written.path, written.base, directories, context);
   const { effect } = written;
   const sourceContent = async (): Promise<string | null> => {
@@ -190,33 +210,26 @@ async function judgeTarget(
     designation.pattern === null
       ? []
       : (await sensitivePaths(directories, context)).filter((path) => designation.pattern?.test(path) === true);
+  const refusals: Refusal<AgentCode>[] = [];
   for (const absolute of [...designation.paths, ...reached]) {
-    const verdict = await judgeAbsoluteWrite(absolute, effect, context, sourceContent);
-    if (verdict.kind === 'deny') {
-      return verdict;
-    }
+    refusals.push(...(await judgeAbsoluteWrite(absolute, effect, context, sourceContent)));
   }
-  return ALLOW;
+  return refusals;
 }
 
-async function judgeCommandLine(line: string, cwd: string, context: GuardContext): Promise<GuardVerdict> {
+/** What refuses a command line: the rules each of its simple commands breaks, then each file one of them writes. */
+async function judgeCommandLine(line: string, cwd: string, context: GuardContext): Promise<Refusals> {
   const commands: readonly SimpleCommand[] = readCommands(line, { home: context.home });
-  for (const command of commands) {
-    const rule = context.policy.commands.find((candidate) => candidate.matches(command));
-    if (rule !== undefined) {
-      return deny(rule.reason);
-    }
-  }
+  const refusals = commands.flatMap((command) =>
+    context.policy.commands.filter((rule) => rule.matches(command)).map((rule) => rule.refusal),
+  );
   const directories = lineDirectories(commands, cwd, context.home);
   for (const command of commands) {
     for (const written of writeTargets(command)) {
-      const verdict = await judgeTarget(written, directories, context);
-      if (verdict.kind === 'deny') {
-        return verdict;
-      }
+      refusals.push(...(await judgeTarget(written, directories, context)));
     }
   }
-  return ALLOW;
+  return refusals;
 }
 
 function editOf(input: JsonObject): FileEdit | null {
@@ -250,58 +263,43 @@ function contentAfter(tool: string, input: JsonObject, before: string | null): s
   }
 }
 
-async function judgeFileTool(
-  tool: string,
-  input: JsonObject,
-  cwd: string,
-  context: GuardContext,
-): Promise<GuardVerdict> {
+async function judgeFileTool(tool: string, input: JsonObject, cwd: string, context: GuardContext): Promise<Refusals> {
   const filePath = stringField(input, 'file_path') ?? stringField(input, 'notebook_path');
   if (filePath === null) {
-    return deny(`Appel ${tool} sans chemin de fichier lisible : refusé par prudence.`);
+    return [agentRefusal('agent/call-without-path', { tool })];
   }
   const absolute = resolve(cwd, filePath);
+  const refusals: Refusal<AgentCode>[] = [];
   for (const candidate of new Set([absolute, await context.realPath(absolute)])) {
     const root = await context.findRoot(candidate);
     const path = root === null ? null : toRepoPath(root, candidate);
-    if (root === null || path === null) {
+    if (path === null) {
       continue;
     }
-    const rule = context.policy.paths.find((protectedPath) => coversPath(protectedPath, path));
-    if (rule !== undefined) {
-      return deny(rule.reason);
-    }
+    refusals.push(...context.policy.paths.filter((rule) => coversPath(rule, path)).map((rule) => rule.refusal));
     if (isAdrFilePath(path)) {
       const before = await context.readFile(candidate);
-      const verdict = judgeAdrWrite(before, contentAfter(tool, input, before));
-      if (verdict.kind === 'deny') {
-        return verdict;
-      }
+      refusals.push(...adrRefusals(before, contentAfter(tool, input, before)));
     }
   }
-  return ALLOW;
+  return refusals;
 }
 
-/**
- * Verdict of the `PreToolUse` hook on one tool call. A shell command is split into simple commands, each checked
- * against the command rules, then every file it writes is judged like a file tool's write: protected paths first,
- * then the ADR rules on the content the write leaves.
- */
-export async function judgeToolCall(call: unknown, context: GuardContext): Promise<GuardVerdict> {
+async function judgeCall(call: unknown, context: GuardContext): Promise<Refusals> {
   if (!isJsonObject(call)) {
-    return deny('Entrée du hook illisible : refusée par prudence.');
+    return [agentRefusal('agent/unreadable-call', {})];
   }
   const tool = stringField(call, 'tool_name');
   const input = objectField(call, 'tool_input');
   const cwd = stringField(call, 'cwd') ?? process.cwd();
   if (tool === null || input === null) {
-    return deny('Entrée du hook sans outil ou sans paramètres : refusée par prudence.');
+    return [agentRefusal('agent/call-without-tool', {})];
   }
   const { policy } = context;
   if (policy.shellTools.includes(tool)) {
     const command = stringField(input, 'command');
     return command === null
-      ? deny(`Appel ${tool} sans commande lisible : refusé par prudence.`)
+      ? [agentRefusal('agent/call-without-command', { tool })]
       : judgeCommandLine(command, cwd, context);
   }
   if (policy.fileTools.includes(tool)) {
@@ -310,9 +308,18 @@ export async function judgeToolCall(call: unknown, context: GuardContext): Promi
   if (policy.codeTools.includes(tool)) {
     const code = JSON.stringify(input).toLowerCase();
     const token = policy.sensitiveTokens.find((sensitive) => code.includes(sensitive));
-    return token === undefined
-      ? ALLOW
-      : deny(`Code ${tool} qui mentionne « ${token} » : la garde ne sait pas le juger, refusé par prudence.`);
+    return token === undefined ? NONE : [agentRefusal('agent/code-unjudgeable', { tool, token })];
   }
-  return ALLOW;
+  return NONE;
+}
+
+/**
+ * What the `PreToolUse` hook answers to one tool call: every rule it breaks, each code once in the order the call
+ * reached it, and nothing when it breaks none. A shell command is split into simple commands, each checked against
+ * the command rules, then every file it writes is judged like a file tool's write: protected paths, then the ADR rules
+ * on the content the write leaves. Nothing stops at the first refusal, so that a fixture sees each rule it breaks.
+ */
+export async function judgeToolCall(call: unknown, context: GuardContext): Promise<Refusals> {
+  const refusals = await judgeCall(call, context);
+  return refusals.filter((refusal, index) => refusals.findIndex(({ code }) => code === refusal.code) === index);
 }

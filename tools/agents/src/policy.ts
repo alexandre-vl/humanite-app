@@ -1,7 +1,10 @@
 import { basename } from 'node:path';
 import { ADR_DIRECTORY } from '@huma/adr/layout';
+import type { Refusal } from '@huma/kit/checks';
 import { AGENT_SESSION_VARIABLES } from '@huma/kit/session';
 import { compareText } from '@huma/kit/text';
+import type { AgentCode } from './checks.ts';
+import { agentRefusal } from './checks.ts';
 import type { SimpleCommand } from './shell/commands.ts';
 import { argv, hasOpaqueProgram, programName } from './shell/commands.ts';
 import type { Word } from './shell/words.ts';
@@ -9,8 +12,7 @@ import { isKnown } from './shell/words.ts';
 
 /** A family of commands an agent may not run, how to recognise one, and the permission rules that also refuse it. */
 type CommandRule = Readonly<{
-  id: string;
-  reason: string;
+  refusal: Refusal<AgentCode>;
   /** `permissions.deny` entries of Claude Code: a first filter, the hook being the real check. */
   permissions: readonly string[];
   matches: (command: SimpleCommand) => boolean;
@@ -18,8 +20,7 @@ type CommandRule = Readonly<{
 
 /** Files an agent may not write, with its file tools or through a shell: a directory and all below it, or one file. */
 export type PathRule = Readonly<{
-  id: string;
-  reason: string;
+  refusal: Refusal<AgentCode>;
   path: string;
   kind: 'directory' | 'file';
   /**
@@ -191,9 +192,7 @@ const skipsHooks = (subcommand: string, args: readonly string[]): boolean =>
   args.some(isNoVerify) || (subcommand === 'commit' && skipsCommitHooks(args));
 
 const GIT_HOOKS_BYPASS: CommandRule = {
-  id: 'git-hooks-bypass',
-  reason:
-    'Les hooks git du dépôt ne se contournent pas : ni --no-verify, ni core.hooksPath ou alias, ni dépôt ou arbre désigné ailleurs, ni plomberie qui écrit sans hooks.',
+  refusal: agentRefusal('agent/git-hooks-bypass', {}),
   permissions: ['Bash(git commit --no-verify *)', 'Bash(git commit -n *)', 'Bash(git push --no-verify *)'],
   matches: (command) => {
     const call = gitCall(command);
@@ -255,17 +254,13 @@ const startsAsRoot = (args: readonly string[]): boolean =>
  * cannot say what it launches, so no rule can clear it.
  */
 const OPAQUE_PROGRAM: CommandRule = {
-  id: 'opaque-program',
-  reason:
-    'Le programme de cette commande ne se lit pas dans la ligne : écrire son nom en clair, pour que la garde sache ce qu’elle laisse passer.',
+  refusal: agentRefusal('agent/opaque-program', {}),
   permissions: [],
   matches: hasOpaqueProgram,
 };
 
 const PRIVILEGE_ESCALATION: CommandRule = {
-  id: 'privilege-escalation',
-  reason:
-    'Les commandes root, et celles qui prennent une autre identité ou les namespaces d’un autre processus, sont lancées par l’utilisateur lui-même, jamais par un agent.',
+  refusal: agentRefusal('agent/privilege-escalation', {}),
   permissions: [...PRIVILEGED].toSorted(compareText).map((name) => `Bash(${name} *)`),
   matches: (command) =>
     PRIVILEGED.has(programName(command)) ||
@@ -337,9 +332,7 @@ function containerCall(command: SimpleCommand): Readonly<{ subcommand: string; a
  */
 function emulatorRule(target: EmulatorTarget): CommandRule {
   return {
-    id: 'emulator-direct',
-    reason:
-      'Le conteneur de l’émulateur ne se lance, ne s’ouvre et ne s’arrête que par pnpm emulator:up et pnpm emulator:down, qui attendent le garde root.',
+    refusal: agentRefusal('agent/emulator-direct', {}),
     permissions: ['exec', 'kill', 'restart', 'rm', 'start', 'stop'].map(
       (subcommand) => `Bash(docker ${subcommand} ${target.container}*)`,
     ),
@@ -361,8 +354,7 @@ const isSessionVariable = (name: string): boolean => AGENT_SESSION_VARIABLES.som
 const DECLARATIONS = new Set(['export', 'declare', 'typeset', 'readonly', 'local']);
 
 const SESSION_MASKING: CommandRule = {
-  id: 'session-masking',
-  reason: 'Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.',
+  refusal: agentRefusal('agent/session-masking', {}),
   permissions: AGENT_SESSION_VARIABLES.map((name) => `Bash(unset ${name}*)`),
   matches: (command) => {
     const name = programName(command);
@@ -409,8 +401,7 @@ function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRule {
   const entries = new Set(commands.map((command) => basename(command.entry)));
   const namesOne = (text: string): boolean => [...scripts, ...entries].some((token) => text.includes(token));
   return {
-    id: 'human-only-command',
-    reason: `${commands.map((command) => command.script).join(', ')} revient au décideur humain : il le lance dans son propre terminal.`,
+    refusal: agentRefusal('agent/human-only-command', { scripts: commands.map((command) => command.script) }),
     permissions: commands.flatMap((command) => [
       `Bash(pnpm ${command.script} *)`,
       `Bash(pnpm run ${command.script} *)`,
@@ -434,9 +425,7 @@ function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRule {
  * agent leaves behind was verified. Writing it by hand would let an agent stop on work nothing checked.
  */
 const verifyStampRule = (path: string): PathRule => ({
-  id: 'verify-stamp',
-  reason:
-    'La trace de la dernière vérification verte est écrite par pnpm verify : l’écrire à la main ferait passer le hook Stop sur un arbre que rien n’a vérifié.',
+  refusal: agentRefusal('agent/verify-stamp', {}),
   path,
   kind: 'file',
   removal: 'allowed',
@@ -444,22 +433,19 @@ const verifyStampRule = (path: string): PathRule => ({
 
 const PROTECTED_PATHS: readonly PathRule[] = [
   {
-    id: 'git-directory',
-    reason: 'Le dossier .git ne s’écrit qu’à travers git.',
+    refusal: agentRefusal('agent/git-directory', {}),
     path: '.git',
     kind: 'directory',
     removal: 'refused',
   },
   {
-    id: 'claude-settings',
-    reason: 'Les réglages Claude Code du dépôt sont générés par pnpm gen depuis leur source typée.',
+    refusal: agentRefusal('agent/claude-settings', {}),
     path: CLAUDE_SETTINGS_PATH,
     kind: 'file',
     removal: 'refused',
   },
   {
-    id: 'claude-local-settings',
-    reason: 'Des réglages locaux pourraient désactiver les hooks du dépôt.',
+    refusal: agentRefusal('agent/claude-local-settings', {}),
     path: CLAUDE_LOCAL_SETTINGS_PATH,
     kind: 'file',
     removal: 'refused',

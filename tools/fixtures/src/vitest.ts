@@ -24,7 +24,9 @@ export function testFixtures(title: string, fixtures: readonly Fixture<string, s
       one(
         fixture.id,
         async () => {
-          expect(await runFixture(fixture)).toMatchObject({ id: fixture.id, outcome: 'passed' });
+          // The whole report is compared, so that a failure shows the codes missing or unexpected, or the crash.
+          const { durationMs, ...report } = await runFixture(fixture);
+          expect(report, `${String(durationMs)} ms`).toEqual({ id: fixture.id, outcome: 'passed' });
         },
         testTimeoutMs([fixture]),
       );

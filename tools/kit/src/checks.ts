@@ -26,12 +26,16 @@ type FindingFactory<Table extends CheckTable<Table>> = <Code extends CheckCodeOf
   commit?: string | null,
 ) => Diagnostic<Code>;
 
+/** A finding about a call rather than a file: the code of the rule that refuses it, and what its author reads. */
+export type Refusal<Code extends string> = Readonly<{ code: Code; reason: string }>;
+
 export type Checks<Table extends CheckTable<Table>> = Readonly<{
   table: Table;
   codes: readonly CheckCodeOf<Table>[];
   /** The message of `code` with its placeholders filled. */
   message: <Code extends CheckCodeOf<Table>>(code: Code, details: CheckDetailsOf<Table, Code>) => string;
   finding: FindingFactory<Table>;
+  refusal: <Code extends CheckCodeOf<Table>>(code: Code, details: CheckDetailsOf<Table, Code>) => Refusal<Code>;
 }>;
 
 /**
@@ -51,5 +55,6 @@ export function defineChecks<const Table extends CheckTable<Table>>(table: Table
     message,
     finding: (code, path, details, position = START, commit = null) =>
       diagnostic(code, path, position, message(code, details), commit),
+    refusal: (code, details) => ({ code, reason: message(code, details) }),
   };
 }

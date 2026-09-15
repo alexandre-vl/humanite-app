@@ -1,5 +1,4 @@
-import type { AgentPolicy } from '@huma/agents/policy';
-import { DECIDED_FROZEN, HUMAN_ONLY_DECISION } from '@huma/adr/guard';
+import { AGENT_CHECKS } from '@huma/agents/checks';
 import { ADR_DIRECTORY, INDEX_FILE } from '@huma/adr/layout';
 import { BINDINGS_PATH } from './bindings.ts';
 import { COMMIT_TYPES, EXTRA_SCOPES, REFS_TRAILER } from './commit-policy.ts';
@@ -21,14 +20,8 @@ const scriptRow = (name: CommandName): string => {
  * `AGENTS.md`: what an agent working in the repository needs to know, taken from the sources the tools enforce. It
  * adds no rule of its own; every line points at a command, a check or an ADR.
  */
-export function renderAgentsGuide(policy: AgentPolicy, generator: string): string {
+export function renderAgentsGuide(generator: string): string {
   const scripts = COMMAND_NAMES.filter((name) => isScriptCommand(COMMANDS[name]));
-  const refused = [
-    HUMAN_ONLY_DECISION,
-    DECIDED_FROZEN,
-    ...policy.commands.map((rule) => rule.reason),
-    ...policy.paths.map((rule) => `${code(rule.path)} : ${rule.reason}`),
-  ];
   return [
     `<!-- Généré par ${generator} : ne pas modifier à la main. -->`,
     '',
@@ -47,9 +40,13 @@ export function renderAgentsGuide(policy: AgentPolicy, generator: string): strin
     '| --- | --- |',
     ...scripts.map(scriptRow),
     '',
-    '## Ce que la garde des agents refuse',
+    '## Ce que la garde des agents fait respecter',
     '',
-    ...refused.map((reason) => `- ${reason}`),
+    'Un appel refusé nomme chaque règle qu’il enfreint par son code, suivi de ce qu’il faut faire à la place.',
+    '',
+    '| Code | Règle |',
+    '| --- | --- |',
+    ...AGENT_CHECKS.codes.map((checkCode) => `| ${code(checkCode)} | ${cell(AGENT_CHECKS.table[checkCode].summary)} |`),
     '',
     '## Commits',
     '',

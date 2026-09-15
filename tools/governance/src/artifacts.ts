@@ -88,7 +88,7 @@ const AGENTS_GUIDE = repoPath('AGENTS.md');
 
 const agentsGuide: Artifact = {
   path: AGENTS_GUIDE,
-  render: async (root) => formatForPath(root, AGENTS_GUIDE, renderAgentsGuide(POLICY, GENERATOR)),
+  render: async (root) => formatForPath(root, AGENTS_GUIDE, renderAgentsGuide(GENERATOR)),
 };
 
 const CLAUDE_MEMORY = repoPath('CLAUDE.md');

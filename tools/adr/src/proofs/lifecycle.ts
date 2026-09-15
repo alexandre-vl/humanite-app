@@ -18,7 +18,7 @@ import type { Creation } from '../lifecycle/create.ts';
 import { createAdr, nextNumber, RESERVATIONS, skeleton } from '../lifecycle/create.ts';
 import type { RefusalReason } from '../lifecycle/decide.ts';
 import { decide, REFUSALS } from '../lifecycle/decide.ts';
-import { judgeAdrWrite } from '../lifecycle/guard.ts';
+import { ADR_WRITE_PROBLEMS, adrWriteProblem } from '../lifecycle/guard.ts';
 import type { Bindings } from '../model/bindings.ts';
 import { withoutEntries } from '../model/bindings.ts';
 import { adrNumber } from '../model/identifiers.ts';
@@ -31,7 +31,7 @@ import { bindingsSource, FAKE_PROOFS, runFakeProof } from './runners.ts';
 const DECISION_CODES = [...keysOf(REFUSALS).map((reason) => `decide/${reason}` as const), 'decide/decided'] as const;
 
 export const LIFECYCLE_CODES = [
-  'guard/denied',
+  ...ADR_WRITE_PROBLEMS.map((problem) => `guard/${problem}` as const),
   ...DECISION_CODES,
   'new/duplicate-number',
   'new/title-refused',
@@ -42,8 +42,10 @@ export type LifecycleCode = (typeof LIFECYCLE_CODES)[number];
 
 const define = fixtureFactory<LifecycleCode>();
 
-const judged = (before: string | null, after: string | null) => async (): Promise<readonly LifecycleCode[]> =>
-  Promise.resolve(judgeAdrWrite(before, after).kind === 'deny' ? ['guard/denied'] : []);
+const judged = (before: string | null, after: string | null) => async (): Promise<readonly LifecycleCode[]> => {
+  const problem = adrWriteProblem(before, after);
+  return Promise.resolve(problem === null ? [] : [`guard/${problem}`]);
+};
 
 const REPOSITORY_ROOT = fileURLToPath(new URL('../../../../', import.meta.url));
 
@@ -155,37 +157,37 @@ export const LIFECYCLE_FIXTURES = [
   define(
     'guard/decided-write',
     'un agent réécrit un ADR accepté',
-    ['guard/denied'],
+    ['guard/decided'],
     judged(ACCEPTED, replaceOnce(ACCEPTED, 'alourdit', 'grossit')),
   ),
   define(
     'guard/status-change',
     'un agent passe un ADR proposé à accepted',
-    ['guard/denied'],
+    ['guard/not-proposed'],
     judged(PROPOSED, ACCEPTED),
   ),
   define(
     'guard/new-decided-file',
     'un agent crée un ADR directement rejeté',
-    ['guard/denied'],
+    ['guard/not-proposed'],
     judged(null, adrDocument({ status: 'rejected' })),
   ),
   define(
     'guard/tagged-status',
     'un agent écrit status: !!str accepted',
-    ['guard/denied'],
+    ['guard/not-proposed'],
     judged(PROPOSED, replaceOnce(PROPOSED, 'status: proposed', 'status: !!str accepted')),
   ),
   define(
     'guard/escaped-status',
     'un agent écrit un statut échappé en YAML',
-    ['guard/denied'],
+    ['guard/not-proposed'],
     judged(PROPOSED, replaceOnce(PROPOSED, 'status: proposed', 'status: "acc\\u0065pted"')),
   ),
   define(
     'guard/non-canonical-proposed',
     'un agent écrit un en-tête proposé non canonique',
-    ['guard/denied'],
+    ['guard/not-proposed'],
     judged(PROPOSED, replaceOnce(PROPOSED, 'status: proposed', "status: 'proposed'")),
   ),
   define(
@@ -203,13 +205,13 @@ export const LIFECYCLE_FIXTURES = [
   define(
     'guard/escaped-decided-rewrite',
     'un agent réécrit en proposé un ADR dont le statut décidé est échappé',
-    ['guard/denied'],
+    ['guard/decided'],
     judged(replaceOnce(PROPOSED, 'status: proposed', 'status: "acc\\u0065pted"'), PROPOSED),
   ),
   define(
     'guard/unknown-result',
     'une modification dont le résultat ne se calcule pas',
-    ['guard/denied'],
+    ['guard/unknown-result'],
     judged(PROPOSED, null),
   ),
   define('format/prettier-keeps-fingerprint', 'Prettier reformate un ADR sans changer son empreinte', [], async () =>
