@@ -14,7 +14,7 @@ import {
   armCommands,
   binderCommands,
   disarmCommands,
-  installCommands,
+  installRemedy,
   renderRootCommands,
   repairCommands,
 } from '../guard/root-commands.ts';
@@ -91,7 +91,7 @@ export async function emulatorStatus(
     checked(
       `garde root installé depuis le dernier commit dans ${config.guard.installDirectory}`,
       install,
-      install.some((finding) => finding.code === 'emulator/guard-uncommitted') ? null : installCommands(root, config),
+      installRemedy(root, config, install),
     ),
     checked(
       'garde root armé sur ce démarrage de l’hôte, sans échec',

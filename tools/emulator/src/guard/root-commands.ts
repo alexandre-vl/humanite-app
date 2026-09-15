@@ -1,5 +1,7 @@
 import { join } from 'node:path';
 import { shellLine } from '@huma/kit/cli';
+import type { Diagnostic } from '@huma/kit/diagnostics';
+import type { EmulatorCode } from '../checks.ts';
 import type { EmulatorConfig } from '../config.ts';
 import { ROOT_SOURCE } from '../sources.ts';
 import { ROOT_FILE_NAMES, ROOT_FILES } from './install.ts';
@@ -40,6 +42,17 @@ export function installCommands(root: string, config: EmulatorConfig): RootComma
       ),
     ],
   };
+}
+
+/** The commands that install the guard, or none while it is uncommitted: only what a commit holds can be installed. */
+export function installRemedy(
+  root: string,
+  config: EmulatorConfig,
+  findings: readonly Diagnostic<EmulatorCode>[],
+): RootCommands | null {
+  return findings.some((finding) => finding.code === 'emulator/guard-uncommitted')
+    ? null
+    : installCommands(root, config);
 }
 
 export const armCommands = (config: EmulatorConfig): RootCommands => ({

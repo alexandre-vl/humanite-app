@@ -16,7 +16,7 @@ import {
 import { guardRunWindowMs } from '../guard/timing.ts';
 import { checkInstall } from '../guard/install.ts';
 import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
-import { armCommands, binderCommands, installCommands, repairCommands } from '../guard/root-commands.ts';
+import { armCommands, binderCommands, installRemedy, repairCommands } from '../guard/root-commands.ts';
 import { binderFindings, readBinder } from '../host/binder.ts';
 import { hostReferenceTakenAt, readHostReference, writeHostReference } from '../host/reference.ts';
 import { driftFindings, residueFindings, residueOf, sampleHost } from '../host/sample.ts';
@@ -71,10 +71,9 @@ export function upSteps(session: Session): readonly Step[] {
     }),
     precondition('guard-installed', 'garde root installé depuis le dernier commit', async () => {
       const findings = await checkInstall(ownRepository(root), config.guard.installDirectory);
-      const committed = !findings.some((finding) => finding.code === 'emulator/guard-uncommitted');
       return findings.length === 0
         ? done(config.guard.installDirectory)
-        : blocked(findings, committed ? installCommands(root, config) : null);
+        : blocked(findings, installRemedy(root, config, findings));
     }),
     precondition('guard-armed', 'garde root armé sur ce démarrage de l’hôte, sans échec', async () => {
       const observation = await observeGuard(config);
