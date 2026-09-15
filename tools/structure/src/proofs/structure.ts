@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { APP_DIRECTORY } from '@huma/architecture';
+import { APP_DIRECTORY, HERMES_DIRECTORIES } from '@huma/architecture';
 import type { FileTree } from '@huma/fixtures';
 import { fixtureFactory, IN_PROCESS, workspaceCopy } from '@huma/fixtures';
 import { findWorkspaceRoot } from '@huma/kit/cli';
@@ -34,16 +34,26 @@ const page = (slice: string, imports: readonly (readonly [string, string])[]): F
   [`src/pages/${slice}/model/uses.ts`]: `${imports.map(([name, specifier]) => `import { ${name} } from '${specifier}';`).join('\n')}\n\nexport const ${slice}Uses = [${imports.map(([name]) => name).join(', ')}];\n`,
 });
 
+/**
+ * A route that imports nothing: enough for the route directory to exist, so every fixture cruises the two Hermes
+ * directories the CLI does — dependency-cruiser throws on a directory of its list that is not there.
+ */
+const ROUTE = 'export default function Route() {\n  return null;\n}\n';
+
 /** The structure findings of an app laid out as `files`, with the manifest and tsconfig of the workspace's app. */
 const checked = (files: FileTree) => async (): Promise<readonly StructureCode[]> => {
   const workspace = await findWorkspaceRoot(import.meta.dirname);
   const tree: FileTree = {
     [`${APP}/package.json`]: await readFile(join(workspace, APP, 'package.json'), 'utf8'),
     [`${APP}/tsconfig.json`]: await readFile(join(workspace, APP, 'tsconfig.json'), 'utf8'),
+    [`${APP}/app/index.tsx`]: ROUTE,
     ...Object.fromEntries(Object.entries(files).map(([path, content]) => [`${APP}/${path}`, content])),
   };
   await using copy = await workspaceCopy(workspace, tree);
-  const findings = [...(await steigerFindings(copy.root, APP)), ...(await cycleFindings(copy.root, APP, ['src']))];
+  const findings = [
+    ...(await steigerFindings(copy.root, APP)),
+    ...(await cycleFindings(copy.root, APP, HERMES_DIRECTORIES)),
+  ];
   return findings.map((finding) => finding.code);
 };
 
@@ -194,6 +204,17 @@ export const STRUCTURE_FIXTURES = [
       'src/entities/article/model/summary.ts':
         "import { article } from './article';\n\nexport const summary = () => article;\n",
       ...ARTICLE_PAGES,
+    }),
+  ),
+  define(
+    'structure/cycle-in-routes',
+    'deux routes qui s’importent l’une l’autre',
+    ['structure/cycle'],
+    checked({
+      ...entity('article', 'article'),
+      ...ARTICLE_PAGES,
+      'app/first.tsx': "import { second } from './second';\n\nexport const first = second;\n",
+      'app/second.tsx': "import { first } from './first';\n\nexport const second = () => first;\n",
     }),
   ),
 ] as const;
