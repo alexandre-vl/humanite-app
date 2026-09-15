@@ -3,5 +3,5 @@
 # on the host and publishes the result.
 set -eu
 # shellcheck source=lib.sh
-. /usr/local/libexec/humanite-redroid/lib.sh
+. /usr/local/libexec/humanite-emulator/lib.sh
 guard_run

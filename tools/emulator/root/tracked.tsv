@@ -1,6 +1,6 @@
 # Généré par pnpm gen depuis tools/emulator/src/android-writes.ts et config.ts : ne pas modifier.
-setting	container	humanite-redroid15
-setting	unit	humanite-redroid-guard
+setting	container	humanite-emulator
+setting	unit	humanite-emulator-guard
 setting	tick_s	30
 setting	run_timeout_s	525
 setting	lock_wait_s	300

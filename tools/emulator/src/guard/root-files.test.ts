@@ -6,7 +6,7 @@ import { ABSENT } from '../android-writes.ts';
 import { EMULATOR } from '../config.ts';
 import { ROOT_FILE_NAMES } from './install.ts';
 import { SNAPSHOT_KINDS } from './kinds.ts';
-import { GUARD_ACTIONS, GUARD_FAILURES, GUARD_MODES, GUARD_PHASES, STATUS_FORMAT } from './status.ts';
+import { GUARD_ACTIONS, GUARD_FAILURES, GUARD_MODES, GUARD_PHASES } from './status.ts';
 import { renderTrackedTable } from './tracked.ts';
 
 const ROOT = new URL('../../root/', import.meta.url).pathname;
@@ -35,11 +35,31 @@ describe('the root scripts', () => {
     },
   );
 
-  test('the library fixes its PATH and locale before anything else runs, and its directories are the configured ones', async () => {
+  test('the library fixes its PATH and locale before anything else runs', async () => {
     const commands = (await read('lib.sh')).split('\n').filter((line) => line !== '' && !line.startsWith('#'));
     expect(commands.slice(0, 3)).toEqual(['PATH=/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL=C', 'export PATH LC_ALL']);
-    expect(commands).toContain(`LIB=${EMULATOR.guard.installDirectory}`);
-    expect(commands).toContain(`RUN=${EMULATOR.guard.runDirectory}`);
+  });
+
+  // Sourcing the library sets variables and defines functions; it writes nothing, so a shell can be asked what it
+  // builds. Comparing what it answers, rather than the lines it is written with, leaves it free to derive them.
+  test('the library names the same host objects as the configuration, from one name', async () => {
+    const asked = await run(
+      'dash',
+      [
+        '-c',
+        `. ${join(ROOT, 'lib.sh')} && printf '%s\\n' "$NAME" "$LIB" "$RUN" "$TRACKED" "$STATUS_FORMAT" && say hello`,
+      ],
+      { cwd: ROOT, timeoutMs: PARSE_TIMEOUT_MS },
+    );
+    expect(asked.stdout.toString('utf8').split('\n')).toEqual([
+      EMULATOR.name,
+      EMULATOR.guard.installDirectory,
+      EMULATOR.guard.runDirectory,
+      `${EMULATOR.guard.installDirectory}/tracked.tsv`,
+      EMULATOR.guard.statusFormat,
+      '',
+    ]);
+    expect(asked.stderr.toString('utf8')).toBe(`${EMULATOR.name}: hello\n`);
   });
 
   test('the library writes every word the status reader knows, and nothing reads /proc attributes but the fresh procfs', async () => {
@@ -47,7 +67,6 @@ describe('the root scripts', () => {
     for (const word of [...GUARD_ACTIONS, ...GUARD_FAILURES, ...GUARD_PHASES, ...GUARD_MODES, ...SNAPSHOT_KINDS]) {
       expect(library, word).toMatch(new RegExp(`(?<![\\w-])${word}(?![\\w-])`, 'u'));
     }
-    expect(library).toContain(`STATUS_FORMAT=${STATUS_FORMAT}`);
     expect(library).toContain(`ABSENT='${ABSENT}'`);
     expect(library).not.toMatch(/\bstat\b[^\n]*\/proc\//u);
   });

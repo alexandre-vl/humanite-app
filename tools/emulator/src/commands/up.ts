@@ -93,7 +93,7 @@ export function upSteps(session: Session): readonly Step[] {
       summary: 'échantillon de l’hôte pris avant Android',
       check: async () => {
         const container = await inspectContainer(context, config.container);
-        const reference = await readHostReference();
+        const reference = await readHostReference(config);
         if (container !== null) {
           return reference === null
             ? blocked(`conteneur ${container.status} sans échantillon d’avant Android : ${RESTART}`)
@@ -103,12 +103,12 @@ export function upSteps(session: Session): readonly Step[] {
         if (residue.length > 0) {
           return blocked(residueFindings(residue), repairCommands(config));
         }
-        return Date.now() - (await hostReferenceTakenAt()) < REFERENCE_FRESH_MS
+        return Date.now() - (await hostReferenceTakenAt(config)) < REFERENCE_FRESH_MS
           ? done('pris à l’instant')
           : todo('à prendre');
       },
       apply: async () => {
-        await writeHostReference();
+        await writeHostReference(config);
       },
       settleMs: 0,
     },
@@ -184,7 +184,7 @@ export function upSteps(session: Session): readonly Step[] {
       settleMs: 2 * guardRunWindowMs(config),
     },
     precondition('host-restored', 'hôte identique à l’échantillon d’avant Android, relu sans root', async () => {
-      const reference = await readHostReference();
+      const reference = await readHostReference(config);
       if (reference === null) {
         return blocked(`aucun échantillon d’avant Android : ${RESTART}`);
       }

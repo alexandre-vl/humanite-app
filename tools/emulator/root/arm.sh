@@ -4,7 +4,7 @@
 # the clean values an earlier session left changed, which arming requires, and starts no timer.
 set -eu
 # shellcheck source=lib.sh
-. /usr/local/libexec/humanite-redroid/lib.sh
+. /usr/local/libexec/humanite-emulator/lib.sh
 case ${1-} in
   '') arm_run ;;
   --repair) repair_run ;;

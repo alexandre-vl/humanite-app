@@ -18,6 +18,12 @@ export type CalmThresholds = Readonly<{
 }>;
 
 export type EmulatorConfig = Readonly<{
+  /**
+   * The one word every object the emulator leaves on the host is named from: its container, its network, its volume,
+   * its systemd units, what root installs and what it writes under /run. Redroid is the image it runs, not what the
+   * host should call it, and a name spelled a second time somewhere else is a file no rename could reach.
+   */
+  name: string;
   image: Readonly<{
     /** Local tag, for people: the container runs the image id. */
     reference: string;
@@ -36,11 +42,15 @@ export type EmulatorConfig = Readonly<{
   /** Arguments of Android's init. */
   bootArguments: Readonly<Record<`androidboot.${string}`, string>>;
   bootTimeoutMs: number;
+  /** Where a command leaves for another what belongs to this boot of the host, under `XDG_RUNTIME_DIR`. */
+  runtimeDirectory: string;
   guard: Readonly<{
     /** The transient systemd timer and service that run the guard as root. */
     unit: string;
     installDirectory: `/${string}`;
     runDirectory: `/run/${string}`;
+    /** First field of every status file the guard publishes: its reader refuses a file that opens on another word. */
+    statusFormat: `${string}/${number}`;
     /** Between two runs of the timer. */
     tickSeconds: number;
     /** What one run takes once it holds the lock: two snapshots of the host and the writes between them. */
@@ -78,15 +88,18 @@ export type EmulatorConfig = Readonly<{
   tools: Readonly<{ java: string; maestro: string }>;
 }>;
 
+const NAME = 'humanite-emulator';
+
 export const EMULATOR = {
+  name: NAME,
   image: {
     reference: 'humanite/redroid:15.0.0_64only-250627',
     id: 'sha256:f096388ce85946ef6c599766043ce21e24e4b95e320702c03a4d77472c4db11f',
     digest: 'redroid/redroid@sha256:b51bde9cef80f7bd7581148192f2b2f4d41f23c6344cfe88eceeb8ddd67490ee',
   },
-  container: 'humanite-redroid15',
-  network: 'humanite-redroid-net',
-  volume: 'humanite-redroid15-data',
+  container: NAME,
+  network: `${NAME}-net`,
+  volume: `${NAME}-data`,
   adb: { host: '127.0.0.1', port: 5555 },
   // Measured: 1.25 GiB with the app, a peak of 2 GiB.
   limits: { memoryGib: 3, cpus: 3, pids: 8192 },
@@ -106,10 +119,12 @@ export const EMULATOR = {
   },
   // Boot took 15 s on every start of the spike.
   bootTimeoutMs: 180_000,
+  runtimeDirectory: NAME,
   guard: {
-    unit: 'humanite-redroid-guard',
-    installDirectory: '/usr/local/libexec/humanite-redroid',
-    runDirectory: '/run/humanite-redroid',
+    unit: `${NAME}-guard`,
+    installDirectory: `/usr/local/libexec/${NAME}`,
+    runDirectory: `/run/${NAME}`,
+    statusFormat: `${NAME}-status/1`,
     tickSeconds: 30,
     restoreSeconds: 180,
     bootDeadlineSeconds: 180,
@@ -126,8 +141,8 @@ export const EMULATOR = {
   metroPort: 8081,
   // Build 5 of the spike, from a clean `android/`: 12 min, a peak of 5.9 GiB, never killed.
   build: {
-    serviceUnit: 'humanite-emulator-build',
-    unit: 'humanite-gradle-build',
+    serviceUnit: `${NAME}-build`,
+    unit: `${NAME}-gradle`,
     memoryHigh: '5600M',
     memoryMax: '6G',
     cpuAffinity: '0-1',

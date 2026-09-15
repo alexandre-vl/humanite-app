@@ -48,7 +48,7 @@ test('reads every record of a status, empty values included', () => {
 });
 
 test('refuses another format, an unknown phase and a missing field', () => {
-  expect(() => parseGuardStatus(STATUS.replace(STATUS_FORMAT, 'humanite-redroid-status/0'))).toThrow('format');
+  expect(() => parseGuardStatus(STATUS.replace(STATUS_FORMAT, `${STATUS_FORMAT}0`))).toThrow('format');
   expect(() => parseGuardStatus(STATUS.replace('phase\trestored', 'phase\tdone'))).toThrow('phase « done » inconnu');
   expect(() => parseGuardStatus(STATUS.replace(/^run_end.*$/mu, ''))).toThrow('run_end absent');
 });

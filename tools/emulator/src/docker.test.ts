@@ -6,8 +6,10 @@ test('creates the container the spike verified: privileged, adb on the loopback,
   const args = runArguments(EMULATOR);
   const [command, labelFlag, label] = args;
   expect([command, labelFlag, label]).toEqual(['run', '--label', `${CONFIG_LABEL}=${configFingerprint(EMULATOR)}`]);
+  // The line the spike verified, with the names the configuration gives: it answers for how the container is run,
+  // never for what it is called.
   expect(args.join(' ')).toContain(
-    '--detach --name humanite-redroid15 --privileged --network humanite-redroid-net --publish 127.0.0.1:5555:5555 --memory 3g --memory-swap 3g --cpus 3 --pids-limit 8192 --volume /dev/binder1:/dev/binder --volume /dev/binder2:/dev/hwbinder --volume /dev/binder3:/dev/vndbinder --volume humanite-redroid15-data:/data sha256:f096388ce85946ef6c599766043ce21e24e4b95e320702c03a4d77472c4db11f androidboot.redroid_width=720 androidboot.redroid_height=1280 androidboot.redroid_dpi=320 androidboot.redroid_fps=15 androidboot.redroid_gpu_mode=guest androidboot.use_memfd=1',
+    `--detach --name ${EMULATOR.container} --privileged --network ${EMULATOR.network} --publish 127.0.0.1:5555:5555 --memory 3g --memory-swap 3g --cpus 3 --pids-limit 8192 --volume /dev/binder1:/dev/binder --volume /dev/binder2:/dev/hwbinder --volume /dev/binder3:/dev/vndbinder --volume ${EMULATOR.volume}:/data sha256:f096388ce85946ef6c599766043ce21e24e4b95e320702c03a4d77472c4db11f androidboot.redroid_width=720 androidboot.redroid_height=1280 androidboot.redroid_dpi=320 androidboot.redroid_fps=15 androidboot.redroid_gpu_mode=guest androidboot.use_memfd=1`,
   );
 });
 

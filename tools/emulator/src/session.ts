@@ -37,14 +37,14 @@ export const cacheDirectory = (root: string): string => join(root, 'node_modules
  * Where a command leaves what another command of this boot of the host reads: the container, the guard and the host
  * are the machine's, not a worktree's, and this directory goes away with the boot that made it.
  */
-export function runtimeDirectory(): string {
+export function runtimeDirectory(config: EmulatorConfig): string {
   const base = process.env['XDG_RUNTIME_DIR'];
   if (base === undefined || base === '') {
     throw new Error(
       'XDG_RUNTIME_DIR absent : ouvrir une session utilisateur systemd avant les commandes de l’émulateur',
     );
   }
-  return join(base, 'humanite-emulator');
+  return join(base, config.runtimeDirectory);
 }
 
 /** The lock the root guard holds during each run, which `docker run` and `docker rm` take too. */

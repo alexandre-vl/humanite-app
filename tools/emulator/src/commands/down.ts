@@ -97,7 +97,7 @@ export function downSteps(session: Session): readonly Step[] {
       settleMs: 2 * guardRunWindowMs(config),
     },
     precondition('host-restored', 'hôte identique à l’échantillon d’avant Android, relu sans root', async () => {
-      const reference = await readHostReference();
+      const reference = await readHostReference(config);
       if (reference === null) {
         return done('aucun échantillon d’avant Android à comparer');
       }
@@ -106,7 +106,7 @@ export function downSteps(session: Session): readonly Step[] {
         return blocked(findings);
       }
       // The session is over and the host answers for itself again: what is left of a sample means one is unfinished.
-      await clearHostReference();
+      await clearHostReference(config);
       return done(`${String(reference.size)} entrées comparées`);
     }),
   ];

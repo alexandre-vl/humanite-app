@@ -1,11 +1,12 @@
 import { isOneOf } from '@huma/kit/records';
+import { EMULATOR } from '../config.ts';
 
 /**
  * The status file the root guard publishes after each of its runs, the only thing it tells the rest of the machine.
  * Written by `root/lib.sh`, one tab-separated record per line; this module is its reader.
  */
 
-export const STATUS_FORMAT = 'humanite-redroid-status/1';
+export const STATUS_FORMAT = EMULATOR.guard.statusFormat;
 
 /**
  * `armed`: reference taken, no container yet · `booting`: Android is booting, nothing restored yet · `restored`: the

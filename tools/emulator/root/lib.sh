@@ -17,9 +17,12 @@ LC_ALL=C
 export PATH LC_ALL
 umask 022
 
-LIB=/usr/local/libexec/humanite-redroid
+# The one name of the emulator on this host, from tools/emulator/src/config.ts; root-files.test.ts sources this
+# library and compares what it builds from it with what the configuration says.
+NAME=humanite-emulator
+LIB=/usr/local/libexec/$NAME
 TRACKED=$LIB/tracked.tsv
-RUN=/run/humanite-redroid
+RUN=/run/$NAME
 STATE=$RUN/state
 SYSCTL_ROOT=/proc/sys
 TRACEFS=/sys/kernel/tracing
@@ -27,7 +30,7 @@ DEBUGFS=/sys/kernel/debug
 MOUNTINFO=/proc/self/mountinfo
 BOOT_ID=/proc/sys/kernel/random/boot_id
 
-STATUS_FORMAT=humanite-redroid-status/1
+STATUS_FORMAT=$NAME-status/1
 TAB=$(printf '\t')
 # Plans separate their fields with the unit separator: `read` would merge two tabs around an empty value.
 US=$(printf '\037')
@@ -55,7 +58,7 @@ function read_value(file,   line, value, lines, got) {
 '
 
 say() {
-  printf 'humanite-redroid: %s\n' "$*" >&2
+  printf '%s: %s\n' "$NAME" "$*" >&2
 }
 
 # require_root: every command of the guard writes the kernel; none of them makes sense without root.

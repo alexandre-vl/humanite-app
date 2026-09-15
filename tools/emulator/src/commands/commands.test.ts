@@ -48,7 +48,7 @@ test('the build outlives whoever starts it: the wait and Gradle run in a transie
   });
   expect(args).toEqual([
     '--user',
-    '--unit=humanite-emulator-build',
+    `--unit=${EMULATOR.build.serviceUnit}`,
     '--collect',
     '--quiet',
     '--working-directory=/work/humanite',
@@ -75,7 +75,7 @@ test('Gradle runs in a capped scope, without swap, first to be killed, on bound 
   expect(args.slice(0, args.indexOf('--'))).toEqual([
     '--user',
     '--scope',
-    '--unit=humanite-gradle-build',
+    `--unit=${EMULATOR.build.unit}`,
     '--collect',
     '--quiet',
     '--property=MemoryHigh=5600M',
