@@ -1,4 +1,5 @@
-import { mkdtemp, readdir, readFile, realpath, rm } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { access, mkdtemp, readdir, readFile, realpath, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { errnoCode } from './errors.ts';
@@ -39,6 +40,13 @@ export async function resolveExistingPath(path: string): Promise<string> {
     }
   }
 }
+
+/** Whether the process may reach `path` as `mode` asks, `F_OK` by default: a reason not to reach it answers `false`. */
+export const isAccessible = async (path: string, mode: number = constants.F_OK): Promise<boolean> =>
+  access(path, mode).then(
+    () => true,
+    () => false,
+  );
 
 /** Text of a UTF-8 file, `null` when it does not exist; any other failure is thrown. */
 export async function readTextIfExists(path: string): Promise<string | null> {

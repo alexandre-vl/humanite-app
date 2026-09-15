@@ -24,6 +24,8 @@ export const FALLBACK_TOKENS = [
   'config alias.',
   '.git/',
   '.claude/',
+  'verify.json',
+  'huma-verified-trees',
   'commit-tree',
   'update-ref',
   'fast-import',

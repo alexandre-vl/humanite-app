@@ -60,6 +60,10 @@ function reachesNames(effect: WriteEffect, names: readonly string[]): boolean {
 const sensitiveNames = (rule: PathRule): readonly string[] =>
   rule.kind === 'directory' ? [basename(rule.path), ...GIT_SENSITIVE_NAMES] : [basename(rule.path)];
 
+/** Whether the rule refuses this effect: a file it only protects from being forged may still be removed. */
+const refuses = (rule: PathRule, effect: WriteEffect): boolean =>
+  rule.removal === 'refused' || (effect.kind !== 'remove' && effect.kind !== 'tree');
+
 type Write = Readonly<{ root: string; path: string; absolute: string; effect: WriteEffect }>;
 
 /** Verdict on an ADR file receiving `after`, where `null` means content the command does not tell. */
@@ -84,7 +88,9 @@ async function judgeWrite(
   const { path, effect } = write;
   const wide = effect.kind === 'remove' || effect.kind === 'tree';
   for (const rule of context.policy.paths) {
-    if (coversPath(rule, path) || (wide && holds(path, rule.path) && reachesNames(effect, sensitiveNames(rule)))) {
+    const reached =
+      coversPath(rule, path) || (wide && holds(path, rule.path) && reachesNames(effect, sensitiveNames(rule)));
+    if (reached && refuses(rule, effect)) {
       return deny(rule.reason);
     }
   }

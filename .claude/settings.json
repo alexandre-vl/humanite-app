@@ -47,7 +47,8 @@
       "Bash(docker stop humanite-redroid15*)",
       "Edit(/.git/**)",
       "Edit(/.claude/settings.json)",
-      "Edit(/.claude/settings.local.json)"
+      "Edit(/.claude/settings.local.json)",
+      "Edit(/node_modules/.cache/huma/verify.json)"
     ]
   }
 }

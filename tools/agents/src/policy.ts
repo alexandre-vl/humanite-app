@@ -16,7 +16,17 @@ type CommandRule = Readonly<{
 }>;
 
 /** Files an agent may not write, with its file tools or through a shell: a directory and all below it, or one file. */
-export type PathRule = Readonly<{ id: string; reason: string; path: string; kind: 'directory' | 'file' }>;
+export type PathRule = Readonly<{
+  id: string;
+  reason: string;
+  path: string;
+  kind: 'directory' | 'file';
+  /**
+   * Whether a command that removes a whole tree holding it is refused too. A file that only harms when it says
+   * something false may be removed: what replaces it is written by the tool that owns it.
+   */
+  removal: 'refused' | 'allowed';
+}>;
 
 /** A package script or entry file reserved to the human decision maker. */
 export type HumanOnlyCommand = Readonly<{ script: string; entry: string }>;
@@ -336,19 +346,40 @@ function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRule {
   };
 }
 
+/**
+ * The trace `pnpm verify` leaves of the tree it judged green: the Stop hook reads it to know whether the tree an
+ * agent leaves behind was verified. Writing it by hand would let an agent stop on work nothing checked.
+ */
+const verifyStampRule = (path: string): PathRule => ({
+  id: 'verify-stamp',
+  reason:
+    'La trace de la dernière vérification verte est écrite par pnpm verify : l’écrire à la main ferait passer le hook Stop sur un arbre que rien n’a vérifié.',
+  path,
+  kind: 'file',
+  removal: 'allowed',
+});
+
 const PROTECTED_PATHS: readonly PathRule[] = [
-  { id: 'git-directory', reason: 'Le dossier .git ne s’écrit qu’à travers git.', path: '.git', kind: 'directory' },
+  {
+    id: 'git-directory',
+    reason: 'Le dossier .git ne s’écrit qu’à travers git.',
+    path: '.git',
+    kind: 'directory',
+    removal: 'refused',
+  },
   {
     id: 'claude-settings',
     reason: 'Les réglages Claude Code du dépôt sont générés par pnpm gen depuis leur source typée.',
     path: CLAUDE_SETTINGS_PATH,
     kind: 'file',
+    removal: 'refused',
   },
   {
     id: 'claude-local-settings',
     reason: 'Des réglages locaux pourraient désactiver les hooks du dépôt.',
     path: CLAUDE_LOCAL_SETTINGS_PATH,
     kind: 'file',
+    removal: 'refused',
   },
 ];
 
@@ -360,10 +391,10 @@ export const coversPath = (rule: PathRule, repositoryPath: string): boolean =>
   repositoryPath === rule.path || (rule.kind === 'directory' && repositoryPath.startsWith(`${rule.path}/`));
 
 /** Tokens a code tool may not mention: what the command and path rules protect, in lowercase. */
-function sensitiveTokens(humanOnly: readonly HumanOnlyCommand[]): readonly string[] {
+function sensitiveTokens(humanOnly: readonly HumanOnlyCommand[], paths: readonly PathRule[]): readonly string[] {
   return [
     ...humanOnly.flatMap((command) => [command.script, basename(command.entry)]),
-    ...PROTECTED_PATHS.map((rule) => (rule.kind === 'directory' ? `${rule.path}/` : rule.path)),
+    ...paths.map((rule) => (rule.kind === 'directory' ? `${rule.path}/` : rule.path)),
     ADR_DIRECTORY,
     ...AGENT_SESSION_VARIABLES,
     '--no-veri',
@@ -375,7 +406,12 @@ function sensitiveTokens(humanOnly: readonly HumanOnlyCommand[]): readonly strin
   ].map((token) => token.toLowerCase());
 }
 
-export function agentPolicy(humanOnly: readonly HumanOnlyCommand[], emulator: EmulatorTarget): AgentPolicy {
+export function agentPolicy(
+  humanOnly: readonly HumanOnlyCommand[],
+  emulator: EmulatorTarget,
+  verifyStamp: string,
+): AgentPolicy {
+  const paths = [...PROTECTED_PATHS, verifyStampRule(verifyStamp)];
   return {
     commands: [
       PRIVILEGE_ESCALATION,
@@ -385,10 +421,10 @@ export function agentPolicy(humanOnly: readonly HumanOnlyCommand[], emulator: Em
       humanOnlyRule(humanOnly),
       emulatorRule(emulator),
     ],
-    paths: PROTECTED_PATHS,
+    paths,
     shellTools: ['Bash', 'Monitor', 'PowerShell'],
     fileTools: ['Edit', 'Write', 'NotebookEdit', 'MultiEdit'],
     codeTools: ['REPL'],
-    sensitiveTokens: sensitiveTokens(humanOnly),
+    sensitiveTokens: sensitiveTokens(humanOnly, paths),
   };
 }

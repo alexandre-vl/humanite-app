@@ -42,7 +42,7 @@ export async function preCommit(context: PreCommitContext): Promise<readonly Dia
   if ((await checkStaging(repository)).length > 0 || (await writeTree(repository)) !== tree) {
     return [gitHookFinding('git/tree-changed', INDEX_PATH, {})];
   }
-  await recordVerifiedTree(repository.root, context.gitProcess, tree);
+  await recordVerifiedTree(repository, context.gitProcess, tree);
   return [];
 }
 

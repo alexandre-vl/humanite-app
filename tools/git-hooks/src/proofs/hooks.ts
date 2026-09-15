@@ -98,7 +98,7 @@ const TRIPWIRE_FIXTURES = [
     'un commit dont pre-commit a vérifié l’index',
     [],
     inRepository({ ...COMMITTED, staged: { 'a.txt': 'a2\n', 'b.txt': 'b\n' } }, async (repository) => {
-      await recordVerifiedTree(repository.root, GIT_PROCESS, await writeTree(repository));
+      await recordVerifiedTree(repository, GIT_PROCESS, await writeTree(repository));
       return codes(await checkVerifiedTree(repository, GIT_PROCESS));
     }),
   ),
@@ -115,9 +115,30 @@ const TRIPWIRE_FIXTURES = [
     'un index modifié après pre-commit',
     ['git/verify-skipped'],
     inRepository({ ...COMMITTED, staged: { 'a.txt': 'a2\n', 'b.txt': 'b\n' } }, async (repository) => {
-      await recordVerifiedTree(repository.root, GIT_PROCESS, await writeTree(repository));
+      await recordVerifiedTree(repository, GIT_PROCESS, await writeTree(repository));
       await writeFile(join(repository.root, 'b.txt'), 'b2\n');
       await git(repository, ['add', 'b.txt']);
+      return codes(await checkVerifiedTree(repository, GIT_PROCESS));
+    }),
+  ),
+  define(
+    'git/verify-skipped-marker-reused',
+    'un marqueur de pre-commit déjà consommé par un commit',
+    ['git/verify-skipped'],
+    inRepository({ ...COMMITTED, staged: { 'a.txt': 'a2\n', 'b.txt': 'b\n' } }, async (repository) => {
+      await recordVerifiedTree(repository, GIT_PROCESS, await writeTree(repository));
+      const first = await checkVerifiedTree(repository, GIT_PROCESS);
+      return [...codes(first), ...codes(await checkVerifiedTree(repository, GIT_PROCESS))];
+    }),
+  ),
+  define(
+    'git/verify-skipped-marker-forged',
+    'un marqueur écrit là où la garde des agents ne protège rien',
+    ['git/verify-skipped'],
+    inRepository({ ...COMMITTED, staged: { 'a.txt': 'a2\n', 'b.txt': 'b\n' } }, async (repository) => {
+      const forged = join(repository.root, 'node_modules/.cache/huma/git-hooks');
+      await mkdir(forged, { recursive: true });
+      await writeFile(join(forged, String(GIT_PROCESS)), `${await writeTree(repository)}\n`);
       return codes(await checkVerifiedTree(repository, GIT_PROCESS));
     }),
   ),

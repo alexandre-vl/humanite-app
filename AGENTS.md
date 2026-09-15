@@ -53,6 +53,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 - `.git` : Le dossier .git ne s’écrit qu’à travers git.
 - `.claude/settings.json` : Les réglages Claude Code du dépôt sont générés par pnpm gen depuis leur source typée.
 - `.claude/settings.local.json` : Des réglages locaux pourraient désactiver les hooks du dépôt.
+- `node_modules/.cache/huma/verify.json` : La trace de la dernière vérification verte est écrite par pnpm verify : l’écrire à la main ferait passer le hook Stop sur un arbre que rien n’a vérifié.
 
 ## Commits
 

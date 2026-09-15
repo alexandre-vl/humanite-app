@@ -72,6 +72,8 @@ const AWAITING_FOUNDATION_ADRS = [
   'agent/emulator-inspect',
   'agent/emulator-script',
   'agent/hooks-directory',
+  'agent/verify-stamp-forged',
+  'agent/valid-remove-verify-stamp',
   'agent/shell-chmod-hook',
   'agent/shell-unknown-directory',
   'agent/shell-partly-known-path',

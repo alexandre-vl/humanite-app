@@ -10,7 +10,8 @@ import type { CommandName } from './commands.ts';
 import { BIN_DIRECTORY, COMMANDS, STAGED_ARGUMENTS, VERIFY_BUDGETS_MS, VERIFY_STEPS } from './commands.ts';
 
 /** Records the tree the last successful `pnpm verify` saw; the stop hook compares the working tree with it. */
-const STAMP_PATH = 'node_modules/.cache/huma/verify.json';
+/** Where a green run records the tree it judged; the agent guard refuses to write it. */
+export const STAMP_PATH = 'node_modules/.cache/huma/verify.json';
 
 export type VerifyOutcome =
   | Readonly<{ kind: 'passed'; tree: string }>

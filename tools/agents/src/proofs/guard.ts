@@ -46,6 +46,7 @@ const LINKS: Readonly<Record<string, string>> = { '/tmp/lien.json': `${ROOT}/.cl
 export const FIXTURE_POLICY: AgentPolicy = agentPolicy(
   [{ script: 'adr:decide', entry: 'tools/governance/src/cli/adr-decide.ts' }],
   { container: 'redroid-fixture', markers: ['redroid-fixture', 'redroid'] },
+  'node_modules/.cache/huma/verify.json',
 );
 
 const FIXTURE_CONTEXT: GuardContext = {
@@ -599,6 +600,18 @@ const SHELL_WRITES = [
     'un agent vide un hook',
     ['agent/denied'],
     judged(bash('printf "" > .git/hooks/pre-commit')),
+  ),
+  define(
+    'agent/verify-stamp-forged',
+    'un agent écrit lui-même la trace de la dernière vérification verte',
+    ['agent/denied'],
+    judged(bash('echo \'{"tree":"abc"}\' > node_modules/.cache/huma/verify.json')),
+  ),
+  define(
+    'agent/valid-remove-verify-stamp',
+    'un agent efface la trace de vérification, que pnpm verify réécrira',
+    [],
+    judged(bash('rm -rf node_modules')),
   ),
   define(
     'agent/shell-chmod-hook',

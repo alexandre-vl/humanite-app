@@ -3,6 +3,7 @@ import { agentPolicy } from '@huma/agents/policy';
 import type { HookCommands } from '@huma/agents/settings';
 import { EMULATOR, emulatorMarkers } from '@huma/emulator/config';
 import { COMMAND_NAMES, COMMANDS, entryFile, nodeEntry, PINNED_NODE } from './commands.ts';
+import { STAMP_PATH } from './verify.ts';
 
 /**
  * The agent policy of this workspace: the fixed rules, every command reserved to the human decision maker, and the
@@ -15,6 +16,7 @@ export const POLICY: AgentPolicy = agentPolicy(
     return spec.audience === 'human' && entry !== null ? [{ script, entry }] : [];
   }),
   { container: EMULATOR.container, markers: emulatorMarkers(EMULATOR) },
+  STAMP_PATH,
 );
 
 const inProject = (path: string): string => `"\${CLAUDE_PROJECT_DIR}/${path}"`;
