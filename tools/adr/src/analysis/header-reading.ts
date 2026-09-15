@@ -3,8 +3,8 @@ import type { Yaml } from 'mdast';
 import type { Document, ErrorCode, YAMLError } from 'yaml';
 import { isMap, isScalar, LineCounter, parseDocument } from 'yaml';
 import { z } from 'zod';
+import { canonicalHeader, headerLines, readCanonicalHeader } from '../model/header.ts';
 import type { Header } from '../model/header.ts';
-import { HEADER_DELIMITER, headerLines, renderHeader } from '../model/header.ts';
 import { parseAdrId } from '../model/identifiers.ts';
 import type { FormatRegistry } from '../spec/formats/registry.ts';
 import { formatSpec } from '../spec/formats/registry.ts';
@@ -101,8 +101,12 @@ const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
 
 const problemOf = (error: YAMLError): string => YAML_PROBLEMS[error.code];
 
-/** Reads the header of an ADR: YAML, then format version, then the schema of that version, then canonical form. */
-export function readHeader(node: Yaml, registry: FormatRegistry, report: FileReport): HeaderReading {
+/**
+ * Reads the header of an ADR: YAML, then format version, then the schema of that version, then canonical form. The
+ * canonical form is the one `readCanonicalHeader` reads in `text`, the whole file, so a header this check accepts is one
+ * the agent hook and `adr:decide` can read; a byte order mark and CRLF line breaks are the encoding checks' findings.
+ */
+export function readHeader(node: Yaml, text: string, registry: FormatRegistry, report: FileReport): HeaderReading {
   const latest = registry.latest;
   const lineCounter = new LineCounter();
   const document = parseDocument(node.value, {
@@ -148,14 +152,14 @@ export function readHeader(node: Yaml, registry: FormatRegistry, report: FileRep
     }
     return { kind: 'unreadable', spec };
   }
-  const header: Header = {
+  const header = canonicalHeader({
     ...parsed.data,
     supersedes: parsed.data.supersedes.flatMap((id) => {
       const number = parseAdrId(id);
       return number === null ? [] : [number];
     }),
-  };
-  if (renderHeader(header) !== `${HEADER_DELIMITER}\n${node.value}\n${HEADER_DELIMITER}\n`) {
+  });
+  if (readCanonicalHeader(text.replace(/^\u{FEFF}/u, '').replaceAll('\r\n', '\n')) === null) {
     report('adr/frontmatter-not-canonical', positionOf(node), { expected: headerLines(header).join(' ⏎ ') });
   }
   if (header.status === INITIAL_STATUS && spec.version !== latest.version) {

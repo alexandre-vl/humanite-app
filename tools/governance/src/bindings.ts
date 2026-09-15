@@ -39,6 +39,7 @@ export const BINDINGS = {
         'adr/frontmatter-yaml',
         'adr/frontmatter-schema',
         'adr/frontmatter-not-canonical',
+        'adr/frontmatter-not-canonical-delimiter',
         'adr/markdown-node',
         'adr/markdown-heading-depth',
         'adr/markdown-task-list',
@@ -75,6 +76,7 @@ export const BINDINGS = {
       R3: [
         'adr/context-question-missing',
         'adr/context-question-shape',
+        'adr/valid-question-code',
         'adr/context-facts-missing',
         'adr/context-fact-shape',
         'adr/context-fact-unsourced',

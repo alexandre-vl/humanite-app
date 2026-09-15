@@ -156,6 +156,12 @@ export const CHECK_FIXTURES = [
     ['adr/frontmatter-not-canonical'],
     inMemory(mutated('status: proposed', "status: 'proposed'")),
   ),
+  define(
+    'adr/frontmatter-not-canonical-delimiter',
+    'une espace après le délimiteur d’ouverture, que le YAML tolère',
+    ['adr/frontmatter-not-canonical'],
+    inMemory(mutated('---\nformat: 1', '--- \nformat: 1')),
+  ),
 
   define(
     'adr/markdown-node',
@@ -299,6 +305,12 @@ export const CHECK_FIXTURES = [
     'une question sans point d’interrogation',
     ['adr/context-question-shape'],
     inMemory(mutated('par l’application ?', 'par l’application.')),
+  ),
+  define(
+    'adr/valid-question-code',
+    'une question qui cite un opérateur ponctué en code',
+    [],
+    inMemory(mutated('valide les données reçues par l’application ?', 'valide `a?.b` et `a ?? b` ?')),
   ),
   define(
     'adr/context-facts-missing',

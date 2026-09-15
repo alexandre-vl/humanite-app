@@ -19,17 +19,24 @@ export type Header = Readonly<{
   supersedes: readonly AdrNumber[];
 }>;
 
-export const HEADER_DELIMITER = '---';
+const HEADER_DELIMITER = '---';
+
+/** The same header with its sequences in canonical order and without duplicates, as the canonical text writes them. */
+export const canonicalHeader = (header: Header): Header => ({
+  format: header.format,
+  status: header.status,
+  significance: SIGNIFICANCES.filter((key) => header.significance.includes(key)),
+  supersedes: [...new Set(header.supersedes)].toSorted((left, right) => left - right),
+});
 
 /** Lines of the canonical header between its delimiters: fixed key order, flow sequences in canonical order. */
 export function headerLines(header: Header): readonly string[] {
-  const significance = SIGNIFICANCES.filter((key) => header.significance.includes(key));
-  const supersedes = [...new Set(header.supersedes)].toSorted((left, right) => left - right).map(formatAdrId);
+  const { format, status, significance, supersedes } = canonicalHeader(header);
   return [
-    `format: ${String(header.format)}`,
-    `status: ${header.status}`,
+    `format: ${String(format)}`,
+    `status: ${status}`,
     `significance: [${significance.join(', ')}]`,
-    ...(supersedes.length === 0 ? [] : [`supersedes: [${supersedes.join(', ')}]`]),
+    ...(supersedes.length === 0 ? [] : [`supersedes: [${supersedes.map(formatAdrId).join(', ')}]`]),
   ];
 }
 

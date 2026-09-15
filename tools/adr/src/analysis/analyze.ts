@@ -77,7 +77,7 @@ export function analyzeAdr(source: AdrSource, registry: FormatRegistry = FORMAT_
   const body = head?.type === 'yaml' ? rest : tree.children;
   let reading: HeaderReading = { kind: 'unreadable', spec: registry.latest };
   if (head?.type === 'yaml') {
-    reading = readHeader(head, registry, report);
+    reading = readHeader(head, text, registry, report);
   } else {
     report('adr/frontmatter-missing', START, {});
   }

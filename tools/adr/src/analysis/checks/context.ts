@@ -17,7 +17,8 @@ export function checkContext(context: BodyContext): void {
   const last = section.blocks.at(-1);
   const questionMark = spec.punctuation.questionMark;
   if (last?.type === 'paragraph') {
-    const question = plainText(last, 'keep');
+    // Inline code is masked: `a?.b` in a question names an operator, it does not end a sentence.
+    const question = plainText(last, 'mask');
     if (!question.endsWith(questionMark) || question.split(questionMark).length !== 2) {
       report('adr/context-question-shape', last, { questionMark });
     }
