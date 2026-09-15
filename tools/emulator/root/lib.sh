@@ -40,8 +40,30 @@ CONTAINER_STATUS=unknown
 STARTED_AT=
 RUN_FAILED=0
 
+# The awk function every reader of a value shares, prepended to their programs: a value spanning lines cannot be
+# written back, and neither can one that could not be read.
+VALUE_FUNCTION='
+function read_value(file,   line, value, lines, got) {
+  while ((got = (getline line < file)) > 0) {
+    gsub(/\t/, " ", line)
+    value = lines++ == 0 ? line : value " " line
+  }
+  close(file)
+  if (got < 0) return "<unreadable>"
+  return lines > 1 ? "<multiline> " value : value
+}
+'
+
 say() {
   printf 'humanite-redroid: %s\n' "$*" >&2
+}
+
+# require_root: every command of the guard writes the kernel; none of them makes sense without root.
+require_root() {
+  if [ "$(id -u)" != 0 ]; then
+    say "$MODE: root only"
+    exit 1
+  fi
 }
 
 # setting NAME: the value of the `setting NAME VALUE` row of tracked.tsv.
@@ -49,27 +71,32 @@ setting() {
   awk -F "$TAB" -v name="$1" '$1 == "setting" && $2 == name { print $3; found = 1 } END { exit !found }' "$TRACKED"
 }
 
-# fail_run REASON DETAIL: records a failure of this run; failures stay in the status until the next arm. A failure
-# the previous one repeats, as every run of a lasting problem does, is not recorded again.
+# fail_run REASON DETAIL: records a failure of this run; failures stay in the status until the next arm. A lasting
+# problem fails every run: its record keeps one row, with the first run that met it, the last, and how many there were.
 fail_run() {
   RUN_FAILED=1
   say "$MODE: $1 $2"
-  if [ -f "$STATE/failures.tsv" ] &&
-    tail -n 1 "$STATE/failures.tsv" | awk -F "$TAB" -v mode="$MODE" -v reason="$1" -v detail="$2" \
-      '$3 == mode && $4 == reason && $5 == detail { found = 1 } END { exit !found }'; then
-    return
-  fi
-  printf 'failure\t%s\t%s\t%s\t%s\n' "$(date +%s)" "$MODE" "$1" "$2" >>"$STATE/failures.tsv"
+  : >>"$STATE/failures.tsv"
+  awk -F "$TAB" -v OFS="$TAB" -v now="$(date +%s)" -v mode="$MODE" -v reason="$1" -v detail="$2" '
+    $5 == mode && $6 == reason && $7 == detail {
+      print $1, $2, now, $4 + 1, mode, reason, detail
+      found = 1
+      next
+    }
+    { print }
+    END { if (!found) print "failure", now, now, 1, mode, reason, detail }
+  ' "$STATE/failures.tsv" >"$STATE/failures.new"
+  mv -f "$STATE/failures.new" "$STATE/failures.tsv"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Reading the host
 
 # sysctl_records: the sysctls that can change (owner read and write) outside net/, which each network namespace has
-# its own of. A value spanning lines cannot be written back: it is recorded with a leading `<multiline>`.
+# its own of.
 sysctl_records() {
   find "$SYSCTL_ROOT" -path "$SYSCTL_ROOT/net" -prune -o -type f -perm -0600 -print |
-    awk -F "$TAB" -v tracked="$TRACKED" -v tab="$TAB" '
+    awk -v tracked="$TRACKED" -v tab="$TAB" "$VALUE_FUNCTION"'
       BEGIN {
         while ((got = (getline row < tracked)) > 0) {
           split(row, field, "\t")
@@ -78,19 +105,7 @@ sysctl_records() {
         if (got < 0) exit 2
         close(tracked)
       }
-      !($0 in skip) {
-        value = ""
-        lines = 0
-        while ((got = (getline line < $0)) > 0) {
-          gsub(/\t/, " ", line)
-          value = lines == 0 ? line : value " " line
-          lines++
-        }
-        close($0)
-        if (got < 0) value = "<unreadable>"
-        else if (lines > 1) value = "<multiline> " value
-        print "sysctl" tab $0 tab value
-      }'
+      !($0 in skip) { print "sysctl" tab $0 tab read_value($0) }'
 }
 
 # proc_records DIRECTORY: attributes of the entries of the procfs mounted at DIRECTORY, keyed as /proc paths, but the
@@ -123,7 +138,7 @@ sysfs_records() {
       if [ "$kind" = sysfsattr ]; then
         stat -c "sysfsattr$TAB%n$TAB%a %u %g" -- "$path"
       else
-        printf 'sysfsval\t%s\t%s\n' "$path" "$(tr '\t\n' '  ' <"$path" | sed 's/ $//')"
+        awk -v file="$path" -v tab="$TAB" "$VALUE_FUNCTION"'BEGIN { print "sysfsval" tab file tab read_value(file) }'
       fi
     done
 }
@@ -140,12 +155,14 @@ mount_records() {
   stat -c "mountroot$TAB%n$TAB%a %u %g" -- "$DEBUGFS" "$TRACEFS"
 }
 
-# tracefs_records: attributes of every tracefs entry, its instances, and the values of the files tracked.tsv lists.
+# tracefs_records: attributes of every tracefs entry, its instances, and the values of the files tracked.tsv lists. The
+# entries an instance holds are its own: the instance itself is the record, and removing it removes them all.
 tracefs_records() {
-  find "$TRACEFS" -xdev -mindepth 1 ! -type l -printf 'tracefsattr\t%p\t%m %U %G\n'
+  find "$TRACEFS" -xdev -mindepth 1 -path "$TRACEFS/instances/*" -prune -o ! -type l -printf 'tracefsattr\t%p\t%m %U %G\n'
   find "$TRACEFS/instances" -mindepth 1 -maxdepth 1 -type d -printf 'tracefs-instance\t%f\tpresent\n'
   awk -F "$TAB" '$1 == "android" && $2 == "tracefsval" { print $3 }' "$TRACKED" | while IFS= read -r file; do
-    printf 'tracefsval\t%s\t%s\n' "$file" "$(tr '\t\n' '  ' <"$TRACEFS/$file" | sed 's/ $//')"
+    awk -v file="$TRACEFS/$file" -v key="$file" -v tab="$TAB" "$VALUE_FUNCTION"'
+      BEGIN { print "tracefsval" tab key tab read_value(file) }'
   done
 }
 
@@ -222,20 +239,27 @@ plan() {
 }
 
 # residue SNAPSHOT: what an earlier session left, which a reference must never record: the entries whose value differs
-# from their `clean` row of tracked.tsv, as KIND KEY VALUE separated by tabs.
+# from their `clean` row of tracked.tsv, as KIND KEY VALUE CLEAN separated by the unit separator.
 residue() {
-  awk -F "$TAB" -v OFS="$TAB" -v absent="$ABSENT" '
+  awk -F "$TAB" -v OFS="$US" -v absent="$ABSENT" '
     FILENAME == ARGV[1] { if ($1 == "clean") clean[$2 SUBSEP $3] = $4; next }
     { seen[$1 SUBSEP $2] = $3 }
     END {
       for (id in clean) {
         value = (id in seen) ? seen[id] : absent
-        if (value != clean[id]) {
-          split(id, part, SUBSEP)
-          print part[1], part[2], value
-        }
+        if (value == clean[id]) continue
+        # An entry the host does not have is no write of Android: the sysfs path of hardware it lacks, a filesystem it
+        # has not mounted. Only where absence is the clean value, as for a tracefs instance, does it say anything.
+        if (value == absent && clean[id] != absent) continue
+        split(id, part, SUBSEP)
+        print part[1], part[2], value, clean[id]
       }
     }' "$TRACKED" "$1" | sort
+}
+
+# residue_detail RESIDUE: the entries of RESIDUE as ` KIND:KEY=VALUE→CLEAN` each, for a failure record.
+residue_detail() {
+  awk -F "$US" '{ printf " %s:%s=%s→%s", $1, $2, $3, $4 }' "$1"
 }
 
 # remount_options SUPER-OPTIONS: the uid, gid and mode a remount gives back, from the options the reference recorded;
@@ -262,7 +286,11 @@ set_attributes() {
   ids=${2#* }
   uid=${ids%% *}
   gid=${ids#* }
-  case "$mode:$uid:$gid" in
+  # A mode is one to four octal digits, as find and stat print it; an owner and a group are numbers.
+  case $mode in
+    '' | *[!0-7]* | ?????*) return 1 ;;
+  esac
+  case "$uid:$gid" in
     *[!0-9:]* | :* | *::* | *:) return 1 ;;
   esac
   [ ! -L "$1" ] && chown -- "$uid:$gid" "$1" && chmod -- "$mode" "$1"
@@ -290,19 +318,26 @@ revert_one() {
   esac
 }
 
-# apply PLAN: writes back every revert of PLAN; false when any write failed, each failure named on the error output.
+# writes_of PLAN: the entries PLAN says to write back, as KIND KEY VALUE separated by the unit separator.
+writes_of() {
+  awk -F "$US" -v OFS="$US" '$1 == "revert" || $1 == "revert-unknown" { print $2, $3, $4 }' "$1"
+}
+
+# apply WRITES: writes back each KIND KEY VALUE of WRITES, in the order of the kinds; false when any write failed,
+# each failure named on the error output and in WRITE_FAILURES.
 apply() {
   failed=
-  while IFS="$US" read -r action kind key before after; do
-    case $action in
-      revert | revert-unknown) ;;
-      *) continue ;;
-    esac
-    if ! revert_one "$kind" "$key" "$before"; then
-      say "cannot write back $kind $key: $before (now $after)"
-      failed="$failed $kind:$key"
-    fi
-  done <"$1"
+  for ordered_kind in $(setting apply_order); do
+    while IFS="$US" read -r kind key value; do
+      if [ "$kind" != "$ordered_kind" ]; then
+        continue
+      fi
+      if ! revert_one "$kind" "$key" "$value"; then
+        say "cannot write back $kind $key: $value"
+        failed="$failed $kind:$key"
+      fi
+    done <"$1"
+  done
   WRITE_FAILURES=$failed
   [ -z "$failed" ]
 }
@@ -319,7 +354,8 @@ restore() {
     return
   fi
   plan "$MODE" "$STATE/reference.tsv" "$STATE/now.tsv" >"$STATE/changes"
-  if ! apply "$STATE/changes"; then
+  writes_of "$STATE/changes" >"$STATE/writes"
+  if ! apply "$STATE/writes"; then
     fail_run write-failed "$WRITE_FAILURES"
   fi
   if ! snapshot "$STATE/after.tsv"; then
@@ -329,7 +365,13 @@ restore() {
   plan "$MODE" "$STATE/reference.tsv" "$STATE/after.tsv" |
     awk -F "$US" '$1 == "revert" || $1 == "revert-unknown"' >"$STATE/remaining"
   if [ -s "$STATE/remaining" ]; then
-    fail_run not-restored "$(planned_keys 'revert revert-unknown' "$STATE/remaining")"
+    # Android writes for as long as it runs: what this run could not give back, the next one does. Once the container
+    # is gone nothing writes any more, so what is left then is a failure.
+    remaining=$(planned_keys 'revert revert-unknown' "$STATE/remaining")
+    case $MODE in
+      boot | tick) say "$MODE: written again while reading, taken again next run:$remaining" ;;
+      *) fail_run not-restored "$remaining" ;;
+    esac
   fi
   unknown=$(planned_keys 'revert-unknown keep-unknown' "$STATE/changes")
   if [ -n "$unknown" ]; then
@@ -413,7 +455,7 @@ ready_to_restore() {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# The three commands
+# The commands
 
 # lock: holds the lock of the guard for the rest of the process: runs never overlap, and `pnpm emulator:up` takes the
 # same lock around `docker run`.
@@ -431,6 +473,8 @@ record_scripts() {
 
 # arm_run: the reference of a clean host without Redroid, then the transient timer that runs guard.sh.
 arm_run() {
+  MODE=arm
+  require_root
   mkdir -p "$STATE"
   chmod 0755 "$RUN"
   chmod 0700 "$STATE"
@@ -456,7 +500,7 @@ arm_run() {
   else
     residue "$STATE/reference.tsv" >"$STATE/residue"
     if [ -s "$STATE/residue" ]; then
-      fail_run residue "$(awk -F "$TAB" '{ printf " %s:%s=%s", $1, $2, $3 }' "$STATE/residue")"
+      fail_run residue "$(residue_detail "$STATE/residue"), give it back with arm.sh --repair"
     fi
   fi
   write_status
@@ -479,19 +523,25 @@ arm_run() {
 
 # guard_run: one run of the timer.
 guard_run() {
+  MODE=tick
+  require_root
   lock 60
   if [ ! -s "$STATE/reference.tsv" ]; then
     say "not armed: run arm.sh"
     exit 1
   fi
-  unit=$(setting unit)
   container=$(setting container)
   if ! sha256sum --check --status "$STATE/scripts.sha256"; then
     fail_run scripts-changed "installed files changed since arm.sh"
     write_status
     exit 1
   fi
-  container_state "$container" || exit 1
+  # A run that cannot say whether Redroid is there says so in the status: a silent exit would let it go stale unseen.
+  if ! container_state "$container"; then
+    fail_run docker-unreadable "docker container inspect $container"
+    write_status
+    exit 1
+  fi
   case $CONTAINER_STATUS in
     absent)
       if [ -f "$STATE/session" ]; then MODE=stop; else MODE=idle; fi
@@ -517,7 +567,6 @@ guard_run() {
     boot | tick)
       PHASE=restored
       if [ "$RUN_FAILED" = 0 ]; then printf '%s\n' "$STARTED_AT" >"$STATE/restored_started_at"; fi
-      rm -f "$STATE/absent_since"
       ;;
     stop | idle)
       PHASE=idle
@@ -527,22 +576,14 @@ guard_run() {
       fi
       ;;
   esac
-  if [ "$MODE" = idle ] && [ "$RUN_FAILED" = 0 ]; then
-    [ -s "$STATE/absent_since" ] || date +%s >"$STATE/absent_since"
-    if [ $(($(date +%s) - $(cat "$STATE/absent_since"))) -ge "$(setting idle_ttl_s)" ]; then
-      PHASE=closed
-      MODE=close
-      write_status
-      systemctl stop --no-block "$unit.timer"
-      exit 0
-    fi
-  fi
   write_status
   [ "$RUN_FAILED" = 0 ]
 }
 
 # disarm_run: a last restore without Redroid, then the timer stops.
 disarm_run() {
+  MODE=stop
+  require_root
   lock 180
   if [ ! -s "$STATE/reference.tsv" ]; then
     say "not armed"
@@ -560,7 +601,7 @@ disarm_run() {
   restore
   if [ "$RUN_FAILED" != 0 ]; then
     write_status
-    say "host not restored: the timer keeps running, see $RUN/status"
+    say "host not restored: the timer keeps running, see $RUN/status; arm.sh --repair gives the clean values back"
     exit 1
   fi
   rm -f "$STATE/session" "$STATE/restored_started_at"
@@ -573,4 +614,44 @@ disarm_run() {
   MODE=close
   write_status
   printf 'disarmed: host restored, %s.timer stopped\n' "$unit"
+}
+
+# repair_run: gives the host back the clean value of every entry an earlier session of Android left changed, by the
+# same writer the guard reverts with, and proves it on a second snapshot. It needs no reference and publishes no
+# status, so it is also the way out when a disarm that cannot restore the host leaves the guard armed.
+repair_run() {
+  MODE=repair
+  require_root
+  mkdir -p "$STATE"
+  chmod 0755 "$RUN"
+  chmod 0700 "$STATE"
+  lock 120
+  container=$(setting container)
+  container_state "$container" || exit 1
+  if [ "$CONTAINER_STATUS" != absent ]; then
+    say "repair: container $container exists ($CONTAINER_STATUS): remove it with pnpm emulator:down first"
+    exit 1
+  fi
+  if ! snapshot "$STATE/repair.tsv"; then
+    say "repair: snapshot incomplete"
+    exit 1
+  fi
+  residue "$STATE/repair.tsv" >"$STATE/repair-residue"
+  if [ ! -s "$STATE/repair-residue" ]; then
+    printf 'nothing to repair: the host holds no write of Android\n'
+    return
+  fi
+  say "repair:$(residue_detail "$STATE/repair-residue")"
+  awk -F "$US" -v OFS="$US" '{ print $1, $2, $4 }' "$STATE/repair-residue" >"$STATE/repair-writes"
+  apply "$STATE/repair-writes" || true
+  if ! snapshot "$STATE/repair.tsv"; then
+    say "repair: second snapshot incomplete"
+    exit 1
+  fi
+  residue "$STATE/repair.tsv" >"$STATE/repair-remaining"
+  if [ -s "$STATE/repair-remaining" ]; then
+    say "repair: still left:$(residue_detail "$STATE/repair-remaining")"
+    exit 1
+  fi
+  printf 'repaired: %s entries given back their clean value\n' "$(wc -l <"$STATE/repair-residue")"
 }

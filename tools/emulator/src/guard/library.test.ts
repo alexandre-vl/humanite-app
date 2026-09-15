@@ -2,7 +2,7 @@ import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { writeTree } from '@huma/fixtures';
 import { temporaryDirectory } from '@huma/kit/fs';
-import { runText } from '@huma/kit/process';
+import { run, runText } from '@huma/kit/process';
 import { expect, test } from 'vitest';
 import { LIBRARY, records } from '../proofs/root.ts';
 
@@ -66,7 +66,18 @@ test('procfs records key each entry as a /proc path, without the process directo
   ]);
 });
 
-test('residue is every entry whose value differs from its clean row, an absent entry included', async () => {
+test.skipIf(process.getuid?.() === 0)('every command of the guard refuses a user that is not root', async () => {
+  await using directory = await temporaryDirectory('emulator-root');
+  await writeFile(join(directory.path, 'tracked.tsv'), '');
+  const result = await run('dash', ['-c', `. "$1"\nMODE=arm\nrequire_root`, 'dash', LIBRARY], {
+    cwd: directory.path,
+    successCodes: [0, 1],
+  });
+  expect(result.exitCode).toBe(1);
+  expect(result.stderr.toString('utf8')).toContain('arm: root only');
+});
+
+test('residue is every entry whose value differs from its clean row, with the value to give it back', async () => {
   await using directory = await temporaryDirectory('emulator-residue');
   await writeTree(directory.path, {
     'tracked.tsv': records([
@@ -80,10 +91,20 @@ test('residue is every entry whose value differs from its clean row, an absent e
       ['procattr', '/proc/sysrq-trigger', '220 0 1000'],
       ['sysctl', '/proc/sys/kernel/modprobe', ''],
       ['sysctl', '/proc/sys/vm/mmap_min_addr', '65536'],
+      ['tracefs-instance', 'bootreceiver', 'present'],
     ]),
   });
+  const US = '\u001F';
+  // /sys/power/wakeup_count is missing from the snapshot and absent from the residue: a host that does not have an
+  // entry never held a write of Android on it. An instance is the other way round, absence being its clean value.
   expect(await library(directory.path, 'residue "$DIRECTORY/snapshot.tsv"')).toBe(
-    'procattr\t/proc/sysrq-trigger\t220 0 1000\nsysctl\t/proc/sys/kernel/modprobe\t\nsysfsattr\t/sys/power/wakeup_count\t<absent>\n',
+    [
+      ['procattr', '/proc/sysrq-trigger', '220 0 1000', '200 0 0'],
+      ['sysctl', '/proc/sys/kernel/modprobe', '', '/sbin/modprobe'],
+      ['tracefs-instance', 'bootreceiver', 'present', '<absent>'],
+    ]
+      .map((row) => `${row.join(US)}\n`)
+      .join(''),
   );
 });
 

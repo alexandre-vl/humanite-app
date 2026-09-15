@@ -83,34 +83,32 @@ export async function sampleHost(): Promise<HostSample> {
 const sampledValue = (sample: HostSample, write: AndroidWrite): string | null =>
   SAMPLED_KINDS.has(write.kind) ? (sample.get(recordId(write.kind, write.key)) ?? ABSENT) : null;
 
-/** A write of Android an earlier session left on the host, with the value of a clean host. */
-export type Residual = Readonly<{ write: AndroidWrite; value: string; clean: string }>;
+/** A write of Android an earlier session left on the host, and the value it holds now. */
+export type Residual = Readonly<{ write: AndroidWrite; value: string }>;
 
 /** The residue a user can see in `sample`: what arming would refuse among the kinds a sample holds. */
 export const residueOf = (sample: HostSample): readonly Residual[] =>
   ANDROID_WRITES.flatMap((write): readonly Residual[] => {
     const value = sampledValue(sample, write);
-    // A sysctl missing from a sample is one only root may read: arming checks it.
-    if (
-      write.clean === null ||
-      value === null ||
-      value === write.clean ||
-      (value === ABSENT && write.kind === 'sysctl')
-    ) {
+    // An entry the sample does not hold is no write of Android: a sysctl only root may read, the sysfs path of
+    // hardware this host lacks, a filesystem it has not mounted. Only where absence is itself the clean value, as
+    // for a tracefs instance, does a missing entry say anything.
+    if (value === null || value === write.clean || (value === ABSENT && write.clean !== ABSENT)) {
       return [];
     }
-    return [{ write, value, clean: write.clean }];
+    return [{ write, value }];
   });
 
 const shown = (value: string): string => (value === '' ? '(vide)' : value);
 
 export const residueFindings = (residue: readonly Residual[]): readonly Diagnostic<EmulatorCode>[] =>
-  residue.map(({ write, value, clean }) =>
+  residue.map(({ write, value }) =>
     emulatorFinding('emulator/host-residue', ANDROID_WRITES_SOURCE, {
       kind: write.kind,
       key: write.key,
       value: shown(value),
-      expected: shown(clean),
+      expected: shown(write.clean),
+      from: write.cleanFrom,
     }),
   );
 

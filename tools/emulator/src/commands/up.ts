@@ -16,7 +16,7 @@ import {
 } from '../docker.ts';
 import { checkInstall } from '../guard/install.ts';
 import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
-import { armCommands, binderCommands, installCommands, residueCommands } from '../guard/root-commands.ts';
+import { armCommands, binderCommands, installCommands, repairCommands } from '../guard/root-commands.ts';
 import { binderFindings, readBinder } from '../host/binder.ts';
 import { hostReferenceTakenAt, readHostReference, writeHostReference } from '../host/reference.ts';
 import { driftFindings, residueFindings, residueOf, sampleHost } from '../host/sample.ts';
@@ -101,7 +101,7 @@ export function upSteps(session: Session): readonly Step[] {
         }
         const residue = residueOf(await sampleHost());
         if (residue.length > 0) {
-          return blocked(residueFindings(residue), residueCommands(residue));
+          return blocked(residueFindings(residue), repairCommands(config));
         }
         return Date.now() - (await hostReferenceTakenAt(session)) < REFERENCE_FRESH_MS
           ? done('pris à l’instant')

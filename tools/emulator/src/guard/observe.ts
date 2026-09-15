@@ -112,7 +112,8 @@ export function guardProblems(
     }
   }
   for (const failure of status.failures) {
-    findings.push(guardFinding(`root/${failure.reason}`, ROOT_SOURCE, { detail: failure.detail }));
+    const detail = failure.count === 1 ? failure.detail : `${failure.detail} (${String(failure.count)} passages)`;
+    findings.push(guardFinding(`root/${failure.reason}`, ROOT_SOURCE, { detail }));
   }
   return findings;
 }

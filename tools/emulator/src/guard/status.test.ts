@@ -14,7 +14,7 @@ const STATUS = [
   'change\trevert\tsysctl\t/proc/sys/kernel/modprobe\t/sbin/modprobe\t',
   'change\tpending\ttracefs-instance\tbootreceiver\t<absent>\tpresent',
   'remaining\trevert\tsysctl\t/proc/sys/kernel/kptr_restrict\t0\t2',
-  'failure\t1789452099\tboot\tnot-restored\t sysctl:/proc/sys/kernel/kptr_restrict',
+  'failure\t1789452039\t1789452099\t3\tboot\tnot-restored\t sysctl:/proc/sys/kernel/kptr_restrict',
   '',
 ].join('\n');
 
@@ -29,7 +29,14 @@ test('reads every record of a status, empty values included', () => {
     restoredStartedAt: '2026-09-15T08:00:00.000000000Z',
     runEnd: 1_789_452_100,
     failures: [
-      { at: 1_789_452_099, mode: 'boot', reason: 'not-restored', detail: ' sysctl:/proc/sys/kernel/kptr_restrict' },
+      {
+        first: 1_789_452_039,
+        last: 1_789_452_099,
+        count: 3,
+        mode: 'boot',
+        reason: 'not-restored',
+        detail: ' sysctl:/proc/sys/kernel/kptr_restrict',
+      },
     ],
   });
   expect(status.changes).toEqual([

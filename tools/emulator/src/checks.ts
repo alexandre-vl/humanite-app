@@ -14,7 +14,7 @@ const TABLE = {
   },
   'emulator/host-residue': {
     summary: 'l’hôte ne garde aucune écriture d’Android d’une session précédente',
-    message: '{kind} {key} : {value}, écrit par Android ; attendu {expected}',
+    message: '{kind} {key} : {value}, écrit par Android ; attendu {expected}, {from}',
   },
   'emulator/guard-install': {
     summary: 'les fichiers installés du garde root sont ceux du commit courant',
@@ -129,6 +129,10 @@ const GUARD_TABLE = {
   'root/scripts-changed': {
     summary: 'les fichiers installés ne changent pas tant que le garde est armé',
     message: '{detail}',
+  },
+  'root/docker-unreadable': {
+    summary: 'chaque passage sait si le conteneur de l’émulateur tourne',
+    message: 'état du conteneur illisible : {detail}',
   },
 } as const satisfies Readonly<
   Record<`root/${GuardAction | GuardFailure}`, Readonly<{ summary: string; message: string }>>

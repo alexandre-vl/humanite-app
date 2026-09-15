@@ -2,7 +2,7 @@ import type { ExitCode } from '@huma/kit/cli';
 import { adbFor, captureAdb, deviceState } from '../android/adb.ts';
 import { dockerContext, dockerUnderGuardLock, guardRunWindowMs, inspectContainer } from '../docker.ts';
 import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
-import { armCommands, disarmCommands, renderRootCommands, residueCommands } from '../guard/root-commands.ts';
+import { armCommands, disarmCommands, renderRootCommands, repairCommands } from '../guard/root-commands.ts';
 import { readHostReference } from '../host/reference.ts';
 import { driftFindings, residueFindings, residueOf, sampleHost } from '../host/sample.ts';
 import type { Session } from '../session.ts';
@@ -69,7 +69,7 @@ export function downSteps(session: Session): readonly Step[] {
           const residue = residueOf(await sampleHost());
           return residue.length === 0
             ? done('garde non armé, aucune écriture d’Android sur l’hôte')
-            : blocked(residueFindings(residue), residueCommands(residue));
+            : blocked(residueFindings(residue), repairCommands(config));
         }
         if (findings.length > 0 || status === null) {
           return blocked(findings);
@@ -102,9 +102,7 @@ export async function emulatorDown(session: Session): Promise<ExitCode> {
   if (report.failure !== null) {
     return 1;
   }
-  session.print(
-    `✓ émulateur arrêté ; le garde se désarme seul au bout de ${String(session.config.guard.idleTtlSeconds)} s sans conteneur, ou tout de suite :`,
-  );
+  session.print('✓ émulateur arrêté ; le garde root veille encore sur l’hôte, jusqu’à :');
   session.print(renderRootCommands(disarmCommands(session.config)));
   return 0;
 }

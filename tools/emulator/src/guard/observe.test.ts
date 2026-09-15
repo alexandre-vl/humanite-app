@@ -62,10 +62,20 @@ test('names what keeps the guard from protecting a session', () => {
   expect(codes({ installed: new Map([...observation().installed, ['lib.sh', 'changed']]) })).toEqual([
     'emulator/guard-scripts',
   ]);
-  const failed: GuardStatus = {
-    ...STATUS,
-    failures: [{ at: 1_050, mode: 'boot', reason: 'unattributed', detail: ' sysctl:/proc/sys/vm/swappiness' }],
-  };
-  expect(codes({ status: failed })).toEqual(['root/unattributed']);
+  const failure = {
+    first: 1_020,
+    last: 1_050,
+    count: 1,
+    mode: 'boot',
+    reason: 'unattributed',
+    detail: ' sysctl:/proc/sys/vm/swappiness',
+  } as const;
+  expect(codes({ status: { ...STATUS, failures: [failure] } })).toEqual(['root/unattributed']);
+  // A lasting problem fails every run of the timer: the report says how many, not one line per run.
+  expect(
+    guardProblems(observation({ status: { ...STATUS, failures: [{ ...failure, count: 8 }] } }), EMULATOR).map(
+      (finding) => finding.message,
+    ),
+  ).toEqual(['écarts non attribués à Android : sysctl:/proc/sys/vm/swappiness (8 passages)']);
   expect(currentStatus(observation({ bootId: 'another-boot' }))).toBeNull();
 });

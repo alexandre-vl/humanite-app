@@ -45,12 +45,25 @@ export const GUARD_FAILURES = [
   'write-failed',
   'not-restored',
   'scripts-changed',
+  'docker-unreadable',
 ] as const;
 
 export type GuardFailure = (typeof GUARD_FAILURES)[number];
 
 /** A difference a run found, and what it did about it. */
 type GuardChange = Readonly<{ action: GuardAction; kind: string; key: string; was: string; is: string }>;
+
+/** A failure, kept as one record however many runs met it: a lasting problem fails every run of the timer. */
+type GuardFailureRecord = Readonly<{
+  /** The first run that met it, and the last, in seconds since the epoch. */
+  first: number;
+  last: number;
+  /** How many runs met it. */
+  count: number;
+  mode: GuardMode;
+  reason: GuardFailure;
+  detail: string;
+}>;
 
 export type GuardStatus = Readonly<{
   bootId: string;
@@ -68,7 +81,7 @@ export type GuardStatus = Readonly<{
   changes: readonly GuardChange[];
   /** Differences still found by the second snapshot of the run, once written. */
   remaining: readonly GuardChange[];
-  failures: readonly Readonly<{ at: number; mode: GuardMode; reason: GuardFailure; detail: string }>[];
+  failures: readonly GuardFailureRecord[];
 }>;
 
 /** The value written for a field the run has nothing for. */
@@ -76,9 +89,9 @@ const NONE = '-';
 
 const optional = (value: string): string | null => (value === NONE ? null : value);
 
-const seconds = (value: string, field: string): number => {
+const integer = (value: string, field: string): number => {
   if (!/^\d+$/u.test(value)) {
-    throw new Error(`statut du garde : ${field} « ${value} » n’est pas un nombre de secondes`);
+    throw new Error(`statut du garde : ${field} « ${value} » n’est pas un entier`);
   }
   return Number(value);
 };
@@ -104,7 +117,7 @@ export function parseGuardStatus(text: string): GuardStatus {
   const scripts = new Map<string, string>();
   const changes: GuardChange[] = [];
   const remaining: GuardChange[] = [];
-  const failures: GuardStatus['failures'][number][] = [];
+  const failures: GuardFailureRecord[] = [];
   for (const line of text.split('\n').filter((candidate) => candidate !== '')) {
     const [field = '', ...values] = line.split('\t');
     switch (field) {
@@ -123,9 +136,11 @@ export function parseGuardStatus(text: string): GuardStatus {
         remaining.push(change(values));
         break;
       case 'failure': {
-        const [at = '', mode = '', reason = '', ...detail] = values;
+        const [first = '', last = '', count = '', mode = '', reason = '', ...detail] = values;
         failures.push({
-          at: seconds(at, 'échec'),
+          first: integer(first, 'échec'),
+          last: integer(last, 'échec'),
+          count: integer(count, 'échec'),
           mode: oneOf(GUARD_MODES, mode, 'mode'),
           reason: oneOf(GUARD_FAILURES, reason, 'échec'),
           detail: detail.join(' '),
@@ -148,12 +163,12 @@ export function parseGuardStatus(text: string): GuardStatus {
   }
   return {
     bootId: value('boot_id'),
-    armedAt: seconds(value('armed_at'), 'armed_at'),
+    armedAt: integer(value('armed_at'), 'armed_at'),
     phase: oneOf(GUARD_PHASES, value('phase'), 'phase'),
     mode: oneOf(GUARD_MODES, value('mode'), 'mode'),
     container: { status: value('container'), startedAt: optional(value('container', 1)) },
     restoredStartedAt: optional(value('restored_started_at')),
-    runEnd: seconds(value('run_end'), 'run_end'),
+    runEnd: integer(value('run_end'), 'run_end'),
     scripts,
     changes,
     remaining,

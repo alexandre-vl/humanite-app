@@ -47,8 +47,6 @@ export type EmulatorConfig = Readonly<{
     bootDeadlineSeconds: number;
     /** How long one run waits for Android's boot, to restore the host as soon as it ends, before leaving it to the next. */
     bootWaitSeconds: number;
-    /** The timer stops itself once the container has been absent this long. */
-    idleTtlSeconds: number;
   }>;
   lmkd: Readonly<{ minfreeLevelsProperty: string; reinitProperty: string }>;
   /** Query parameters of the dev client's deep link that skip its onboarding, its launcher and its floating button. */
@@ -112,7 +110,6 @@ export const EMULATOR = {
     runTimeoutSeconds: 180,
     bootDeadlineSeconds: 180,
     bootWaitSeconds: 45,
-    idleTtlSeconds: 14_400,
   },
   // lmkd reads the pressure of the whole host and killed the foreground app at 0.9 GiB used out of 3: minfree levels
   // make it judge free memory instead, while the container's own limit stays the safeguard.

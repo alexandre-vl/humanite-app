@@ -1,6 +1,13 @@
 import { repoPath } from '@huma/kit/paths';
 import { keysOf } from '@huma/kit/records';
-import { ANDROID_WRITES, MINIMUM_RECORDS, SKIPPED_SYSCTLS, VOLATILE_SYSCTLS } from '../android-writes.ts';
+import { SNAPSHOT_KINDS } from './kinds.ts';
+import {
+  ANDROID_WILDCARDS,
+  ANDROID_WRITES,
+  MINIMUM_RECORDS,
+  SKIPPED_SYSCTLS,
+  VOLATILE_SYSCTLS,
+} from '../android-writes.ts';
 import type { EmulatorConfig } from '../config.ts';
 import { ROOT_SOURCE } from '../sources.ts';
 
@@ -9,8 +16,9 @@ export const TRACKED_TABLE = repoPath(`${ROOT_SOURCE}/tracked.tsv`);
 
 /**
  * `root/tracked.tsv`: one tab-separated row per line. `setting NAME VALUE` a setting of the guard · `minimum KIND COUNT`
- * the records a snapshot needs of a kind · `android KIND KEY VALUE` a write of Android · `clean KIND KEY VALUE` the
- * value arming requires · `volatile` and `skip` sysctls a difference of is ignored or that are never read.
+ * the records a snapshot needs of a kind · `android KIND KEY VALUE` a write of Android, `KEY` being `*` for every entry
+ * of a kind · `clean KIND KEY VALUE` the value arming requires and repair gives back · `volatile` and `skip` sysctls a
+ * difference of is ignored or that are never read.
  */
 export function renderTrackedTable(config: EmulatorConfig): string {
   const rows: readonly (readonly string[])[] = [
@@ -20,11 +28,11 @@ export function renderTrackedTable(config: EmulatorConfig): string {
     ['setting', 'run_timeout_s', String(config.guard.runTimeoutSeconds)],
     ['setting', 'boot_deadline_s', String(config.guard.bootDeadlineSeconds)],
     ['setting', 'boot_wait_s', String(config.guard.bootWaitSeconds)],
-    ['setting', 'idle_ttl_s', String(config.guard.idleTtlSeconds)],
+    ['setting', 'apply_order', SNAPSHOT_KINDS.join(' ')],
     ...keysOf(MINIMUM_RECORDS).map((kind) => ['minimum', kind, String(MINIMUM_RECORDS[kind])]),
+    ...ANDROID_WILDCARDS.map((wildcard) => ['android', wildcard.kind, '*', wildcard.android]),
     ...ANDROID_WRITES.map((write) => ['android', write.kind, write.key, write.android]),
-    ...ANDROID_WRITES.flatMap((write) => (write.clean === null ? [] : [['clean', write.kind, write.key, write.clean]])),
-
+    ...ANDROID_WRITES.map((write) => ['clean', write.kind, write.key, write.clean]),
     ...VOLATILE_SYSCTLS.map((key) => ['volatile', 'sysctl', key]),
     ...SKIPPED_SYSCTLS.map((key) => ['skip', 'sysctl', key]),
   ];

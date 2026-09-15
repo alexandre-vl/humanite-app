@@ -5,16 +5,17 @@ setting	tick_s	30
 setting	run_timeout_s	180
 setting	boot_deadline_s	180
 setting	boot_wait_s	45
-setting	idle_ttl_s	14400
+setting	apply_order	superopts mountroot sysctl procattr sysfsattr sysfsval tracefsattr tracefsval tracefs-instance
+minimum	superopts	2
+minimum	mountroot	2
 minimum	sysctl	100
 minimum	procattr	100
 minimum	sysfsattr	3
 minimum	sysfsval	1
-minimum	superopts	2
-minimum	mountroot	2
 minimum	tracefsattr	100
-minimum	tracefs-instance	0
 minimum	tracefsval	1
+minimum	tracefs-instance	0
+android	tracefsattr	*	*
 android	sysctl	/proc/sys/kernel/sysrq	0
 android	sysctl	/proc/sys/kernel/modprobe	
 android	sysctl	/proc/sys/kernel/panic_on_oops	1
@@ -51,18 +52,30 @@ android	superopts	/sys/kernel/debug	rw,mode=755
 android	superopts	/sys/kernel/tracing	rw,gid=3012
 android	mountroot	/sys/kernel/debug	755 0 0
 android	mountroot	/sys/kernel/tracing	*
-android	tracefsattr	*	*
 android	tracefsval	tracing_on	0
 android	tracefs-instance	bootreceiver	present
 android	tracefs-instance	wifi	present
+clean	sysctl	/proc/sys/kernel/sysrq	438
 clean	sysctl	/proc/sys/kernel/modprobe	/sbin/modprobe
+clean	sysctl	/proc/sys/kernel/panic_on_oops	0
 clean	sysctl	/proc/sys/kernel/hung_task_timeout_secs	120
 clean	sysctl	/proc/sys/kernel/hung_task_warnings	10
 clean	sysctl	/proc/sys/kernel/hung_task_check_count	4194304
 clean	sysctl	/proc/sys/kernel/hung_task_panic	0
+clean	sysctl	/proc/sys/kernel/randomize_va_space	2
 clean	sysctl	/proc/sys/vm/mmap_min_addr	65536
+clean	sysctl	/proc/sys/vm/watermark_boost_factor	15000
+clean	sysctl	/proc/sys/vm/overcommit_memory	1
+clean	sysctl	/proc/sys/kernel/sched_schedstats	0
+clean	sysctl	/proc/sys/kernel/perf_event_paranoid	3
+clean	sysctl	/proc/sys/kernel/perf_event_max_sample_rate	100000
+clean	sysctl	/proc/sys/kernel/perf_cpu_time_max_percent	25
+clean	sysctl	/proc/sys/kernel/perf_event_mlock_kb	516
+clean	sysctl	/proc/sys/kernel/kptr_restrict	0
 clean	sysctl	/proc/sys/vm/mmap_rnd_bits	28
 clean	sysctl	/proc/sys/vm/mmap_rnd_compat_bits	8
+clean	sysctl	/proc/sys/kernel/unprivileged_bpf_disabled	2
+clean	sysctl	/proc/sys/vm/watermark_scale_factor	10
 clean	procattr	/proc/sysrq-trigger	200 0 0
 clean	procattr	/proc/kmsg	400 0 0
 clean	procattr	/proc/pressure/memory	666 0 0
@@ -73,6 +86,7 @@ clean	procattr	/proc/vmallocinfo	400 0 0
 clean	sysfsattr	/sys/power/wakeup_count	644 0 0
 clean	sysfsattr	/sys/power/state	644 0 0
 clean	sysfsattr	/sys/firmware/acpi/tables	755 0 0
+clean	sysfsval	/sys/kernel/mm/lru_gen/enabled	0x0007
 clean	superopts	/sys/kernel/debug	rw
 clean	superopts	/sys/kernel/tracing	rw
 clean	mountroot	/sys/kernel/debug	700 0 0
@@ -81,4 +95,5 @@ clean	tracefsval	tracing_on	1
 clean	tracefs-instance	bootreceiver	<absent>
 clean	tracefs-instance	wifi	<absent>
 volatile	sysctl	/proc/sys/kernel/ns_last_pid
+volatile	sysctl	/proc/sys/kernel/tainted
 skip	sysctl	/proc/sys/vm/stat_refresh

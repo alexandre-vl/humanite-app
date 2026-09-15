@@ -16,7 +16,7 @@ import {
   disarmCommands,
   installCommands,
   renderRootCommands,
-  residueCommands,
+  repairCommands,
 } from '../guard/root-commands.ts';
 import { binderFindings, readBinder } from '../host/binder.ts';
 import { missedThresholds, sampleMemory } from '../host/memory.ts';
@@ -75,7 +75,7 @@ export async function emulatorStatus(
     checked(
       'aucune écriture d’Android restée sur l’hôte (lecture sans root)',
       residueFindings(residue),
-      residueCommands(residue),
+      repairCommands(config),
     ),
     info(
       `mémoire : ${String(memory.availableMib)} Mio disponibles, swap libre ${String(memory.swapFreeMib)} Mio, pression avg60 ${String(memory.pressureAvg60)}, user.slice ${String(memory.userSliceMib)} Mio : ${missed.length === 0 ? 'créneau calme pour un build natif' : `pas de créneau calme (${missed.join(', ')})`}`,

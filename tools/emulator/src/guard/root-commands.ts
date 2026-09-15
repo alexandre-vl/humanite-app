@@ -1,8 +1,6 @@
 import { join } from 'node:path';
-import { shellLine, shellWord } from '@huma/kit/cli';
-import { ABSENT } from '../android-writes.ts';
+import { shellLine } from '@huma/kit/cli';
 import type { EmulatorConfig } from '../config.ts';
-import type { Residual } from '../host/sample.ts';
 import { ROOT_SOURCE } from '../sources.ts';
 import { ROOT_FILE_NAMES, ROOT_FILES } from './install.ts';
 
@@ -66,42 +64,14 @@ export function binderCommands(config: EmulatorConfig): RootCommands {
   };
 }
 
-/** The shell words that give an entry back the value of a clean host, `null` when no command can. */
-function restoreWords({ write, clean }: Residual): readonly string[] | null {
-  switch (write.kind) {
-    case 'procattr':
-    case 'sysfsattr':
-    case 'mountroot': {
-      const [mode = '', uid = '', gid = ''] = clean.split(' ');
-      return ['chown', `${uid}:${gid}`, write.key, '&&', 'chmod', mode, write.key];
-    }
-    case 'sysctl':
-    case 'sysfsval':
-      return ['echo', shellWord(clean), '>', write.key];
-    case 'superopts':
-      return ['mount', '-o', 'remount,uid=0,gid=0,mode=700', write.key];
-    case 'tracefsval':
-      return ['echo', shellWord(clean), '>', `/sys/kernel/tracing/${write.key}`];
-    case 'tracefs-instance':
-      return clean === ABSENT ? ['rmdir', `/sys/kernel/tracing/instances/${write.key}`] : null;
-    case 'tracefsattr':
-      return null;
-  }
-}
-
-/** Gives the host back the values of a clean host, in one root shell; `null` when there is nothing to give back. */
-export function residueCommands(residue: readonly Residual[]): RootCommands | null {
-  const scripts = residue.flatMap((residual) => {
-    const words = restoreWords(residual);
-    return words === null ? [] : [words.join(' ')];
-  });
-  return scripts.length === 0
-    ? null
-    : {
-        purpose: 'rendre à l’hôte les valeurs qu’une session précédente d’Android a laissées',
-        commands: [sudo(['sh', '-c', scripts.join(' && ')])],
-      };
-}
+/**
+ * Gives the host back the values of a clean host. The guard does the writing, by the code that reverts Android while
+ * a session runs: there is one writer of the kernel, and it is the one the fixtures prove.
+ */
+export const repairCommands = (config: EmulatorConfig): RootCommands => ({
+  purpose: 'rendre à l’hôte les valeurs qu’une session précédente d’Android a laissées',
+  commands: [sudo([join(config.guard.installDirectory, 'arm.sh'), '--repair'])],
+});
 
 /** The commands as lines a person pastes, after the purpose. */
 export const renderRootCommands = (commands: RootCommands): string =>

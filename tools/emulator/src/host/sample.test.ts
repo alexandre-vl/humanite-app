@@ -45,7 +45,7 @@ test('residue is every readable write of Android whose value is not the one of a
       'sysctl\t/proc/sys/kernel/hung_task_warnings': '65535',
     }),
   );
-  expect(residue.map(({ write, value, clean }) => [write.key, value, clean])).toEqual([
+  expect(residue.map(({ write, value }) => [write.key, value, write.clean])).toEqual([
     ['/proc/sys/kernel/hung_task_warnings', '65535', '10'],
     ['/proc/sysrq-trigger', '220 0 1000', '200 0 0'],
     ['/sys/kernel/debug', 'rw,mode=755', 'rw'],

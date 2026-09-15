@@ -7,6 +7,7 @@ import { temporaryDirectory } from '@huma/kit/fs';
 import { run } from '@huma/kit/process';
 import { isOneOf } from '@huma/kit/records';
 import type { GuardCode } from '../checks.ts';
+import { SNAPSHOT_KINDS } from '../guard/kinds.ts';
 import type { GuardMode, GuardStatus } from '../guard/status.ts';
 import { GUARD_ACTIONS, parseGuardStatus } from '../guard/status.ts';
 
@@ -29,7 +30,10 @@ type Row = readonly string[];
 /** Tab-separated records, one per line. */
 export const records = (rows: readonly Row[]): string => rows.map((row) => `${row.join('\t')}\n`).join('');
 
-/** A table in which Android writes a sysctl, the attributes of a /proc entry, a tracefs instance and any tracefs mode. */
+/**
+ * A table shaped like the one `pnpm gen` writes: every entry Android writes has a clean value, but the entries of a
+ * kind it changes by the hundred, here tracefs modes, which only the reference of a run knows.
+ */
 const TRACKED: readonly Row[] = [
   ['setting', 'container', 'redroid-fixture'],
   ['setting', 'unit', 'redroid-fixture-guard'],
@@ -37,19 +41,28 @@ const TRACKED: readonly Row[] = [
   ['setting', 'run_timeout_s', '120'],
   ['setting', 'boot_deadline_s', '180'],
   ['setting', 'boot_wait_s', '60'],
-  ['setting', 'idle_ttl_s', '14400'],
+  ['setting', 'apply_order', SNAPSHOT_KINDS.join(' ')],
+  ['android', 'tracefsattr', '*', '*'],
   ['android', 'sysctl', '/proc/sys/kernel/kptr_restrict', '2'],
   ['android', 'sysctl', '/proc/sys/kernel/modprobe', ''],
   ['android', 'procattr', '/proc/sysrq-trigger', '220 0 1000'],
+  ['android', 'superopts', '/sys/kernel/debug', 'rw,mode=755'],
+  ['android', 'mountroot', '/sys/kernel/debug', '755 0 0'],
   ['android', 'tracefs-instance', 'bootreceiver', 'present'],
-  ['android', 'tracefsattr', '*', '*'],
+  ['clean', 'sysctl', '/proc/sys/kernel/kptr_restrict', '0'],
+  ['clean', 'sysctl', '/proc/sys/kernel/modprobe', '/sbin/modprobe'],
   ['clean', 'procattr', '/proc/sysrq-trigger', '200 0 0'],
+  ['clean', 'superopts', '/sys/kernel/debug', 'rw'],
+  ['clean', 'mountroot', '/sys/kernel/debug', '700 0 0'],
+  ['clean', 'tracefs-instance', 'bootreceiver', '<absent>'],
   ['volatile', 'sysctl', '/proc/sys/kernel/ns_last_pid'],
 ];
 
 /** The host before any session: every record the fixtures change, at its value without Android. */
 const CLEAN: readonly Row[] = [
+  ['mountroot', '/sys/kernel/debug', '700 0 0'],
   ['procattr', '/proc/sysrq-trigger', '200 0 0'],
+  ['superopts', '/sys/kernel/debug', 'rw'],
   ['sysctl', '/proc/sys/kernel/kptr_restrict', '0'],
   ['sysctl', '/proc/sys/kernel/modprobe', '/sbin/modprobe'],
   ['sysctl', '/proc/sys/kernel/ns_last_pid', '1000'],
@@ -63,8 +76,12 @@ function withRecord(host: readonly Row[], kind: string, key: string, value: stri
   return value === null ? others : [...others, [kind, key, value]];
 }
 
-/** Runs `body` in dash with the library sourced and its paths moved into `directory`; resolves standard output. */
-async function dash(directory: string, body: string, signal: AbortSignal): Promise<string> {
+/** Runs `body` in dash with the library sourced and its paths moved into `directory`; resolves what it left. */
+async function dash(
+  directory: string,
+  body: string,
+  signal: AbortSignal,
+): Promise<Readonly<{ stdout: string; exitCode: number }>> {
   const script = [
     'set -eu',
     '. "$1"',
@@ -77,12 +94,12 @@ async function dash(directory: string, body: string, signal: AbortSignal): Promi
     'PATH=$DIRECTORY/bin:$PATH',
     body,
   ].join('\n');
-  const { stdout } = await run('dash', ['-c', script, 'dash', LIBRARY, directory], {
+  const { stdout, exitCode } = await run('dash', ['-c', script, 'dash', LIBRARY, directory], {
     cwd: directory,
     signal,
-    successCodes: [0, 1],
+    successCodes: [0, 1, 2],
   });
-  return stdout.toString('utf8');
+  return { stdout: stdout.toString('utf8'), exitCode };
 }
 
 /** The actions of a plan printed by the library, as codes. */
@@ -108,9 +125,12 @@ const planned =
       'reference.tsv': records(reference),
       'now.tsv': records(now),
     });
-    return planCodes(
-      await dash(directory.path, `plan ${mode} "$DIRECTORY/reference.tsv" "$DIRECTORY/now.tsv"`, signal),
+    const { stdout } = await dash(
+      directory.path,
+      `plan ${mode} "$DIRECTORY/reference.tsv" "$DIRECTORY/now.tsv"`,
+      signal,
     );
+    return planCodes(stdout);
   };
 
 const android = (host: readonly Row[]): readonly Row[] =>
@@ -178,10 +198,10 @@ const PLAN_FIXTURES = [
     planned('idle', CLEAN, withRecord(CLEAN, 'procattr', '/proc/sysrq-trigger', '220 0 1000')),
   ),
   define(
-    'root/plan-idle-shared-value',
-    'hors session, un sysctl prend la valeur d’Android qu’un autre locataire peut écrire aussi : la référence le suit',
+    'root/plan-idle-unvalued-kind',
+    'hors session, une entrée tracefs change de mode : aucune valeur propre ne la nomme, la référence la suit',
     ['root/accept'],
-    planned('idle', CLEAN, android(CLEAN)),
+    planned('idle', CLEAN, withRecord(CLEAN, 'tracefsattr', '/sys/kernel/tracing/tracing_on', '664 0 3012')),
   ),
   define(
     'root/plan-appeared-entry',
@@ -229,6 +249,7 @@ const INSTALLED: FileTree = {
  */
 const FAKES = String.raw`
 export DIRECTORY
+require_root() { :; }
 snapshot() {
   count=$(($(cat "$DIRECTORY/snapshot-count" 2>/dev/null || echo 0) + 1))
   printf '%s\n' "$count" >"$DIRECTORY/snapshot-count"
@@ -236,6 +257,7 @@ snapshot() {
 }
 container_state() {
   read -r CONTAINER_STATUS STARTED_AT <"$DIRECTORY/container"
+  if [ "$CONTAINER_STATUS" = unreadable ]; then return 1; fi
   if [ "$STARTED_AT" = - ]; then STARTED_AT=; fi
 }
 booted() { true; }
@@ -247,15 +269,16 @@ revert_one() {
 
 /** One command of a guard fixture: its script, run in its own dash, the container it sees and a file to change. */
 type GuardCommand = Readonly<{
-  command: 'arm_run' | 'guard_run' | 'disarm_run';
-  container: 'absent' | 'running' | 'exited';
+  command: 'arm_run' | 'guard_run' | 'disarm_run' | 'repair_run';
+  container: 'absent' | 'running' | 'exited' | 'unreadable';
   before?: (directory: string) => Promise<void>;
 }>;
 
 const STARTED_AT = '2026-09-15T08:00:00.000000000Z';
 
-/** What a guard fixture left: the status the library published, its directory and the writes it logged. */
-type Scenario = AsyncDisposable & Readonly<{ status: GuardStatus; directory: string; writes: string }>;
+/** What a guard fixture left: the status the library published, its directory, the writes it logged and its exits. */
+type Scenario = AsyncDisposable &
+  Readonly<{ status: GuardStatus; directory: string; writes: string; exitCodes: readonly number[] }>;
 
 /** Runs `commands` in turn on the snapshots given, then reads the status the library published. */
 async function guardScenario(
@@ -272,17 +295,24 @@ async function guardScenario(
     ),
     ...extra,
   });
+  const exitCodes: number[] = [];
   for (const step of commands) {
     await writeFile(
       join(directory.path, 'container'),
       `${step.container} ${step.container === 'absent' ? '-' : STARTED_AT}\n`,
     );
     await step.before?.(directory.path);
-    await dash(directory.path, `${FAKES}\n(${step.command}) || true`, signal);
+    exitCodes.push((await dash(directory.path, `${FAKES}\n${step.command}`, signal)).exitCode);
   }
   const status = parseGuardStatus(await readFile(join(directory.path, 'run/status'), 'utf8'));
   const writes = await readFile(join(directory.path, 'writes'), 'utf8').catch(() => '');
-  return { status, directory: directory.path, writes, [Symbol.asyncDispose]: directory[Symbol.asyncDispose] };
+  return {
+    status,
+    directory: directory.path,
+    writes,
+    exitCodes,
+    [Symbol.asyncDispose]: directory[Symbol.asyncDispose],
+  };
 }
 
 /** The codes of a status: the action of each change, then the reason of each failure. */
@@ -301,6 +331,8 @@ function expectThat(condition: boolean, message: string): void {
 const ARM: GuardCommand = { command: 'arm_run', container: 'absent' };
 
 const RUNNING: GuardCommand = { command: 'guard_run', container: 'running' };
+
+const IDLE: GuardCommand = { command: 'guard_run', container: 'absent' };
 
 const GUARD_FIXTURES = [
   define(
@@ -335,13 +367,86 @@ const GUARD_FIXTURES = [
   ),
   define(
     'root/run-write-failed',
-    'une réécriture échoue : le passage échoue et le second instantané trouve encore l’écart',
+    'hors session, la réécriture d’une écriture d’Android échoue : le passage échoue et ne reprend pas la référence',
     ['root/revert', 'root/write-failed', 'root/not-restored'],
     async ({ signal }) => {
-      await using scenario = await guardScenario(signal, [CLEAN, android(CLEAN), android(CLEAN)], [ARM, RUNNING], {
+      await using scenario = await guardScenario(signal, [CLEAN, android(CLEAN), android(CLEAN)], [ARM, IDLE], {
         'writes-fail': '',
       });
-      expectThat(scenario.status.restoredStartedAt === null, 'un passage en échec ne retient pas le démarrage');
+      expectThat(scenario.exitCodes.at(-1) === 1, `sortie ${String(scenario.exitCodes.at(-1))}, 1 attendue`);
+      const reference = await readFile(join(scenario.directory, 'run/state/reference.tsv'), 'utf8');
+      expectThat(
+        reference.includes('/proc/sys/kernel/kptr_restrict\t0'),
+        'un passage en échec ne reprend pas la référence',
+      );
+      return statusCodes(scenario.status);
+    },
+  ),
+  define(
+    'root/run-boot-keeps-writing',
+    'Android réécrit pendant que le passage relit : rien n’échoue, le prochain passage reprend l’écart',
+    ['root/revert'],
+    async ({ signal }) => {
+      await using scenario = await guardScenario(signal, [CLEAN, android(CLEAN), android(CLEAN)], [ARM, RUNNING]);
+      expectThat(scenario.exitCodes.at(-1) === 0, `sortie ${String(scenario.exitCodes.at(-1))}, 0 attendue`);
+      expectThat(
+        scenario.status.remaining.length === 1,
+        `${String(scenario.status.remaining.length)} écart(s) restant(s)`,
+      );
+      expectThat(scenario.status.phase === 'restored', `phase ${scenario.status.phase}`);
+      return statusCodes(scenario.status);
+    },
+  ),
+  define(
+    'root/run-docker-unreadable',
+    'docker ne dit pas si le conteneur tourne : le passage échoue en le publiant, sans rien écrire',
+    ['root/docker-unreadable'],
+    async ({ signal }) => {
+      const unreadable: GuardCommand = { command: 'guard_run', container: 'unreadable' };
+      await using scenario = await guardScenario(signal, [CLEAN, android(CLEAN)], [ARM, unreadable]);
+      expectThat(scenario.writes === '', `aucune réécriture attendue : ${scenario.writes}`);
+      return statusCodes(scenario.status);
+    },
+  ),
+  define(
+    'root/run-filesystem-before-mount-point',
+    'debugfs et son point de montage changent : le système de fichiers est remonté avant que le point reprenne son mode',
+    ['root/revert', 'root/revert'],
+    async ({ signal }) => {
+      const android15 = withRecord(
+        withRecord(CLEAN, 'superopts', '/sys/kernel/debug', 'rw,mode=755'),
+        'mountroot',
+        '/sys/kernel/debug',
+        '755 0 0',
+      );
+      await using scenario = await guardScenario(signal, [CLEAN, android15, CLEAN], [ARM, RUNNING]);
+      expectThat(
+        scenario.writes === 'superopts|/sys/kernel/debug|rw\nmountroot|/sys/kernel/debug|700 0 0\n',
+        `réécritures : ${JSON.stringify(scenario.writes)}`,
+      );
+      return statusCodes(scenario.status);
+    },
+  ),
+  define(
+    'root/repair-clean-values',
+    'arm.sh --repair rend leur valeur propre aux écritures qu’une session a laissées, garde armé compris',
+    [],
+    async ({ signal }) => {
+      const residue = withRecord(CLEAN, 'procattr', '/proc/sysrq-trigger', '220 0 1000');
+      const repair: GuardCommand = { command: 'repair_run', container: 'absent' };
+      await using scenario = await guardScenario(signal, [CLEAN, residue, CLEAN], [ARM, repair]);
+      expectThat(
+        scenario.exitCodes.every((code) => code === 0),
+        `sorties ${scenario.exitCodes.join(',')}`,
+      );
+      expectThat(
+        scenario.writes === 'procattr|/proc/sysrq-trigger|200 0 0\n',
+        `réécritures : ${JSON.stringify(scenario.writes)}`,
+      );
+      expectThat(
+        scenario.status.mode === 'arm',
+        `la réparation ne publie pas de statut : mode ${scenario.status.mode}`,
+      );
       return statusCodes(scenario.status);
     },
   ),
