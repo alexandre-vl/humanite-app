@@ -1,5 +1,6 @@
 import type { CheckCodeOf } from '@huma/kit/checks';
 import { defineChecks } from '@huma/kit/checks';
+import { isOneOf } from '@huma/kit/records';
 import type { GuardAction, GuardFailure } from './guard/status.ts';
 
 /** Findings of the emulator commands: what the host, the root guard, docker and a session must be. */
@@ -36,10 +37,6 @@ const TABLE = {
     summary: 'le garde root publie un statut lisible, de ce démarrage de l’hôte',
     message: '{text}',
   },
-  'emulator/guard-phase': {
-    summary: 'le garde root est dans une phase qui permet l’étape',
-    message: 'phase {phase} ({mode}), attendu {expected}',
-  },
   'emulator/guard-stale': {
     summary: 'le dernier passage du garde root est récent',
     message: 'dernier passage il y a {seconds} s, attendu moins de {limit} s',
@@ -60,10 +57,6 @@ const TABLE = {
     summary: 'l’hôte est identique avant et après une session de l’émulateur',
     message: '{kind} {key} : {before} → {after}',
   },
-  'emulator/step': {
-    summary: 'chaque étape vérifie sa postcondition avant la suivante',
-    message: '{step} : {evidence}',
-  },
 } as const;
 
 const EMULATOR_CHECKS = defineChecks(TABLE);
@@ -71,6 +64,9 @@ const EMULATOR_CHECKS = defineChecks(TABLE);
 export type EmulatorCode = CheckCodeOf<typeof TABLE>;
 
 export const emulatorFinding = EMULATOR_CHECKS.finding;
+
+/** Whether `code` is a finding of an emulator command rather than of the root guard, to narrow the two apart. */
+export const isEmulatorCode = (code: string): code is EmulatorCode => isOneOf(EMULATOR_CHECKS.codes, code);
 
 /**
  * What the root guard reports in its status: how each run treated a difference between the reference and the host,

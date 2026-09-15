@@ -141,8 +141,9 @@ const AWAITING_FOUNDATION_ADRS = [
 
 /** Whether a proof awaits an ADR of the foundations: every dependency, Expo, git hook, guardrail, lint, root guard and structure proof, and the agent proofs above. */
 const awaitsFoundationAdr = (id: string): boolean =>
-  ['deps/', 'expo/', 'git/', 'guardrail/', 'lint/', 'root/', 'structure/'].some((prefix) => id.startsWith(prefix)) ||
-  AWAITING_FOUNDATION_ADRS.includes(id);
+  ['deps/', 'emulator/', 'expo/', 'git/', 'guardrail/', 'lint/', 'root/', 'structure/'].some((prefix) =>
+    id.startsWith(prefix),
+  ) || AWAITING_FOUNDATION_ADRS.includes(id);
 
 test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
