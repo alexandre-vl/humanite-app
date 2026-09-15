@@ -1,3 +1,4 @@
+import { basename } from 'node:path';
 import type { OutputOperator, RawCommand, RawPart, RawRedirection, RawScript, RawWord } from './syntax.ts';
 import { readCommandLine } from './syntax.ts';
 import type { Piece, Word } from './words.ts';
@@ -7,7 +8,8 @@ import { isKnown, makeWord } from './words.ts';
  * The simple commands a command line runs, with their words expanded as far as the line itself tells: brace
  * expansion, the home directory, variables the line assigns or loops over, and the commands that wrappers
  * (`env`, `timeout`, `xargs`…), shells (`bash -c`, `sh <<EOF`), `eval` and `find -exec` run in turn. It is not a
- * shell: a script can still hide a command from it, which is why the git hooks and `pnpm verify` check again.
+ * shell: a script can still hide a command from it, which is why `prepare-commit-msg` refuses a commit whose index
+ * `pre-commit` never verified.
  */
 
 type Assignment = Readonly<{ name: string; value: Word }>;
@@ -400,8 +402,11 @@ const WRAPPERS: Readonly<Record<string, WrapperSpec>> = {
   nice: { values: ['-n', '--adjustment'] },
   nohup: {},
   npx: RUNNER,
+  pkexec: { values: ['--user'] },
+  run0: { values: ['-u', '--user', '-g', '--group', '-D', '--chdir', '--setenv', '--property'] },
   setsid: {},
   stdbuf: { values: ['-i', '-o', '-e', '--input', '--output', '--error'] },
+  su: { values: ['-s', '--shell', '-g', '--group'], scripts: ['-c', '--command'] },
   sudo: {
     values: [
       '-u',
@@ -420,6 +425,7 @@ const WRAPPERS: Readonly<Record<string, WrapperSpec>> = {
       '--chdir',
     ],
   },
+  sudoedit: {},
   'systemd-run': {
     values: ['-p', '--property', '-u', '--unit', '-E', '--setenv', '--slice', '-M', '--machine', '--description'],
   },
@@ -531,7 +537,7 @@ function findActions(command: SimpleCommand): readonly SimpleCommand[] {
 
 /** What a command runs in turn: the wrapped command and the command lines it reads. */
 function innerOf(command: SimpleCommand): Unwrapped {
-  const name = command.words[0]?.text ?? '';
+  const name = programName(command);
   const spec = WRAPPERS[name];
   if (spec !== undefined) {
     return unwrap(command, spec);
@@ -590,7 +596,8 @@ function readInto(script: RawScript, scope: Scope, context: ShellContext, depth:
 
 /** Variables a command sets for the rest of the line. */
 function record(command: SimpleCommand, scope: Scope): void {
-  const [name, ...args] = command.words.map((word) => word.text);
+  const [first, ...args] = command.words.map((word) => word.text);
+  const name = first === undefined ? undefined : programName(command);
   if (name === undefined) {
     command.assignments.forEach((assignment) => scope.set(assignment.name, [assignment.value.pieces]));
   } else if (DECLARATIONS.has(name)) {
@@ -622,7 +629,7 @@ function emit(command: SimpleCommand, scope: Scope, context: ShellContext, depth
   for (const script of inner.scripts) {
     readInto(readCommandLine(script), new Map(scope), context, depth + 1, out);
   }
-  if (command.words[0]?.text === 'find') {
+  if (programName(command) === 'find') {
     findActions(command).forEach((action) => {
       emit(action, scope, context, depth + 1, out);
     });
@@ -638,3 +645,15 @@ export function readCommands(line: string, context: ShellContext): readonly Simp
 
 /** The text of each word: what most rules compare. */
 export const argv = (command: SimpleCommand): readonly string[] => command.words.map((word) => word.text);
+
+/**
+ * The program a command runs, by its base name: `/usr/bin/git`, `\\git` and `"git"` all name `git`. A rule that
+ * compares the first word as written is disarmed by an absolute path, so every rule reads this name instead.
+ */
+export const programName = (command: SimpleCommand): string => basename(command.words[0]?.text ?? '');
+
+/** A program the line does not spell out: the guard cannot name what it would run, so no rule can clear it. */
+export const hasOpaqueProgram = (command: SimpleCommand): boolean => {
+  const [program] = command.words;
+  return program !== undefined && !isKnown(program);
+};

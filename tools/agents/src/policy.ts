@@ -2,7 +2,7 @@ import { basename } from 'node:path';
 import { ADR_DIRECTORY } from '@huma/adr/layout';
 import { AGENT_SESSION_VARIABLES } from '@huma/kit/session';
 import type { SimpleCommand } from './shell/commands.ts';
-import { argv } from './shell/commands.ts';
+import { argv, hasOpaqueProgram, programName } from './shell/commands.ts';
 import type { Word } from './shell/words.ts';
 import { isKnown } from './shell/words.ts';
 
@@ -110,7 +110,7 @@ type GitCall = Readonly<{ globals: readonly string[]; subcommand: Word; args: re
 
 function gitCall(command: SimpleCommand): GitCall | null {
   const { words } = command;
-  if (words[0]?.text !== 'git') {
+  if (programName(command) !== 'git') {
     return null;
   }
   let index = 1;
@@ -198,11 +198,23 @@ const GIT_HOOKS_BYPASS: CommandRule = {
 
 const PRIVILEGED = new Set(['sudo', 'sudoedit', 'doas', 'pkexec', 'su', 'run0']);
 
+/**
+ * A command whose program only the run itself would name: a substitution, a variable the line never sets. The guard
+ * cannot say what it launches, so no rule can clear it.
+ */
+const OPAQUE_PROGRAM: CommandRule = {
+  id: 'opaque-program',
+  reason:
+    'Le programme de cette commande ne se lit pas dans la ligne : écrire son nom en clair, pour que la garde sache ce qu’elle laisse passer.',
+  permissions: [],
+  matches: hasOpaqueProgram,
+};
+
 const PRIVILEGE_ESCALATION: CommandRule = {
   id: 'privilege-escalation',
   reason: 'Les commandes root sont lancées par l’utilisateur lui-même, jamais par un agent.',
   permissions: ['Bash(sudo *)', 'Bash(doas *)', 'Bash(pkexec *)', 'Bash(su *)', 'Bash(run0 *)'],
-  matches: (command) => PRIVILEGED.has(command.words[0]?.text ?? ''),
+  matches: (command) => PRIVILEGED.has(programName(command)),
 };
 
 /** What the policy protects of the Android emulator: words that name its container or its image. */
@@ -275,7 +287,8 @@ const SESSION_MASKING: CommandRule = {
   reason: 'Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.',
   permissions: AGENT_SESSION_VARIABLES.map((name) => `Bash(unset ${name}*)`),
   matches: (command) => {
-    const [name, ...args] = argv(command);
+    const name = programName(command);
+    const args = argv(command).slice(1);
     const named = (arg: string): boolean => isSessionVariable(arg.replace(/^--unset=/u, '').split('=')[0] ?? '');
     return (
       command.assignments.some((assignment) => isSessionVariable(assignment.name)) ||
@@ -365,8 +378,9 @@ function sensitiveTokens(humanOnly: readonly HumanOnlyCommand[]): readonly strin
 export function agentPolicy(humanOnly: readonly HumanOnlyCommand[], emulator: EmulatorTarget): AgentPolicy {
   return {
     commands: [
-      GIT_HOOKS_BYPASS,
       PRIVILEGE_ESCALATION,
+      OPAQUE_PROGRAM,
+      GIT_HOOKS_BYPASS,
       SESSION_MASKING,
       humanOnlyRule(humanOnly),
       emulatorRule(emulator),
