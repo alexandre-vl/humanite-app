@@ -24,7 +24,11 @@ await runCommand(async () => {
   const repository = ownRepository(root);
   const verify = async (): Promise<Verification> => {
     const outcome = await runVerify(root, { staged: true, output: 'attached', env: process.env });
-    return outcome.kind === 'passed' ? outcome : { kind: 'failed', step: outcome.step, ending: outcome.ending };
+    // A run that wrote in the tree it judged is not a failure of a step: pre-commit writes the tree again after the
+    // checks and refuses the commit itself, with the code that says the tree moved.
+    return outcome.kind === 'failed'
+      ? { kind: 'failed', step: outcome.step, ending: outcome.ending }
+      : { kind: 'passed' };
   };
   const context = { repository, gitProcess: process.ppid, verify };
   const findings = await (async () => {

@@ -25,7 +25,7 @@ import { renderAgentsGuide } from './agents-guide.ts';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
 import { governanceFinding } from './checks.ts';
-import { COMMAND_NAMES, COMMANDS, commandLine, entryFile, ESLINT_CONFIG_FILE, SCRIPT_AUDIENCES } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, commandLine, ESLINT_CONFIG_FILE, HOOK_ENTRIES, isScriptCommand } from './commands.ts';
 import { HOOK_COMMANDS, POLICY } from './policy.ts';
 import { renderEffectiveTsconfigs } from './tsconfig-snapshot.ts';
 import { WORKSPACE_FILE } from './workspace-manifest.ts';
@@ -77,10 +77,7 @@ const manifestField = (path: RepoPath, field: string, value: () => unknown): Art
 /** The scripts of the root manifest: the commands a person runs. */
 const manifest = manifestField(repoPath('package.json'), 'scripts', () =>
   Object.fromEntries(
-    COMMAND_NAMES.filter((name) => SCRIPT_AUDIENCES.includes(COMMANDS[name].audience)).map((name) => [
-      name,
-      commandLine(COMMANDS[name]),
-    ]),
+    COMMAND_NAMES.filter((name) => isScriptCommand(COMMANDS[name])).map((name) => [name, commandLine(COMMANDS[name])]),
   ),
 );
 
@@ -186,10 +183,7 @@ const KNIP_CONFIG = repoPath('knip.json');
  * routes and the exports of each package.
  */
 const KNIP_ENTRIES: readonly string[] = [
-  ...COMMAND_NAMES.flatMap((name) => {
-    const entry = entryFile(COMMANDS[name]);
-    return entry === null || SCRIPT_AUDIENCES.includes(COMMANDS[name].audience) ? [] : [entry];
-  }),
+  ...HOOK_ENTRIES,
   `${APP_DIRECTORY}/${PLACES.app.directory}/routes/typed-routes.guard.ts`,
 ];
 

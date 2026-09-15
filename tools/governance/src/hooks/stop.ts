@@ -31,10 +31,18 @@ export async function respondToStop(rawInput: string): Promise<string> {
     env: process.env,
     signal: AbortSignal.timeout(STOP_TIMEOUT_SECONDS * 1_000 - ANSWER_MARGIN_MS),
   });
-  if (outcome.kind === 'passed') {
-    return '';
+  switch (outcome.kind) {
+    case 'passed':
+      return '';
+    // Green, but a step wrote in the tree it was judging: nothing recorded it, so this hook would run the whole chain
+    // again at the next stop. Saying so once is what lets the agent settle the tree instead.
+    case 'changed':
+      return blockOutput(
+        'pnpm verify passe, mais une étape a écrit dans l’arbre qu’elle vérifiait : relancer pnpm verify sur l’arbre tel qu’il est, ou annuler ce que l’étape a écrit.',
+      );
+    case 'failed':
+      return blockOutput(
+        `pnpm verify échoue à l’étape ${outcome.step} (${outcome.ending}) : corriger avant de terminer, ou dire pourquoi c’est impossible.\n${outcome.output.slice(-OUTPUT_TAIL)}`,
+      );
   }
-  return blockOutput(
-    `pnpm verify échoue à l’étape ${outcome.step} (${outcome.ending}) : corriger avant de terminer, ou dire pourquoi c’est impossible.\n${outcome.output.slice(-OUTPUT_TAIL)}`,
-  );
 }

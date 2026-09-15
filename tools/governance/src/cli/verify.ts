@@ -12,10 +12,18 @@ await runCommand(async () => {
     env: process.env,
   });
   const seconds = ((performance.now() - started) / 1000).toFixed(0);
-  if (outcome.kind === 'failed') {
-    printError(`✗ pnpm verify : échec à l’étape ${outcome.step} après ${seconds} s`);
-    return 1;
+  switch (outcome.kind) {
+    case 'failed':
+      printError(`✗ pnpm verify : échec à l’étape ${outcome.step} après ${seconds} s (${outcome.ending})`);
+      return 1;
+    case 'changed':
+      print(`✓ pnpm verify : tous les contrôles passent en ${seconds} s`);
+      // Nothing failed, so the run is green; but the tree it judged is not the one left behind, and no later check
+      // may take this run for a verification of it.
+      printError('⚠ une étape a écrit dans l’arbre qu’elle vérifiait : rien n’est estampillé, relancer pnpm verify');
+      return 0;
+    case 'passed':
+      print(`✓ pnpm verify : tous les contrôles passent en ${seconds} s`);
+      return 0;
   }
-  print(`✓ pnpm verify : tous les contrôles passent en ${seconds} s`);
-  return 0;
 });

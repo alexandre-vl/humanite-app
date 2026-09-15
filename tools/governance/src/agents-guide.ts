@@ -1,12 +1,11 @@
 import type { AgentPolicy } from '@huma/agents/policy';
 import { DECIDED_FROZEN, HUMAN_ONLY_DECISION } from '@huma/adr/guard';
 import { ADR_DIRECTORY, INDEX_FILE } from '@huma/adr/layout';
-import { compareText } from '@huma/kit/text';
 import { BINDINGS_PATH } from './bindings.ts';
 import { COMMIT_TYPES, EXTRA_SCOPES, REFS_TRAILER } from './commit-policy.ts';
 import { WORKSPACE_ROOTS } from './workspace-manifest.ts';
 import type { CommandName } from './commands.ts';
-import { COMMAND_NAMES, COMMANDS, COMMANDS_PATH, SCRIPT_AUDIENCES, VERIFY_STEPS } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, COMMANDS_PATH, isScriptCommand, VERIFY_PLAN } from './commands.ts';
 
 const code = (text: string): string => `\`${text}\``;
 
@@ -23,9 +22,7 @@ const scriptRow = (name: CommandName): string => {
  * adds no rule of its own; every line points at a command, a check or an ADR.
  */
 export function renderAgentsGuide(policy: AgentPolicy, generator: string): string {
-  const scripts = COMMAND_NAMES.filter((name) => SCRIPT_AUDIENCES.includes(COMMANDS[name].audience)).toSorted(
-    compareText,
-  );
+  const scripts = COMMAND_NAMES.filter((name) => isScriptCommand(COMMANDS[name]));
   const refused = [
     HUMAN_ONLY_DECISION,
     DECIDED_FROZEN,
@@ -41,7 +38,7 @@ export function renderAgentsGuide(policy: AgentPolicy, generator: string): strin
     '',
     '## Avant de terminer',
     '',
-    `- ${code('pnpm verify')} doit passer : ${VERIFY_STEPS.map(code).join(', ')}. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.`,
+    `- ${code('pnpm verify')} doit passer : ${VERIFY_PLAN.map((entry) => code(entry.step)).join(', ')}. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.`,
     `- Les sessions de Claude Code démarrent à la racine du dépôt : les réglages et les hooks du projet ne sont lus que depuis le ${code('.claude/')} du dossier de démarrage.`,
     '',
     '## Commandes',

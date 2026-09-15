@@ -2,7 +2,7 @@ import type { AgentPolicy } from '@huma/agents/policy';
 import { agentPolicy } from '@huma/agents/policy';
 import type { HookCommands } from '@huma/agents/settings';
 import { EMULATOR, emulatorMarkers } from '@huma/emulator/config';
-import { COMMAND_NAMES, COMMANDS, entryFile, nodeEntry, PINNED_NODE } from './commands.ts';
+import { COMMAND_NAMES, COMMANDS, nodeEntry, PINNED_NODE } from './commands.ts';
 import { STAMP_PATH } from './verify.ts';
 
 /**
@@ -10,10 +10,10 @@ import { STAMP_PATH } from './verify.ts';
  * container of the Android emulator.
  */
 export const POLICY: AgentPolicy = agentPolicy(
+  // The table gives a human command a TypeScript entry: the guard recognises the file, not only the script name.
   COMMAND_NAMES.flatMap((script) => {
     const spec = COMMANDS[script];
-    const entry = entryFile(spec);
-    return spec.audience === 'human' && entry !== null ? [{ script, entry }] : [];
+    return spec.audience === 'human' ? [{ script, entry: spec.program.entry }] : [];
   }),
   { container: EMULATOR.container, markers: emulatorMarkers(EMULATOR) },
   STAMP_PATH,
