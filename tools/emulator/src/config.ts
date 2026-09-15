@@ -144,3 +144,13 @@ export const EMULATOR = {
   buildTools: '36.0.0',
   tools: { java: 'temurin-17.0.20+101', maestro: 'cli-2.10.0' },
 } as const satisfies EmulatorConfig;
+
+/**
+ * Words that name the emulator in a docker command: its container, the name of its image and the start of the image
+ * id, as the agent guard recognises them.
+ */
+export const emulatorMarkers = (config: EmulatorConfig): readonly string[] => [
+  config.container,
+  config.image.digest.slice(config.image.digest.indexOf('/') + 1, config.image.digest.indexOf('@')),
+  config.image.id.slice('sha256:'.length, 'sha256:'.length + 12),
+];

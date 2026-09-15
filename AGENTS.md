@@ -47,6 +47,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 - Les commandes root sont lancées par l’utilisateur lui-même, jamais par un agent.
 - Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.
 - adr:decide revient au décideur humain : il le lance dans son propre terminal.
+- Le conteneur de l’émulateur ne se lance, ne s’ouvre et ne s’arrête que par pnpm emulator:up et pnpm emulator:down, qui attendent le garde root.
 - `.git` : Le dossier .git ne s’écrit qu’à travers git.
 - `.claude/settings.json` : Les réglages Claude Code du dépôt sont générés par pnpm gen depuis leur source typée.
 - `.claude/settings.local.json` : Des réglages locaux pourraient désactiver les hooks du dépôt.

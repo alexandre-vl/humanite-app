@@ -43,9 +43,10 @@ const FILES: Readonly<Record<string, string>> = {
 const LINKS: Readonly<Record<string, string>> = { '/tmp/lien.json': `${ROOT}/.claude/settings.local.json` };
 
 /** The policy of a workspace whose human-only command is `adr:decide`, run by its entry file. */
-export const FIXTURE_POLICY: AgentPolicy = agentPolicy([
-  { script: 'adr:decide', entry: 'tools/governance/src/cli/adr-decide.ts' },
-]);
+export const FIXTURE_POLICY: AgentPolicy = agentPolicy(
+  [{ script: 'adr:decide', entry: 'tools/governance/src/cli/adr-decide.ts' }],
+  { container: 'redroid-fixture', markers: ['redroid-fixture', 'redroid'] },
+);
 
 const FIXTURE_CONTEXT: GuardContext = {
   policy: FIXTURE_POLICY,
@@ -406,6 +407,40 @@ const PRIVILEGE_COMMANDS = [
   define('agent/run0', 'un agent lance run0', ['agent/denied'], judged(bash('run0 ls /root'))),
 ] as const;
 
+const EMULATOR_COMMANDS = [
+  define(
+    'agent/emulator-run',
+    'un agent lance l’image de l’émulateur sans emulator:up',
+    ['agent/denied'],
+    judged(bash('docker run -d --name redroid-fixture --privileged example/redroid:15')),
+  ),
+  define(
+    'agent/emulator-remove',
+    'un agent supprime le conteneur de l’émulateur sans emulator:down',
+    ['agent/denied'],
+    judged(bash('docker rm -f redroid-fixture')),
+  ),
+  define(
+    'agent/emulator-exec',
+    'un agent ouvre un shell dans le conteneur privilégié de l’émulateur',
+    ['agent/denied'],
+    judged(bash(`docker exec redroid-fixture sh -c 'echo 0 > /proc/sys/kernel/sysrq'`)),
+  ),
+  define(
+    'agent/emulator-container-command',
+    'un agent arrête le conteneur par la commande de gestion container',
+    ['agent/denied'],
+    judged(bash('docker --context default container stop redroid-fixture')),
+  ),
+  define(
+    'agent/emulator-inspect',
+    'un agent lit l’état du conteneur de l’émulateur',
+    [],
+    judged(bash('docker inspect redroid-fixture')),
+  ),
+  define('agent/emulator-script', 'un agent lance pnpm emulator:up', [], judged(bash('pnpm emulator:up'))),
+] as const;
+
 const SHELL_WRITES = [
   define(
     'agent/shell-sed-status',
@@ -687,6 +722,7 @@ export const AGENT_FIXTURES = [
   ...SESSION_COMMANDS,
   ...GIT_COMMANDS,
   ...PRIVILEGE_COMMANDS,
+  ...EMULATOR_COMMANDS,
   ...SHELL_WRITES,
   ...FILE_TOOLS,
   ...CALL_SHAPES,

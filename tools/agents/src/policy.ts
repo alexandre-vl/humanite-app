@@ -205,6 +205,69 @@ export const PRIVILEGE_ESCALATION: CommandRule = {
   matches: (command) => PRIVILEGED.has(command.words[0]?.text ?? ''),
 };
 
+/** What the policy protects of the Android emulator: words that name its container or its image. */
+export type EmulatorTarget = Readonly<{ container: string; markers: readonly string[] }>;
+
+/** docker subcommands that create, start, enter, change or remove a container. */
+const CONTAINER_CHANGES = new Set([
+  'attach',
+  'commit',
+  'cp',
+  'create',
+  'exec',
+  'kill',
+  'pause',
+  'rename',
+  'restart',
+  'rm',
+  'run',
+  'start',
+  'stop',
+  'unpause',
+  'update',
+]);
+
+/** docker global options followed by a value. */
+const DOCKER_VALUE_OPTIONS = new Set(['-H', '--host', '-c', '--context', '--config', '-l', '--log-level']);
+
+/** The subcommand of a docker call and its arguments, a `container` management command read as its subcommand. */
+function dockerCall(command: SimpleCommand): Readonly<{ subcommand: string; args: readonly string[] }> | null {
+  const words = argv(command);
+  if (basename(words[0] ?? '') !== 'docker') {
+    return null;
+  }
+  let index = 1;
+  while ((words[index] ?? '').startsWith('-')) {
+    index += DOCKER_VALUE_OPTIONS.has(words[index] ?? '') ? 2 : 1;
+  }
+  const managed = words[index] === 'container' ? 1 : 0;
+  const subcommand = words[index + managed];
+  return subcommand === undefined ? null : { subcommand, args: words.slice(index + managed + 1) };
+}
+
+/**
+ * Refuses docker calls that start, enter, change or remove the emulator's container, or run its image: Android in a
+ * privileged container writes the host kernel, and only `emulator:up` and `emulator:down` wait for the root guard.
+ */
+export function emulatorRule(target: EmulatorTarget): CommandRule {
+  return {
+    id: 'emulator-direct',
+    reason:
+      'Le conteneur de l’émulateur ne se lance, ne s’ouvre et ne s’arrête que par pnpm emulator:up et pnpm emulator:down, qui attendent le garde root.',
+    permissions: ['exec', 'kill', 'restart', 'rm', 'start', 'stop'].map(
+      (subcommand) => `Bash(docker ${subcommand} ${target.container}*)`,
+    ),
+    matches: (command) => {
+      const call = dockerCall(command);
+      return (
+        call !== null &&
+        CONTAINER_CHANGES.has(call.subcommand) &&
+        call.args.some((arg) => target.markers.some((marker) => arg.includes(marker)))
+      );
+    },
+  };
+}
+
 const isSessionVariable = (name: string): boolean => AGENT_SESSION_VARIABLES.some((variable) => variable === name);
 
 export const SESSION_MASKING: CommandRule = {
@@ -299,9 +362,15 @@ function sensitiveTokens(humanOnly: readonly HumanOnlyCommand[]): readonly strin
   ].map((token) => token.toLowerCase());
 }
 
-export function agentPolicy(humanOnly: readonly HumanOnlyCommand[]): AgentPolicy {
+export function agentPolicy(humanOnly: readonly HumanOnlyCommand[], emulator: EmulatorTarget): AgentPolicy {
   return {
-    commands: [GIT_HOOKS_BYPASS, PRIVILEGE_ESCALATION, SESSION_MASKING, humanOnlyRule(humanOnly)],
+    commands: [
+      GIT_HOOKS_BYPASS,
+      PRIVILEGE_ESCALATION,
+      SESSION_MASKING,
+      humanOnlyRule(humanOnly),
+      emulatorRule(emulator),
+    ],
     paths: PROTECTED_PATHS,
     shellTools: ['Bash', 'Monitor', 'PowerShell'],
     fileTools: ['Edit', 'Write', 'NotebookEdit', 'MultiEdit'],

@@ -1,15 +1,20 @@
 import type { AgentPolicy } from '@huma/agents/policy';
 import { agentPolicy } from '@huma/agents/policy';
 import type { HookCommands } from '@huma/agents/settings';
+import { EMULATOR, emulatorMarkers } from '@huma/emulator/config';
 import { COMMAND_NAMES, COMMANDS, entryFile, nodeEntry, PINNED_NODE } from './commands.ts';
 
-/** The agent policy of this workspace: the fixed rules, plus every command reserved to the human decision maker. */
+/**
+ * The agent policy of this workspace: the fixed rules, every command reserved to the human decision maker, and the
+ * container of the Android emulator.
+ */
 export const POLICY: AgentPolicy = agentPolicy(
   COMMAND_NAMES.flatMap((script) => {
     const spec = COMMANDS[script];
     const entry = entryFile(spec);
     return spec.audience === 'human' && entry !== null ? [{ script, entry }] : [];
   }),
+  { container: EMULATOR.container, markers: emulatorMarkers(EMULATOR) },
 );
 
 const inProject = (path: string): string => `"\${CLAUDE_PROJECT_DIR}/${path}"`;

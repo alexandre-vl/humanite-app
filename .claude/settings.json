@@ -39,6 +39,12 @@
       "Bash(unset AI_AGENT*)",
       "Bash(pnpm adr:decide *)",
       "Bash(pnpm run adr:decide *)",
+      "Bash(docker exec humanite-redroid15*)",
+      "Bash(docker kill humanite-redroid15*)",
+      "Bash(docker restart humanite-redroid15*)",
+      "Bash(docker rm humanite-redroid15*)",
+      "Bash(docker start humanite-redroid15*)",
+      "Bash(docker stop humanite-redroid15*)",
       "Edit(/.git/**)",
       "Edit(/.claude/settings.json)",
       "Edit(/.claude/settings.local.json)"
