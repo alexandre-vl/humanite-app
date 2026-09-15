@@ -1,4 +1,9 @@
 import { setTimeout as sleep } from 'node:timers/promises';
+import type { Diagnostic } from '@huma/kit/diagnostics';
+import { formatDiagnostic } from '@huma/kit/diagnostics';
+import type { RootCommands } from './guard/root-commands.ts';
+import { renderRootCommands } from './guard/root-commands.ts';
+import type { Session } from './session.ts';
 
 /**
  * What a step finds when it checks its postcondition: `done` when it holds, `todo` when the step can make it hold,
@@ -69,4 +74,44 @@ export async function runSteps(
     options.report(outcome);
   }
   return { completed, failure: null };
+}
+
+export const done = (line: string): Evidence => ({ state: 'done', line });
+
+export const todo = (line: string): Evidence => ({ state: 'todo', line });
+
+/** A postcondition only someone else can make hold: findings, or a line, and the root commands that would. */
+export const blocked = (
+  cause: readonly Diagnostic<string>[] | string,
+  remedy: RootCommands | null = null,
+): Evidence => ({
+  state: 'blocked',
+  line: typeof cause === 'string' ? cause : cause.map(formatDiagnostic).join('\n'),
+  remedy: remedy === null ? null : renderRootCommands(remedy),
+});
+
+/** A step that only checks what someone else sets up. */
+export const precondition = (id: string, summary: string, check: Step['check']): Step => ({
+  id,
+  summary,
+  check,
+  apply: null,
+  settleMs: 0,
+});
+
+/** Runs `steps`, printing each postcondition that holds, then the one that does not with its remedy. */
+export async function runReported(session: Session, steps: readonly Step[]): Promise<StepsReport> {
+  const report = await runSteps(steps, {
+    signal: session.signal,
+    report: (outcome) => {
+      session.print(`✓ ${outcome.summary} : ${outcome.line}${outcome.applied ? ' (fait)' : ''}`);
+    },
+  });
+  if (report.failure !== null) {
+    session.print(`✗ ${report.failure.summary}${report.failure.line === '' ? '' : `\n${report.failure.line}`}`);
+    if (report.failure.remedy !== null) {
+      session.print(report.failure.remedy);
+    }
+  }
+  return report;
 }

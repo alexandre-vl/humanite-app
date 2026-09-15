@@ -1,0 +1,9 @@
+# Démarre l'app par le lien profond du dev client, servie par Metro, et attend l'écran d'accueil.
+appId: ${APP_ID}
+---
+- stopApp
+- openLink: ${DEV_CLIENT_LINK}
+- extendedWaitUntil:
+    visible: 'Humanité'
+    timeout: 180000
+- takeScreenshot: home

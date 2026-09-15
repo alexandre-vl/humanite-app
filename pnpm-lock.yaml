@@ -441,6 +441,9 @@ importers:
 
   tools/emulator:
     dependencies:
+      '@huma/architecture':
+        specifier: workspace:*
+        version: link:../../packages/architecture
       '@huma/fixtures':
         specifier: workspace:*
         version: link:../fixtures

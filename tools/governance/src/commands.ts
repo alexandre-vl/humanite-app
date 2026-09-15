@@ -65,10 +65,40 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'vérifie manifestes, catalog, références TypeScript et lockfile',
   },
+  'emulator:build': {
+    argv: ['node', cli('emulator-build')],
+    audience: 'everyone',
+    summary: 'construit le dev client Android dans un service utilisateur plafonné, une fois l’hôte calme',
+  },
+  'emulator:down': {
+    argv: ['node', cli('emulator-down')],
+    audience: 'everyone',
+    summary: 'supprime le conteneur de l’émulateur et attend que le garde root ait restauré l’hôte',
+  },
+  'emulator:e2e': {
+    argv: ['node', cli('emulator-e2e')],
+    audience: 'everyone',
+    summary: 'lance les parcours Maestro de l’app sur l’émulateur',
+  },
+  'emulator:install': {
+    argv: ['node', cli('emulator-install')],
+    audience: 'everyone',
+    summary: 'installe le dev client construit sur l’émulateur',
+  },
+  'emulator:metro': {
+    argv: ['node', cli('emulator-metro')],
+    audience: 'everyone',
+    summary: 'sert l’app au dev client avec Metro, sur la boucle locale',
+  },
   'emulator:status': {
     argv: ['node', cli('emulator-status')],
     audience: 'everyone',
     summary: 'vérifie sans rien changer ce que l’émulateur Android exige, et affiche les commandes root qui manquent',
+  },
+  'emulator:up': {
+    argv: ['node', cli('emulator-up')],
+    audience: 'everyone',
+    summary: 'démarre l’émulateur Android et vérifie chaque étape, restauration de l’hôte comprise',
   },
   'expo:types': {
     argv: ['node', cli('expo-types')],

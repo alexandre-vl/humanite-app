@@ -1,8 +1,10 @@
 import { readFile, stat } from 'node:fs/promises';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { errnoCode } from '@huma/kit/errors';
+import { isJsonObject } from '@huma/kit/json';
+import { compareText } from '@huma/kit/text';
 import type { AndroidWrite } from '../android-writes.ts';
-import { ABSENT, ANDROID_WRITES } from '../android-writes.ts';
+import { ABSENT, ANDROID_WRITES, VOLATILE_SYSCTLS } from '../android-writes.ts';
 import type { EmulatorCode } from '../checks.ts';
 import { emulatorFinding } from '../checks.ts';
 import type { SnapshotKind } from '../guard/kinds.ts';
@@ -111,3 +113,39 @@ export const residueFindings = (residue: readonly Residual[]): readonly Diagnost
       expected: shown(clean),
     }),
   );
+
+const VOLATILE: ReadonlySet<string> = new Set(VOLATILE_SYSCTLS.map((key) => recordId('sysctl', key)));
+
+/** Every entry both samples hold with different values, but the volatile ones: what a session left changed. */
+export const driftFindings = (before: HostSample, after: HostSample): readonly Diagnostic<EmulatorCode>[] =>
+  [...before]
+    .filter(([id, value]) => !VOLATILE.has(id) && after.has(id) && after.get(id) !== value)
+    .toSorted(([left], [right]) => compareText(left, right))
+    .map(([id, value]) => {
+      const [kind = '', key = ''] = id.split('\t');
+      return emulatorFinding('emulator/host-drift', ANDROID_WRITES_SOURCE, {
+        kind,
+        key,
+        before: value,
+        after: after.get(id) ?? ABSENT,
+      });
+    });
+
+/** A sample as JSON, for a later command to compare the host with. */
+export const serializeSample = (sample: HostSample): string =>
+  `${JSON.stringify(Object.fromEntries(sample), null, 2)}\n`;
+
+export function deserializeSample(text: string): HostSample {
+  const parsed: unknown = JSON.parse(text);
+  if (!isJsonObject(parsed)) {
+    throw new Error('échantillon de l’hôte illisible');
+  }
+  return new Map(
+    Object.entries(parsed).map(([id, value]) => {
+      if (typeof value !== 'string') {
+        throw new Error(`échantillon de l’hôte illisible : ${id}`);
+      }
+      return [id, value] as const;
+    }),
+  );
+}

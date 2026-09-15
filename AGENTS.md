@@ -11,27 +11,33 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 
 ## Commandes
 
-| Commande               | Rôle                                                                                                   |
-| ---------------------- | ------------------------------------------------------------------------------------------------------ |
-| `pnpm adr:check`       | vérifie les ADR, leurs liens et leur historique                                                        |
-| `pnpm adr:decide`      | accepte ou rejette un ADR proposé (décideur humain seulement, dans son propre terminal)                |
-| `pnpm adr:new`         | crée un ADR proposé au dernier format                                                                  |
-| `pnpm adr:status`      | liste les ADR, leur statut et leurs preuves                                                            |
-| `pnpm deps:check`      | vérifie manifestes, catalog, références TypeScript et lockfile                                         |
-| `pnpm emulator:status` | vérifie sans rien changer ce que l’émulateur Android exige, et affiche les commandes root qui manquent |
-| `pnpm expo:types`      | génère les types de routes de chaque app Expo, sans qu’Expo réécrive un fichier suivi                  |
-| `pnpm format`          | formate les fichiers du dépôt                                                                          |
-| `pnpm format:check`    | vérifie le formatage des fichiers du dépôt                                                             |
-| `pnpm gen`             | régénère les fichiers dérivés                                                                          |
-| `pnpm gen:check`       | vérifie que les fichiers dérivés sont à jour                                                           |
-| `pnpm hooks:check`     | vérifie les hooks git et Claude Code installés, et l’historique des messages                           |
-| `pnpm hooks:install`   | installe les hooks git du dépôt                                                                        |
-| `pnpm knip`            | cherche les fichiers, exports et dépendances que rien n’emploie                                        |
-| `pnpm lint`            | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré                    |
-| `pnpm structure:check` | vérifie la structure Feature-Sliced de chaque app avec Steiger et y cherche les cycles d’imports       |
-| `pnpm test`            | tests et fixtures des outils                                                                           |
-| `pnpm typecheck`       | vérification des types de chaque projet                                                                |
-| `pnpm verify`          | tous les contrôles du dépôt, dans l’ordre                                                              |
+| Commande                | Rôle                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ |
+| `pnpm adr:check`        | vérifie les ADR, leurs liens et leur historique                                                        |
+| `pnpm adr:decide`       | accepte ou rejette un ADR proposé (décideur humain seulement, dans son propre terminal)                |
+| `pnpm adr:new`          | crée un ADR proposé au dernier format                                                                  |
+| `pnpm adr:status`       | liste les ADR, leur statut et leurs preuves                                                            |
+| `pnpm deps:check`       | vérifie manifestes, catalog, références TypeScript et lockfile                                         |
+| `pnpm emulator:build`   | construit le dev client Android dans un service utilisateur plafonné, une fois l’hôte calme            |
+| `pnpm emulator:down`    | supprime le conteneur de l’émulateur et attend que le garde root ait restauré l’hôte                   |
+| `pnpm emulator:e2e`     | lance les parcours Maestro de l’app sur l’émulateur                                                    |
+| `pnpm emulator:install` | installe le dev client construit sur l’émulateur                                                       |
+| `pnpm emulator:metro`   | sert l’app au dev client avec Metro, sur la boucle locale                                              |
+| `pnpm emulator:status`  | vérifie sans rien changer ce que l’émulateur Android exige, et affiche les commandes root qui manquent |
+| `pnpm emulator:up`      | démarre l’émulateur Android et vérifie chaque étape, restauration de l’hôte comprise                   |
+| `pnpm expo:types`       | génère les types de routes de chaque app Expo, sans qu’Expo réécrive un fichier suivi                  |
+| `pnpm format`           | formate les fichiers du dépôt                                                                          |
+| `pnpm format:check`     | vérifie le formatage des fichiers du dépôt                                                             |
+| `pnpm gen`              | régénère les fichiers dérivés                                                                          |
+| `pnpm gen:check`        | vérifie que les fichiers dérivés sont à jour                                                           |
+| `pnpm hooks:check`      | vérifie les hooks git et Claude Code installés, et l’historique des messages                           |
+| `pnpm hooks:install`    | installe les hooks git du dépôt                                                                        |
+| `pnpm knip`             | cherche les fichiers, exports et dépendances que rien n’emploie                                        |
+| `pnpm lint`             | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré                    |
+| `pnpm structure:check`  | vérifie la structure Feature-Sliced de chaque app avec Steiger et y cherche les cycles d’imports       |
+| `pnpm test`             | tests et fixtures des outils                                                                           |
+| `pnpm typecheck`        | vérification des types de chaque projet                                                                |
+| `pnpm verify`           | tous les contrôles du dépôt, dans l’ordre                                                              |
 
 ## Ce que la garde des agents refuse
 

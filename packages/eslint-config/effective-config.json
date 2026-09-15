@@ -20,6 +20,7 @@
           "cspell": {
             "language": "en",
             "words": [
+              "aapt",
               "adbd",
               "adrs",
               "alnum",
@@ -32,6 +33,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "getprop",
               "ionice",
               "lmkd",
               "minfree",
@@ -624,6 +626,7 @@
           "cspell": {
             "language": "en",
             "words": [
+              "aapt",
               "adbd",
               "adrs",
               "alnum",
@@ -636,6 +639,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "getprop",
               "ionice",
               "lmkd",
               "minfree",
@@ -1082,6 +1086,7 @@
           "cspell": {
             "language": "en",
             "words": [
+              "aapt",
               "adbd",
               "adrs",
               "alnum",
@@ -1094,6 +1099,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "getprop",
               "ionice",
               "lmkd",
               "minfree",
@@ -3106,6 +3112,7 @@
           "cspell": {
             "language": "en",
             "words": [
+              "aapt",
               "adbd",
               "adrs",
               "alnum",
@@ -3118,6 +3125,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "getprop",
               "ionice",
               "lmkd",
               "minfree",
@@ -5129,6 +5137,7 @@
           "cspell": {
             "language": "en",
             "words": [
+              "aapt",
               "adbd",
               "adrs",
               "alnum",
@@ -5141,6 +5150,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "getprop",
               "ionice",
               "lmkd",
               "minfree",

@@ -1,3 +1,5 @@
+import { runText } from '@huma/kit/process';
+
 /** What the repository relies on in the manifest of a built APK. */
 export type ApkManifest = Readonly<{
   packageName: string;
@@ -66,3 +68,7 @@ export function devClientScheme(manifest: ApkManifest): string {
   }
   return scheme;
 }
+
+/** Reads the manifest of `apk` with the `aapt2` of the SDK's build tools. */
+export const readApkManifest = async (aapt2: string, apk: string, cwd: string): Promise<ApkManifest> =>
+  parseManifestTree(await runText(aapt2, ['dump', 'xmltree', '--file', 'AndroidManifest.xml', apk], { cwd }));

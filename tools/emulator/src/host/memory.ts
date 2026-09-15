@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { setTimeout as sleep } from 'node:timers/promises';
 import type { CalmThresholds } from '../config.ts';
 
 /** The memory figures of the shared host a calm window depends on. */
@@ -100,3 +101,13 @@ export async function waitForCalm(thresholds: CalmThresholds, watch: CalmWatch):
     await watch.wait(thresholds.intervalMs);
   }
 }
+
+/** The watch of the real host: its memory, real waits and the real clock. */
+export const hostCalmWatch = (signal: AbortSignal, report: CalmWatch['report']): CalmWatch => ({
+  sample: sampleMemory,
+  wait: async (milliseconds) => {
+    await sleep(milliseconds, undefined, { signal });
+  },
+  now: () => Date.now(),
+  report,
+});

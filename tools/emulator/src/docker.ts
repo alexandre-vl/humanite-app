@@ -1,10 +1,12 @@
 import { createHash } from 'node:crypto';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { arrayField, isJsonObject, objectField, parseJson, stringField } from '@huma/kit/json';
-import { capture } from '@huma/kit/process';
+import { capture, run } from '@huma/kit/process';
 import type { EmulatorCode } from './checks.ts';
 import { emulatorFinding } from './checks.ts';
 import type { EmulatorConfig } from './config.ts';
+import type { Session } from './session.ts';
+import { guardLock } from './session.ts';
 import { CONFIG_SOURCE } from './sources.ts';
 
 /** The label that records, on the container, the fingerprint of the options it was created with. */
@@ -163,3 +165,49 @@ export const inspectContainer = async (context: DockerContext, name: string): Pr
 
 export const inspectImage = async (context: DockerContext, name: string): Promise<ImageState | null> =>
   parseImageInspect(await inspect(context, 'image', name));
+
+/** Whether docker knows a network or a volume of that name. */
+export async function dockerObjectExists(
+  context: DockerContext,
+  kind: 'network' | 'volume',
+  name: string,
+): Promise<boolean> {
+  const captured = await capture('docker', [kind, 'inspect', name], { ...context, timeoutMs: INSPECT_TIMEOUT_MS });
+  if (captured.exit.kind === 'exited' && captured.exit.code === 0) {
+    return true;
+  }
+  const stderr = captured.stderr.toString('utf8');
+  if (captured.exit.kind === 'exited' && /no such|not found/iu.test(stderr)) {
+    return false;
+  }
+  throw new Error(`docker ${kind} inspect ${name} : ${stderr.trim()}`);
+}
+
+/** Runs `docker` with `args` and resolves its output; a failure throws with what docker printed. */
+export async function runDocker(context: DockerContext, args: readonly string[], timeoutMs: number): Promise<string> {
+  const { stdout } = await run('docker', args, { ...context, timeoutMs });
+  return stdout.toString('utf8');
+}
+
+export const dockerContext = (session: Session): DockerContext => ({ cwd: session.root, signal: session.signal });
+
+/** The longest a run of the root guard lasts: its wait for Android's boot, then its time budget, plus a tick. */
+export const guardRunWindowMs = (session: Session): number =>
+  (session.config.guard.bootWaitSeconds + session.config.guard.runTimeoutSeconds + session.config.guard.tickSeconds) *
+  1000;
+
+/**
+ * Runs docker holding the lock of the root guard, which `flock` waits for: no run of the guard can then snapshot the
+ * host while the container starts or goes away.
+ */
+export async function dockerUnderGuardLock(
+  session: Session,
+  args: readonly string[],
+  timeoutMs: number,
+): Promise<void> {
+  const waitSeconds = String(Math.ceil(guardRunWindowMs(session) / 1000));
+  await run('flock', ['--exclusive', '--wait', waitSeconds, guardLock(session.config), 'docker', ...args], {
+    ...dockerContext(session),
+    timeoutMs,
+  });
+}

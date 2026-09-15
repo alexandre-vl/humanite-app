@@ -144,6 +144,3 @@ export const EMULATOR = {
   buildTools: '36.0.0',
   tools: { java: 'temurin-17.0.20+101', maestro: 'cli-2.10.0' },
 } as const satisfies EmulatorConfig;
-
-/** The adb serial of the emulator. */
-export const ADB_SERIAL = `${EMULATOR.adb.host}:${String(EMULATOR.adb.port)}`;

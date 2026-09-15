@@ -10,6 +10,7 @@ const CSPELL_CONFIG = fileURLToPath(new URL('../cspell.json', import.meta.url));
 
 /** Words of the workspace's own vocabulary that the English dictionaries lack: git, shell and tool terms. */
 const WORDS = [
+  'aapt',
   'adbd',
   'adrs',
   'alnum',
@@ -22,6 +23,7 @@ const WORDS = [
   'debugfs',
   'dirents',
   'doas',
+  'getprop',
   'ionice',
   'lmkd',
   'minfree',
