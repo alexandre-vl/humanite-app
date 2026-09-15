@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import type { ExitCode } from '@huma/kit/cli';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
+import { describeError } from '@huma/kit/errors';
 import { ownRepository } from '@huma/kit/git';
 import { compareText } from '@huma/kit/text';
 import type { EmulatorConfig } from '../config.ts';
@@ -36,6 +37,9 @@ const info = (text: string): Line => ({ kind: 'info', text });
 const checked = (text: string, findings: readonly Diagnostic<string>[], remedy: RootCommands | null = null): Line =>
   findings.length === 0 ? ok(text) : { kind: 'blocked', text, findings, remedy };
 
+/** A blocking line that stands on its text alone: what a section reports when it could not even read its data. */
+const blockedLine = (text: string): Line => ({ kind: 'blocked', text, findings: [], remedy: null });
+
 function render(title: string, lines: readonly Line[]): string {
   const body = lines.map((line) => {
     switch (line.kind) {
@@ -48,10 +52,30 @@ function render(title: string, lines: readonly Line[]): string {
           `✗ ${line.text}`,
           renderDiagnostics(line.findings, 'text'),
           ...(line.remedy === null ? [] : [renderRootCommands(line.remedy)]),
-        ].join('\n');
+        ]
+          .filter((part) => part !== '')
+          .join('\n');
     }
   });
   return [title, ...body].join('\n');
+}
+
+/**
+ * Renders one section, turning anything its `produce` throws — a docker that does not answer, a proc file that vanished
+ * — into a blocked line rather than a crash. The status command is what a person runs when the emulator is broken, so
+ * every section it can still read must show, and a section it cannot read is a finding of its own.
+ */
+export async function section(
+  title: string,
+  produce: () => Promise<readonly Line[]>,
+): Promise<Readonly<{ text: string; blocked: boolean }>> {
+  let lines: readonly Line[];
+  try {
+    lines = await produce();
+  } catch (error) {
+    lines = [blockedLine(describeError(error))];
+  }
+  return { text: render(title, lines), blocked: lines.some((line) => line.kind === 'blocked') };
 }
 
 /**
@@ -64,13 +88,24 @@ export async function emulatorStatus(
   config: EmulatorConfig,
   print: (text: string) => void,
 ): Promise<ExitCode> {
-  const context = { cwd: root };
+  const sections = [
+    await section('Hôte', async () => await hostLines(config)),
+    await section('Garde root', async () => await guardLines(root, config)),
+    await section('Docker', async () => await dockerLines(root, config)),
+    await section('Build natif', async () => await buildLines(root, config)),
+  ];
+  print(sections.map((each) => each.text).join('\n\n'));
+  return sections.some((each) => each.blocked) ? 1 : 0;
+}
+
+/** The host: binder devices open to all, nothing Android left behind that a user can read, and the memory headroom. */
+async function hostLines(config: EmulatorConfig): Promise<readonly Line[]> {
   const devices = Object.keys(config.binder.devices).join(',');
   const binder = binderFindings(await readBinder(config), config);
   const residue = residueOf(await sampleHost());
   const memory = await sampleMemory();
   const missed = missedThresholds(memory, config.build.calm);
-  const host: readonly Line[] = [
+  return [
     checked(`binder : ${devices} en 666`, binder, binderCommands(config)),
     checked(
       'aucune écriture d’Android restée sur l’hôte (lecture sans root)',
@@ -81,13 +116,16 @@ export async function emulatorStatus(
       `mémoire : ${String(memory.availableMib)} Mio disponibles, swap libre ${String(memory.swapFreeMib)} Mio, pression avg60 ${String(memory.pressureAvg60)}, user.slice ${String(memory.userSliceMib)} Mio : ${missed.length === 0 ? 'créneau calme pour un build natif' : `pas de créneau calme (${missed.join(', ')})`}`,
     ),
   ];
+}
 
+/** The root guard: installed from the last commit, armed on this boot without failure, and when it last ran. */
+async function guardLines(root: string, config: EmulatorConfig): Promise<readonly Line[]> {
   const install = await checkInstall(ownRepository(root), config.guard.installDirectory);
   const observation = await observeGuard(config);
   const problems = guardProblems(observation, config);
   const status = currentStatus(observation);
   const armed = observation.timer.activeState === 'active';
-  const guard: readonly Line[] = [
+  return [
     checked(
       `garde root installé depuis le dernier commit dans ${config.guard.installDirectory}`,
       install,
@@ -106,10 +144,14 @@ export async function emulatorStatus(
           ),
         ]),
   ];
+}
 
+/** Docker: the pinned image, and the container of the emulator or that it is absent. */
+async function dockerLines(root: string, config: EmulatorConfig): Promise<readonly Line[]> {
+  const context = { cwd: root };
   const image = await inspectImage(context, config.image.id);
   const container = await inspectContainer(context, config.container);
-  const docker: readonly Line[] = [
+  return [
     checked(`image ${config.image.reference} épinglée`, imageFindings(image, config)),
     container === null
       ? info(`conteneur ${config.container} absent`)
@@ -118,15 +160,6 @@ export async function emulatorStatus(
           containerFindings(container, config),
         ),
   ];
-
-  const sections = [
-    render('Hôte', host),
-    render('Garde root', guard),
-    render('Docker', docker),
-    render('Build natif', await buildLines(root, config)),
-  ];
-  print(sections.join('\n\n'));
-  return [...host, ...guard, ...docker].some((line) => line.kind === 'blocked') ? 1 : 0;
 }
 
 /** Where the native build stands: a unit still running, the last line of its latest log, and the APK it left. */

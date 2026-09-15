@@ -6,6 +6,7 @@ import { downSteps } from './down.ts';
 import { devClientLink, maestroArguments } from './e2e.ts';
 import { cpuCount, gradleEnvironment, gradleScopeArguments } from './gradle.ts';
 import { metroArguments, metroEnvironment } from './metro.ts';
+import { section } from './status.ts';
 import { upSteps } from './up.ts';
 
 const session = commandSession('/work/humanite', EMULATOR, () => undefined);
@@ -128,6 +129,20 @@ test('Metro serves the loopback over IPv4, never in CI mode, without network req
     EXPO_OFFLINE: '1',
     NODE_OPTIONS: '--max-old-space-size=4096 --dns-result-order=ipv4first',
   });
+});
+
+test('a status section that cannot read its data blocks on the error instead of crashing the whole report', async () => {
+  const failed = await section('Docker', async () => {
+    await Promise.resolve();
+    throw new Error('daemon injoignable');
+  });
+  expect(failed.blocked).toBe(true);
+  expect(failed.text).toContain('daemon injoignable');
+  const clean = await section('Hôte', async () => {
+    await Promise.resolve();
+    return [{ kind: 'ok', text: 'binder' }];
+  });
+  expect([clean.blocked, clean.text.includes('✓ binder')]).toEqual([false, true]);
 });
 
 test('the dev client link skips the launcher, and Maestro gets the app and its link as flow variables', () => {
