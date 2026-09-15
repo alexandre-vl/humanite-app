@@ -2,9 +2,9 @@
 setting	container	humanite-redroid15
 setting	unit	humanite-redroid-guard
 setting	tick_s	30
-setting	run_timeout_s	120
+setting	run_timeout_s	180
 setting	boot_deadline_s	180
-setting	boot_wait_s	60
+setting	boot_wait_s	45
 setting	idle_ttl_s	14400
 minimum	sysctl	100
 minimum	procattr	100

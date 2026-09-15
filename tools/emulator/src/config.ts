@@ -107,9 +107,9 @@ export const EMULATOR = {
     installDirectory: '/usr/local/libexec/humanite-redroid',
     runDirectory: '/run/humanite-redroid',
     tickSeconds: 30,
-    runTimeoutSeconds: 120,
+    runTimeoutSeconds: 180,
     bootDeadlineSeconds: 180,
-    bootWaitSeconds: 60,
+    bootWaitSeconds: 45,
     idleTtlSeconds: 14_400,
   },
   // lmkd reads the pressure of the whole host and killed the foreground app at 0.9 GiB used out of 3: minfree levels

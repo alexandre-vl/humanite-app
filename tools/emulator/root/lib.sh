@@ -183,15 +183,18 @@ snapshot() {
 #   pending         a tracefs instance of Android: removed once Redroid stops
 #   keep-unknown    a tracefs instance nothing attributes to Android, created during a session: kept, the run fails
 #   unrevertable    a value the guard cannot write back: the run fails
-#   accept          an entry that appeared or vanished, or a change in idle mode nothing attributes to Android
+#   accept          an entry that appeared or vanished, or a change in idle mode: out of a session, only a write of
+#                   Android whose clean value tracked.tsv knows is reverted, since other tenants may write the others
 plan() {
   awk -F "$TAB" -v OFS="$US" -v mode="$1" -v absent="$ABSENT" '
     function known(kind, key, value) {
+      if (mode == "idle" && !((kind SUBSEP key) in clean)) return 0
       return ((kind SUBSEP key) in android && (android[kind SUBSEP key] == "*" || android[kind SUBSEP key] == value)) ||
         ((kind SUBSEP "*") in android && (android[kind SUBSEP "*"] == "*" || android[kind SUBSEP "*"] == value))
     }
     FILENAME == ARGV[1] {
       if ($1 == "android") android[$2 SUBSEP $3] = $4
+      else if ($1 == "clean") clean[$2 SUBSEP $3] = $4
       else if ($1 == "volatile") volatile[$2 SUBSEP $3] = 1
       next
     }

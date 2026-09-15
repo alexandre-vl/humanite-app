@@ -173,8 +173,14 @@ const PLAN_FIXTURES = [
   ),
   define(
     'root/plan-idle-android',
-    'hors session, la valeur d’Android apparaît dans un sysctl : écriture annulée, jamais reprise',
+    'hors session, les attributs d’Android apparaissent sur une entrée de /proc : écriture annulée, jamais reprise',
     ['root/revert'],
+    planned('idle', CLEAN, withRecord(CLEAN, 'procattr', '/proc/sysrq-trigger', '220 0 1000')),
+  ),
+  define(
+    'root/plan-idle-shared-value',
+    'hors session, un sysctl prend la valeur d’Android qu’un autre locataire peut écrire aussi : la référence le suit',
+    ['root/accept'],
     planned('idle', CLEAN, android(CLEAN)),
   ),
   define(
