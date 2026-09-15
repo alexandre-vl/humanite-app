@@ -6,7 +6,7 @@ import type { RepoPath } from './paths.ts';
 import { keysOf } from './records.ts';
 
 /** What a check verifies, in a few words, and what a finding says: what was found, then what is expected. */
-export type CheckDefinition = Readonly<{ summary: string; message: string }>;
+type CheckDefinition = Readonly<{ summary: string; message: string }>;
 
 /** A table of checks keyed by code: every entry is a `CheckDefinition`, possibly with more fields. */
 export type CheckTable<Table> = { readonly [Code in keyof Table]: CheckDefinition };
@@ -18,7 +18,7 @@ export type CheckDetailsOf<Table extends CheckTable<Table>, Code extends CheckCo
   Table[Code]['message']
 >;
 
-export type FindingFactory<Table extends CheckTable<Table>> = <Code extends CheckCodeOf<Table>>(
+type FindingFactory<Table extends CheckTable<Table>> = <Code extends CheckCodeOf<Table>>(
   code: Code,
   path: RepoPath,
   details: CheckDetailsOf<Table, Code>,

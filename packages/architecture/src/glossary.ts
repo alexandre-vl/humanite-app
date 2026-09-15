@@ -21,5 +21,3 @@ export const GLOSSARY = [
   ['rubrique', 'section'],
   ['rubriques', 'sections'],
 ] as const satisfies readonly (readonly [Lowercase<string>, Lowercase<string>])[];
-
-export type GlossaryTerm = (typeof GLOSSARY)[number][0];

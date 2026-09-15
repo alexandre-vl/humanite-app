@@ -181,7 +181,7 @@ function checkTrailers(message: string, input: MessageInput, policy: CommitPolic
 }
 
 /** Values of the ADR citation trailers, in order. */
-export const citedAdrs = (trailers: readonly Trailer[], policy: CommitPolicy): readonly string[] =>
+const citedAdrs = (trailers: readonly Trailer[], policy: CommitPolicy): readonly string[] =>
   trailers
     .filter((trailer) => trailer.key.toLowerCase() === policy.refsKey.toLowerCase())
     .map((trailer) => trailer.value);

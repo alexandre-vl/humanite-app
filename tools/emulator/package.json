@@ -4,7 +4,6 @@
   "type": "module",
   "exports": {
     "./build": "./src/commands/build.ts",
-    "./checks": "./src/checks.ts",
     "./config": "./src/config.ts",
     "./down": "./src/commands/down.ts",
     "./e2e": "./src/commands/e2e.ts",

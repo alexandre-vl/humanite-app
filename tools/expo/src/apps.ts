@@ -3,7 +3,7 @@ import type { RepoPath } from '@huma/kit/paths';
 import { repoPath } from '@huma/kit/paths';
 
 /** The package that makes a workspace package an Expo Router app. */
-export const EXPO_ROUTER = 'expo-router';
+const EXPO_ROUTER = 'expo-router';
 
 const declares = (each: WorkspacePackage, name: string): boolean =>
   each.specifiers.dependencies.has(name) || each.specifiers.devDependencies.has(name);

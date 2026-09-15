@@ -9,9 +9,7 @@
     "./installation": "./src/installation.ts",
     "./message": "./src/message.ts",
     "./proofs": "./src/proofs/registry.ts",
-    "./shims": "./src/shims.ts",
-    "./staging": "./src/staging.ts",
-    "./tripwire": "./src/tripwire.ts"
+    "./shims": "./src/shims.ts"
   },
   "dependencies": {
     "@huma/fixtures": "workspace:*",

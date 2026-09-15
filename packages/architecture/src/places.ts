@@ -4,12 +4,10 @@
  */
 
 /** Segments of a slice, by purpose. */
-export const SEGMENTS = ['ui', 'model', 'api', 'lib', 'config', 'i18n'] as const;
-
-export type Segment = (typeof SEGMENTS)[number];
+const SEGMENTS = ['ui', 'model', 'api', 'lib', 'config', 'i18n'] as const;
 
 /** Segments of the `_app` layer: Steiger refuses `ui` there and `providers` as a name (journal 0a, correction 17). */
-export const APP_SEGMENTS = ['routes', 'model', 'lib', 'config'] as const;
+const APP_SEGMENTS = ['routes', 'model', 'lib', 'config'] as const;
 
 /**
  * Places from top to bottom: a place imports only places of later groups, and the shared places of its own group.
@@ -31,7 +29,7 @@ type Groups = typeof ORDER;
 export type Place = Groups[number][number];
 
 /** Places of the shared kernel, which may import one another along the edges `IMPORTS` lists. */
-export type KernelPlace = Groups[7][number];
+type KernelPlace = Groups[7][number];
 
 /** The places of the groups after the one holding `Current`. */
 type Below<Remaining extends readonly (readonly string[])[], Current extends string> = Remaining extends readonly [
@@ -48,7 +46,7 @@ export type Importable<Importer extends Place> =
   Below<Groups, Importer> | (Importer extends KernelPlace ? KernelPlace : never);
 
 /** Component levels, from the primitives that alone touch native views to the pages. */
-export type ComponentLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4';
+type ComponentLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4';
 
 /**
  * How the files of a place are grouped:
@@ -58,7 +56,7 @@ export type ComponentLevel = 'L0' | 'L1' | 'L2' | 'L3' | 'L4';
  * - `modules`: `<module>/…`, public entry `<module>/index.ts`;
  * - `module`: one module, public entry `index.ts`.
  */
-export type PlaceLayout = 'routes' | 'segments' | 'slices' | 'modules' | 'module';
+type PlaceLayout = 'routes' | 'segments' | 'slices' | 'modules' | 'module';
 
 export type PlaceSpec = Readonly<{
   /** Directory relative to the app. */
@@ -176,7 +174,7 @@ export const IMPORTS = {
 export const PLACE_NAMES: readonly Place[] = ORDER.flat();
 
 /** A package only some places may import: the rest of the app reaches it through them. */
-export type ModulePolicy = Readonly<{
+type ModulePolicy = Readonly<{
   /** Places that may import the package. */
   places: readonly Place[];
   /** Names every place may import from it anyway. */

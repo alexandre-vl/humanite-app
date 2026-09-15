@@ -196,6 +196,11 @@ const KNIP_ENTRIES: readonly string[] = [
 /** The package directory of a file of the workspace: `tools/governance` for `tools/governance/src/cli/gen.ts`. */
 const packageOf = (path: string): string => path.split('/').slice(0, 2).join('/');
 
+/**
+ * The exports of an entry file count as used only when something imports them, so a module a package exposes cannot
+ * hide dead exports. The app is the exception: Expo Router reads the exports of its routes at run time, where knip
+ * cannot see them, and would report every page and layout the routes re-export.
+ */
 const knipConfig: Artifact = {
   path: KNIP_CONFIG,
   render: async (root) => {
@@ -206,10 +211,15 @@ const knipConfig: Artifact = {
           entry: [...new Set(KNIP_ENTRIES.filter((path) => packageOf(path) === workspace))]
             .map((path) => path.slice(workspace.length + 1))
             .toSorted(compareText),
+          ...(workspace === APP_DIRECTORY ? { includeEntryExports: false } : {}),
         },
       ]),
     );
-    const text = JSON.stringify({ $schema: 'https://unpkg.com/knip@6/schema.json', workspaces }, null, 2);
+    const text = JSON.stringify(
+      { $schema: 'https://unpkg.com/knip@6/schema.json', includeEntryExports: true, workspaces },
+      null,
+      2,
+    );
     return formatForPath(root, KNIP_CONFIG, `${text}\n`);
   },
 };

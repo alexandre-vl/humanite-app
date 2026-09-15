@@ -266,12 +266,6 @@ export async function refNames(repository: GitRepository, prefix: string): Promi
   return splitLines(await git(repository, ['for-each-ref', '--format=%(refname)', '--sort=refname', prefix]));
 }
 
-/** Short name of the branch `HEAD` is on, `null` when it is detached. */
-export async function currentBranch(repository: GitRepository): Promise<string | null> {
-  const name = (await git(repository, ['symbolic-ref', '--quiet', '--short', 'HEAD'], { successCodes: [0, 1] })).trim();
-  return name === '' ? null : name;
-}
-
 export const commonDirectory = async (repository: GitRepository): Promise<string> =>
   (await git(repository, ['rev-parse', '--path-format=absolute', '--git-common-dir'])).trim();
 
@@ -547,7 +541,7 @@ function parseCommit(id: string, bytes: Uint8Array): CommitObject {
 }
 
 /** Commits read by id through one `git cat-file --batch` process. */
-export async function readCommits(
+async function readCommits(
   repository: GitRepository,
   ids: readonly string[],
 ): Promise<ReadonlyMap<string, CommitObject>> {

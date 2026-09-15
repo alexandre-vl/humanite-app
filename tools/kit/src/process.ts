@@ -29,7 +29,7 @@ export type ProcessOptions = Readonly<{
 
 export type Captured = Readonly<{ exit: Exit; stdout: Buffer; stderr: Buffer }>;
 
-export const KILL_GRACE_MS = 2_000;
+const KILL_GRACE_MS = 2_000;
 
 /** How long the outputs of an exited child stay open for a process it left behind before they are closed. */
 const DRAIN_MS = 1_000;
@@ -48,7 +48,7 @@ const signalGroup = (group: number, signal: NodeJS.Signals): void => {
 };
 
 /** Kills every stoppable child group still running; this process exits right after. */
-export function stopLiveProcesses(): void {
+function stopLiveProcesses(): void {
   for (const group of liveGroups) {
     signalGroup(group, 'SIGKILL');
   }

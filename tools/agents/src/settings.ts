@@ -10,7 +10,7 @@ export type HookCommands = Readonly<{
   stopTimeoutSeconds: number;
 }>;
 
-export const SETTINGS_SCHEMA = 'https://json.schemastore.org/claude-code-settings.json';
+const SETTINGS_SCHEMA = 'https://json.schemastore.org/claude-code-settings.json';
 
 /** `.claude/settings.json` of the repository: the hooks that enforce the policy and the permission rules that echo it. */
 export function renderClaudeSettings(policy: AgentPolicy, hooks: HookCommands): string {

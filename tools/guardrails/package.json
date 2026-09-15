@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./eslint": "./src/eslint.ts",
     "./proofs": "./src/proofs/registry.ts"
   },
   "dependencies": {

@@ -66,7 +66,7 @@ const TABLE = {
   },
 } as const;
 
-export const EMULATOR_CHECKS = defineChecks(TABLE);
+const EMULATOR_CHECKS = defineChecks(TABLE);
 
 export type EmulatorCode = CheckCodeOf<typeof TABLE>;
 

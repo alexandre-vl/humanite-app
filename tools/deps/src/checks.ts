@@ -86,7 +86,7 @@ const TABLE = {
   },
 } as const;
 
-export const DEPS_CHECKS = defineChecks(TABLE);
+const DEPS_CHECKS = defineChecks(TABLE);
 
 export type DepsCode = CheckCodeOf<typeof TABLE>;
 

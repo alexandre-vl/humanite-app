@@ -21,7 +21,7 @@ const TABLE = {
   },
 } as const;
 
-export const EXPO_CHECKS = defineChecks(TABLE);
+const EXPO_CHECKS = defineChecks(TABLE);
 
 export type ExpoCode = CheckCodeOf<typeof TABLE>;
 

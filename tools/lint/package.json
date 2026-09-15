@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./checks": "./src/checks.ts",
     "./eslint": "./src/eslint.ts",
     "./prettier": "./src/prettier.ts",
     "./proofs": "./src/proofs/registry.ts"

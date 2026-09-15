@@ -1,15 +1,7 @@
 import { capture } from '@huma/kit/process';
 import { describe, expect, expectTypeOf, test } from 'vitest';
-import type { Coverage, Fixture } from './bench.ts';
-import {
-  findDuplicateIds,
-  fixtureFactory,
-  formatReports,
-  runFixture,
-  runFixtures,
-  SETTLE_MS,
-  uncoveredCodes,
-} from './bench.ts';
+import type { Coverage } from './bench.ts';
+import { findDuplicateIds, fixtureFactory, runFixture, SETTLE_MS, uncoveredCodes } from './bench.ts';
 
 type Code = 'a/one' | 'a/two';
 
@@ -88,37 +80,9 @@ describe('runFixture', () => {
   }, 15_000);
 });
 
-describe('runFixtures', () => {
-  test('keeps the input order when later fixtures finish first', async () => {
-    const delayed = (id: string, milliseconds: number): Fixture<string, Code> =>
-      define(id, id, [], async () => {
-        await waiting(milliseconds);
-        return [];
-      });
-    const reports = await runFixtures([delayed('slow', 30), delayed('fast', 1), delayed('medium', 10)], {
-      concurrency: 3,
-    });
-    expect(reports.map((report) => report.id)).toEqual(['slow', 'fast', 'medium']);
-  });
-});
-
 test('findDuplicateIds lists each repeated id once, sorted', () => {
   const ids = ['b', 'a', 'b', 'c', 'a', 'b'];
   expect(findDuplicateIds(ids.map((id) => define(id, id, [], observing([]))))).toEqual(['a', 'b']);
-});
-
-test('formatReports prints one line per fixture and the conforming count', () => {
-  const text = formatReports([
-    { id: 'ok', durationMs: 1, outcome: 'passed' },
-    { id: 'diff', durationMs: 1, outcome: 'failed', missing: ['a/two'], unexpected: [] },
-    { id: 'crash', durationMs: 1, outcome: 'crashed', error: 'Error: boom\n    at stack' },
-  ]);
-  expect(text.split('\n')).toEqual([
-    '✓ ok',
-    '✗ diff — manquants : a/two ; en trop : ∅',
-    '✗ crash — plantage : Error: boom',
-    '1/3 fixtures conformes',
-  ]);
 });
 
 describe('Coverage', () => {

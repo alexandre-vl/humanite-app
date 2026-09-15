@@ -1,8 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  "includeEntryExports": true,
   "workspaces": {
     "apps/mobile": {
-      "entry": ["src/_app/routes/typed-routes.guard.ts"]
+      "entry": ["src/_app/routes/typed-routes.guard.ts"],
+      "includeEntryExports": false
     },
     "tools/governance": {
       "entry": ["src/cli/agent-guard.ts", "src/cli/agent-stop.ts", "src/cli/git-hook.ts"]

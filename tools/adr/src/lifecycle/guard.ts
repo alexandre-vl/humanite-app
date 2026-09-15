@@ -43,7 +43,7 @@ export function looksDecided(text: string): boolean {
 export const DECIDED_FROZEN =
   'Un ADR décidé est figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).';
 
-export const UNKNOWN_RESULT =
+const UNKNOWN_RESULT =
   'Contenu de l’ADR après cette modification incalculable (texte à remplacer absent tel quel) : reprendre le texte exact, ou modifier l’en-tête dans un appel séparé.';
 
 /** Verdict on a write that turns `before` (`null` for a new file) into `after` (`null` when it cannot be computed). */

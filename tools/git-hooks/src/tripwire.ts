@@ -15,7 +15,7 @@ import { gitHookFinding } from './checks.ts';
  */
 
 /** Where pre-commit records the verified trees, in the worktree: git runs hooks at its root. */
-export const MARKER_DIRECTORY = 'node_modules/.cache/huma/git-hooks';
+const MARKER_DIRECTORY = 'node_modules/.cache/huma/git-hooks';
 
 /** Markers older than this come from commits long finished: pre-commit removes them. */
 const MARKER_LIFETIME_MS = 60 * 60 * 1000;

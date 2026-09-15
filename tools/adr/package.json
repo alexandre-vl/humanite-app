@@ -5,7 +5,6 @@
   "exports": {
     "./bindings": "./src/model/bindings.ts",
     "./check": "./src/repository/check.ts",
-    "./checks": "./src/spec/checks.ts",
     "./collection": "./src/repository/collection.ts",
     "./create": "./src/lifecycle/create.ts",
     "./decide": "./src/lifecycle/decide.ts",

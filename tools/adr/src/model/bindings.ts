@@ -6,7 +6,7 @@ export type Convention = Readonly<{ convention: string }>;
 export type RuleBinding<Proof extends string> = readonly [Proof, ...Proof[]] | Convention;
 
 /** What an ADR governs: repository paths matched by globs relative to the root (`*`, `**` and `?`). */
-export type Scope = Readonly<{ paths: readonly [string, ...string[]] }>;
+type Scope = Readonly<{ paths: readonly [string, ...string[]] }>;
 
 /** How one ADR is enforced: the paths it governs and, per binding rule, the fixtures that prove it. */
 export type AdrBinding<Proof extends string> = Readonly<{

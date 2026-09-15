@@ -1,5 +1,4 @@
 import { describeError } from '@huma/kit/errors';
-import { mapConcurrently } from '@huma/kit/pool';
 import { compareText } from '@huma/kit/text';
 
 /**
@@ -92,12 +91,10 @@ export type FixtureReport<Id extends string, Code extends string> = Readonly<{ i
     | Readonly<{ outcome: 'crashed'; error: string }>
   );
 
-export type Outcome = FixtureReport<string, string>['outcome'];
-
 export type RunOptions = Readonly<{ timeoutMs: number }>;
 
 /** Time budget of one fixture when the caller sets none: a fixture that hangs must not hang the check. */
-export const DEFAULT_TIMEOUT_MS = 30_000;
+const DEFAULT_TIMEOUT_MS = 30_000;
 
 /** Time a fixture that exceeded its budget gets to stop what it started, once its signal is aborted. */
 export const SETTLE_MS = 5_000;
@@ -165,15 +162,6 @@ export async function runFixture<Id extends string, Code extends string>(
   }
 }
 
-/** Runs fixtures with at most `concurrency` in flight; reports keep the order of `fixtures`. */
-export async function runFixtures<Id extends string, Code extends string>(
-  fixtures: readonly Fixture<Id, Code>[],
-  options: Readonly<{ concurrency: number }> & Partial<RunOptions>,
-): Promise<readonly FixtureReport<Id, Code>[]> {
-  const runOptions: RunOptions = { timeoutMs: options.timeoutMs ?? DEFAULT_TIMEOUT_MS };
-  return mapConcurrently(fixtures, options.concurrency, async (fixture) => runFixture(fixture, runOptions));
-}
-
 export function findDuplicateIds(fixtures: readonly Fixture<string, string>[]): readonly string[] {
   const seen = new Set<string>();
   const duplicates = new Set<string>();
@@ -181,21 +169,4 @@ export function findDuplicateIds(fixtures: readonly Fixture<string, string>[]): 
     (seen.has(id) ? duplicates : seen).add(id);
   }
   return [...duplicates].toSorted(compareText);
-}
-
-const listCodes = (codes: readonly string[]): string => (codes.length === 0 ? '∅' : codes.join(', '));
-
-export function formatReports(reports: readonly FixtureReport<string, string>[]): string {
-  const lines = reports.map((report) => {
-    switch (report.outcome) {
-      case 'passed':
-        return `✓ ${report.id}`;
-      case 'failed':
-        return `✗ ${report.id} — manquants : ${listCodes(report.missing)} ; en trop : ${listCodes(report.unexpected)}`;
-      case 'crashed':
-        return `✗ ${report.id} — plantage : ${report.error.split('\n', 1)[0] ?? ''}`;
-    }
-  });
-  const passed = reports.filter((report) => report.outcome === 'passed').length;
-  return [...lines, `${String(passed)}/${String(reports.length)} fixtures conformes`].join('\n');
 }

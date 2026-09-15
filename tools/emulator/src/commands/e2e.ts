@@ -12,7 +12,7 @@ import { toolDirectory } from '../tools.ts';
 import { metroRunning } from './metro.ts';
 
 /** The flows Maestro runs, beside the app they test. */
-export const E2E_DIRECTORY = `${APP_DIRECTORY}/e2e`;
+const E2E_DIRECTORY = `${APP_DIRECTORY}/e2e`;
 
 /** The deep link that opens the app of `scheme` in the dev client, served by Metro on the loopback, with no screen of its own. */
 export const devClientLink = (scheme: string, config: EmulatorConfig): string =>

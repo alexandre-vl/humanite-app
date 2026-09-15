@@ -7,7 +7,7 @@ import type { Word } from './shell/words.ts';
 import { isKnown } from './shell/words.ts';
 
 /** A family of commands an agent may not run, how to recognise one, and the permission rules that also refuse it. */
-export type CommandRule = Readonly<{
+type CommandRule = Readonly<{
   id: string;
   reason: string;
   /** `permissions.deny` entries of Claude Code: a first filter, the hook being the real check. */
@@ -165,7 +165,7 @@ const isNoVerify = (arg: string): boolean => arg.length >= '--no-veri'.length &&
 const skipsHooks = (subcommand: string, args: readonly string[]): boolean =>
   args.some(isNoVerify) || (subcommand === 'commit' && skipsCommitHooks(args));
 
-export const GIT_HOOKS_BYPASS: CommandRule = {
+const GIT_HOOKS_BYPASS: CommandRule = {
   id: 'git-hooks-bypass',
   reason:
     'Les hooks git du dépôt ne se contournent pas : ni --no-verify, ni core.hooksPath ou alias, ni dépôt ou arbre désigné ailleurs, ni plomberie qui écrit sans hooks.',
@@ -198,7 +198,7 @@ export const GIT_HOOKS_BYPASS: CommandRule = {
 
 const PRIVILEGED = new Set(['sudo', 'sudoedit', 'doas', 'pkexec', 'su', 'run0']);
 
-export const PRIVILEGE_ESCALATION: CommandRule = {
+const PRIVILEGE_ESCALATION: CommandRule = {
   id: 'privilege-escalation',
   reason: 'Les commandes root sont lancées par l’utilisateur lui-même, jamais par un agent.',
   permissions: ['Bash(sudo *)', 'Bash(doas *)', 'Bash(pkexec *)', 'Bash(su *)', 'Bash(run0 *)'],
@@ -249,7 +249,7 @@ function dockerCall(command: SimpleCommand): Readonly<{ subcommand: string; args
  * Refuses docker calls that start, enter, change or remove the emulator's container, or run its image: Android in a
  * privileged container writes the host kernel, and only `emulator:up` and `emulator:down` wait for the root guard.
  */
-export function emulatorRule(target: EmulatorTarget): CommandRule {
+function emulatorRule(target: EmulatorTarget): CommandRule {
   return {
     id: 'emulator-direct',
     reason:
@@ -270,7 +270,7 @@ export function emulatorRule(target: EmulatorTarget): CommandRule {
 
 const isSessionVariable = (name: string): boolean => AGENT_SESSION_VARIABLES.some((variable) => variable === name);
 
-export const SESSION_MASKING: CommandRule = {
+const SESSION_MASKING: CommandRule = {
   id: 'session-masking',
   reason: 'Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.',
   permissions: AGENT_SESSION_VARIABLES.map((name) => `Bash(unset ${name}*)`),
@@ -297,7 +297,7 @@ const EVAL_OPTIONS = new Set(['-e', '--eval', '-p', '--print']);
  * Refuses the scripts reserved to the human decision maker: run by script name, by entry file (directly or through
  * a code runner), or named in code evaluated inline. Reading or searching those files stays allowed.
  */
-export function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRule {
+function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRule {
   const scripts = new Set(commands.map((command) => command.script));
   const entries = new Set(commands.map((command) => basename(command.entry)));
   const namesOne = (text: string): boolean => [...scripts, ...entries].some((token) => text.includes(token));
@@ -323,7 +323,7 @@ export function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRul
   };
 }
 
-export const PROTECTED_PATHS: readonly PathRule[] = [
+const PROTECTED_PATHS: readonly PathRule[] = [
   { id: 'git-directory', reason: 'Le dossier .git ne s’écrit qu’à travers git.', path: '.git', kind: 'directory' },
   {
     id: 'claude-settings',

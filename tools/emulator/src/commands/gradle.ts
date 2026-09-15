@@ -9,8 +9,8 @@ import type { Session } from '../session.ts';
 import { aapt2Executable, androidHome, appRoot, debugApk } from '../session.ts';
 import { toolDirectory } from '../tools.ts';
 
-/** The last line the build prints when the APK is built, which `emulator:status` looks for in the log. */
-export const BUILT = '✓ APK construit';
+/** The last line the build prints when the APK is built. */
+const BUILT = '✓ APK construit';
 
 /**
  * The arguments of `systemd-run` that run Gradle in a transient scope capped as the spike measured it safe: without

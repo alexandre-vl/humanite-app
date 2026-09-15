@@ -205,7 +205,7 @@ async function readPackage(root: string, directory: string): Promise<WorkspacePa
  * The pnpm settings a workspace may write, with the values pnpm 11 accepts: a setting outside this type cannot be
  * written, so a misspelt one is never silently ignored by pnpm.
  */
-export type PnpmSettings = Readonly<{
+type PnpmSettings = Readonly<{
   nodeLinker: 'isolated' | 'hoisted' | 'pnp';
   enableGlobalVirtualStore: boolean;
   strictDepBuilds: boolean;

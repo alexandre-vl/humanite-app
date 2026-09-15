@@ -7,16 +7,15 @@ import { defineChecks } from '@huma/kit/checks';
  * proven by at least one fixture, and the index lists them all.
  */
 
-export const CHECK_SCOPES = ['file', 'collection', 'repository', 'history'] as const;
-
-export type CheckScope = (typeof CHECK_SCOPES)[number];
-
+/** How far each check reaches, with the label the index gives it. */
 export const CHECK_SCOPE_LABELS = {
   file: 'fichier',
   collection: 'collection',
   repository: 'dépôt',
   history: 'historique',
-} as const satisfies Readonly<Record<CheckScope, string>>;
+} as const;
+
+type CheckScope = keyof typeof CHECK_SCOPE_LABELS;
 
 type CheckDefinition = Readonly<{ scope: CheckScope; summary: string; message: string }>;
 

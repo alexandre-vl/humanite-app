@@ -25,8 +25,7 @@ import { canTransition, INITIAL_STATUS, isDecided, TRANSITIONS } from '../spec/s
 type HistoryCode = ScopedCode<'history'>;
 
 /** Where an ADR number stands after a commit, or in the source being checked. */
-export type AdrState =
-  Readonly<{ kind: 'absent' }> | Readonly<{ kind: 'present'; path: RepoPath; document: AdrDocument }>;
+type AdrState = Readonly<{ kind: 'absent' }> | Readonly<{ kind: 'present'; path: RepoPath; document: AdrDocument }>;
 
 export type CommittedState = Readonly<{ commit: string; authorDate: string; state: AdrState }>;
 

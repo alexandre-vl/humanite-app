@@ -3,6 +3,7 @@ import { AGENT_PROOFS } from '@huma/agents/proofs';
 import { DEPS_PROOFS } from '@huma/deps/proofs';
 import { EMULATOR_PROOFS } from '@huma/emulator/proofs';
 import { EXPO_PROOFS } from '@huma/expo/proofs';
+import type { Fixture } from '@huma/fixtures';
 import { runFixture } from '@huma/fixtures';
 import { GIT_HOOK_PROOFS } from '@huma/git-hooks/proofs';
 import { GUARDRAIL_PROOFS } from '@huma/guardrails/proofs';
@@ -12,8 +13,25 @@ import { COMMIT_HISTORY_FIXTURES } from './proofs/commit-history.ts';
 import { COMMIT_REFS_FIXTURES } from './proofs/commit-refs.ts';
 import { GOVERNANCE_FIXTURES } from './proofs/governance.ts';
 
+type IdOf<Fixtures extends readonly Fixture<string, string>[]> = Fixtures[number]['id'];
+
+/** The id of every fixture of the workspace that can prove a rule, as the bindings name them. */
+export type ProofId =
+  | IdOf<typeof ADR_PROOFS>
+  | IdOf<typeof AGENT_PROOFS>
+  | IdOf<typeof DEPS_PROOFS>
+  | IdOf<typeof EMULATOR_PROOFS>
+  | IdOf<typeof EXPO_PROOFS>
+  | IdOf<typeof GIT_HOOK_PROOFS>
+  | IdOf<typeof GUARDRAIL_PROOFS>
+  | IdOf<typeof LINT_PROOFS>
+  | IdOf<typeof STRUCTURE_PROOFS>
+  | IdOf<typeof GOVERNANCE_FIXTURES>
+  | IdOf<typeof COMMIT_HISTORY_FIXTURES>
+  | IdOf<typeof COMMIT_REFS_FIXTURES>;
+
 /** Every fixture of the workspace that can prove a rule; the bindings point at their ids. */
-export const PROOFS = [
+export const PROOFS: readonly Fixture<ProofId, string>[] = [
   ...ADR_PROOFS,
   ...AGENT_PROOFS,
   ...DEPS_PROOFS,
@@ -26,9 +44,7 @@ export const PROOFS = [
   ...GOVERNANCE_FIXTURES,
   ...COMMIT_HISTORY_FIXTURES,
   ...COMMIT_REFS_FIXTURES,
-] as const;
-
-export type ProofId = (typeof PROOFS)[number]['id'];
+];
 
 export const PROOF_IDS: ReadonlySet<string> = new Set(PROOFS.map((fixture) => fixture.id));
 

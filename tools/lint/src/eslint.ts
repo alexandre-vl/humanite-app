@@ -13,7 +13,7 @@ import { lintFinding } from './checks.ts';
 export const SUPPRESSIONS_FILE = 'eslint-suppressions.json';
 
 /** A term code does not use, with the word it uses instead. */
-export type GlossaryEntry = readonly [term: string, english: string];
+type GlossaryEntry = readonly [term: string, english: string];
 
 export type LintRequest = Readonly<{
   root: string;

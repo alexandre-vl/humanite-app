@@ -45,7 +45,7 @@ const TABLE = {
   },
 } as const;
 
-export const LINT_CHECKS = defineChecks(TABLE);
+const LINT_CHECKS = defineChecks(TABLE);
 
 export type LintCode = CheckCodeOf<typeof TABLE>;
 

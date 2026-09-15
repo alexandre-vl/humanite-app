@@ -2,11 +2,6 @@
   "name": "@huma/governance",
   "private": true,
   "type": "module",
-  "exports": {
-    "./bindings": "./src/bindings.ts",
-    "./commands": "./src/commands.ts",
-    "./proofs": "./src/proofs.ts"
-  },
   "dependencies": {
     "@huma/adr": "workspace:*",
     "@huma/agents": "workspace:*",

@@ -4,7 +4,6 @@
   "type": "module",
   "exports": {
     "./check": "./src/check.ts",
-    "./checks": "./src/checks.ts",
     "./proofs": "./src/proofs/registry.ts",
     "./workspace": "./src/workspace.ts"
   },

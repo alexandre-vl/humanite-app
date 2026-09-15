@@ -20,7 +20,7 @@ const TABLE = {
   },
 } as const;
 
-export const LOCAL_SETTINGS_CHECKS = defineChecks(TABLE);
+const LOCAL_SETTINGS_CHECKS = defineChecks(TABLE);
 
 export type LocalSettingsCode = CheckCodeOf<typeof TABLE>;
 

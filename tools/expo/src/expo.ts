@@ -11,7 +11,7 @@ import { compareText } from '@huma/kit/text';
  */
 
 /** A route directory as Expo Router's `require.context` lists it: keys only, no route is ever loaded. */
-export type RouteContext = ((id: string) => never) &
+type RouteContext = ((id: string) => never) &
   Readonly<{ keys: () => string[]; resolve: (key: string) => string; id: string }>;
 
 /** Expo's tooling, applied to the app at `appRoot`. */
@@ -31,7 +31,7 @@ export type ExpoTooling = Readonly<{
 }>;
 
 /** The declaration file Expo writes next to the app config, and asks git to ignore. */
-export const EXPO_ENV_TYPES = 'expo-env.d.ts';
+const EXPO_ENV_TYPES = 'expo-env.d.ts';
 
 type Callable = (...args: readonly unknown[]) => unknown;
 

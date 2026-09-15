@@ -137,10 +137,8 @@ const TABLE = {
   },
 } as const;
 
-export const GIT_HOOK_CHECKS = defineChecks(TABLE);
+const GIT_HOOK_CHECKS = defineChecks(TABLE);
 
 export type GitHookCode = CheckCodeOf<typeof TABLE>;
-
-export const GIT_HOOK_CODES = GIT_HOOK_CHECKS.codes;
 
 export const gitHookFinding = GIT_HOOK_CHECKS.finding;

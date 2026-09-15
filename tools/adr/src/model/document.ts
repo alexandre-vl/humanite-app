@@ -43,7 +43,7 @@ type AdrFile = Readonly<{
 }>;
 
 /** An ADR whose header and title could be read: its status, rules and references are known. */
-export type ReadableAdr = AdrFile &
+type ReadableAdr = AdrFile &
   Readonly<{
     kind: 'readable';
     spec: FormatSpec;
@@ -54,6 +54,6 @@ export type ReadableAdr = AdrFile &
   }>;
 
 /** An ADR file whose header or title cannot be read: it still takes its number and keeps its history. */
-export type UnreadableAdr = AdrFile & Readonly<{ kind: 'unreadable' }>;
+type UnreadableAdr = AdrFile & Readonly<{ kind: 'unreadable' }>;
 
 export type AdrDocument = ReadableAdr | UnreadableAdr;

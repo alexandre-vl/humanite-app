@@ -11,7 +11,7 @@ import { STRUCTURE_CHECKS, structureFinding } from './checks.ts';
  * Every rule of Steiger's Feature-Sliced plugin, on or off. Steiger judges what no other tool owns; boundaries owns
  * the places, their entries and their imports, so the rules that repeat it stay off and a finding has one owner.
  */
-export const STEIGER_RULES = {
+const STEIGER_RULES = {
   'fsd/ambiguous-slice-names': 'error',
   'fsd/excessive-slicing': 'error',
   'fsd/import-locality': 'error',

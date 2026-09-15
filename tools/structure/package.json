@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./checks": "./src/checks.ts",
     "./cycles": "./src/cycles.ts",
     "./proofs": "./src/proofs/registry.ts",
     "./steiger": "./src/steiger.ts"

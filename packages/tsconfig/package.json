@@ -4,8 +4,6 @@
   "type": "module",
   "exports": {
     "./hermes.json": "./hermes.json",
-    "./node.json": "./node.json",
-    "./project.json": "./project.json",
-    "./strict.json": "./strict.json"
+    "./node.json": "./node.json"
   }
 }

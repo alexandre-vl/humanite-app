@@ -4,7 +4,6 @@
   "type": "module",
   "exports": {
     "./apps": "./src/apps.ts",
-    "./checks": "./src/checks.ts",
     "./expo": "./src/expo.ts",
     "./proofs": "./src/proofs/registry.ts",
     "./sdk": "./src/sdk.ts",

@@ -5,7 +5,7 @@ import type { TestedRanges } from '@huma/deps/check';
 import { isJsonObject, stringField } from '@huma/kit/json';
 
 /** The table of the native modules an Expo SDK tested together, as `expo install` reads it. */
-export const BUNDLED_NATIVE_MODULES = 'expo/bundledNativeModules.json';
+const BUNDLED_NATIVE_MODULES = 'expo/bundledNativeModules.json';
 
 /** The ranges the Expo SDK installed by the app at `appRoot` tested, which `expo install` would pick. */
 export async function expoTestedRanges(appRoot: string, importer: string): Promise<TestedRanges> {

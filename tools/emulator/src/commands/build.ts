@@ -25,7 +25,7 @@ export const prebuildArguments = (options: Pick<BuildOptions, 'clean'>): readonl
 ];
 
 /** Where the build writes what it prints: a user service has no terminal. */
-export const buildLog = (session: Session, startedAt: Date): string =>
+const buildLog = (session: Session, startedAt: Date): string =>
   join(cacheDirectory(session.root), `build-${startedAt.toISOString().replaceAll(':', '-')}.log`);
 
 /**
