@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, utimes, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
 import { temporaryDirectory } from './fs.ts';
@@ -274,6 +274,28 @@ test('worktreeTreeId matches a commit of the whole working tree and writes neith
   const treeId = await worktreeTreeId(repo);
   expect(await readFile(join(root, '.git', 'index'))).toEqual(indexBefore);
   expect(await looseObjectCount(root)).toBe(objectsBefore);
+  await git(repo, ['add', '--all']);
+  expect((await git(repo, ['write-tree'])).trim()).toBe(treeId);
+});
+
+test('worktreeTreeId sees a same-size change git can only tell from a racily clean index entry', async () => {
+  await using directory = await temporaryDirectory('kit-git');
+  const root = join(directory.path, 'repo');
+  const repo = await repository(root, []);
+  // Whole seconds of the mtime and sizes only, as git compares them within a second without nanosecond times.
+  await git(repo, ['config', 'core.checkStat', 'minimal']);
+  await git(repo, ['config', 'core.trustCtime', 'false']);
+  const past = new Date(Date.now() - 60_000);
+  await writeFile(join(root, 'a.md'), '1');
+  await utimes(join(root, 'a.md'), past, past);
+  await git(repo, ['add', '--all']);
+  await git(repo, ['commit', '--quiet', '-m', 'c1']);
+  // The entry is now racily clean: the index is no newer than the file. A same-size write keeping the file's time
+  // leaves only that to tell the change from.
+  await utimes(join(root, '.git', 'index'), past, past);
+  await writeFile(join(root, 'a.md'), '2');
+  await utimes(join(root, 'a.md'), past, past);
+  const treeId = await worktreeTreeId(repo);
   await git(repo, ['add', '--all']);
   expect((await git(repo, ['write-tree'])).trim()).toBe(treeId);
 });

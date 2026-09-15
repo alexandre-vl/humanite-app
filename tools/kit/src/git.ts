@@ -1,5 +1,5 @@
 import { realpathSync } from 'node:fs';
-import { copyFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdir, stat, utimes } from 'node:fs/promises';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { errnoCode } from './errors.ts';
 import { temporaryDirectory } from './fs.ts';
@@ -615,7 +615,9 @@ export async function firstParentHistory(
 
 /**
  * Id of the tree that `git add --all` would commit, untracked files included. It is computed in a copy of the index
- * with a private object directory, so the index, the working tree and the object store all stay untouched.
+ * with a private object directory, so the index, the working tree and the object store all stay untouched. The copy
+ * keeps the times of the index: git trusts the cached stat of a file written no later than the index was, and a copy
+ * dated now would hide a same-size change made in the same second as the last index write.
  */
 export async function worktreeTreeId(repository: GitRepository): Promise<string> {
   const [index = '', objects = ''] = await gitPaths(repository, ['index', 'objects']);
@@ -623,6 +625,8 @@ export async function worktreeTreeId(repository: GitRepository): Promise<string>
   const copy = join(scratch.path, 'index');
   try {
     await copyFile(index, copy);
+    const { atime, mtime } = await stat(index);
+    await utimes(copy, atime, mtime);
   } catch (error) {
     if (errnoCode(error) !== 'ENOENT') {
       throw error;
