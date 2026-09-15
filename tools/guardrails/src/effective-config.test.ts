@@ -19,3 +19,32 @@ test('no rule of any kind of file is set to warn: the workspace tolerates no war
   );
   expect(warnings).toEqual([]);
 });
+
+/**
+ * The typescript-eslint bans the ultra-typed vision rests on: `any`, `as`, `!`, the `@ts-ignore` escape and the
+ * exhaustive switch. Their messages carry no policy tag, so no faulty-file fixture proves them, and the snapshot is
+ * regenerated on any config change — without this, a ban turned off would pass both gen:check and the warn test above.
+ */
+const MANDATORY_RULES: readonly string[] = [
+  '@typescript-eslint/no-explicit-any',
+  '@typescript-eslint/no-non-null-assertion',
+  '@typescript-eslint/consistent-type-assertions',
+  '@typescript-eslint/ban-ts-comment',
+  '@typescript-eslint/switch-exhaustiveness-check',
+];
+
+test('every mandatory typed ban stays an error for each kind of TypeScript file', async () => {
+  const text = await readFile(join(await findWorkspaceRoot(import.meta.dirname), EFFECTIVE_CONFIG), 'utf8');
+  const configs: unknown = JSON.parse(text);
+  const kinds = Object.entries(typeof configs === 'object' && configs !== null ? configs : {}).filter(
+    ([file]) => file.endsWith('.ts') || file.endsWith('.tsx'),
+  );
+  const weakened = kinds.flatMap(([file, config]: readonly [string, unknown]) => {
+    const rules: unknown = typeof config === 'object' && config !== null ? Reflect.get(config, 'rules') : null;
+    return MANDATORY_RULES.filter((rule) => {
+      const entry: unknown = typeof rules === 'object' && rules !== null ? Reflect.get(rules, rule) : undefined;
+      return (Array.isArray(entry) ? entry[0] : entry) !== 'error';
+    }).map((rule) => `${file} ${rule}`);
+  });
+  expect([kinds.length === 0, weakened]).toEqual([false, []]);
+});
