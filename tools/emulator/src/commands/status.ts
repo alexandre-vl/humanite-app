@@ -1,7 +1,10 @@
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { join } from 'node:path';
 import type { ExitCode } from '@huma/kit/cli';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
 import { ownRepository } from '@huma/kit/git';
+import { compareText } from '@huma/kit/text';
 import type { EmulatorConfig } from '../config.ts';
 import { containerFindings, imageFindings, inspectContainer, inspectImage } from '../docker.ts';
 import { checkInstall } from '../guard/install.ts';
@@ -18,6 +21,8 @@ import {
 import { binderFindings, readBinder } from '../host/binder.ts';
 import { missedThresholds, sampleMemory } from '../host/memory.ts';
 import { residueFindings, residueOf, sampleHost } from '../host/sample.ts';
+import { cacheDirectory, debugApk } from '../session.ts';
+import { runningBuildUnit } from './build.ts';
 
 /** One line of the report: a fact that holds, one that blocks the emulator with its findings, or a piece of state. */
 type Line =
@@ -114,7 +119,35 @@ export async function emulatorStatus(
         ),
   ];
 
-  const sections = [render('Hôte', host), render('Garde root', guard), render('Docker', docker)];
+  const sections = [
+    render('Hôte', host),
+    render('Garde root', guard),
+    render('Docker', docker),
+    render('Build natif', await buildLines(root, config)),
+  ];
   print(sections.join('\n\n'));
   return [...host, ...guard, ...docker].some((line) => line.kind === 'blocked') ? 1 : 0;
+}
+
+/** Where the native build stands: a unit still running, the last line of its latest log, and the APK it left. */
+async function buildLines(root: string, config: EmulatorConfig): Promise<readonly Line[]> {
+  const running = await runningBuildUnit(root, config);
+  const cache = cacheDirectory(root);
+  const logs = (await readdir(cache).catch(() => []))
+    .filter((name) => name.startsWith('build-') && name.endsWith('.log'))
+    .toSorted(compareText);
+  const latest = logs.at(-1);
+  const lastLine =
+    latest === undefined
+      ? null
+      : ((await readFile(join(cache, latest), 'utf8'))
+          .split('\n')
+          .filter((line) => line.trim() !== '')
+          .at(-1) ?? '(vide)');
+  const apk = await stat(debugApk(root)).catch(() => null);
+  return [
+    info(running === null ? 'aucun build en cours' : `build en cours dans ${running}`),
+    ...(latest === undefined ? [] : [info(`dernier journal ${join(cache, latest)} : ${lastLine ?? ''}`)]),
+    info(apk === null ? 'APK absent : pnpm emulator:build' : `APK du ${apk.mtime.toISOString()} : ${debugApk(root)}`),
+  ];
 }

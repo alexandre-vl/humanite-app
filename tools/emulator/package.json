@@ -8,6 +8,7 @@
     "./config": "./src/config.ts",
     "./down": "./src/commands/down.ts",
     "./e2e": "./src/commands/e2e.ts",
+    "./gradle": "./src/commands/gradle.ts",
     "./install": "./src/commands/install.ts",
     "./metro": "./src/commands/metro.ts",
     "./proofs": "./src/proofs/registry.ts",

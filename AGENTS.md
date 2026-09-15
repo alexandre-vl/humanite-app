@@ -18,9 +18,10 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm adr:new`          | crée un ADR proposé au dernier format                                                                  |
 | `pnpm adr:status`       | liste les ADR, leur statut et leurs preuves                                                            |
 | `pnpm deps:check`       | vérifie manifestes, catalog, références TypeScript et lockfile                                         |
-| `pnpm emulator:build`   | construit le dev client Android dans un service utilisateur plafonné, une fois l’hôte calme            |
+| `pnpm emulator:build`   | génère android/ puis confie à un service utilisateur l’attente d’un hôte calme et le build natif       |
 | `pnpm emulator:down`    | supprime le conteneur de l’émulateur et attend que le garde root ait restauré l’hôte                   |
 | `pnpm emulator:e2e`     | lance les parcours Maestro de l’app sur l’émulateur                                                    |
+| `pnpm emulator:gradle`  | attend un hôte calme, puis construit l’APK de l’émulateur avec Gradle dans une scope plafonnée         |
 | `pnpm emulator:install` | installe le dev client construit sur l’émulateur                                                       |
 | `pnpm emulator:metro`   | sert l’app au dev client avec Metro, sur la boucle locale                                              |
 | `pnpm emulator:status`  | vérifie sans rien changer ce que l’émulateur Android exige, et affiche les commandes root qui manquent |

@@ -55,7 +55,9 @@ export type EmulatorConfig = Readonly<{
   devClientFlags: Readonly<Record<string, '1'>>;
   metroPort: number;
   build: Readonly<{
-    /** The transient user service that runs Gradle outside the process tree of whoever started the build. */
+    /** The transient user service that waits for a calm host then runs Gradle, outside the tree of whoever started it. */
+    serviceUnit: string;
+    /** The transient scope that caps Gradle and everything it starts. */
     unit: string;
     memoryHigh: string;
     memoryMax: string;
@@ -122,6 +124,7 @@ export const EMULATOR = {
   metroPort: 8081,
   // Build 5 of the spike, from a clean `android/`: 12 min, a peak of 5.9 GiB, never killed.
   build: {
+    serviceUnit: 'humanite-emulator-build',
     unit: 'humanite-gradle-build',
     memoryHigh: '5600M',
     memoryMax: '6G',
@@ -137,7 +140,7 @@ export const EMULATOR = {
       maxPressureAvg60: 10,
       samples: 3,
       intervalMs: 60_000,
-      maxWaitMs: 14_400_000,
+      maxWaitMs: 36_000_000,
     },
   },
   androidSdk: 'Android/Sdk',

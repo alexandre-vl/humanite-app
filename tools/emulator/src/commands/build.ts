@@ -1,75 +1,55 @@
-import { access, mkdir, readFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { APP_DIRECTORY } from '@huma/architecture';
 import type { ExitCode } from '@huma/kit/cli';
 import { ownRepository, statusEntries } from '@huma/kit/git';
-import { capture, describeExit, runAttached } from '@huma/kit/process';
-import { readApkManifest } from '../android/apk.ts';
-import { hostCalmWatch, waitForCalm } from '../host/memory.ts';
+import type { Environment } from '@huma/kit/process';
+import { capture, describeExit, run, runAttached } from '@huma/kit/process';
+import type { EmulatorConfig } from '../config.ts';
 import type { Session } from '../session.ts';
-import { aapt2Executable, androidHome, appRoot, cacheDirectory, debugApk } from '../session.ts';
-import { toolDirectory } from '../tools.ts';
+import { appRoot, cacheDirectory } from '../session.ts';
 
-export type BuildOptions = Readonly<{ clean: boolean }>;
-
-/** Where Gradle writes what the build prints: a user service has no terminal. */
-const buildLog = (session: Session): string =>
-  join(cacheDirectory(session.root), `gradle-${new Date().toISOString().replaceAll(':', '-')}.log`);
-
-/**
- * The arguments of `systemd-run` that build the debug APK for the emulator's ABI in a transient user service, capped as
- * the spike measured it safe: out of the process tree of whoever started it, without swap, the Gradle JVM the first
- * process the kernel kills, and the CPUs ninja may use bound by affinity since it ignores the Gradle workers.
- */
-export function buildUnitArguments(
-  session: Session,
-  paths: Readonly<{ javaHome: string; log: string }>,
-): readonly string[] {
-  const { build } = session.config;
-  return [
-    '--user',
-    `--unit=${build.unit}`,
-    '--collect',
-    '--wait',
-    `--working-directory=${join(appRoot(session.root), 'android')}`,
-    `--property=MemoryHigh=${build.memoryHigh}`,
-    `--property=MemoryMax=${build.memoryMax}`,
-    '--property=MemorySwapMax=0',
-    `--property=CPUQuota=${build.cpuQuota}`,
-    `--property=StandardOutput=append:${paths.log}`,
-    `--property=StandardError=append:${paths.log}`,
-    `--setenv=ANDROID_HOME=${androidHome(session.config)}`,
-    `--setenv=JAVA_HOME=${paths.javaHome}`,
-    // Gradle runs node to resolve React Native and Expo: the one the workspace pins.
-    `--setenv=PATH=${[join(paths.javaHome, 'bin'), join(session.root, 'node_modules', '.bin'), '/usr/bin', '/bin'].join(':')}`,
-    '--',
-    'taskset',
-    '-c',
-    build.cpuAffinity,
-    'choom',
-    '-n',
-    '1000',
-    '--',
-    './gradlew',
-    'assembleDebug',
-    `-PreactNativeArchitectures=${build.architectures}`,
-    '-Pkotlin.compiler.execution.strategy=in-process',
-    `-Dorg.gradle.jvmargs=${build.gradleJvmArgs}`,
-    '--no-daemon',
-    '--no-parallel',
-    '--no-watch-fs',
-    `--max-workers=${String(build.gradleWorkers)}`,
-    '--console=plain',
-  ];
-}
+export type BuildOptions = Readonly<{
+  clean: boolean;
+  /** The command that waits for a calm host and runs Gradle, `emulator:gradle`, as absolute paths. */
+  gradleCommand: readonly [string, ...string[]];
+}>;
 
 /** The arguments of Expo's CLI that generate `android/` from the app's configuration, installing nothing. */
-export const prebuildArguments = (options: BuildOptions): readonly string[] => [
+export const prebuildArguments = (options: Pick<BuildOptions, 'clean'>): readonly string[] => [
   'prebuild',
   '--platform',
   'android',
   '--no-install',
   ...(options.clean ? [] : ['--no-clean']),
+];
+
+/** Where the build writes what it prints: a user service has no terminal. */
+export const buildLog = (session: Session, startedAt: Date): string =>
+  join(cacheDirectory(session.root), `build-${startedAt.toISOString().replaceAll(':', '-')}.log`);
+
+/**
+ * The arguments of `systemd-run` that run the rest of the build in a transient user service: owned by the user's
+ * service manager, it outlives the process that started it, which an agent's tool may kill when the host runs low on
+ * memory while the build still waits for its calm window.
+ */
+export const buildServiceArguments = (
+  session: Session,
+  paths: Readonly<{ log: string; command: readonly [string, ...string[]]; environment: Environment }>,
+): readonly string[] => [
+  '--user',
+  `--unit=${session.config.build.serviceUnit}`,
+  '--collect',
+  '--quiet',
+  `--working-directory=${session.root}`,
+  `--property=StandardOutput=append:${paths.log}`,
+  `--property=StandardError=append:${paths.log}`,
+  ...['PATH', 'HOME', 'XDG_RUNTIME_DIR'].flatMap((name) => {
+    const value = paths.environment[name];
+    return value === undefined ? [] : [`--setenv=${name}=${value}`];
+  }),
+  '--',
+  ...paths.command,
 ];
 
 /** Paths of the app with a change git sees: prebuild may rewrite none of them, since `android/` alone is generated. */
@@ -78,15 +58,25 @@ async function changedAppPaths(session: Session): Promise<ReadonlySet<string>> {
   return new Set(entries.map((entry) => entry.path).filter((path) => path.startsWith(`${APP_DIRECTORY}/`)));
 }
 
+/** The user unit of the build still running, its watcher service or the scope of Gradle; `null` when none runs. */
+export async function runningBuildUnit(root: string, config: EmulatorConfig): Promise<string | null> {
+  for (const unit of [`${config.build.serviceUnit}.service`, `${config.build.unit}.scope`]) {
+    const active = await capture('systemctl', ['--user', 'is-active', '--quiet', unit], { cwd: root });
+    if (active.exit.kind === 'exited' && active.exit.code === 0) {
+      return unit;
+    }
+  }
+  return null;
+}
+
 /**
- * `android/` from the app's configuration, then, once the shared host is calm, the debug APK built by Gradle in its
- * capped user service; its manifest is read back to show what was built.
+ * `android/` from the app's configuration, then the rest of the build handed to a transient user service, which waits
+ * for a calm host and runs Gradle: this command returns once the service has started, with the log to follow.
  */
 export async function emulatorBuild(session: Session, options: BuildOptions): Promise<ExitCode> {
-  const unit = `${session.config.build.unit}.service`;
-  const active = await capture('systemctl', ['--user', 'is-active', '--quiet', unit], { cwd: session.root });
-  if (active.exit.kind === 'exited' && active.exit.code === 0) {
-    session.print(`✗ un build tourne déjà dans ${unit} : attendre sa fin (journalctl --user -u ${unit})`);
+  const running = await runningBuildUnit(session.root, session.config);
+  if (running !== null) {
+    session.print(`✗ un build tourne déjà dans ${running} : pnpm emulator:status pour le suivre`);
     return 1;
   }
   const before = await changedAppPaths(session);
@@ -107,39 +97,15 @@ export async function emulatorBuild(session: Session, options: BuildOptions): Pr
     session.print(`✗ prebuild a réécrit des fichiers suivis : ${rewritten.join(', ')}`);
     return 1;
   }
-  session.print('▶ attente d’un créneau calme sur l’hôte');
-  const calm = await waitForCalm(
-    session.config.build.calm,
-    hostCalmWatch(session.signal, (sample, missed, calmInARow) => {
-      const state =
-        missed.length === 0
-          ? `calme ${String(calmInARow)}/${String(session.config.build.calm.samples)}`
-          : missed.join(', ');
-      session.print(`  ${new Date().toISOString()} ${state}`);
-    }),
-  );
-  if (!calm) {
-    session.print('✗ aucun créneau calme dans le délai : relancer plus tard');
-    return 1;
-  }
-  const log = buildLog(session);
+  const log = buildLog(session, new Date());
   await mkdir(cacheDirectory(session.root), { recursive: true });
-  const javaHome = await toolDirectory(session, 'java');
-  session.print(`▶ Gradle dans ${unit}, journal ${log}`);
-  const gradle = await runAttached('systemd-run', buildUnitArguments(session, { javaHome, log }), {
-    cwd: session.root,
-    signal: session.signal,
-  });
-  if (gradle.kind !== 'exited' || gradle.code !== 0) {
-    const tail = (await readFile(log, 'utf8').catch(() => '')).split('\n').slice(-30).join('\n');
-    session.print(`${tail}\n✗ Gradle : ${describeExit(gradle)}`);
-    return 1;
-  }
-  const apk = debugApk(session.root);
-  await access(apk);
-  const manifest = await readApkManifest(aapt2Executable(session.config), apk, session.root);
+  await run(
+    'systemd-run',
+    buildServiceArguments(session, { log, command: options.gradleCommand, environment: process.env }),
+    { cwd: session.root, signal: session.signal, timeoutMs: 60_000 },
+  );
   session.print(
-    `✓ ${apk} : ${manifest.packageName}, targetSdk ${String(manifest.targetSdk)}, enableOnBackInvokedCallback ${String(manifest.backInvokedCallback)}`,
+    `✓ build confié à ${session.config.build.serviceUnit}.service : créneau calme, puis Gradle plafonné\n  journal : ${log}\n  suivi : pnpm emulator:status`,
   );
   return 0;
 }

@@ -1,9 +1,10 @@
 import { expect, test } from 'vitest';
 import { EMULATOR } from '../config.ts';
 import { commandSession } from '../session.ts';
-import { buildUnitArguments, prebuildArguments } from './build.ts';
+import { buildServiceArguments, prebuildArguments } from './build.ts';
 import { downSteps } from './down.ts';
 import { devClientLink, maestroArguments } from './e2e.ts';
+import { gradleEnvironment, gradleScopeArguments } from './gradle.ts';
 import { metroArguments, metroEnvironment } from './metro.ts';
 import { upSteps } from './up.ts';
 
@@ -39,24 +40,49 @@ test('down removes the container only once the guard has seen it, and ends on th
   ]);
 });
 
-test('Gradle runs in a capped user service, without swap, first to be killed, on bound CPUs; never through expo run', () => {
-  const args = buildUnitArguments(session, { javaHome: '/java', log: '/work/humanite/build.log' });
-  expect(args.slice(0, 5)).toEqual([
+test('the build outlives whoever starts it: the wait and Gradle run in a transient user service', () => {
+  const args = buildServiceArguments(session, {
+    log: '/work/humanite/node_modules/.cache/emulator/build.log',
+    command: ['/work/humanite/node_modules/.bin/node', '/work/humanite/tools/governance/src/cli/emulator-gradle.ts'],
+    environment: { PATH: '/usr/bin:/bin', HOME: '/home/user', SECRET: 'x' },
+  });
+  expect(args).toEqual([
     '--user',
+    '--unit=humanite-emulator-build',
+    '--collect',
+    '--quiet',
+    '--working-directory=/work/humanite',
+    '--property=StandardOutput=append:/work/humanite/node_modules/.cache/emulator/build.log',
+    '--property=StandardError=append:/work/humanite/node_modules/.cache/emulator/build.log',
+    '--setenv=PATH=/usr/bin:/bin',
+    '--setenv=HOME=/home/user',
+    '--',
+    '/work/humanite/node_modules/.bin/node',
+    '/work/humanite/tools/governance/src/cli/emulator-gradle.ts',
+  ]);
+  expect(prebuildArguments({ clean: false })).toEqual([
+    'prebuild',
+    '--platform',
+    'android',
+    '--no-install',
+    '--no-clean',
+  ]);
+  expect(prebuildArguments({ clean: true })).toEqual(['prebuild', '--platform', 'android', '--no-install']);
+});
+
+test('Gradle runs in a capped scope, without swap, first to be killed, on bound CPUs; never through expo run', () => {
+  const args = gradleScopeArguments(session);
+  expect(args.slice(0, args.indexOf('--'))).toEqual([
+    '--user',
+    '--scope',
     '--unit=humanite-gradle-build',
     '--collect',
-    '--wait',
-    '--working-directory=/work/humanite/apps/mobile/android',
+    '--quiet',
+    '--property=MemoryHigh=5600M',
+    '--property=MemoryMax=6G',
+    '--property=MemorySwapMax=0',
+    '--property=CPUQuota=600%',
   ]);
-  expect(args).toEqual(
-    expect.arrayContaining([
-      '--property=MemoryHigh=5600M',
-      '--property=MemoryMax=6G',
-      '--property=MemorySwapMax=0',
-      '--property=CPUQuota=600%',
-      '--setenv=PATH=/java/bin:/work/humanite/node_modules/.bin:/usr/bin:/bin',
-    ]),
-  );
   expect(args.slice(args.indexOf('--'))).toEqual([
     '--',
     'taskset',
@@ -78,14 +104,10 @@ test('Gradle runs in a capped user service, without swap, first to be killed, on
     '--console=plain',
   ]);
   expect(args.join(' ')).not.toContain('run:android');
-  expect(prebuildArguments({ clean: false })).toEqual([
-    'prebuild',
-    '--platform',
-    'android',
-    '--no-install',
-    '--no-clean',
-  ]);
-  expect(prebuildArguments({ clean: true })).toEqual(['prebuild', '--platform', 'android', '--no-install']);
+  expect(gradleEnvironment(session, '/java', { PATH: '/usr/bin' })).toMatchObject({
+    JAVA_HOME: '/java',
+    PATH: '/java/bin:/work/humanite/node_modules/.bin:/usr/bin',
+  });
 });
 
 test('Metro serves the loopback over IPv4, never in CI mode, without network requests', () => {

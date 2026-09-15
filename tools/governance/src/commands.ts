@@ -68,7 +68,7 @@ export const COMMANDS = {
   'emulator:build': {
     argv: ['node', cli('emulator-build')],
     audience: 'everyone',
-    summary: 'construit le dev client Android dans un service utilisateur plafonné, une fois l’hôte calme',
+    summary: 'génère android/ puis confie à un service utilisateur l’attente d’un hôte calme et le build natif',
   },
   'emulator:down': {
     argv: ['node', cli('emulator-down')],
@@ -79,6 +79,11 @@ export const COMMANDS = {
     argv: ['node', cli('emulator-e2e')],
     audience: 'everyone',
     summary: 'lance les parcours Maestro de l’app sur l’émulateur',
+  },
+  'emulator:gradle': {
+    argv: ['node', cli('emulator-gradle')],
+    audience: 'everyone',
+    summary: 'attend un hôte calme, puis construit l’APK de l’émulateur avec Gradle dans une scope plafonnée',
   },
   'emulator:install': {
     argv: ['node', cli('emulator-install')],
