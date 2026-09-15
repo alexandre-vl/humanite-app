@@ -145,6 +145,8 @@ export const BINDINGS = {
         'adr/valid-merge-acceptance',
         'adr/decision-content-changed',
         'adr/decision-content-changed-staged',
+        'decide/valid-message-accepted',
+        'decide/valid-message-superseding',
       ],
       R7: [
         'adr/frozen-modified',

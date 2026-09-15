@@ -1,15 +1,19 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Bindings } from '@huma/adr/bindings';
+import type { AdrId } from '@huma/adr/identifiers';
+import { adrNumber, formatAdrId } from '@huma/adr/identifiers';
 import { ACCEPTED, adrDocument, ONE, PROPOSED, ZERO } from '@huma/adr/proof-documents';
+import type { DecidedStatus } from '@huma/adr/statuses';
 import type { FileTree, FixtureContext, RepositoryPlan } from '@huma/fixtures';
 import { createRepository, FIXTURE_IDENTITY, fixtureFactory } from '@huma/fixtures';
 import type { GitHookCode } from '@huma/git-hooks/checks';
 import { commitMessage } from '@huma/git-hooks/flows';
 import { temporaryDirectory } from '@huma/kit/fs';
 import { isolatedRepository } from '@huma/kit/git';
+import type { RepoPath } from '@huma/kit/paths';
 import { commitPolicy } from '../commit-policy.ts';
-import { expectedRefs } from '../commit-refs.ts';
+import { decisionCommit, expectedRefs, refsForWorktree } from '../commit-refs.ts';
 
 const define = fixtureFactory<GitHookCode>();
 
@@ -56,6 +60,46 @@ const acceptedWith = (staged: FileTree): RepositoryPlan => ({
 });
 
 const CHANGED_SOURCE: FileTree = { 'src/a.ts': 'export const a = 1;\n' };
+
+const ADR_ZERO = formatAdrId(adrNumber(0));
+
+const ADR_ONE = formatAdrId(adrNumber(1));
+
+/** ADR-0000 governs the ADRs themselves, as it does in this workspace: every decision writes inside its scope. */
+const ADR_SCOPE: Bindings = { 'ADR-0000': { scope: { paths: ['docs/adr/**'] }, rules: { R1: ['proof/x'] } } };
+
+/** The message git composes from the arguments `adr:decide` prints: the subject, then the block of trailers. */
+const composedMessage = (argv: readonly string[]): string => {
+  const subject = argv[argv.indexOf('-m') + 1] ?? '';
+  const trailers = argv.flatMap((word, index) => (word === '--trailer' ? [argv[index + 1] ?? ''] : []));
+  return `${subject}\n\n${trailers.join('\n')}\n`;
+};
+
+/**
+ * Codes of the commit-msg hook for the commit `adr:decide` prints once the decision is written: its trailers come from
+ * the paths the decision wrote, read in the working tree, exactly as `decideInWorkspace` computes them.
+ */
+const decisionCitations =
+  (plan: RepositoryPlan, id: AdrId, status: DecidedStatus, written: readonly RepoPath[]) =>
+  async ({ signal }: FixtureContext): Promise<readonly GitHookCode[]> => {
+    await using directory = await temporaryDirectory('governance-decision');
+    const root = join(directory.path, 'depot');
+    await createRepository(root, plan, { signal });
+    const repository = isolatedRepository(root, { env: FIXTURE_IDENTITY, signal });
+    const messageFile = join(directory.path, 'COMMIT_EDITMSG');
+    await writeFile(
+      messageFile,
+      composedMessage(decisionCommit(id, status, await refsForWorktree(repository, written, ADR_SCOPE))),
+    );
+    const findings = await commitMessage({
+      repository,
+      messageFile,
+      editor: false,
+      policy: await commitPolicy(repository),
+      expectedRefs: async (base) => expectedRefs(repository, base, ADR_SCOPE),
+    });
+    return findings.map((finding) => finding.code);
+  };
 
 export const COMMIT_REFS_FIXTURES = [
   define(
@@ -107,6 +151,48 @@ export const COMMIT_REFS_FIXTURES = [
     citations(
       acceptedWith({ [ONE]: adrDocument({ title: 'Validation des données par Valibot', supersedes: 'ADR-0000' }) }),
       'docs(adr): proposer ADR-0001\n\nRefs: ADR-0000\nRefs: ADR-0001\n',
+    ),
+  ),
+  define(
+    'decide/valid-message-accepted',
+    'la commande de commit qu’affiche adr:decide après une acceptation',
+    [],
+    decisionCitations(
+      { commits: [{ files: { [ZERO]: PROPOSED, ...SOURCE } }], staged: { [ZERO]: ACCEPTED, ...SOURCE } },
+      ADR_ZERO,
+      'accepted',
+      [ZERO],
+    ),
+  ),
+  define(
+    'decide/valid-message-superseding',
+    'la commande de commit qu’affiche adr:decide quand l’ADR accepté en remplace un autre',
+    [],
+    decisionCitations(
+      {
+        commits: [
+          { files: { [ZERO]: ACCEPTED, ...SOURCE } },
+          {
+            files: {
+              [ZERO]: ACCEPTED,
+              [ONE]: adrDocument({ title: 'Validation des données par Valibot', supersedes: 'ADR-0000' }),
+              ...SOURCE,
+            },
+          },
+        ],
+        staged: {
+          [ZERO]: ACCEPTED,
+          [ONE]: adrDocument({
+            title: 'Validation des données par Valibot',
+            status: 'accepted',
+            supersedes: 'ADR-0000',
+          }),
+          ...SOURCE,
+        },
+      },
+      ADR_ONE,
+      'accepted',
+      [ONE],
     ),
   ),
   define(

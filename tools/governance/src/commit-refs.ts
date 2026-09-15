@@ -1,4 +1,7 @@
 import type { Bindings } from '@huma/adr/bindings';
+import type { AdrDocument } from '@huma/adr/document';
+import type { AdrId } from '@huma/adr/identifiers';
+import type { DecidedStatus } from '@huma/adr/statuses';
 import { effectiveStatuses, readCollection } from '@huma/adr/collection';
 import { compileGlob } from '@huma/adr/globs';
 import { formatAdrId, parseAdrId } from '@huma/adr/identifiers';
@@ -7,19 +10,31 @@ import { readSnapshot } from '@huma/adr/snapshot';
 import type { ExpectedRefs } from '@huma/git-hooks/message';
 import type { GitRepository } from '@huma/kit/git';
 import { stagedPaths } from '@huma/kit/git';
+import type { RepoPath } from '@huma/kit/paths';
+import { compareText } from '@huma/kit/text';
 import { BINDINGS } from './bindings.ts';
 
+/** What the message of a decision says it did. */
+const VERBS = { accepted: 'accepter', rejected: 'rejeter' } as const satisfies Readonly<Record<DecidedStatus, string>>;
+
+/** The commit that records a decision: the human runs it, so it carries every trailer the commit-msg hook requires. */
+export const decisionCommit = (id: AdrId, status: DecidedStatus, refs: readonly string[]): readonly string[] => [
+  'git',
+  'commit',
+  '-m',
+  `docs(adr): ${VERBS[status]} ${id}`,
+  ...refs.flatMap((ref) => ['--trailer', `Refs: ${ref}`]),
+];
+
 /**
- * The ADRs a commit of the index on top of `base` cites: every ADR accepted in the index whose scope holds a changed
- * path, and every ADR whose file changes. It may also cite the ADRs a changed ADR supersedes.
+ * The ADRs a change of `paths` cites: every ADR the collection holds as accepted whose scope holds one of them, and
+ * every ADR whose own file changes. It may also cite the ADRs a changed ADR supersedes.
  */
-export async function expectedRefs(
-  repository: GitRepository,
-  base: string,
+function refsForPaths(
+  paths: readonly RepoPath[],
+  documents: readonly AdrDocument[],
   bindings: Bindings = BINDINGS,
-): Promise<ExpectedRefs> {
-  const paths = await stagedPaths(repository, base);
-  const { documents } = readCollection(await readSnapshot(repository, 'index'));
+): ExpectedRefs {
   const statuses = effectiveStatuses(documents);
   const required = new Map<string, string>();
   for (const [id, binding] of Object.entries(bindings)) {
@@ -44,4 +59,30 @@ export async function expectedRefs(
     }
   }
   return { required, allowed };
+}
+
+/**
+ * The ADRs a commit of the index on top of `base` cites, read from the index: what the commit-msg hook requires of the
+ * message it is about to accept.
+ */
+export async function expectedRefs(
+  repository: GitRepository,
+  base: string,
+  bindings: Bindings = BINDINGS,
+): Promise<ExpectedRefs> {
+  const { documents } = readCollection(await readSnapshot(repository, 'index'));
+  return refsForPaths(await stagedPaths(repository, base), documents, bindings);
+}
+
+/**
+ * The `Refs:` trailers a commit of `paths` must carry, sorted and without repetition, as the commit-msg hook reads
+ * them. The collection comes from the working tree: a decision names the ADRs of the state it just wrote.
+ */
+export async function refsForWorktree(
+  repository: GitRepository,
+  paths: readonly RepoPath[],
+  bindings: Bindings = BINDINGS,
+): Promise<readonly string[]> {
+  const { documents } = readCollection(await readSnapshot(repository, 'worktree'));
+  return [...refsForPaths(paths, documents, bindings).required.keys()].toSorted(compareText);
 }
