@@ -19,6 +19,10 @@ const TABLE = {
     summary: 'le lockfile suit les manifestes',
     message: '{name} déclaré {specifier}, verrouillé {locked} : relancer pnpm install',
   },
+  'deps/importer-extra': {
+    summary: 'le lockfile ne résout pour un paquet que les dépendances qu’il déclare',
+    message: '{name} verrouillé mais déclaré par aucun manifeste de ce paquet : relancer pnpm install',
+  },
   'deps/catalog-range': {
     summary: 'le catalog épingle des versions exactes',
     message: '{name} : {version} n’est pas une version exacte',
@@ -30,6 +34,10 @@ const TABLE = {
   'deps/catalog-unused': {
     summary: 'chaque entrée du catalog sert à un paquet',
     message: '{name} n’est déclaré par aucun paquet : le retirer du catalog',
+  },
+  'deps/catalog-missing': {
+    summary: 'chaque dépendance en catalog: nomme une entrée du catalog',
+    message: '{name} déclaré catalog: mais absent du catalog : l’ajouter à pnpm-workspace.yaml',
   },
   'deps/specifier-form': {
     summary: 'une dépendance passe par le catalog ou le workspace',

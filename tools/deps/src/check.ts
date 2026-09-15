@@ -113,6 +113,9 @@ function checkPackage(
       if (specifier !== expected) {
         findings.push(depsFinding('deps/specifier-form', manifest, { name, specifier, expected }));
       }
+      if (target === undefined && specifier === 'catalog:' && !workspace.catalog.has(name)) {
+        findings.push(depsFinding('deps/catalog-missing', manifest, { name }));
+      }
       const entry = locked.get(name);
       if (kind !== 'peerDependencies' && entry !== undefined && entry.specifier !== specifier) {
         findings.push(depsFinding('deps/importer-stale', manifest, { name, specifier, locked: entry.specifier }));
@@ -127,6 +130,10 @@ function checkPackage(
     findings.push(depsFinding('deps/root-unknown', manifest, { directory: each.directory }));
   }
   for (const [name, entry] of locked) {
+    // `devEngines.runtime` (`node`, `specifier: runtime:…`) is the runtime pnpm manages, not a manifest dependency.
+    if (!declared.has(name) && !entry.specifier.startsWith('runtime:')) {
+      findings.push(depsFinding('deps/importer-extra', manifest, { name }));
+    }
     const peers: ReadonlyMap<string, boolean> =
       workspace.lockfile.peers.get(`${name}@${resolvedVersion(entry.version)}`) ?? new Map();
     for (const [peer, optional] of peers) {

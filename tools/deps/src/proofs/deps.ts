@@ -293,6 +293,29 @@ export const DEPS_FIXTURES = [
     ),
   ),
   define(
+    'deps/catalog-missing',
+    'une dépendance en catalog: qu’aucune entrée du catalog ne nomme',
+    ['deps/catalog-missing'],
+    checked(
+      withPackage('tools/kit', (each) => ({
+        ...each,
+        specifiers: specifiers({ dependencies: { prettier: 'catalog:', 'left-pad': 'catalog:' } }),
+      })),
+    ),
+  ),
+  define(
+    'deps/importer-extra',
+    'un lockfile qui garde une dépendance retirée du manifeste',
+    ['deps/importer-extra'],
+    checked(withImporter('tools/kit', { 'left-pad': { specifier: 'catalog:', version: '1.3.0' } })),
+  ),
+  define(
+    'deps/valid-runtime',
+    'le runtime que pnpm gère par devEngines n’est pas une dépendance de trop',
+    [],
+    checked(withImporter('.', { node: { specifier: 'runtime:24.17.0', version: 'runtime:24.17.0' } })),
+  ),
+  define(
     'deps/specifier-form',
     'une dépendance du workspace déclarée par version',
     ['deps/specifier-form', 'deps/importer-stale'],
