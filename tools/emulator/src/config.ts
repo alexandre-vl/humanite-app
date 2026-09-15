@@ -41,12 +41,16 @@ export type EmulatorConfig = Readonly<{
     unit: string;
     installDirectory: `/${string}`;
     runDirectory: `/run/${string}`;
+    /** Between two runs of the timer. */
     tickSeconds: number;
-    runTimeoutSeconds: number;
+    /** What one run takes once it holds the lock: two snapshots of the host and the writes between them. */
+    restoreSeconds: number;
     /** The guard restores the host even when Android has not finished booting by then. */
     bootDeadlineSeconds: number;
     /** How long one run waits for Android's boot, to restore the host as soon as it ends, before leaving it to the next. */
     bootWaitSeconds: number;
+    /** How long `docker run` or `docker rm --force` may take while it holds the lock of the guard. */
+    containerChangeSeconds: number;
   }>;
   lmkd: Readonly<{ minfreeLevelsProperty: string; reinitProperty: string }>;
   /** Query parameters of the dev client's deep link that skip its onboarding, its launcher and its floating button. */
@@ -59,8 +63,8 @@ export type EmulatorConfig = Readonly<{
     unit: string;
     memoryHigh: string;
     memoryMax: string;
-    cpuQuota: `${number}%`;
-    /** CPUs Gradle may use: ninja sizes its jobs from the affinity mask and ignores the Gradle workers. */
+    /** CPUs Gradle may use: ninja sizes its jobs from the affinity mask and ignores the Gradle workers, and the
+     * scope caps the group at what that many CPUs give. */
     cpuAffinity: string;
     gradleJvmArgs: string;
     gradleWorkers: number;
@@ -107,9 +111,10 @@ export const EMULATOR = {
     installDirectory: '/usr/local/libexec/humanite-redroid',
     runDirectory: '/run/humanite-redroid',
     tickSeconds: 30,
-    runTimeoutSeconds: 180,
+    restoreSeconds: 180,
     bootDeadlineSeconds: 180,
     bootWaitSeconds: 45,
+    containerChangeSeconds: 300,
   },
   // lmkd reads the pressure of the whole host and killed the foreground app at 0.9 GiB used out of 3: minfree levels
   // make it judge free memory instead, while the container's own limit stays the safeguard.
@@ -125,7 +130,6 @@ export const EMULATOR = {
     unit: 'humanite-gradle-build',
     memoryHigh: '5600M',
     memoryMax: '6G',
-    cpuQuota: '600%',
     cpuAffinity: '0-1',
     gradleJvmArgs: '-Xmx3g -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8',
     gradleWorkers: 1,

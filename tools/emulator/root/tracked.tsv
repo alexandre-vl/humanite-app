@@ -2,7 +2,8 @@
 setting	container	humanite-redroid15
 setting	unit	humanite-redroid-guard
 setting	tick_s	30
-setting	run_timeout_s	180
+setting	run_timeout_s	525
+setting	lock_wait_s	300
 setting	boot_deadline_s	180
 setting	boot_wait_s	45
 setting	apply_order	superopts mountroot sysctl procattr sysfsattr sysfsval tracefsattr tracefsval tracefs-instance

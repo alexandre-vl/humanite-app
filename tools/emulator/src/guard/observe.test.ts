@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 import { EMULATOR } from '../config.ts';
 import type { GuardObservation } from './observe.ts';
 import { currentStatus, guardProblems } from './observe.ts';
+import { guardStaleSeconds } from './timing.ts';
 import type { GuardStatus } from './status.ts';
 
 const BOOT = 'c782471d-2ec0-48ae-af2b-d25ccc4cf445';
@@ -56,9 +57,7 @@ test('names what keeps the guard from protecting a session', () => {
   ]);
   expect(codes({ status: { unreadable: 'statut du garde : format inconnu' } })).toEqual(['emulator/guard-status']);
   expect(codes({ bootId: 'another-boot' })).toEqual(['emulator/guard-status']);
-  expect(codes({ now: 1_100 + EMULATOR.guard.tickSeconds + EMULATOR.guard.runTimeoutSeconds + 1 })).toEqual([
-    'emulator/guard-stale',
-  ]);
+  expect(codes({ now: 1_100 + guardStaleSeconds(EMULATOR) + 1 })).toEqual(['emulator/guard-stale']);
   expect(codes({ installed: new Map([...observation().installed, ['lib.sh', 'changed']]) })).toEqual([
     'emulator/guard-scripts',
   ]);

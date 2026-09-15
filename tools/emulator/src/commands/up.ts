@@ -7,13 +7,13 @@ import {
   dockerContext,
   dockerObjectExists,
   dockerUnderGuardLock,
-  guardRunWindowMs,
   imageFindings,
   inspectContainer,
   inspectImage,
   runArguments,
   runDocker,
 } from '../docker.ts';
+import { guardRunWindowMs } from '../guard/timing.ts';
 import { checkInstall } from '../guard/install.ts';
 import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
 import { armCommands, binderCommands, installCommands, repairCommands } from '../guard/root-commands.ts';
@@ -93,7 +93,7 @@ export function upSteps(session: Session): readonly Step[] {
       summary: 'échantillon de l’hôte pris avant Android',
       check: async () => {
         const container = await inspectContainer(context, config.container);
-        const reference = await readHostReference(session);
+        const reference = await readHostReference();
         if (container !== null) {
           return reference === null
             ? blocked(`conteneur ${container.status} sans échantillon d’avant Android : ${RESTART}`)
@@ -103,12 +103,12 @@ export function upSteps(session: Session): readonly Step[] {
         if (residue.length > 0) {
           return blocked(residueFindings(residue), repairCommands(config));
         }
-        return Date.now() - (await hostReferenceTakenAt(session)) < REFERENCE_FRESH_MS
+        return Date.now() - (await hostReferenceTakenAt()) < REFERENCE_FRESH_MS
           ? done('pris à l’instant')
           : todo('à prendre');
       },
       apply: async () => {
-        await writeHostReference(session);
+        await writeHostReference();
       },
       settleMs: 0,
     },
@@ -149,7 +149,7 @@ export function upSteps(session: Session): readonly Step[] {
           : blocked(`conteneur ${container.status} : ${RESTART}`);
       },
       apply: async () => {
-        await dockerUnderGuardLock(session, runArguments(config), guardRunWindowMs(session) + 60_000);
+        await dockerUnderGuardLock(session, runArguments(config));
       },
       settleMs: 30_000,
     },
@@ -181,10 +181,10 @@ export function upSteps(session: Session): readonly Step[] {
           : todo(`phase ${status.phase} (${status.mode})`);
       },
       apply: null,
-      settleMs: 2 * guardRunWindowMs(session),
+      settleMs: 2 * guardRunWindowMs(config),
     },
     precondition('host-restored', 'hôte identique à l’échantillon d’avant Android, relu sans root', async () => {
-      const reference = await readHostReference(session);
+      const reference = await readHostReference();
       if (reference === null) {
         return blocked(`aucun échantillon d’avant Android : ${RESTART}`);
       }

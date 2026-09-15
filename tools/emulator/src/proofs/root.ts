@@ -39,6 +39,7 @@ const TRACKED: readonly Row[] = [
   ['setting', 'unit', 'redroid-fixture-guard'],
   ['setting', 'tick_s', '30'],
   ['setting', 'run_timeout_s', '120'],
+  ['setting', 'lock_wait_s', '60'],
   ['setting', 'boot_deadline_s', '180'],
   ['setting', 'boot_wait_s', '60'],
   ['setting', 'apply_order', SNAPSHOT_KINDS.join(' ')],

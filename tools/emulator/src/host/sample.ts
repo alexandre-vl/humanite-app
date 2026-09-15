@@ -83,6 +83,11 @@ export async function sampleHost(): Promise<HostSample> {
 const sampledValue = (sample: HostSample, write: AndroidWrite): string | null =>
   SAMPLED_KINDS.has(write.kind) ? (sample.get(recordId(write.kind, write.key)) ?? ABSENT) : null;
 
+/** The entries of the table a sample never holds: tracefs is root's alone, and so are its instances. */
+export const UNSAMPLED_WRITES: readonly AndroidWrite[] = ANDROID_WRITES.filter(
+  (write) => !SAMPLED_KINDS.has(write.kind),
+);
+
 /** A write of Android an earlier session left on the host, and the value it holds now. */
 export type Residual = Readonly<{ write: AndroidWrite; value: string }>;
 

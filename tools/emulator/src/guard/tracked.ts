@@ -1,6 +1,7 @@
 import { repoPath } from '@huma/kit/paths';
 import { keysOf } from '@huma/kit/records';
 import { SNAPSHOT_KINDS } from './kinds.ts';
+import { guardLockWaitSeconds, guardRunTimeoutSeconds } from './timing.ts';
 import {
   ANDROID_WILDCARDS,
   ANDROID_WRITES,
@@ -25,7 +26,8 @@ export function renderTrackedTable(config: EmulatorConfig): string {
     ['setting', 'container', config.container],
     ['setting', 'unit', config.guard.unit],
     ['setting', 'tick_s', String(config.guard.tickSeconds)],
-    ['setting', 'run_timeout_s', String(config.guard.runTimeoutSeconds)],
+    ['setting', 'run_timeout_s', String(guardRunTimeoutSeconds(config))],
+    ['setting', 'lock_wait_s', String(guardLockWaitSeconds(config))],
     ['setting', 'boot_deadline_s', String(config.guard.bootDeadlineSeconds)],
     ['setting', 'boot_wait_s', String(config.guard.bootWaitSeconds)],
     ['setting', 'apply_order', SNAPSHOT_KINDS.join(' ')],

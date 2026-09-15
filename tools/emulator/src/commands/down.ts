@@ -1,10 +1,12 @@
 import type { ExitCode } from '@huma/kit/cli';
 import { adbFor, captureAdb, deviceState } from '../android/adb.ts';
-import { dockerContext, dockerUnderGuardLock, guardRunWindowMs, inspectContainer } from '../docker.ts';
+import { dockerContext, dockerUnderGuardLock, inspectContainer } from '../docker.ts';
+import { guardAbsent } from '../guard/observe.ts';
+import { guardRunWindowMs } from '../guard/timing.ts';
 import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
 import { armCommands, disarmCommands, renderRootCommands, repairCommands } from '../guard/root-commands.ts';
-import { readHostReference } from '../host/reference.ts';
-import { driftFindings, residueFindings, residueOf, sampleHost } from '../host/sample.ts';
+import { clearHostReference, readHostReference } from '../host/reference.ts';
+import { driftFindings, residueFindings, residueOf, sampleHost, UNSAMPLED_WRITES } from '../host/sample.ts';
 import type { Session } from '../session.ts';
 import type { Step } from '../steps.ts';
 import { blocked, done, precondition, runReported, todo } from '../steps.ts';
@@ -27,8 +29,13 @@ export function downSteps(session: Session): readonly Step[] {
           return done('conteneur déjà absent');
         }
         const observation = await observeGuard(config);
+        // Nothing to wait for when no guard answers for this boot of the host: neither arming nor repairing is
+        // possible while the container exists, so waiting here would leave `down` no way out at all.
+        if (guardAbsent(observation)) {
+          return done('garde non armé : rien ne doit voir le conteneur partir');
+        }
         const status = currentStatus(observation);
-        if (status === null || observation.timer.activeState !== 'active') {
+        if (status === null) {
           return blocked(guardProblems(observation, config), armCommands(config));
         }
         return status.container.startedAt === container.startedAt
@@ -36,7 +43,7 @@ export function downSteps(session: Session): readonly Step[] {
           : todo('pas encore vu');
       },
       apply: null,
-      settleMs: guardRunWindowMs(session),
+      settleMs: guardRunWindowMs(config),
     },
     {
       id: 'adb-disconnected',
@@ -53,7 +60,7 @@ export function downSteps(session: Session): readonly Step[] {
       check: async () =>
         (await inspectContainer(context, config.container)) === null ? done('absent') : todo('présent'),
       apply: async () => {
-        await dockerUnderGuardLock(session, ['rm', '--force', config.container], guardRunWindowMs(session) + 60_000);
+        await dockerUnderGuardLock(session, ['rm', '--force', config.container]);
       },
       settleMs: 30_000,
     },
@@ -64,11 +71,14 @@ export function downSteps(session: Session): readonly Step[] {
         const observation = await observeGuard(config);
         const findings = guardProblems(observation, config);
         const status = currentStatus(observation);
-        if (status === null && observation.timer.activeState !== 'active') {
+        if (guardAbsent(observation)) {
           // No guard ran on this boot of the host: what a user can read of it must then hold no write of Android.
+          // What a user cannot read stays unknown, and only the guard, armed, ever answers for it.
           const residue = residueOf(await sampleHost());
           return residue.length === 0
-            ? done('garde non armé, aucune écriture d’Android sur l’hôte')
+            ? done(
+                `garde non armé : aucune écriture d’Android parmi ce qu’un utilisateur lit ; ${String(UNSAMPLED_WRITES.length)} entrées de tracefs ne le sont que par root`,
+              )
             : blocked(residueFindings(residue), repairCommands(config));
         }
         if (findings.length > 0 || status === null) {
@@ -84,15 +94,20 @@ export function downSteps(session: Session): readonly Step[] {
           : todo(`phase ${status.phase} (${status.mode})`);
       },
       apply: null,
-      settleMs: 2 * guardRunWindowMs(session),
+      settleMs: 2 * guardRunWindowMs(config),
     },
     precondition('host-restored', 'hôte identique à l’échantillon d’avant Android, relu sans root', async () => {
-      const reference = await readHostReference(session);
+      const reference = await readHostReference();
       if (reference === null) {
         return done('aucun échantillon d’avant Android à comparer');
       }
       const findings = driftFindings(reference, await sampleHost());
-      return findings.length === 0 ? done(`${String(reference.size)} entrées comparées`) : blocked(findings);
+      if (findings.length > 0) {
+        return blocked(findings);
+      }
+      // The session is over and the host answers for itself again: what is left of a sample means one is unfinished.
+      await clearHostReference();
+      return done(`${String(reference.size)} entrées comparées`);
     }),
   ];
 }

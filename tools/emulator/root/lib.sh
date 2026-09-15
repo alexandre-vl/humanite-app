@@ -457,8 +457,8 @@ ready_to_restore() {
 # ---------------------------------------------------------------------------------------------------------------------
 # The commands
 
-# lock: holds the lock of the guard for the rest of the process: runs never overlap, and `pnpm emulator:up` takes the
-# same lock around `docker run`.
+# lock SECONDS: holds the lock of the guard for the rest of the process: runs never overlap, and `pnpm emulator:up`
+# takes the same lock around `docker run`. The wait comes from tracked.tsv, so both sides wait on one number.
 lock() {
   exec 9>>"$RUN/lock"
   flock -w "$1" 9 || {
@@ -478,7 +478,7 @@ arm_run() {
   mkdir -p "$STATE"
   chmod 0755 "$RUN"
   chmod 0700 "$STATE"
-  lock 120
+  lock "$(setting lock_wait_s)"
   unit=$(setting unit)
   container=$(setting container)
   if systemctl is-active --quiet "$unit.timer"; then
@@ -525,7 +525,7 @@ arm_run() {
 guard_run() {
   MODE=tick
   require_root
-  lock 60
+  lock "$(setting lock_wait_s)"
   if [ ! -s "$STATE/reference.tsv" ]; then
     say "not armed: run arm.sh"
     exit 1
@@ -584,7 +584,7 @@ guard_run() {
 disarm_run() {
   MODE=stop
   require_root
-  lock 180
+  lock "$(setting lock_wait_s)"
   if [ ! -s "$STATE/reference.tsv" ]; then
     say "not armed"
     exit 1
@@ -625,7 +625,7 @@ repair_run() {
   mkdir -p "$STATE"
   chmod 0755 "$RUN"
   chmod 0700 "$STATE"
-  lock 120
+  lock "$(setting lock_wait_s)"
   container=$(setting container)
   container_state "$container" || exit 1
   if [ "$CONTAINER_STATUS" != absent ]; then

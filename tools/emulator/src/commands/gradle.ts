@@ -12,10 +12,18 @@ import { toolDirectory } from '../tools.ts';
 /** The last line the build prints when the APK is built. */
 const BUILT = '✓ APK construit';
 
+/** How many CPUs a `taskset` list names: `0-1` is two, `0,3` is two as well. */
+export const cpuCount = (affinity: string): number =>
+  affinity.split(',').reduce((total, part) => {
+    const [first = '', last = first] = part.split('-');
+    return total + (Number(last) - Number(first) + 1);
+  }, 0);
+
 /**
  * The arguments of `systemd-run` that run Gradle in a transient scope capped as the spike measured it safe: without
  * swap, the Gradle JVM the first process the kernel kills, and the CPUs ninja may use bound by affinity since it
- * ignores the Gradle workers. A scope keeps the caller's terminal, working directory and environment.
+ * ignores the Gradle workers. The quota of the scope says the same in the scheduler's terms, so a process that sets
+ * its own affinity gains nothing. A scope keeps the caller's terminal, working directory and environment.
  */
 export const gradleScopeArguments = (session: Session): readonly string[] => {
   const { build } = session.config;
@@ -28,7 +36,7 @@ export const gradleScopeArguments = (session: Session): readonly string[] => {
     `--property=MemoryHigh=${build.memoryHigh}`,
     `--property=MemoryMax=${build.memoryMax}`,
     '--property=MemorySwapMax=0',
-    `--property=CPUQuota=${build.cpuQuota}`,
+    `--property=CPUQuota=${String(cpuCount(build.cpuAffinity) * 100)}%`,
     '--',
     'taskset',
     '-c',

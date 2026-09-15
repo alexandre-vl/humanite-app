@@ -4,7 +4,7 @@ import { commandSession } from '../session.ts';
 import { buildServiceArguments, prebuildArguments } from './build.ts';
 import { downSteps } from './down.ts';
 import { devClientLink, maestroArguments } from './e2e.ts';
-import { gradleEnvironment, gradleScopeArguments } from './gradle.ts';
+import { cpuCount, gradleEnvironment, gradleScopeArguments } from './gradle.ts';
 import { metroArguments, metroEnvironment } from './metro.ts';
 import { upSteps } from './up.ts';
 
@@ -81,7 +81,7 @@ test('Gradle runs in a capped scope, without swap, first to be killed, on bound 
     '--property=MemoryHigh=5600M',
     '--property=MemoryMax=6G',
     '--property=MemorySwapMax=0',
-    '--property=CPUQuota=600%',
+    '--property=CPUQuota=200%',
   ]);
   expect(args.slice(args.indexOf('--'))).toEqual([
     '--',
@@ -108,6 +108,16 @@ test('Gradle runs in a capped scope, without swap, first to be killed, on bound 
     JAVA_HOME: '/java',
     PATH: '/java/bin:/work/humanite/node_modules/.bin:/usr/bin',
   });
+});
+
+test('the CPU cap of the scope says what the affinity says: one list of CPUs, two ways of binding it', () => {
+  expect(cpuCount('0-1')).toBe(2);
+  expect(cpuCount('3')).toBe(1);
+  expect(cpuCount('0,3')).toBe(2);
+  expect(cpuCount('0-1,4-6')).toBe(5);
+  expect(gradleScopeArguments(session)).toContain(
+    `--property=CPUQuota=${String(cpuCount(EMULATOR.build.cpuAffinity) * 100)}%`,
+  );
 });
 
 test('Metro serves the loopback over IPv4, never in CI mode, without network requests', () => {

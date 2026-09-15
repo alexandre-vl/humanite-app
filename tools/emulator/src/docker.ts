@@ -7,6 +7,7 @@ import { emulatorFinding } from './checks.ts';
 import type { EmulatorConfig } from './config.ts';
 import type { Session } from './session.ts';
 import { guardLock } from './session.ts';
+import { dockerLockWaitSeconds, dockerUnderLockMs } from './guard/timing.ts';
 import { CONFIG_SOURCE } from './sources.ts';
 
 /** The label that records, on the container, the fingerprint of the options it was created with. */
@@ -191,23 +192,15 @@ export async function runDocker(context: DockerContext, args: readonly string[],
 
 export const dockerContext = (session: Session): DockerContext => ({ cwd: session.root, signal: session.signal });
 
-/** The longest a run of the root guard lasts: its wait for Android's boot, then its time budget, plus a tick. */
-export const guardRunWindowMs = (session: Session): number =>
-  (session.config.guard.bootWaitSeconds + session.config.guard.runTimeoutSeconds + session.config.guard.tickSeconds) *
-  1000;
-
 /**
  * Runs docker holding the lock of the root guard, which `flock` waits for: no run of the guard can then snapshot the
- * host while the container starts or goes away.
+ * host while the container starts or goes away. It waits for the lock as long as a run of the guard may hold it, then
+ * gives the change of container its own time.
  */
-export async function dockerUnderGuardLock(
-  session: Session,
-  args: readonly string[],
-  timeoutMs: number,
-): Promise<void> {
-  const waitSeconds = String(Math.ceil(guardRunWindowMs(session) / 1000));
+export async function dockerUnderGuardLock(session: Session, args: readonly string[]): Promise<void> {
+  const waitSeconds = String(dockerLockWaitSeconds(session.config));
   await run('flock', ['--exclusive', '--wait', waitSeconds, guardLock(session.config), 'docker', ...args], {
     ...dockerContext(session),
-    timeoutMs,
+    timeoutMs: dockerUnderLockMs(session.config),
   });
 }

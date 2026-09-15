@@ -6,6 +6,7 @@ import { runText } from '@huma/kit/process';
 import type { EmulatorConfig } from '../config.ts';
 import { ROOT_SOURCE } from '../sources.ts';
 import { QUERY_TIMEOUT_MS } from '../tools.ts';
+import { guardStaleSeconds } from './timing.ts';
 import type { EmulatorCode, GuardCode } from '../checks.ts';
 import { emulatorFinding, guardFinding } from '../checks.ts';
 import type { RootFile } from './install.ts';
@@ -62,6 +63,10 @@ export async function observeGuard(config: EmulatorConfig): Promise<GuardObserva
   };
 }
 
+/** Whether no root guard answers for this boot of the host: none was armed, or its timer is gone. */
+export const guardAbsent = (observation: GuardObservation): boolean =>
+  currentStatus(observation) === null && observation.timer.activeState !== 'active';
+
 /** A readable status of this boot of the host, `null` otherwise. */
 export const currentStatus = (observation: GuardObservation): GuardStatus | null =>
   observation.status === null || 'unreadable' in observation.status || observation.status.bootId !== observation.bootId
@@ -99,7 +104,7 @@ export function guardProblems(
     findings.push(emulatorFinding('emulator/guard-status', ROOT_SOURCE, { text }));
     return findings;
   }
-  const limit = config.guard.tickSeconds + config.guard.runTimeoutSeconds;
+  const limit = guardStaleSeconds(config);
   if (observation.timer.activeState === 'active' && observation.now - status.runEnd > limit) {
     const seconds = String(observation.now - status.runEnd);
     findings.push(emulatorFinding('emulator/guard-stale', ROOT_SOURCE, { seconds, limit: String(limit) }));

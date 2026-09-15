@@ -1,6 +1,7 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatDiagnostic } from '@huma/kit/diagnostics';
+import { describeError } from '@huma/kit/errors';
 import type { RootCommands } from './guard/root-commands.ts';
 import { renderRootCommands } from './guard/root-commands.ts';
 import type { Session } from './session.ts';
@@ -34,6 +35,18 @@ export type StepsReport = Readonly<{
 
 const POLL_MS = 1_000;
 
+/**
+ * Runs `work` and turns anything it throws into evidence that the step is blocked: a docker that answers nothing, a
+ * `flock` that gives up, a file that vanished. The run then reports the step that stopped it, never a stack trace.
+ */
+async function attempt(work: () => Promise<Evidence>): Promise<Evidence> {
+  try {
+    return await work();
+  } catch (error) {
+    return blocked(describeError(error));
+  }
+}
+
 /** Checks `step` until its postcondition holds or `settleMs` has passed, and resolves the last evidence. */
 async function settle(step: Step, signal: AbortSignal, pollMs: number): Promise<Evidence> {
   const deadline = Date.now() + step.settleMs;
@@ -57,13 +70,13 @@ export async function runSteps(
   const pollMs = options.pollMs ?? POLL_MS;
   const completed: StepOutcome[] = [];
   for (const step of steps) {
-    const before = await step.check(options.signal);
+    const before = await attempt(async () => step.check(options.signal));
     let evidence = before;
     if (before.state === 'todo') {
-      if (step.apply !== null) {
-        await step.apply(options.signal);
-      }
-      evidence = await settle(step, options.signal, pollMs);
+      evidence = await attempt(async () => {
+        await step.apply?.(options.signal);
+        return settle(step, options.signal, pollMs);
+      });
     }
     if (evidence.state !== 'done') {
       const remedy = evidence.state === 'blocked' ? evidence.remedy : null;
