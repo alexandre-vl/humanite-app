@@ -42,6 +42,7 @@ export const FALLBACK_TOKENS = [
   'nsenter',
   'machinectl',
   'newgrp',
+  'chroot',
   'claudecode',
   'ai_agent',
   'claude_code_child_session',

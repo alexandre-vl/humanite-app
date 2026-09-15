@@ -126,6 +126,12 @@ const AWAITING_FOUNDATION_ADRS = [
   'agent/valid-git-reset',
   'agent/valid-git-worktree',
   'agent/valid-git-config-read',
+  'agent/python-decides',
+  'agent/perl-decides',
+  'agent/ruby-decides',
+  'agent/deno-eval-decides',
+  'agent/chroot',
+  'agent/valid-python-read',
   'claude-hook/stop-unverifiable-blocks',
   'claude-hook/stop-unverifiable-once',
 ];

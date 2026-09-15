@@ -237,6 +237,7 @@ const PRIVILEGED = new Set([
   'machinectl',
   'sg',
   'newgrp',
+  'chroot',
 ]);
 
 /** `systemd-run` starts a unit as anyone: as root, or inside a machine, it is one more way to ask for root. */
@@ -380,9 +381,24 @@ const SESSION_MASKING: CommandRule = {
 
 const PACKAGE_RUNNERS = new Set(['pnpm', 'npm', 'yarn', 'corepack', 'bun']);
 
-const CODE_RUNNERS = new Set(['node', 'tsx', 'bun', 'deno']);
+/** Interpreters that run a file given as an operand: an entry of the repository is one of them. */
+const FILE_RUNNERS = new Set(['node', 'tsx', 'bun', 'deno']);
 
-const EVAL_OPTIONS = new Set(['-e', '--eval', '-p', '--print']);
+/**
+ * Interpreters that run code written on the line, with the words that carry it. The word before the code is what
+ * tells them apart: `deno eval CODE` says `eval` where the others say `-e`.
+ */
+const CODE_RUNNERS: Readonly<Record<string, readonly string[]>> = {
+  node: ['-e', '--eval', '-p', '--print'],
+  tsx: ['-e', '--eval'],
+  bun: ['-e', '--eval', '-p', '--print'],
+  deno: ['-e', '--eval', 'eval'],
+  python: ['-c'],
+  python3: ['-c'],
+  perl: ['-e', '-E'],
+  ruby: ['-e'],
+  php: ['-r'],
+};
 
 /**
  * Refuses the scripts reserved to the human decision maker: run by script name, by entry file (directly or through
@@ -402,13 +418,12 @@ function humanOnlyRule(commands: readonly HumanOnlyCommand[]): CommandRule {
     matches: (command) => {
       const [program = '', ...args] = argv(command);
       const name = basename(program);
+      const carriers = CODE_RUNNERS[name] ?? [];
       return (
         (PACKAGE_RUNNERS.has(name) && args.some((arg) => scripts.has(arg))) ||
         entries.has(name) ||
-        (CODE_RUNNERS.has(name) &&
-          args.some(
-            (arg, index) => entries.has(basename(arg)) || (EVAL_OPTIONS.has(args[index - 1] ?? '') && namesOne(arg)),
-          ))
+        (FILE_RUNNERS.has(name) && args.some((arg) => entries.has(basename(arg)))) ||
+        args.some((arg, index) => carriers.includes(args[index - 1] ?? '') && namesOne(arg))
       );
     },
   };
