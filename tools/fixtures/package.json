@@ -7,12 +7,12 @@
     "./vitest": "./src/vitest.ts"
   },
   "dependencies": {
-    "@huma/kit": "workspace:*"
+    "@huma/kit": "workspace:*",
+    "vitest": "catalog:"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:"
+    "vite": "catalog:"
   }
 }

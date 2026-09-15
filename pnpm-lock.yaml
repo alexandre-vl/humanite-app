@@ -494,6 +494,9 @@ importers:
       '@huma/kit':
         specifier: workspace:*
         version: link:../kit
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
     devDependencies:
       '@huma/tsconfig':
         specifier: workspace:*
@@ -504,9 +507,6 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
 
   tools/git-hooks:
     dependencies:
