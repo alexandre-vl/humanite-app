@@ -388,9 +388,13 @@ type WrapperSpec = Readonly<{
 /** `npx` and the `exec` or `dlx` subcommand of a package runner. */
 const RUNNER: WrapperSpec = { values: ['-p', '--package', '--filter', '-F', '-C', '--dir'], scripts: ['-c', '--call'] };
 
-/** Commands that run the command given as their arguments. */
+/**
+ * Commands that run the command given as their arguments. A program missing from this table hides what it runs from
+ * every rule, so tracers, launchers and credential changers belong here even when a rule refuses them outright.
+ */
 const WRAPPERS: Readonly<Record<string, WrapperSpec>> = {
   builtin: {},
+  capsh: { values: ['--user', '--uid', '--gid', '--groups', '--caps', '--drop', '--keep', '--chroot'] },
   chrt: { operands: 1 },
   chroot: { values: ['--userspec', '--groups'], operands: 1 },
   command: {},
@@ -399,13 +403,42 @@ const WRAPPERS: Readonly<Record<string, WrapperSpec>> = {
   exec: { values: ['-a'] },
   flock: { values: ['-w', '--timeout', '-E', '--conflict-exit-code'], scripts: ['-c', '--command'], operands: 1 },
   ionice: { values: ['-c', '--class', '-n', '--classdata', '-p', '--pid', '-P', '--pgid', '-u', '--uid'] },
+  ltrace: { values: ['-e', '-o', '-p', '-l', '-s', '-u'] },
   nice: { values: ['-n', '--adjustment'] },
   nohup: {},
   npx: RUNNER,
+  nsenter: { values: ['-t', '--target', '-S', '--setuid', '-G', '--setgid', '--wd', '-r', '--root'] },
+  parallel: { values: ['-j', '--jobs', '-N', '-d', '--delimiter', '--results'] },
   pkexec: { values: ['--user'] },
+  proxychains: { values: ['-f'] },
+  proxychains4: { values: ['-f'] },
+  rlwrap: { values: ['-a', '-b', '-f', '-H', '-p', '-P', '-s', '-C'] },
   run0: { values: ['-u', '--user', '-g', '--group', '-D', '--chdir', '--setenv', '--property'] },
+  runuser: { values: ['-s', '--shell', '-g', '--group', '-u', '--user'], scripts: ['-c', '--command'] },
+  script: { values: ['-o', '--output-limit', '-t', '--timing', '-I', '-B'], scripts: ['-c', '--command'] },
+  setarch: { operands: 1 },
+  setpriv: {
+    values: [
+      '--reuid',
+      '--regid',
+      '--groups',
+      '--inh-caps',
+      '--ambient-caps',
+      '--bounding-set',
+      '--pdeathsig',
+      '--selinux-label',
+      '--apparmor-profile',
+    ],
+  },
   setsid: {},
+  sg: { scripts: ['-c'], operands: 1 },
+  ssh: {
+    values: ['-o', '-i', '-p', '-l', '-F', '-L', '-R', '-D', '-b', '-c', '-e', '-m', '-J', '-E', '-S', '-W'],
+    operands: 1,
+    joined: true,
+  },
   stdbuf: { values: ['-i', '-o', '-e', '--input', '--output', '--error'] },
+  strace: { values: ['-e', '-o', '-p', '-s', '-E', '-P', '-u', '-a', '-b', '-I', '-S'] },
   su: { values: ['-s', '--shell', '-g', '--group'], scripts: ['-c', '--command'] },
   sudo: {
     values: [
@@ -433,6 +466,9 @@ const WRAPPERS: Readonly<Record<string, WrapperSpec>> = {
   time: { values: ['-f', '--format', '-o', '--output'] },
   timeout: { values: ['-s', '--signal', '-k', '--kill-after'], operands: 1 },
   unbuffer: {},
+  unshare: {
+    values: ['-S', '--setuid', '-G', '--setgid', '--map-user', '--map-group', '--wd', '-R', '--root', '--propagation'],
+  },
   watch: { values: ['-n', '--interval'], joined: true },
   xargs: {
     values: ['-a', '--arg-file', '-d', '--delimiter', '-E', '-I', '-L', '--max-lines', '-n', '--max-args', '-P', '-s'],
@@ -452,6 +488,13 @@ const FIND_ACTIONS = new Set(['-exec', '-execdir', '-ok', '-okdir']);
 
 type Unwrapped = Readonly<{ command: SimpleCommand | null; scripts: readonly string[] }>;
 
+/**
+ * Whether `text` is a cluster of short options ending on one of `options`, which then takes the next word:
+ * `script -qc CMD` is `script -q -c CMD`, and reading `-qc` as an option that takes nothing hides `CMD`.
+ */
+const endsOnShortOption = (text: string, options: readonly string[]): boolean =>
+  /^-[A-Za-z]{2,}$/u.test(text) && options.some((option) => option.length === 2 && text.endsWith(option.slice(1)));
+
 /** The command a wrapper runs, and the command lines its options carry. */
 function unwrap(command: SimpleCommand, spec: WrapperSpec): Unwrapped {
   const words = command.words.slice(1);
@@ -468,13 +511,13 @@ function unwrap(command: SimpleCommand, spec: WrapperSpec): Unwrapped {
     if (assignment !== null) {
       assignments.push(assignment);
       index += 1;
-    } else if (spec.scripts?.includes(text) === true) {
+    } else if (spec.scripts?.includes(text) === true || endsOnShortOption(text, spec.scripts ?? [])) {
       scripts.push(words[index + 1]?.text ?? '');
       index += 2;
     } else if (spec.scripts?.some((option) => text.startsWith(`${option}=`)) === true) {
       scripts.push(text.slice(text.indexOf('=') + 1));
       index += 1;
-    } else if (spec.values?.includes(text) === true) {
+    } else if (spec.values?.includes(text) === true || endsOnShortOption(text, spec.values ?? [])) {
       index += 2;
     } else if (text.startsWith('-') && text !== '-') {
       index += 1;

@@ -44,7 +44,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 
 - Décider d’un ADR (accepted, rejected) revient au décideur humain : il lance la décision dans son propre terminal.
 - Un ADR décidé est figé : pour changer la décision, proposer un nouvel ADR qui le remplace (supersedes).
-- Les commandes root sont lancées par l’utilisateur lui-même, jamais par un agent.
+- Les commandes root, et celles qui prennent une autre identité ou les namespaces d’un autre processus, sont lancées par l’utilisateur lui-même, jamais par un agent.
 - Le programme de cette commande ne se lit pas dans la ligne : écrire son nom en clair, pour que la garde sache ce qu’elle laisse passer.
 - Les hooks git du dépôt ne se contournent pas : ni --no-verify, ni core.hooksPath ou alias, ni dépôt ou arbre désigné ailleurs, ni plomberie qui écrit sans hooks.
 - Une session d’agent ne masque pas les variables qui la signalent aux outils du dépôt.

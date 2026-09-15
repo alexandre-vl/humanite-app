@@ -15,9 +15,11 @@ export const FALLBACK_TOKENS = [
   'adr-decide',
   '--no-veri',
   'hookspath',
+  'include.path',
   'git_config',
   'git_dir',
   'git_work_tree',
+  'git_index_file',
   '--work-tree',
   '--git-dir',
   '-c alias.',
@@ -34,17 +36,31 @@ export const FALLBACK_TOKENS = [
   'doas',
   'pkexec',
   'run0',
+  'runuser',
+  'setpriv',
+  'capsh',
+  'nsenter',
+  'machinectl',
+  'newgrp',
   'claudecode',
   'ai_agent',
   'claude_code_child_session',
 ];
+
+/**
+ * Programs whose name is too short to look for inside a word — `su` sits in « issue », `sg` in « message » — so they
+ * are looked for as words of their own. Written out beside the list above, and for the same reason.
+ */
+export const FALLBACK_WORDS = ['su', 'sg'];
+
+const AS_WORD = new RegExp(`(?:^|[^a-z0-9_-])(?:${FALLBACK_WORDS.join('|')})(?![a-z0-9_-])`, 'u');
 
 const describe = (error: unknown): string => (Error.isError(error) ? error.message : typeof error);
 
 /** `true` when a raw hook input mentions a protected area and must be refused without further analysis. */
 export const touchesProtectedArea = (rawInput: string): boolean => {
   const lowered = rawInput.toLowerCase();
-  return rawInput.trim() === '' || FALLBACK_TOKENS.some((token) => lowered.includes(token));
+  return rawInput.trim() === '' || FALLBACK_TOKENS.some((token) => lowered.includes(token)) || AS_WORD.test(lowered);
 };
 
 /** Output of the `PreToolUse` hook when the guard failed: a refusal when the call touches a protected area. */

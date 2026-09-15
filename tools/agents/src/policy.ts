@@ -1,6 +1,7 @@
 import { basename } from 'node:path';
 import { ADR_DIRECTORY } from '@huma/adr/layout';
 import { AGENT_SESSION_VARIABLES } from '@huma/kit/session';
+import { compareText } from '@huma/kit/text';
 import type { SimpleCommand } from './shell/commands.ts';
 import { argv, hasOpaqueProgram, programName } from './shell/commands.ts';
 import type { Word } from './shell/words.ts';
@@ -97,8 +98,11 @@ const GIT_VALUE_OPTIONS = new Set([
 
 const GIT_LOCATION_OPTIONS = ['--git-dir', '--work-tree'];
 
-/** Variables that make git run the hooks, and the checks they start, of another repository or work tree. */
-const GIT_LOCATION_VARIABLES = new Set(['GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR']);
+/**
+ * Variables that make git run the hooks, and the checks they start, on another repository, work tree or index:
+ * `GIT_INDEX_FILE` has pre-commit judge one index while the commit is built from another.
+ */
+const GIT_LOCATION_VARIABLES = new Set(['GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_INDEX_FILE']);
 
 /** Git subcommands that run hooks and accept `--no-verify`. */
 const VERIFIED_SUBCOMMANDS = new Set(['commit', 'merge', 'am', 'rebase', 'push', 'cherry-pick', 'revert', 'pull']);
@@ -108,12 +112,19 @@ const COMMIT_VALUE_LETTERS = new Set(['m', 'F', 'C', 'c', 't', 'u']);
 
 /** Subcommands that write commits, refs or history without running any hook. */
 const HOOKLESS_SUBCOMMANDS = new Set([
+  'checkout-index',
   'commit-tree',
-  'update-ref',
   'fast-import',
-  'replace',
   'filter-branch',
   'filter-repo',
+  'hash-object',
+  'mktree',
+  'notes',
+  'read-tree',
+  'replace',
+  'symbolic-ref',
+  'update-index',
+  'update-ref',
 ]);
 
 type GitCall = Readonly<{ globals: readonly string[]; subcommand: Word; args: readonly string[] }>;
@@ -139,7 +150,11 @@ function gitCall(command: SimpleCommand): GitCall | null {
   return subcommand === undefined ? null : { globals, subcommand, args: texts(words.slice(index + 1)) };
 }
 
-const mentionsHooksPath = (text: string): boolean => /hookspath/iu.test(text);
+/**
+ * Configuration that decides where git reads its hooks: the setting itself, or an included file that could carry
+ * it. `git -c include.path=…` and `git config include.path …` both reach `core.hooksPath` one step away.
+ */
+const redirectsHooks = (text: string): boolean => /hookspath|include(?:if[^.]*)?\.path/iu.test(text);
 
 const definesAlias = (text: string): boolean => /^alias\./iu.test(text);
 
@@ -195,18 +210,44 @@ const GIT_HOOKS_BYPASS: CommandRule = {
     const readsConfig = call.args.some((arg) => /^(?:--get|--list$|-l$)/u.test(arg));
     return (
       command.assignments.some((assignment) => assignment.name.startsWith('GIT_CONFIG')) ||
-      call.globals.some((option) => mentionsHooksPath(option) || definesAlias(option)) ||
+      call.globals.some((option) => redirectsHooks(option) || definesAlias(option)) ||
       HOOKLESS_SUBCOMMANDS.has(subcommand) ||
-      (subcommand === 'config' &&
-        !readsConfig &&
-        call.args.some((arg) => mentionsHooksPath(arg) || definesAlias(arg))) ||
+      (subcommand === 'config' && !readsConfig && call.args.some((arg) => redirectsHooks(arg) || definesAlias(arg))) ||
       (verified && relocated) ||
       (verified && skipsHooks(subcommand, call.args))
     );
   },
 };
 
-const PRIVILEGED = new Set(['sudo', 'sudoedit', 'doas', 'pkexec', 'su', 'run0']);
+/**
+ * Programs whose whole purpose is to run something with credentials or in a namespace the caller does not have:
+ * asking for root, changing user or group, dropping into another process's namespaces.
+ */
+const PRIVILEGED = new Set([
+  'sudo',
+  'sudoedit',
+  'doas',
+  'pkexec',
+  'su',
+  'run0',
+  'runuser',
+  'setpriv',
+  'capsh',
+  'nsenter',
+  'machinectl',
+  'sg',
+  'newgrp',
+]);
+
+/** `systemd-run` starts a unit as anyone: as root, or inside a machine, it is one more way to ask for root. */
+const startsAsRoot = (args: readonly string[]): boolean =>
+  args.some(
+    (arg, index) =>
+      /^--uid=(?:0|root)$/u.test(arg) ||
+      (arg === '--uid' && ['0', 'root'].includes(args[index + 1] ?? '')) ||
+      arg === '-M' ||
+      arg.startsWith('--machine'),
+  );
 
 /**
  * A command whose program only the run itself would name: a substitution, a variable the line never sets. The guard
@@ -222,22 +263,28 @@ const OPAQUE_PROGRAM: CommandRule = {
 
 const PRIVILEGE_ESCALATION: CommandRule = {
   id: 'privilege-escalation',
-  reason: 'Les commandes root sont lancées par l’utilisateur lui-même, jamais par un agent.',
-  permissions: ['Bash(sudo *)', 'Bash(doas *)', 'Bash(pkexec *)', 'Bash(su *)', 'Bash(run0 *)'],
-  matches: (command) => PRIVILEGED.has(programName(command)),
+  reason:
+    'Les commandes root, et celles qui prennent une autre identité ou les namespaces d’un autre processus, sont lancées par l’utilisateur lui-même, jamais par un agent.',
+  permissions: [...PRIVILEGED].toSorted(compareText).map((name) => `Bash(${name} *)`),
+  matches: (command) =>
+    PRIVILEGED.has(programName(command)) ||
+    (programName(command) === 'systemd-run' && startsAsRoot(argv(command).slice(1))),
 };
 
 /** What the policy protects of the Android emulator: words that name its container or its image. */
 export type EmulatorTarget = Readonly<{ container: string; markers: readonly string[] }>;
 
-/** docker subcommands that create, start, enter, change or remove a container. */
+/** Subcommands that create, start, enter, change or remove a container, its network, its volume or its image. */
 const CONTAINER_CHANGES = new Set([
   'attach',
+  'build',
   'commit',
   'cp',
   'create',
+  'down',
   'exec',
   'kill',
+  'network',
   'pause',
   'rename',
   'restart',
@@ -246,25 +293,41 @@ const CONTAINER_CHANGES = new Set([
   'start',
   'stop',
   'unpause',
+  'up',
   'update',
+  'volume',
 ]);
 
 /** docker global options followed by a value. */
 const DOCKER_VALUE_OPTIONS = new Set(['-H', '--host', '-c', '--context', '--config', '-l', '--log-level']);
 
-/** The subcommand of a docker call and its arguments, a `container` management command read as its subcommand. */
-function dockerCall(command: SimpleCommand): Readonly<{ subcommand: string; args: readonly string[] }> | null {
+/** Programs that manage containers of this host with docker's own subcommands, under docker's name or another. */
+const CONTAINER_TOOLS = new Set(['docker', 'podman', 'nerdctl', 'docker-compose', 'podman-compose']);
+
+/** Words that stand between the program and the subcommand: `docker container rm`, `docker compose down`. */
+const CONTAINER_GROUPS = new Set(['container', 'compose']);
+
+/**
+ * Programs that reach a container below the docker layer. They have no read-only use of the emulator's container a
+ * command of the repository does not already give, so any mention of it is refused whatever the subcommand.
+ */
+const RUNTIME_TOOLS = new Set(['ctr', 'crictl', 'runc']);
+
+/** The subcommand of a container tool and its arguments, a group word read through to its subcommand. */
+function containerCall(command: SimpleCommand): Readonly<{ subcommand: string; args: readonly string[] }> | null {
   const words = argv(command);
-  if (basename(words[0] ?? '') !== 'docker') {
+  if (!CONTAINER_TOOLS.has(basename(words[0] ?? ''))) {
     return null;
   }
   let index = 1;
   while ((words[index] ?? '').startsWith('-')) {
     index += DOCKER_VALUE_OPTIONS.has(words[index] ?? '') ? 2 : 1;
   }
-  const managed = words[index] === 'container' ? 1 : 0;
-  const subcommand = words[index + managed];
-  return subcommand === undefined ? null : { subcommand, args: words.slice(index + managed + 1) };
+  while (CONTAINER_GROUPS.has(words[index] ?? '')) {
+    index += 1;
+  }
+  const subcommand = words[index];
+  return subcommand === undefined ? null : { subcommand, args: words.slice(index + 1) };
 }
 
 /**
@@ -280,17 +343,21 @@ function emulatorRule(target: EmulatorTarget): CommandRule {
       (subcommand) => `Bash(docker ${subcommand} ${target.container}*)`,
     ),
     matches: (command) => {
-      const call = dockerCall(command);
-      return (
-        call !== null &&
-        CONTAINER_CHANGES.has(call.subcommand) &&
-        call.args.some((arg) => target.markers.some((marker) => arg.includes(marker)))
-      );
+      const names = (args: readonly string[]): boolean =>
+        args.some((arg) => target.markers.some((marker) => arg.includes(marker)));
+      if (RUNTIME_TOOLS.has(programName(command))) {
+        return names(argv(command).slice(1));
+      }
+      const call = containerCall(command);
+      return call !== null && CONTAINER_CHANGES.has(call.subcommand) && names(call.args);
     },
   };
 }
 
 const isSessionVariable = (name: string): boolean => AGENT_SESSION_VARIABLES.some((variable) => variable === name);
+
+/** Builtins that declare a variable: with a value of their own, they overwrite what the session set. */
+const DECLARATIONS = new Set(['export', 'declare', 'typeset', 'readonly', 'local']);
 
 const SESSION_MASKING: CommandRule = {
   id: 'session-masking',
@@ -304,6 +371,7 @@ const SESSION_MASKING: CommandRule = {
       command.assignments.some((assignment) => isSessionVariable(assignment.name)) ||
       (name === 'unset' && args.some(named)) ||
       (name === 'env' && args.some((arg) => named(arg) || ['-i', '--ignore-environment', '-'].includes(arg))) ||
+      (DECLARATIONS.has(name) && args.some((arg) => arg.includes('=') && named(arg))) ||
       (name === 'export' && args.includes('-n') && args.some(named)) ||
       ((name === 'declare' || name === 'typeset') && args.includes('+x') && args.some(named))
     );
@@ -399,10 +467,12 @@ function sensitiveTokens(humanOnly: readonly HumanOnlyCommand[], paths: readonly
     ...AGENT_SESSION_VARIABLES,
     '--no-veri',
     'hookspath',
+    'include.path',
     'git_config',
+    'git_index_file',
     'commit-tree',
     'update-ref',
-    'sudo',
+    ...PRIVILEGED,
   ].map((token) => token.toLowerCase());
 }
 
