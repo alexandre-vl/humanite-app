@@ -21,19 +21,21 @@ export async function metroRunning(config: EmulatorConfig): Promise<boolean> {
   }
 }
 
-/** The arguments of Expo's CLI that start Metro for the dev client, on the loopback only, without network requests. */
+/**
+ * The arguments of Expo's CLI that start Metro for the dev client on the loopback only. Not `--offline`, which Expo
+ * refuses beside `--localhost` and which would serve the whole network: `EXPO_OFFLINE` stops its requests instead.
+ */
 export const metroArguments = (config: EmulatorConfig): readonly string[] => [
   'start',
   '--dev-client',
   '--localhost',
-  '--offline',
   '--port',
   String(config.metroPort),
 ];
 
 /**
- * The environment Metro runs with: without `CI`, which freezes the bundle Metro serves, and with IPv4 first, since
- * `--localhost` would otherwise listen on `::1` alone while `adb reverse` reaches 127.0.0.1.
+ * The environment Metro runs with: without `CI`, which freezes the bundle Metro serves, without network requests, and
+ * with IPv4 first, since `--localhost` would otherwise listen on `::1` alone while `adb reverse` reaches 127.0.0.1.
  */
 export function metroEnvironment(environment: Environment): Environment {
   const options = [environment['NODE_OPTIONS'], '--dns-result-order=ipv4first'].filter(
@@ -42,6 +44,7 @@ export function metroEnvironment(environment: Environment): Environment {
   return {
     ...Object.fromEntries(Object.entries(environment).filter(([name]) => name !== 'CI')),
     EXPO_NO_TELEMETRY: '1',
+    EXPO_OFFLINE: '1',
     NODE_OPTIONS: options.join(' '),
   };
 }

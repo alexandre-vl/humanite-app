@@ -89,10 +89,11 @@ test('Gradle runs in a capped user service, without swap, first to be killed, on
 });
 
 test('Metro serves the loopback over IPv4, never in CI mode, without network requests', () => {
-  expect(metroArguments(EMULATOR)).toEqual(['start', '--dev-client', '--localhost', '--offline', '--port', '8081']);
+  expect(metroArguments(EMULATOR)).toEqual(['start', '--dev-client', '--localhost', '--port', '8081']);
   expect(metroEnvironment({ CI: '1', NODE_OPTIONS: '--max-old-space-size=4096', HOME: '/home/user' })).toEqual({
     HOME: '/home/user',
     EXPO_NO_TELEMETRY: '1',
+    EXPO_OFFLINE: '1',
     NODE_OPTIONS: '--max-old-space-size=4096 --dns-result-order=ipv4first',
   });
 });
