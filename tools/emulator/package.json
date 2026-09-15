@@ -9,6 +9,7 @@
     "./e2e": "./src/commands/e2e.ts",
     "./gradle": "./src/commands/gradle.ts",
     "./install": "./src/commands/install.ts",
+    "./lock": "./src/lock.ts",
     "./metro": "./src/commands/metro.ts",
     "./proofs": "./src/proofs/registry.ts",
     "./session": "./src/session.ts",
