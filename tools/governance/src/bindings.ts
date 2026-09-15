@@ -1,5 +1,4 @@
 import type { Bindings } from '@huma/adr/bindings';
-import { CLAUDE_SETTINGS_PATH } from '@huma/agents/policy';
 import { repoPath } from '@huma/kit/paths';
 import type { ProofId } from './proofs.ts';
 
@@ -16,11 +15,18 @@ export const BINDINGS = {
       paths: [
         'docs/adr/**',
         'tools/adr/**',
-        'tools/agents/**',
-        'tools/fixtures/**',
-        'tools/governance/**',
-        'tools/kit/**',
-        CLAUDE_SETTINGS_PATH,
+        'tools/agents/src/guard.ts',
+        'tools/governance/src/acknowledgments.ts',
+        'tools/governance/src/bindings.ts',
+        'tools/governance/src/bindings-file.ts',
+        'tools/governance/src/cli/adr-check.ts',
+        'tools/governance/src/cli/adr-decide.ts',
+        'tools/governance/src/cli/adr-new.ts',
+        'tools/governance/src/cli/adr-status.ts',
+        'tools/governance/src/commit-refs.ts',
+        'tools/governance/src/decision.ts',
+        'tools/governance/src/proofs/commit-refs.ts',
+        'tools/governance/src/workspace.ts',
       ],
     },
     rules: {
@@ -145,6 +151,7 @@ export const BINDINGS = {
         'adr/valid-merge-acceptance',
         'adr/decision-content-changed',
         'adr/decision-content-changed-staged',
+        'decide/rejects',
         'decide/valid-message-accepted',
         'decide/valid-message-superseding',
       ],
@@ -276,7 +283,6 @@ export const BINDINGS = {
         'agent/shell-heredoc-proposed',
         'agent/shell-rename-proposed',
         'agent/shell-copy-proposed',
-        'decide/rejects',
       ],
     },
   },
