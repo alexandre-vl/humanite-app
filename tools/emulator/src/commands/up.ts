@@ -1,7 +1,7 @@
 import type { ExitCode } from '@huma/kit/cli';
 import { ownRepository } from '@huma/kit/git';
-import type { Adb } from './android/adb.ts';
-import { adbFor, captureAdb, deviceShell, deviceState, getprop, parseReverseList, runAdb } from './android/adb.ts';
+import type { Adb } from '../android/adb.ts';
+import { adbFor, captureAdb, deviceShell, deviceState, getprop, parseReverseList, runAdb } from '../android/adb.ts';
 import {
   containerFindings,
   dockerContext,
@@ -13,16 +13,16 @@ import {
   inspectImage,
   runArguments,
   runDocker,
-} from './docker.ts';
-import { checkInstall } from './guard/install.ts';
-import { currentStatus, guardProblems, observeGuard } from './guard/observe.ts';
-import { armCommands, binderCommands, installCommands, residueCommands } from './guard/root-commands.ts';
-import { binderFindings, readBinder } from './host/binder.ts';
-import { hostReferenceTakenAt, readHostReference, writeHostReference } from './host/reference.ts';
-import { driftFindings, residueFindings, residueOf, sampleHost } from './host/sample.ts';
-import type { Session } from './session.ts';
-import type { Step } from './steps.ts';
-import { blocked, done, precondition, runReported, todo } from './steps.ts';
+} from '../docker.ts';
+import { checkInstall } from '../guard/install.ts';
+import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
+import { armCommands, binderCommands, installCommands, residueCommands } from '../guard/root-commands.ts';
+import { binderFindings, readBinder } from '../host/binder.ts';
+import { hostReferenceTakenAt, readHostReference, writeHostReference } from '../host/reference.ts';
+import { driftFindings, residueFindings, residueOf, sampleHost } from '../host/sample.ts';
+import type { Session } from '../session.ts';
+import type { Step } from '../steps.ts';
+import { blocked, done, precondition, runReported, todo } from '../steps.ts';
 
 /** The boot of Android in the container, as `getprop` inside it tells. */
 async function bootCompleted(session: Session): Promise<boolean> {

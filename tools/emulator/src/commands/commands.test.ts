@@ -1,10 +1,10 @@
 import { expect, test } from 'vitest';
+import { EMULATOR } from '../config.ts';
+import { commandSession } from '../session.ts';
 import { buildUnitArguments, prebuildArguments } from './build.ts';
-import { EMULATOR } from './config.ts';
 import { downSteps } from './down.ts';
 import { devClientLink, maestroArguments } from './e2e.ts';
 import { metroArguments, metroEnvironment } from './metro.ts';
-import { commandSession } from './session.ts';
 import { upSteps } from './up.ts';
 
 const session = commandSession('/work/humanite', EMULATOR, () => undefined);

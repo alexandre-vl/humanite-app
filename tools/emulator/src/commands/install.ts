@@ -1,10 +1,10 @@
 import { access } from 'node:fs/promises';
 import type { ExitCode } from '@huma/kit/cli';
 import { describeError } from '@huma/kit/errors';
-import { adbFor, deviceShell, deviceState, runAdb } from './android/adb.ts';
-import { readApkManifest } from './android/apk.ts';
-import type { Session } from './session.ts';
-import { aapt2Executable, debugApk } from './session.ts';
+import { adbFor, deviceShell, deviceState, runAdb } from '../android/adb.ts';
+import { readApkManifest } from '../android/apk.ts';
+import type { Session } from '../session.ts';
+import { aapt2Executable, debugApk } from '../session.ts';
 
 const INSTALL_TIMEOUT_MS = 300_000;
 

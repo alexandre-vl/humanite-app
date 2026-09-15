@@ -4,11 +4,11 @@ import { APP_DIRECTORY } from '@huma/architecture';
 import type { ExitCode } from '@huma/kit/cli';
 import { ownRepository, statusEntries } from '@huma/kit/git';
 import { capture, describeExit, runAttached } from '@huma/kit/process';
-import { readApkManifest } from './android/apk.ts';
-import { hostCalmWatch, waitForCalm } from './host/memory.ts';
-import type { Session } from './session.ts';
-import { aapt2Executable, androidHome, appRoot, cacheDirectory, debugApk } from './session.ts';
-import { toolDirectory } from './tools.ts';
+import { readApkManifest } from '../android/apk.ts';
+import { hostCalmWatch, waitForCalm } from '../host/memory.ts';
+import type { Session } from '../session.ts';
+import { aapt2Executable, androidHome, appRoot, cacheDirectory, debugApk } from '../session.ts';
+import { toolDirectory } from '../tools.ts';
 
 export type BuildOptions = Readonly<{ clean: boolean }>;
 

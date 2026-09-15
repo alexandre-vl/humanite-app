@@ -2,9 +2,9 @@ import { join } from 'node:path';
 import type { ExitCode } from '@huma/kit/cli';
 import type { Environment } from '@huma/kit/process';
 import { describeExit, runAttached } from '@huma/kit/process';
-import type { EmulatorConfig } from './config.ts';
-import type { Session } from './session.ts';
-import { appRoot } from './session.ts';
+import type { EmulatorConfig } from '../config.ts';
+import type { Session } from '../session.ts';
+import { appRoot } from '../session.ts';
 
 /** The answer of a running Metro to `GET /status`. */
 const RUNNING = 'packager-status:running';

@@ -3,18 +3,18 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./build": "./src/build.ts",
+    "./build": "./src/commands/build.ts",
     "./checks": "./src/checks.ts",
     "./config": "./src/config.ts",
-    "./down": "./src/down.ts",
-    "./e2e": "./src/e2e.ts",
-    "./install-app": "./src/install-app.ts",
-    "./metro": "./src/metro.ts",
+    "./down": "./src/commands/down.ts",
+    "./e2e": "./src/commands/e2e.ts",
+    "./install": "./src/commands/install.ts",
+    "./metro": "./src/commands/metro.ts",
     "./proofs": "./src/proofs/registry.ts",
     "./session": "./src/session.ts",
-    "./status": "./src/status.ts",
+    "./status": "./src/commands/status.ts",
     "./tracked": "./src/guard/tracked.ts",
-    "./up": "./src/up.ts"
+    "./up": "./src/commands/up.ts"
   },
   "dependencies": {
     "@huma/architecture": "workspace:*",

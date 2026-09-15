@@ -1,5 +1,5 @@
 import { EMULATOR } from '@huma/emulator/config';
-import { emulatorInstall } from '@huma/emulator/install-app';
+import { emulatorInstall } from '@huma/emulator/install';
 import { commandSession } from '@huma/emulator/session';
 import { findWorkspaceRoot, print, readArguments, runCommand } from '@huma/kit/cli';
 

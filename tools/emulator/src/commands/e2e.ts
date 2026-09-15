@@ -3,13 +3,13 @@ import { join } from 'node:path';
 import { APP_DIRECTORY } from '@huma/architecture';
 import type { ExitCode } from '@huma/kit/cli';
 import { describeExit, runAttached } from '@huma/kit/process';
-import { adbFor, deviceShell, deviceState, parseReverseList, runAdb } from './android/adb.ts';
-import { devClientScheme, readApkManifest } from './android/apk.ts';
-import type { EmulatorConfig } from './config.ts';
+import { adbFor, deviceShell, deviceState, parseReverseList, runAdb } from '../android/adb.ts';
+import { devClientScheme, readApkManifest } from '../android/apk.ts';
+import type { EmulatorConfig } from '../config.ts';
+import type { Session } from '../session.ts';
+import { aapt2Executable, adbSerial, cacheDirectory, debugApk } from '../session.ts';
+import { toolDirectory } from '../tools.ts';
 import { metroRunning } from './metro.ts';
-import type { Session } from './session.ts';
-import { aapt2Executable, adbSerial, cacheDirectory, debugApk } from './session.ts';
-import { toolDirectory } from './tools.ts';
 
 /** The flows Maestro runs, beside the app they test. */
 export const E2E_DIRECTORY = `${APP_DIRECTORY}/e2e`;

@@ -2,14 +2,11 @@ import type { ExitCode } from '@huma/kit/cli';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
 import { ownRepository } from '@huma/kit/git';
-import type { EmulatorConfig } from './config.ts';
-import { containerFindings, imageFindings, inspectContainer, inspectImage } from './docker.ts';
-import { binderFindings, readBinder } from './host/binder.ts';
-import { missedThresholds, sampleMemory } from './host/memory.ts';
-import { residueFindings, residueOf, sampleHost } from './host/sample.ts';
-import { checkInstall } from './guard/install.ts';
-import { currentStatus, guardProblems, observeGuard } from './guard/observe.ts';
-import type { RootCommands } from './guard/root-commands.ts';
+import type { EmulatorConfig } from '../config.ts';
+import { containerFindings, imageFindings, inspectContainer, inspectImage } from '../docker.ts';
+import { checkInstall } from '../guard/install.ts';
+import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
+import type { RootCommands } from '../guard/root-commands.ts';
 import {
   armCommands,
   binderCommands,
@@ -17,7 +14,10 @@ import {
   installCommands,
   renderRootCommands,
   residueCommands,
-} from './guard/root-commands.ts';
+} from '../guard/root-commands.ts';
+import { binderFindings, readBinder } from '../host/binder.ts';
+import { missedThresholds, sampleMemory } from '../host/memory.ts';
+import { residueFindings, residueOf, sampleHost } from '../host/sample.ts';
 
 /** One line of the report: a fact that holds, one that blocks the emulator with its findings, or a piece of state. */
 type Line =

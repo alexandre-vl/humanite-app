@@ -1,13 +1,13 @@
 import type { ExitCode } from '@huma/kit/cli';
-import { adbFor, captureAdb, deviceState } from './android/adb.ts';
-import { dockerContext, dockerUnderGuardLock, guardRunWindowMs, inspectContainer } from './docker.ts';
-import { currentStatus, guardProblems, observeGuard } from './guard/observe.ts';
-import { armCommands, disarmCommands, renderRootCommands, residueCommands } from './guard/root-commands.ts';
-import { readHostReference } from './host/reference.ts';
-import { driftFindings, residueFindings, residueOf, sampleHost } from './host/sample.ts';
-import type { Session } from './session.ts';
-import type { Step } from './steps.ts';
-import { blocked, done, precondition, runReported, todo } from './steps.ts';
+import { adbFor, captureAdb, deviceState } from '../android/adb.ts';
+import { dockerContext, dockerUnderGuardLock, guardRunWindowMs, inspectContainer } from '../docker.ts';
+import { currentStatus, guardProblems, observeGuard } from '../guard/observe.ts';
+import { armCommands, disarmCommands, renderRootCommands, residueCommands } from '../guard/root-commands.ts';
+import { readHostReference } from '../host/reference.ts';
+import { driftFindings, residueFindings, residueOf, sampleHost } from '../host/sample.ts';
+import type { Session } from '../session.ts';
+import type { Step } from '../steps.ts';
+import { blocked, done, precondition, runReported, todo } from '../steps.ts';
 
 /**
  * The steps of `emulator:down`: once a run of the root guard has seen the container, adb lets go of it, the container
