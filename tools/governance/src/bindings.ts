@@ -288,4 +288,41 @@ export const BINDINGS = {
       ],
     },
   },
+  'ADR-0001': {
+    scope: {
+      paths: [
+        'pnpm-workspace.yaml',
+        'pnpm-lock.yaml',
+        'package.json',
+        'apps/*/package.json',
+        'packages/*/package.json',
+        'tools/*/package.json',
+        'tools/deps/**',
+        'tools/governance/src/cli/deps-check.ts',
+      ],
+    },
+    rules: {
+      R1: [
+        'deps/catalog-missing',
+        'deps/catalog-stale',
+        'deps/catalog-unused',
+        'deps/single-version',
+        'deps/lockfile-version',
+      ],
+      R2: [
+        'deps/catalog-range',
+        'deps/sibling-version',
+        'deps/single-instance',
+        'deps/importer-stale',
+        'deps/importer-missing',
+        'deps/importer-extra',
+        'deps/importer-unknown',
+        'deps/private-copy',
+        'deps/private-copy-allowed',
+        'deps/private-copy-unused',
+      ],
+      R3: ['deps/tested-version', 'deps/untested-version'],
+      R4: ['deps/specifier-form'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;
