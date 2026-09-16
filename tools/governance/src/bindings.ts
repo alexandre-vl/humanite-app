@@ -392,4 +392,32 @@ export const BINDINGS = {
       R5: ['lint/deprecated-rule'],
     },
   },
+  'ADR-0005': {
+    scope: {
+      paths: [
+        'apps/mobile/app/**',
+        'apps/mobile/src/**',
+        'packages/architecture/**',
+        'tools/structure/**',
+        'tools/governance/src/cli/structure-check.ts',
+      ],
+    },
+    rules: {
+      R1: [
+        'structure/ambiguous-slice-names',
+        'structure/inconsistent-naming',
+        'structure/insignificant-slice',
+        'structure/no-reserved-folder-names',
+        'structure/repetitive-naming',
+        'structure/excessive-slicing',
+        'structure/shared-lib-grouping',
+        'structure/import-locality',
+        'structure/clean',
+      ],
+      R2: ['guardrail/place-unknown-file', 'guardrail/unknown-file-imports'],
+      R3: ['guardrail/entry-re-export', 'guardrail/export-all'],
+      R4: ['structure/cycle', 'structure/cycle-in-routes'],
+      R5: ['guardrail/route-re-export', 'guardrail/route-error-boundary'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

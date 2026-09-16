@@ -13,6 +13,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                 | Plateforme Expo SDK 57 et New Architecture                 | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                | TypeScript 6 ultra-strict en version unique                | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                | Lint et format bloquants sans désactivation                | proposé | `guarded-config`                                                           |
+| [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)        | Architecture FSD avec routes hors src et couche _app       | proposé | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -80,6 +81,18 @@ Statut : proposé. Périmètre : `packages/eslint-config/**`, `tools/lint/**`, `
 | R3    | DOIT        | `lint/unformatted`, `lint/format-error`, `lint/prettier-ignored`                                                                                     |
 | R4    | NE DOIT PAS | convention : L’absence d’avertissement et le maintien à error des bans typés nommés sont vérifiés par tools/guardrails/src/effective-config.test.ts. |
 | R5    | DOIT        | `lint/deprecated-rule`                                                                                                                               |
+
+### ADR-0005 · Architecture FSD avec routes hors src et couche _app
+
+Statut : proposé. Périmètre : `apps/mobile/app/**`, `apps/mobile/src/**`, `packages/architecture/**`, `tools/structure/**`, `tools/governance/src/cli/structure-check.ts`.
+
+| Règle | Niveau | Preuves                                                                                                                                                                                                                                                                                  |
+| ----- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT   | `structure/ambiguous-slice-names`, `structure/inconsistent-naming`, `structure/insignificant-slice`, `structure/no-reserved-folder-names`, `structure/repetitive-naming`, `structure/excessive-slicing`, `structure/shared-lib-grouping`, `structure/import-locality`, `structure/clean` |
+| R2    | DOIT   | `guardrail/place-unknown-file`, `guardrail/unknown-file-imports`                                                                                                                                                                                                                         |
+| R3    | DOIT   | `guardrail/entry-re-export`, `guardrail/export-all`                                                                                                                                                                                                                                      |
+| R4    | DOIT   | `structure/cycle`, `structure/cycle-in-routes`                                                                                                                                                                                                                                           |
+| R5    | DOIT   | `guardrail/route-re-export`, `guardrail/route-error-boundary`                                                                                                                                                                                                                            |
 
 ## Référentiel
 
