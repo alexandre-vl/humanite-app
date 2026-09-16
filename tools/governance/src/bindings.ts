@@ -349,4 +349,26 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0003': {
+    scope: {
+      paths: [
+        'packages/tsconfig/**',
+        'tsconfig.json',
+        'apps/*/tsconfig.json',
+        'packages/*/tsconfig.json',
+        'tools/*/tsconfig.json',
+        'tools/governance/src/tsconfig-snapshot.ts',
+      ],
+    },
+    rules: {
+      R1: ['deps/single-instance', 'deps/single-version'],
+      R2: {
+        convention:
+          'Les options strictes de chaque projet sont vérifiées par tools/governance/src/tsconfig-snapshot.test.ts contre le préréglage packages/tsconfig/strict.json.',
+      },
+      R3: ['guardrail/node-import-js', 'guardrail/node-export-js', 'guardrail/node-dynamic-import-js'],
+      R4: ['guardrail/node-decorator', 'guardrail/node-accessor'],
+      R5: ['deps/reference-missing', 'deps/reference-undeclared'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

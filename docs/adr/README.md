@@ -11,6 +11,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md)      | Décisions structurantes en ADR MADR vérifiés et figés      | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`, `reversal-cost` |
 | [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md) | Monorepo pnpm à catalog strict et versions Expo contrôlées | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                 | Plateforme Expo SDK 57 et New Architecture                 | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
+| [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                | TypeScript 6 ultra-strict en version unique                | proposé | `dependency`, `guarded-config`                                             |
 
 ## Confirmation
 
@@ -54,6 +55,18 @@ Statut : proposé. Périmètre : `apps/mobile/app.config.ts`, `apps/mobile/app/*
 | R1    | DOIT   | `deps/tested-version`, `deps/untested-version`                                                                          |
 | R2    | DOIT   | `expo/routes-directory`, `expo/tsconfig-rewrite`, `expo/gitignore-rewrite`, `expo/routes-invalid`, `expo/typed-routes`  |
 | R3    | DOIT   | convention : Les invariants d’app.config sont vérifiés par tools/expo/src/app-config.test.ts, hors du banc de fixtures. |
+
+### ADR-0003 · TypeScript 6 ultra-strict en version unique
+
+Statut : proposé. Périmètre : `packages/tsconfig/**`, `tsconfig.json`, `apps/*/tsconfig.json`, `packages/*/tsconfig.json`, `tools/*/tsconfig.json`, `tools/governance/src/tsconfig-snapshot.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                  |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | DOIT        | `deps/single-instance`, `deps/single-version`                                                                                                                            |
+| R2    | DOIT        | convention : Les options strictes de chaque projet sont vérifiées par tools/governance/src/tsconfig-snapshot.test.ts contre le préréglage packages/tsconfig/strict.json. |
+| R3    | DOIT        | `guardrail/node-import-js`, `guardrail/node-export-js`, `guardrail/node-dynamic-import-js`                                                                               |
+| R4    | NE DOIT PAS | `guardrail/node-decorator`, `guardrail/node-accessor`                                                                                                                    |
+| R5    | DOIT        | `deps/reference-missing`, `deps/reference-undeclared`                                                                                                                    |
 
 ## Référentiel
 
