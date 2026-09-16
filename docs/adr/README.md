@@ -14,6 +14,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                | TypeScript 6 ultra-strict en version unique                | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                | Lint et format bloquants sans désactivation                | proposé | `guarded-config`                                                           |
 | [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)        | Architecture FSD avec routes hors src et couche _app       | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                              | Niveaux de composants L0 à L4                              | proposé | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -93,6 +94,17 @@ Statut : proposé. Périmètre : `apps/mobile/app/**`, `apps/mobile/src/**`, `pa
 | R3    | DOIT   | `guardrail/entry-re-export`, `guardrail/export-all`                                                                                                                                                                                                                                      |
 | R4    | DOIT   | `structure/cycle`, `structure/cycle-in-routes`                                                                                                                                                                                                                                           |
 | R5    | DOIT   | `guardrail/route-re-export`, `guardrail/route-error-boundary`                                                                                                                                                                                                                            |
+
+### ADR-0006 · Niveaux de composants L0 à L4
+
+Statut : proposé. Périmètre : `packages/architecture/**`, `packages/eslint-config/src/index.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                          |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | DOIT        | `guardrail/import-primitive`, `guardrail/import-component`, `guardrail/import-entity`, `guardrail/import-feature`, `guardrail/import-page`, `guardrail/import-app`, `guardrail/import-route`, `guardrail/import-api`, `guardrail/import-config`, `guardrail/import-i18n`, `guardrail/import-lib` |
+| R2    | NE DOIT PAS | `guardrail/import-page-internals`                                                                                                                                                                                                                                                                |
+| R3    | DOIT        | `guardrail/module-react-native`, `guardrail/module-react-native-entry`, `guardrail/module-react-native-platform`, `guardrail/module-react-native-namespace`, `guardrail/module-react-native-gesture-handler`, `guardrail/module-react-native-reanimated`                                         |
+| R4    | DOIT        | `guardrail/platform-variant`, `guardrail/platform-variant-primitive`                                                                                                                                                                                                                             |
 
 ## Référentiel
 

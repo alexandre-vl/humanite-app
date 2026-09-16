@@ -420,4 +420,34 @@ export const BINDINGS = {
       R5: ['guardrail/route-re-export', 'guardrail/route-error-boundary'],
     },
   },
+  'ADR-0006': {
+    scope: {
+      paths: ['packages/architecture/**', 'packages/eslint-config/src/index.ts'],
+    },
+    rules: {
+      R1: [
+        'guardrail/import-primitive',
+        'guardrail/import-component',
+        'guardrail/import-entity',
+        'guardrail/import-feature',
+        'guardrail/import-page',
+        'guardrail/import-app',
+        'guardrail/import-route',
+        'guardrail/import-api',
+        'guardrail/import-config',
+        'guardrail/import-i18n',
+        'guardrail/import-lib',
+      ],
+      R2: ['guardrail/import-page-internals'],
+      R3: [
+        'guardrail/module-react-native',
+        'guardrail/module-react-native-entry',
+        'guardrail/module-react-native-platform',
+        'guardrail/module-react-native-namespace',
+        'guardrail/module-react-native-gesture-handler',
+        'guardrail/module-react-native-reanimated',
+      ],
+      R4: ['guardrail/platform-variant', 'guardrail/platform-variant-primitive'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;
