@@ -16,6 +16,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)        | Architecture FSD avec routes hors src et couche _app       | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                              | Niveaux de composants L0 à L4                              | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                  | Glossaire et orthographe des identifiants                  | proposé | `guarded-config`                                                           |
+| [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)        | Contrôles locaux par hooks git et garde-fous testés        | proposé | `guarded-config`                                                           |
 
 ## Confirmation
 
@@ -116,6 +117,19 @@ Statut : proposé. Périmètre : `packages/architecture/src/glossary.ts`, `packa
 | R1    | DOIT   | `guardrail/spelling-unknown`                                                                                                                             |
 | R2    | DOIT   | `guardrail/glossary-term`, `guardrail/glossary-synonym`, `lint/glossary-word-inside`, `lint/glossary-file-name`                                          |
 | R3    | DOIT   | `guardrail/naming-file`, `guardrail/naming-folder`, `guardrail/naming-route-conventions`, `guardrail/naming-route-file`, `guardrail/naming-route-folder` |
+
+### ADR-0008 · Contrôles locaux par hooks git et garde-fous testés
+
+Statut : proposé. Périmètre : `tools/git-hooks/**`, `tools/fixtures/**`, `tools/governance/src/cli/git-hook.ts`, `tools/governance/src/cli/hooks-check.ts`, `tools/governance/src/cli/hooks-install.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | `git/header`, `git/header-length`, `git/type`, `git/scope`, `git/scope-before-package`, `git/body-separator`, `git/not-canonical`, `git/generated-fixup`, `git/control-character`, `git/valid-message`                                                                                                                                                |
+| R2    | DOIT        | `git/refs-missing`, `git/refs-missing-commit-msg`, `git/refs-format`, `git/refs-order`, `git/refs-extra`, `git/refs-in-prose`, `git/refs-unrelated-cited`, `git/refs-scope-required`, `git/refs-adr-file-required`, `git/trailer-unknown`                                                                                                             |
+| R3    | DOIT        | `git/hook-missing`, `git/hook-modified`, `git/hook-not-executable`, `git/hook-unexpected`, `git/hooks-directory-link`, `git/hooks-path`, `git/hooks-path-worktree`, `git/install-refused-hooks-path`, `git/config-include`, `git/no-verify-through-shims`, `git/valid-installation`, `git/valid-commit-through-shims`                                 |
+| R4    | DOIT        | `git/verify-failed`, `git/verify-skipped`, `git/verify-skipped-index-changed`, `git/verify-skipped-marker-forged`, `git/verify-skipped-marker-reused`, `git/tree-changed`, `git/index-flagged`, `git/unstaged`, `git/unstaged-before-checks`, `git/untracked`, `git/unmerged`, `git/valid-pre-commit`, `git/valid-staging`, `git/valid-verified-tree` |
+| R5    | DOIT        | convention : Le banc de fixtures de tools/fixtures et les tests de couverture et de mutation de chaque liste de preuves prouvent que chaque garde-fou se déclenche exactement sur ses codes.                                                                                                                                                          |
+| R6    | NE DOIT PAS | `git/history-bypassed-commit`, `git/history-replaced-commit`, `git/patch-refused`, `git/anchor-not-ancestor`, `git/anchor-unknown`                                                                                                                                                                                                                    |
 
 ## Référentiel
 
