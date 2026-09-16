@@ -15,6 +15,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                | Lint et format bloquants sans désactivation                | proposé | `guarded-config`                                                           |
 | [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)        | Architecture FSD avec routes hors src et couche _app       | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                              | Niveaux de composants L0 à L4                              | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                  | Glossaire et orthographe des identifiants                  | proposé | `guarded-config`                                                           |
 
 ## Confirmation
 
@@ -105,6 +106,16 @@ Statut : proposé. Périmètre : `packages/architecture/**`, `packages/eslint-co
 | R2    | NE DOIT PAS | `guardrail/import-page-internals`                                                                                                                                                                                                                                                                |
 | R3    | DOIT        | `guardrail/module-react-native`, `guardrail/module-react-native-entry`, `guardrail/module-react-native-platform`, `guardrail/module-react-native-namespace`, `guardrail/module-react-native-gesture-handler`, `guardrail/module-react-native-reanimated`                                         |
 | R4    | DOIT        | `guardrail/platform-variant`, `guardrail/platform-variant-primitive`                                                                                                                                                                                                                             |
+
+### ADR-0007 · Glossaire et orthographe des identifiants
+
+Statut : proposé. Périmètre : `packages/architecture/src/glossary.ts`, `packages/eslint-config/src/spelling.ts`, `packages/eslint-config/cspell.json`.
+
+| Règle | Niveau | Preuves                                                                                                                                                  |
+| ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT   | `guardrail/spelling-unknown`                                                                                                                             |
+| R2    | DOIT   | `guardrail/glossary-term`, `guardrail/glossary-synonym`, `lint/glossary-word-inside`, `lint/glossary-file-name`                                          |
+| R3    | DOIT   | `guardrail/naming-file`, `guardrail/naming-folder`, `guardrail/naming-route-conventions`, `guardrail/naming-route-file`, `guardrail/naming-route-folder` |
 
 ## Référentiel
 

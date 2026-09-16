@@ -450,4 +450,29 @@ export const BINDINGS = {
       R4: ['guardrail/platform-variant', 'guardrail/platform-variant-primitive'],
     },
   },
+  'ADR-0007': {
+    scope: {
+      paths: [
+        'packages/architecture/src/glossary.ts',
+        'packages/eslint-config/src/spelling.ts',
+        'packages/eslint-config/cspell.json',
+      ],
+    },
+    rules: {
+      R1: ['guardrail/spelling-unknown'],
+      R2: [
+        'guardrail/glossary-term',
+        'guardrail/glossary-synonym',
+        'lint/glossary-word-inside',
+        'lint/glossary-file-name',
+      ],
+      R3: [
+        'guardrail/naming-file',
+        'guardrail/naming-folder',
+        'guardrail/naming-route-conventions',
+        'guardrail/naming-route-file',
+        'guardrail/naming-route-folder',
+      ],
+    },
+  },
 } as const satisfies Bindings<ProofId>;
