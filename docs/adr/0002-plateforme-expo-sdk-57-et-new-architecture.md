@@ -37,6 +37,7 @@ Option retenue : « Expo SDK 57 avec New Architecture et Hermes », parce que c�
 - **R1** — Les versions d’Expo, de React et de React Native DOIVENT rester celles que le SDK 57 teste ensemble.
 - **R2** — Les types de routes DOIVENT être générés depuis le dossier des routes, sans qu’Expo réécrive un fichier suivi.
 - **R3** — La configuration de l’app DOIT garder les invariants dont dépendent le build et le dev client : un scheme, un identifiant d’application unique, le retour prédictif désactivé, les routes typées et le React Compiler activés, les mises à jour OTA coupées.
+- **R4** — Le code NE DOIT PAS employer une API JavaScript absente de Hermes V1.
 
 ### Conséquences
 
