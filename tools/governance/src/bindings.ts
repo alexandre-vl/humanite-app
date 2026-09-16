@@ -325,4 +325,28 @@ export const BINDINGS = {
       R4: ['deps/specifier-form'],
     },
   },
+  'ADR-0002': {
+    scope: {
+      paths: [
+        'apps/mobile/app.config.ts',
+        'apps/mobile/app/**',
+        'tools/expo/**',
+        'tools/governance/src/cli/expo-types.ts',
+      ],
+    },
+    rules: {
+      R1: ['deps/tested-version', 'deps/untested-version'],
+      R2: [
+        'expo/routes-directory',
+        'expo/tsconfig-rewrite',
+        'expo/gitignore-rewrite',
+        'expo/routes-invalid',
+        'expo/typed-routes',
+      ],
+      R3: {
+        convention:
+          'Les invariants d’app.config sont vérifiés par tools/expo/src/app-config.test.ts, hors du banc de fixtures.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

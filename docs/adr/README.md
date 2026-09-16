@@ -10,6 +10,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | ------------------------------------------------------------------------------ | ---------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
 | [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md)      | Décisions structurantes en ADR MADR vérifiés et figés      | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`, `reversal-cost` |
 | [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md) | Monorepo pnpm à catalog strict et versions Expo contrôlées | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                 | Plateforme Expo SDK 57 et New Architecture                 | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 
 ## Confirmation
 
@@ -43,6 +44,16 @@ Statut : proposé. Périmètre : `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `packa
 | R2    | NE DOIT PAS | `deps/catalog-range`, `deps/sibling-version`, `deps/single-instance`, `deps/importer-stale`, `deps/importer-missing`, `deps/importer-extra`, `deps/importer-unknown`, `deps/private-copy`, `deps/private-copy-allowed`, `deps/private-copy-unused` |
 | R3    | DOIT        | `deps/tested-version`, `deps/untested-version`                                                                                                                                                                                                     |
 | R4    | DOIT        | `deps/specifier-form`                                                                                                                                                                                                                              |
+
+### ADR-0002 · Plateforme Expo SDK 57 et New Architecture
+
+Statut : proposé. Périmètre : `apps/mobile/app.config.ts`, `apps/mobile/app/**`, `tools/expo/**`, `tools/governance/src/cli/expo-types.ts`.
+
+| Règle | Niveau | Preuves                                                                                                                 |
+| ----- | ------ | ----------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT   | `deps/tested-version`, `deps/untested-version`                                                                          |
+| R2    | DOIT   | `expo/routes-directory`, `expo/tsconfig-rewrite`, `expo/gitignore-rewrite`, `expo/routes-invalid`, `expo/typed-routes`  |
+| R3    | DOIT   | convention : Les invariants d’app.config sont vérifiés par tools/expo/src/app-config.test.ts, hors du banc de fixtures. |
 
 ## Référentiel
 
