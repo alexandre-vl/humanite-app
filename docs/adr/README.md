@@ -12,6 +12,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md) | Monorepo pnpm à catalog strict et versions Expo contrôlées | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                 | Plateforme Expo SDK 57 et New Architecture                 | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                | TypeScript 6 ultra-strict en version unique                | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                | Lint et format bloquants sans désactivation                | proposé | `guarded-config`                                                           |
 
 ## Confirmation
 
@@ -67,6 +68,18 @@ Statut : proposé. Périmètre : `packages/tsconfig/**`, `tsconfig.json`, `apps/
 | R3    | DOIT        | `guardrail/node-import-js`, `guardrail/node-export-js`, `guardrail/node-dynamic-import-js`                                                                               |
 | R4    | NE DOIT PAS | `guardrail/node-decorator`, `guardrail/node-accessor`                                                                                                                    |
 | R5    | DOIT        | `deps/reference-missing`, `deps/reference-undeclared`                                                                                                                    |
+
+### ADR-0004 · Lint et format bloquants sans désactivation
+
+Statut : proposé. Périmètre : `packages/eslint-config/**`, `tools/lint/**`, `tools/governance/src/cli/lint.ts`, `tools/governance/src/cli/format.ts`, `tools/guardrails/src/effective-config.test.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                              |
+| ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | `lint/rule`, `lint/unconfigured`, `lint/parse-error`, `lint/git-ignored`, `lint/clean`                                                               |
+| R2    | NE DOIT PAS | `lint/inline-config`, `lint/suppressed`, `lint/suppressions-file`                                                                                    |
+| R3    | DOIT        | `lint/unformatted`, `lint/format-error`, `lint/prettier-ignored`                                                                                     |
+| R4    | NE DOIT PAS | convention : L’absence d’avertissement et le maintien à error des bans typés nommés sont vérifiés par tools/guardrails/src/effective-config.test.ts. |
+| R5    | DOIT        | `lint/deprecated-rule`                                                                                                                               |
 
 ## Référentiel
 

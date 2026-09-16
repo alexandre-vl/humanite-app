@@ -371,4 +371,25 @@ export const BINDINGS = {
       R5: ['deps/reference-missing', 'deps/reference-undeclared'],
     },
   },
+  'ADR-0004': {
+    scope: {
+      paths: [
+        'packages/eslint-config/**',
+        'tools/lint/**',
+        'tools/governance/src/cli/lint.ts',
+        'tools/governance/src/cli/format.ts',
+        'tools/guardrails/src/effective-config.test.ts',
+      ],
+    },
+    rules: {
+      R1: ['lint/rule', 'lint/unconfigured', 'lint/parse-error', 'lint/git-ignored', 'lint/clean'],
+      R2: ['lint/inline-config', 'lint/suppressed', 'lint/suppressions-file'],
+      R3: ['lint/unformatted', 'lint/format-error', 'lint/prettier-ignored'],
+      R4: {
+        convention:
+          'L’absence d’avertissement et le maintien à error des bans typés nommés sont vérifiés par tools/guardrails/src/effective-config.test.ts.',
+      },
+      R5: ['lint/deprecated-rule'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;
