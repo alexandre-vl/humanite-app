@@ -189,6 +189,8 @@ export const MODULES = {
   'react-native': { places: ['primitive'], except: ['Platform'] },
   'react-native-gesture-handler': { places: ['primitive'], except: [] },
   'react-native-reanimated': { places: ['primitive'], except: [] },
+  'react-native-safe-area-context': { places: ['primitive'], except: [] },
+  'react-native-screens': { places: ['primitive'], except: [] },
 } as const satisfies Readonly<Record<string, ModulePolicy>>;
 
 export type ConfinedModule = keyof typeof MODULES;

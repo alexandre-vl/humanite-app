@@ -22,6 +22,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                 | Contrats de données en Zod                                 | proposé | `dependency`, `guarded-config`, `data-format`                              |
 | [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                       | Design tokens et createStyles brandé                       | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                    | Textes UI en dictionnaire français typé                    | proposé | `guarded-config`, `boundary`, `data-format`                                |
+| [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                  | Navigation Expo Router par onglets natifs                  | proposé | `guarded-config`, `reversal-cost`                                          |
 
 ## Confirmation
 
@@ -107,12 +108,12 @@ Statut : proposé. Périmètre : `apps/mobile/app/**`, `apps/mobile/src/**`, `pa
 
 Statut : proposé. Périmètre : `packages/architecture/**`, `packages/eslint-config/src/index.ts`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                          |
-| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| R1    | DOIT        | `guardrail/import-primitive`, `guardrail/import-component`, `guardrail/import-entity`, `guardrail/import-feature`, `guardrail/import-page`, `guardrail/import-app`, `guardrail/import-route`, `guardrail/import-api`, `guardrail/import-config`, `guardrail/import-i18n`, `guardrail/import-lib` |
-| R2    | NE DOIT PAS | `guardrail/import-page-internals`                                                                                                                                                                                                                                                                |
-| R3    | DOIT        | `guardrail/module-react-native`, `guardrail/module-react-native-entry`, `guardrail/module-react-native-platform`, `guardrail/module-react-native-namespace`, `guardrail/module-react-native-gesture-handler`, `guardrail/module-react-native-reanimated`                                         |
-| R4    | DOIT        | `guardrail/platform-variant`, `guardrail/platform-variant-primitive`                                                                                                                                                                                                                             |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                              |
+| ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | `guardrail/import-primitive`, `guardrail/import-component`, `guardrail/import-entity`, `guardrail/import-feature`, `guardrail/import-page`, `guardrail/import-app`, `guardrail/import-route`, `guardrail/import-api`, `guardrail/import-config`, `guardrail/import-i18n`, `guardrail/import-lib`                                                     |
+| R2    | NE DOIT PAS | `guardrail/import-page-internals`                                                                                                                                                                                                                                                                                                                    |
+| R3    | DOIT        | `guardrail/module-react-native`, `guardrail/module-react-native-entry`, `guardrail/module-react-native-platform`, `guardrail/module-react-native-namespace`, `guardrail/module-react-native-gesture-handler`, `guardrail/module-react-native-reanimated`, `guardrail/module-react-native-safe-area-context`, `guardrail/module-react-native-screens` |
+| R4    | DOIT        | `guardrail/platform-variant`, `guardrail/platform-variant-primitive`                                                                                                                                                                                                                                                                                 |
 
 ### ADR-0007 · Glossaire et orthographe des identifiants
 
@@ -190,6 +191,15 @@ Statut : proposé. Périmètre : `packages/contracts/src/display-text.ts`, `apps
 | R1    | DOIT        | convention : Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un. |
 | R2    | DOIT        | convention : La prop children d’une primitive de texte est typée DisplayText, la marque opaque des contrats ; une chaîne quelconque n’y est pas assignable.                                                     |
 | R3    | NE DOIT PAS | `guardrail/text-jsx`                                                                                                                                                                                            |
+
+### ADR-0014 · Navigation Expo Router par onglets natifs
+
+Statut : proposé. Périmètre : `apps/mobile/src/_app/routes/tabs-layout.tsx`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                        |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | NE DOIT PAS | `guardrail/nav-js-tabs`                                                                                                                                                                                                        |
+| R2    | DOIT        | convention : La barre de navigation par onglets de apps/mobile/src/_app/routes/tabs-layout.tsx est composée avec NativeTabs de expo-router/unstable-native-tabs, le seul composant qui rend des onglets natifs par plateforme. |
 
 ## Référentiel
 

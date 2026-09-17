@@ -1,11 +1,11 @@
-# Démarre l'app par le lien profond du dev client, servie par Metro, et attend l'écran d'accueil. Le lanceur du dev
-# client affiche aussi le nom de l'app : l'en-tête de la pile, qui porte le nom de la route, prouve que l'app tourne.
+# Démarre l'app par le lien profond du dev client, servie par Metro, et attend l'écran d'accueil. La barre d'onglets
+# native affiche « À la une », un libellé propre à l'app absent du lanceur, ce qui prouve que l'app elle-même tourne.
 appId: ${APP_ID}
 ---
 - stopApp
 - openLink: ${DEV_CLIENT_LINK}
 - extendedWaitUntil:
-    visible: 'index'
+    visible: 'À la une'
     timeout: 180000
 - assertVisible: 'Humanité'
 - takeScreenshot: home

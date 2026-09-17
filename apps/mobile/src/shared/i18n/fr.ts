@@ -2,4 +2,8 @@
 export const FR = {
   'app.name': 'Humanité',
   'error.generic': 'Une erreur est survenue.',
+  'nav.headline': 'À la une',
+  'nav.live': 'En continu',
+  'nav.newsstand': 'Kiosque',
+  'nav.account': 'Mon compte',
 } as const satisfies Readonly<Record<string, string>>;

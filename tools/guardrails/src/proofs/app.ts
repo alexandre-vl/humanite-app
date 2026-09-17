@@ -172,6 +172,26 @@ export function useOpacity(): number {
       }),
     ),
     define(
+      'guardrail/module-react-native-safe-area-context',
+      'une page qui lit les marges de sûreté',
+      ['module/react-native-safe-area-context'],
+      linted({
+        'src/pages/home/model/insets.ts': "export { SafeAreaProvider } from 'react-native-safe-area-context';\n",
+      }),
+    ),
+    define(
+      'guardrail/module-react-native-screens',
+      'une page qui touche un écran natif',
+      ['module/react-native-screens'],
+      linted({ 'src/pages/home/model/screens.ts': "export { ScreenStack } from 'react-native-screens';\n" }),
+    ),
+    define(
+      'guardrail/nav-js-tabs',
+      'une page qui compose la barre par les onglets JS',
+      ['nav/js-tabs'],
+      linted({ 'src/pages/home/ui/home-page.tsx': component('HomePage', 'expo-router/js-tabs', 'Tabs') }),
+    ),
+    define(
       'guardrail/route-re-export',
       'une route qui importe sa page puis l’exporte elle-même',
       ['route/re-export'],

@@ -79,6 +79,15 @@ const STYLE_SYNTAX: readonly SyntaxRestriction[] = [
 /** UI text comes from the dictionary through a DisplayText: raw text written in the JSX, whitespace aside, escapes it. */
 const TEXT_SYNTAX: readonly SyntaxRestriction[] = [{ policy: 'text/jsx', selector: String.raw`JSXText[value=/\S/]` }];
 
+/** The tab bar is composed with NativeTabs: the JS tabs of Expo Router, imported directly or as the deprecated Tabs, do not render a native bar. */
+const NAV_SYNTAX: readonly SyntaxRestriction[] = [
+  { policy: 'nav/js-tabs', selector: String.raw`ImportDeclaration[source.value='expo-router/js-tabs']` },
+  {
+    policy: 'nav/js-tabs',
+    selector: String.raw`ImportDeclaration[source.value='expo-router'] > ImportSpecifier[imported.name='Tabs']`,
+  },
+];
+
 const NODE_PROPERTIES: readonly PropertyRestriction[] = [
   { policy: 'node/process-exit', object: 'process', property: 'exit' },
 ];
@@ -196,6 +205,7 @@ const HERMES: Runtime = {
     ...CONFINED_NAMESPACES,
     ...STYLE_SYNTAX,
     ...TEXT_SYNTAX,
+    ...NAV_SYNTAX,
     ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),
   ],
   properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),

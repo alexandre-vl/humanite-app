@@ -472,6 +472,8 @@ export const BINDINGS = {
         'guardrail/module-react-native-namespace',
         'guardrail/module-react-native-gesture-handler',
         'guardrail/module-react-native-reanimated',
+        'guardrail/module-react-native-safe-area-context',
+        'guardrail/module-react-native-screens',
       ],
       R4: ['guardrail/platform-variant', 'guardrail/platform-variant-primitive'],
     },
@@ -749,6 +751,18 @@ export const BINDINGS = {
           'La prop children d’une primitive de texte est typée DisplayText, la marque opaque des contrats ; une chaîne quelconque n’y est pas assignable.',
       },
       R3: ['guardrail/text-jsx'],
+    },
+  },
+  'ADR-0014': {
+    scope: {
+      paths: ['apps/mobile/src/_app/routes/tabs-layout.tsx'],
+    },
+    rules: {
+      R1: ['guardrail/nav-js-tabs'],
+      R2: {
+        convention:
+          'La barre de navigation par onglets de apps/mobile/src/_app/routes/tabs-layout.tsx est composée avec NativeTabs de expo-router/unstable-native-tabs, le seul composant qui rend des onglets natifs par plateforme.',
+      },
     },
   },
 } as const satisfies Bindings<ProofId>;

@@ -38,6 +38,7 @@ const WRITTEN = {
   'entry/re-export': 'une entrée publique ne fait que réexporter ce que les fichiers de son unité définissent',
   'style/inline': 'construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés',
   'text/jsx': 'rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire',
+  'nav/js-tabs': 'composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native',
 } as const satisfies Readonly<Record<`${string}/${string}`, string>>;
 
 type WrittenPolicy = keyof typeof WRITTEN;
