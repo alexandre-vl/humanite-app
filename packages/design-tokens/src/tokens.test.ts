@@ -7,6 +7,7 @@ import {
   PALETTE,
   RADII,
   REDUCED_DURATIONS,
+  SIZES,
   SPACING,
 } from './index.ts';
 import type { Color, Duration, FontFamily, FontSize, LineHeight, Radius, Space } from './index.ts';
@@ -37,4 +38,11 @@ test('durations have a reduced-motion counterpart of zero', () => {
 test('the palette exposes the measured colours', () => {
   expect(PALETTE.uiRed).toBe('#f13c47');
   expectTypeOf(PALETTE.logoRed).toEqualTypeOf<Color>();
+});
+
+test('sizes give the collapsible header its bands and the scroll inset they add up to', () => {
+  expect(SIZES.headerExpanded).toBe(64);
+  expect(SIZES.sectionBar).toBe(40);
+  expect(SIZES.headerBlock).toBe(SIZES.headerExpanded + SIZES.sectionBar);
+  expectTypeOf(SIZES.headerBlock).toEqualTypeOf<Space>();
 });

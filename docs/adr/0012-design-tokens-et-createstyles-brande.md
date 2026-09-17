@@ -67,4 +67,5 @@ Option retenue : « createStyles brandé sur les tokens », parce que c’est la
 ## Informations complémentaires
 
 - L’interdiction d’un style en ligne est prouvée par une fixture des garde-fous ; R1 et R2 sont des conventions que le système de types tient.
+- Les valeurs d’une animation Reanimated — une opacité ou un `translateY` interpolés image par image — ne sont pas des tokens : le type `Style` n’a pas de `transform`, et la sortie de `useAnimatedStyle` est une valeur de mouvement calculée à l’exécution. Une primitive L0 l’applique à sa vue `Animated.View` interne, hors de la prop `style` brandée ; les bornes de l’interpolation restent des tokens.
 - Réévaluation : React Native fige une API de style strict qui rend le brandage redondant, ou `createStyles` devient un goulet mesuré au profilage.

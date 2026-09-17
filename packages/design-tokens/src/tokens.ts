@@ -52,6 +52,19 @@ export const FONT_FAMILIES = {
   display: FontFamily;
 }>;
 
+/**
+ * Component sizes in points: the collapsible header's expanded and collapsed bands, its sticky section bar, and the
+ * scroll inset those add up to — heights the four-point SPACING grid does not reach.
+ */
+const HEADER_EXPANDED = 64;
+const SECTION_BAR = 40;
+export const SIZES = {
+  headerExpanded: space(HEADER_EXPANDED),
+  headerCollapsed: space(0),
+  sectionBar: space(SECTION_BAR),
+  headerBlock: space(HEADER_EXPANDED + SECTION_BAR),
+} as const satisfies Readonly<Record<string, Space>>;
+
 /** Animation durations in milliseconds. */
 export const DURATIONS = {
   instant: duration(0),

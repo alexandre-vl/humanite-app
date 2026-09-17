@@ -1,6 +1,15 @@
 export type { Brand, Color, Duration, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
 export { PALETTE } from './palette.ts';
-export { DURATIONS, FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, RADII, REDUCED_DURATIONS, SPACING } from './tokens.ts';
+export {
+  DURATIONS,
+  FONT_FAMILIES,
+  FONT_SIZES,
+  LINE_HEIGHTS,
+  RADII,
+  REDUCED_DURATIONS,
+  SIZES,
+  SPACING,
+} from './tokens.ts';
 export { contrastRatio } from './contrast.ts';
 export type { Theme } from './theme.ts';
 export { DARK_THEME, LIGHT_THEME, THEMES } from './theme.ts';

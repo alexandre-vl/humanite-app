@@ -21,3 +21,26 @@ jest.mock('react-native-mmkv', () => {
 jest.mock('expo-splash-screen', () => ({ preventAutoHideAsync: jest.fn(), hideAsync: jest.fn() }));
 
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
+
+// react-native-reanimated (and its own mock) eagerly loads the worklets native module a headless runner lacks. This stand-in
+// gives Animated views the plain react-native ones, a shared value backed by a closure, and an animated style that runs its
+// updater once — enough for the collapsible header to render and its geometry to be exercised on the JS thread.
+jest.mock('react-native-reanimated', () => {
+  const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
+  const useSharedValue = (initial: number): { get: () => number; set: (next: number) => void } => {
+    let current = initial;
+    return {
+      get: (): number => current,
+      set: (next: number): void => {
+        current = next;
+      },
+    };
+  };
+  return {
+    __esModule: true,
+    default: reactNative,
+    useSharedValue,
+    useAnimatedScrollHandler: () => jest.fn(),
+    useAnimatedStyle: (updater: () => unknown): unknown => updater(),
+  };
+});

@@ -28,6 +28,7 @@ const WORDS = [
   'fn',
   'getprop',
   'ionice',
+  'lerp',
   'lmkd',
   'ltrace',
   'minfree',
