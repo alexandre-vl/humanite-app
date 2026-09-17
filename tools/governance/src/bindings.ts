@@ -699,4 +699,20 @@ export const BINDINGS = {
       ],
     },
   },
+  'ADR-0011': {
+    scope: {
+      paths: ['packages/contracts/**'],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Les types, erreurs et identifiants de données sont définis par des schémas Zod dans packages/contracts, que les autres paquets réemploient.',
+      },
+      R2: ['deps/dependency-confined'],
+      R3: {
+        convention:
+          'La sortie brandée d’un schéma Zod n’est pas assignable depuis une chaîne : seule l’analyse d’un schéma des contrats produit un identifiant.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

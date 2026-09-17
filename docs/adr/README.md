@@ -19,6 +19,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)        | Contrôles locaux par hooks git et garde-fous testés        | proposé | `guarded-config`                                                           |
 | [ADR-0009](0009-permissions-des-agents.md)                                     | Permissions des agents                                     | proposé | `guarded-config`                                                           |
 | [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                   | Émulateur Android Redroid sur le serveur                   | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
+| [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                 | Contrats de données en Zod                                 | proposé | `dependency`, `guarded-config`, `data-format`                              |
 
 ## Confirmation
 
@@ -157,6 +158,16 @@ Statut : proposé. Périmètre : `tools/emulator/**`.
 | R3    | DOIT   | `emulator/guard-installed-uncommitted`, `emulator/guard-not-armed`, `emulator/guard-run-stale`, `emulator/guard-scripts-changed`, `emulator/valid-guard`, `root/run-scripts-changed`, `root/arm-residue`                                                                                                                                                                                                                               |
 | R4    | DOIT   | `emulator/host-drift-session`, `emulator/host-residue-left`, `emulator/valid-clean-host`, `root/run-boot-restored`, `root/run-boot-keeps-writing`, `root/run-stop-instance`, `root/repair-clean-values`, `root/run-idle-follows`, `root/run-idle-neighbor`, `root/run-capture-failed`, `root/run-docker-unreadable`, `root/run-empty-values`, `root/run-filesystem-before-mount-point`, `root/run-unwritable`, `root/run-write-failed` |
 | R5    | DOIT   | `root/plan-any-tracefs-mode`, `root/plan-appeared-entry`, `root/plan-idle-android`, `root/plan-idle-neighbor`, `root/plan-idle-unvalued-kind`, `root/plan-instance-running`, `root/plan-instance-stopped`, `root/plan-known-attributes`, `root/plan-known-sysctl`, `root/plan-multiline`, `root/plan-other-value`, `root/plan-unknown-instance`, `root/plan-unknown-sysctl`, `root/plan-volatile`                                      |
+
+### ADR-0011 · Contrats de données en Zod
+
+Statut : proposé. Périmètre : `packages/contracts/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                  |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | convention : Les types, erreurs et identifiants de données sont définis par des schémas Zod dans packages/contracts, que les autres paquets réemploient. |
+| R2    | NE DOIT PAS | `deps/dependency-confined`                                                                                                                               |
+| R3    | DOIT        | convention : La sortie brandée d’un schéma Zod n’est pas assignable depuis une chaîne : seule l’analyse d’un schéma des contrats produit un identifiant. |
 
 ## Référentiel
 
