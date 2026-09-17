@@ -86,7 +86,11 @@ export function spellingConfig(files: readonly string[], enabled: ReadonlySet<Po
           configFile: CSPELL_CONFIG,
           cspell: {
             language: 'en',
-            words: [...WORDS, ...(glossary ? [] : GLOSSARY.map(([term]) => term))],
+            words: [
+              ...WORDS,
+              ...GLOSSARY.map(([, english]) => english),
+              ...(glossary ? [] : GLOSSARY.map(([term]) => term)),
+            ],
             flagWords: glossary ? GLOSSARY.map(([term, english]) => `${term}->${english}`) : [],
           },
         },

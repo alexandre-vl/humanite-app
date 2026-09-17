@@ -286,6 +286,22 @@ importers:
         specifier: 'catalog:'
         version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
 
+  packages/contracts:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 4.5.4
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
   packages/eslint-config:
     dependencies:
       '@cspell/eslint-plugin':

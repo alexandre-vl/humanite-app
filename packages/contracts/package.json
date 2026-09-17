@@ -1,0 +1,16 @@
+{
+  "name": "@huma/contracts",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
