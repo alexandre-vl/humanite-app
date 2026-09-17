@@ -1,0 +1,217 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { ARTICLE } from '@huma/contracts';
+import type { Article, SectionId } from '@huma/contracts';
+import { directiveFromMarkdown } from 'mdast-util-directive';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
+import type { BlockContent, DefinitionContent, PhrasingContent, RootContent } from 'mdast';
+import { directive } from 'micromark-extension-directive';
+import { frontmatter } from 'micromark-extension-frontmatter';
+import { SECTIONS } from './registries.ts';
+import { validateCorpus } from './validate.ts';
+
+/** Where each item file lives, relative to this module. */
+const CORPUS = new URL('../corpus/', import.meta.url);
+
+/** The shapes `ARTICLE` accepts as input, before it brands and validates them. */
+type RawTarget =
+  { readonly kind: 'article'; readonly id: string } | { readonly kind: 'external'; readonly url: string };
+
+type RawSpan =
+  | { readonly type: 'text'; readonly value: string }
+  | { readonly type: 'emphasis'; readonly value: string }
+  | { readonly type: 'strong'; readonly value: string }
+  | { readonly type: 'link'; readonly text: string; readonly target: RawTarget };
+
+type RawBlock =
+  | { readonly type: 'paragraph'; readonly spans: readonly RawSpan[] }
+  | { readonly type: 'heading'; readonly text: string }
+  | { readonly type: 'quote'; readonly spans: readonly RawSpan[]; readonly source?: string }
+  | { readonly type: 'image'; readonly caption: string; readonly key: string }
+  | { readonly type: 'video'; readonly title: string; readonly duration: string }
+  | { readonly type: 'related'; readonly id: string }
+  | { readonly type: 'callout'; readonly title: string; readonly text: string; readonly button: string };
+
+/** The flat `key: value` front matter; values are kept raw so a colon inside a title survives. */
+const parseFrontmatter = (text: string): Readonly<Record<string, string>> =>
+  Object.fromEntries(
+    text.split('\n').flatMap((line) => {
+      const match = /^([a-z]+):\s*(.*)$/u.exec(line);
+      return match === null ? [] : [[match[1] ?? '', (match[2] ?? '').trim()] as const];
+    }),
+  );
+
+/** A `key: a, b` scalar split into trimmed, non-empty parts. */
+const splitList = (value: string | undefined): readonly string[] =>
+  value === undefined
+    ? []
+    : value
+        .split(',')
+        .map((part) => part.trim())
+        .filter((part) => part.length > 0);
+
+/** A `légende | crédit` hero scalar. */
+const splitHero = (value: string): Readonly<{ caption: string; credit: string }> => {
+  const [caption, credit] = value.split('|').map((part) => part.trim());
+  return { caption: caption ?? '', credit: credit ?? '' };
+};
+
+/** `2026-09-10 08:30` to an ISO instant, read as UTC for a stable mock. */
+const toInstant = (value: string | undefined): string | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+  const [, date, time] = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/u.exec(value) ?? [];
+  return date === undefined || time === undefined ? value : `${date}T${time}:00.000Z`;
+};
+
+/** The plain text of inline content, line breaks becoming spaces. */
+const plain = (nodes: readonly PhrasingContent[]): string =>
+  nodes
+    .map((node): string => {
+      if (node.type === 'text' || node.type === 'inlineCode') {
+        return node.value;
+      }
+      if (node.type === 'break') {
+        return ' ';
+      }
+      return 'children' in node ? plain(node.children) : '';
+    })
+    .join('');
+
+/** Where a link points, from its url: another item, or an external page. */
+const toTarget = (url: string): RawTarget =>
+  url.startsWith('article:') ? { kind: 'article', id: url.slice('article:'.length) } : { kind: 'external', url };
+
+/** Inline content to spans; images are handled at block level, breaks and code fall back to text. */
+const toSpans = (nodes: readonly PhrasingContent[]): readonly RawSpan[] =>
+  nodes.flatMap((node): readonly RawSpan[] => {
+    if (node.type === 'text') {
+      return [{ type: 'text', value: node.value }];
+    }
+    if (node.type === 'emphasis') {
+      return [{ type: 'emphasis', value: plain(node.children) }];
+    }
+    if (node.type === 'strong') {
+      return [{ type: 'strong', value: plain(node.children) }];
+    }
+    if (node.type === 'link') {
+      return [{ type: 'link', text: plain(node.children), target: toTarget(node.url) }];
+    }
+    if (node.type === 'break' || node.type === 'inlineCode') {
+      return [{ type: 'text', value: node.type === 'break' ? ' ' : node.value }];
+    }
+    return [];
+  });
+
+/** A blockquote to a quote block, pulling out a trailing `— Source` line that a soft break joins in. */
+const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBlock => {
+  const paragraph = children.find((child) => child.type === 'paragraph');
+  if (paragraph === undefined) {
+    return { type: 'quote', spans: [] };
+  }
+  const spans = toSpans(paragraph.children);
+  const last = spans.at(-1);
+  if (last?.type === 'text' && last.value.includes('\n')) {
+    const lines = last.value.split('\n');
+    const tail = lines.at(-1) ?? '';
+    if (/^\s*—/u.test(tail)) {
+      const head = lines.slice(0, -1).join(' ').trimEnd();
+      const body: readonly RawSpan[] =
+        head.length > 0 ? [...spans.slice(0, -1), { type: 'text', value: head }] : spans.slice(0, -1);
+      return { type: 'quote', spans: body, source: tail.replace(/^\s*—\s*/u, '') };
+    }
+  }
+  return { type: 'quote', spans };
+};
+
+/** A paragraph that holds only an image becomes an image block; otherwise a paragraph of spans. */
+const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
+  const [only] = children;
+  if (children.length === 1 && only?.type === 'image') {
+    return { type: 'image', caption: only.alt ?? '', key: only.url };
+  }
+  return { type: 'paragraph', spans: toSpans(children) };
+};
+
+/** A leaf directive to its block, its `[label]` split on ` | `. */
+const toDirective = (name: string, label: string): RawBlock => {
+  const [first = '', second = '', third = ''] = label.split('|').map((part) => part.trim());
+  if (name === 'video') {
+    return { type: 'video', title: first, duration: second };
+  }
+  if (name === 'related') {
+    return { type: 'related', id: first };
+  }
+  if (name === 'callout') {
+    return { type: 'callout', title: first, text: second, button: third };
+  }
+  throw new Error(`directive inconnue : ::${name}`);
+};
+
+const toBlock = (node: RootContent): RawBlock => {
+  if (node.type === 'heading') {
+    return { type: 'heading', text: plain(node.children) };
+  }
+  if (node.type === 'paragraph') {
+    return toParagraph(node.children);
+  }
+  if (node.type === 'blockquote') {
+    return toQuote(node.children);
+  }
+  if (node.type === 'leafDirective') {
+    return toDirective(node.name, plain(node.children));
+  }
+  throw new Error(`bloc non pris en charge : ${node.type}`);
+};
+
+/** Parse one item file to the shape `ARTICLE` validates. */
+const toArticle = (text: string): Article => {
+  const tree = fromMarkdown(text, {
+    extensions: [frontmatter(['yaml']), directive()],
+    mdastExtensions: [frontmatterFromMarkdown(['yaml']), directiveFromMarkdown()],
+  });
+  const head = tree.children[0];
+  const front = parseFrontmatter(head?.type === 'yaml' ? head.value : '');
+  const hero = front['hero'];
+  const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
+  return ARTICLE.parse({
+    id: front['id'],
+    kind: front['kind'],
+    section: front['section'],
+    format: front['format'],
+    access: front['access'],
+    title: front['title'],
+    standfirst: front['standfirst'],
+    authors: splitList(front['authors']),
+    publishedAt: toInstant(front['published']),
+    tags: splitList(front['tags']),
+    ...(hero === undefined ? {} : { hero: splitHero(hero) }),
+    ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
+    blocks: body.map(toBlock),
+  });
+};
+
+/** Reads and validates every item, throwing an aggregate error when the corpus breaks any rule. */
+export function buildCorpus(): readonly Article[] {
+  const errors: string[] = [];
+  const items: { readonly folder: SectionId; readonly article: Article }[] = [];
+  for (const section of SECTIONS) {
+    const directory = new URL(`${section.id}/`, CORPUS);
+    const files = readdirSync(directory)
+      .filter((name) => name.endsWith('.md'))
+      .toSorted((left, right) => left.localeCompare(right));
+    for (const file of files) {
+      try {
+        items.push({ folder: section.id, article: toArticle(readFileSync(new URL(file, directory), 'utf8')) });
+      } catch (error) {
+        errors.push(`${section.id}/${file} : ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
+  errors.push(...validateCorpus(items));
+  if (errors.length > 0) {
+    throw new Error(`corpus invalide :\n${errors.join('\n')}`);
+  }
+  return items.map((item) => item.article).toSorted((left, right) => left.id.localeCompare(right.id));
+}

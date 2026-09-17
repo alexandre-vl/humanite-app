@@ -23,6 +23,9 @@
       "path": "./packages/eslint-config"
     },
     {
+      "path": "./packages/mock-content"
+    },
+    {
       "path": "./tools/adr"
     },
     {

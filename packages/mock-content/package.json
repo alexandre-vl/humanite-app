@@ -1,0 +1,26 @@
+{
+  "name": "@huma/mock-content",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "generate": "node src/generate.ts"
+  },
+  "dependencies": {
+    "@huma/contracts": "workspace:*",
+    "mdast-util-directive": "catalog:",
+    "mdast-util-from-markdown": "catalog:",
+    "mdast-util-frontmatter": "catalog:",
+    "micromark-extension-directive": "catalog:",
+    "micromark-extension-frontmatter": "catalog:"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/mdast": "catalog:",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

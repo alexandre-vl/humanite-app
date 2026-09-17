@@ -1,0 +1,5 @@
+{
+  "extends": "@huma/tsconfig/node.json",
+  "include": ["src"],
+  "references": [{ "path": "../contracts" }]
+}
