@@ -16,3 +16,8 @@ jest.mock('react-native-mmkv', () => {
     }),
   };
 });
+
+// expo-splash-screen and expo-font reach native modules absent from a headless runner; the startup-gate test drives them.
+jest.mock('expo-splash-screen', () => ({ preventAutoHideAsync: jest.fn(), hideAsync: jest.fn() }));
+
+jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));

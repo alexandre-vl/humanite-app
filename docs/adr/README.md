@@ -25,6 +25,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                  | Navigation Expo Router par onglets natifs                  | proposé | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                   | Cache de données TanStack Query persisté                   | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)        | Tests par environnement Vitest jest-expo et Maestro        | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0017](0017-typographie-et-licences-des-polices.md)                        | Typographie et licences des polices                        | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 
 ## Confirmation
 
@@ -221,6 +222,15 @@ Statut : proposé. Périmètre : `apps/mobile/jest.config.cjs`, `apps/mobile/jes
 | R1    | NE DOIT PAS | `guardrail/test-describe-only`, `guardrail/test-it-only`, `guardrail/test-test-only`                                                                                                                         |
 | R2    | DOIT        | convention : Les composants et la logique de apps/mobile sont testés par jest-expo et RNTL, configurés par apps/mobile/jest.config.cjs ; Vitest teste les paquets et les outils, Maestro teste les parcours. |
 | R3    | DOIT        | convention : Les tests de apps/mobile passent par la commande test:app de pnpm verify, déclarée dans tools/governance/src/commands.ts ; le pre-commit rejoue la vérification, donc chaque commit les passe.  |
+
+### ADR-0017 · Typographie et licences des polices
+
+Statut : proposé. Périmètre : `apps/mobile/src/_app/model/fonts.ts`, `apps/mobile/src/_app/routes/startup-gate.tsx`, `apps/mobile/src/shared/lib/startup/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                       |
+| ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-expo-font`, `guardrail/module-expo-splash-screen`                                                                                                                                                           |
+| R2    | DOIT        | convention : Une famille de police est un token FontFamily de @huma/design-tokens (FONT_FAMILIES) ; le champ fontFamily de create-styles accepte ce seul type brandé, donc une chaîne libre ne peut pas entrer dans un style. |
 
 ## Référentiel
 

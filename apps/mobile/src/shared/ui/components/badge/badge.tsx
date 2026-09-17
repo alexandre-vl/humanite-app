@@ -1,5 +1,5 @@
 import type { DisplayText } from '@huma/contracts';
-import { FONT_SIZES, FONT_WEIGHTS, LIGHT_THEME, RADII, SPACING } from '@huma/design-tokens';
+import { FONT_FAMILIES, FONT_SIZES, LIGHT_THEME, RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '../../../lib/styles';
 import { Box } from '../../primitives/box';
@@ -15,7 +15,7 @@ const styles = createStyles({
     borderRadius: RADII.sm,
     backgroundColor: LIGHT_THEME.premium,
   },
-  label: { fontSize: FONT_SIZES.xs, fontWeight: FONT_WEIGHTS.bold, color: LIGHT_THEME.textPrimary },
+  label: { fontSize: FONT_SIZES.xs, fontFamily: FONT_FAMILIES.body.bold, color: LIGHT_THEME.textPrimary },
 });
 
 /** A small status marker, such as the premium tag on an item. */

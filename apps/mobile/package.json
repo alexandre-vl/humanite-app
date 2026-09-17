@@ -16,6 +16,8 @@
     "#api": "./src/shared/api/index.ts"
   },
   "dependencies": {
+    "@expo-google-fonts/anton": "catalog:",
+    "@expo-google-fonts/overpass": "catalog:",
     "@expo/dom-webview": "catalog:",
     "@expo/log-box": "catalog:",
     "@expo/metro-runtime": "catalog:",
@@ -26,8 +28,10 @@
     "expo": "catalog:",
     "expo-constants": "catalog:",
     "expo-dev-client": "catalog:",
+    "expo-font": "catalog:",
     "expo-linking": "catalog:",
     "expo-router": "catalog:",
+    "expo-splash-screen": "catalog:",
     "expo-system-ui": "catalog:",
     "react": "catalog:",
     "react-native": "catalog:",

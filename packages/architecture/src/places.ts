@@ -184,8 +184,11 @@ type ModulePolicy = Readonly<{
 /**
  * Packages whose use the component levels confine: native views, animations and gestures live in L0 primitives,
  * which alone touch the native layer; `Platform` answers a question, not a view, and stays open to every place.
+ * Startup modules — font loading and the splash screen — live in the app layer that drives them.
  */
 export const MODULES = {
+  'expo-font': { places: ['app'], except: [] },
+  'expo-splash-screen': { places: ['app'], except: [] },
   'react-native': { places: ['primitive'], except: ['Platform'] },
   'react-native-gesture-handler': { places: ['primitive'], except: [] },
   'react-native-mmkv': { places: ['lib'], except: [] },

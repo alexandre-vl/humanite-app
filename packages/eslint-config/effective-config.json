@@ -24,6 +24,7 @@
               "adbd",
               "adrs",
               "alnum",
+              "anton",
               "backquoted",
               "capsh",
               "chattr",
@@ -34,6 +35,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "fn",
               "getprop",
               "ionice",
               "lmkd",
@@ -45,6 +47,7 @@
               "nohup",
               "nosystem",
               "nsenter",
+              "overpass",
               "pathspec",
               "pids",
               "pkexec",
@@ -657,6 +660,7 @@
               "adbd",
               "adrs",
               "alnum",
+              "anton",
               "backquoted",
               "capsh",
               "chattr",
@@ -667,6 +671,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "fn",
               "getprop",
               "ionice",
               "lmkd",
@@ -678,6 +683,7 @@
               "nohup",
               "nosystem",
               "nsenter",
+              "overpass",
               "pathspec",
               "pids",
               "pkexec",
@@ -1144,6 +1150,7 @@
               "adbd",
               "adrs",
               "alnum",
+              "anton",
               "backquoted",
               "capsh",
               "chattr",
@@ -1154,6 +1161,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "fn",
               "getprop",
               "ionice",
               "lmkd",
@@ -1165,6 +1173,7 @@
               "nohup",
               "nosystem",
               "nsenter",
+              "overpass",
               "pathspec",
               "pids",
               "pkexec",
@@ -2178,6 +2187,220 @@
                   }
                 ]
               }
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-font"
+                  }
+                }
+              },
+              "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-splash-screen"
+                  }
+                }
+              },
+              "message": "[module/expo-splash-screen] expo-splash-screen ne s’importe que depuis : app"
             },
             {
               "from": [
@@ -3087,6 +3310,14 @@
           "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
         },
         {
+          "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-splash-screen'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-splash-screen] expo-splash-screen ne s’importe que depuis : app"
+        },
+        {
           "selector": "ImportDeclaration[source.value='react-native'] > ImportNamespaceSpecifier",
           "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
         },
@@ -3546,6 +3777,7 @@
               "adbd",
               "adrs",
               "alnum",
+              "anton",
               "backquoted",
               "capsh",
               "chattr",
@@ -3556,6 +3788,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "fn",
               "getprop",
               "ionice",
               "lmkd",
@@ -3567,6 +3800,7 @@
               "nohup",
               "nosystem",
               "nsenter",
+              "overpass",
               "pathspec",
               "pids",
               "pkexec",
@@ -4590,6 +4824,220 @@
                 },
                 {
                   "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-font"
+                  }
+                }
+              },
+              "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-splash-screen"
+                  }
+                }
+              },
+              "message": "[module/expo-splash-screen] expo-splash-screen ne s’importe que depuis : app"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "app"
                   }
                 },
@@ -5490,6 +5938,14 @@
         {
           "selector": "ExportAllDeclaration",
           "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-splash-screen'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-splash-screen] expo-splash-screen ne s’importe que depuis : app"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native'] > ImportNamespaceSpecifier",
@@ -5947,6 +6403,7 @@
               "adbd",
               "adrs",
               "alnum",
+              "anton",
               "backquoted",
               "capsh",
               "chattr",
@@ -5957,6 +6414,7 @@
               "debugfs",
               "dirents",
               "doas",
+              "fn",
               "getprop",
               "ionice",
               "lmkd",
@@ -5968,6 +6426,7 @@
               "nohup",
               "nosystem",
               "nsenter",
+              "overpass",
               "pathspec",
               "pids",
               "pkexec",
@@ -6991,6 +7450,220 @@
                 },
                 {
                   "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-font"
+                  }
+                }
+              },
+              "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-splash-screen"
+                  }
+                }
+              },
+              "message": "[module/expo-splash-screen] expo-splash-screen ne s’importe que depuis : app"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "app"
                   }
                 },
@@ -7891,6 +8564,14 @@
         {
           "selector": "ExportAllDeclaration",
           "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-splash-screen'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-splash-screen] expo-splash-screen ne s’importe que depuis : app"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native'] > ImportNamespaceSpecifier",

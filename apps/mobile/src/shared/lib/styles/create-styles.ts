@@ -1,4 +1,4 @@
-import type { Brand, Color, FontSize, FontWeight, Radius, Space } from '@huma/design-tokens';
+import type { Brand, Color, FontFamily, FontSize, Radius, Space } from '@huma/design-tokens';
 
 /**
  * A style built only from design tokens: every value that carries a dimension or a colour is a branded token, so a raw
@@ -48,8 +48,8 @@ type Style = Readonly<{
   borderColor?: Color;
   backgroundColor?: Color;
   color?: Color;
+  fontFamily?: FontFamily;
   fontSize?: FontSize;
-  fontWeight?: FontWeight;
   textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify';
   opacity?: number;
   overflow?: 'visible' | 'hidden';

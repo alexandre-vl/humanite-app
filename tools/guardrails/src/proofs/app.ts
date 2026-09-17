@@ -192,6 +192,18 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/store.ts': "export { createMMKV } from 'react-native-mmkv';\n" }),
     ),
     define(
+      'guardrail/module-expo-font',
+      'une page qui charge une police',
+      ['module/expo-font'],
+      linted({ 'src/pages/home/model/fonts.ts': "export { useFonts } from 'expo-font';\n" }),
+    ),
+    define(
+      'guardrail/module-expo-splash-screen',
+      'une page qui pilote le splash',
+      ['module/expo-splash-screen'],
+      linted({ 'src/pages/home/model/splash.ts': "export { hideAsync } from 'expo-splash-screen';\n" }),
+    ),
+    define(
       'guardrail/nav-js-tabs',
       'une page qui compose la barre par les onglets JS',
       ['nav/js-tabs'],

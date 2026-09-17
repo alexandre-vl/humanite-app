@@ -1,5 +1,5 @@
-import type { Duration, FontSize, FontWeight, LineHeight, Radius, Space } from './brand.ts';
-import { duration, fontSize, fontWeight, lineHeight, radius, space } from './brand.ts';
+import type { Duration, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
+import { duration, fontFamily, fontSize, lineHeight, radius, space } from './brand.ts';
 
 /** Spacing scale in points, on a four-point grid. */
 export const SPACING = {
@@ -39,12 +39,18 @@ export const LINE_HEIGHTS = {
   loose: lineHeight(1.6),
 } as const satisfies Readonly<Record<string, LineHeight>>;
 
-/** Font weights (docs/app-actuelle: Roboto Light, Regular, Bold). */
-export const FONT_WEIGHTS = {
-  light: fontWeight('300'),
-  regular: fontWeight('400'),
-  bold: fontWeight('700'),
-} as const satisfies Readonly<Record<string, FontWeight>>;
+/** Font families: Overpass for body text, one face per weight; Anton for display titles (docs/app-actuelle). */
+export const FONT_FAMILIES = {
+  body: {
+    light: fontFamily('Overpass_300Light'),
+    regular: fontFamily('Overpass_400Regular'),
+    bold: fontFamily('Overpass_700Bold'),
+  },
+  display: fontFamily('Anton_400Regular'),
+} as const satisfies Readonly<{
+  body: Readonly<Record<'light' | 'regular' | 'bold', FontFamily>>;
+  display: FontFamily;
+}>;
 
 /** Animation durations in milliseconds. */
 export const DURATIONS = {
