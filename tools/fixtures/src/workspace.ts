@@ -39,6 +39,22 @@ export async function writeTree(root: string, tree: FileTree): Promise<void> {
   }
 }
 
+const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+  typeof value === 'object' && value !== null;
+
+/**
+ * A tsconfig's JSON without its `references`: they point at workspace packages a fixture tree does not hold, so a copy
+ * would carry dangling references that crash tsconfck. A fixture imports no workspace package, so it never needs them.
+ */
+export function withoutReferences(tsconfig: string): string {
+  const parsed: unknown = JSON.parse(tsconfig);
+  if (!isRecord(parsed)) {
+    return tsconfig;
+  }
+  const entries = Object.entries(parsed).filter(([key]) => key !== 'references');
+  return `${JSON.stringify(Object.fromEntries(entries), null, 2)}\n`;
+}
+
 /** Parent directories of `path` inside the tree, deepest first. */
 const parentsOf = (path: string): readonly string[] =>
   path

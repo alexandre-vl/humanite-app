@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { APP_DIRECTORY, HERMES_DIRECTORIES } from '@huma/architecture';
 import type { FileTree } from '@huma/fixtures';
-import { fixtureFactory, IN_PROCESS, workspaceCopy } from '@huma/fixtures';
+import { fixtureFactory, IN_PROCESS, withoutReferences, workspaceCopy } from '@huma/fixtures';
 import { findWorkspaceRoot } from '@huma/kit/cli';
 import type { StructureCode } from '../checks.ts';
 import { cycleFindings } from '../cycles.ts';
@@ -45,7 +45,7 @@ const checked = (files: FileTree) => async (): Promise<readonly StructureCode[]>
   const workspace = await findWorkspaceRoot(import.meta.dirname);
   const tree: FileTree = {
     [`${APP}/package.json`]: await readFile(join(workspace, APP, 'package.json'), 'utf8'),
-    [`${APP}/tsconfig.json`]: await readFile(join(workspace, APP, 'tsconfig.json'), 'utf8'),
+    [`${APP}/tsconfig.json`]: withoutReferences(await readFile(join(workspace, APP, 'tsconfig.json'), 'utf8')),
     [`${APP}/app/index.tsx`]: ROUTE,
     ...Object.fromEntries(Object.entries(files).map(([path, content]) => [`${APP}/${path}`, content])),
   };

@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { APP_DIRECTORY } from '@huma/architecture';
+import { withoutReferences } from '@huma/fixtures';
 import type { FileTree } from '@huma/fixtures';
 import { findWorkspaceRoot } from '@huma/kit/cli';
 
@@ -72,7 +73,7 @@ export async function appTree(files: FileTree): Promise<FileTree> {
   const tree = { ...APP_FILES, ...files };
   return {
     [`${APP_DIRECTORY}/package.json`]: await readFile(join(app, 'package.json'), 'utf8'),
-    [`${APP_DIRECTORY}/tsconfig.json`]: await readFile(join(app, 'tsconfig.json'), 'utf8'),
+    [`${APP_DIRECTORY}/tsconfig.json`]: withoutReferences(await readFile(join(app, 'tsconfig.json'), 'utf8')),
     ...Object.fromEntries(Object.entries(tree).map(([path, content]) => [`${APP_DIRECTORY}/${path}`, content])),
   };
 }

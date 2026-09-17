@@ -20,6 +20,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0009](0009-permissions-des-agents.md)                                     | Permissions des agents                                     | proposé | `guarded-config`                                                           |
 | [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                   | Émulateur Android Redroid sur le serveur                   | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                 | Contrats de données en Zod                                 | proposé | `dependency`, `guarded-config`, `data-format`                              |
+| [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                       | Design tokens et createStyles brandé                       | proposé | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -168,6 +169,16 @@ Statut : proposé. Périmètre : `packages/contracts/**`.
 | R1    | DOIT        | convention : Les types, erreurs et identifiants de données sont définis par des schémas Zod dans packages/contracts, que les autres paquets réemploient. |
 | R2    | NE DOIT PAS | `deps/dependency-confined`                                                                                                                               |
 | R3    | DOIT        | convention : La sortie brandée d’un schéma Zod n’est pas assignable depuis une chaîne : seule l’analyse d’un schéma des contrats produit un identifiant. |
+
+### ADR-0012 · Design tokens et createStyles brandé
+
+Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/shared/lib/styles/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                       |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | convention : Le type Style de apps/mobile/src/shared/lib/styles n’accepte comme valeur dimensionnelle ou colorée qu’un token brandé de @huma/design-tokens, hors de portée d’un nombre ou d’une chaîne bruts. |
+| R2    | DOIT        | convention : La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.                                         |
+| R3    | NE DOIT PAS | `guardrail/style-inline`                                                                                                                                                                                      |
 
 ## Référentiel
 

@@ -715,4 +715,20 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0012': {
+    scope: {
+      paths: ['packages/design-tokens/**', 'apps/mobile/src/shared/lib/styles/**'],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Le type Style de apps/mobile/src/shared/lib/styles n’accepte comme valeur dimensionnelle ou colorée qu’un token brandé de @huma/design-tokens, hors de portée d’un nombre ou d’une chaîne bruts.',
+      },
+      R2: {
+        convention:
+          'La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.',
+      },
+      R3: ['guardrail/style-inline'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

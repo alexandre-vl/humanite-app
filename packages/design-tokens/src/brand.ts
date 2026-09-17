@@ -1,13 +1,13 @@
 /** A value only a constructor of this module can produce: a plain number or string is not a token. */
 declare const brand: unique symbol;
-type Brand<Value, Name extends string> = Value & Readonly<{ [brand]: Name }>;
+export type Brand<Value, Name extends string> = Value & Readonly<{ [brand]: Name }>;
 
 export type Space = Brand<number, 'Space'>;
 export type Radius = Brand<number, 'Radius'>;
 export type FontSize = Brand<number, 'FontSize'>;
 export type LineHeight = Brand<number, 'LineHeight'>;
 export type Duration = Brand<number, 'Duration'>;
-export type FontWeight = Brand<string, 'FontWeight'>;
+export type FontWeight = Brand<'100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900', 'FontWeight'>;
 export type Color = Brand<string, 'Color'>;
 
 const HEX = /^#[0-9a-f]{6}$/u;

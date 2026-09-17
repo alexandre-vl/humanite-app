@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
+import { createStyles } from '../../../lib/styles';
+import type { StyleRef } from '../../../lib/styles';
 
-export type SurfaceProps = Readonly<{ children: ReactNode }>;
+export type SurfaceProps = Readonly<{ children: ReactNode; style?: StyleRef }>;
 
-const styles = StyleSheet.create({ surface: { flex: 1 } });
+const styles = createStyles({ surface: { flex: 1 } });
 
 /** The ground a screen draws on, filling the space its parent gives it. */
-export function Surface({ children }: SurfaceProps): ReactNode {
-  return <View style={styles.surface}>{children}</View>;
+export function Surface({ children, style }: SurfaceProps): ReactNode {
+  return <View style={[styles.surface, style]}>{children}</View>;
 }

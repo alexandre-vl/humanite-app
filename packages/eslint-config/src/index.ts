@@ -71,6 +71,11 @@ const ENTRY_SYNTAX: readonly SyntaxRestriction[] = [
   { policy: 'entry/re-export', selector: 'Program > :not(ExportNamedDeclaration[source])' },
 ];
 
+/** Styles come from createStyles, the one constructor that turns tokens into a StyleRef: an inline style object escapes it, even nested in a style array. */
+const STYLE_SYNTAX: readonly SyntaxRestriction[] = [
+  { policy: 'style/inline', selector: 'JSXAttribute[name.name="style"] > JSXExpressionContainer ObjectExpression' },
+];
+
 const NODE_PROPERTIES: readonly PropertyRestriction[] = [
   { policy: 'node/process-exit', object: 'process', property: 'exit' },
 ];
@@ -184,7 +189,7 @@ const CONFINED_NAMESPACES: readonly SyntaxRestriction[] = CONFINED_MODULES.map((
 }));
 
 const HERMES: Runtime = {
-  syntax: [...CONFINED_NAMESPACES, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax)],
+  syntax: [...CONFINED_NAMESPACES, ...STYLE_SYNTAX, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax)],
   properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),
   globals: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.globals),
   naming: HERMES_NAMING,

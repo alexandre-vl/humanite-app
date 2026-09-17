@@ -264,6 +264,34 @@ export function useOpacity(): number {
           "export { APP_NAME as formatTitle } from '#config';\n\nexport const favoriteCount = 1;\n",
       }),
     ),
+    define(
+      'guardrail/style-inline',
+      'une primitive qui écrit un style en ligne au lieu de passer par createStyles',
+      ['style/inline'],
+      linted({
+        'src/shared/ui/primitives/surface/surface.tsx': `import type { ReactNode } from 'react';
+import { View } from 'react-native';
+
+export function Surface(): ReactNode {
+  return <View style={{ flex: 1 }} />;
+}
+`,
+      }),
+    ),
+    define(
+      'guardrail/style-inline-array',
+      'une primitive qui glisse un style en ligne dans un tableau de styles',
+      ['style/inline'],
+      linted({
+        'src/shared/ui/primitives/surface/surface.tsx': `import type { ReactNode } from 'react';
+import { View } from 'react-native';
+
+export function Surface(): ReactNode {
+  return <View style={[{ flex: 1 }]} />;
+}
+`,
+      }),
+    ),
   ] as const;
 };
 
