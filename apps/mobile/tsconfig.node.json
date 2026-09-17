@@ -1,4 +1,4 @@
 {
   "extends": "@huma/tsconfig/node.json",
-  "include": ["app.config.ts", "metro.config.ts"]
+  "include": ["app.config.ts", "jest.setup.ts", "metro.config.ts"]
 }

@@ -777,4 +777,25 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0016': {
+    scope: {
+      paths: [
+        'apps/mobile/jest.config.cjs',
+        'apps/mobile/jest.setup.ts',
+        'apps/mobile/**/*.test.ts',
+        'apps/mobile/**/*.test.tsx',
+      ],
+    },
+    rules: {
+      R1: ['guardrail/test-describe-only', 'guardrail/test-it-only', 'guardrail/test-test-only'],
+      R2: {
+        convention:
+          'Les composants et la logique de apps/mobile sont testés par jest-expo et RNTL, configurés par apps/mobile/jest.config.cjs ; Vitest teste les paquets et les outils, Maestro teste les parcours.',
+      },
+      R3: {
+        convention:
+          'Les tests de apps/mobile passent par la commande test:app de pnpm verify, déclarée dans tools/governance/src/commands.ts ; le pre-commit rejoue la vérification, donc chaque commit les passe.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

@@ -223,6 +223,12 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'tests et fixtures des outils',
   },
+  'test:app': {
+    program: cli('test-app'),
+    arguments: [],
+    audience: 'everyone',
+    summary: 'tests jest-expo et RNTL de l’app',
+  },
   typecheck: {
     program: binary('tsc'),
     arguments: ['--build'],
@@ -271,6 +277,7 @@ export const VERIFY_PLAN = [
   { step: 'lint', budgetMs: 600_000 },
   { step: 'typecheck', budgetMs: 600_000 },
   { step: 'test', budgetMs: 900_000 },
+  { step: 'test:app', budgetMs: 600_000 },
   { step: 'adr:check', budgetMs: 300_000, staged: ['--source', 'index'] },
 ] as const satisfies readonly VerifyEntry[];
 

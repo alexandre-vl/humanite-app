@@ -6,7 +6,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 
 ## Avant de terminer
 
-- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `deps:check`, `format:check`, `expo:types`, `structure:check`, `knip`, `lint`, `typecheck`, `test`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
+- `pnpm verify` doit passer : `gen:check`, `hooks:check`, `deps:check`, `format:check`, `expo:types`, `structure:check`, `knip`, `lint`, `typecheck`, `test`, `test:app`, `adr:check`. Le hook Stop le relance quand l’arbre a changé depuis la dernière vérification verte.
 - Les sessions de Claude Code démarrent à la racine du dépôt : les réglages et les hooks du projet ne sont lus que depuis le `.claude/` du dossier de démarrage.
 
 ## Commandes
@@ -37,6 +37,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm lint`             | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré                    |
 | `pnpm structure:check`  | vérifie la structure Feature-Sliced de chaque app avec Steiger et y cherche les cycles d’imports       |
 | `pnpm test`             | tests et fixtures des outils                                                                           |
+| `pnpm test:app`         | tests jest-expo et RNTL de l’app                                                                       |
 | `pnpm typecheck`        | vérification des types de chaque projet                                                                |
 | `pnpm verify`           | tous les contrôles du dépôt, dans l’ordre                                                              |
 

@@ -70,7 +70,7 @@
       "types": ["node"],
       "verbatimModuleSyntax": true
     },
-    "include": ["app.config.ts", "metro.config.ts"],
+    "include": ["app.config.ts", "jest.setup.ts", "metro.config.ts"],
     "exclude": ["<projet>/node_modules/.cache/tsc"]
   },
   "packages/architecture/tsconfig.json": {

@@ -35,6 +35,7 @@
     "lint": "node tools/governance/src/cli/lint.ts",
     "structure:check": "node tools/governance/src/cli/structure-check.ts",
     "test": "vitest run",
+    "test:app": "node tools/governance/src/cli/test-app.ts",
     "typecheck": "tsc --build",
     "verify": "node tools/governance/src/cli/verify.ts"
   },

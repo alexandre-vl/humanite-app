@@ -24,6 +24,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                    | Textes UI en dictionnaire français typé                    | proposé | `guarded-config`, `boundary`, `data-format`                                |
 | [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                  | Navigation Expo Router par onglets natifs                  | proposé | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                   | Cache de données TanStack Query persisté                   | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
+| [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)        | Tests par environnement Vitest jest-expo et Maestro        | proposé | `dependency`, `guarded-config`                                             |
 
 ## Confirmation
 
@@ -210,6 +211,16 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/storage/**`, `apps/
 | ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | NE DOIT PAS | `guardrail/module-react-native-mmkv`                                                                                                                                                                                                                           |
 | R2    | DOIT        | convention : Le buster du cache de PersistQueryClientProvider est CACHE_BUSTER, la constante que pnpm gen calcule en hachant les sources de packages/contracts ; gen:check refuse une valeur périmée, donc un changement des contrats jette le cache persisté. |
+
+### ADR-0016 · Tests par environnement Vitest jest-expo et Maestro
+
+Statut : proposé. Périmètre : `apps/mobile/jest.config.cjs`, `apps/mobile/jest.setup.ts`, `apps/mobile/**/*.test.ts`, `apps/mobile/**/*.test.tsx`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                      |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | NE DOIT PAS | `guardrail/test-describe-only`, `guardrail/test-it-only`, `guardrail/test-test-only`                                                                                                                         |
+| R2    | DOIT        | convention : Les composants et la logique de apps/mobile sont testés par jest-expo et RNTL, configurés par apps/mobile/jest.config.cjs ; Vitest teste les paquets et les outils, Maestro teste les parcours. |
+| R3    | DOIT        | convention : Les tests de apps/mobile passent par la commande test:app de pnpm verify, déclarée dans tools/governance/src/commands.ts ; le pre-commit rejoue la vérification, donc chaque commit les passe.  |
 
 ## Référentiel
 
