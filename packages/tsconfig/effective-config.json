@@ -111,6 +111,7 @@
   "packages/contracts/tsconfig.json": {
     "compilerOptions": {
       "allowImportingTsExtensions": true,
+      "allowJs": false,
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "composite": true,
@@ -125,6 +126,7 @@
       "module": "nodenext",
       "moduleDetection": "force",
       "moduleResolution": "nodenext",
+      "noEmit": false,
       "noFallthroughCasesInSwitch": true,
       "noImplicitOverride": true,
       "noImplicitReturns": true,
@@ -145,6 +147,7 @@
   "packages/design-tokens/tsconfig.json": {
     "compilerOptions": {
       "allowImportingTsExtensions": true,
+      "allowJs": false,
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "composite": true,
@@ -159,6 +162,7 @@
       "module": "nodenext",
       "moduleDetection": "force",
       "moduleResolution": "nodenext",
+      "noEmit": false,
       "noFallthroughCasesInSwitch": true,
       "noImplicitOverride": true,
       "noImplicitReturns": true,
@@ -214,6 +218,7 @@
   "packages/mock-api/tsconfig.json": {
     "compilerOptions": {
       "allowImportingTsExtensions": true,
+      "allowJs": false,
       "allowUnreachableCode": false,
       "allowUnusedLabels": false,
       "composite": true,
@@ -228,6 +233,7 @@
       "module": "nodenext",
       "moduleDetection": "force",
       "moduleResolution": "nodenext",
+      "noEmit": false,
       "noFallthroughCasesInSwitch": true,
       "noImplicitOverride": true,
       "noImplicitReturns": true,

@@ -15,6 +15,8 @@ export const SPAN = z.discriminatedUnion('type', [
   z.object({ type: z.literal('link'), text: z.string(), target: LINK_TARGET }),
 ]);
 export type Span = z.infer<typeof SPAN>;
+/** The raw shape `SPAN` accepts as input, before it validates it. */
+export type SpanInput = z.input<typeof SPAN>;
 
 /** A block of an article body. */
 export const BLOCK = z.discriminatedUnion('type', [
@@ -27,6 +29,8 @@ export const BLOCK = z.discriminatedUnion('type', [
   z.object({ type: z.literal('callout'), title: z.string(), text: z.string(), button: z.string() }),
 ]);
 export type Block = z.infer<typeof BLOCK>;
+/** The raw shape `BLOCK` accepts as input, before it brands and validates it. */
+export type BlockInput = z.input<typeof BLOCK>;
 
 /** A section of the newspaper: its id, three-letter code, label and order in the bar. */
 export const SECTION = z.object({

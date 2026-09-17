@@ -17,7 +17,7 @@ export type Theme = Readonly<{
 }>;
 
 /** The light theme, built from the measured palette. */
-export const LIGHT_THEME: Theme = {
+export const LIGHT_THEME = {
   background: PALETTE.white,
   surface: PALETTE.white,
   card: PALETTE.cardGrey,
@@ -28,10 +28,10 @@ export const LIGHT_THEME: Theme = {
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
   systemBar: PALETTE.systemBarRed,
-};
+} as const satisfies Theme;
 
 /** The dark theme, derived from the measured dark background #141414. */
-export const DARK_THEME: Theme = {
+export const DARK_THEME = {
   background: PALETTE.darkBackground,
   surface: color('#1e1e1e'),
   card: color('#242424'),
@@ -42,7 +42,7 @@ export const DARK_THEME: Theme = {
   premium: PALETTE.premiumYellow,
   border: color('#333333'),
   systemBar: PALETTE.darkBackground,
-};
+} as const satisfies Theme;
 
 /** The themes by name. */
 export const THEMES = { light: LIGHT_THEME, dark: DARK_THEME } as const satisfies Readonly<Record<string, Theme>>;

@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { ARTICLE } from '@huma/contracts';
-import type { Article, SectionId } from '@huma/contracts';
+import type { Article, BlockInput, SectionId, SpanInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -13,24 +13,10 @@ import { validateCorpus } from './validate.ts';
 /** Where each item file lives, relative to this module. */
 const CORPUS = new URL('../corpus/', import.meta.url);
 
-/** The shapes `ARTICLE` accepts as input, before it brands and validates them. */
-type RawTarget =
-  { readonly kind: 'article'; readonly id: string } | { readonly kind: 'external'; readonly url: string };
-
-type RawSpan =
-  | { readonly type: 'text'; readonly value: string }
-  | { readonly type: 'emphasis'; readonly value: string }
-  | { readonly type: 'strong'; readonly value: string }
-  | { readonly type: 'link'; readonly text: string; readonly target: RawTarget };
-
-type RawBlock =
-  | { readonly type: 'paragraph'; readonly spans: readonly RawSpan[] }
-  | { readonly type: 'heading'; readonly text: string }
-  | { readonly type: 'quote'; readonly spans: readonly RawSpan[]; readonly source?: string }
-  | { readonly type: 'image'; readonly caption: string; readonly key: string }
-  | { readonly type: 'video'; readonly title: string; readonly duration: string }
-  | { readonly type: 'related'; readonly id: string }
-  | { readonly type: 'callout'; readonly title: string; readonly text: string; readonly button: string };
+/** The shapes `ARTICLE` accepts as input, before it brands and validates them, derived from the contracts. */
+type RawSpan = SpanInput;
+type RawBlock = BlockInput;
+type RawTarget = Extract<RawSpan, { type: 'link' }>['target'];
 
 /** The flat `key: value` front matter; values are kept raw so a colon inside a title survives. */
 const parseFrontmatter = (text: string): Readonly<Record<string, string>> =>
@@ -84,8 +70,8 @@ const toTarget = (url: string): RawTarget =>
   url.startsWith('article:') ? { kind: 'article', id: url.slice('article:'.length) } : { kind: 'external', url };
 
 /** Inline content to spans; images are handled at block level, breaks and code fall back to text. */
-const toSpans = (nodes: readonly PhrasingContent[]): readonly RawSpan[] =>
-  nodes.flatMap((node): readonly RawSpan[] => {
+const toSpans = (nodes: readonly PhrasingContent[]): RawSpan[] =>
+  nodes.flatMap((node): RawSpan[] => {
     if (node.type === 'text') {
       return [{ type: 'text', value: node.value }];
     }
@@ -117,7 +103,7 @@ const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBl
     const tail = lines.at(-1) ?? '';
     if (/^\s*—/u.test(tail)) {
       const head = lines.slice(0, -1).join(' ').trimEnd();
-      const body: readonly RawSpan[] =
+      const body: RawSpan[] =
         head.length > 0 ? [...spans.slice(0, -1), { type: 'text', value: head }] : spans.slice(0, -1);
       return { type: 'quote', spans: body, source: tail.replace(/^\s*—\s*/u, '') };
     }

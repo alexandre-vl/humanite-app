@@ -34,10 +34,14 @@ const matches = (summary: ArticleSummary, query: string): boolean => {
   );
 };
 
-const page = (items: readonly ArticleSummary[], cursor: string | undefined, limit: number): Page<ArticleSummary> => {
+const page = (
+  items: readonly ArticleSummary[],
+  cursor: string | undefined,
+  limit: number | undefined,
+): Page<ArticleSummary> => {
   const parsed = cursor === undefined ? 0 : Number.parseInt(cursor, 10);
   const offset = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
-  const size = limit > 0 ? limit : DEFAULT_LIMIT;
+  const size = limit !== undefined && limit > 0 ? limit : DEFAULT_LIMIT;
   const next = offset + size;
   return {
     items: items.slice(offset, next),
@@ -92,11 +96,11 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
     },
     getFeed: async (query: FeedQuery): Promise<Page<ArticleSummary>> => {
       await guard('getFeed');
-      return page(inSection(query.section), query.cursor, query.limit ?? DEFAULT_LIMIT);
+      return page(inSection(query.section), query.cursor, query.limit);
     },
     getLiveFeed: async (query: LiveQuery): Promise<Page<ArticleSummary>> => {
       await guard('getLiveFeed');
-      return page(CHRONOLOGICAL, query.cursor, query.limit ?? DEFAULT_LIMIT);
+      return page(CHRONOLOGICAL, query.cursor, query.limit);
     },
     getArticle: async (id: ArticleId): Promise<Article> => {
       await guard('getArticle');
@@ -107,7 +111,7 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
       return page(
         CHRONOLOGICAL.filter((summary) => matches(summary, query.text)),
         query.cursor,
-        query.limit ?? DEFAULT_LIMIT,
+        query.limit,
       );
     },
     getSession: async (): Promise<Session> => {
