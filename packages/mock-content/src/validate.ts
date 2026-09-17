@@ -3,7 +3,7 @@ import { AUTHORS, SECTIONS } from './registries.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
 
-/** Per-section counts of the special formats, by section slug (mock/tools/corpus.py). */
+/** Per-section counts of the special formats, by section slug. */
 const EXPECTED = new Map<string, Quota>([
   ['politique', { video: 1, column: 0, callout: 0 }],
   ['social-eco', { video: 0, column: 1, callout: 0 }],
@@ -15,7 +15,7 @@ const EXPECTED = new Map<string, Quota>([
   ['sport', { video: 1, column: 0, callout: 0 }],
 ]);
 
-/** Accepted word counts per item kind (mock/tools/corpus.py). */
+/** Accepted word counts per item kind. */
 const WORDS: Readonly<Record<string, Readonly<{ min: number; max: number }>>> = {
   article: { min: 300, max: 800 },
   video: { min: 120, max: 420 },
