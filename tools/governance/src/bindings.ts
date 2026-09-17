@@ -765,4 +765,16 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0015': {
+    scope: {
+      paths: ['apps/mobile/src/shared/lib/storage/**', 'apps/mobile/src/_app/model/**'],
+    },
+    rules: {
+      R1: ['guardrail/module-react-native-mmkv'],
+      R2: {
+        convention:
+          'Le buster du cache de PersistQueryClientProvider est CACHE_BUSTER, la constante que pnpm gen calcule en hachant les sources de packages/contracts ; gen:check refuse une valeur périmée, donc un changement des contrats jette le cache persisté.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

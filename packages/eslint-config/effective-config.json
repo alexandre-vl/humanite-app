@@ -39,6 +39,7 @@
               "lmkd",
               "ltrace",
               "minfree",
+              "mmkv",
               "mountinfo",
               "mountroot",
               "nohup",
@@ -671,6 +672,7 @@
               "lmkd",
               "ltrace",
               "minfree",
+              "mmkv",
               "mountinfo",
               "mountroot",
               "nohup",
@@ -1157,6 +1159,7 @@
               "lmkd",
               "ltrace",
               "minfree",
+              "mmkv",
               "mountinfo",
               "mountroot",
               "nohup",
@@ -2392,6 +2395,113 @@
                 }
               },
               "message": "[module/react-native-gesture-handler] react-native-gesture-handler ne s’importe que depuis : primitive"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "react-native-mmkv"
+                  }
+                }
+              },
+              "message": "[module/react-native-mmkv] react-native-mmkv ne s’importe que depuis : lib"
             },
             {
               "from": [
@@ -2985,6 +3095,10 @@
           "message": "[module/react-native-gesture-handler] react-native-gesture-handler ne s’importe que depuis : primitive"
         },
         {
+          "selector": "ImportDeclaration[source.value='react-native-mmkv'] > ImportNamespaceSpecifier",
+          "message": "[module/react-native-mmkv] react-native-mmkv ne s’importe que depuis : lib"
+        },
+        {
           "selector": "ImportDeclaration[source.value='react-native-reanimated'] > ImportNamespaceSpecifier",
           "message": "[module/react-native-reanimated] react-native-reanimated ne s’importe que depuis : primitive"
         },
@@ -3447,6 +3561,7 @@
               "lmkd",
               "ltrace",
               "minfree",
+              "mmkv",
               "mountinfo",
               "mountroot",
               "nohup",
@@ -4742,6 +4857,113 @@
                 },
                 {
                   "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "react-native-mmkv"
+                  }
+                }
+              },
+              "message": "[module/react-native-mmkv] react-native-mmkv ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
                     "type": "lib"
                   }
                 },
@@ -5276,6 +5498,10 @@
         {
           "selector": "ImportDeclaration[source.value='react-native-gesture-handler'] > ImportNamespaceSpecifier",
           "message": "[module/react-native-gesture-handler] react-native-gesture-handler ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='react-native-mmkv'] > ImportNamespaceSpecifier",
+          "message": "[module/react-native-mmkv] react-native-mmkv ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-reanimated'] > ImportNamespaceSpecifier",
@@ -5736,6 +5962,7 @@
               "lmkd",
               "ltrace",
               "minfree",
+              "mmkv",
               "mountinfo",
               "mountroot",
               "nohup",
@@ -7031,6 +7258,113 @@
                 },
                 {
                   "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "react-native-mmkv"
+                  }
+                }
+              },
+              "message": "[module/react-native-mmkv] react-native-mmkv ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
                     "type": "lib"
                   }
                 },
@@ -7565,6 +7899,10 @@
         {
           "selector": "ImportDeclaration[source.value='react-native-gesture-handler'] > ImportNamespaceSpecifier",
           "message": "[module/react-native-gesture-handler] react-native-gesture-handler ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='react-native-mmkv'] > ImportNamespaceSpecifier",
+          "message": "[module/react-native-mmkv] react-native-mmkv ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-reanimated'] > ImportNamespaceSpecifier",

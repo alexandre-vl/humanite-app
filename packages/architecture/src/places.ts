@@ -188,6 +188,7 @@ type ModulePolicy = Readonly<{
 export const MODULES = {
   'react-native': { places: ['primitive'], except: ['Platform'] },
   'react-native-gesture-handler': { places: ['primitive'], except: [] },
+  'react-native-mmkv': { places: ['lib'], except: [] },
   'react-native-reanimated': { places: ['primitive'], except: [] },
   'react-native-safe-area-context': { places: ['primitive'], except: [] },
   'react-native-screens': { places: ['primitive'], except: [] },

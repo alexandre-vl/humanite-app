@@ -23,6 +23,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                       | Design tokens et createStyles brandé                       | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                    | Textes UI en dictionnaire français typé                    | proposé | `guarded-config`, `boundary`, `data-format`                                |
 | [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                  | Navigation Expo Router par onglets natifs                  | proposé | `guarded-config`, `reversal-cost`                                          |
+| [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                   | Cache de données TanStack Query persisté                   | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 
 ## Confirmation
 
@@ -200,6 +201,15 @@ Statut : proposé. Périmètre : `apps/mobile/src/_app/routes/tabs-layout.tsx`.
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | R1    | NE DOIT PAS | `guardrail/nav-js-tabs`                                                                                                                                                                                                        |
 | R2    | DOIT        | convention : La barre de navigation par onglets de apps/mobile/src/_app/routes/tabs-layout.tsx est composée avec NativeTabs de expo-router/unstable-native-tabs, le seul composant qui rend des onglets natifs par plateforme. |
+
+### ADR-0015 · Cache de données TanStack Query persisté
+
+Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/storage/**`, `apps/mobile/src/_app/model/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                        |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-react-native-mmkv`                                                                                                                                                                                                                           |
+| R2    | DOIT        | convention : Le buster du cache de PersistQueryClientProvider est CACHE_BUSTER, la constante que pnpm gen calcule en hachant les sources de packages/contracts ; gen:check refuse une valeur périmée, donc un changement des contrats jette le cache persisté. |
 
 ## Référentiel
 

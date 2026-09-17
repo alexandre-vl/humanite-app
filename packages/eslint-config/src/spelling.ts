@@ -29,6 +29,7 @@ const WORDS = [
   'lmkd',
   'ltrace',
   'minfree',
+  'mmkv',
   'mountinfo',
   'mountroot',
   'nohup',

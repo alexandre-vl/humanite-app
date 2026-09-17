@@ -186,6 +186,12 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/screens.ts': "export { ScreenStack } from 'react-native-screens';\n" }),
     ),
     define(
+      'guardrail/module-react-native-mmkv',
+      'une page qui ouvre un stockage natif',
+      ['module/react-native-mmkv'],
+      linted({ 'src/pages/home/model/store.ts': "export { createMMKV } from 'react-native-mmkv';\n" }),
+    ),
+    define(
       'guardrail/nav-js-tabs',
       'une page qui compose la barre par les onglets JS',
       ['nav/js-tabs'],
