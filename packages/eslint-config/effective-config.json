@@ -2776,6 +2776,10 @@
           "message": "[style/inline] construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés"
         },
         {
+          "selector": "JSXText[value=/\\S/]",
+          "message": "[text/jsx] rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire"
+        },
+        {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
           "message": "[hermes/array-from-async] Array.fromAsync n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
         },
@@ -4834,6 +4838,10 @@
           "message": "[style/inline] construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés"
         },
         {
+          "selector": "JSXText[value=/\\S/]",
+          "message": "[text/jsx] rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire"
+        },
+        {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
           "message": "[hermes/array-from-async] Array.fromAsync n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
         },
@@ -6886,6 +6894,10 @@
         {
           "selector": "JSXAttribute[name.name=\"style\"] > JSXExpressionContainer ObjectExpression",
           "message": "[style/inline] construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés"
+        },
+        {
+          "selector": "JSXText[value=/\\S/]",
+          "message": "[text/jsx] rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",

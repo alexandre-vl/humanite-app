@@ -19,6 +19,7 @@
     "@expo/dom-webview": "catalog:",
     "@expo/log-box": "catalog:",
     "@expo/metro-runtime": "catalog:",
+    "@huma/contracts": "workspace:*",
     "@huma/design-tokens": "workspace:*",
     "expo": "catalog:",
     "expo-constants": "catalog:",

@@ -76,6 +76,9 @@ const STYLE_SYNTAX: readonly SyntaxRestriction[] = [
   { policy: 'style/inline', selector: 'JSXAttribute[name.name="style"] > JSXExpressionContainer ObjectExpression' },
 ];
 
+/** UI text comes from the dictionary through a DisplayText: raw text written in the JSX, whitespace aside, escapes it. */
+const TEXT_SYNTAX: readonly SyntaxRestriction[] = [{ policy: 'text/jsx', selector: String.raw`JSXText[value=/\S/]` }];
+
 const NODE_PROPERTIES: readonly PropertyRestriction[] = [
   { policy: 'node/process-exit', object: 'process', property: 'exit' },
 ];
@@ -189,7 +192,12 @@ const CONFINED_NAMESPACES: readonly SyntaxRestriction[] = CONFINED_MODULES.map((
 }));
 
 const HERMES: Runtime = {
-  syntax: [...CONFINED_NAMESPACES, ...STYLE_SYNTAX, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax)],
+  syntax: [
+    ...CONFINED_NAMESPACES,
+    ...STYLE_SYNTAX,
+    ...TEXT_SYNTAX,
+    ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),
+  ],
   properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),
   globals: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.globals),
   naming: HERMES_NAMING,

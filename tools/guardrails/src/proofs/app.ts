@@ -292,6 +292,20 @@ export function Surface(): ReactNode {
 `,
       }),
     ),
+    define(
+      'guardrail/text-jsx',
+      'une primitive qui écrit un texte brut dans le JSX au lieu de passer par Text',
+      ['text/jsx'],
+      linted({
+        'src/shared/ui/primitives/surface/surface.tsx': `import type { ReactNode } from 'react';
+import { View } from 'react-native';
+
+export function Surface(): ReactNode {
+  return <View>Bonjour</View>;
+}
+`,
+      }),
+    ),
   ] as const;
 };
 

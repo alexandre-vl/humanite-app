@@ -731,4 +731,24 @@ export const BINDINGS = {
       R3: ['guardrail/style-inline'],
     },
   },
+  'ADR-0013': {
+    scope: {
+      paths: [
+        'packages/contracts/src/display-text.ts',
+        'apps/mobile/src/shared/i18n/**',
+        'apps/mobile/src/shared/ui/primitives/text/**',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un.',
+      },
+      R2: {
+        convention:
+          'La prop children d’une primitive de texte est typée DisplayText, la marque opaque des contrats ; une chaîne quelconque n’y est pas assignable.',
+      },
+      R3: ['guardrail/text-jsx'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

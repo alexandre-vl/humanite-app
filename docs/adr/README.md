@@ -21,6 +21,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                   | Émulateur Android Redroid sur le serveur                   | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                 | Contrats de données en Zod                                 | proposé | `dependency`, `guarded-config`, `data-format`                              |
 | [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                       | Design tokens et createStyles brandé                       | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                    | Textes UI en dictionnaire français typé                    | proposé | `guarded-config`, `boundary`, `data-format`                                |
 
 ## Confirmation
 
@@ -179,6 +180,16 @@ Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 | R1    | DOIT        | convention : Le type Style de apps/mobile/src/shared/lib/styles n’accepte comme valeur dimensionnelle ou colorée qu’un token brandé de @huma/design-tokens, hors de portée d’un nombre ou d’une chaîne bruts. |
 | R2    | DOIT        | convention : La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.                                         |
 | R3    | NE DOIT PAS | `guardrail/style-inline`                                                                                                                                                                                      |
+
+### ADR-0013 · Textes UI en dictionnaire français typé
+
+Statut : proposé. Périmètre : `packages/contracts/src/display-text.ts`, `apps/mobile/src/shared/i18n/**`, `apps/mobile/src/shared/ui/primitives/text/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                         |
+| ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | convention : Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un. |
+| R2    | DOIT        | convention : La prop children d’une primitive de texte est typée DisplayText, la marque opaque des contrats ; une chaîne quelconque n’y est pas assignable.                                                     |
+| R3    | NE DOIT PAS | `guardrail/text-jsx`                                                                                                                                                                                            |
 
 ## Référentiel
 
