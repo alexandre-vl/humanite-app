@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { createStyles } from '../../../lib/styles';
 import type { StyleRef } from '../../../lib/styles';
 
-export type SurfaceProps = Readonly<{ children: ReactNode; style?: StyleRef }>;
+export type SurfaceProps = Readonly<{ children?: ReactNode; style?: StyleRef }>;
 
 const styles = createStyles({ surface: { flex: 1 } });
 

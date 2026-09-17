@@ -37,6 +37,7 @@ const WORDS = [
   'pathspec',
   'pids',
   'pkexec',
+  'pressable',
   'procattr',
   'proxychains',
   'punct',
