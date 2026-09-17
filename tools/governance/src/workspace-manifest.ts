@@ -111,4 +111,5 @@ export const DEPENDENCY_POLICY: DependencyPolicy = {
     // @expo/cli and Steiger validate their own inputs with zod 3: both run in Node beside the app, never inside it.
     zod: ['@expo/cli', 'steiger', 'zod-validation-error'],
   },
+  confined: {},
 };

@@ -89,6 +89,7 @@ const VALID: Scenario = {
     roots: { packages: ['packages'], tools: ['packages', 'tools'] },
     singleInstance: ['prettier'],
     singleVersion: { typescript: [] },
+    confined: {},
   },
   tested: [],
 };
@@ -426,5 +427,39 @@ export const DEPS_FIXTURES = [
     'une politique qui nomme un paquet mal orthographié',
     ['deps/policy-unknown'],
     checked(withPolicy({ singleInstance: ['prettier', 'pretier'] })),
+  ),
+  define(
+    'deps/dependency-confined',
+    'un paquet de packages/ qui déclare une dépendance réservée à un autre paquet',
+    ['deps/dependency-confined'],
+    checked(
+      withPolicy({ confined: { packages: { 'mdast-util-gfm': ['packages/contracts'] } } }),
+      withNewPackage(
+        {
+          directory: 'packages/design-tokens',
+          name: '@huma/design-tokens',
+          specifiers: specifiers({ dependencies: { 'mdast-util-gfm': 'catalog:' } }),
+          references: [],
+        },
+        { 'mdast-util-gfm': { specifier: 'catalog:', version: '3.1.0' } },
+      ),
+    ),
+  ),
+  define(
+    'deps/dependency-confined-allowed',
+    'la dépendance réservée, déclarée par le paquet que la politique autorise',
+    [],
+    checked(
+      withPolicy({ confined: { packages: { 'mdast-util-gfm': ['packages/contracts'] } } }),
+      withNewPackage(
+        {
+          directory: 'packages/contracts',
+          name: '@huma/contracts',
+          specifiers: specifiers({ dependencies: { 'mdast-util-gfm': 'catalog:' } }),
+          references: [],
+        },
+        { 'mdast-util-gfm': { specifier: 'catalog:', version: '3.1.0' } },
+      ),
+    ),
   ),
 ] as const;

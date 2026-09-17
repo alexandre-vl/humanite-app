@@ -63,6 +63,10 @@ const TABLE = {
     summary: 'chaque paquet est rangé sous un dossier de la politique',
     message: '{directory} n’est sous aucun dossier de la politique de dépendances',
   },
+  'deps/dependency-confined': {
+    summary: 'une dépendance réservée n’est déclarée que par les paquets que la politique autorise',
+    message: 'dépendance {name} réservée : sous {root}/, seul {allowed} peut la déclarer',
+  },
   'deps/single-instance': {
     summary: 'les paquets à instance unique ne sont installés qu’une fois',
     message: '{name} installé en {count} instances ({instances}) : aligner leurs pairs pour n’en garder qu’une',

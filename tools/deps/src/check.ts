@@ -24,6 +24,11 @@ export type DependencyPolicy = Readonly<{
    * another version: a copy that only a listed dependent loads never meets the code of the workspace.
    */
   singleVersion: Readonly<Record<string, readonly string[]>>;
+  /**
+   * Third-party packages a workspace root may declare only from certain directories, by root then package name: the
+   * single home of a shape stays the single importer of the library that defines it, so no sibling reaches for it.
+   */
+  confined: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>>;
 }>;
 
 /**
@@ -123,6 +128,19 @@ function checkPackage(
       const targetRoot = target === undefined ? null : rootOf(target.directory, policy.roots);
       if (root !== null && targetRoot !== null && !(policy.roots[root] ?? []).includes(targetRoot)) {
         findings.push(depsFinding('deps/root-dependency', manifest, { name, root, target: targetRoot }));
+      }
+    }
+  }
+  if (root !== null) {
+    const confined = policy.confined[root];
+    if (confined !== undefined) {
+      for (const name of declared) {
+        const allowed = confined[name];
+        if (allowed !== undefined && !allowed.includes(each.directory)) {
+          findings.push(
+            depsFinding('deps/dependency-confined', manifest, { name, root, allowed: sortedList(allowed) }),
+          );
+        }
       }
     }
   }
@@ -298,7 +316,11 @@ function checkPolicyNames(
   policy: DependencyPolicy,
   instances: ReadonlyMap<string, readonly string[]>,
 ): readonly Diagnostic<DepsCode>[] {
-  const names = new Set([...policy.singleInstance, ...Object.keys(policy.singleVersion)]);
+  const names = new Set([
+    ...policy.singleInstance,
+    ...Object.keys(policy.singleVersion),
+    ...Object.values(policy.confined).flatMap((byName) => Object.keys(byName)),
+  ]);
   return [...names]
     .filter((name) => !instances.has(name))
     .map((name) => depsFinding('deps/policy-unknown', policy.source, { name }));
