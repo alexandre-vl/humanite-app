@@ -1,0 +1,17 @@
+{
+  "name": "@huma/mock-api",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@huma/contracts": "workspace:*",
+    "@huma/mock-content": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -211,6 +211,40 @@
     "include": ["src"],
     "exclude": ["<projet>/node_modules/.cache/tsc"]
   },
+  "packages/mock-api/tsconfig.json": {
+    "compilerOptions": {
+      "allowImportingTsExtensions": true,
+      "allowUnreachableCode": false,
+      "allowUnusedLabels": false,
+      "composite": true,
+      "declaration": true,
+      "emitDeclarationOnly": true,
+      "erasableSyntaxOnly": true,
+      "exactOptionalPropertyTypes": true,
+      "incremental": true,
+      "isolatedModules": true,
+      "lib": ["esnext"],
+      "libReplacement": false,
+      "module": "nodenext",
+      "moduleDetection": "force",
+      "moduleResolution": "nodenext",
+      "noFallthroughCasesInSwitch": true,
+      "noImplicitOverride": true,
+      "noImplicitReturns": true,
+      "noPropertyAccessFromIndexSignature": true,
+      "noUncheckedIndexedAccess": true,
+      "noUncheckedSideEffectImports": true,
+      "outDir": "./node_modules/.cache/tsc",
+      "preserveConstEnums": true,
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "types": [],
+      "verbatimModuleSyntax": true
+    },
+    "include": ["src"],
+    "exclude": ["<projet>/node_modules/.cache/tsc"]
+  },
   "packages/mock-content/tsconfig.json": {
     "compilerOptions": {
       "allowImportingTsExtensions": true,
