@@ -38,6 +38,9 @@ Option retenue : « Monorepo pnpm à catalog strict », parce que c’est la seu
 - **R2** — Un manifeste NE DOIT PAS déclarer, pour une dépendance, une version absente du catalog ou différente de celle d’un autre paquet.
 - **R3** — Chaque module natif d’Expo DOIT rester dans la plage que `bundledNativeModules.json` fixe pour la version d’Expo du catalog.
 - **R4** — Une dépendance interne DOIT être référencée par `workspace:*` et une dépendance tierce par `catalog:`.
+- **R5** — Chaque paquet DOIT vivre sous un dossier de la politique de dépendances et limiter ses dépendances aux dossiers qu’elle ouvre au sien.
+- **R6** — Un paquet DOIT déclarer les pairs obligatoires de ses dépendances directes.
+- **R7** — La politique de dépendances DOIT limiter ses entrées aux paquets installés.
 
 ### Conséquences
 

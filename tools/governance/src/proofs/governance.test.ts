@@ -1,3 +1,5 @@
+import type { Bindings } from '@huma/adr/bindings';
+import { proofsOf } from '@huma/adr/bindings';
 import type { Coverage } from '@huma/fixtures';
 import { findDuplicateIds } from '@huma/fixtures';
 import { testFixtures } from '@huma/fixtures/vitest';
@@ -149,6 +151,23 @@ test('every proof that touches an ADR is bound to a rule of ADR-0000; the others
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
   const ids = PROOFS.map((fixture) => fixture.id);
   expect(ids.filter((id) => !bound.has(id))).toEqual(ids.filter(awaitsFoundationAdr));
+});
+
+/**
+ * The reverse of "a rule exists only if a tool proves it": every proof that proves a code fires is bound to a rule of
+ * some ADR. Only the agent-guard and Stop-hook proofs may stay unbound — ADR-0009 cites representatives and the Stop
+ * hook has no ADR yet — so a new enforcing proof under any other prefix cannot ship without an ADR.
+ */
+test('every enforcing proof is bound to an ADR, save the agent-guard and Stop-hook proofs awaiting theirs', () => {
+  const allBindings: Bindings = BINDINGS;
+  const bound = new Set<string>(Object.values(allBindings).flatMap((binding) => proofsOf(binding)));
+  const unbound = PROOFS.filter((fixture) => fixture.expected.length > 0 && !bound.has(fixture.id)).map(
+    (fixture) => fixture.id,
+  );
+  const awaiting = unbound.filter((id) => id.startsWith('agent/') || id.startsWith('claude-hook/'));
+  expect(unbound.toSorted((left, right) => left.localeCompare(right))).toEqual(
+    awaiting.toSorted((left, right) => left.localeCompare(right)),
+  );
 });
 
 testFixtures('each governance fixture reports exactly its expected codes', GOVERNANCE_FIXTURES);

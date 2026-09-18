@@ -39,6 +39,7 @@ Option retenue : « TypeScript 6 unique avec un préréglage strict partagé »,
 - **R3** — Un module DOIT être importé avec son extension `.ts`, non par un chemin `.js` recompilé.
 - **R4** — Le code NE DOIT PAS employer un décorateur ni un accesseur `accessor`, que Node n’efface pas.
 - **R5** — Chaque projet DOIT déclarer en référence les paquets qu’il importe, pour `tsc --build`.
+- **R6** — Le code NE DOIT PAS appeler `process.exit`, qui coupe les sorties en attente.
 
 ### Conséquences
 

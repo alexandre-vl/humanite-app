@@ -323,6 +323,9 @@ export const BINDINGS = {
       ],
       R3: ['deps/tested-version', 'deps/untested-version'],
       R4: ['deps/specifier-form'],
+      R5: ['deps/root-unknown', 'deps/root-dependency'],
+      R6: ['deps/peer-undeclared'],
+      R7: ['deps/policy-unknown'],
     },
   },
   'ADR-0002': {
@@ -395,6 +398,7 @@ export const BINDINGS = {
       R3: ['guardrail/node-import-js', 'guardrail/node-export-js', 'guardrail/node-dynamic-import-js'],
       R4: ['guardrail/node-decorator', 'guardrail/node-accessor'],
       R5: ['deps/reference-missing', 'deps/reference-undeclared'],
+      R6: ['guardrail/node-process-exit'],
     },
   },
   'ADR-0004': {
@@ -523,6 +527,9 @@ export const BINDINGS = {
         'git/body-separator',
         'git/not-canonical',
         'git/generated-fixup',
+        'git/generated-message',
+        'git/breaking-change-space',
+        'git/comment-line',
         'git/control-character',
         'git/valid-message',
       ],
@@ -578,6 +585,7 @@ export const BINDINGS = {
         'git/patch-refused',
         'git/anchor-not-ancestor',
         'git/anchor-unknown',
+        'git/history-shallow',
       ],
     },
   },
@@ -730,7 +738,7 @@ export const BINDINGS = {
         convention:
           'La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.',
       },
-      R3: ['guardrail/style-inline'],
+      R3: ['guardrail/style-inline', 'guardrail/style-inline-array'],
     },
   },
   'ADR-0013': {

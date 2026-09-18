@@ -60,6 +60,9 @@ Statut : proposé. Périmètre : `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `packa
 | R2    | NE DOIT PAS | `deps/catalog-range`, `deps/sibling-version`, `deps/single-instance`, `deps/importer-stale`, `deps/importer-missing`, `deps/importer-extra`, `deps/importer-unknown`, `deps/private-copy`, `deps/private-copy-allowed`, `deps/private-copy-unused` |
 | R3    | DOIT        | `deps/tested-version`, `deps/untested-version`                                                                                                                                                                                                     |
 | R4    | DOIT        | `deps/specifier-form`                                                                                                                                                                                                                              |
+| R5    | DOIT        | `deps/root-unknown`, `deps/root-dependency`                                                                                                                                                                                                        |
+| R6    | DOIT        | `deps/peer-undeclared`                                                                                                                                                                                                                             |
+| R7    | DOIT        | `deps/policy-unknown`                                                                                                                                                                                                                              |
 
 ### ADR-0002 · Plateforme Expo SDK 57 et New Architecture
 
@@ -83,6 +86,7 @@ Statut : proposé. Périmètre : `packages/tsconfig/**`, `tsconfig.json`, `apps/
 | R3    | DOIT        | `guardrail/node-import-js`, `guardrail/node-export-js`, `guardrail/node-dynamic-import-js`                                                                               |
 | R4    | NE DOIT PAS | `guardrail/node-decorator`, `guardrail/node-accessor`                                                                                                                    |
 | R5    | DOIT        | `deps/reference-missing`, `deps/reference-undeclared`                                                                                                                    |
+| R6    | NE DOIT PAS | `guardrail/node-process-exit`                                                                                                                                            |
 
 ### ADR-0004 · Lint et format bloquants sans désactivation
 
@@ -135,12 +139,12 @@ Statut : proposé. Périmètre : `tools/git-hooks/**`, `tools/fixtures/**`, `too
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                               |
 | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | DOIT        | `git/header`, `git/header-length`, `git/type`, `git/scope`, `git/scope-before-package`, `git/body-separator`, `git/not-canonical`, `git/generated-fixup`, `git/control-character`, `git/valid-message`                                                                                                                                                |
+| R1    | DOIT        | `git/header`, `git/header-length`, `git/type`, `git/scope`, `git/scope-before-package`, `git/body-separator`, `git/not-canonical`, `git/generated-fixup`, `git/generated-message`, `git/breaking-change-space`, `git/comment-line`, `git/control-character`, `git/valid-message`                                                                      |
 | R2    | DOIT        | `git/refs-missing`, `git/refs-missing-commit-msg`, `git/refs-format`, `git/refs-order`, `git/refs-extra`, `git/refs-in-prose`, `git/refs-unrelated-cited`, `git/refs-scope-required`, `git/refs-adr-file-required`, `git/trailer-unknown`                                                                                                             |
 | R3    | DOIT        | `git/hook-missing`, `git/hook-modified`, `git/hook-not-executable`, `git/hook-unexpected`, `git/hooks-directory-link`, `git/hooks-path`, `git/hooks-path-worktree`, `git/install-refused-hooks-path`, `git/config-include`, `git/no-verify-through-shims`, `git/valid-installation`, `git/valid-commit-through-shims`                                 |
 | R4    | DOIT        | `git/verify-failed`, `git/verify-skipped`, `git/verify-skipped-index-changed`, `git/verify-skipped-marker-forged`, `git/verify-skipped-marker-reused`, `git/tree-changed`, `git/index-flagged`, `git/unstaged`, `git/unstaged-before-checks`, `git/untracked`, `git/unmerged`, `git/valid-pre-commit`, `git/valid-staging`, `git/valid-verified-tree` |
 | R5    | DOIT        | convention : Le banc de fixtures de tools/fixtures et les tests de couverture et de mutation de chaque liste de preuves prouvent que chaque garde-fou se déclenche exactement sur ses codes.                                                                                                                                                          |
-| R6    | NE DOIT PAS | `git/history-bypassed-commit`, `git/history-replaced-commit`, `git/patch-refused`, `git/anchor-not-ancestor`, `git/anchor-unknown`                                                                                                                                                                                                                    |
+| R6    | NE DOIT PAS | `git/history-bypassed-commit`, `git/history-replaced-commit`, `git/patch-refused`, `git/anchor-not-ancestor`, `git/anchor-unknown`, `git/history-shallow`                                                                                                                                                                                             |
 
 ### ADR-0009 · Permissions des agents
 
@@ -184,7 +188,7 @@ Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | DOIT        | convention : Le type Style de apps/mobile/src/shared/lib/styles n’accepte comme valeur dimensionnelle ou colorée qu’un token brandé de @huma/design-tokens, hors de portée d’un nombre ou d’une chaîne bruts. |
 | R2    | DOIT        | convention : La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.                                         |
-| R3    | NE DOIT PAS | `guardrail/style-inline`                                                                                                                                                                                      |
+| R3    | NE DOIT PAS | `guardrail/style-inline`, `guardrail/style-inline-array`                                                                                                                                                      |
 
 ### ADR-0013 · Textes UI en dictionnaire français typé
 
