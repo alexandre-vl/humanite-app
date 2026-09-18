@@ -2,7 +2,8 @@
 export const FR = {
   'action.retry': 'Réessayer',
   'app.name': 'Humanité',
-  'error.generic': 'Une erreur est survenue.',
+  'error.title': 'L’écran n’a pas pu s’afficher',
+  'error.message': 'Une erreur est survenue.',
   'feed.empty.title': 'Rien à lire pour l’instant',
   'feed.empty.message': 'Aucun article n’est encore paru.',
   'feed.error.title': 'Le journal ne répond pas',

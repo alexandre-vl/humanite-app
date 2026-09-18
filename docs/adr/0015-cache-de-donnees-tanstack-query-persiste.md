@@ -63,7 +63,7 @@ Option retenue : « Le cache TanStack Query persisté sur MMKV », parce que c�
 ## Informations complémentaires
 
 - Le gcTime du QueryClient dérive de la même durée que le maxAge du persister, donc il ne descend jamais sous elle.
-- Les données restaurées seront revalidées par un schéma Zod quand des requêtes existeront ; jusque-là le buster suffit à écarter un cache incompatible.
+- Les premières requêtes existent (ADR-0021) et les données restaurées ne sont pas revalidées par un schéma : le buster hache toutes les sources des contrats, donc une forme qui change jette le cache entier avant qu’il ne soit lu, et un schéma n’ajouterait rien contre cette dérive. Ce que le buster ne voit pas est la corruption des octets, qu’un garde de forme refuse au retour du disque (`apps/mobile/src/_app/model/persister.ts`).
 - Le grain de confinement atteignable est la place `lib` entière ; ADR-0006 confine les vues natives aux primitives L0, une bibliothèque de stockage sans vue vit dans `shared/lib`.
 - L’état Zustand et les formats MMKV versionnés relèvent d’un ADR propre, écrit avec le premier store.
 - Réévaluation : TanStack Query change son API de persistance, ou MMKV cesse d’être maintenue.

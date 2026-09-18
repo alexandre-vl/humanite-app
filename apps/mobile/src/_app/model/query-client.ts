@@ -1,14 +1,23 @@
 import { QueryClient } from '@tanstack/react-query';
 import type { PersistQueryClientOptions } from '@tanstack/react-query-persist-client';
+import { isRetryable } from '#api';
 import { CACHE_BUSTER } from './cache-buster';
 import { mmkvPersister } from './persister';
 
 /** How long a persisted cache stays valid; the query gcTime matches it, so gcTime never falls below the persister maxAge. */
 const CACHE_MAX_AGE = 1000 * 60 * 60 * 24;
 
+/** How many times a read that may still pass is tried again before a screen says it failed. */
+const RETRIES = 2;
+
 /** The app's single QueryClient: its cache is persisted to MMKV and restored at startup. */
 export const queryClient = new QueryClient({
-  defaultOptions: { queries: { gcTime: CACHE_MAX_AGE } },
+  defaultOptions: {
+    queries: {
+      gcTime: CACHE_MAX_AGE,
+      retry: (failureCount: number, error: Error) => failureCount < RETRIES && isRetryable(error),
+    },
+  },
 });
 
 /** The persistence options the provider applies: the MMKV persister, the contracts-hash buster, and the max cache age. */
