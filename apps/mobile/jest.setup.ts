@@ -44,3 +44,19 @@ jest.mock('react-native-reanimated', () => {
     useAnimatedStyle: (updater: () => unknown): unknown => updater(),
   };
 });
+
+// expo-image and expo-symbols reach native modules a headless runner lacks; each renders a plain view so the image and
+// icon primitives mount without touching the native layer.
+jest.mock('expo-image', () => {
+  const react = jest.requireActual<typeof import('react')>('react');
+  const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
+  const image = (): unknown => react.createElement(reactNative.View, null);
+  return { __esModule: true, Image: image };
+});
+
+jest.mock('expo-symbols', () => {
+  const react = jest.requireActual<typeof import('react')>('react');
+  const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
+  const symbolView = (): unknown => react.createElement(reactNative.View, null);
+  return { __esModule: true, SymbolView: symbolView };
+});

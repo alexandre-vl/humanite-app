@@ -204,6 +204,18 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/splash.ts': "export { hideAsync } from 'expo-splash-screen';\n" }),
     ),
     define(
+      'guardrail/module-expo-image',
+      'une page qui rend une image native',
+      ['module/expo-image'],
+      linted({ 'src/pages/home/model/image.ts': "export { Image } from 'expo-image';\n" }),
+    ),
+    define(
+      'guardrail/module-expo-symbols',
+      'une page qui rend un symbole natif',
+      ['module/expo-symbols'],
+      linted({ 'src/pages/home/model/symbol.ts': "export { SymbolView } from 'expo-symbols';\n" }),
+    ),
+    define(
       'guardrail/nav-js-tabs',
       'une page qui compose la barre par les onglets JS',
       ['nav/js-tabs'],

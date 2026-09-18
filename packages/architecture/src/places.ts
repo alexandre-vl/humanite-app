@@ -188,7 +188,9 @@ type ModulePolicy = Readonly<{
  */
 export const MODULES = {
   'expo-font': { places: ['app'], except: [] },
+  'expo-image': { places: ['primitive'], except: [] },
   'expo-splash-screen': { places: ['app'], except: [] },
+  'expo-symbols': { places: ['primitive'], except: [] },
   'react-native': { places: ['primitive'], except: ['Platform'] },
   'react-native-gesture-handler': { places: ['primitive'], except: [] },
   'react-native-mmkv': { places: ['lib'], except: [] },

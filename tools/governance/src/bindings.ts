@@ -814,4 +814,16 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0018': {
+    scope: {
+      paths: ['apps/mobile/src/shared/ui/primitives/image/**', 'apps/mobile/src/shared/ui/primitives/icon/**'],
+    },
+    rules: {
+      R1: ['guardrail/module-expo-image', 'guardrail/module-expo-symbols'],
+      R2: {
+        convention:
+          'Un Icon nomme son symbole par une clé du registre typé ICONS (IconName = keyof typeof ICONS, chaque clé mappée à { ios: SFSymbol, android: AndroidSymbol }) ; une chaîne de plateforme libre ne compile pas.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

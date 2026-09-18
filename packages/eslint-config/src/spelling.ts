@@ -16,6 +16,7 @@ const WORDS = [
   'alnum',
   'anton',
   'backquoted',
+  'blurhash',
   'capsh',
   'chattr',
   'chgrp',

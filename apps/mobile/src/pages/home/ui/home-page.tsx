@@ -5,23 +5,33 @@ import { useStartup } from '#lib/startup';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { CollapsibleHeader } from '#primitives/collapsible-header';
+import { Icon } from '#primitives/icon';
+import { Image } from '#primitives/image';
 import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
 
 const styles = createStyles({
   masthead: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: LIGHT_THEME.border },
-  sticky: { flex: 1, justifyContent: 'center', paddingHorizontal: SPACING.lg, backgroundColor: LIGHT_THEME.surface },
+  sticky: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
+    backgroundColor: LIGHT_THEME.surface,
+  },
   displayText: { fontFamily: FONT_FAMILIES.display },
   card: {
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
-    paddingVertical: SPACING.xxxl,
+    aspectRatio: 16 / 9,
     borderRadius: RADII.md,
     backgroundColor: LIGHT_THEME.card,
   },
 });
 
-/** Placeholder feed rows: enough to scroll and drive the header until the real fil arrives in the reading phase. */
+/** A BlurHash literal standing in for each article's lead image until the reading phase wires real photos. */
+const PLACEHOLDER = 'L6Pj0^jE.AyE_3t7t7R**0o#DgR4';
 const FEED = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 /** The À la une screen: the masthead collapses behind the section bar as the placeholder feed scrolls. */
@@ -37,12 +47,13 @@ export function HomePage(): ReactNode {
         }
         sticky={
           <Box style={styles.sticky}>
+            <Icon name="search" size={SPACING.lg} tintColor={LIGHT_THEME.primary} />
             <Text style={styles.displayText}>{t('nav.headline')}</Text>
           </Box>
         }
       >
         {FEED.map((id) => (
-          <Box key={id} style={styles.card} />
+          <Image key={id} source={{ blurhash: PLACEHOLDER }} style={styles.card} />
         ))}
       </CollapsibleHeader>
     </Surface>

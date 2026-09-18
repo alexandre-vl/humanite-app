@@ -26,6 +26,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                   | Cache de données TanStack Query persisté                   | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)        | Tests par environnement Vitest jest-expo et Maestro        | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0017](0017-typographie-et-licences-des-polices.md)                        | Typographie et licences des polices                        | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0018](0018-images-et-symboles-natifs.md)                                  | Images et symboles natifs                                  | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 
 ## Confirmation
 
@@ -231,6 +232,15 @@ Statut : proposé. Périmètre : `apps/mobile/src/_app/model/fonts.ts`, `apps/mo
 | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | NE DOIT PAS | `guardrail/module-expo-font`, `guardrail/module-expo-splash-screen`                                                                                                                                                           |
 | R2    | DOIT        | convention : Une famille de police est un token FontFamily de @huma/design-tokens (FONT_FAMILIES) ; le champ fontFamily de create-styles accepte ce seul type brandé, donc une chaîne libre ne peut pas entrer dans un style. |
+
+### ADR-0018 · Images et symboles natifs
+
+Statut : proposé. Périmètre : `apps/mobile/src/shared/ui/primitives/image/**`, `apps/mobile/src/shared/ui/primitives/icon/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                   |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-expo-image`, `guardrail/module-expo-symbols`                                                                                                                                                            |
+| R2    | DOIT        | convention : Un Icon nomme son symbole par une clé du registre typé ICONS (IconName = keyof typeof ICONS, chaque clé mappée à { ios: SFSymbol, android: AndroidSymbol }) ; une chaîne de plateforme libre ne compile pas. |
 
 ## Référentiel
 

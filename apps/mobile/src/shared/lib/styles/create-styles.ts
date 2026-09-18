@@ -35,6 +35,7 @@ type Style = Readonly<{
   columnGap?: Space;
   width?: Space;
   height?: Space;
+  aspectRatio?: number;
   minWidth?: Space;
   minHeight?: Space;
   maxWidth?: Space;
