@@ -1,0 +1,90 @@
+import type { DisplayText } from '@huma/contracts';
+import { asDisplayText } from '../display-text';
+
+/**
+ * The newspaper's own clock. A publication time is a Paris time, so a card shows the day the newsroom published on
+ * whatever the reader's device is set to — and a test reads the same string on any machine. Hermes has neither
+ * `Intl.RelativeTimeFormat` nor `Intl.PluralRules` (journal 0a, vérification 15), so the words below are written here.
+ */
+const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Paris',
+  hourCycle: 'h23',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const WEEK = 7 * DAY;
+
+const PER_MINUTE = 60;
+const PER_HOUR = 60 * PER_MINUTE;
+
+/** An instant as the newsroom's clock reads it. */
+type Clock = Readonly<{ year: number; month: number; day: number; hour: number; minute: number }>;
+
+const readClock = (instant: number): Clock => {
+  const parts = new Map<string, string>(
+    NEWSROOM_CLOCK.formatToParts(instant).map((part): readonly [string, string] => [part.type, part.value]),
+  );
+  const read = (type: string): number => Number(parts.get(type) ?? '0');
+  return { year: read('year'), month: read('month'), day: read('day'), hour: read('hour'), minute: read('minute') };
+};
+
+const parseInstant = (instant: string): number => {
+  const millis = Date.parse(instant);
+  if (Number.isNaN(millis)) {
+    throw new RangeError(`instant invalide : ${instant}`);
+  }
+  return millis;
+};
+
+const pad = (value: number): string => String(value).padStart(2, '0');
+
+/** The day an item was published, in the one form the newspaper prints: `12/09/2026`. */
+export const formatDate = (instant: string): DisplayText => {
+  const clock = readClock(parseInstant(instant));
+  return asDisplayText(`${pad(clock.day)}/${pad(clock.month)}/${String(clock.year)}`);
+};
+
+/** The moment an item was published, as a timeline row carries it: `12/09, 19:52`. */
+export const formatDateTime = (instant: string): DisplayText => {
+  const clock = readClock(parseInstant(instant));
+  return asDisplayText(`${pad(clock.day)}/${pad(clock.month)}, ${pad(clock.hour)}:${pad(clock.minute)}`);
+};
+
+/**
+ * How long ago an item was published, read against `now` rather than the wall clock so a test can fix the moment.
+ * `min` and `h` are symbols and take no plural; `jour` does, and French turns at two, not at one. Past a week the
+ * relative form stops helping and the printed date takes over. An instant still to come reads as the present.
+ */
+export const formatRelativeTime = (instant: string, now: number): DisplayText => {
+  const elapsed = now - parseInstant(instant);
+  if (elapsed < MINUTE) {
+    return asDisplayText("à l'instant");
+  }
+  if (elapsed < HOUR) {
+    return asDisplayText(`il y a ${String(Math.floor(elapsed / MINUTE))} min`);
+  }
+  if (elapsed < DAY) {
+    return asDisplayText(`il y a ${String(Math.floor(elapsed / HOUR))} h`);
+  }
+  if (elapsed < WEEK) {
+    const days = Math.floor(elapsed / DAY);
+    return asDisplayText(`il y a ${String(days)} ${days < 2 ? 'jour' : 'jours'}`);
+  }
+  return formatDate(instant);
+};
+
+/** A running time, as a player prints it: `4:18`, and `1:04:18` once past the hour. */
+export const formatDuration = (seconds: number): DisplayText => {
+  const hours = Math.floor(seconds / PER_HOUR);
+  const minutes = Math.floor((seconds % PER_HOUR) / PER_MINUTE);
+  const rest = seconds % PER_MINUTE;
+  return asDisplayText(hours > 0 ? `${String(hours)}:${pad(minutes)}:${pad(rest)}` : `${String(minutes)}:${pad(rest)}`);
+};

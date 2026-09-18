@@ -1,15 +1,15 @@
 import { TEXT_VARIANTS } from '@huma/design-tokens';
-import { catalogLabel } from '../../../lib/catalogue';
 import type { CatalogEntry } from '../../../lib/catalogue';
+import { asDisplayText } from '../../../lib/display-text';
 import { Text } from './text';
 
 export const catalog: CatalogEntry = {
-  name: catalogLabel('Text'),
+  name: asDisplayText('Text'),
   render: () => (
     <>
       {TEXT_VARIANTS.map((variant) => (
         <Text key={variant} variant={variant}>
-          {catalogLabel(variant)}
+          {asDisplayText(variant)}
         </Text>
       ))}
     </>

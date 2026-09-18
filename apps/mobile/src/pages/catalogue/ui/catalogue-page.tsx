@@ -1,7 +1,7 @@
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { catalogLabel } from '#lib/catalogue';
 import type { CatalogLevel } from '#lib/catalogue';
+import { asDisplayText } from '#lib/display-text';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Scroll } from '#primitives/scroll';
@@ -31,7 +31,7 @@ export function CataloguePage(): ReactNode {
           }
           return (
             <Box key={level} style={styles.section}>
-              <Text>{catalogLabel(level)}</Text>
+              <Text>{asDisplayText(level)}</Text>
               {items.map((item) => (
                 <Box key={item.entry.name} style={styles.entry}>
                   <Text>{item.entry.name}</Text>

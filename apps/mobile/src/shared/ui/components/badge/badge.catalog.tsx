@@ -1,8 +1,8 @@
-import { catalogLabel } from '../../../lib/catalogue';
 import type { CatalogEntry } from '../../../lib/catalogue';
+import { asDisplayText } from '../../../lib/display-text';
 import { Badge } from './badge';
 
 export const catalog: CatalogEntry = {
-  name: catalogLabel('Badge'),
-  render: () => <Badge label={catalogLabel('Premium')} />,
+  name: asDisplayText('Badge'),
+  render: () => <Badge label={asDisplayText('Premium')} />,
 };

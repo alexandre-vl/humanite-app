@@ -1,10 +1,10 @@
-import { catalogLabel } from '../../../lib/catalogue';
 import type { CatalogEntry } from '../../../lib/catalogue';
+import { asDisplayText } from '../../../lib/display-text';
 import { EmptyState } from './empty-state';
 
 export const catalog: CatalogEntry = {
-  name: catalogLabel('EmptyState'),
+  name: asDisplayText('EmptyState'),
   render: () => (
-    <EmptyState title={catalogLabel('Rien à afficher')} message={catalogLabel('Aucun contenu pour le moment')} />
+    <EmptyState title={asDisplayText('Rien à afficher')} message={asDisplayText('Aucun contenu pour le moment')} />
   ),
 };

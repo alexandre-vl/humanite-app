@@ -1,7 +1,7 @@
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { catalogLabel } from '../../../lib/catalogue';
 import type { CatalogEntry } from '../../../lib/catalogue';
+import { asDisplayText } from '../../../lib/display-text';
 import { useTheme } from '../../../lib/styles';
 import { Icon } from './icon';
 
@@ -11,6 +11,6 @@ function IconDemo(): ReactNode {
 }
 
 export const catalog: CatalogEntry = {
-  name: catalogLabel('Icon'),
+  name: asDisplayText('Icon'),
   render: () => <IconDemo />,
 };

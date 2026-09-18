@@ -1,7 +1,7 @@
 import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { catalogLabel } from '../../../lib/catalogue';
 import type { CatalogEntry } from '../../../lib/catalogue';
+import { asDisplayText } from '../../../lib/display-text';
 import { createStyles } from '../../../lib/styles';
 import { Surface } from './surface';
 
@@ -15,6 +15,6 @@ function SurfaceDemo(): ReactNode {
 }
 
 export const catalog: CatalogEntry = {
-  name: catalogLabel('Surface'),
+  name: asDisplayText('Surface'),
   render: () => <SurfaceDemo />,
 };

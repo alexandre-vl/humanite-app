@@ -1,7 +1,7 @@
 import { SIZES } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { catalogLabel } from '../../../lib/catalogue';
 import type { CatalogEntry } from '../../../lib/catalogue';
+import { asDisplayText } from '../../../lib/display-text';
 import { createStyles } from '../../../lib/styles';
 import { Image } from './image';
 
@@ -16,6 +16,6 @@ function ImageDemo(): ReactNode {
 }
 
 export const catalog: CatalogEntry = {
-  name: catalogLabel('Image'),
+  name: asDisplayText('Image'),
   render: () => <ImageDemo />,
 };
