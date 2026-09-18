@@ -115,7 +115,15 @@ export function policyMessage(id: PolicyId): string {
   return `[${id}] ${describeGap(HERMES_GAPS[gap])} n’existe pas dans Hermes V1 (journal 0a, vérification 15)`;
 }
 
-const TAG = /\[(?<id>[a-z0-9-]+\/[a-z0-9-]+)\]/u;
+const TAG = /\[(?<id>[a-z0-9-]+\/(?:@[a-z0-9-]+\/)?[a-z0-9-]+)\]/u;
+
+/**
+ * The policy id a bracketed tag names — `[module/@shopify/flash-list]` → `module/@shopify/flash-list`, `null` when the
+ * message carries no tag. It reads the tag only, scope segment included; the caller checks it against the known ids.
+ */
+export function policyTag(message: string): string | null {
+  return TAG.exec(message)?.groups?.['id'] ?? null;
+}
 
 /** The policy a lint message comes from, `null` when neither its rule nor its text names a known policy. */
 export function policyOf(rule: string | null, message: string): PolicyId | null {
@@ -126,6 +134,6 @@ export function policyOf(rule: string | null, message: string): PolicyId | null 
   if (byRule !== undefined) {
     return byRule;
   }
-  const id = TAG.exec(message)?.groups?.['id'];
+  const id = policyTag(message);
   return POLICY_IDS.find((known) => known === id) ?? null;
 }
