@@ -8,6 +8,7 @@
     "./workspace": "./src/workspace.ts"
   },
   "dependencies": {
+    "@huma/architecture": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
     "semver": "catalog:",

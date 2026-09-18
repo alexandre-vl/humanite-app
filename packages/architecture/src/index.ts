@@ -1,5 +1,6 @@
 export {
   APP_DIRECTORY,
+  BUNDLED_FILES,
   ENTRY_FILES,
   entryOf,
   HERMES_DIRECTORIES,

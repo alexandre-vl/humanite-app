@@ -140,11 +140,12 @@ const solution: Artifact = {
 const EFFECTIVE_ESLINT_CONFIG = repoPath('packages/eslint-config/effective-config.json');
 
 /**
- * One file of each kind the ESLint configuration tells apart, none of which needs to exist: Node code, JavaScript
- * configuration, then the routes, the public entries and the rest of the code Hermes runs.
+ * One file of each kind the ESLint configuration tells apart, none of which needs to exist: Node code, a package the
+ * app bundles, JavaScript configuration, then the routes, the public entries and the rest of the code Hermes runs.
  */
 const ESLINT_SAMPLES = [
   repoPath('tools/sample/src/sample.ts'),
+  repoPath('packages/contracts/src/sample.ts'),
   repoPath(`${APP_DIRECTORY}/babel.config.js`),
   repoPath(`${APP_DIRECTORY}/${PLACES.route.directory}/sample.tsx`),
   repoPath(`${APP_DIRECTORY}/${PLACES.page.directory}/sample/index.ts`),

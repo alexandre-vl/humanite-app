@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import type { HermesGap } from '@huma/architecture';
 import {
+  BUNDLED_FILES,
   CONFINED_MODULES,
   ENTRY_FILES,
   HERMES_FILES,
@@ -234,6 +235,17 @@ const HERMES: Runtime = {
   naming: HERMES_NAMING,
 };
 
+/**
+ * The Node runtime with the gaps of Hermes on top: a package the app bundles is written for the tools that build it and
+ * for the phone that runs it at once, so it keeps the rules of Node and loses the APIs Hermes has never had.
+ */
+const BUNDLED: Runtime = {
+  ...NODE,
+  syntax: [...NODE.syntax, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax)],
+  properties: [...NODE.properties, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties)],
+  globals: [...NODE.globals, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.globals)],
+};
+
 /** The restrictions of `runtime` for files of a narrower role, a route or a public entry. */
 const narrowed = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runtime => ({
   ...runtime,
@@ -336,6 +348,11 @@ export function defineWorkspaceConfig({
       files: TYPESCRIPT_FILES,
       ignores: [...HERMES_FILES],
       rules: restrictions(NODE, policies),
+    },
+    {
+      files: [...BUNDLED_FILES],
+      ignores: ['**/*.test.ts'],
+      rules: restrictions(BUNDLED, policies),
     },
     {
       files: [...HERMES_FILES],

@@ -20,8 +20,11 @@ const DEFAULT_LIMIT = 12;
 
 const summarize = (article: Article): ArticleSummary => ARTICLE_SUMMARY.parse(article);
 
-/** Every summary, newest first — the order feeds and search present. */
-const CHRONOLOGICAL: readonly ArticleSummary[] = CORPUS.map(summarize).toSorted((left, right) =>
+/**
+ * Every summary, newest first — the order feeds and search present. The app bundles this module, so it runs on Hermes,
+ * which has no `Array.prototype.toSorted`: a copy sorted in place says the same thing to both engines.
+ */
+const CHRONOLOGICAL: readonly ArticleSummary[] = [...CORPUS.map(summarize)].sort((left, right) =>
   right.publishedAt.localeCompare(left.publishedAt),
 );
 

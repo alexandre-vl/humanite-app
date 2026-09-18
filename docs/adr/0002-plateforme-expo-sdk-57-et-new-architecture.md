@@ -69,4 +69,5 @@ Option retenue : « Expo SDK 57 avec New Architecture et Hermes », parce que c�
 ## Informations complémentaires
 
 - La Nouvelle Architecture et Hermes sont les défauts du SDK 57 ; l’app ne les redéclare pas et n’ouvre aucune voie de repli vers l’ancienne architecture.
+- Hermes exécute plus que `apps/mobile` : les paquets du dépôt dont l’app dépend entrent dans le bundle, alors que les outils qui les fabriquent restent sur Node. R4 vaut donc pour leurs sources aussi, et la liste de celles qui partent sur le téléphone est tenue dans l’architecture (`packages/architecture/src/app.ts`).
 - Réévaluation : Expo publie un SDK stable qui remplace le 57 ou change l’obligation de la Nouvelle Architecture.

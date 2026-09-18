@@ -639,6 +639,809 @@
       ]
     }
   },
+  "packages/contracts/src/sample.ts": {
+    "plugins": ["@", "@cspell", "@typescript-eslint", "check-file"],
+    "parserOptions": {
+      "projectService": true,
+      "tsconfigRootDir": "<racine>"
+    },
+    "settings": {},
+    "rules": {
+      "@cspell/spellchecker": [
+        "error",
+        {
+          "checkIdentifiers": true,
+          "checkComments": false,
+          "checkStrings": false,
+          "checkStringTemplates": false,
+          "checkJSXText": false,
+          "report": "all",
+          "configFile": "<racine>/packages/eslint-config/cspell.json",
+          "cspell": {
+            "language": "en",
+            "words": [
+              "aapt",
+              "adbd",
+              "adrs",
+              "alnum",
+              "anton",
+              "backquoted",
+              "blurhash",
+              "capsh",
+              "chattr",
+              "chgrp",
+              "chrt",
+              "claudecode",
+              "cntrl",
+              "debugfs",
+              "dirents",
+              "doas",
+              "fn",
+              "getprop",
+              "ionice",
+              "lerp",
+              "lmkd",
+              "ltrace",
+              "minfree",
+              "mmkv",
+              "mountinfo",
+              "mountroot",
+              "nohup",
+              "nosystem",
+              "nsenter",
+              "overpass",
+              "pathspec",
+              "pids",
+              "pkexec",
+              "pressable",
+              "procattr",
+              "proxychains",
+              "punct",
+              "redirections",
+              "reinit",
+              "runuser",
+              "setarch",
+              "setpriv",
+              "setsid",
+              "steiger",
+              "stripspace",
+              "sudoedit",
+              "superopts",
+              "sysctls",
+              "sysfsattr",
+              "sysfsval",
+              "taskset",
+              "thumbhash",
+              "tracefs",
+              "tracefsattr",
+              "tracefsval",
+              "worktree",
+              "worktrees",
+              "xdigit",
+              "subscriber",
+              "subscription",
+              "brief",
+              "standfirst",
+              "standfirst",
+              "bookmark",
+              "bookmarks",
+              "bookmark",
+              "bookmarks",
+              "newsstand",
+              "newsstand",
+              "standfirst",
+              "issue",
+              "section",
+              "section",
+              "sections"
+            ],
+            "flagWords": [
+              "abonne->subscriber",
+              "abonnement->subscription",
+              "breve->brief",
+              "chapo->standfirst",
+              "chapô->standfirst",
+              "favori->bookmark",
+              "favoris->bookmarks",
+              "favorite->bookmark",
+              "favorites->bookmarks",
+              "kiosk->newsstand",
+              "kiosque->newsstand",
+              "lede->standfirst",
+              "numero->issue",
+              "rubric->section",
+              "rubrique->section",
+              "rubriques->sections"
+            ],
+            "allowCompoundWords": false,
+            "caseSensitive": false,
+            "enabled": true
+          },
+          "autoFix": false,
+          "ignoreImportProperties": true,
+          "ignoreImports": true,
+          "numSuggestions": 8
+        }
+      ],
+      "@typescript-eslint/adjacent-overload-signatures": "error",
+      "@typescript-eslint/array-type": "error",
+      "@typescript-eslint/await-thenable": "error",
+      "@typescript-eslint/ban-ts-comment": [
+        "error",
+        {
+          "ts-check": false,
+          "ts-expect-error": "allow-with-description",
+          "ts-ignore": true,
+          "ts-nocheck": true,
+          "minimumDescriptionLength": 10
+        }
+      ],
+      "@typescript-eslint/ban-tslint-comment": "error",
+      "@typescript-eslint/class-literal-property-style": "error",
+      "@typescript-eslint/consistent-generic-constructors": "error",
+      "@typescript-eslint/consistent-indexed-object-style": "error",
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        {
+          "assertionStyle": "never"
+        }
+      ],
+      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+      "@typescript-eslint/dot-notation": [
+        "error",
+        {
+          "allowIndexSignaturePropertyAccess": false,
+          "allowKeywords": true,
+          "allowPattern": "",
+          "allowPrivateClassPropertyAccess": false,
+          "allowProtectedClassPropertyAccess": false
+        }
+      ],
+      "@typescript-eslint/explicit-module-boundary-types": "error",
+      "@typescript-eslint/method-signature-style": ["error", "property"],
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "default",
+          "format": ["camelCase"],
+          "leadingUnderscore": "forbid",
+          "trailingUnderscore": "forbid"
+        },
+        {
+          "selector": "typeLike",
+          "format": ["PascalCase"]
+        },
+        {
+          "selector": ["objectLiteralProperty", "typeProperty"],
+          "format": null
+        },
+        {
+          "selector": "import",
+          "format": ["camelCase", "PascalCase"]
+        },
+        {
+          "selector": "variable",
+          "modifiers": ["const"],
+          "format": ["camelCase", "UPPER_CASE"]
+        }
+      ],
+      "@typescript-eslint/no-array-constructor": "error",
+      "@typescript-eslint/no-array-delete": "error",
+      "@typescript-eslint/no-base-to-string": "error",
+      "@typescript-eslint/no-confusing-non-null-assertion": "error",
+      "@typescript-eslint/no-confusing-void-expression": "error",
+      "@typescript-eslint/no-deprecated": "error",
+      "@typescript-eslint/no-duplicate-enum-values": "error",
+      "@typescript-eslint/no-duplicate-type-constituents": "error",
+      "@typescript-eslint/no-dynamic-delete": "error",
+      "@typescript-eslint/no-empty-function": [
+        "error",
+        {
+          "allow": []
+        }
+      ],
+      "@typescript-eslint/no-empty-object-type": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-extra-non-null-assertion": "error",
+      "@typescript-eslint/no-extraneous-class": "error",
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-for-in-array": "error",
+      "@typescript-eslint/no-generated-empty-object-type": "error",
+      "@typescript-eslint/no-implied-eval": "error",
+      "@typescript-eslint/no-import-type-side-effects": "error",
+      "@typescript-eslint/no-inferrable-types": "error",
+      "@typescript-eslint/no-invalid-void-type": "error",
+      "@typescript-eslint/no-meaningless-void-operator": "error",
+      "@typescript-eslint/no-misused-new": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+      "@typescript-eslint/no-misused-spread": "error",
+      "@typescript-eslint/no-mixed-enums": "error",
+      "@typescript-eslint/no-namespace": "error",
+      "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
+      "@typescript-eslint/no-non-null-assertion": "error",
+      "@typescript-eslint/no-redundant-type-constituents": "error",
+      "@typescript-eslint/no-require-imports": "error",
+      "@typescript-eslint/no-shadow": "error",
+      "@typescript-eslint/no-this-alias": "error",
+      "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+      "@typescript-eslint/no-unnecessary-condition": "error",
+      "@typescript-eslint/no-unnecessary-template-expression": "error",
+      "@typescript-eslint/no-unnecessary-type-arguments": "error",
+      "@typescript-eslint/no-unnecessary-type-assertion": "error",
+      "@typescript-eslint/no-unnecessary-type-constraint": "error",
+      "@typescript-eslint/no-unnecessary-type-conversion": "error",
+      "@typescript-eslint/no-unnecessary-type-parameters": "error",
+      "@typescript-eslint/no-unsafe-argument": "error",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-call": "error",
+      "@typescript-eslint/no-unsafe-declaration-merging": "error",
+      "@typescript-eslint/no-unsafe-enum-comparison": "error",
+      "@typescript-eslint/no-unsafe-function-type": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-return": "error",
+      "@typescript-eslint/no-unsafe-unary-minus": "error",
+      "@typescript-eslint/no-unused-expressions": [
+        "error",
+        {
+          "allowShortCircuit": false,
+          "allowTaggedTemplates": false,
+          "allowTernary": false
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-useless-constructor": "error",
+      "@typescript-eslint/no-useless-default-assignment": "error",
+      "@typescript-eslint/no-wrapper-object-types": "error",
+      "@typescript-eslint/non-nullable-type-assertion-style": "error",
+      "@typescript-eslint/only-throw-error": "error",
+      "@typescript-eslint/prefer-as-const": "error",
+      "@typescript-eslint/prefer-find": "error",
+      "@typescript-eslint/prefer-for-of": "error",
+      "@typescript-eslint/prefer-function-type": "error",
+      "@typescript-eslint/prefer-includes": "error",
+      "@typescript-eslint/prefer-literal-enum-member": "error",
+      "@typescript-eslint/prefer-namespace-keyword": "error",
+      "@typescript-eslint/prefer-nullish-coalescing": "error",
+      "@typescript-eslint/prefer-optional-chain": "error",
+      "@typescript-eslint/prefer-promise-reject-errors": "error",
+      "@typescript-eslint/prefer-readonly": "error",
+      "@typescript-eslint/prefer-reduce-type-parameter": "error",
+      "@typescript-eslint/prefer-regexp-exec": "error",
+      "@typescript-eslint/prefer-return-this-type": "error",
+      "@typescript-eslint/prefer-string-starts-ends-with": "error",
+      "@typescript-eslint/promise-function-async": "error",
+      "@typescript-eslint/related-getter-setter-pairs": "error",
+      "@typescript-eslint/require-array-sort-compare": "error",
+      "@typescript-eslint/require-await": "error",
+      "@typescript-eslint/restrict-plus-operands": [
+        "error",
+        {
+          "allowAny": false,
+          "allowBoolean": false,
+          "allowNullish": false,
+          "allowNumberAndString": false,
+          "allowRegExp": false
+        }
+      ],
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          "allowAny": false,
+          "allowBoolean": false,
+          "allowNever": false,
+          "allowNullish": false,
+          "allowNumber": false,
+          "allowRegExp": false
+        }
+      ],
+      "@typescript-eslint/return-await": ["error", "error-handling-correctness-only"],
+      "@typescript-eslint/strict-boolean-expressions": [
+        "error",
+        {
+          "allowNullableObject": false,
+          "allowNumber": false,
+          "allowString": false
+        }
+      ],
+      "@typescript-eslint/switch-exhaustiveness-check": [
+        "error",
+        {
+          "allowDefaultCaseForExhaustiveSwitch": false,
+          "considerDefaultExhaustiveForUnions": false,
+          "requireDefaultForNonUnion": true
+        }
+      ],
+      "@typescript-eslint/triple-slash-reference": "error",
+      "@typescript-eslint/unbound-method": "error",
+      "@typescript-eslint/unified-signatures": "error",
+      "@typescript-eslint/use-unknown-in-catch-callback-variable": "error",
+      "check-file/filename-naming-convention": [
+        "error",
+        {
+          "**/*": "KEBAB_CASE"
+        },
+        {
+          "ignoreMiddleExtensions": true
+        }
+      ],
+      "check-file/folder-match-with-fex": [
+        "error",
+        {
+          "*.@(ios|android).@(ts|tsx)": "apps/mobile/src/shared/ui/primitives/*/"
+        }
+      ],
+      "check-file/folder-naming-convention": [
+        "error",
+        {
+          "**/": "KEBAB_CASE"
+        },
+        {
+          "ignoreWords": ["_app"]
+        }
+      ],
+      "constructor-super": "off",
+      "curly": ["error", "all"],
+      "dot-notation": [
+        "off",
+        {
+          "allowKeywords": true,
+          "allowPattern": ""
+        }
+      ],
+      "eqeqeq": ["error", "always"],
+      "for-direction": "error",
+      "getter-return": [
+        "off",
+        {
+          "allowImplicit": false
+        }
+      ],
+      "no-array-constructor": "off",
+      "no-async-promise-executor": "error",
+      "no-case-declarations": "error",
+      "no-class-assign": "off",
+      "no-compare-neg-zero": "error",
+      "no-cond-assign": ["error", "except-parens"],
+      "no-console": ["error", {}],
+      "no-const-assign": "off",
+      "no-constant-binary-expression": [
+        "error",
+        {
+          "checkRelationalComparisons": false
+        }
+      ],
+      "no-constant-condition": [
+        "error",
+        {
+          "checkLoops": "allExceptWhileTrue"
+        }
+      ],
+      "no-control-regex": "error",
+      "no-debugger": "error",
+      "no-delete-var": "error",
+      "no-dupe-args": "off",
+      "no-dupe-class-members": "off",
+      "no-dupe-else-if": "error",
+      "no-dupe-keys": "off",
+      "no-duplicate-case": "error",
+      "no-empty": [
+        "error",
+        {
+          "allowEmptyCatch": false
+        }
+      ],
+      "no-empty-character-class": "error",
+      "no-empty-function": [
+        "off",
+        {
+          "allow": []
+        }
+      ],
+      "no-empty-pattern": [
+        "error",
+        {
+          "allowObjectPatternsAsParameters": false
+        }
+      ],
+      "no-empty-static-block": "error",
+      "no-ex-assign": "error",
+      "no-extra-boolean-cast": ["error", {}],
+      "no-fallthrough": [
+        "error",
+        {
+          "allowEmptyCase": false,
+          "reportUnusedFallthroughComment": false
+        }
+      ],
+      "no-func-assign": "off",
+      "no-global-assign": [
+        "error",
+        {
+          "exceptions": []
+        }
+      ],
+      "no-implicit-coercion": [
+        "error",
+        {
+          "allow": [],
+          "boolean": true,
+          "disallowTemplateShorthand": false,
+          "number": true,
+          "string": true
+        }
+      ],
+      "no-implied-eval": "off",
+      "no-import-assign": "off",
+      "no-invalid-regexp": ["error", {}],
+      "no-irregular-whitespace": [
+        "error",
+        {
+          "skipComments": false,
+          "skipJSXText": false,
+          "skipRegExps": false,
+          "skipStrings": true,
+          "skipTemplates": false
+        }
+      ],
+      "no-loss-of-precision": "error",
+      "no-misleading-character-class": [
+        "error",
+        {
+          "allowEscape": false
+        }
+      ],
+      "no-new-native-nonconstructor": "off",
+      "no-new-symbol": "off",
+      "no-nonoctal-decimal-escape": "error",
+      "no-obj-calls": "off",
+      "no-octal": "error",
+      "no-param-reassign": "error",
+      "no-prototype-builtins": "error",
+      "no-redeclare": [
+        "off",
+        {
+          "builtinGlobals": true
+        }
+      ],
+      "no-regex-spaces": "error",
+      "no-restricted-globals": [
+        "error",
+        {
+          "name": "FinalizationRegistry",
+          "message": "[hermes/finalization-registry] FinalizationRegistry n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "name": "Iterator",
+          "message": "[hermes/iterator-helpers] Iterator n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "name": "Temporal",
+          "message": "[hermes/temporal] Temporal n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        }
+      ],
+      "no-restricted-properties": [
+        "error",
+        {
+          "object": "describe",
+          "property": "only",
+          "message": "[test/describe-only] un describe focalisé cache le reste de la suite"
+        },
+        {
+          "object": "it",
+          "property": "only",
+          "message": "[test/it-only] un it focalisé cache le reste de la suite"
+        },
+        {
+          "object": "test",
+          "property": "only",
+          "message": "[test/test-only] un test focalisé cache le reste de la suite"
+        },
+        {
+          "object": "process",
+          "property": "exit",
+          "message": "[node/process-exit] fixer process.exitCode : process.exit coupe les sorties en attente"
+        },
+        {
+          "property": "toSorted",
+          "message": "[hermes/array-to-sorted] .toSorted n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Array",
+          "property": "fromAsync",
+          "message": "[hermes/array-from-async] Array.fromAsync n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Object",
+          "property": "groupBy",
+          "message": "[hermes/object-group-by] Object.groupBy n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Map",
+          "property": "groupBy",
+          "message": "[hermes/map-group-by] Map.groupBy n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "RegExp",
+          "property": "escape",
+          "message": "[hermes/regexp-escape] RegExp.escape n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "crypto",
+          "property": "getRandomValues",
+          "message": "[hermes/crypto-get-random-values] crypto.getRandomValues n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "crypto",
+          "property": "randomUUID",
+          "message": "[hermes/crypto-random-uuid] crypto.randomUUID n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "property": "formatRange",
+          "message": "[hermes/intl-format-range] .formatRange n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "RelativeTimeFormat",
+          "message": "[hermes/intl-relative-time-format] Intl.RelativeTimeFormat n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "PluralRules",
+          "message": "[hermes/intl-plural-rules] Intl.PluralRules n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "ListFormat",
+          "message": "[hermes/intl-list-format] Intl.ListFormat n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "DisplayNames",
+          "message": "[hermes/intl-display-names] Intl.DisplayNames n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "Locale",
+          "message": "[hermes/intl-locale] Intl.Locale n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "Segmenter",
+          "message": "[hermes/intl-segmenter] Intl.Segmenter n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "object": "Intl",
+          "property": "supportedValuesOf",
+          "message": "[hermes/intl-supported-values-of] Intl.supportedValuesOf n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "ExportAllDeclaration",
+          "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
+        },
+        {
+          "selector": "Decorator",
+          "message": "[node/decorator] Node efface les types sans rien transformer : un décorateur échoue à l’exécution"
+        },
+        {
+          "selector": "AccessorProperty, TSAbstractAccessorProperty",
+          "message": "[node/accessor] Node efface les types sans rien transformer : un accesseur accessor échoue à l’exécution"
+        },
+        {
+          "selector": "ImportDeclaration[source.value=/^\\.{1,2}\\/.*\\.js$/]",
+          "message": "[node/import-js] importer le fichier .ts : Node exécute les sources TypeScript"
+        },
+        {
+          "selector": "ExportNamedDeclaration[source.value=/^\\.{1,2}\\/.*\\.js$/]",
+          "message": "[node/export-js] réexporter depuis le fichier .ts : Node exécute les sources TypeScript"
+        },
+        {
+          "selector": "ImportExpression[source.value=/^\\.{1,2}\\/.*\\.js$/]",
+          "message": "[node/dynamic-import-js] importer dynamiquement le fichier .ts : Node exécute les sources TypeScript"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
+          "message": "[hermes/array-from-async] Array.fromAsync n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Object'][property.name='groupBy']",
+          "message": "[hermes/object-group-by] Object.groupBy n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Map'][property.name='groupBy']",
+          "message": "[hermes/map-group-by] Map.groupBy n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "Literal[regex.flags=/v/]",
+          "message": "[hermes/regexp-v-flag] le drapeau v des expressions régulières n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "NewExpression[callee.name='RegExp'] > Literal:nth-child(2)[value=/v/]",
+          "message": "[hermes/regexp-v-flag] le drapeau v des expressions régulières n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "CallExpression[callee.name='RegExp'] > Literal:nth-child(2)[value=/v/]",
+          "message": "[hermes/regexp-v-flag] le drapeau v des expressions régulières n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='RegExp'][property.name='escape']",
+          "message": "[hermes/regexp-escape] RegExp.escape n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.name='globalThis'][property.name='FinalizationRegistry']",
+          "message": "[hermes/finalization-registry] FinalizationRegistry n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.name='globalThis'][property.name='Iterator']",
+          "message": "[hermes/iterator-helpers] Iterator n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.name='globalThis'][property.name='Temporal']",
+          "message": "[hermes/temporal] Temporal n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='crypto'][property.name='getRandomValues']",
+          "message": "[hermes/crypto-get-random-values] crypto.getRandomValues n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='crypto'][property.name='randomUUID']",
+          "message": "[hermes/crypto-random-uuid] crypto.randomUUID n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='RelativeTimeFormat']",
+          "message": "[hermes/intl-relative-time-format] Intl.RelativeTimeFormat n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='PluralRules']",
+          "message": "[hermes/intl-plural-rules] Intl.PluralRules n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='ListFormat']",
+          "message": "[hermes/intl-list-format] Intl.ListFormat n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='DisplayNames']",
+          "message": "[hermes/intl-display-names] Intl.DisplayNames n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='Locale']",
+          "message": "[hermes/intl-locale] Intl.Locale n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='Segmenter']",
+          "message": "[hermes/intl-segmenter] Intl.Segmenter n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Intl'][property.name='supportedValuesOf']",
+          "message": "[hermes/intl-supported-values-of] Intl.supportedValuesOf n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
+        }
+      ],
+      "no-return-await": "off",
+      "no-self-assign": [
+        "error",
+        {
+          "props": true
+        }
+      ],
+      "no-setter-return": "off",
+      "no-shadow-restricted-names": [
+        "error",
+        {
+          "reportGlobalThis": true
+        }
+      ],
+      "no-sparse-arrays": "error",
+      "no-this-before-super": "off",
+      "no-throw-literal": "off",
+      "no-unassigned-vars": "error",
+      "no-undef": [
+        "off",
+        {
+          "typeof": false
+        }
+      ],
+      "no-unexpected-multiline": "error",
+      "no-unreachable": "off",
+      "no-unsafe-finally": "error",
+      "no-unsafe-negation": [
+        "off",
+        {
+          "enforceForOrderingRelations": false
+        }
+      ],
+      "no-unsafe-optional-chaining": [
+        "error",
+        {
+          "disallowArithmeticOperators": false
+        }
+      ],
+      "no-unused-expressions": [
+        "off",
+        {
+          "allowShortCircuit": false,
+          "allowTernary": false,
+          "allowTaggedTemplates": false,
+          "enforceForJSX": false,
+          "ignoreDirectives": false
+        }
+      ],
+      "no-unused-labels": "error",
+      "no-unused-private-class-members": "error",
+      "no-unused-vars": [
+        "off",
+        {
+          "vars": "all",
+          "args": "after-used",
+          "ignoreRestSiblings": false,
+          "caughtErrors": "all",
+          "ignoreClassWithStaticInitBlock": false,
+          "ignoreUsingDeclarations": false,
+          "reportUsedIgnorePattern": false
+        }
+      ],
+      "no-useless-assignment": "error",
+      "no-useless-backreference": "error",
+      "no-useless-catch": "error",
+      "no-useless-constructor": "off",
+      "no-useless-escape": [
+        "error",
+        {
+          "allowRegexCharacters": []
+        }
+      ],
+      "no-var": "error",
+      "no-warning-comments": [
+        "error",
+        {
+          "location": "start",
+          "terms": ["todo", "fixme", "xxx"]
+        }
+      ],
+      "no-with": "off",
+      "object-shorthand": ["error", "always"],
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "any",
+          "ignoreReadBeforeAssign": false
+        }
+      ],
+      "prefer-promise-reject-errors": [
+        "off",
+        {
+          "allowEmptyReject": false
+        }
+      ],
+      "prefer-rest-params": "error",
+      "prefer-spread": "error",
+      "prefer-template": "error",
+      "preserve-caught-error": [
+        "error",
+        {
+          "requireCatchParameter": false,
+          "errorClassNames": []
+        }
+      ],
+      "require-await": "off",
+      "require-yield": "error",
+      "use-isnan": [
+        "error",
+        {
+          "enforceForIndexOf": false,
+          "enforceForSwitchCase": true
+        }
+      ],
+      "valid-typeof": [
+        "error",
+        {
+          "requireStringLiterals": false
+        }
+      ]
+    }
+  },
   "apps/mobile/babel.config.js": {
     "plugins": ["@", "@cspell", "check-file"],
     "parserOptions": {
