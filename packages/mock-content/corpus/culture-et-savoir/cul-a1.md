@@ -12,7 +12,7 @@ tags: patrimoine, restauration, moyen âge
 hero: Une restauratrice au travail sur la fresque de l'église Saint-Genou | Photo : atelier Vermeil / CC BY 4.0
 ---
 
-::video[Sous les enduits, la fresque retrouvée de Belleroche | 4:07]
+::video[Sous les enduits, la fresque retrouvée de Belleroche]{duration="4:07"}
 
 Reportage — la scène se découvre au ralenti, centimètre carré après centimètre carré. Dans la nef fraîche de l'église Saint-Genou, à Belleroche, une équipe de restaurateurs dégage depuis le printemps une peinture murale que personne n'attendait.
 

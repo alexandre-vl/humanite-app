@@ -12,7 +12,7 @@ tags: villes, jeunesse, économie
 hero: Le marché éphémère installé sur la friche de Serravia | Photo : Agence Méridien / CC BY 4.0
 ---
 
-::video[À Serravia, un marché naît sur une friche | 4:05]
+::video[À Serravia, un marché naît sur une friche]{duration="4:05"}
 
 La scène se joue chaque samedi à l'aube, sur un terrain vague du centre de Serravia. Là où s'élevaient les anciennes halles, fermées l'an dernier pour vétusté, une trentaine de jeunes commerçants dressent désormais leurs étals sous des bâches colorées.
 

@@ -8,6 +8,7 @@ import type { BlockContent, DefinitionContent, PhrasingContent, RootContent } fr
 import { directive } from 'micromark-extension-directive';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { SECTIONS } from './registries.ts';
+import { toInstant } from './time.ts';
 import { validateCorpus } from './validate.ts';
 
 /** Where each item file lives, relative to this module. */
@@ -17,6 +18,9 @@ const CORPUS = new URL('../corpus/', import.meta.url);
 type RawSpan = SpanInput;
 type RawBlock = BlockInput;
 type RawTarget = Extract<RawSpan, { type: 'link' }>['target'];
+
+/** A `::name[label]{attribute="value"}` line, the node `mdast-util-directive` adds to the tree. */
+type Directive = Extract<RootContent, { type: 'leafDirective' }>;
 
 /** The flat `key: value` front matter; values are kept raw so a colon inside a title survives. */
 const parseFrontmatter = (text: string): Readonly<Record<string, string>> =>
@@ -42,15 +46,6 @@ const splitHero = (value: string): Readonly<{ caption: string; credit: string }>
   return { caption: caption ?? '', credit: credit ?? '' };
 };
 
-/** `2026-09-10 08:30` to an ISO instant, read as UTC for a stable mock. */
-const toInstant = (value: string | undefined): string | undefined => {
-  if (value === undefined) {
-    return undefined;
-  }
-  const [, date, time] = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/u.exec(value) ?? [];
-  return date === undefined || time === undefined ? value : `${date}T${time}:00.000Z`;
-};
-
 /** The plain text of inline content, line breaks becoming spaces. */
 const plain = (nodes: readonly PhrasingContent[]): string =>
   nodes
@@ -60,6 +55,9 @@ const plain = (nodes: readonly PhrasingContent[]): string =>
       }
       if (node.type === 'break') {
         return ' ';
+      }
+      if (node.type === 'textDirective') {
+        throw new Error(`« :${node.name} » est lu comme une directive : un deux-points collé à un mot en ouvre une`);
       }
       return 'children' in node ? plain(node.children) : '';
     })
@@ -120,19 +118,30 @@ const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
   return { type: 'paragraph', spans: toSpans(children) };
 };
 
-/** A leaf directive to its block, its `[label]` split on ` | `. */
-const toDirective = (name: string, label: string): RawBlock => {
-  const [first = '', second = '', third = ''] = label.split('|').map((part) => part.trim());
-  if (name === 'video') {
-    return { type: 'video', title: first, duration: second };
+/** A `m:ss` running time to whole seconds. It reaches here as an attribute: inside a label, `:ss` opens a directive. */
+const toSeconds = (value: string | null | undefined): number => {
+  const [, minutes, seconds] = /^(\d{1,2}):([0-5]\d)$/u.exec(value ?? '') ?? [];
+  if (minutes === undefined || seconds === undefined) {
+    throw new Error(`durée invalide : « ${value ?? ''} », attendu m:ss`);
   }
-  if (name === 'related') {
+  return Number(minutes) * 60 + Number(seconds);
+};
+
+/** A leaf directive to its block: prose from its `[label]` split on ` | `, data from its `{name="value"}` attributes. */
+const toDirective = (node: Directive): RawBlock => {
+  const [first = '', second = '', third = ''] = plain(node.children)
+    .split('|')
+    .map((part) => part.trim());
+  if (node.name === 'video') {
+    return { type: 'video', title: first, durationSeconds: toSeconds(node.attributes?.['duration']) };
+  }
+  if (node.name === 'related') {
     return { type: 'related', id: first };
   }
-  if (name === 'callout') {
+  if (node.name === 'callout') {
     return { type: 'callout', title: first, text: second, button: third };
   }
-  throw new Error(`directive inconnue : ::${name}`);
+  throw new Error(`directive inconnue : ::${node.name}`);
 };
 
 const toBlock = (node: RootContent): RawBlock => {
@@ -146,13 +155,13 @@ const toBlock = (node: RootContent): RawBlock => {
     return toQuote(node.children);
   }
   if (node.type === 'leafDirective') {
-    return toDirective(node.name, plain(node.children));
+    return toDirective(node);
   }
   throw new Error(`bloc non pris en charge : ${node.type}`);
 };
 
-/** Parse one item file to the shape `ARTICLE` validates. */
-const toArticle = (text: string): Article => {
+/** Parse one item file to the shape `ARTICLE` validates. Exported so its refusals can be pinned by a test. */
+export const parseItem = (text: string): Article => {
   const tree = fromMarkdown(text, {
     extensions: [frontmatter(['yaml']), directive()],
     mdastExtensions: [frontmatterFromMarkdown(['yaml']), directiveFromMarkdown()],
@@ -170,7 +179,7 @@ const toArticle = (text: string): Article => {
     title: front['title'],
     standfirst: front['standfirst'],
     authors: splitList(front['authors']),
-    publishedAt: toInstant(front['published']),
+    publishedAt: front['published'] === undefined ? undefined : toInstant(front['published']),
     tags: splitList(front['tags']),
     ...(hero === undefined ? {} : { hero: splitHero(hero) }),
     ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
@@ -189,7 +198,7 @@ export function buildCorpus(): readonly Article[] {
       .toSorted((left, right) => left.localeCompare(right));
     for (const file of files) {
       try {
-        items.push({ folder: section.id, article: toArticle(readFileSync(new URL(file, directory), 'utf8')) });
+        items.push({ folder: section.id, article: parseItem(readFileSync(new URL(file, directory), 'utf8')) });
       } catch (error) {
         errors.push(`${section.id}/${file} : ${error instanceof Error ? error.message : String(error)}`);
       }

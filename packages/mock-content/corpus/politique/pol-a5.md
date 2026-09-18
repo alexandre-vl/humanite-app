@@ -12,7 +12,7 @@ tags: démocratie locale, conseil municipal, budget
 hero: La salle du conseil de Sainte-Coline en séance de nuit | Photo : Karim Sadi / Studio Arvor
 ---
 
-::video[Une nuit au conseil municipal de Sainte-Coline | 4:18]
+::video[Une nuit au conseil municipal de Sainte-Coline]{duration="4:18"}
 
 Il est 21 heures passées quand la séance reprend, après une courte suspension. Sur les bancs, une vingtaine d'élus, des dossiers en pile et des gobelets de café tièdes. À l'ordre du jour, un budget supplémentaire de 1,2 million d'euros, ligne après ligne.
 

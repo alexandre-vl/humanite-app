@@ -22,7 +22,8 @@ test('BLOCK parses each block kind and rejects an unknown one', () => {
     true,
   );
   expect(BLOCK.safeParse({ type: 'image', caption: 'c', key: 'pol-a1-hero' }).success).toBe(true);
-  expect(BLOCK.safeParse({ type: 'video', title: 'T', duration: '3:12' }).success).toBe(true);
+  expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: 192 }).success).toBe(true);
+  expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: '3:12' }).success).toBe(false);
   expect(BLOCK.safeParse({ type: 'related', id: 'pol-a2' }).success).toBe(true);
   expect(BLOCK.safeParse({ type: 'callout', title: 'T', text: 'x', button: 'Voir' }).success).toBe(true);
   expect(BLOCK.safeParse({ type: 'sidebar' }).success).toBe(false);

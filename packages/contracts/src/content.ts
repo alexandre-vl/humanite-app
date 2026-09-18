@@ -25,7 +25,7 @@ export const BLOCK = z.discriminatedUnion('type', [
   z.object({ type: z.literal('heading'), text: DISPLAY_TEXT }),
   z.object({ type: z.literal('quote'), spans: z.array(SPAN), source: DISPLAY_TEXT.optional() }),
   z.object({ type: z.literal('image'), caption: DISPLAY_TEXT, key: z.string() }),
-  z.object({ type: z.literal('video'), title: DISPLAY_TEXT, duration: DISPLAY_TEXT }),
+  z.object({ type: z.literal('video'), title: DISPLAY_TEXT, durationSeconds: z.number().int().positive() }),
   z.object({ type: z.literal('related'), id: ARTICLE_ID }),
   z.object({ type: z.literal('callout'), title: DISPLAY_TEXT, text: DISPLAY_TEXT, button: DISPLAY_TEXT }),
 ]);

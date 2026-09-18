@@ -11,7 +11,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Dévoilée par hasard lors de travaux dans l'église Saint-Genou, une peinture murale du XIVe siècle fait l'objet d'un chantier de restauration minutieux que suit notre équipe, pinceau après pinceau.",
     authors: ['helene-marchetti'],
-    publishedAt: '2026-09-10T09:15:00.000Z',
+    publishedAt: '2026-09-10T07:15:00.000Z',
     tags: ['patrimoine', 'restauration', 'moyen âge'],
     hero: {
       caption: "Une restauratrice au travail sur la fresque de l'église Saint-Genou",
@@ -21,7 +21,7 @@ export const CORPUS_DATA = [
       {
         type: 'video',
         title: 'Sous les enduits, la fresque retrouvée de Belleroche',
-        duration: '4',
+        durationSeconds: 247,
       },
       {
         type: 'paragraph',
@@ -103,7 +103,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Fermé depuis l'automne 2024, le musée municipal de Villeneuve-sur-Arche accueille de nouveau le public samedi, avec des salles réaménagées, un parcours pour les enfants et une collection enfin sortie des réserves.",
     authors: ['helene-marchetti', 'paul-delorme'],
-    publishedAt: '2026-09-10T14:30:00.000Z',
+    publishedAt: '2026-09-10T12:30:00.000Z',
     tags: ['musée', 'patrimoine', 'exposition'],
     hero: {
       caption: 'La grande galerie du musée Berthelin après rénovation',
@@ -240,7 +240,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Alors que les espaces gratuits se raréfient dans nos villes, nos bibliothèques municipales restent l'un des rares endroits où l'on est accueilli sans condition. Il serait imprudent de les tenir pour acquises.",
     authors: ['odile-sarrazin'],
-    publishedAt: '2026-09-11T08:00:00.000Z',
+    publishedAt: '2026-09-11T06:00:00.000Z',
     tags: ['bibliothèques', 'service public', 'lecture'],
     blocks: [
       {
@@ -341,7 +341,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Voté en juillet, le dispositif entre en vigueur ce mois-ci. Il ouvre aux jeunes un crédit annuel valable dans les musées, cinémas et librairies partenaires, mais son financement suscite déjà des interrogations.',
     authors: ['paul-delorme', 'helene-marchetti'],
-    publishedAt: '2026-09-11T16:45:00.000Z',
+    publishedAt: '2026-09-11T14:45:00.000Z',
     tags: ['culture', 'jeunesse', 'politique culturelle'],
     hero: {
       caption: "L'entrée d'un cinéma partenaire du nouveau pass",
@@ -496,7 +496,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Photographies, carnets d'atelier, bulletins de paie : un collectif de bénévoles rassemble et scanne les archives privées d'anciens ouvriers du textile, pour constituer un fonds accessible à tous.",
     authors: ['helene-marchetti'],
-    publishedAt: '2026-09-12T10:20:00.000Z',
+    publishedAt: '2026-09-12T08:20:00.000Z',
     tags: ['mémoire', 'archives', 'patrimoine industriel'],
     hero: {
       caption: "Des bénévoles trient de vieilles photographies d'atelier",
@@ -620,7 +620,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Menacée de disparition après le départ à la retraite de son gérant, la librairie du Beffroi revit sous la forme d'une coopérative réunissant plus de deux cents habitants, décidés à garder un commerce du livre en centre-ville.",
     authors: ['paul-delorme'],
-    publishedAt: '2026-09-12T18:05:00.000Z',
+    publishedAt: '2026-09-12T16:05:00.000Z',
     tags: ['librairie', 'coopérative', 'lecture'],
     hero: {
       caption: 'La devanture de la librairie du Beffroi, à Belleroche',
@@ -729,7 +729,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Le théâtre a présenté mardi une programmation resserrée autour de la création contemporaine, avec quatorze spectacles et un festival de lectures ouvert aux textes d'auteurs encore inédits.",
     authors: ['helene-marchetti'],
-    publishedAt: '2026-09-11T07:30:00.000Z',
+    publishedAt: '2026-09-11T05:30:00.000Z',
     tags: ['théâtre', 'création', 'saison'],
     blocks: [
       {
@@ -774,7 +774,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Les archéologues ont dégagé un lot de plusieurs centaines de pièces enfouies dans une jarre, une découverte qualifiée de rare pour la région et qui va retarder le chantier de plusieurs semaines.',
     authors: ['paul-delorme'],
-    publishedAt: '2026-09-12T07:45:00.000Z',
+    publishedAt: '2026-09-12T05:45:00.000Z',
     tags: ['archéologie', 'découverte'],
     emphasis: true,
     blocks: [
@@ -820,7 +820,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Financée pour cinq ans par un mécénat local, la nouvelle chaire réunira historiens et géographes autour du patrimoine fluvial de la région, avec un premier colloque annoncé pour le printemps prochain.',
     authors: ['helene-marchetti', 'paul-delorme'],
-    publishedAt: '2026-09-13T08:30:00.000Z',
+    publishedAt: '2026-09-13T06:30:00.000Z',
     tags: ['recherche', 'université', 'patrimoine'],
     blocks: [
       {
@@ -865,7 +865,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Le fabricant de pièces métalliques veut supprimer cent vingt postes sur son site du Val d'Arche. La direction évoque des départs volontaires ; les représentants du personnel redoutent, eux, un premier pas vers la fermeture.",
     authors: ['marion-castel'],
-    publishedAt: '2026-09-10T09:05:00.000Z',
+    publishedAt: '2026-09-10T07:05:00.000Z',
     tags: ['emploi', 'industrie', 'social'],
     hero: {
       caption: "L'entrée du site des Fonderies du Vernay",
@@ -1015,7 +1015,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Fruits, légumes, fromages : en un an, les étals ont vu leurs tarifs grimper. Commerçants et clients décrivent une même spirale, entre coûts de production en hausse et pouvoir d'achat en berne, à l'approche de l'hiver.",
     authors: ['julien-ferrand'],
-    publishedAt: '2026-09-10T15:30:00.000Z',
+    publishedAt: '2026-09-10T13:30:00.000Z',
     tags: ["pouvoir d'achat", 'consommation', 'commerce'],
     hero: {
       caption: 'Un étal de primeurs sur le marché de Sainte-Coline',
@@ -1130,7 +1130,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Élus, chambre de commerce et organismes de formation planchent sur l'avenir d'un bassin d'emploi fragilisé. Objectif : anticiper les reconversions plutôt que de les subir, dans un territoire longtemps tourné vers la métallurgie.",
     authors: ['marion-castel', 'julien-ferrand'],
-    publishedAt: '2026-09-11T08:10:00.000Z',
+    publishedAt: '2026-09-11T06:10:00.000Z',
     tags: ['emploi', 'formation', 'territoires'],
     hero: {
       caption: "Une friche industrielle en bordure de Villefranche-d'Arvor",
@@ -1248,7 +1248,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Derrière les chiffres de la croissance, il y a des files qui s'allongent le samedi matin. Notre chroniqueur revient sur ce que révèle, très concrètement, l'essor discret de l'économie du dépannage et du partage.",
     authors: ['bernard-quillet'],
-    publishedAt: '2026-09-12T07:30:00.000Z',
+    publishedAt: '2026-09-12T05:30:00.000Z',
     tags: ['économie sociale', 'précarité', 'société'],
     blocks: [
       {
@@ -1389,7 +1389,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Menacés par le départ à la retraite de leur patron, les employés d'une menuiserie ont repris l'entreprise en société coopérative. Un an après, l'atelier tourne, avec des débuts encourageants mais encore fragiles.",
     authors: ['julien-ferrand'],
-    publishedAt: '2026-09-12T14:00:00.000Z',
+    publishedAt: '2026-09-12T12:00:00.000Z',
     tags: ['économie sociale', 'emploi', 'coopératives'],
     hero: {
       caption: "L'atelier de la menuiserie coopérative de Montreuil-l'Abbé",
@@ -1501,7 +1501,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Dans le pays de l'Ombre, plusieurs bureaux ont vu leurs horaires rognés. Les élus dénoncent un abandon silencieux et réclament une concertation avant toute nouvelle fermeture, quand l'opérateur invoque la baisse du courrier.",
     authors: ['marion-castel'],
-    publishedAt: '2026-09-13T09:00:00.000Z',
+    publishedAt: '2026-09-13T07:00:00.000Z',
     tags: ['services publics', 'ruralité', 'poste'],
     hero: {
       caption: "Un bureau de poste aux horaires réduits dans le pays de l'Ombre",
@@ -1608,7 +1608,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Selon les chiffres trimestriels publiés jeudi, l'emploi progresse légèrement, porté par les services et la construction. Les acteurs locaux restent prudents, à l'ombre des difficultés du secteur industriel.",
     authors: ['julien-ferrand'],
-    publishedAt: '2026-09-10T10:40:00.000Z',
+    publishedAt: '2026-09-10T08:40:00.000Z',
     tags: ['emploi', 'économie'],
     emphasis: true,
     blocks: [
@@ -1644,7 +1644,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Baptisée « l'arche », cette monnaie complémentaire est acceptée depuis lundi par une quarantaine de commerçants. Ses promoteurs y voient un moyen de garder la richesse sur le territoire et de soutenir les circuits courts.",
     authors: ['marion-castel'],
-    publishedAt: '2026-09-11T11:25:00.000Z',
+    publishedAt: '2026-09-11T09:25:00.000Z',
     tags: ['économie locale', 'commerce'],
     blocks: [
       {
@@ -1689,7 +1689,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Une partie des salariés a débrayé jeudi matin sur deux sites. Les représentants du personnel réclament une revalorisation face à l'inflation ; la direction promet d'ouvrir des négociations la semaine prochaine.",
     authors: ['marion-castel', 'julien-ferrand'],
-    publishedAt: '2026-09-13T09:45:00.000Z',
+    publishedAt: '2026-09-13T07:45:00.000Z',
     tags: ['social', 'salaires', 'logistique'],
     blocks: [
       {
@@ -1734,7 +1734,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Le niveau de la nappe du bassin de la Sonne n'a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l'arrosage des jardins et à réduire la pression du réseau sur onze communes.",
     authors: ['hugo-lambert'],
-    publishedAt: '2026-09-10T08:30:00.000Z',
+    publishedAt: '2026-09-10T06:30:00.000Z',
     tags: ['eau', 'sécheresse', 'ressources'],
     hero: {
       caption: 'La retenue de la Sonne à son étiage',
@@ -1887,7 +1887,7 @@ export const CORPUS_DATA = [
     standfirst:
       "La société d'économie mixte Énergies du Plateau veut couvrir d'anciennes carrières de panneaux photovoltaïques, mais des riverains s'inquiètent de l'emprise du chantier sur les chemins de randonnée les plus fréquentés.",
     authors: ['lea-fontanel'],
-    publishedAt: '2026-09-10T15:10:00.000Z',
+    publishedAt: '2026-09-10T13:10:00.000Z',
     tags: ['énergie', 'solaire', 'aménagement'],
     hero: {
       caption: 'Les anciennes carrières du plateau de Montbrel',
@@ -2035,7 +2035,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Le conservatoire des espaces naturels des Trois-Vallées constate le retour d'oiseaux nicheurs sur la zone humide restaurée, un signe encourageant pour un chantier longtemps contesté par les riverains de la vallée.",
     authors: ['hugo-lambert', 'lea-fontanel'],
-    publishedAt: '2026-09-11T09:40:00.000Z',
+    publishedAt: '2026-09-11T07:40:00.000Z',
     tags: ['biodiversité', 'zones humides', 'rivière'],
     hero: {
       caption: 'Les vasières restaurées des marais de Grand-Rieu',
@@ -2164,7 +2164,7 @@ export const CORPUS_DATA = [
     standfirst:
       "L'association Canopée urbaine et la mairie veulent planter deux mille arbres en trois ans dans les rues les plus exposées à la chaleur, après un été où le centre a battu ses records de température nocturne.",
     authors: ['lea-fontanel'],
-    publishedAt: '2026-09-11T12:20:00.000Z',
+    publishedAt: '2026-09-11T10:20:00.000Z',
     tags: ['ville', 'arbres', 'climat'],
     hero: {
       caption: 'Une rue du centre de Villeneuve-sur-Arche en plein été',
@@ -2289,7 +2289,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Sur le plateau, une trentaine de maraîchers misent sur les haies et les bandes fleuries pour attirer les insectes auxiliaires, une stratégie patiente qu'ils veulent mesurer parcelle par parcelle avant de la généraliser.",
     authors: ['hugo-lambert'],
-    publishedAt: '2026-09-12T08:15:00.000Z',
+    publishedAt: '2026-09-12T06:15:00.000Z',
     tags: ['agriculture', 'pesticides', 'biodiversité'],
     hero: {
       caption: 'Une haie fraîchement plantée en bordure de parcelle',
@@ -2420,7 +2420,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Portée par une trentaine de bénévoles, la structure veut donner une deuxième vie aux objets et apprendre aux habitants à réparer eux-mêmes leur électroménager, dans un local prêté par la commune de Saint-Prieux.',
     authors: ['lea-fontanel'],
-    publishedAt: '2026-09-12T17:05:00.000Z',
+    publishedAt: '2026-09-12T15:05:00.000Z',
     tags: ['déchets', 'réemploi', 'économie circulaire'],
     hero: {
       caption: "L'atelier de réparation installé dans l'ancienne gare",
@@ -2549,7 +2549,7 @@ export const CORPUS_DATA = [
     standfirst:
       "La circulation sera différenciée dès jeudi matin et la vitesse abaissée sur les principaux axes, tandis que les personnes fragiles sont invitées à limiter leurs efforts en plein air jusqu'à la fin de l'épisode.",
     authors: ['hugo-lambert'],
-    publishedAt: '2026-09-11T07:30:00.000Z',
+    publishedAt: '2026-09-11T05:30:00.000Z',
     tags: ['pollution', 'santé', 'air'],
     emphasis: true,
     blocks: [
@@ -2595,7 +2595,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Le collectif Rives vivantes a mobilisé près de trois cents bénévoles dimanche pour nettoyer les berges de la rivière, entre le pont de Montbrel et l'écluse de Saint-Prieux, sous un soleil de fin d'été.",
     authors: ['lea-fontanel'],
-    publishedAt: '2026-09-11T18:40:00.000Z',
+    publishedAt: '2026-09-11T16:40:00.000Z',
     tags: ['rivière', 'déchets', 'bénévolat'],
     blocks: [
       {
@@ -2640,7 +2640,7 @@ export const CORPUS_DATA = [
     standfirst:
       "La commune propose une prime complémentaire aux foyers modestes qui équipent leur toiture, dans la limite d'une enveloppe annuelle et sous condition de ressources, avec des demandes ouvertes dès le mois d'octobre.",
     authors: ['hugo-lambert', 'lea-fontanel'],
-    publishedAt: '2026-09-12T10:15:00.000Z',
+    publishedAt: '2026-09-12T08:15:00.000Z',
     tags: ['énergie', 'solaire', 'aides'],
     blocks: [
       {
@@ -2685,7 +2685,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Une étude locale rendue publique mardi chiffre pour la première fois les écarts de rémunération dans un secteur presque entièrement féminin, où le temps partiel subi pèse lourd sur les fiches de paie.',
     authors: ['claire-vasseur', 'ines-benali'],
-    publishedAt: '2026-09-10T08:00:00.000Z',
+    publishedAt: '2026-09-10T06:00:00.000Z',
     tags: ['égalité', 'salaires', 'travail'],
     hero: {
       caption: 'Une aide à domicile en tournée dans un quartier pavillonnaire',
@@ -2799,7 +2799,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Lancé il y a deux ans à Saint-Maur-des-Vignes, le réseau Élan met en relation des professionnelles bénévoles et des femmes éloignées de l'emploi. Un premier bilan, encourageant, vient d'être présenté.",
     authors: ['claire-vasseur'],
-    publishedAt: '2026-09-10T17:20:00.000Z',
+    publishedAt: '2026-09-10T15:20:00.000Z',
     tags: ['emploi', 'solidarité', 'égalité'],
     hero: {
       caption: "Deux femmes discutent lors d'un atelier du réseau Élan",
@@ -2924,7 +2924,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Une analyse des exécutifs locaux de la région montre que si les assemblées sont désormais presque paritaires, les délégations stratégiques — finances, urbanisme, sécurité — demeurent très majoritairement masculines.',
     authors: ['ines-benali'],
-    publishedAt: '2026-09-11T09:40:00.000Z',
+    publishedAt: '2026-09-11T07:40:00.000Z',
     tags: ['parité', 'politique locale', 'égalité'],
     hero: {
       caption: 'Une séance du conseil municipal de Villeneuve-sur-Arche',
@@ -3040,7 +3040,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Reléguées aux horaires du matin et aux terrains annexes, les joueuses du club local ont saisi la mairie. Elles demandent un partage équitable des installations, alors que leurs effectifs ont doublé en trois ans.',
     authors: ['ines-benali', 'claire-vasseur'],
-    publishedAt: '2026-09-11T15:10:00.000Z',
+    publishedAt: '2026-09-11T13:10:00.000Z',
     tags: ['sport', 'égalité', 'vie locale'],
     hero: {
       caption: "L'équipe féminine à l'entraînement sur un terrain annexe",
@@ -3171,7 +3171,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Faute de transports et de services de proximité, de nombreuses femmes âgées ou isolées peinent à demander de l'aide. Un camion-permanence tente d'aller à leur rencontre, marché après marché.",
     authors: ['claire-vasseur'],
-    publishedAt: '2026-09-12T11:00:00.000Z',
+    publishedAt: '2026-09-12T09:00:00.000Z',
     tags: ['ruralité', 'solidarité', 'égalité'],
     hero: {
       caption: "Le camion-permanence installé sur la place d'un village",
@@ -3298,7 +3298,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Dans plusieurs collèges de la région, un programme propose aux élèves de rencontrer des femmes ingénieures et chercheuses. Objectif : enrayer le décrochage des filles dès la troisième dans les filières scientifiques.',
     authors: ['ines-benali'],
-    publishedAt: '2026-09-12T16:30:00.000Z',
+    publishedAt: '2026-09-12T14:30:00.000Z',
     tags: ['éducation', 'sciences', 'égalité'],
     hero: {
       caption: "Une collégienne manipule un petit robot lors d'un atelier",
@@ -3407,7 +3407,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Selon un bilan présenté mercredi, le nombre de signalements a augmenté l'an dernier, une évolution que les associations attribuent autant à une libération de la parole qu'à une réalité préoccupante.",
     authors: ['claire-vasseur'],
-    publishedAt: '2026-09-11T07:00:00.000Z',
+    publishedAt: '2026-09-11T05:00:00.000Z',
     tags: ['violences', 'société'],
     emphasis: true,
     blocks: [
@@ -3453,7 +3453,7 @@ export const CORPUS_DATA = [
     standfirst:
       "La sociologue recevra le mois prochain un prix régional récompensant une décennie d'enquêtes sur les tâches domestiques et le soin, longtemps absentes des statistiques officielles.",
     authors: ['ines-benali'],
-    publishedAt: '2026-09-12T08:15:00.000Z',
+    publishedAt: '2026-09-12T06:15:00.000Z',
     tags: ['recherche', 'égalité'],
     blocks: [
       {
@@ -3498,7 +3498,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Rencontres, ateliers et micro-crédit : la manifestation entend accompagner celles qui souhaitent créer leur activité, dans un territoire où elles restent minoritaires parmi les créateurs d'entreprise.",
     authors: ['claire-vasseur', 'ines-benali'],
-    publishedAt: '2026-09-13T09:00:00.000Z',
+    publishedAt: '2026-09-13T07:00:00.000Z',
     tags: ['entrepreneuriat', 'égalité', 'économie'],
     blocks: [
       {
@@ -3543,7 +3543,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Réunis à Port-Méridienne, les représentants des deux pays voisins ont paraphé un accord encadrant les zones de pêche contestées, sous la médiation de l'Union des États du Levant, saluée par les riverains.",
     authors: ['elise-morvan', 'samir-haddad'],
-    publishedAt: '2026-09-10T07:30:00.000Z',
+    publishedAt: '2026-09-10T05:30:00.000Z',
     tags: ['diplomatie', 'pêche', 'coopération'],
     hero: {
       caption: 'Le port de Port-Méridienne au petit matin',
@@ -3689,7 +3689,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Trois semaines après les crues qui ont ravagé plusieurs îles, les habitants dénoncent la lenteur des secours et le manque d'eau potable, tandis que l'Union des États du Levant peine à coordonner les convois.",
     authors: ['samir-haddad'],
-    publishedAt: '2026-09-11T09:15:00.000Z',
+    publishedAt: '2026-09-11T07:15:00.000Z',
     tags: ['catastrophe', 'humanitaire', 'coopération'],
     hero: {
       caption: "Un quartier encore inondé sur l'île principale des Cargues",
@@ -3818,7 +3818,7 @@ export const CORPUS_DATA = [
     standfirst:
       "L'arrivée de portiques automatisés sur le premier terminal à conteneurs de la région fait craindre des centaines de suppressions d'emplois, dans une ville où la manutention fait vivre des quartiers entiers.",
     authors: ['elise-morvan', 'samir-haddad'],
-    publishedAt: '2026-09-12T08:05:00.000Z',
+    publishedAt: '2026-09-12T06:05:00.000Z',
     tags: ['travail', 'économie', 'migration'],
     hero: {
       caption: 'Les portiques du terminal de Port-Méridienne',
@@ -3956,7 +3956,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Reportage vidéo dans la capitale de la Valdavie, où de jeunes commerçants ont transformé une friche en marché éphémère, faute d'avoir pu reprendre les anciennes halles fermées pour vétusté l'an dernier.",
     authors: ['elise-morvan'],
-    publishedAt: '2026-09-11T18:30:00.000Z',
+    publishedAt: '2026-09-11T16:30:00.000Z',
     tags: ['villes', 'jeunesse', 'économie'],
     hero: {
       caption: 'Le marché éphémère installé sur la friche de Serravia',
@@ -3966,7 +3966,7 @@ export const CORPUS_DATA = [
       {
         type: 'video',
         title: 'À Serravia, un marché naît sur une friche',
-        duration: '4',
+        durationSeconds: 245,
       },
       {
         type: 'paragraph',
@@ -4034,7 +4034,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Une trêve signée, un archipel qui attend son eau potable : la même semaine, le monde a offert le meilleur et le pire de la coopération. Il est temps d'en tirer une leçon simple mais exigeante, écrit notre chroniqueur.",
     authors: ['yves-kerlan'],
-    publishedAt: '2026-09-12T09:00:00.000Z',
+    publishedAt: '2026-09-12T07:00:00.000Z',
     tags: ['diplomatie', 'humanitaire', 'opinion'],
     blocks: [
       {
@@ -4161,7 +4161,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Un an après la sécheresse historique qui a frappé la région de Terragne, le mécanisme d'aide créé pour financer la reconstruction n'a reçu qu'une fraction des sommes annoncées, révèle un rapport interne.",
     authors: ['samir-haddad', 'elise-morvan'],
-    publishedAt: '2026-09-13T07:40:00.000Z',
+    publishedAt: '2026-09-13T05:40:00.000Z',
     tags: ['climat', 'coopération', 'économie'],
     hero: {
       caption: 'Un champ asséché dans la région de Terragne',
@@ -4302,7 +4302,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Les deux pays ont annoncé la réouverture du poste-frontière de Vireux, fermé au printemps à la suite d'un différend douanier, une décision saluée par les commerçants transfrontaliers des deux côtés.",
     authors: ['elise-morvan'],
-    publishedAt: '2026-09-13T09:30:00.000Z',
+    publishedAt: '2026-09-13T07:30:00.000Z',
     tags: ['frontières', 'commerce'],
     emphasis: true,
     blocks: [
@@ -4348,7 +4348,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Les pays membres ont validé la création d'une flotte partagée d'avions bombardiers d'eau, mobilisable en quelques heures, après une saison marquée par des feux d'une ampleur inédite dans la région.",
     authors: ['samir-haddad'],
-    publishedAt: '2026-09-10T12:10:00.000Z',
+    publishedAt: '2026-09-10T10:10:00.000Z',
     tags: ['climat', 'coopération'],
     blocks: [
       {
@@ -4393,7 +4393,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Un ancien bus municipal transformé en médiathèque mobile sillonne depuis la rentrée les quartiers périphériques de la capitale valdave, proposant livres, jeux et accès à Internet aux habitants les plus éloignés.',
     authors: ['elise-morvan', 'samir-haddad'],
-    publishedAt: '2026-09-11T15:50:00.000Z',
+    publishedAt: '2026-09-11T13:50:00.000Z',
     tags: ['culture', 'villes'],
     blocks: [
       {
@@ -4438,7 +4438,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Après un mois de courriers de parents et d'élus ruraux, l'assemblée départementale a voté mardi soir le maintien des trois dessertes que ses services jugeaient trop coûteuses. Le financement reste à confirmer pour la prochaine rentrée.",
     authors: ['lucie-varenne'],
-    publishedAt: '2026-09-10T08:30:00.000Z',
+    publishedAt: '2026-09-10T06:30:00.000Z',
     tags: ['transports', 'ruralité', 'collectivités'],
     hero: {
       caption: "Un car scolaire sur le plateau de Villefranche-d'Arvor",
@@ -4577,7 +4577,7 @@ export const CORPUS_DATA = [
     standfirst:
       "La municipalité veut récupérer une centaine de logements laissés vides dans le centre ancien. Elle mise d'abord sur des aides à la rénovation, puis, en dernier recours, sur la réquisition, une piste qui divise déjà le conseil municipal.",
     authors: ['karim-belhadj'],
-    publishedAt: '2026-09-10T12:15:00.000Z',
+    publishedAt: '2026-09-10T10:15:00.000Z',
     tags: ['logement', 'urbanisme', 'collectivités'],
     hero: {
       caption: 'Une façade du centre ancien de Sainte-Coline',
@@ -4693,7 +4693,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Engagées depuis un an vers un rapprochement, les deux communautés de communes ne s'accordent ni sur le nombre de vice-présidents ni sur le siège de la future collectivité. Une réunion décisive est prévue la semaine prochaine.",
     authors: ['lucie-varenne', 'karim-belhadj'],
-    publishedAt: '2026-09-11T07:45:00.000Z',
+    publishedAt: '2026-09-11T05:45:00.000Z',
     tags: ['intercommunalité', 'gouvernance', 'territoires'],
     hero: {
       caption: "La salle du conseil communautaire du Val d'Arche",
@@ -4831,7 +4831,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Commerçants, riverains et associations de cyclistes se sont affrontés lors de la première réunion publique. La mairie promet une décision au printemps, après une phase d'expérimentation dès le mois d'octobre.",
     authors: ['karim-belhadj'],
-    publishedAt: '2026-09-11T16:20:00.000Z',
+    publishedAt: '2026-09-11T14:20:00.000Z',
     tags: ['mobilités', 'commerce', 'concertation'],
     hero: {
       caption: "La rue Marchande, artère commerçante de Villefranche-d'Arvor",
@@ -4967,7 +4967,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Jusqu'à une heure avancée, les élus ont débattu du budget, des cantines et de l'éclairage public. Notre reportage vidéo au cœur d'une assemblée où chaque euro se discute pied à pied, loin des projecteurs.",
     authors: ['lucie-varenne'],
-    publishedAt: '2026-09-12T09:10:00.000Z',
+    publishedAt: '2026-09-12T07:10:00.000Z',
     tags: ['démocratie locale', 'conseil municipal', 'budget'],
     hero: {
       caption: 'La salle du conseil de Sainte-Coline en séance de nuit',
@@ -4977,7 +4977,7 @@ export const CORPUS_DATA = [
       {
         type: 'video',
         title: 'Une nuit au conseil municipal de Sainte-Coline',
-        duration: '4',
+        durationSeconds: 258,
       },
       {
         type: 'paragraph',
@@ -5045,7 +5045,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Conflits d'intérêts, cadeaux, marchés publics : la nouvelle charte encadre les pratiques des cent trente élus communautaires. Une déontologue indépendante pourra être saisie par les habitants comme par les agents.",
     authors: ['lucie-varenne'],
-    publishedAt: '2026-09-12T18:40:00.000Z',
+    publishedAt: '2026-09-12T16:40:00.000Z',
     tags: ['transparence', 'éthique', 'intercommunalité'],
     hero: {
       caption: 'Signature de la charte de déontologie en séance',
@@ -5174,7 +5174,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Faute d'un dossier environnemental complet, la consultation prévue en octobre est repoussée à la fin de l'hiver, a indiqué la préfecture dans un bref communiqué diffusé mercredi en fin de journée.",
     authors: ['karim-belhadj'],
-    publishedAt: '2026-09-10T07:20:00.000Z',
+    publishedAt: '2026-09-10T05:20:00.000Z',
     tags: ['aménagement', 'transports'],
     emphasis: true,
     blocks: [
@@ -5210,7 +5210,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Les habitants pourront proposer et voter des projets de proximité, du mobilier urbain aux jardins partagés. La commune promet de réaliser les lauréats dès l'année prochaine, dans la limite de l'enveloppe votée.",
     authors: ['lucie-varenne'],
-    publishedAt: '2026-09-11T13:05:00.000Z',
+    publishedAt: '2026-09-11T11:05:00.000Z',
     tags: ['démocratie locale', 'budget'],
     blocks: [
       {
@@ -5245,7 +5245,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Un fonds exceptionnel de deux millions d'euros doit permettre de réparer voiries et bâtiments publics endommagés cet été. Les premières enveloppes seront versées aux communes avant la fin du mois d'octobre.",
     authors: ['lucie-varenne', 'karim-belhadj'],
-    publishedAt: '2026-09-13T08:15:00.000Z',
+    publishedAt: '2026-09-13T06:15:00.000Z',
     tags: ['intempéries', 'collectivités', 'budget'],
     blocks: [
       {
@@ -5290,7 +5290,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Après une nuit de veille devant la mairie, la municipalité a accepté mercredi d'ouvrir le gymnase des Charmilles pour accueillir une soixantaine de personnes sans abri avant les premières gelées.",
     authors: ['nadia-oussedik'],
-    publishedAt: '2026-09-11T08:15:00.000Z',
+    publishedAt: '2026-09-11T06:15:00.000Z',
     tags: ['logement', 'précarité', 'solidarité'],
     hero: {
       caption: 'Le gymnase des Charmilles réaménagé en dortoir',
@@ -5431,7 +5431,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Faute de places suffisantes au réfectoire, plusieurs écoles de Bourg-Méran organisent deux services successifs, réduisant le temps du repas à vingt minutes pour certains enfants, s'inquiètent des parents.",
     authors: ['thomas-lecuyer'],
-    publishedAt: '2026-09-10T09:40:00.000Z',
+    publishedAt: '2026-09-10T07:40:00.000Z',
     tags: ['éducation', 'enfance', 'restauration scolaire'],
     hero: {
       caption: "Le réfectoire de l'école des Peupliers à l'heure du déjeuner",
@@ -5556,7 +5556,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Ouverte il y a un an à Saint-Clair-du-Roc, la structure peine encore à recruter des généralistes, malgré des logements de fonction et une prime d'installation financée par cinq communes réunies.",
     authors: ['nadia-oussedik', 'thomas-lecuyer'],
-    publishedAt: '2026-09-12T07:50:00.000Z',
+    publishedAt: '2026-09-12T05:50:00.000Z',
     tags: ['santé', 'ruralité', 'services publics'],
     hero: {
       caption: "La façade de la maison de santé du Val d'Arche",
@@ -5696,7 +5696,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Chaque mardi, des collégiens de Villeneuve-sur-Arche rejoignent les pensionnaires d'une maison de retraite pour cuisiner, jardiner ou simplement discuter, dans le cadre d'un projet lancé au printemps.",
     authors: ['thomas-lecuyer'],
-    publishedAt: '2026-09-12T10:20:00.000Z',
+    publishedAt: '2026-09-12T08:20:00.000Z',
     tags: ['grand âge', 'lien social', 'éducation'],
     hero: {
       caption: 'Un atelier cuisine partagé à la résidence Les Tilleuls',
@@ -5826,7 +5826,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Lancé pour six mois, un service de navette sur réservation dessert désormais les écarts privés de ligne régulière, avec l'ambition de désenclaver les personnes âgées et les jeunes sans permis.",
     authors: ['nadia-oussedik'],
-    publishedAt: '2026-09-11T11:05:00.000Z',
+    publishedAt: '2026-09-11T09:05:00.000Z',
     tags: ['mobilité', 'ruralité', 'services publics'],
     hero: {
       caption: 'Le minibus solidaire à son premier arrêt au hameau de Faverolles',
@@ -5962,7 +5962,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Fréquentée par un nombre record de familles cette rentrée, l'épicerie sociale du quartier de Longeval lance un appel aux bénévoles pour tenir ses distributions et éviter de réduire ses horaires d'ouverture.",
     authors: ['nadia-oussedik', 'thomas-lecuyer'],
-    publishedAt: '2026-09-13T08:30:00.000Z',
+    publishedAt: '2026-09-13T06:30:00.000Z',
     tags: ['solidarité', 'précarité', 'bénévolat'],
     hero: {
       caption: "Les rayons de l'épicerie solidaire de Longeval",
@@ -6102,7 +6102,7 @@ export const CORPUS_DATA = [
     standfirst:
       "La municipalité a confirmé mercredi la création d'un accueil de jour, ouvert du lundi au samedi, offrant boissons chaudes, laverie et permanence sociale aux personnes à la rue durant la saison froide.",
     authors: ['nadia-oussedik'],
-    publishedAt: '2026-09-13T09:10:00.000Z',
+    publishedAt: '2026-09-13T07:10:00.000Z',
     tags: ['précarité', 'solidarité'],
     emphasis: true,
     blocks: [
@@ -6148,7 +6148,7 @@ export const CORPUS_DATA = [
     standfirst:
       "À partir d'octobre, l'équipement municipal restera ouvert jusqu'à vingt-deux heures trois soirs par semaine, une réponse à la demande d'espaces de travail calmes formulée par les jeunes de la commune.",
     authors: ['thomas-lecuyer'],
-    publishedAt: '2026-09-10T16:45:00.000Z',
+    publishedAt: '2026-09-10T14:45:00.000Z',
     tags: ['culture', 'jeunesse'],
     blocks: [
       {
@@ -6193,7 +6193,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Des bacs de compostage ont été installés cette semaine dans les cantines de trois établissements, avec l'objectif de sensibiliser les élèves et de réduire d'un tiers le volume des ordures ménagères.",
     authors: ['nadia-oussedik', 'thomas-lecuyer'],
-    publishedAt: '2026-09-12T14:20:00.000Z',
+    publishedAt: '2026-09-12T12:20:00.000Z',
     tags: ['éducation', 'déchets'],
     blocks: [
       {
@@ -6238,7 +6238,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Promu au printemps, le club de football amateur enchaîne les bons résultats, mais son stade centenaire ne répond plus aux normes de la division supérieure et la municipalité tarde encore à trancher.',
     authors: ['maxime-renaud'],
-    publishedAt: '2026-09-10T09:20:00.000Z',
+    publishedAt: '2026-09-10T07:20:00.000Z',
     tags: ['football', 'amateurs', 'équipements'],
     hero: {
       caption: 'Les tribunes en bois du stade de Bourg-la-Rivière',
@@ -6389,7 +6389,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Monté de deux divisions en trois ans, le club féminin attire un public nouveau et bouscule les hiérarchies régionales, porté par une formation patiente et un noyau de joueuses fidèles au maillot.',
     authors: ['sofia-laurenti'],
-    publishedAt: '2026-09-10T16:40:00.000Z',
+    publishedAt: '2026-09-10T14:40:00.000Z',
     tags: ['handball', 'sport féminin', 'clubs'],
     hero: {
       caption: "Les joueuses des Aiglons à l'entraînement",
@@ -6527,7 +6527,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Le temps d'une étape, nous avons suivi les bénévoles, les signaleurs et les coureurs de cette épreuve cycliste amateur qui traverse chaque automne une trentaine de communes du plateau, entre villages pavoisés et cols discrets.",
     authors: ['maxime-renaud', 'sofia-laurenti'],
-    publishedAt: '2026-09-11T11:10:00.000Z',
+    publishedAt: '2026-09-11T09:10:00.000Z',
     tags: ['cyclisme', 'course', 'bénévolat'],
     hero: {
       caption: "Le peloton dans la traversée d'un village du plateau",
@@ -6537,7 +6537,7 @@ export const CORPUS_DATA = [
       {
         type: 'video',
         title: 'Une matinée sur la Ronde des Trois-Vallées',
-        duration: '4',
+        durationSeconds: 278,
       },
       {
         type: 'paragraph',
@@ -6609,7 +6609,7 @@ export const CORPUS_DATA = [
     standfirst:
       'Révélée cet été sur les pistes régionales, la jeune athlète du plateau intéresse déjà les pôles espoirs, mais son club et sa famille veulent avancer sans brûler les étapes ni sacrifier la scolarité.',
     authors: ['sofia-laurenti'],
-    publishedAt: '2026-09-12T09:05:00.000Z',
+    publishedAt: '2026-09-12T07:05:00.000Z',
     tags: ['athlétisme', 'jeunes', 'formation'],
     hero: {
       caption: "Awa Diakité à l'entraînement sur la piste de Saint-Prieux",
@@ -6750,7 +6750,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Faute d'effectifs suffisants dans les catégories jeunes, les deux clubs de rugby du canton unissent leurs forces sous de nouvelles couleurs, un mariage de raison longtemps repoussé par les fiertés locales.",
     authors: ['maxime-renaud'],
-    publishedAt: '2026-09-12T18:20:00.000Z',
+    publishedAt: '2026-09-12T16:20:00.000Z',
     tags: ['rugby', 'clubs', 'jeunesse'],
     hero: {
       caption: 'Les deux équipes réunies avant un entraînement commun',
@@ -6879,7 +6879,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Fermé pour une rénovation complète, l'équipement rouvre avec un bassin plus sobre en énergie, mais les clubs s'inquiètent déjà du partage des créneaux entre scolaires, associations et public.",
     authors: ['sofia-laurenti'],
-    publishedAt: '2026-09-13T08:30:00.000Z',
+    publishedAt: '2026-09-13T06:30:00.000Z',
     tags: ['natation', 'équipements', 'collectivités'],
     hero: {
       caption: 'Le grand bassin rénové de la piscine de Clairefont',
@@ -7009,7 +7009,7 @@ export const CORPUS_DATA = [
     standfirst:
       "À la surprise générale, l'attaquant vedette du championnat de la saison passée rejoint le promu plutôt qu'un club mieux classé, un renfort de poids qui nourrit les ambitions de montée du club.",
     authors: ['maxime-renaud'],
-    publishedAt: '2026-09-11T08:10:00.000Z',
+    publishedAt: '2026-09-11T06:10:00.000Z',
     tags: ['football', 'transferts', 'clubs'],
     emphasis: true,
     blocks: [
@@ -7055,7 +7055,7 @@ export const CORPUS_DATA = [
     standfirst:
       'En cause, une panne du système de chauffage de la salle omnisports, jugée trop froide pour accueillir la rencontre, qui sera reprogrammée dans les prochaines semaines par la ligue régionale.',
     authors: ['sofia-laurenti'],
-    publishedAt: '2026-09-12T16:05:00.000Z',
+    publishedAt: '2026-09-12T14:05:00.000Z',
     tags: ['handball', 'calendrier', 'équipements'],
     blocks: [
       {
@@ -7100,7 +7100,7 @@ export const CORPUS_DATA = [
     standfirst:
       "Financé par la commune et l'intercommunalité, l'équipement doit permettre aux clubs de jouer même par mauvais temps et de dégager des créneaux supplémentaires pour les écoles de football du secteur.",
     authors: ['maxime-renaud', 'sofia-laurenti'],
-    publishedAt: '2026-09-13T09:15:00.000Z',
+    publishedAt: '2026-09-13T07:15:00.000Z',
     tags: ['football', 'équipements', 'jeunesse'],
     blocks: [
       {

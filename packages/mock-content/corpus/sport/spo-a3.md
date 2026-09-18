@@ -12,7 +12,7 @@ tags: cyclisme, course, bénévolat
 hero: Le peloton dans la traversée d'un village du plateau | Photo : Malo Renard
 ---
 
-::video[Une matinée sur la Ronde des Trois-Vallées | 4:38]
+::video[Une matinée sur la Ronde des Trois-Vallées]{duration="4:38"}
 
 Il est six heures et le jour hésite encore quand les premiers bénévoles déplient les barrières sur la place du village. La Ronde des Trois-Vallées, épreuve cycliste amateur, va traverser aujourd'hui une trentaine de communes du plateau.
 

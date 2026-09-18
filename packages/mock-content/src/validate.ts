@@ -1,5 +1,6 @@
 import type { Article, ArticleId, Block, SectionId, Span } from '@huma/contracts';
 import { AUTHORS, SECTIONS } from './registries.ts';
+import { toInstant } from './time.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
 
@@ -23,7 +24,11 @@ const WORDS: Readonly<Record<string, Readonly<{ min: number; max: number }>>> = 
   brief: { min: 50, max: 180 },
 };
 
-const WINDOW = { start: '2026-09-10T07:00:00.000Z', end: '2026-09-13T09:55:00.000Z' } as const;
+/** The newsroom hours the corpus covers, written on its own clock and compared as instants. */
+const WINDOW = { start: toInstant('2026-09-10 07:00'), end: toInstant('2026-09-13 09:55') } as const;
+
+/** What a report of the newspaper runs, in seconds: under a minute is a mistake, a quarter of an hour is a film. */
+const RUNNING_TIME = { min: 60, max: 900 } as const;
 
 /** An item with the section folder it was read from. */
 type Item = Readonly<{ folder: SectionId; article: Article }>;
@@ -138,6 +143,15 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   }
   if (kinds.filter((kind) => kind === 'video').length !== (article.format === 'video' ? 1 : 0)) {
     errors.push(`${where} : une ::video ne paraît que dans un item vidéo`);
+  }
+  if (
+    article.blocks.some(
+      (block) =>
+        block.type === 'video' &&
+        (block.durationSeconds < RUNNING_TIME.min || block.durationSeconds > RUNNING_TIME.max),
+    )
+  ) {
+    errors.push(`${where} : durée de vidéo hors de ${String(RUNNING_TIME.min)}–${String(RUNNING_TIME.max)} s`);
   }
   if (article.format === 'column' && kinds.includes('image')) {
     errors.push(`${where} : pas d’image dans une chronique`);
