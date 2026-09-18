@@ -3,7 +3,7 @@ import { fixtureFactory, IN_PROCESS } from '@huma/fixtures';
 import type { PolicyId } from '@huma/eslint-config/policies';
 import { lintTree } from '../lint-tree.ts';
 import { ALL_POLICIES, mutantsOf } from '../mutation.ts';
-import { appTree, component, constant, emptyComponent, route } from './app-tree.ts';
+import { appTree, component, constant, emptyComponent, queryModule, route } from './app-tree.ts';
 
 const define = fixtureFactory<PolicyId>(IN_PROCESS);
 
@@ -198,6 +198,12 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/fonts.ts': "export { useFonts } from 'expo-font';\n" }),
     ),
     define(
+      'guardrail/module-huma-mock-api',
+      'une page qui lit le contenu simulé sans passer par la place api',
+      ['module/@huma/mock-api'],
+      linted({ 'src/pages/home/model/content.ts': "export { contentApi } from '@huma/mock-api';\n" }),
+    ),
+    define(
       'guardrail/module-expo-splash-screen',
       'une page qui pilote le splash',
       ['module/expo-splash-screen'],
@@ -220,6 +226,18 @@ export function useOpacity(): number {
       'une page qui compose la barre par les onglets JS',
       ['nav/js-tabs'],
       linted({ 'src/pages/home/ui/home-page.tsx': component('HomePage', 'expo-router/js-tabs', 'Tabs') }),
+    ),
+    define(
+      'guardrail/query-options',
+      'une page qui écrit elle-même les options d’une requête',
+      ['query/options'],
+      linted({ 'src/pages/home/model/queries.ts': queryModule('homeQuery') }),
+    ),
+    define(
+      'guardrail/query-options-exempt',
+      'le segment api d’une entité, le seul lieu qui déclare une requête',
+      [],
+      linted({ 'src/entities/article/api/queries.ts': queryModule('articleQuery') }),
     ),
     define(
       'guardrail/route-re-export',

@@ -5,6 +5,7 @@ export {
   HERMES_DIRECTORIES,
   HERMES_FILES,
   packageImports,
+  QUERY_FILES,
   ROUTE_FILES,
   THEME_FILES,
 } from './app.ts';

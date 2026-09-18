@@ -2,5 +2,9 @@
   "extends": ["expo/tsconfig.base", "@huma/tsconfig/hermes.json"],
   "include": ["app", "src", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "exclude": ["expo-env.d.ts"],
-  "references": [{ "path": "../../packages/contracts" }, { "path": "../../packages/design-tokens" }]
+  "references": [
+    { "path": "../../packages/contracts" },
+    { "path": "../../packages/design-tokens" },
+    { "path": "../../packages/mock-api" }
+  ]
 }

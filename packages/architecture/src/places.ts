@@ -184,9 +184,11 @@ type ModulePolicy = Readonly<{
 /**
  * Packages whose use the component levels confine: native views, animations and gestures live in L0 primitives,
  * which alone touch the native layer; `Platform` answers a question, not a view, and stays open to every place.
- * Startup modules — font loading and the splash screen — live in the app layer that drives them.
+ * Startup modules — font loading and the splash screen — live in the app layer that drives them. The content the app
+ * reads enters through the `api` place alone, so swapping the mock for a service touches one module.
  */
 export const MODULES = {
+  '@huma/mock-api': { places: ['api'], except: [] },
   'expo-font': { places: ['app'], except: [] },
   'expo-image': { places: ['primitive'], except: [] },
   'expo-splash-screen': { places: ['app'], except: [] },

@@ -23,6 +23,7 @@
     "@expo/metro-runtime": "catalog:",
     "@huma/contracts": "workspace:*",
     "@huma/design-tokens": "workspace:*",
+    "@huma/mock-api": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-persist-client": "catalog:",
     "expo": "catalog:",

@@ -6,28 +6,29 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 
 ## Registre
 
-| ADR                                                                            | Titre                                                      | Statut  | Importance                                                                 |
-| ------------------------------------------------------------------------------ | ---------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
-| [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md)      | Décisions structurantes en ADR MADR vérifiés et figés      | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`, `reversal-cost` |
-| [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md) | Monorepo pnpm à catalog strict et versions Expo contrôlées | proposé | `dependency`, `guarded-config`                                             |
-| [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                 | Plateforme Expo SDK 57 et New Architecture                 | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
-| [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                | TypeScript 6 ultra-strict en version unique                | proposé | `dependency`, `guarded-config`                                             |
-| [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                | Lint et format bloquants sans désactivation                | proposé | `guarded-config`                                                           |
-| [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)        | Architecture FSD avec routes hors src et couche _app       | proposé | `guarded-config`, `boundary`                                               |
-| [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                              | Niveaux de composants L0 à L4                              | proposé | `guarded-config`, `boundary`                                               |
-| [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                  | Glossaire et orthographe des identifiants                  | proposé | `guarded-config`                                                           |
-| [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)        | Contrôles locaux par hooks git et garde-fous testés        | proposé | `guarded-config`                                                           |
-| [ADR-0009](0009-permissions-des-agents.md)                                     | Permissions des agents                                     | proposé | `guarded-config`                                                           |
-| [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                   | Émulateur Android Redroid sur le serveur                   | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
-| [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                 | Contrats de données en Zod                                 | proposé | `dependency`, `guarded-config`, `data-format`                              |
-| [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                       | Design tokens et createStyles brandé                       | proposé | `guarded-config`, `boundary`                                               |
-| [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                    | Textes UI en dictionnaire français typé                    | proposé | `guarded-config`, `boundary`, `data-format`                                |
-| [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                  | Navigation Expo Router par onglets natifs                  | proposé | `guarded-config`, `reversal-cost`                                          |
-| [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                   | Cache de données TanStack Query persisté                   | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
-| [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)        | Tests par environnement Vitest jest-expo et Maestro        | proposé | `dependency`, `guarded-config`                                             |
-| [ADR-0017](0017-typographie-et-licences-des-polices.md)                        | Typographie et licences des polices                        | proposé | `dependency`, `guarded-config`, `boundary`                                 |
-| [ADR-0018](0018-images-et-symboles-natifs.md)                                  | Images et symboles natifs                                  | proposé | `dependency`, `guarded-config`, `boundary`                                 |
-| [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)         | Contenu simulé en corpus fictif et visuels générés         | proposé | `dependency`, `data-format`                                                |
+| ADR                                                                             | Titre                                                       | Statut  | Importance                                                                 |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
+| [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md)       | Décisions structurantes en ADR MADR vérifiés et figés       | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`, `reversal-cost` |
+| [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md)  | Monorepo pnpm à catalog strict et versions Expo contrôlées  | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                  | Plateforme Expo SDK 57 et New Architecture                  | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
+| [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                 | TypeScript 6 ultra-strict en version unique                 | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                 | Lint et format bloquants sans désactivation                 | proposé | `guarded-config`                                                           |
+| [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)         | Architecture FSD avec routes hors src et couche _app        | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                               | Niveaux de composants L0 à L4                               | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                   | Glossaire et orthographe des identifiants                   | proposé | `guarded-config`                                                           |
+| [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)         | Contrôles locaux par hooks git et garde-fous testés         | proposé | `guarded-config`                                                           |
+| [ADR-0009](0009-permissions-des-agents.md)                                      | Permissions des agents                                      | proposé | `guarded-config`                                                           |
+| [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                    | Émulateur Android Redroid sur le serveur                    | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
+| [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                  | Contrats de données en Zod                                  | proposé | `dependency`, `guarded-config`, `data-format`                              |
+| [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                        | Design tokens et createStyles brandé                        | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                     | Textes UI en dictionnaire français typé                     | proposé | `guarded-config`, `boundary`, `data-format`                                |
+| [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                   | Navigation Expo Router par onglets natifs                   | proposé | `guarded-config`, `reversal-cost`                                          |
+| [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                    | Cache de données TanStack Query persisté                    | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
+| [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)         | Tests par environnement Vitest jest-expo et Maestro         | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0017](0017-typographie-et-licences-des-polices.md)                         | Typographie et licences des polices                         | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0018](0018-images-et-symboles-natifs.md)                                   | Images et symboles natifs                                   | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | proposé | `dependency`, `data-format`                                                |
+| [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 
 ## Confirmation
 
@@ -257,6 +258,15 @@ Statut : proposé. Périmètre : `packages/mock-content/**`, `packages/mock-api/
 | R1    | NE DOIT PAS | convention : Aucun média n’entre dans packages/mock-content : le dépôt ne suit que les visuels que son propre générateur écrit, et le manifeste des images est produit par pnpm --filter @huma/mock-content generate, jamais par un téléchargement. |
 | R2    | DOIT        | convention : IMAGE_KEY impose la forme « identifiant d’item, puis sujet » ; validateCorpus refuse une clé qui nomme un autre item ou qui sert deux images, et le test des visuels exige un fichier par clé et par largeur, sans orphelin.           |
 | R3    | DOIT        | convention : artworkSvg ne lit que la clé et la couleur de la rubrique : la graine du dessin est un hachage de la clé, si bien qu’une regénération redonne les mêmes octets, ce qu’un test tient.                                                   |
+
+### ADR-0021 · Accès au contenu par une seule porte et requêtes par entité
+
+Statut : proposé. Périmètre : `apps/mobile/src/shared/api/**`, `apps/mobile/src/entities/**`, `packages/eslint-config/src/query.ts`.
+
+| Règle | Niveau      | Preuves                                                     |
+| ----- | ----------- | ----------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-huma-mock-api`                            |
+| R2    | DOIT        | `guardrail/query-options`, `guardrail/query-options-exempt` |
 
 ## Référentiel
 

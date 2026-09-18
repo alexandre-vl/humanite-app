@@ -996,7 +996,16 @@
     }
   },
   "apps/mobile/app/sample.tsx": {
-    "plugins": ["@", "@cspell", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
+    "plugins": [
+      "@",
+      "@cspell",
+      "@tanstack/query",
+      "@typescript-eslint",
+      "boundaries",
+      "check-file",
+      "react-hooks",
+      "react-x"
+    ],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -1255,6 +1264,14 @@
           "numSuggestions": 8
         }
       ],
+      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/infinite-query-property-order": "error",
+      "@tanstack/query/mutation-property-order": "error",
+      "@tanstack/query/no-rest-destructuring": "error",
+      "@tanstack/query/no-unstable-deps": "error",
+      "@tanstack/query/no-void-query-fn": "error",
+      "@tanstack/query/prefer-query-options": "error",
+      "@tanstack/query/stable-query-client": "error",
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",
@@ -2196,6 +2213,113 @@
                   }
                 ]
               }
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "@huma/mock-api"
+                  }
+                }
+              },
+              "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
             },
             {
               "from": [
@@ -3533,6 +3657,10 @@
           "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
         },
         {
+          "selector": "ImportDeclaration[source.value='@huma/mock-api'] > ImportNamespaceSpecifier",
+          "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
+        },
+        {
           "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
         },
@@ -3591,6 +3719,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-router'] > ImportSpecifier[imported.name='Tabs']",
           "message": "[nav/js-tabs] composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
+          "message": "[query/options] déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -3852,7 +3984,16 @@
     }
   },
   "apps/mobile/src/pages/sample/index.ts": {
-    "plugins": ["@", "@cspell", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
+    "plugins": [
+      "@",
+      "@cspell",
+      "@tanstack/query",
+      "@typescript-eslint",
+      "boundaries",
+      "check-file",
+      "react-hooks",
+      "react-x"
+    ],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -4111,6 +4252,14 @@
           "numSuggestions": 8
         }
       ],
+      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/infinite-query-property-order": "error",
+      "@tanstack/query/mutation-property-order": "error",
+      "@tanstack/query/no-rest-destructuring": "error",
+      "@tanstack/query/no-unstable-deps": "error",
+      "@tanstack/query/no-void-query-fn": "error",
+      "@tanstack/query/prefer-query-options": "error",
+      "@tanstack/query/stable-query-client": "error",
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",
@@ -5052,6 +5201,113 @@
                   }
                 ]
               }
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "@huma/mock-api"
+                  }
+                }
+              },
+              "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
             },
             {
               "from": [
@@ -6392,6 +6648,10 @@
           "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
         },
         {
+          "selector": "ImportDeclaration[source.value='@huma/mock-api'] > ImportNamespaceSpecifier",
+          "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
+        },
+        {
           "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
         },
@@ -6450,6 +6710,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-router'] > ImportSpecifier[imported.name='Tabs']",
           "message": "[nav/js-tabs] composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
+          "message": "[query/options] déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -6707,7 +6971,16 @@
     }
   },
   "apps/mobile/src/pages/sample/ui/sample.tsx": {
-    "plugins": ["@", "@cspell", "@typescript-eslint", "boundaries", "check-file", "react-hooks", "react-x"],
+    "plugins": [
+      "@",
+      "@cspell",
+      "@tanstack/query",
+      "@typescript-eslint",
+      "boundaries",
+      "check-file",
+      "react-hooks",
+      "react-x"
+    ],
     "parserOptions": {
       "projectService": true,
       "tsconfigRootDir": "<racine>"
@@ -6966,6 +7239,14 @@
           "numSuggestions": 8
         }
       ],
+      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/infinite-query-property-order": "error",
+      "@tanstack/query/mutation-property-order": "error",
+      "@tanstack/query/no-rest-destructuring": "error",
+      "@tanstack/query/no-unstable-deps": "error",
+      "@tanstack/query/no-void-query-fn": "error",
+      "@tanstack/query/prefer-query-options": "error",
+      "@tanstack/query/stable-query-client": "error",
       "@typescript-eslint/adjacent-overload-signatures": "error",
       "@typescript-eslint/array-type": "error",
       "@typescript-eslint/await-thenable": "error",
@@ -7907,6 +8188,113 @@
                   }
                 ]
               }
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "@huma/mock-api"
+                  }
+                }
+              },
+              "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
             },
             {
               "from": [
@@ -9247,6 +9635,10 @@
           "message": "[export/all] nommer chaque export : export * cache ce qu’un module expose"
         },
         {
+          "selector": "ImportDeclaration[source.value='@huma/mock-api'] > ImportNamespaceSpecifier",
+          "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
+        },
+        {
           "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
         },
@@ -9305,6 +9697,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-router'] > ImportSpecifier[imported.name='Tabs']",
           "message": "[nav/js-tabs] composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
+          "message": "[query/options] déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",

@@ -6,6 +6,7 @@ import {
   HERMES_FILES,
   HERMES_GAP_NAMES,
   HERMES_GAPS,
+  QUERY_FILES,
   ROUTE_FILES,
   THEME_FILES,
 } from '@huma/architecture';
@@ -16,6 +17,7 @@ import { boundariesConfig } from './boundaries.ts';
 import { namingConfig } from './naming.ts';
 import type { PolicyId } from './policies.ts';
 import { hermesPolicy, modulePolicy, POLICY_IDS, policyMessage } from './policies.ts';
+import { queryConfig } from './query.ts';
 import { reactConfig } from './react.ts';
 import { spellingConfig } from './spelling.ts';
 
@@ -94,6 +96,14 @@ const THEME_SYNTAX: readonly SyntaxRestriction[] = [
   {
     policy: 'style/theme',
     selector: String.raw`ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]`,
+  },
+];
+
+/** A query is declared where its entity lives: the api segment of a slice builds the options, every screen composes them. */
+const QUERY_SYNTAX: readonly SyntaxRestriction[] = [
+  {
+    policy: 'query/options',
+    selector: String.raw`ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]`,
   },
 ];
 
@@ -216,6 +226,7 @@ const HERMES: Runtime = {
     ...THEME_SYNTAX,
     ...TEXT_SYNTAX,
     ...NAV_SYNTAX,
+    ...QUERY_SYNTAX,
     ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),
   ],
   properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),
@@ -335,6 +346,10 @@ export function defineWorkspaceConfig({
       rules: restrictions(exempt(HERMES, THEME_SYNTAX), policies),
     },
     {
+      files: [...QUERY_FILES],
+      rules: restrictions(exempt(HERMES, QUERY_SYNTAX), policies),
+    },
+    {
       files: [...ROUTE_FILES],
       rules: restrictions(narrowed(HERMES, ROUTE_SYNTAX), policies),
     },
@@ -345,6 +360,7 @@ export function defineWorkspaceConfig({
     ...namingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
     spellingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
     reactConfig(tsconfigRootDir),
+    queryConfig(),
     boundariesConfig(tsconfigRootDir, policies),
   );
 }

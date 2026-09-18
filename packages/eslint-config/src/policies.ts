@@ -41,6 +41,8 @@ const WRITTEN = {
     'recevoir le thème du paramètre de createStyles : un thème figé importé en dur ignore le schéma de couleurs en vigueur',
   'text/jsx': 'rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire',
   'nav/js-tabs': 'composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native',
+  'query/options':
+    'déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit',
 } as const satisfies Readonly<Record<`${string}/${string}`, string>>;
 
 type WrittenPolicy = keyof typeof WRITTEN;

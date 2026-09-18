@@ -29,6 +29,12 @@ export function ${name}(): ReactNode {
 }
 `;
 
+/** A module declaring the options of one query. */
+export const queryModule = (name: string): string => `import { queryOptions } from '@tanstack/react-query';
+
+export const ${name} = queryOptions({ queryKey: ['article'], queryFn: () => 'titre' });
+`;
+
 /** A route of the app: its error boundary, then its page. */
 export const route = (page: string, source: string): string =>
   `export { ErrorBoundary } from '#app';\nexport { ${page} as default } from '${source}';\n`;

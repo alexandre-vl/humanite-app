@@ -46,6 +46,13 @@ export const THEME_FILES: readonly string[] = [
 ];
 
 /**
+ * Where a query is declared, as globs relative to the workspace root: the `api` segment of an entity. These files alone
+ * build query options, so the key of an entity and the call that reads it stay in one place, and a screen composes
+ * options it did not write.
+ */
+export const QUERY_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.entity.directory}/*/api/*.ts`];
+
+/**
  * The `imports` field of the app's `package.json`: one `#` alias per importable place, pointing at public entries only,
  * so a file behind an entry cannot even be resolved from outside its slice or module (journal 0a, correction 12).
  */

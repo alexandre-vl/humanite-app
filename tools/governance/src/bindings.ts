@@ -854,4 +854,13 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0021': {
+    scope: {
+      paths: ['apps/mobile/src/shared/api/**', 'apps/mobile/src/entities/**', 'packages/eslint-config/src/query.ts'],
+    },
+    rules: {
+      R1: ['guardrail/module-huma-mock-api'],
+      R2: ['guardrail/query-options', 'guardrail/query-options-exempt'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;
