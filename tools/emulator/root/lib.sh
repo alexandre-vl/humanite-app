@@ -180,19 +180,32 @@ missing_kinds() {
     END { for (kind in minimum) if (count[kind] + 0 < minimum[kind] + 0) print kind }' "$TRACKED" "$1" | sort
 }
 
-# snapshot FILE: every record of the host, sorted; FILE is written only when every reader succeeded.
+# snapshot FILE: every record of the host, sorted; FILE is written only when every reader succeeded. Reading /proc
+# races with the processes that exit on a busy host: -ignore_readdir_race covers most of it, and a read a race still
+# broke is tried again, up to a few times, so a transient error does not fail the whole run. A lasting problem — a
+# reader that keeps failing, or a kind with too few records — fails after the last attempt.
 snapshot() {
-  if ! { sysctl_records && fresh_proc_records && sysfs_records && mount_records && tracefs_records; } >"$1.raw"; then
-    return 1
-  fi
-  sort -t "$TAB" -k1,1 -k2,2 -u "$1.raw" >"$1.sorted"
-  missing=$(missing_kinds "$1.sorted")
-  if [ -n "$missing" ]; then
-    say "snapshot without enough records of: $missing"
-    return 1
-  fi
-  mv -f "$1.sorted" "$1"
-  rm -f "$1.raw"
+  attempt=1
+  while :; do
+    missing=
+    if { sysctl_records && fresh_proc_records && sysfs_records && mount_records && tracefs_records; } >"$1.raw"; then
+      sort -t "$TAB" -k1,1 -k2,2 -u "$1.raw" >"$1.sorted"
+      missing=$(missing_kinds "$1.sorted")
+      if [ -z "$missing" ]; then
+        mv -f "$1.sorted" "$1"
+        rm -f "$1.raw"
+        return 0
+      fi
+    fi
+    if [ "$attempt" -ge 5 ]; then
+      if [ -n "$missing" ]; then
+        say "snapshot without enough records of: $missing"
+      fi
+      return 1
+    fi
+    attempt=$((attempt + 1))
+    sleep 1
+  done
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
