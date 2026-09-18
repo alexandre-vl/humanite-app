@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import type { ReactNode } from 'react';
 
 // react-native-mmkv reaches its native NitroModules TurboModule at import, which no headless runner provides. The
 // storage lib only calls getString/set/remove, so an in-memory map stands in and lets the persister round-trip.
@@ -59,4 +60,19 @@ jest.mock('expo-symbols', () => {
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
   const symbolView = (): unknown => react.createElement(reactNative.View, null);
   return { __esModule: true, SymbolView: symbolView };
+});
+
+// react-native-safe-area-context measures native insets a headless runner lacks; a passthrough provider and zero insets
+// let the safe-area primitive and the collapsible header render without a device.
+jest.mock('react-native-safe-area-context', () => {
+  const react = jest.requireActual<typeof import('react')>('react');
+  const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
+  const insets = { top: 0, bottom: 0, left: 0, right: 0 };
+  const safeAreaProvider = ({ children }: { children: ReactNode }): unknown =>
+    react.createElement(reactNative.View, null, children);
+  return {
+    __esModule: true,
+    SafeAreaProvider: safeAreaProvider,
+    useSafeAreaInsets: (): typeof insets => insets,
+  };
 });

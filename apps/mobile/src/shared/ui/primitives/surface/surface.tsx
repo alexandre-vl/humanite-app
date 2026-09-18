@@ -5,9 +5,9 @@ import type { StyleRef } from '../../../lib/styles';
 
 export type SurfaceProps = Readonly<{ children?: ReactNode; style?: StyleRef; onLayout?: () => void }>;
 
-const useStyles = createStyles(() => ({ surface: { flex: 1 } }));
+const useStyles = createStyles((theme) => ({ surface: { flex: 1, backgroundColor: theme.background } }));
 
-/** The ground a screen draws on, filling the space its parent gives it. */
+/** The ground a screen draws on in the theme's background, filling the space its parent gives it. */
 export function Surface({ children, style, onLayout }: SurfaceProps): ReactNode {
   const styles = useStyles();
   return (
