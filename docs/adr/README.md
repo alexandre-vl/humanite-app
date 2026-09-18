@@ -27,6 +27,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)        | Tests par environnement Vitest jest-expo et Maestro        | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0017](0017-typographie-et-licences-des-polices.md)                        | Typographie et licences des polices                        | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0018](0018-images-et-symboles-natifs.md)                                  | Images et symboles natifs                                  | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)         | Contenu simulé en corpus fictif et visuels générés         | proposé | `dependency`, `data-format`                                                |
 
 ## Confirmation
 
@@ -246,6 +247,16 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/ui/primitives/image/**`
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | NE DOIT PAS | `guardrail/module-expo-image`, `guardrail/module-expo-symbols`                                                                                                                                                            |
 | R2    | DOIT        | convention : Un Icon nomme son symbole par une clé du registre typé ICONS (IconName = keyof typeof ICONS, chaque clé mappée à { ios: SFSymbol, android: AndroidSymbol }) ; une chaîne de plateforme libre ne compile pas. |
+
+### ADR-0020 · Contenu simulé en corpus fictif et visuels générés
+
+Statut : proposé. Périmètre : `packages/mock-content/**`, `packages/mock-api/**`, `packages/design-tokens/src/sections.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                             |
+| ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | convention : Aucun média n’entre dans packages/mock-content : le dépôt ne suit que les visuels que son propre générateur écrit, et le manifeste des images est produit par pnpm --filter @huma/mock-content generate, jamais par un téléchargement. |
+| R2    | DOIT        | convention : IMAGE_KEY impose la forme « identifiant d’item, puis sujet » ; validateCorpus refuse une clé qui nomme un autre item ou qui sert deux images, et le test des visuels exige un fichier par clé et par largeur, sans orphelin.           |
+| R3    | DOIT        | convention : artworkSvg ne lit que la clé et la couleur de la rubrique : la graine du dessin est un hachage de la clé, si bien qu’une regénération redonne les mêmes octets, ce qu’un test tient.                                                   |
 
 ## Référentiel
 
