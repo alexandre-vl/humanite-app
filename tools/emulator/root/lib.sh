@@ -112,9 +112,11 @@ sysctl_records() {
 }
 
 # proc_records DIRECTORY: attributes of the entries of the procfs mounted at DIRECTORY, keyed as /proc paths, but the
-# per-process directories, the views of this process's namespaces and symbolic links.
+# per-process directories, the views of this process's namespaces and symbolic links. A per-process directory that
+# vanishes mid-scan, as one does whenever a process exits on a busy host, is skipped rather than failing the scan
+# (-ignore_readdir_race), so a snapshot does not break under process churn.
 proc_records() {
-  (cd "$1" && find . -xdev -mindepth 1 \
+  (cd "$1" && find . -ignore_readdir_race -xdev -mindepth 1 \
     \( -path './[0-9]*' -o -path ./self -o -path ./thread-self -o -path ./net -o -path ./sys \) -prune \
     -o ! -type l -printf 'procattr\t/proc/%P\t%m %U %G\n')
 }
