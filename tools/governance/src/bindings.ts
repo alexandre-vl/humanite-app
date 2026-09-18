@@ -739,6 +739,7 @@ export const BINDINGS = {
           'La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.',
       },
       R3: ['guardrail/style-inline', 'guardrail/style-inline-array'],
+      R4: ['guardrail/style-theme', 'guardrail/style-theme-exempt'],
     },
   },
   'ADR-0013': {

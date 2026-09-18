@@ -189,6 +189,7 @@ Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 | R1    | DOIT        | convention : Le type Style de apps/mobile/src/shared/lib/styles n’accepte comme valeur dimensionnelle ou colorée qu’un token brandé de @huma/design-tokens, hors de portée d’un nombre ou d’une chaîne bruts. |
 | R2    | DOIT        | convention : La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.                                         |
 | R3    | NE DOIT PAS | `guardrail/style-inline`, `guardrail/style-inline-array`                                                                                                                                                      |
+| R4    | NE DOIT PAS | `guardrail/style-theme`, `guardrail/style-theme-exempt`                                                                                                                                                       |
 
 ### ADR-0013 · Textes UI en dictionnaire français typé
 

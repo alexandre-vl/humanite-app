@@ -7,6 +7,7 @@ import {
   HERMES_GAP_NAMES,
   HERMES_GAPS,
   ROUTE_FILES,
+  THEME_FILES,
 } from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -85,6 +86,14 @@ const NAV_SYNTAX: readonly SyntaxRestriction[] = [
   {
     policy: 'nav/js-tabs',
     selector: String.raw`ImportDeclaration[source.value='expo-router'] > ImportSpecifier[imported.name='Tabs']`,
+  },
+];
+
+/** A style follows the theme in force: only the theme context and its root import a frozen theme, everyone else reads it from the parameter of createStyles. */
+const THEME_SYNTAX: readonly SyntaxRestriction[] = [
+  {
+    policy: 'style/theme',
+    selector: String.raw`ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]`,
   },
 ];
 
@@ -204,6 +213,7 @@ const HERMES: Runtime = {
   syntax: [
     ...CONFINED_NAMESPACES,
     ...STYLE_SYNTAX,
+    ...THEME_SYNTAX,
     ...TEXT_SYNTAX,
     ...NAV_SYNTAX,
     ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),
@@ -217,6 +227,12 @@ const HERMES: Runtime = {
 const narrowed = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runtime => ({
   ...runtime,
   syntax: [...runtime.syntax, ...syntax],
+});
+
+/** The restrictions of `runtime` without the ones a place is exempt from, the inverse of `narrowed`: the theme's core keeps every rule but the theme lock. */
+const exempt = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runtime => ({
+  ...runtime,
+  syntax: runtime.syntax.filter((restriction) => !syntax.includes(restriction)),
 });
 
 /**
@@ -313,6 +329,10 @@ export function defineWorkspaceConfig({
     {
       files: [...HERMES_FILES],
       rules: restrictions(HERMES, policies),
+    },
+    {
+      files: [...THEME_FILES],
+      rules: restrictions(exempt(HERMES, THEME_SYNTAX), policies),
     },
     {
       files: [...ROUTE_FILES],

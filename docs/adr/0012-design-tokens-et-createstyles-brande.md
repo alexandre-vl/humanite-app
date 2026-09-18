@@ -12,14 +12,16 @@ significance: [guarded-config, boundary]
 - Une primitive est le seul code qui importe les vues de react-native et leur prop `style` (ADR-0006).
 - `createStyles` vit dans la bibliothèque partagée, que les primitives comme les composants peuvent importer (`cat apps/mobile/src/shared/lib/styles/index.ts`).
 - React Native accepte un objet de style libre, où une marge ou une couleur s’écrivent en clair (`pnpm lint`).
+- L’app peint en thème clair ou sombre selon le schéma de couleurs du système, donc un style suit le thème en vigueur au lieu de figer une couleur (`cat packages/design-tokens/src/theme.ts`).
 
-Comment garantir qu’un style n’emploie que des valeurs de tokens, par une seule fabrique, sans qu’une primitive écrive une couleur ou une marge brutes ?
+Comment garantir qu’un style n’emploie que des valeurs de tokens et suive le thème en vigueur, par une seule fabrique, sans qu’une primitive écrive une couleur ou une marge brutes ?
 
 ## Critères de décision
 
 - **C1** — Une valeur de style provient d’un token, jamais d’un nombre ou d’une couleur bruts.
 - **C2** — Les styles ont une seule fabrique, que primitives et composants réemploient.
 - **C3** — Une primitive n’accepte pas un objet de style quelconque.
+- **C4** — Un style suit le thème en vigueur, clair ou sombre, sans qu’un composant fige une couleur.
 
 ## Options étudiées
 
@@ -30,16 +32,18 @@ Comment garantir qu’un style n’emploie que des valeurs de tokens, par une se
 
 ## Décision
 
-Option retenue : « createStyles brandé sur les tokens », parce que c’est la seule option qui n’admet que des valeurs de tokens (C1), donne aux styles une fabrique unique (C2) et ferme la prop `style` d’une primitive à tout autre objet (C3).
+Option retenue : « createStyles brandé sur les tokens », parce que c’est la seule option qui n’admet que des valeurs de tokens (C1), donne aux styles une fabrique unique (C2), ferme la prop `style` d’une primitive à tout autre objet (C3) et porte le thème en vigueur jusqu’à chaque style (C4).
 
 - **R1** — Une valeur de style DOIT être un token brandé, le type `Style` refusant un nombre ou une couleur bruts.
 - **R2** — La prop `style` d’une primitive DOIT être le type `StyleRef` que `createStyles` produit.
 - **R3** — Un objet de style en ligne NE DOIT PAS paraître dans le JSX.
+- **R4** — Hors du contexte de thème et de sa racine, un style NE DOIT PAS importer un thème figé ; il reçoit le thème en vigueur du paramètre de `createStyles`.
 
 ### Conséquences
 
 - Bien, parce qu’une marge ou une couleur hors des tokens ne compile pas.
 - Bien, parce qu’un seul point de passage construit tous les styles.
+- Bien, parce qu’un basculement clair-sombre du système repeint chaque style, sans qu’un composant fige une couleur.
 - Mauvais, parce qu’un style ponctuel demande une entrée de `createStyles` plutôt qu’un objet en ligne.
 
 ## Avantages et inconvénients des options
@@ -49,12 +53,14 @@ Option retenue : « createStyles brandé sur les tokens », parce que c’est la
 - Bien, parce que le type `Style` n’accepte que des tokens brandés (C1).
 - Bien, parce qu’une seule fabrique sert les primitives et les composants (C2).
 - Bien, parce que `StyleRef` est opaque : une primitive refuse un objet quelconque (C3).
+- Bien, parce que la fabrique lit le thème en vigueur, donc chaque style suit le schéma clair ou sombre (C4).
 - Mauvais, parce qu’il faut déclarer chaque style avant de l’employer (C2).
 
 ### StyleSheet.create dans chaque composant
 
 - Mauvais, parce que `StyleSheet.create` accepte des nombres et des couleurs bruts (C1).
 - Mauvais, parce que chaque composant redéfinit sa propre fabrique (C2).
+- Mauvais, parce qu’un StyleSheet figé à la définition ne suit pas un changement de thème (C4).
 
 ### Des objets de style en ligne dans le JSX
 
@@ -66,6 +72,6 @@ Option retenue : « createStyles brandé sur les tokens », parce que c’est la
 
 ## Informations complémentaires
 
-- L’interdiction d’un style en ligne est prouvée par une fixture des garde-fous ; R1 et R2 sont des conventions que le système de types tient.
+- L’interdiction d’un style en ligne et celle d’un thème figé hors de son contexte sont prouvées par des fixtures des garde-fous ; R1 et R2 sont des conventions que le système de types tient.
 - Les valeurs d’une animation Reanimated — une opacité ou un `translateY` interpolés image par image — ne sont pas des tokens : le type `Style` n’a pas de `transform`, et la sortie de `useAnimatedStyle` est une valeur de mouvement calculée à l’exécution. Une primitive L0 l’applique à sa vue `Animated.View` interne, hors de la prop `style` brandée ; les bornes de l’interpolation restent des tokens.
 - Réévaluation : React Native fige une API de style strict qui rend le brandage redondant, ou `createStyles` devient un goulet mesuré au profilage.

@@ -343,6 +343,24 @@ export function Surface(): ReactNode {
       }),
     ),
     define(
+      'guardrail/style-theme',
+      'une page qui lit un thème figé au lieu de le recevoir de createStyles',
+      ['style/theme'],
+      linted({
+        'src/pages/home/model/palette.ts':
+          "import { LIGHT_THEME } from '@huma/design-tokens';\n\nexport const palette = LIGHT_THEME;\n",
+      }),
+    ),
+    define(
+      'guardrail/style-theme-exempt',
+      'le contexte de thème qui importe un thème figé, le seul lieu qui le peut',
+      [],
+      linted({
+        'src/shared/lib/styles/theme.tsx':
+          "import { LIGHT_THEME } from '@huma/design-tokens';\n\nexport const defaultTheme = LIGHT_THEME;\n",
+      }),
+    ),
+    define(
       'guardrail/text-jsx',
       'une primitive qui écrit un texte brut dans le JSX au lieu de passer par Text',
       ['text/jsx'],

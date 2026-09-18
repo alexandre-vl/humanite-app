@@ -6,6 +6,7 @@ export {
   HERMES_FILES,
   packageImports,
   ROUTE_FILES,
+  THEME_FILES,
 } from './app.ts';
 export type { ConfinedModule, Place, PlaceSpec } from './places.ts';
 export { CONFINED_MODULES, IMPORTS, MODULES, PLACE_NAMES, PLACES } from './places.ts';

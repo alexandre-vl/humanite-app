@@ -36,6 +36,16 @@ export const ENTRY_FILES: readonly string[] = PLACE_NAMES.flatMap((name) => {
 });
 
 /**
+ * The theme's trusted core, as paths relative to the workspace root: the context that holds the theme and the root that
+ * resolves it from the system scheme. These two files alone import a frozen theme; every other file receives the theme
+ * in force from createStyles, so a component cannot pin a colour that ignores dark mode.
+ */
+export const THEME_FILES: readonly string[] = [
+  `${APP_DIRECTORY}/src/shared/lib/styles/theme.tsx`,
+  `${APP_DIRECTORY}/src/shared/ui/primitives/theme/theme-root.tsx`,
+];
+
+/**
  * The `imports` field of the app's `package.json`: one `#` alias per importable place, pointing at public entries only,
  * so a file behind an entry cannot even be resolved from outside its slice or module (journal 0a, correction 12).
  */
