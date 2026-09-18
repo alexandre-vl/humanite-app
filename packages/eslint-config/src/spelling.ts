@@ -61,6 +61,7 @@ const WORDS = [
   'sysfsattr',
   'sysfsval',
   'taskset',
+  'thumbhash',
   'tracefs',
   'tracefsattr',
   'tracefsval',

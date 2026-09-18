@@ -76,8 +76,10 @@ catalog:
   react-native-worklets: 0.10.1
   react-refresh: 0.14.2
   semver: 7.8.5
+  sharp: 0.35.4
   steiger: 0.6.0
   test-renderer: 1.2.0
+  thumbhash: 0.1.1
   typescript: 6.0.3
   typescript-eslint: 8.70.0
   vite: 8.3.0

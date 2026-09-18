@@ -56,7 +56,7 @@ const wordRange = (article: Article): Readonly<{ min: number; max: number }> =>
   WORDS[article.kind === 'brief' ? 'brief' : article.format] ?? { min: 0, max: Number.POSITIVE_INFINITY };
 
 /** Every picture an item names: its lead illustration, then the images of its body. */
-const imageKeys = (article: Article): readonly ImageKey[] => [
+export const imageKeys = (article: Article): readonly ImageKey[] => [
   ...(article.hero === undefined ? [] : [article.hero.key]),
   ...article.blocks.flatMap((block) => (block.type === 'image' ? [block.key] : [])),
 ];

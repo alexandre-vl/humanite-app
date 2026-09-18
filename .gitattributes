@@ -1,0 +1,3 @@
+# Generated pictures: bytes, never diffed as text.
+*.webp binary
+*.png binary

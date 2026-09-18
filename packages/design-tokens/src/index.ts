@@ -11,6 +11,8 @@ export {
   SPACING,
 } from './tokens.ts';
 export { contrastRatio } from './contrast.ts';
+export type { SectionCode } from './sections.ts';
+export { SECTION_COLORS, sectionCode, sectionColor } from './sections.ts';
 export type { Theme } from './theme.ts';
 export { DARK_THEME, LIGHT_THEME, THEMES } from './theme.ts';
 export type { TextTone, TextVariant } from './typography.ts';
