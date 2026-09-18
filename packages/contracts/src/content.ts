@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DISPLAY_TEXT } from './display-text.ts';
-import { ARTICLE_ID, AUTHOR_ID, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 
 /** Where a link points: another item of the corpus, or an external page. */
 const LINK_TARGET = z.discriminatedUnion('kind', [
@@ -24,7 +24,7 @@ export const BLOCK = z.discriminatedUnion('type', [
   z.object({ type: z.literal('paragraph'), spans: z.array(SPAN) }),
   z.object({ type: z.literal('heading'), text: DISPLAY_TEXT }),
   z.object({ type: z.literal('quote'), spans: z.array(SPAN), source: DISPLAY_TEXT.optional() }),
-  z.object({ type: z.literal('image'), caption: DISPLAY_TEXT, key: z.string() }),
+  z.object({ type: z.literal('image'), caption: DISPLAY_TEXT, key: IMAGE_KEY }),
   z.object({ type: z.literal('video'), title: DISPLAY_TEXT, durationSeconds: z.number().int().positive() }),
   z.object({ type: z.literal('related'), id: ARTICLE_ID }),
   z.object({ type: z.literal('callout'), title: DISPLAY_TEXT, text: DISPLAY_TEXT, button: DISPLAY_TEXT }),

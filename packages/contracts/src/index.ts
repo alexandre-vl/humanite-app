@@ -1,7 +1,7 @@
 export { ACCESS, ARTICLE_FORMAT, ARTICLE_KIND } from './enums.ts';
 export type { Access, ArticleFormat, ArticleKind } from './enums.ts';
-export { ARTICLE_ID, AUTHOR_ID, SECTION_ID } from './ids.ts';
-export type { ArticleId, AuthorId, SectionId } from './ids.ts';
+export { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
+export type { ArticleId, AuthorId, ImageKey, SectionId } from './ids.ts';
 export type { DisplayText } from './display-text.ts';
 export { AUTHOR, BLOCK, SECTION, SPAN } from './content.ts';
 export type { Author, Block, BlockInput, Section, Span, SpanInput } from './content.ts';

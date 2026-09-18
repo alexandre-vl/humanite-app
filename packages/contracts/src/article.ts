@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { BLOCK } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT, ARTICLE_KIND } from './enums.ts';
-import { ARTICLE_ID, AUTHOR_ID, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 
-/** The illustration of an item, with its caption and its credit. */
-export const HERO = z.object({ caption: DISPLAY_TEXT, credit: DISPLAY_TEXT });
+/** The illustration of an item: the key that names its picture, with the caption and the credit that go under it. */
+export const HERO = z.object({ key: IMAGE_KEY, caption: DISPLAY_TEXT, credit: DISPLAY_TEXT });
 export type Hero = z.infer<typeof HERO>;
 
 /** An item as a feed shows it: everything but the body. */

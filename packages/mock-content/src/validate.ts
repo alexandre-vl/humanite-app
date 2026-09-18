@@ -1,4 +1,4 @@
-import type { Article, ArticleId, Block, SectionId, Span } from '@huma/contracts';
+import type { Article, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
 import { AUTHORS, SECTIONS } from './registries.ts';
 import { toInstant } from './time.ts';
 
@@ -54,6 +54,12 @@ const wordCount = (article: Article): number => article.blocks.reduce((sum, bloc
 
 const wordRange = (article: Article): Readonly<{ min: number; max: number }> =>
   WORDS[article.kind === 'brief' ? 'brief' : article.format] ?? { min: 0, max: Number.POSITIVE_INFINITY };
+
+/** Every picture an item names: its lead illustration, then the images of its body. */
+const imageKeys = (article: Article): readonly ImageKey[] => [
+  ...(article.hero === undefined ? [] : [article.hero.key]),
+  ...article.blocks.flatMap((block) => (block.type === 'image' ? [block.key] : [])),
+];
 
 /** The ids an item points to, through internal links and related blocks. */
 const linkedIds = (article: Article): readonly ArticleId[] =>
@@ -165,6 +171,11 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (article.publishedAt < WINDOW.start || article.publishedAt > WINDOW.end) {
     errors.push(`${where} : date de publication hors de la fenêtre du corpus`);
   }
+  for (const key of imageKeys(article)) {
+    if (!key.startsWith(`${article.id}-`)) {
+      errors.push(`${where} : clé d’image « ${key} » hors de l’item`);
+    }
+  }
   for (const target of linkedIds(article)) {
     if (target === article.id) {
       errors.push(`${where} : lien vers lui-même`);
@@ -212,7 +223,16 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
 /** Every rule the corpus must meet, beyond the field shapes `ARTICLE` already checks. */
 export function validateCorpus(items: readonly Item[]): readonly string[] {
   const ids = new Set(items.map((item) => item.article.id));
+  const seen = new Set<ImageKey>();
+  const twice = new Set<ImageKey>();
+  for (const key of items.flatMap((item) => imageKeys(item.article))) {
+    if (seen.has(key)) {
+      twice.add(key);
+    }
+    seen.add(key);
+  }
   return [
+    ...[...twice].map((key) => `clé d’image « ${key} » employée par deux items`),
     ...items.flatMap((item) => checkItem(item, ids)),
     ...SECTIONS.flatMap((section) =>
       checkSection(

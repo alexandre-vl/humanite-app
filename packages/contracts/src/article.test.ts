@@ -14,7 +14,7 @@ const validSummary = {
   authors: ['lucie-varenne'],
   publishedAt: '2026-09-10T08:30:00.000Z',
   tags: ['budget', 'education'],
-  hero: { caption: 'Une légende', credit: 'Photo : Camille Ancel / CC BY 4.0' },
+  hero: { key: 'pol-a1-hero', caption: 'Une légende', credit: 'Photo : Camille Ancel / CC BY 4.0' },
 };
 
 test('ARTICLE_SUMMARY parses a valid summary', () => {
@@ -41,7 +41,9 @@ test('ARTICLE extends the summary with a non-empty body', () => {
   expect(ARTICLE.safeParse({ ...validSummary, blocks: [] }).success).toBe(false);
 });
 
-test('HERO needs a caption and a credit', () => {
-  const hero: Hero = HERO.parse({ caption: 'c', credit: 'Photo : X' });
+test('HERO names its picture, its caption and its credit', () => {
+  const hero: Hero = HERO.parse({ key: 'pol-a1-hero', caption: 'c', credit: 'Photo : X' });
   expectTypeOf(hero).toEqualTypeOf<Hero>();
+  expect(HERO.safeParse({ caption: 'c', credit: 'Photo : X' }).success).toBe(false);
+  expect(HERO.safeParse({ key: 'pol-a1', caption: 'c', credit: 'Photo : X' }).success).toBe(false);
 });

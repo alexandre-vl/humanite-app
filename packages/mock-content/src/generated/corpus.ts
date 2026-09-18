@@ -14,6 +14,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T07:15:00.000Z',
     tags: ['patrimoine', 'restauration', 'moyen âge'],
     hero: {
+      key: 'cul-a1-hero',
       caption: "Une restauratrice au travail sur la fresque de l'église Saint-Genou",
       credit: 'Photo : atelier Vermeil / CC BY 4.0',
     },
@@ -106,6 +107,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T12:30:00.000Z',
     tags: ['musée', 'patrimoine', 'exposition'],
     hero: {
+      key: 'cul-a2-hero',
       caption: 'La grande galerie du musée Berthelin après rénovation',
       credit: 'Photo : studio Clairefont / CC BY 4.0',
     },
@@ -344,6 +346,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T14:45:00.000Z',
     tags: ['culture', 'jeunesse', 'politique culturelle'],
     hero: {
+      key: 'cul-a4-hero',
       caption: "L'entrée d'un cinéma partenaire du nouveau pass",
       credit: 'Photo : Léo Barthe / CC BY 4.0',
     },
@@ -499,6 +502,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T08:20:00.000Z',
     tags: ['mémoire', 'archives', 'patrimoine industriel'],
     hero: {
+      key: 'cul-a5-hero',
       caption: "Des bénévoles trient de vieilles photographies d'atelier",
       credit: 'Photo : Marie Estève / CC BY 4.0',
     },
@@ -623,6 +627,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T16:05:00.000Z',
     tags: ['librairie', 'coopérative', 'lecture'],
     hero: {
+      key: 'cul-a6-hero',
       caption: 'La devanture de la librairie du Beffroi, à Belleroche',
       credit: 'Photo : Karim Solère / CC BY 4.0',
     },
@@ -868,6 +873,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T07:05:00.000Z',
     tags: ['emploi', 'industrie', 'social'],
     hero: {
+      key: 'eco-a1-hero',
       caption: "L'entrée du site des Fonderies du Vernay",
       credit: 'Photo : Camille Ancel / Studio Arvor',
     },
@@ -1018,6 +1024,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T13:30:00.000Z',
     tags: ["pouvoir d'achat", 'consommation', 'commerce'],
     hero: {
+      key: 'eco-a2-hero',
       caption: 'Un étal de primeurs sur le marché de Sainte-Coline',
       credit: 'Photo : Nadia Rous / Studio Arvor',
     },
@@ -1133,6 +1140,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T06:10:00.000Z',
     tags: ['emploi', 'formation', 'territoires'],
     hero: {
+      key: 'eco-a3-hero',
       caption: "Une friche industrielle en bordure de Villefranche-d'Arvor",
       credit: 'Photo : Léo Prat / Studio Arvor',
     },
@@ -1392,6 +1400,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T12:00:00.000Z',
     tags: ['économie sociale', 'emploi', 'coopératives'],
     hero: {
+      key: 'eco-a5-hero',
       caption: "L'atelier de la menuiserie coopérative de Montreuil-l'Abbé",
       credit: 'Photo : Karim Sadi / Studio Arvor',
     },
@@ -1504,6 +1513,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-13T07:00:00.000Z',
     tags: ['services publics', 'ruralité', 'poste'],
     hero: {
+      key: 'eco-a6-hero',
       caption: "Un bureau de poste aux horaires réduits dans le pays de l'Ombre",
       credit: 'Photo : Inès Fabre / Studio Arvor',
     },
@@ -1737,6 +1747,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T06:30:00.000Z',
     tags: ['eau', 'sécheresse', 'ressources'],
     hero: {
+      key: 'env-a1-hero',
       caption: 'La retenue de la Sonne à son étiage',
       credit: 'Photo : Camille Ancel',
     },
@@ -1890,6 +1901,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T13:10:00.000Z',
     tags: ['énergie', 'solaire', 'aménagement'],
     hero: {
+      key: 'env-a2-hero',
       caption: 'Les anciennes carrières du plateau de Montbrel',
       credit: 'Photo : Théo Vasseur / agence Grand-Angle',
     },
@@ -2038,6 +2050,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T07:40:00.000Z',
     tags: ['biodiversité', 'zones humides', 'rivière'],
     hero: {
+      key: 'env-a3-hero',
       caption: 'Les vasières restaurées des marais de Grand-Rieu',
       credit: 'Photo : Malo Renard',
     },
@@ -2167,6 +2180,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T10:20:00.000Z',
     tags: ['ville', 'arbres', 'climat'],
     hero: {
+      key: 'env-a4-hero',
       caption: 'Une rue du centre de Villeneuve-sur-Arche en plein été',
       credit: 'Photo : Fanny Delcourt / agence Plein-Cadre',
     },
@@ -2292,6 +2306,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T06:15:00.000Z',
     tags: ['agriculture', 'pesticides', 'biodiversité'],
     hero: {
+      key: 'env-a5-hero',
       caption: 'Une haie fraîchement plantée en bordure de parcelle',
       credit: 'Photo : Camille Ancel',
     },
@@ -2423,6 +2438,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T15:05:00.000Z',
     tags: ['déchets', 'réemploi', 'économie circulaire'],
     hero: {
+      key: 'env-a6-hero',
       caption: "L'atelier de réparation installé dans l'ancienne gare",
       credit: 'Photo : Yann Mercier',
     },
@@ -2688,6 +2704,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T06:00:00.000Z',
     tags: ['égalité', 'salaires', 'travail'],
     hero: {
+      key: 'fem-a1-hero',
       caption: 'Une aide à domicile en tournée dans un quartier pavillonnaire',
       credit: 'Photo : Sonia Ferrer / CC BY 4.0',
     },
@@ -2802,6 +2819,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T15:20:00.000Z',
     tags: ['emploi', 'solidarité', 'égalité'],
     hero: {
+      key: 'fem-a2-hero',
       caption: "Deux femmes discutent lors d'un atelier du réseau Élan",
       credit: 'Photo : Inès Aubry / CC BY 4.0',
     },
@@ -2927,6 +2945,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T07:40:00.000Z',
     tags: ['parité', 'politique locale', 'égalité'],
     hero: {
+      key: 'fem-a3-hero',
       caption: 'Une séance du conseil municipal de Villeneuve-sur-Arche',
       credit: 'Photo : Paul Rivière / CC BY 4.0',
     },
@@ -3043,6 +3062,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T13:10:00.000Z',
     tags: ['sport', 'égalité', 'vie locale'],
     hero: {
+      key: 'fem-a4-hero',
       caption: "L'équipe féminine à l'entraînement sur un terrain annexe",
       credit: 'Photo : Nadia Belkacem / CC BY 4.0',
     },
@@ -3174,6 +3194,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T09:00:00.000Z',
     tags: ['ruralité', 'solidarité', 'égalité'],
     hero: {
+      key: 'fem-a5-hero',
       caption: "Le camion-permanence installé sur la place d'un village",
       credit: 'Photo : Claire Aubert / CC BY 4.0',
     },
@@ -3301,6 +3322,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T14:30:00.000Z',
     tags: ['éducation', 'sciences', 'égalité'],
     hero: {
+      key: 'fem-a6-hero',
       caption: "Une collégienne manipule un petit robot lors d'un atelier",
       credit: 'Photo : Yasmine Roux / CC BY 4.0',
     },
@@ -3546,6 +3568,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T05:30:00.000Z',
     tags: ['diplomatie', 'pêche', 'coopération'],
     hero: {
+      key: 'mon-a1-hero',
       caption: 'Le port de Port-Méridienne au petit matin',
       credit: 'Photo : Agence Méridien / CC BY 4.0',
     },
@@ -3692,6 +3715,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T07:15:00.000Z',
     tags: ['catastrophe', 'humanitaire', 'coopération'],
     hero: {
+      key: 'mon-a2-hero',
       caption: "Un quartier encore inondé sur l'île principale des Cargues",
       credit: 'Photo : Agence Méridien / CC BY 4.0',
     },
@@ -3821,6 +3845,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T06:05:00.000Z',
     tags: ['travail', 'économie', 'migration'],
     hero: {
+      key: 'mon-a3-hero',
       caption: 'Les portiques du terminal de Port-Méridienne',
       credit: 'Photo : Agence Méridien / CC BY 4.0',
     },
@@ -3959,6 +3984,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T16:30:00.000Z',
     tags: ['villes', 'jeunesse', 'économie'],
     hero: {
+      key: 'mon-a4-hero',
       caption: 'Le marché éphémère installé sur la friche de Serravia',
       credit: 'Photo : Agence Méridien / CC BY 4.0',
     },
@@ -4164,6 +4190,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-13T05:40:00.000Z',
     tags: ['climat', 'coopération', 'économie'],
     hero: {
+      key: 'mon-a6-hero',
       caption: 'Un champ asséché dans la région de Terragne',
       credit: 'Photo : Agence Méridien / CC BY 4.0',
     },
@@ -4441,6 +4468,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T06:30:00.000Z',
     tags: ['transports', 'ruralité', 'collectivités'],
     hero: {
+      key: 'pol-a1-hero',
       caption: "Un car scolaire sur le plateau de Villefranche-d'Arvor",
       credit: 'Photo : Camille Ancel / Studio Arvor',
     },
@@ -4580,6 +4608,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T10:15:00.000Z',
     tags: ['logement', 'urbanisme', 'collectivités'],
     hero: {
+      key: 'pol-a2-hero',
       caption: 'Une façade du centre ancien de Sainte-Coline',
       credit: 'Photo : Nadia Rous / Studio Arvor',
     },
@@ -4696,6 +4725,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T05:45:00.000Z',
     tags: ['intercommunalité', 'gouvernance', 'territoires'],
     hero: {
+      key: 'pol-a3-hero',
       caption: "La salle du conseil communautaire du Val d'Arche",
       credit: 'Photo : Léo Prat / Studio Arvor',
     },
@@ -4834,6 +4864,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T14:20:00.000Z',
     tags: ['mobilités', 'commerce', 'concertation'],
     hero: {
+      key: 'pol-a4-hero',
       caption: "La rue Marchande, artère commerçante de Villefranche-d'Arvor",
       credit: 'Photo : Sonia Belkacem / Studio Arvor',
     },
@@ -4970,6 +5001,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T07:10:00.000Z',
     tags: ['démocratie locale', 'conseil municipal', 'budget'],
     hero: {
+      key: 'pol-a5-hero',
       caption: 'La salle du conseil de Sainte-Coline en séance de nuit',
       credit: 'Photo : Karim Sadi / Studio Arvor',
     },
@@ -5048,6 +5080,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T16:40:00.000Z',
     tags: ['transparence', 'éthique', 'intercommunalité'],
     hero: {
+      key: 'pol-a6-hero',
       caption: 'Signature de la charte de déontologie en séance',
       credit: 'Photo : Inès Fabre / Studio Arvor',
     },
@@ -5293,6 +5326,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T06:15:00.000Z',
     tags: ['logement', 'précarité', 'solidarité'],
     hero: {
+      key: 'soc-a1-hero',
       caption: 'Le gymnase des Charmilles réaménagé en dortoir',
       credit: 'Photo : Studio Arche / CC BY 4.0',
     },
@@ -5434,6 +5468,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T07:40:00.000Z',
     tags: ['éducation', 'enfance', 'restauration scolaire'],
     hero: {
+      key: 'soc-a2-hero',
       caption: "Le réfectoire de l'école des Peupliers à l'heure du déjeuner",
       credit: 'Photo : Clara Vidonne / CC BY 4.0',
     },
@@ -5559,6 +5594,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T05:50:00.000Z',
     tags: ['santé', 'ruralité', 'services publics'],
     hero: {
+      key: 'soc-a3-hero',
       caption: "La façade de la maison de santé du Val d'Arche",
       credit: 'Photo : Studio Arche / CC BY 4.0',
     },
@@ -5699,6 +5735,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T08:20:00.000Z',
     tags: ['grand âge', 'lien social', 'éducation'],
     hero: {
+      key: 'soc-a4-hero',
       caption: 'Un atelier cuisine partagé à la résidence Les Tilleuls',
       credit: 'Photo : Marème Sow / CC BY 4.0',
     },
@@ -5829,6 +5866,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T09:05:00.000Z',
     tags: ['mobilité', 'ruralité', 'services publics'],
     hero: {
+      key: 'soc-a5-hero',
       caption: 'Le minibus solidaire à son premier arrêt au hameau de Faverolles',
       credit: 'Photo : Studio Arche / CC BY 4.0',
     },
@@ -5965,6 +6003,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-13T06:30:00.000Z',
     tags: ['solidarité', 'précarité', 'bénévolat'],
     hero: {
+      key: 'soc-a6-hero',
       caption: "Les rayons de l'épicerie solidaire de Longeval",
       credit: 'Photo : Clara Vidonne / CC BY 4.0',
     },
@@ -6241,6 +6280,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T07:20:00.000Z',
     tags: ['football', 'amateurs', 'équipements'],
     hero: {
+      key: 'spo-a1-hero',
       caption: 'Les tribunes en bois du stade de Bourg-la-Rivière',
       credit: 'Photo : Théo Vasseur / agence Grand-Angle',
     },
@@ -6392,6 +6432,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-10T14:40:00.000Z',
     tags: ['handball', 'sport féminin', 'clubs'],
     hero: {
+      key: 'spo-a2-hero',
       caption: "Les joueuses des Aiglons à l'entraînement",
       credit: 'Photo : Fanny Delcourt / agence Plein-Cadre',
     },
@@ -6530,6 +6571,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-11T09:10:00.000Z',
     tags: ['cyclisme', 'course', 'bénévolat'],
     hero: {
+      key: 'spo-a3-hero',
       caption: "Le peloton dans la traversée d'un village du plateau",
       credit: 'Photo : Malo Renard',
     },
@@ -6612,6 +6654,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T07:05:00.000Z',
     tags: ['athlétisme', 'jeunes', 'formation'],
     hero: {
+      key: 'spo-a4-hero',
       caption: "Awa Diakité à l'entraînement sur la piste de Saint-Prieux",
       credit: 'Photo : Camille Ancel',
     },
@@ -6753,6 +6796,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-12T16:20:00.000Z',
     tags: ['rugby', 'clubs', 'jeunesse'],
     hero: {
+      key: 'spo-a5-hero',
       caption: 'Les deux équipes réunies avant un entraînement commun',
       credit: 'Photo : Yann Mercier',
     },
@@ -6882,6 +6926,7 @@ export const CORPUS_DATA = [
     publishedAt: '2026-09-13T06:30:00.000Z',
     tags: ['natation', 'équipements', 'collectivités'],
     hero: {
+      key: 'spo-a6-hero',
       caption: 'Le grand bassin rénové de la piscine de Clairefont',
       credit: 'Photo : Fanny Delcourt / agence Plein-Cadre',
     },

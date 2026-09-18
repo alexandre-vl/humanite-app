@@ -40,10 +40,10 @@ const splitList = (value: string | undefined): readonly string[] =>
         .map((part) => part.trim())
         .filter((part) => part.length > 0);
 
-/** A `légende | crédit` hero scalar. */
-const splitHero = (value: string): Readonly<{ caption: string; credit: string }> => {
+/** A `légende | crédit` hero scalar. Its key is the item's own, so a lead picture is named without being authored. */
+const toHero = (id: string, value: string): Readonly<{ key: string; caption: string; credit: string }> => {
   const [caption, credit] = value.split('|').map((part) => part.trim());
-  return { caption: caption ?? '', credit: credit ?? '' };
+  return { key: `${id}-hero`, caption: caption ?? '', credit: credit ?? '' };
 };
 
 /** The plain text of inline content, line breaks becoming spaces. */
@@ -168,10 +168,11 @@ export const parseItem = (text: string): Article => {
   });
   const head = tree.children[0];
   const front = parseFrontmatter(head?.type === 'yaml' ? head.value : '');
+  const id = front['id'] ?? '';
   const hero = front['hero'];
   const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
   return ARTICLE.parse({
-    id: front['id'],
+    id,
     kind: front['kind'],
     section: front['section'],
     format: front['format'],
@@ -181,7 +182,7 @@ export const parseItem = (text: string): Article => {
     authors: splitList(front['authors']),
     publishedAt: front['published'] === undefined ? undefined : toInstant(front['published']),
     tags: splitList(front['tags']),
-    ...(hero === undefined ? {} : { hero: splitHero(hero) }),
+    ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
     ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
     blocks: body.map(toBlock),
   });
