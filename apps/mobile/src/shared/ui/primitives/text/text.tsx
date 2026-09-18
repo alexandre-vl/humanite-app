@@ -1,16 +1,34 @@
 import type { DisplayText } from '@huma/contracts';
-import { FONT_FAMILIES } from '@huma/design-tokens';
+import type { TextTone, TextVariant } from '@huma/design-tokens';
+import { TYPOGRAPHY } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { Text as NativeText } from 'react-native';
-import { createStyles } from '../../../lib/styles';
-import type { StyleRef } from '../../../lib/styles';
+import { useTheme } from '../../../lib/styles';
 
-export type TextProps = Readonly<{ children: DisplayText; style?: StyleRef }>;
+export type TextProps = Readonly<{
+  children: DisplayText;
+  variant?: TextVariant;
+  tone?: TextTone;
+  numberOfLines?: number;
+}>;
 
-const useStyles = createStyles(() => ({ text: { fontFamily: FONT_FAMILIES.body.regular } }));
-
-/** App text, in the body typeface by default; a passed style overrides it, weight by weight. */
-export function Text({ children, style }: TextProps): ReactNode {
-  const styles = useStyles();
-  return <NativeText style={[styles.text, style]}>{children}</NativeText>;
+/**
+ * App text in a named type style. The variant fixes the face, the size and the line height it derives (the size times
+ * its multiple); the tone is the theme colour it paints with, the variant's own unless a caller overrides it. Text
+ * truncates to numberOfLines when given, and reads a DisplayText, never a raw string.
+ */
+export function Text({ children, variant = 'body', tone, numberOfLines }: TextProps): ReactNode {
+  const theme = useTheme();
+  const role = TYPOGRAPHY[variant];
+  const style = {
+    fontFamily: role.family,
+    fontSize: role.size,
+    lineHeight: role.size * role.leading,
+    color: theme[tone ?? role.tone],
+  };
+  return (
+    <NativeText numberOfLines={numberOfLines} style={style}>
+      {children}
+    </NativeText>
+  );
 }

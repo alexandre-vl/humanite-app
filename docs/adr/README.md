@@ -233,10 +233,10 @@ Statut : proposé. Périmètre : `apps/mobile/jest.config.cjs`, `apps/mobile/jes
 
 Statut : proposé. Périmètre : `apps/mobile/src/_app/model/fonts.ts`, `apps/mobile/src/_app/routes/startup-gate.tsx`, `apps/mobile/src/shared/lib/startup/**`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                                       |
-| ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | NE DOIT PAS | `guardrail/module-expo-font`, `guardrail/module-expo-splash-screen`                                                                                                                                                           |
-| R2    | DOIT        | convention : Une famille de police est un token FontFamily de @huma/design-tokens (FONT_FAMILIES) ; le champ fontFamily de create-styles accepte ce seul type brandé, donc une chaîne libre ne peut pas entrer dans un style. |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                  |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-expo-font`, `guardrail/module-expo-splash-screen`                                                                                                                                                                                      |
+| R2    | DOIT        | convention : Une famille de police est un token FontFamily de @huma/design-tokens (FONT_FAMILIES), assemblé dans les variants TYPOGRAPHY ; la primitive Text prend un nom de variant, jamais une chaîne, donc aucune police libre n’entre dans le rendu. |
 
 ### ADR-0018 · Images et symboles natifs
 

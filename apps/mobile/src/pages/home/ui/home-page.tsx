@@ -1,4 +1,4 @@
-import { FONT_FAMILIES, RADII, SPACING } from '@huma/design-tokens';
+import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
 import { useStartup } from '#lib/startup';
@@ -20,7 +20,6 @@ const useStyles = createStyles((theme) => ({
     paddingHorizontal: SPACING.lg,
     backgroundColor: theme.surface,
   },
-  displayText: { fontFamily: FONT_FAMILIES.display },
   card: {
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
@@ -44,13 +43,13 @@ export function HomePage(): ReactNode {
       <CollapsibleHeader
         header={
           <Box style={styles.masthead}>
-            <Text style={styles.displayText}>{t('app.name')}</Text>
+            <Text variant="display">{t('app.name')}</Text>
           </Box>
         }
         sticky={
           <Box style={styles.sticky}>
             <Icon name="search" size={SPACING.lg} tintColor={theme.primary} />
-            <Text style={styles.displayText}>{t('nav.headline')}</Text>
+            <Text variant="display">{t('nav.headline')}</Text>
           </Box>
         }
       >

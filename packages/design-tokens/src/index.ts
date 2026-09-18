@@ -13,3 +13,5 @@ export {
 export { contrastRatio } from './contrast.ts';
 export type { Theme } from './theme.ts';
 export { DARK_THEME, LIGHT_THEME, THEMES } from './theme.ts';
+export type { TextTone, TextVariant } from './typography.ts';
+export { TEXT_VARIANTS, TYPOGRAPHY } from './typography.ts';

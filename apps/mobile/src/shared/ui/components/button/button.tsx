@@ -1,5 +1,5 @@
 import type { DisplayText } from '@huma/contracts';
-import { FONT_FAMILIES, RADII, SPACING } from '@huma/design-tokens';
+import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '../../../lib/styles';
 import { Pressable } from '../../primitives/pressable';
@@ -15,7 +15,6 @@ const useStyles = createStyles((theme) => ({
     borderRadius: RADII.pill,
     backgroundColor: theme.primary,
   },
-  label: { color: theme.textInverse, fontFamily: FONT_FAMILIES.body.bold },
 }));
 
 /** A primary action: a pill that answers a press with a label. */
@@ -23,7 +22,9 @@ export function Button({ label, onPress }: ButtonProps): ReactNode {
   const styles = useStyles();
   return (
     <Pressable style={styles.button} onPress={onPress}>
-      <Text style={styles.label}>{label}</Text>
+      <Text variant="label" tone="textInverse">
+        {label}
+      </Text>
     </Pressable>
   );
 }

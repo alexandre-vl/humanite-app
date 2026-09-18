@@ -1,12 +1,12 @@
-import type { Brand, Color, FontFamily, FontSize, Radius, Space, Theme } from '@huma/design-tokens';
+import type { Brand, Color, Radius, Space, Theme } from '@huma/design-tokens';
 import { useMemo } from 'react';
 import { useTheme } from './theme';
 
 /**
  * A style built only from design tokens: every value that carries a dimension or a colour is a branded token, so a raw
- * number or string cannot reach a native view. Layout keywords stay plain, the way React Native types them. There is no
- * lineHeight leaf: a line height is not a token but an absolute value a font size and a multiplier yield, so it is
- * derived at the text layer, never set on a style here.
+ * number or string cannot reach a native view. Layout keywords stay plain, the way React Native types them. Typography
+ * is absent: a run of text names a Text variant, so a face, a size, a text colour or a line height never enters a style
+ * — a line height is not a token but a size times a multiple, derived there at the text layer.
  */
 type Style = Readonly<{
   flex?: number;
@@ -51,10 +51,6 @@ type Style = Readonly<{
   borderWidth?: Space;
   borderColor?: Color;
   backgroundColor?: Color;
-  color?: Color;
-  fontFamily?: FontFamily;
-  fontSize?: FontSize;
-  textAlign?: 'auto' | 'left' | 'right' | 'center' | 'justify';
   opacity?: number;
   overflow?: 'visible' | 'hidden';
   zIndex?: number;
