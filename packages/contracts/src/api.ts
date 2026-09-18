@@ -20,6 +20,7 @@ export type ContentApi = Readonly<{
   getFeed: (query: FeedQuery) => Promise<Page<ArticleSummary>>;
   getLiveFeed: (query: LiveQuery) => Promise<Page<ArticleSummary>>;
   getArticle: (id: ArticleId) => Promise<Article>;
+  getSummaries: (ids: readonly ArticleId[]) => Promise<readonly ArticleSummary[]>;
   search: (query: SearchQuery) => Promise<Page<ArticleSummary>>;
   getSession: () => Promise<Session>;
 }>;

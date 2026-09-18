@@ -25,6 +25,13 @@ const CHRONOLOGICAL: readonly ArticleSummary[] = CORPUS.map(summarize).toSorted(
   right.publishedAt.localeCompare(left.publishedAt),
 );
 
+/** The same summaries, reachable by id: a related block names ids, and resolves them without pulling whole bodies. */
+const SUMMARIES = new Map(CHRONOLOGICAL.map((summary): readonly [ArticleId, ArticleSummary] => [summary.id, summary]));
+
+const notFound = (id: ArticleId): never => {
+  throw new ContentApiError('not-found', `article introuvable : ${id}`);
+};
+
 const matches = (summary: ArticleSummary, query: string): boolean => {
   const needle = query.toLowerCase();
   return (
@@ -77,13 +84,9 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
   const inSection = (section: SectionId | undefined): readonly ArticleSummary[] =>
     section === undefined ? CHRONOLOGICAL : CHRONOLOGICAL.filter((summary) => summary.section === section);
 
-  const find = (id: ArticleId): Article => {
-    const article = CORPUS.find((each) => each.id === id);
-    if (article === undefined) {
-      throw new ContentApiError('not-found', `article introuvable : ${id}`);
-    }
-    return article;
-  };
+  const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
+
+  const summaryOf = (id: ArticleId): ArticleSummary => SUMMARIES.get(id) ?? notFound(id);
 
   return {
     getSections: async (): Promise<readonly Section[]> => {
@@ -105,6 +108,10 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
     getArticle: async (id: ArticleId): Promise<Article> => {
       await guard('getArticle');
       return find(id);
+    },
+    getSummaries: async (ids: readonly ArticleId[]): Promise<readonly ArticleSummary[]> => {
+      await guard('getSummaries');
+      return ids.map(summaryOf);
     },
     search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
       await guard('search');
