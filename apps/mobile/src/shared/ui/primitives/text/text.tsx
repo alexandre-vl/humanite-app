@@ -7,9 +7,10 @@ import type { StyleRef } from '../../../lib/styles';
 
 export type TextProps = Readonly<{ children: DisplayText; style?: StyleRef }>;
 
-const styles = createStyles({ text: { fontFamily: FONT_FAMILIES.body.regular } });
+const useStyles = createStyles(() => ({ text: { fontFamily: FONT_FAMILIES.body.regular } }));
 
 /** App text, in the body typeface by default; a passed style overrides it, weight by weight. */
 export function Text({ children, style }: TextProps): ReactNode {
+  const styles = useStyles();
   return <NativeText style={[styles.text, style]}>{children}</NativeText>;
 }

@@ -1,9 +1,12 @@
-import type { Brand, Color, FontFamily, FontSize, Radius, Space } from '@huma/design-tokens';
+import type { Brand, Color, FontFamily, FontSize, Radius, Space, Theme } from '@huma/design-tokens';
+import { useMemo } from 'react';
+import { useTheme } from './theme';
 
 /**
  * A style built only from design tokens: every value that carries a dimension or a colour is a branded token, so a raw
  * number or string cannot reach a native view. Layout keywords stay plain, the way React Native types them. There is no
- * lineHeight: the tokens are multipliers, while React Native's lineHeight is absolute points the Text primitive derives.
+ * lineHeight leaf: a line height is not a token but an absolute value a font size and a multiplier yield, so it is
+ * derived at the text layer, never set on a style here.
  */
 type Style = Readonly<{
   flex?: number;
@@ -60,14 +63,24 @@ type Style = Readonly<{
 /** An opaque handle to a token-built style; a primitive's `style` prop accepts nothing else. */
 export type StyleRef = Brand<Style, 'StyleRef'>;
 
-/** Turns a table of token-built styles into style handles: the only constructor of styles the app has. */
+/**
+ * The only constructor of styles the app has. It takes a table keyed by name and built from the theme in force, and
+ * returns a hook: a component calls it to read the current theme's styles, rebuilt only when the theme changes. A table
+ * that ignores the theme takes no parameter.
+ */
 export function createStyles<Definition extends Readonly<Record<string, Style>>>(
-  definition: Definition,
-): { readonly [Name in keyof Definition]: StyleRef } {
-  const branded = (value: unknown): value is { readonly [Name in keyof Definition]: StyleRef } =>
-    typeof value === 'object' && value !== null;
-  if (branded(definition)) {
-    return definition;
-  }
-  throw new Error('styles invalides');
+  build: (theme: Theme) => Definition,
+): () => { readonly [Name in keyof Definition]: StyleRef } {
+  const brand = (definition: Definition): { readonly [Name in keyof Definition]: StyleRef } => {
+    const branded = (value: unknown): value is { readonly [Name in keyof Definition]: StyleRef } =>
+      typeof value === 'object' && value !== null;
+    if (branded(definition)) {
+      return definition;
+    }
+    throw new Error('styles invalides');
+  };
+  return function useStyles(): { readonly [Name in keyof Definition]: StyleRef } {
+    const theme = useTheme();
+    return useMemo(() => brand(build(theme)), [theme]);
+  };
 }

@@ -1,5 +1,5 @@
 import type { DisplayText } from '@huma/contracts';
-import { FONT_FAMILIES, LIGHT_THEME, RADII, SPACING } from '@huma/design-tokens';
+import { FONT_FAMILIES, RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '../../../lib/styles';
 import { Pressable } from '../../primitives/pressable';
@@ -7,19 +7,20 @@ import { Text } from '../../primitives/text';
 
 export type ButtonProps = Readonly<{ label: DisplayText; onPress?: () => void }>;
 
-const styles = createStyles({
+const useStyles = createStyles((theme) => ({
   button: {
     alignItems: 'center',
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.lg,
     borderRadius: RADII.pill,
-    backgroundColor: LIGHT_THEME.primary,
+    backgroundColor: theme.primary,
   },
-  label: { color: LIGHT_THEME.textInverse, fontFamily: FONT_FAMILIES.body.bold },
-});
+  label: { color: theme.textInverse, fontFamily: FONT_FAMILIES.body.bold },
+}));
 
 /** A primary action: a pill that answers a press with a label. */
 export function Button({ label, onPress }: ButtonProps): ReactNode {
+  const styles = useStyles();
   return (
     <Pressable style={styles.button} onPress={onPress}>
       <Text style={styles.label}>{label}</Text>

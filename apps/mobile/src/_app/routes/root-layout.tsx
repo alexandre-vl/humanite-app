@@ -4,6 +4,7 @@ import { preventAutoHideAsync } from 'expo-splash-screen';
 import type { ReactNode } from 'react';
 import { StartupProvider } from '#lib/startup';
 import { SafeAreaRoot } from '#primitives/safe-area';
+import { ThemeRoot } from '#primitives/theme';
 import { persistOptions, queryClient } from '../model/query-client';
 import { StartupGate } from './startup-gate';
 
@@ -14,11 +15,13 @@ export function RootLayout(): ReactNode {
     <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       <StartupProvider>
         <StartupGate>
-          <SafeAreaRoot>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack>
-          </SafeAreaRoot>
+          <ThemeRoot>
+            <SafeAreaRoot>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </Stack>
+            </SafeAreaRoot>
+          </ThemeRoot>
         </StartupGate>
       </StartupProvider>
     </PersistQueryClientProvider>

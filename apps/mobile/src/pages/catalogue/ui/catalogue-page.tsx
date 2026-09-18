@@ -12,14 +12,15 @@ import { REGISTRY } from '../model/registry';
 /** The levels the catalogue lists, top down. */
 const LEVELS: readonly CatalogLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
 
-const styles = createStyles({
+const useStyles = createStyles(() => ({
   content: { padding: SPACING.lg, gap: SPACING.xl },
   section: { gap: SPACING.md },
   entry: { gap: SPACING.xs },
-});
+}));
 
 /** A running gallery of every catalogued primitive and component, grouped by level. */
 export function CataloguePage(): ReactNode {
+  const styles = useStyles();
   return (
     <Surface>
       <Scroll contentStyle={styles.content}>

@@ -12,7 +12,7 @@ export type CollapsibleHeaderProps = Readonly<{
   style?: StyleRef;
 }>;
 
-const styles = createStyles({
+const useStyles = createStyles(() => ({
   frame: { flex: 1 },
   content: { paddingTop: SIZES.headerBlock },
   masthead: {
@@ -30,12 +30,13 @@ const styles = createStyles({
     right: SPACING.none,
     height: SIZES.sectionBar,
   },
-});
+}));
 
 const DISTANCE = collapseDistance(SIZES.headerExpanded, SIZES.headerCollapsed);
 
 /** A header whose `header` band fades and slides away as `children` scroll, leaving the `sticky` band pinned at the top. */
 export function CollapsibleHeader({ header, sticky, children, style }: CollapsibleHeaderProps): ReactNode {
+  const styles = useStyles();
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((event) => {
     scrollY.set(event.contentOffset.y);
