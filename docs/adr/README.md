@@ -197,13 +197,13 @@ Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 
 ### ADR-0013 · Textes UI en dictionnaire français typé
 
-Statut : proposé. Périmètre : `packages/contracts/src/display-text.ts`, `apps/mobile/src/shared/i18n/**`, `apps/mobile/src/shared/ui/primitives/text/**`.
+Statut : proposé. Périmètre : `packages/contracts/src/display-text.ts`, `apps/mobile/src/shared/i18n/**`, `apps/mobile/src/shared/lib/display-text/**`, `apps/mobile/src/shared/lib/format/**`, `apps/mobile/src/shared/ui/primitives/text/**`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                         |
-| ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | DOIT        | convention : Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un. |
-| R2    | DOIT        | convention : La prop children d’une primitive de texte est typée DisplayText, la marque opaque des contrats ; une chaîne quelconque n’y est pas assignable.                                                     |
-| R3    | NE DOIT PAS | `guardrail/text-jsx`                                                                                                                                                                                            |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                |
+| ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | convention : Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un.        |
+| R2    | DOIT        | convention : Le texte qu’une primitive de texte reçoit est typé DisplayText, la marque opaque des contrats, qu’il entre par children ou par les fragments d’une phrase ; une chaîne quelconque n’y est pas assignable. |
+| R3    | NE DOIT PAS | `guardrail/text-jsx`                                                                                                                                                                                                   |
 
 ### ADR-0014 · Navigation Expo Router par onglets natifs
 
