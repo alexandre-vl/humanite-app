@@ -18,6 +18,7 @@ export const ICONS = {
   headline: { ios: 'house', android: 'home' },
   live: { ios: 'bolt', android: 'bolt' },
   newsstand: { ios: 'newspaper', android: 'newspaper' },
+  play: { ios: 'play.fill', android: 'play_arrow' },
   search: { ios: 'magnifyingglass', android: 'search' },
   share: { ios: 'square.and.arrow.up', android: 'ios_share' },
 } as const satisfies Readonly<Record<string, IconSymbol>>;

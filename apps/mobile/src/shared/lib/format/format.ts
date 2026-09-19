@@ -102,6 +102,18 @@ export const formatDayLabel = (instant: string): DisplayText => {
   return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
 
+/**
+ * The signature under an article: `Par Lisa Guillemin`, and `Par Lisa Guillemin et Yves Kerlan` for two. The contract
+ * allows no more than two names, so a list needs no comma — and the joining word is written here, with the weekdays
+ * above, for the same reason: a formatter may not reach the dictionary, and the words it prints are its own.
+ */
+export const formatByline = (names: readonly string[]): DisplayText => {
+  if (names.length === 0) {
+    throw new RangeError('un article est signé');
+  }
+  return asDisplayText(`Par ${names.join(' et ')}`);
+};
+
 /** A running time, as a player prints it: `4:18`, and `1:04:18` once past the hour. */
 export const formatDuration = (seconds: number): DisplayText => {
   const hours = Math.floor(seconds / PER_HOUR);

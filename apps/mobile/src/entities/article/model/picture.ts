@@ -6,6 +6,13 @@ import type { Visual, VisualSize } from '#api';
 export const HERO_RATIO = 16 / 9;
 
 /**
+ * The wider frame a picture fills on a reading screen, measured on capture 13 at 1058 × 493 points. A card crops its
+ * picture to the shape the corpus draws it in; an article crops it to the band the sheet gives it, which is not the
+ * same shape and is not meant to be.
+ */
+export const LEAD_RATIO = 1058 / 493;
+
+/**
  * The illustration an item carries at the size asked for, or nothing: a brief and a column are written without one.
  * The corpus holds no brief with a picture today, but nothing in the contracts forbids one — the schema makes `hero`
  * optional on every item, and the corpus rule only stops requiring it of a brief — so the question is asked of the

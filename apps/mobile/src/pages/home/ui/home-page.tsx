@@ -26,6 +26,9 @@ export function HomePage(): ReactNode {
     <Surface>
       <ArticleFeed
         query={feedQuery}
+        onOpen={(id) => {
+          router.push({ pathname: '/article/[id]', params: { id } });
+        }}
         header={
           <Box style={styles.masthead}>
             <Text variant="display">{t('app.name')}</Text>

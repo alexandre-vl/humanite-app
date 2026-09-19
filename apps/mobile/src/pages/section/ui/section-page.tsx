@@ -33,6 +33,9 @@ export function SectionPage(): ReactNode {
       ) : (
         <ArticleFeed
           query={sectionFeedQuery(id)}
+          onOpen={(article) => {
+            router.push({ pathname: '/article/[id]', params: { id: article } });
+          }}
           sticky={
             <SectionBar
               active={id}

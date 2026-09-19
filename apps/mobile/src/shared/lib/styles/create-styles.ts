@@ -51,6 +51,7 @@ type Style = Readonly<{
   left?: Space;
   right?: Space;
   borderRadius?: Radius;
+  borderTopLeftRadius?: Radius;
   borderWidth?: Space;
   borderLeftWidth?: Space;
   borderStyle?: 'solid' | 'dashed' | 'dotted';

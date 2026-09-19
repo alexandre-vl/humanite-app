@@ -13,12 +13,17 @@ export const SPACING = {
   xxxl: space(48),
 } as const satisfies Readonly<Record<string, Space>>;
 
-/** Corner radii in points; the current app favours generous rounding (docs/app-actuelle). */
+/**
+ * Corner radii in points; the current app favours generous rounding (docs/app-actuelle). `sheet` is the one a reading
+ * screen turns the top-left corner of its sheet by, measured on capture 13 as a circle of radius 129 px — 49 points —
+ * fitted over 134 rows to within half a pixel, against a top-right corner left square.
+ */
 export const RADII = {
   none: radius(0),
   sm: radius(6),
   md: radius(12),
   lg: radius(20),
+  sheet: radius(48),
   pill: radius(999),
 } as const satisfies Readonly<Record<string, Radius>>;
 
