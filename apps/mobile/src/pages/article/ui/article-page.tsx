@@ -2,6 +2,7 @@ import { ARTICLE_ID } from '@huma/contracts';
 import { Stack, router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleReader } from '#entities/article';
+import { BookmarkToggle } from '#features/bookmark';
 import { articleHref, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
@@ -17,6 +18,10 @@ import { Surface } from '#primitives/surface';
  * The native header stays, carrying the back chevron and no title: an article's own headline is already the first
  * thing under it, and repeating it in a bar would say it twice.
  *
+ * Keeping the article is offered from that same header, opposite the chevron. The screen this copies puts the mark in
+ * the flow of the text, where it scrolls out of reach of a reader who has read down to the end and decided: the two
+ * things one does to an article one is reading — leave it, keep it — belong together and stay.
+ *
  * Following a link inside the body leads to another article by replacing this screen rather than stacking one more,
  * the way one section replaces another: a reader who followed four links back to back should step back to the feed,
  * not walk every article already read.
@@ -25,7 +30,7 @@ export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
   return (
     <Surface>
-      <Stack.Screen options={{ title: '' }} />
+      <Stack.Screen options={{ title: '', headerRight: () => <BookmarkToggle id={id} /> }} />
       <ArticleReader
         id={id}
         onFollow={(target) => {

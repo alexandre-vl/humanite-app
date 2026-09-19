@@ -16,11 +16,14 @@ import { searchable } from '../model/search';
 const ARTICLES = 'articles';
 
 /**
- * The branch a reader's question is filed under. It is named apart from the other keys because the app asks about it:
- * a question is worth answering from memory while the reader is still on the screen, and not worth keeping on disk
- * after — see the persistence options, which read this and nothing else about a key.
+ * The two branches a reading of the reader's own making is filed under: what they asked for, and what they kept.
+ *
+ * They are named apart from the rest because the app asks about them: such a reading is worth answering from memory
+ * while the reader is still on the screen, and not worth keeping on disk after — see the persistence options, which
+ * read this and nothing else about a key.
  */
 const SEARCH = 'search';
+const KEPT = 'kept';
 
 /**
  * The newsroom's own namespace. The roster is read from here rather than from an author entity of its own: an article
@@ -50,6 +53,7 @@ const KEYS = {
   search: (text: string): readonly string[] => [ARTICLES, SEARCH, text],
   one: (id: ArticleId): readonly string[] => [ARTICLES, 'one', id],
   summaries: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, 'summaries', ...ids],
+  kept: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, KEPT, ...ids],
   authors: (): readonly string[] => [AUTHORS],
 } as const;
 
@@ -109,8 +113,9 @@ export const searchQuery = (text: string): PagedFeed =>
     searchable(text),
   );
 
-/** Whether a key in the cache is a reader's question rather than a reading of the paper. */
-export const isSearchKey = (key: readonly unknown[]): boolean => key[0] === ARTICLES && key[1] === SEARCH;
+/** Whether a key in the cache is a reading of the reader's own making rather than a reading of the paper. */
+export const isReaderKey = (key: readonly unknown[]): boolean =>
+  key[0] === ARTICLES && (key[1] === SEARCH || key[1] === KEPT);
 
 /** One reading of the content under one key, whatever it answers with, and whether it is to be read at all. */
 const single = <Value>(queryKey: readonly string[], read: () => Promise<Value>, enabled = true) =>
@@ -134,6 +139,14 @@ export const articleQuery = (id: ArticleId): Single<Article> =>
  */
 export const summariesQuery = (ids: readonly ArticleId[]): Single<readonly ArticleSummary[]> =>
   single(KEYS.summaries(ids), async () => content.getSummaries(ids), ids.length > 0);
+
+/**
+ * The same reading, for the list the reader keeps rather than for the one an article points at. It is the same call
+ * and a different question: this one is theirs, it is a different one after every mark they make, and it is answered
+ * from the corpus the app carries — so it is filed apart, and stays out of what is written to disk.
+ */
+export const keptQuery = (ids: readonly ArticleId[]): Single<readonly ArticleSummary[]> =>
+  single(KEYS.kept(ids), async () => content.getSummaries(ids), ids.length > 0);
 
 /**
  * The newsroom, which a byline reads to turn the ids an article carries into names. Like the sections it is the

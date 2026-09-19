@@ -1,4 +1,4 @@
-import type { ArticleId } from '@huma/contracts';
+import type { ArticleId, ArticleSummary } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
@@ -13,9 +13,11 @@ import { FeedStandIn } from './feed-stand-in';
 export type ArticleFeedProps = Readonly<{
   feed: ReadFeed;
   onOpen: (id: ArticleId) => void;
+  action?: ((summary: ArticleSummary) => ReactNode) | undefined;
   header?: ReactNode;
   sticky?: ReactNode;
-  empty?: EmptyWords;
+  stickyRows?: 1 | 2 | undefined;
+  empty?: EmptyWords | undefined;
 }>;
 
 const useStyles = createStyles(() => ({
@@ -29,7 +31,7 @@ const useStyles = createStyles(() => ({
  * It reports which article was pressed and goes nowhere itself: an entity may not name a route, and the screen that
  * mounts the feed is the one that knows what opening an article means for it.
  */
-export function ArticleFeed({ feed, onOpen, header, sticky, empty }: ArticleFeedProps): ReactNode {
+export function ArticleFeed({ feed, onOpen, action, header, sticky, stickyRows, empty }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
   return (
     <List
@@ -43,13 +45,14 @@ export function ArticleFeed({ feed, onOpen, header, sticky, empty }: ArticleFeed
               onOpen(summary.id);
             }}
           >
-            <ArticleCard summary={summary} />
+            <ArticleCard summary={summary} action={action?.(summary)} />
           </Pressable>
         </Box>
       )}
       contentStyle={styles.feed}
       header={header}
       sticky={sticky}
+      stickyRows={stickyRows}
       empty={<FeedStandIn state={feed.state} onRetry={feed.retry} empty={empty} />}
       onEndReached={feed.onEndReached}
     />

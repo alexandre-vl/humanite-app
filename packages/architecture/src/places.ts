@@ -186,6 +186,9 @@ type ModulePolicy = Readonly<{
  * which alone touch the native layer; `Platform` answers a question, not a view, and stays open to every place.
  * Startup modules — font loading and the splash screen — live in the app layer that drives them. The content the app
  * reads enters through the `api` place alone, so swapping the mock for a service touches one module.
+ *
+ * What the reader does to the paper is kept apart from what the paper says: a store of their own lives in a feature,
+ * the one place that holds an action, and nothing below it can start keeping state of its own on the side.
  */
 export const MODULES = {
   '@huma/mock-api': { places: ['api'], except: [] },
@@ -202,6 +205,7 @@ export const MODULES = {
   'react-native-reanimated': { places: ['primitive'], except: [] },
   'react-native-safe-area-context': { places: ['primitive'], except: [] },
   'react-native-screens': { places: ['primitive'], except: [] },
+  zustand: { places: ['feature'], except: [] },
 } as const satisfies Readonly<Record<string, ModulePolicy>>;
 
 export type ConfinedModule = keyof typeof MODULES;

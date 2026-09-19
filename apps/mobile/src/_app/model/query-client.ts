@@ -1,7 +1,7 @@
 import { QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query';
 import type { PersistQueryClientOptions } from '@tanstack/react-query-persist-client';
 import { isRetryable } from '#api';
-import { isSearchKey } from '#entities/article';
+import { isReaderKey } from '#entities/article';
 import { CACHE_BUSTER } from './cache-buster';
 import { mmkvPersister } from './persister';
 
@@ -33,12 +33,15 @@ export const queryClient = new QueryClient({
 
 /**
  * What of the cache is written to disk. A reading of the paper is worth keeping: the same pages will be wanted
- * tomorrow, and finding them already there is the whole point of persisting anything. A reader's question is not: it
- * is answered from the corpus the app already carries, it is asked once and rarely twice, and keeping it would file
- * every question ever typed beside the journal — and re-serialise them all on each of the next day's writes. It stays
- * in memory, where the reader still on the screen finds it, and goes no further.
+ * tomorrow, and finding them already there is the whole point of persisting anything. A reading of the reader's own
+ * making is not: it is answered from the corpus the app already carries, it is different after every question typed
+ * and every mark made, and keeping it would file each one beside the journal — and re-serialise them all on each of
+ * the next day's writes. It stays in memory, where the reader still on the screen finds it, and goes no further.
+ *
+ * What they kept is not lost with it: that list is theirs and is written under its own key, not as an answer of the
+ * paper's.
  */
-const isWorthKeeping = (query: Readonly<{ queryKey: readonly unknown[] }>): boolean => !isSearchKey(query.queryKey);
+const isWorthKeeping = (query: Readonly<{ queryKey: readonly unknown[] }>): boolean => !isReaderKey(query.queryKey);
 
 /** The persistence options the provider applies: the MMKV persister, the contracts-hash buster, and the max cache age. */
 export const persistOptions: Omit<PersistQueryClientOptions, 'queryClient'> = {

@@ -1,6 +1,7 @@
-import type { ArticleSummary } from '@huma/contracts';
+import type { ArticleId, ArticleSummary } from '@huma/contracts';
 import type { QueryStatus } from '@tanstack/react-query';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { keptQuery } from '../api/queries';
 import type { PagedFeed } from '../api/queries';
 
 /** Why a feed is showing no article: it has not answered yet, it failed, or it truly holds none. */
@@ -59,6 +60,24 @@ export function usePagedFeed(query: PagedFeed): PagedRead {
       if (hasNextPage && !isFetchingNextPage) {
         void fetchNextPage();
       }
+    },
+  };
+}
+
+/**
+ * Reads the articles someone else's list names, in the order it names them, as a feed.
+ *
+ * A list of none is a feed holding none, not a feed still loading: nothing is asked when there is nothing to ask
+ * about, so the answer would never come and the stand-in would turn for ever. There is no next page to reach: the
+ * whole list is one call, however long it is.
+ */
+export function useKeptFeed(ids: readonly ArticleId[]): ReadFeed {
+  const { data, status, refetch } = useQuery(keptQuery(ids));
+  return {
+    items: data ?? [],
+    state: ids.length === 0 ? 'empty' : stateOf(status),
+    retry: () => {
+      void refetch();
     },
   };
 }

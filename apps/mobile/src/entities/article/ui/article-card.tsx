@@ -10,7 +10,7 @@ import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
 import { HERO_RATIO, pictureOf } from '../model/picture';
 
-export type ArticleCardProps = Readonly<{ summary: ArticleSummary }>;
+export type ArticleCardProps = Readonly<{ summary: ArticleSummary; action?: ReactNode | undefined }>;
 
 /**
  * Whether a card tells the reader the item is reserved, access by access. The table answers for every access the
@@ -45,10 +45,20 @@ const useStyles = createStyles((theme) => ({
     backgroundColor: theme.border,
     marginBottom: SPACING.xs,
   },
+  // The date and whatever the screen does to the article share the last line, one at each end. A card that had it at
+  // one corner of its picture would lose it on the cards that carry none, and put it on the picture itself, where the
+  // screen it copies draws it in a colour that holds against a photograph but not against a dark ground.
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 }));
 
-/** One article as a feed announces it: its picture, who may read it, its title, the standfirst, and its date. */
-export function ArticleCard({ summary }: ArticleCardProps): ReactNode {
+/**
+ * One article as a feed announces it: its picture, who may read it, its title, the standfirst, and its date.
+ *
+ * `action` is whatever the screen lets a reader do to the article from the feed. The card takes it already made: an
+ * entity may not name a route nor hold an action of its own, and the screen that mounts the feed is the one that knows
+ * what doing anything to an article means there.
+ */
+export function ArticleCard({ summary, action }: ArticleCardProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'card');
   return (
@@ -63,7 +73,10 @@ export function ArticleCard({ summary }: ArticleCardProps): ReactNode {
       <Text variant="standfirst" numberOfLines={3}>
         {summary.standfirst}
       </Text>
-      <Text variant="caption">{formatDate(summary.publishedAt)}</Text>
+      <Box style={styles.footer}>
+        <Text variant="caption">{formatDate(summary.publishedAt)}</Text>
+        {action}
+      </Box>
     </Box>
   );
 }

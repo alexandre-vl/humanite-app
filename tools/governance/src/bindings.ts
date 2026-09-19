@@ -887,4 +887,24 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0024': {
+    scope: {
+      paths: ['apps/mobile/src/features/**', 'apps/mobile/src/shared/lib/storage/**'],
+    },
+    rules: {
+      R1: ['guardrail/module-zustand'],
+      R2: {
+        convention:
+          'La façade du stockage n’accepte qu’une clé du registre : son paramètre est typé sur les valeurs de la table, si bien qu’une clé écrite à la main ne compile pas, et le registre reste le seul endroit où lire ce que l’app pose sur le disque.',
+      },
+      R3: {
+        convention:
+          'Le middleware de persistance du magasin prend la version en paramètre obligatoire du format écrit : elle est relue à la restauration, et un format d’une autre version passe par la migration ou est écarté.',
+      },
+      R4: {
+        convention:
+          'Ce qui revient du disque est une chaîne quelconque : le magasin la repasse par l’analyseur marqué des contrats, identifiant par identifiant, et ne garde que ceux qui en ressortent — un disque modifié à la main ne peut donc pas placer dans le magasin une valeur que le reste de l’app croirait validée.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

@@ -272,6 +272,12 @@ export function TabIcons(): ReactNode {
       linted({ 'src/entities/article/model/open.ts': "export { router } from 'expo-router';\n" }),
     ),
     define(
+      'guardrail/module-zustand',
+      'une entité qui garde de son côté ce que le lecteur a fait',
+      ['module/zustand'],
+      linted({ 'src/entities/article/model/kept.ts': "export { create } from 'zustand';\n" }),
+    ),
+    define(
       'guardrail/route-params',
       'une page qui lit elle-même les paramètres de sa route',
       ['route/params'],

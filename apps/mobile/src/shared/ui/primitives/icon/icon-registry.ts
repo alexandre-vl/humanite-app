@@ -14,7 +14,10 @@ type IconSymbol = Readonly<{ ios: SFSymbol; android: AndroidSymbol }>;
  */
 export const ICONS = {
   account: { ios: 'person', android: 'person' },
-  bookmark: { ios: 'bookmark', android: 'bookmark' },
+  // The two states of one mark, outline then solid. The platforms name them the other way round from each other: an
+  // `ios` bookmark is the outline and Material's is the solid one, so the pair is spelt out rather than guessed.
+  bookmark: { ios: 'bookmark', android: 'bookmark_border' },
+  bookmarkKept: { ios: 'bookmark.fill', android: 'bookmark' },
   clear: { ios: 'xmark.circle.fill', android: 'cancel' },
   headline: { ios: 'house', android: 'home' },
   live: { ios: 'bolt', android: 'bolt' },

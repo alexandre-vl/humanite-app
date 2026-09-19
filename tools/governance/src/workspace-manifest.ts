@@ -110,6 +110,7 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     vitest: '5.0.0',
     yaml: '2.9.1',
     zod: '4.5.4',
+    zustand: '5.0.15',
   },
 };
 

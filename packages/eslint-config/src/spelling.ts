@@ -40,6 +40,7 @@ const WORDS = [
   'nosystem',
   'nsenter',
   'overpass',
+  'partialize',
   'pathspec',
   'pids',
   'pkexec',

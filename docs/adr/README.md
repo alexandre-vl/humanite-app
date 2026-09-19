@@ -31,6 +31,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 
 ## Confirmation
 
@@ -288,6 +289,17 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/routing/**`.
 | R1    | NE DOIT PAS | `guardrail/module-expo-router`                                                                                                                                                                                                                                 |
 | R2    | NE DOIT PAS | `guardrail/route-params`, `guardrail/route-params-exempt`                                                                                                                                                                                                      |
 | R3    | DOIT        | convention : Un identifiant du domaine est une chaîne marquée que seul l’analyseur des contrats produit : un écran qui en déclare un ne peut pas l’obtenir d’un paramètre brut, et la marque est inimitable puisque l’assertion de type est interdite partout. |
+
+### ADR-0024 · État du lecteur en magasin Zustand et format versionné
+
+Statut : proposé. Périmètre : `apps/mobile/src/features/**`, `apps/mobile/src/shared/lib/storage/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                   |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-zustand`                                                                                                                                                                                                                                                                                                |
+| R2    | DOIT        | convention : La façade du stockage n’accepte qu’une clé du registre : son paramètre est typé sur les valeurs de la table, si bien qu’une clé écrite à la main ne compile pas, et le registre reste le seul endroit où lire ce que l’app pose sur le disque.                                                               |
+| R3    | DOIT        | convention : Le middleware de persistance du magasin prend la version en paramètre obligatoire du format écrit : elle est relue à la restauration, et un format d’une autre version passe par la migration ou est écarté.                                                                                                 |
+| R4    | DOIT        | convention : Ce qui revient du disque est une chaîne quelconque : le magasin la repasse par l’analyseur marqué des contrats, identifiant par identifiant, et ne garde que ceux qui en ressortent — un disque modifié à la main ne peut donc pas placer dans le magasin une valeur que le reste de l’app croirait validée. |
 
 ## Référentiel
 
