@@ -1,7 +1,7 @@
 import { SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ArticleFeed, feedQuery } from '#entities/article';
+import { ArticleFeed, feedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar } from '#entities/section';
 import { t } from '#i18n';
 import { createStyles, useTheme } from '#lib/styles';
@@ -22,10 +22,11 @@ const useStyles = createStyles((theme) => ({
 export function HomePage(): ReactNode {
   const styles = useStyles();
   const theme = useTheme();
+  const feed = usePagedFeed(feedQuery);
   return (
     <Surface>
       <ArticleFeed
-        query={feedQuery}
+        feed={feed}
         onOpen={(id) => {
           router.push({ pathname: '/article/[id]', params: { id } });
         }}

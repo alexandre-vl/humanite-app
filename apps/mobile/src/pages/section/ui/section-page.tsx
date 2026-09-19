@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Stack, router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { EmptyState } from '#components/empty-state';
-import { ArticleFeed, sectionFeedQuery } from '#entities/article';
+import { ArticleFeed, sectionFeedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar, sectionsQuery } from '#entities/section';
 import { t } from '#i18n';
 import { useRouteParams } from '#lib/routing';
@@ -25,6 +25,7 @@ export function SectionPage(): ReactNode {
   const sections = useQuery(sectionsQuery).data;
   const section = sections?.find((one) => one.id === id) ?? null;
   const unknown = sections !== undefined && section === null;
+  const feed = usePagedFeed(sectionFeedQuery(id));
   return (
     <Surface>
       {section === null ? null : <Stack.Screen options={{ title: section.label }} />}
@@ -32,7 +33,7 @@ export function SectionPage(): ReactNode {
         <EmptyState title={t('section.unknown.title')} message={t('section.unknown.message')} />
       ) : (
         <ArticleFeed
-          query={sectionFeedQuery(id)}
+          feed={feed}
           onOpen={(article) => {
             router.push({ pathname: '/article/[id]', params: { id: article } });
           }}

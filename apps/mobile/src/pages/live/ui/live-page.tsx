@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ArticleWire, liveFeedQuery } from '#entities/article';
+import { ArticleWire, liveFeedQuery, usePagedFeed } from '#entities/article';
 import { createStyles } from '#lib/styles';
 import { Surface } from '#primitives/surface';
 
@@ -16,10 +16,11 @@ const useStyles = createStyles((theme) => ({
  */
 export function LivePage(): ReactNode {
   const styles = useStyles();
+  const feed = usePagedFeed(liveFeedQuery);
   return (
     <Surface style={styles.wire}>
       <ArticleWire
-        query={liveFeedQuery}
+        feed={feed}
         onOpen={(id) => {
           router.push({ pathname: '/article/[id]', params: { id } });
         }}

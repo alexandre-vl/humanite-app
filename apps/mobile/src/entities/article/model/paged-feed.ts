@@ -28,10 +28,12 @@ export type ReadFeed = Readonly<{
 }>;
 
 /**
- * Reads a paged feed. Both the card feed and the wire read one, and they read it the same way: the pages already
- * fetched, flattened; one more asked for as the end comes near, and only when one is left to ask for and none is on
- * its way. Written once so the two screens cannot drift on when a reader is told the feed is empty, or on when the
- * next page is asked for.
+ * Reads a paged feed. Every screen that shows one reads it this way: the pages already fetched, flattened; one more
+ * asked for as the end comes near, and only when one is left to ask for and none is on its way. Written once so no two
+ * screens drift on when a reader is told the feed is empty, or on when the next page is asked for.
+ *
+ * The screen reads it, not the view it hands it to. A view that read its own feed would be the only one to know what
+ * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
 export function usePagedFeed(query: PagedFeed): ReadFeed {
   const { data, status, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);

@@ -1,14 +1,21 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import type { ReactNode } from 'react';
 import { content } from '#api';
 import { feedQuery } from '../api/queries';
+import { usePagedFeed } from '../model/paged-feed';
 import { ArticleFeed } from './article-feed';
+
+/** What a screen does with a feed, in miniature: it reads it, then hands it to the view that shows it. */
+function Screen({ onOpen }: Readonly<{ onOpen: (id: string) => void }>): ReactNode {
+  return <ArticleFeed feed={usePagedFeed(feedQuery)} onOpen={onOpen} />;
+}
 
 const mounted = async (onOpen: (id: string) => void): Promise<void> => {
   await render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0 } } })}>
-      <ArticleFeed query={feedQuery} onOpen={onOpen} />
+      <Screen onOpen={onOpen} />
     </QueryClientProvider>,
   );
   // A virtualised list reports its first layout in an animation frame, which jest runs as a timer: flushing one

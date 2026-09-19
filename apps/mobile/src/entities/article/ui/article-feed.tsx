@@ -5,13 +5,12 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
-import type { PagedFeed } from '../api/queries';
-import { usePagedFeed } from '../model/paged-feed';
+import type { ReadFeed } from '../model/paged-feed';
 import { ArticleCard, shapeOf } from './article-card';
 import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleFeedProps = Readonly<{
-  query: PagedFeed;
+  feed: ReadFeed;
   onOpen: (id: ArticleId) => void;
   header?: ReactNode;
   sticky?: ReactNode;
@@ -28,9 +27,8 @@ const useStyles = createStyles(() => ({
  * It reports which article was pressed and goes nowhere itself: an entity may not name a route, and the screen that
  * mounts the feed is the one that knows what opening an article means for it.
  */
-export function ArticleFeed({ query, onOpen, header, sticky }: ArticleFeedProps): ReactNode {
+export function ArticleFeed({ feed, onOpen, header, sticky }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
-  const feed = usePagedFeed(query);
   return (
     <List
       items={feed.items}

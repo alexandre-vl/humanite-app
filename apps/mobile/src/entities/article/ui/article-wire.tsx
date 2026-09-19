@@ -5,8 +5,7 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
-import type { PagedFeed } from '../api/queries';
-import { usePagedFeed } from '../model/paged-feed';
+import type { ReadFeed } from '../model/paged-feed';
 import type { WireRow as Row } from '../model/wire';
 import { rowKey, rowKind, rowPins, wireRows } from '../model/wire';
 import { FeedStandIn } from './feed-stand-in';
@@ -14,7 +13,7 @@ import { WireDay } from './wire-day';
 import { WireHero } from './wire-hero';
 import { WireRow } from './wire-row';
 
-export type ArticleWireProps = Readonly<{ query: PagedFeed; onOpen: (id: ArticleId) => void }>;
+export type ArticleWireProps = Readonly<{ feed: ReadFeed; onOpen: (id: ArticleId) => void }>;
 
 const useStyles = createStyles(() => ({
   wire: { paddingBottom: SPACING.xl },
@@ -28,9 +27,8 @@ const useStyles = createStyles(() => ({
  * The days are worked out over the pages already read rather than page by page: a page holds whatever twelve items the
  * cursor reached, and a day begins and ends wherever it does, never on a page boundary.
  */
-export function ArticleWire({ query, onOpen }: ArticleWireProps): ReactNode {
+export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
   const styles = useStyles();
-  const feed = usePagedFeed(query);
   const rows = wireRows(feed.items);
   const open = (id: ArticleId) => () => {
     onOpen(id);
