@@ -1,11 +1,13 @@
 import { describe, expect, test } from 'vitest';
-import { contrastRatio, DARK_THEME, LIGHT_THEME, THEMES } from './index.ts';
-import type { Theme } from './index.ts';
+import { contrastRatio, PALETTE, THEMES } from './index.ts';
+import type { Color, Theme } from './index.ts';
 
-const themes: readonly (readonly [string, Theme])[] = [
-  ['light', LIGHT_THEME],
-  ['dark', DARK_THEME],
-];
+/** Every theme the tokens publish, read from the table instead of listed again beside it. */
+const themes: readonly (readonly [string, Theme])[] = Object.entries(THEMES);
+
+test('the tokens publish a light and a dark theme', () => {
+  expect(Object.keys(THEMES)).toEqual(['light', 'dark']);
+});
 
 describe.each(themes)('%s theme', (name, theme) => {
   test(`${name}: primary text meets WCAG AA against the background`, () => {
@@ -15,9 +17,15 @@ describe.each(themes)('%s theme', (name, theme) => {
   test(`${name}: muted text meets WCAG AA for large text against the background`, () => {
     expect(contrastRatio(theme.textMuted, theme.background)).toBeGreaterThanOrEqual(3);
   });
-});
 
-test('THEMES holds the light and dark themes', () => {
-  expect(THEMES.light).toBe(LIGHT_THEME);
-  expect(THEMES.dark).toBe(DARK_THEME);
+  test(`${name}: text on the primary colour meets WCAG AA for large text`, () => {
+    expect(contrastRatio(theme.onPrimary, theme.primary)).toBeGreaterThanOrEqual(3);
+  });
+
+  test(`${name}: every colour it paints with is named in the palette`, () => {
+    const named = new Set<Color>(Object.values(PALETTE));
+    for (const [role, value] of Object.entries(theme)) {
+      expect(named, role).toContain(value);
+    }
+  });
 });

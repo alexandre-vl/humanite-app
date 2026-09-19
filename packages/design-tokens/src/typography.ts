@@ -2,7 +2,7 @@ import type { FontFamily, FontSize, LineHeight } from './brand.ts';
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from './tokens.ts';
 
 /** The theme colour a run of text paints with: a subset of the theme's colour roles, named where a text style is set. */
-export type TextTone = 'textPrimary' | 'textMuted' | 'textInverse' | 'primary';
+export type TextTone = 'textPrimary' | 'textMuted' | 'onPrimary' | 'primary';
 
 /** A named text style: a face, a size, a line-height multiple and the tone it paints with unless a caller overrides it. */
 type Typography = Readonly<{ family: FontFamily; size: FontSize; leading: LineHeight; tone: TextTone }>;

@@ -5,7 +5,7 @@ import type { TextTone, TextVariant } from './typography.ts';
 import { TEXT_VARIANTS, TYPOGRAPHY } from './typography.ts';
 
 /** The colour roles a text may take, each proven a real key of the theme by the `satisfies`. */
-const TONE_ROLES = ['textPrimary', 'textMuted', 'textInverse', 'primary'] as const satisfies readonly (keyof Theme)[];
+const TONE_ROLES = ['textPrimary', 'textMuted', 'onPrimary', 'primary'] as const satisfies readonly (keyof Theme)[];
 
 test('the text tones are exactly the theme colour roles a text may take', () => {
   expectTypeOf<TextTone>().toEqualTypeOf<(typeof TONE_ROLES)[number]>();

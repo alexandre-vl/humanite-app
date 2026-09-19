@@ -22,7 +22,7 @@ export function Button({ label, onPress }: ButtonProps): ReactNode {
   const styles = useStyles();
   return (
     <Pressable style={styles.button} onPress={onPress}>
-      <Text variant="label" tone="textInverse">
+      <Text variant="label" tone="onPrimary">
         {label}
       </Text>
     </Pressable>

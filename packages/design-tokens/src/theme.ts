@@ -1,15 +1,20 @@
 import type { Color } from './brand.ts';
-import { color } from './brand.ts';
 import { PALETTE } from './palette.ts';
 
-/** The semantic colour roles a screen paints with, one value per theme. */
+/**
+ * The semantic colour roles a screen paints with, one value per theme.
+ *
+ * `onPrimary` is the text a screen lays on `primary`: the wire of En continu paints its whole ground in it, and a
+ * button its pill. Both themes give it the same value, because `primary` itself is the same red in both — a surface
+ * that does not change between themes cannot ask for two different texts on it.
+ */
 export type Theme = Readonly<{
   background: Color;
   surface: Color;
   card: Color;
   textPrimary: Color;
   textMuted: Color;
-  textInverse: Color;
+  onPrimary: Color;
   primary: Color;
   premium: Color;
   border: Color;
@@ -20,10 +25,10 @@ export type Theme = Readonly<{
 export const LIGHT_THEME = {
   background: PALETTE.white,
   surface: PALETTE.white,
-  card: PALETTE.cardGrey,
+  card: PALETTE.paleGrey,
   textPrimary: PALETTE.aubergine,
   textMuted: PALETTE.dateGrey,
-  textInverse: PALETTE.white,
+  onPrimary: PALETTE.white,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
@@ -33,14 +38,14 @@ export const LIGHT_THEME = {
 /** The dark theme, derived from the measured dark background #141414. */
 export const DARK_THEME = {
   background: PALETTE.darkBackground,
-  surface: color('#1e1e1e'),
-  card: color('#242424'),
-  textPrimary: color('#f5f5f5'),
-  textMuted: color('#b0a8b6'),
-  textInverse: PALETTE.aubergine,
+  surface: PALETTE.darkSurface,
+  card: PALETTE.darkCard,
+  textPrimary: PALETTE.paleGrey,
+  textMuted: PALETTE.darkMuted,
+  onPrimary: PALETTE.white,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
-  border: color('#333333'),
+  border: PALETTE.darkBorder,
   systemBar: PALETTE.darkBackground,
 } as const satisfies Theme;
 
