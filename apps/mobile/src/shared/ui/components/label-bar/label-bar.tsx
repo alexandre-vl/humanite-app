@@ -1,0 +1,54 @@
+import type { DisplayText } from '@huma/contracts';
+import { SPACING } from '@huma/design-tokens';
+import type { ReactNode } from 'react';
+import { createStyles } from '../../../lib/styles';
+import { Box } from '../../primitives/box';
+import { Pressable } from '../../primitives/pressable';
+import { Scroll } from '../../primitives/scroll';
+import { Text } from '../../primitives/text';
+
+/** One choice in a band: what it is called, and what the band reports when it is chosen. */
+export type LabelBarItem<Id extends string> = Readonly<{ id: Id; label: DisplayText }>;
+
+export type LabelBarProps<Id extends string> = Readonly<{
+  items: readonly LabelBarItem<Id>[];
+  active?: Id | undefined;
+  onSelect: (id: Id) => void;
+}>;
+
+const useStyles = createStyles((theme) => ({
+  bar: { flex: 1, backgroundColor: theme.surface },
+  labels: { alignItems: 'flex-end', paddingHorizontal: SPACING.sm },
+  label: { paddingHorizontal: SPACING.md, paddingTop: SPACING.sm },
+  // The rule under a choice is drawn whether or not it is the one showing, in the ground's own colour when it is not:
+  // a rule that appeared would push every label up by its own height the moment a choice was made.
+  rule: { height: SPACING.xs, backgroundColor: theme.surface },
+  ruleActive: { height: SPACING.xs, backgroundColor: theme.primary },
+}));
+
+/**
+ * A band of choices that scrolls across the screen, naming the one showing with a rule under its label.
+ *
+ * It reports a tap and goes nowhere itself, so a screen may make choosing mean whatever it means there: opening
+ * another screen, replacing the one being read, or swapping what this one shows. The identifiers keep their own type
+ * through it, so a band of sections reports a section and nothing else.
+ */
+export function LabelBar<Id extends string>({ items, active, onSelect }: LabelBarProps<Id>): ReactNode {
+  const styles = useStyles();
+  return (
+    <Scroll axis="horizontal" style={styles.bar} contentStyle={styles.labels}>
+      {items.map((item) => (
+        <Pressable
+          key={item.id}
+          style={styles.label}
+          onPress={() => {
+            onSelect(item.id);
+          }}
+        >
+          <Text variant="label">{item.label}</Text>
+          <Box style={styles[item.id === active ? 'ruleActive' : 'rule']} />
+        </Pressable>
+      ))}
+    </Scroll>
+  );
+}

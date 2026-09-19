@@ -49,9 +49,11 @@ test('the paper is laid at a turn to the left, written as React Native reads it'
   expect(() => angle(Number.NaN)).toThrow(/angle invalide/u);
 });
 
-test('sizes give the collapsible header its bands and the scroll inset they add up to', () => {
+test('sizes give a list its bands and the scroll inset each arrangement adds up to', () => {
   expect(SIZES.headerExpanded).toBe(64);
-  expect(SIZES.sectionBar).toBe(40);
-  expect(SIZES.headerBlock).toBe(SIZES.headerExpanded + SIZES.sectionBar);
-  expectTypeOf(SIZES.headerBlock).toEqualTypeOf<Space>();
+  expect(SIZES.band).toBe(40);
+  expect(SIZES.bandPair).toBe(SIZES.band * 2);
+  expect(SIZES.headerBand).toBe(SIZES.headerExpanded + SIZES.band);
+  expect(SIZES.headerBandPair).toBe(SIZES.headerExpanded + SIZES.bandPair);
+  expectTypeOf(SIZES.headerBandPair).toEqualTypeOf<Space>();
 });

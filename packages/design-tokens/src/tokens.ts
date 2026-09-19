@@ -60,18 +60,24 @@ export const FONT_FAMILIES = {
 } as const satisfies Readonly<{ body: Readonly<Record<string, FontFamily>>; display: FontFamily }>;
 
 /**
- * Component sizes in points: the collapsible header's expanded and collapsed bands, its sticky section bar, and the
- * scroll inset those add up to — heights the four-point SPACING grid does not reach. `stroke` is the rule the paper
- * draws where it draws one — the line a timeline hangs its items from, the line a field is typed on — and `ring` the
- * hollow mark on it: both finer than the grid's smallest step.
+ * Component sizes in points — heights the four-point SPACING grid does not reach.
+ *
+ * A list lays its own bands: a masthead that slides away as it scrolls, from `headerExpanded` down to
+ * `headerCollapsed`, and under it a strip that stays, of one `band` or of two stacked. The scroll inset each
+ * arrangement adds up to is named too, because a style table is built once and cannot add.
+ *
+ * `stroke` is the rule the paper draws where it draws one — the line a timeline hangs its items from, the line a field
+ * is typed on — and `ring` the hollow mark on it: both finer than the grid's smallest step.
  */
 const HEADER_EXPANDED = 64;
-const SECTION_BAR = 40;
+const BAND = 40;
 export const SIZES = {
   headerExpanded: space(HEADER_EXPANDED),
   headerCollapsed: space(0),
-  sectionBar: space(SECTION_BAR),
-  headerBlock: space(HEADER_EXPANDED + SECTION_BAR),
+  band: space(BAND),
+  bandPair: space(BAND * 2),
+  headerBand: space(HEADER_EXPANDED + BAND),
+  headerBandPair: space(HEADER_EXPANDED + BAND * 2),
   stroke: space(2),
   ring: space(12),
 } as const satisfies Readonly<Record<string, Space>>;

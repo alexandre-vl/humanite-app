@@ -20,11 +20,31 @@ type ListCore<Item> = Readonly<{
   contentStyle?: StyleRef;
 }>;
 
-/** Bands the list draws over its own content: a masthead that slides away, a strip that stays under it. */
-type WithBands = Readonly<{ header?: ReactNode; sticky?: ReactNode; pinned?: undefined }>;
+/**
+ * How many rows the strip that stays takes, each one `SIZES.band` tall. The list draws the strip and insets its own
+ * content by exactly its height, so it has to be told: a band is composed by the screen, and what a screen puts in one
+ * is not something a list can see.
+ */
+type BandRows = 1 | 2;
+
+/**
+ * Bands the list draws over its own content: a masthead that slides away, a strip that stays under it, and how many
+ * rows that strip takes — one unless it says otherwise, which is what a strip of one kind of thing takes.
+ */
+type WithBands = Readonly<{
+  header?: ReactNode;
+  sticky?: ReactNode;
+  stickyRows?: BandRows | undefined;
+  pinned?: undefined;
+}>;
 
 /** Items of the data that stay at the top while the run they open scrolls past. */
-type WithPinned<Item> = Readonly<{ header?: undefined; sticky?: undefined; pinned: (item: Item) => boolean }>;
+type WithPinned<Item> = Readonly<{
+  header?: undefined;
+  sticky?: undefined;
+  stickyRows?: undefined;
+  pinned: (item: Item) => boolean;
+}>;
 
 /**
  * A list either draws bands of its own or pins items of its data, never both: the pinned item is laid at the very top
@@ -46,8 +66,10 @@ const useStyles = createStyles(() => ({
   fill: { flex: 1 },
   flush: { paddingTop: SPACING.none },
   underHeader: { paddingTop: SIZES.headerExpanded },
-  underSticky: { paddingTop: SIZES.sectionBar },
-  underBoth: { paddingTop: SIZES.headerBlock },
+  underBand: { paddingTop: SIZES.band },
+  underBandPair: { paddingTop: SIZES.bandPair },
+  underHeaderBand: { paddingTop: SIZES.headerBand },
+  underHeaderBandPair: { paddingTop: SIZES.headerBandPair },
   masthead: {
     position: 'absolute',
     top: SPACING.none,
@@ -56,46 +78,59 @@ const useStyles = createStyles(() => ({
     height: SIZES.headerExpanded,
     overflow: 'hidden',
   },
-  stickyUnderHeader: {
+  bandUnderHeader: {
     position: 'absolute',
     top: SIZES.headerExpanded,
     left: SPACING.none,
     right: SPACING.none,
-    height: SIZES.sectionBar,
+    height: SIZES.band,
   },
-  stickyAtTop: {
+  bandPairUnderHeader: {
+    position: 'absolute',
+    top: SIZES.headerExpanded,
+    left: SPACING.none,
+    right: SPACING.none,
+    height: SIZES.bandPair,
+  },
+  bandAtTop: {
     position: 'absolute',
     top: SPACING.none,
     left: SPACING.none,
     right: SPACING.none,
-    height: SIZES.sectionBar,
+    height: SIZES.band,
+  },
+  bandPairAtTop: {
+    position: 'absolute',
+    top: SPACING.none,
+    left: SPACING.none,
+    right: SPACING.none,
+    height: SIZES.bandPair,
   },
 }));
 
 /**
- * The inset the scrolled content needs: each band the list carries hides its own height at the top. It takes the bands
- * by name rather than two flags in a row, which nothing would stop a caller from handing over the wrong way round.
+ * The inset the scrolled content needs, and where the strip that stays is laid, for each arrangement of bands: each
+ * band hides its own height at the top. Two tables rather than a chain of conditions, because a style table is built
+ * once per theme and cannot add two heights together at the moment it is read.
  */
-const insetOf = (
-  bands: Readonly<{ header: boolean; sticky: boolean }>,
-): 'flush' | 'underHeader' | 'underSticky' | 'underBoth' => {
-  if (bands.header && bands.sticky) {
-    return 'underBoth';
-  }
-  if (bands.header) {
-    return 'underHeader';
-  }
-  if (bands.sticky) {
-    return 'underSticky';
-  }
-  return 'flush';
-};
+const INSETS = {
+  bare: { none: 'flush', 1: 'underBand', 2: 'underBandPair' },
+  header: { none: 'underHeader', 1: 'underHeaderBand', 2: 'underHeaderBandPair' },
+} as const;
+
+const BANDS = {
+  bare: { 1: 'bandAtTop', 2: 'bandPairAtTop' },
+  header: { 1: 'bandUnderHeader', 2: 'bandPairUnderHeader' },
+} as const;
 
 /**
  * A virtualised list, under an optional `header` band that fades and slides away as it scrolls and an optional `sticky`
- * band that stays pinned. The bands live here rather than in a header primitive of their own because a screen may hold
- * only one scrolling region — two would fight for the gesture and neither would recycle — and because a primitive may
- * not import another primitive, so whoever owns the scroll must also own what reacts to it.
+ * band that stays pinned, of `stickyRows` rows. The bands live here rather than in a header primitive of their own
+ * because a screen may hold only one scrolling region — two would fight for the gesture and neither would recycle —
+ * and because a primitive may not import another primitive, so whoever owns the scroll must also own what reacts to it.
+ *
+ * What goes in a band is the screen's, its height is not: the list insets its own content by exactly what the bands
+ * hide, and a band it measured for itself would be a band it had to render before it could lay anything out.
  *
  * The scroll offset arrives on the JavaScript thread: the list replaces the scroll handler of the view it renders with
  * its own (`@shopify/flash-list/dist/recyclerview/RecyclerView.js`, the `CompatScrollView` element), and calls ours back
@@ -122,6 +157,7 @@ export function List<Item>({
   empty,
   header,
   sticky,
+  stickyRows = 1,
   onEndReached,
   contentStyle,
 }: ListProps<Item>): ReactNode {
@@ -132,6 +168,10 @@ export function List<Item>({
   );
   const scrollY = useSharedValue(0);
   const hasHeader = header !== undefined;
+  const above = hasHeader ? 'header' : 'bare';
+  // The inset is read off the band actually handed over, never off the row count alone: a count given without a band
+  // would otherwise push the content down under nothing at all.
+  const rows = sticky === undefined ? 'none' : stickyRows;
   // What the header gives back as it collapses, and therefore how far the band under it follows: nothing at all when
   // the list carries no header, since a band that follows nothing has nowhere to go.
   const slide = hasHeader ? DISTANCE : 0;
@@ -152,7 +192,7 @@ export function List<Item>({
         renderItem={(info) => <>{renderItem(info.item)}</>}
         stickyHeaderIndices={pinnedPlaces}
         ListEmptyComponent={<>{empty}</>}
-        contentContainerStyle={[styles[insetOf({ header: hasHeader, sticky: sticky !== undefined })], contentStyle]}
+        contentContainerStyle={[styles[INSETS[above][rows]], contentStyle]}
         onEndReached={onEndReached}
         onEndReachedThreshold={END_THRESHOLD}
         onScroll={(event) => {
@@ -162,9 +202,7 @@ export function List<Item>({
       />
       {header === undefined ? null : <Animated.View style={[styles.masthead, mastheadStyle]}>{header}</Animated.View>}
       {sticky === undefined ? null : (
-        <Animated.View style={[styles[hasHeader ? 'stickyUnderHeader' : 'stickyAtTop'], stickyStyle]}>
-          {sticky}
-        </Animated.View>
+        <Animated.View style={[styles[BANDS[above][stickyRows]], stickyStyle]}>{sticky}</Animated.View>
       )}
     </Animated.View>
   );

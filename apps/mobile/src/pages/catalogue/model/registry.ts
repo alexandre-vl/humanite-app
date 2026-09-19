@@ -10,6 +10,7 @@ import { catalog as badgeCatalog } from '#components/badge';
 import { catalog as buttonCatalog } from '#components/button';
 import { catalog as chipCatalog } from '#components/chip';
 import { catalog as emptyStateCatalog } from '#components/empty-state';
+import { catalog as labelBarCatalog } from '#components/label-bar';
 import { catalog as paperCatalog } from '#components/paper';
 import { catalog as sectionTitleCatalog } from '#components/section-title';
 import { catalog as skeletonCatalog } from '#components/skeleton';
@@ -29,6 +30,7 @@ export const REGISTRY: readonly CatalogItem[] = [
   { level: 'L1', entry: buttonCatalog },
   { level: 'L1', entry: chipCatalog },
   { level: 'L1', entry: emptyStateCatalog },
+  { level: 'L1', entry: labelBarCatalog },
   { level: 'L1', entry: paperCatalog },
   { level: 'L1', entry: sectionTitleCatalog },
   { level: 'L1', entry: skeletonCatalog },
