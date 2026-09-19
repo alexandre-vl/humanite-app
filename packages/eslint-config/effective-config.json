@@ -3183,6 +3183,113 @@
                 },
                 {
                   "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "@huma/mock-content"
+                  }
+                }
+              },
+              "message": "[module/@huma/mock-content] @huma/mock-content ne s’importe que depuis : api"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
                     "type": "lib"
                   }
                 },
@@ -4569,6 +4676,10 @@
         {
           "selector": "ImportDeclaration[source.value='@huma/mock-api'] > ImportNamespaceSpecifier",
           "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='@huma/mock-content'] > ImportNamespaceSpecifier",
+          "message": "[module/@huma/mock-content] @huma/mock-content ne s’importe que depuis : api"
         },
         {
           "selector": "ImportDeclaration[source.value='@shopify/flash-list'] > ImportNamespaceSpecifier",
@@ -6282,6 +6393,113 @@
                 },
                 {
                   "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "@huma/mock-content"
+                  }
+                }
+              },
+              "message": "[module/@huma/mock-content] @huma/mock-content ne s’importe que depuis : api"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
                     "type": "lib"
                   }
                 },
@@ -7671,6 +7889,10 @@
         {
           "selector": "ImportDeclaration[source.value='@huma/mock-api'] > ImportNamespaceSpecifier",
           "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='@huma/mock-content'] > ImportNamespaceSpecifier",
+          "message": "[module/@huma/mock-content] @huma/mock-content ne s’importe que depuis : api"
         },
         {
           "selector": "ImportDeclaration[source.value='@shopify/flash-list'] > ImportNamespaceSpecifier",
@@ -9380,6 +9602,113 @@
                 },
                 {
                   "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "@huma/mock-content"
+                  }
+                }
+              },
+              "message": "[module/@huma/mock-content] @huma/mock-content ne s’importe que depuis : api"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
                     "type": "lib"
                   }
                 },
@@ -10769,6 +11098,10 @@
         {
           "selector": "ImportDeclaration[source.value='@huma/mock-api'] > ImportNamespaceSpecifier",
           "message": "[module/@huma/mock-api] @huma/mock-api ne s’importe que depuis : api"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='@huma/mock-content'] > ImportNamespaceSpecifier",
+          "message": "[module/@huma/mock-content] @huma/mock-content ne s’importe que depuis : api"
         },
         {
           "selector": "ImportDeclaration[source.value='@shopify/flash-list'] > ImportNamespaceSpecifier",

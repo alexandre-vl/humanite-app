@@ -5,14 +5,14 @@ import { asDisplayText } from '../../../lib/display-text';
 import { createStyles } from '../../../lib/styles';
 import { Image } from './image';
 
-// A BlurHash literal: a real image surface with no network fetch and no bundled binary.
-const DEMO = 'L6Pj0^jE.AyE_3t7t7R**0o#DgR4';
+/** The thumbhash of a real picture of the corpus: what a card paints while its illustration loads. */
+const DEMO = '0lYGDIJ4mXZ/h3h2d4VXgIf7hw==';
 
 const useStyles = createStyles(() => ({ demo: { width: SIZES.headerExpanded, height: SIZES.headerExpanded } }));
 
 function ImageDemo(): ReactNode {
   const styles = useStyles();
-  return <Image source={{ blurhash: DEMO }} style={styles.demo} />;
+  return <Image source={{ thumbhash: DEMO }} style={styles.demo} />;
 }
 
 export const catalog: CatalogEntry = {

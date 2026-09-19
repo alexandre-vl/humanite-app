@@ -189,6 +189,7 @@ type ModulePolicy = Readonly<{
  */
 export const MODULES = {
   '@huma/mock-api': { places: ['api'], except: [] },
+  '@huma/mock-content': { places: ['api'], except: [] },
   '@shopify/flash-list': { places: ['primitive'], except: [] },
   'expo-font': { places: ['app'], except: [] },
   'expo-image': { places: ['primitive'], except: [] },

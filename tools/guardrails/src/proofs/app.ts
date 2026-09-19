@@ -204,6 +204,12 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/content.ts': "export { contentApi } from '@huma/mock-api';\n" }),
     ),
     define(
+      'guardrail/module-huma-mock-content',
+      'une page qui lit le corpus simulé sans passer par la place api',
+      ['module/@huma/mock-content'],
+      linted({ 'src/pages/home/model/corpus.ts': "export { CORPUS } from '@huma/mock-content';\n" }),
+    ),
+    define(
       'guardrail/module-expo-splash-screen',
       'une page qui pilote le splash',
       ['module/expo-splash-screen'],

@@ -65,4 +65,5 @@ Option retenue : « Une porte unique et des requêtes par entité », parce qu�
 
 - Le plugin de lint du client de requêtes est classé règle par règle ; une règle de plus dans une version suivante fait échouer la configuration au lieu d’entrer sans être lue (`packages/eslint-config/src/query.ts`).
 - Les curseurs restent opaques : une requête n’en fabrique aucun, elle rend celui que la page précédente a donné (`packages/contracts/src/page.ts`).
+- Les visuels passent par la même porte : le corpus expose un registre d’imports statiques que l’empaqueteur résout, et la place `api` seule le lit pour rendre, d’une clé d’image, le module et son thumbhash (`packages/mock-content/src/assets.ts`).
 - Réévaluation : un service distant remplace le contenu simulé, ou la pagination cesse de reposer sur un curseur.

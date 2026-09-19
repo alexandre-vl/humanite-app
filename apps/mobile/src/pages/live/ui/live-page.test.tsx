@@ -10,8 +10,9 @@ describe('LivePage', () => {
         <LivePage />
       </QueryClientProvider>,
     );
-    // A virtualised list reports its first layout after the render returns; flushing keeps that update inside act.
-    await act(async () => Promise.resolve());
+    // A virtualised list reports its first layout in an animation frame, which jest runs as a timer: flushing one
+    // keeps that update inside act.
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
     expect(await screen.findByText('En continu')).toBeTruthy();
   });
 });

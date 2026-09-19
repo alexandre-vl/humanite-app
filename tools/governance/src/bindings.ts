@@ -859,7 +859,7 @@ export const BINDINGS = {
       paths: ['apps/mobile/src/shared/api/**', 'apps/mobile/src/entities/**', 'packages/eslint-config/src/query.ts'],
     },
     rules: {
-      R1: ['guardrail/module-huma-mock-api'],
+      R1: ['guardrail/module-huma-mock-api', 'guardrail/module-huma-mock-content'],
       R2: ['guardrail/query-options', 'guardrail/query-options-exempt'],
     },
   },

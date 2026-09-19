@@ -264,10 +264,10 @@ Statut : proposé. Périmètre : `packages/mock-content/**`, `packages/mock-api/
 
 Statut : proposé. Périmètre : `apps/mobile/src/shared/api/**`, `apps/mobile/src/entities/**`, `packages/eslint-config/src/query.ts`.
 
-| Règle | Niveau      | Preuves                                                     |
-| ----- | ----------- | ----------------------------------------------------------- |
-| R1    | NE DOIT PAS | `guardrail/module-huma-mock-api`                            |
-| R2    | DOIT        | `guardrail/query-options`, `guardrail/query-options-exempt` |
+| Règle | Niveau      | Preuves                                                                |
+| ----- | ----------- | ---------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-huma-mock-api`, `guardrail/module-huma-mock-content` |
+| R2    | DOIT        | `guardrail/query-options`, `guardrail/query-options-exempt`            |
 
 ### ADR-0022 · Liste virtualisée native derrière une primitive
 

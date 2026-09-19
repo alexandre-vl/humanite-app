@@ -5,6 +5,7 @@
   "references": [
     { "path": "../../packages/contracts" },
     { "path": "../../packages/design-tokens" },
-    { "path": "../../packages/mock-api" }
+    { "path": "../../packages/mock-api" },
+    { "path": "../../packages/mock-content" }
   ]
 }

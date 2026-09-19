@@ -14,8 +14,9 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    // A virtualised list reports its first layout after the render returns; flushing keeps that update inside act.
-    await act(async () => Promise.resolve());
+    // A virtualised list reports its first layout in an animation frame, which jest runs as a timer: flushing one
+    // keeps that update inside act.
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
     expect(screen.getByTestId('header')).toBeTruthy();
     expect(screen.getByTestId('sticky')).toBeTruthy();
     expect(await screen.findByTestId('un')).toBeTruthy();
