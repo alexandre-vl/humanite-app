@@ -192,6 +192,7 @@ export const MODULES = {
   '@huma/mock-content': { places: ['api'], except: [] },
   '@shopify/flash-list': { places: ['primitive'], except: [] },
   'expo-font': { places: ['app'], except: [] },
+  'expo-router': { places: ['app', 'lib', 'page'], except: [] },
   'expo-image': { places: ['primitive'], except: [] },
   'expo-splash-screen': { places: ['app'], except: [] },
   'expo-symbols': { places: ['primitive'], except: [] },

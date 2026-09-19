@@ -8,6 +8,7 @@ export {
   packageImports,
   QUERY_FILES,
   ROUTE_FILES,
+  ROUTING_FILES,
   THEME_FILES,
 } from './app.ts';
 export type { ConfinedModule, Place, PlaceSpec } from './places.ts';

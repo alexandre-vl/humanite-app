@@ -70,6 +70,13 @@ export const THEME_FILES: readonly string[] = [
 export const QUERY_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.entity.directory}/*/api/*.ts`];
 
 /**
+ * Where the parameters of a route are read, as globs relative to the workspace root: the routing module of the shared
+ * layer. These files alone name the reader Expo Router offers, so a screen receives values an analyser of the contracts
+ * has read rather than the strings a route hands over.
+ */
+export const ROUTING_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.lib.directory}/routing/*.ts`];
+
+/**
  * The `imports` field of the app's `package.json`: one `#` alias per importable place, pointing at public entries only,
  * so a file behind an entry cannot even be resolved from outside its slice or module (journal 0a, correction 12).
  */

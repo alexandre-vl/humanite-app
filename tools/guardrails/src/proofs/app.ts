@@ -235,9 +235,9 @@ export function useOpacity(): number {
     ),
     define(
       'guardrail/nav-js-tabs',
-      'une page qui compose la barre par les onglets JS',
+      'la couche app, qui compose la barre par les onglets JS',
       ['nav/js-tabs'],
-      linted({ 'src/pages/home/ui/home-page.tsx': component('HomePage', 'expo-router/js-tabs', 'Tabs') }),
+      linted({ 'src/_app/routes/tabs-layout.tsx': component('TabsLayout', 'expo-router/js-tabs', 'Tabs') }),
     ),
     define(
       'guardrail/query-options',
@@ -250,6 +250,24 @@ export function useOpacity(): number {
       'le segment api d’une entité, le seul lieu qui déclare une requête',
       [],
       linted({ 'src/entities/article/api/queries.ts': queryModule('articleQuery') }),
+    ),
+    define(
+      'guardrail/module-expo-router',
+      'une entité qui pousse elle-même un écran sur la pile',
+      ['module/expo-router'],
+      linted({ 'src/entities/article/model/open.ts': "export { router } from 'expo-router';\n" }),
+    ),
+    define(
+      'guardrail/route-params',
+      'une page qui lit elle-même les paramètres de sa route',
+      ['route/params'],
+      linted({ 'src/pages/home/model/params.ts': "export { useLocalSearchParams } from 'expo-router';\n" }),
+    ),
+    define(
+      'guardrail/route-params-exempt',
+      'le module de routage, le seul lieu qui lit les paramètres d’une route',
+      [],
+      linted({ 'src/shared/lib/routing/routing.ts': "export { useLocalSearchParams } from 'expo-router';\n" }),
     ),
     define(
       'guardrail/route-re-export',

@@ -8,6 +8,7 @@ import {
   HERMES_GAP_NAMES,
   HERMES_GAPS,
   QUERY_FILES,
+  ROUTING_FILES,
   ROUTE_FILES,
   THEME_FILES,
 } from '@huma/architecture';
@@ -105,6 +106,21 @@ const QUERY_SYNTAX: readonly SyntaxRestriction[] = [
   {
     policy: 'query/options',
     selector: String.raw`ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]`,
+  },
+];
+
+/**
+ * A route hands over strings: the routing module alone reads them, and a screen takes what an analyser gives back.
+ * Re-exporting the reader is restricted beside importing it, since a module that passes it on launders it just as well.
+ */
+const ROUTE_PARAMS_SYNTAX: readonly SyntaxRestriction[] = [
+  {
+    policy: 'route/params',
+    selector: String.raw`ImportDeclaration[source.value=/^expo-router(?:\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]`,
+  },
+  {
+    policy: 'route/params',
+    selector: String.raw`ExportNamedDeclaration[source.value=/^expo-router(?:\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]`,
   },
 ];
 
@@ -228,6 +244,7 @@ const HERMES: Runtime = {
     ...TEXT_SYNTAX,
     ...NAV_SYNTAX,
     ...QUERY_SYNTAX,
+    ...ROUTE_PARAMS_SYNTAX,
     ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),
   ],
   properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),
@@ -365,6 +382,10 @@ export function defineWorkspaceConfig({
     {
       files: [...QUERY_FILES],
       rules: restrictions(exempt(HERMES, QUERY_SYNTAX), policies),
+    },
+    {
+      files: [...ROUTING_FILES],
+      rules: restrictions(exempt(HERMES, ROUTE_PARAMS_SYNTAX), policies),
     },
     {
       files: [...ROUTE_FILES],

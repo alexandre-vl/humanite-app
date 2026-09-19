@@ -43,6 +43,8 @@ const WRITTEN = {
   'nav/js-tabs': 'composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native',
   'query/options':
     'déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit',
+  'route/params':
+    'lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran',
 } as const satisfies Readonly<Record<`${string}/${string}`, string>>;
 
 type WrittenPolicy = keyof typeof WRITTEN;

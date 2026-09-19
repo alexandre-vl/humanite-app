@@ -1,2 +1,2 @@
-export { feedQuery, liveFeedQuery } from './api/queries';
+export { feedQuery, liveFeedQuery, sectionFeedQuery } from './api/queries';
 export { ArticleFeed } from './ui/article-feed';

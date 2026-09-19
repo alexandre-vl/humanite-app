@@ -10,6 +10,8 @@ export const FR = {
   'feed.error.title': 'Le journal ne répond pas',
   'feed.error.message': 'Les articles n’ont pas pu être chargés.',
   'nav.headline': 'À la une',
+  'section.unknown.title': 'Rubrique introuvable',
+  'section.unknown.message': 'Cette rubrique n’est pas au sommaire du journal.',
   'nav.live': 'En continu',
   'nav.newsstand': 'Kiosque',
   'nav.account': 'Mon compte',

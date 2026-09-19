@@ -871,7 +871,20 @@ export const BINDINGS = {
       R1: ['guardrail/module-shopify-flash-list'],
       R2: {
         convention:
-          'La primitive List rend la seule région défilante de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives.',
+          'La primitive List rend la seule région défilante verticale de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. Une bande qui défile en travers prend l’autre axe et ne lui dispute aucun geste.',
+      },
+    },
+  },
+  'ADR-0023': {
+    scope: {
+      paths: ['apps/mobile/src/shared/lib/routing/**'],
+    },
+    rules: {
+      R1: ['guardrail/module-expo-router'],
+      R2: ['guardrail/route-params', 'guardrail/route-params-exempt'],
+      R3: {
+        convention:
+          'Un identifiant du domaine est une chaîne marquée que seul l’analyseur des contrats produit : un écran qui en déclare un ne peut pas l’obtenir d’un paramètre brut, et la marque est inimitable puisque l’assertion de type est interdite partout.',
       },
     },
   },

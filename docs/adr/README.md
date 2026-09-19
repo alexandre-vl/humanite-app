@@ -30,6 +30,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | proposé | `dependency`, `data-format`                                                |
 | [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | proposé | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -273,10 +274,20 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/api/**`, `apps/mobile/s
 
 Statut : proposé. Périmètre : `apps/mobile/src/shared/ui/primitives/list/**`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                          |
-| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | NE DOIT PAS | `guardrail/module-shopify-flash-list`                                                                                                                                                                                                                                            |
-| R2    | DOIT        | convention : La primitive List rend la seule région défilante de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                     |
+| ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-shopify-flash-list`                                                                                                                                                                                                                                                                                                                                       |
+| R2    | DOIT        | convention : La primitive List rend la seule région défilante verticale de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. Une bande qui défile en travers prend l’autre axe et ne lui dispute aucun geste. |
+
+### ADR-0023 · Une porte unique valide les paramètres d'une route
+
+Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/routing/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                        |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-expo-router`                                                                                                                                                                                                                                 |
+| R2    | NE DOIT PAS | `guardrail/route-params`, `guardrail/route-params-exempt`                                                                                                                                                                                                      |
+| R3    | DOIT        | convention : Un identifiant du domaine est une chaîne marquée que seul l’analyseur des contrats produit : un écran qui en déclare un ne peut pas l’obtenir d’un paramètre brut, et la marque est inimitable puisque l’assertion de type est interdite partout. |
 
 ## Référentiel
 

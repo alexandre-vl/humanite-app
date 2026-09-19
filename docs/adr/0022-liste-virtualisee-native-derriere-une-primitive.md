@@ -20,7 +20,7 @@ Comment rendre un fil paginé sans que la liste native fuie hors des primitives,
 ## Critères de décision
 
 - **C1** — Une liste native n’est importée que par une primitive L0.
-- **C2** — Un écran ne tient qu’une seule région défilante, bandes qui réagissent au défilement comprises.
+- **C2** — Un écran ne tient qu’une seule région défilante verticale, bandes qui réagissent au défilement comprises.
 - **C3** — Le fil ne monte que ce qui est visible, recycle par type d’élément et demande la page suivante quand la fin approche.
 - **C4** — Le module arrive à la version que le SDK teste avec ses autres modules.
 
@@ -35,7 +35,7 @@ Comment rendre un fil paginé sans que la liste native fuie hors des primitives,
 Option retenue : « liste virtualisée du SDK, confinée à une primitive qui porte aussi les bandes », parce qu’elle seule garde la liste native dans une primitive (C1), réunit le défilement et ce qui y réagit dans un seul composant (C2), recycle par type et annonce la fin du fil (C3), à la version que le SDK épingle (C4).
 
 - **R1** — `@shopify/flash-list` NE DOIT PAS être importée hors des primitives.
-- **R2** — Un écran DOIT confier son défilement à une seule liste, les bandes qui le suivent comprises.
+- **R2** — Un écran DOIT confier son défilement vertical à une seule liste, les bandes qui le suivent comprises.
 
 ### Conséquences
 
@@ -70,5 +70,6 @@ Option retenue : « liste virtualisée du SDK, confinée à une primitive qui po
 
 - Le décalage du défilement arrive sur le fil JavaScript : la liste remplace l’`onScroll` de la vue qu’elle rend par le sien, puis rappelle le nôtre en écoutant (`cat apps/mobile/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js`). Un gestionnaire worklet n’a donc aucun point d’accroche.
 - `@babel/runtime` entre au catalog parce que la liste le déclare en pair non optionnel (`cat apps/mobile/node_modules/@shopify/flash-list/package.json`).
+- La règle porte sur l’axe vertical, celui du fait qui la fonde : une bande qui défile en travers, comme la barre des sections, prend l’autre axe et ne dispute rien à la liste.
 - Le pager horizontal entre rubriques et les budgets qui mesureraient ce choix restent à décider dans des ADR distincts.
 - Réévaluation : Expo change la liste qu’il teste avec son SDK, ou un budget de performance mesuré sur appareil réel échoue sur un fil.

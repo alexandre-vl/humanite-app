@@ -1,4 +1,4 @@
-import type { LiveQuery } from '@huma/contracts';
+import type { FeedQuery, LiveQuery, SectionId } from '@huma/contracts';
 import { infiniteQueryOptions } from '@tanstack/react-query';
 import { content } from '#api';
 
@@ -22,6 +22,21 @@ export const feedQuery = infiniteQueryOptions({
   initialPageParam: FIRST,
   getNextPageParam: (page) => page.nextCursor,
 });
+
+/** The same page of one section, the filter the content applies before it counts the pages. */
+const inSection = (section: SectionId, cursor: string): FeedQuery => ({ ...at(cursor), section });
+
+/**
+ * The articles of one section, newest first, by pages. The section is part of the key, so each one keeps the pages it
+ * has already read, and coming back to a section does not throw away what another one is holding.
+ */
+export const sectionFeedQuery = (section: SectionId): FeedOptions =>
+  infiniteQueryOptions({
+    queryKey: [ARTICLES, 'section', section],
+    queryFn: async ({ pageParam }) => content.getFeed(inSection(section, pageParam)),
+    initialPageParam: FIRST,
+    getNextPageParam: (page) => page.nextCursor,
+  });
 
 /** The same articles as a running wire: what the En continu screen reads. */
 export const liveFeedQuery = infiniteQueryOptions({

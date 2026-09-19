@@ -3454,6 +3454,93 @@
                 },
                 {
                   "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-router"
+                  }
+                }
+              },
+              "message": "[module/expo-router] expo-router ne s’importe que depuis : app, lib, page"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "app"
                   }
                 },
@@ -4690,6 +4777,10 @@
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
         },
         {
+          "selector": "ImportDeclaration[source.value='expo-router'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-router] expo-router ne s’importe que depuis : app, lib, page"
+        },
+        {
           "selector": "ImportDeclaration[source.value='expo-image'] > ImportNamespaceSpecifier",
           "message": "[module/expo-image] expo-image ne s’importe que depuis : primitive"
         },
@@ -4748,6 +4839,14 @@
         {
           "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
           "message": "[query/options] déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
+        },
+        {
+          "selector": "ImportDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]",
+          "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
+        },
+        {
+          "selector": "ExportNamedDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]",
+          "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -6664,6 +6763,93 @@
                 },
                 {
                   "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-router"
+                  }
+                }
+              },
+              "message": "[module/expo-router] expo-router ne s’importe que depuis : app, lib, page"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "app"
                   }
                 },
@@ -7903,6 +8089,10 @@
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
         },
         {
+          "selector": "ImportDeclaration[source.value='expo-router'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-router] expo-router ne s’importe que depuis : app, lib, page"
+        },
+        {
           "selector": "ImportDeclaration[source.value='expo-image'] > ImportNamespaceSpecifier",
           "message": "[module/expo-image] expo-image ne s’importe que depuis : primitive"
         },
@@ -7961,6 +8151,14 @@
         {
           "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
           "message": "[query/options] déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
+        },
+        {
+          "selector": "ImportDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]",
+          "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
+        },
+        {
+          "selector": "ExportNamedDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]",
+          "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -9873,6 +10071,93 @@
                 },
                 {
                   "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-router"
+                  }
+                }
+              },
+              "message": "[module/expo-router] expo-router ne s’importe que depuis : app, lib, page"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "app"
                   }
                 },
@@ -11112,6 +11397,10 @@
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
         },
         {
+          "selector": "ImportDeclaration[source.value='expo-router'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-router] expo-router ne s’importe que depuis : app, lib, page"
+        },
+        {
           "selector": "ImportDeclaration[source.value='expo-image'] > ImportNamespaceSpecifier",
           "message": "[module/expo-image] expo-image ne s’importe que depuis : primitive"
         },
@@ -11170,6 +11459,14 @@
         {
           "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
           "message": "[query/options] déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
+        },
+        {
+          "selector": "ImportDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]",
+          "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
+        },
+        {
+          "selector": "ExportNamedDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]",
+          "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
