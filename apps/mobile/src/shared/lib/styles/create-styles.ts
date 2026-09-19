@@ -3,10 +3,11 @@ import { useMemo } from 'react';
 import { useTheme } from './theme';
 
 /**
- * A style built only from design tokens: every value that carries a dimension or a colour is a branded token, so a raw
- * number or string cannot reach a native view. Layout keywords stay plain, the way React Native types them. Typography
- * is absent: a run of text names a Text variant, so a face, a size, a text colour or a line height never enters a style
- * — a line height is not a token but a size times a multiple, derived there at the text layer.
+ * A style built only from design tokens: every length, radius and colour is a branded token, so a raw dimension cannot
+ * reach a native view. Layout keywords stay plain, the way React Native types them, and so do the six fields that carry
+ * a ratio rather than a dimension — `flex`, `flexGrow`, `flexShrink`, `aspectRatio`, `opacity`, `zIndex` — which no
+ * token scale would measure. Typography is absent: a run of text names a Text variant, and `textStyle` alone turns that
+ * into a face, a size, a colour and the line height it derives.
  */
 type Style = Readonly<{
   flex?: number;

@@ -39,18 +39,20 @@ export const LINE_HEIGHTS = {
   loose: lineHeight(1.6),
 } as const satisfies Readonly<Record<string, LineHeight>>;
 
-/** Font families: Overpass for body text, one face per weight; Anton for display titles (docs/app-actuelle). */
+/**
+ * Font families: Overpass for body text, one face per weight; Anton for display titles (docs/app-actuelle). A slanted
+ * face is loaded rather than asked for, because Android synthesises no italic: naming a family that has no italic file
+ * and asking for one leaves the text upright, silently.
+ */
 export const FONT_FAMILIES = {
   body: {
     light: fontFamily('Overpass_300Light'),
+    lightItalic: fontFamily('Overpass_300Light_Italic'),
     regular: fontFamily('Overpass_400Regular'),
     bold: fontFamily('Overpass_700Bold'),
   },
   display: fontFamily('Anton_400Regular'),
-} as const satisfies Readonly<{
-  body: Readonly<Record<'light' | 'regular' | 'bold', FontFamily>>;
-  display: FontFamily;
-}>;
+} as const satisfies Readonly<{ body: Readonly<Record<string, FontFamily>>; display: FontFamily }>;
 
 /**
  * Component sizes in points: the collapsible header's expanded and collapsed bands, its sticky section bar, and the

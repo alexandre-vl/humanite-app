@@ -7,14 +7,20 @@ import { PALETTE } from './palette.ts';
  * `onPrimary` is the text a screen lays on `primary`: the wire of En continu paints its whole ground in it, and a
  * button its pill. Both themes give it the same value, because `primary` itself is the same red in both — a surface
  * that does not change between themes cannot ask for two different texts on it.
+ *
+ * `ground` is what a reading screen lays its sheet of `background` on, and `headline` the colour a headline takes
+ * there. The dark article of the current app needs no rule of its own for either: its ground and its sheet are the
+ * same value, so the sheet stops showing, and its headline turns white where the light one is red (captures 11, 13).
  */
 export type Theme = Readonly<{
   background: Color;
+  ground: Color;
   surface: Color;
   card: Color;
   textPrimary: Color;
   textMuted: Color;
   onPrimary: Color;
+  headline: Color;
   primary: Color;
   premium: Color;
   border: Color;
@@ -24,11 +30,13 @@ export type Theme = Readonly<{
 /** The light theme, built from the measured palette. */
 export const LIGHT_THEME = {
   background: PALETTE.white,
+  ground: PALETTE.blueGrey,
   surface: PALETTE.white,
   card: PALETTE.paleGrey,
   textPrimary: PALETTE.aubergine,
   textMuted: PALETTE.dateGrey,
   onPrimary: PALETTE.white,
+  headline: PALETTE.uiRed,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
@@ -38,11 +46,13 @@ export const LIGHT_THEME = {
 /** The dark theme, derived from the measured dark background #141414. */
 export const DARK_THEME = {
   background: PALETTE.darkBackground,
+  ground: PALETTE.darkBackground,
   surface: PALETTE.darkSurface,
   card: PALETTE.darkCard,
   textPrimary: PALETTE.paleGrey,
   textMuted: PALETTE.darkMuted,
   onPrimary: PALETTE.white,
+  headline: PALETTE.white,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.darkBorder,
