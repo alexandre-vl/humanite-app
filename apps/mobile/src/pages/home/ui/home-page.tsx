@@ -5,7 +5,6 @@ import { t } from '#i18n';
 import { useStartup } from '#lib/startup';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
-import { CollapsibleHeader } from '#primitives/collapsible-header';
 import { Icon } from '#primitives/icon';
 import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
@@ -29,7 +28,8 @@ export function HomePage(): ReactNode {
   const theme = useTheme();
   return (
     <Surface onLayout={signalFirstLayout}>
-      <CollapsibleHeader
+      <ArticleFeed
+        query={feedQuery}
         header={
           <Box style={styles.masthead}>
             <Text variant="display">{t('app.name')}</Text>
@@ -41,9 +41,7 @@ export function HomePage(): ReactNode {
             <Text variant="display">{t('nav.headline')}</Text>
           </Box>
         }
-      >
-        <ArticleFeed query={feedQuery} />
-      </CollapsibleHeader>
+      />
     </Surface>
   );
 }

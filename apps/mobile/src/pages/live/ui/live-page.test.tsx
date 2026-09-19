@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 import { LivePage } from './live-page';
 
 describe('LivePage', () => {
@@ -10,6 +10,8 @@ describe('LivePage', () => {
         <LivePage />
       </QueryClientProvider>,
     );
+    // A virtualised list reports its first layout after the render returns; flushing keeps that update inside act.
+    await act(async () => Promise.resolve());
     expect(await screen.findByText('En continu')).toBeTruthy();
   });
 });

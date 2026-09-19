@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { feedQuery } from '../api/queries';
 import { ArticleFeed } from './article-feed';
@@ -16,6 +16,8 @@ describe('ArticleFeed', () => {
         <ArticleFeed query={feedQuery} />
       </QueryClientProvider>,
     );
+    // A virtualised list reports its first layout after the render returns; flushing keeps that update inside act.
+    await act(async () => Promise.resolve());
     expect(await screen.findByText(first.title)).toBeTruthy();
     expect(await screen.findByText(first.standfirst)).toBeTruthy();
   });

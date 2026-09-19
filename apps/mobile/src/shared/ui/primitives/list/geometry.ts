@@ -1,5 +1,5 @@
 /**
- * The pure geometry of the collapsing header, in points. Reanimated worklets call `collapseProgress` and `lerp` on the UI
+ * The pure geometry of the collapsing bands, in points. Reanimated worklets call `collapseProgress` and `lerp` on the UI
  * thread — hence the `'worklet'` directive — while a jest test exercises them as plain functions on the JS thread.
  */
 

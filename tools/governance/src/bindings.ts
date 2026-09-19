@@ -863,4 +863,16 @@ export const BINDINGS = {
       R2: ['guardrail/query-options', 'guardrail/query-options-exempt'],
     },
   },
+  'ADR-0022': {
+    scope: {
+      paths: ['apps/mobile/src/shared/ui/primitives/list/**'],
+    },
+    rules: {
+      R1: ['guardrail/module-shopify-flash-list'],
+      R2: {
+        convention:
+          'La primitive List rend la seule région défilante de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

@@ -222,6 +222,12 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/symbol.ts': "export { SymbolView } from 'expo-symbols';\n" }),
     ),
     define(
+      'guardrail/module-shopify-flash-list',
+      'une page qui rend elle-même une liste virtualisée',
+      ['module/@shopify/flash-list'],
+      linted({ 'src/pages/home/model/list.ts': "export { FlashList } from '@shopify/flash-list';\n" }),
+    ),
+    define(
       'guardrail/nav-js-tabs',
       'une page qui compose la barre par les onglets JS',
       ['nav/js-tabs'],

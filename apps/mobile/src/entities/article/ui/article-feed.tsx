@@ -7,53 +7,90 @@ import { Skeleton } from '#components/skeleton';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
+import { List } from '#primitives/list';
 import type { FeedOptions } from '../api/queries';
 import { ArticleCard } from './article-card';
 
-export type ArticleFeedProps = Readonly<{ query: FeedOptions }>;
+export type ArticleFeedProps = Readonly<{ query: FeedOptions; header?: ReactNode; sticky?: ReactNode }>;
 
 const useStyles = createStyles(() => ({
-  feed: { gap: SPACING.md, padding: SPACING.lg },
+  feed: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xl },
+  item: { paddingTop: SPACING.md },
+  standIn: { gap: SPACING.md, padding: SPACING.lg },
   retry: { alignItems: 'center' },
 }));
 
-/** A paged feed of articles, and what stands in its place while it loads, when it fails and when it holds nothing. */
-export function ArticleFeed({ query }: ArticleFeedProps): ReactNode {
-  const styles = useStyles();
-  const { data, isPending, isError, refetch } = useInfiniteQuery(query);
+/** Why the feed is showing no article: it has not answered yet, it failed, or it truly holds none. */
+type FeedState = 'pending' | 'error' | 'empty';
+
+const stateOf = (isPending: boolean, isError: boolean): FeedState => {
   if (isPending) {
-    return (
-      <Box style={styles.feed}>
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-      </Box>
-    );
+    return 'pending';
   }
   if (isError) {
-    return (
-      <Box style={styles.feed}>
-        <EmptyState title={t('feed.error.title')} message={t('feed.error.message')} />
-        <Box style={styles.retry}>
-          <Button
-            label={t('action.retry')}
-            onPress={() => {
-              void refetch();
-            }}
-          />
+    return 'error';
+  }
+  return 'empty';
+};
+
+type FeedStandInProps = Readonly<{ state: FeedState; onRetry: () => void }>;
+
+/** What stands in the feed's place: shapes while it loads, a failure worth another try, or an empty shelf. */
+function FeedStandIn({ state, onRetry }: FeedStandInProps): ReactNode {
+  const styles = useStyles();
+  switch (state) {
+    case 'pending':
+      return (
+        <Box style={styles.standIn}>
+          <Skeleton />
+          <Skeleton />
+          <Skeleton />
         </Box>
-      </Box>
-    );
+      );
+    case 'error':
+      return (
+        <Box style={styles.standIn}>
+          <EmptyState title={t('feed.error.title')} message={t('feed.error.message')} />
+          <Box style={styles.retry}>
+            <Button label={t('action.retry')} onPress={onRetry} />
+          </Box>
+        </Box>
+      );
+    case 'empty':
+      return <EmptyState title={t('feed.empty.title')} message={t('feed.empty.message')} />;
   }
-  const summaries = data.pages.flatMap((page) => page.items);
-  if (summaries.length === 0) {
-    return <EmptyState title={t('feed.empty.title')} message={t('feed.empty.message')} />;
-  }
+}
+
+/** A paged feed of articles, under the bands its screen supplies, asking for the next page as the end comes near. */
+export function ArticleFeed({ query, header, sticky }: ArticleFeedProps): ReactNode {
+  const styles = useStyles();
+  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);
+  const summaries = data?.pages.flatMap((page) => page.items) ?? [];
   return (
-    <Box style={styles.feed}>
-      {summaries.map((summary) => (
-        <ArticleCard key={summary.id} summary={summary} />
-      ))}
-    </Box>
+    <List
+      items={summaries}
+      keyOf={(summary) => summary.id}
+      renderItem={(summary) => (
+        <Box style={styles.item}>
+          <ArticleCard summary={summary} />
+        </Box>
+      )}
+      contentStyle={styles.feed}
+      header={header}
+      sticky={sticky}
+      empty={
+        <FeedStandIn
+          state={stateOf(isPending, isError)}
+          onRetry={() => {
+            void refetch();
+          }}
+        />
+      }
+      onEndReached={() => {
+        if (hasNextPage && !isFetchingNextPage) {
+          void fetchNextPage();
+        }
+      }}
+    />
   );
 }

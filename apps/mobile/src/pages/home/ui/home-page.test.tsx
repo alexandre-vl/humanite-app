@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react-native';
+import { act, render, screen } from '@testing-library/react-native';
 import { StartupProvider } from '#lib/startup';
 import { HomePage } from './home-page';
 
@@ -13,6 +13,8 @@ describe('HomePage', () => {
         </StartupProvider>
       </QueryClientProvider>,
     );
+    // A virtualised list reports its first layout after the render returns; flushing keeps that update inside act.
+    await act(async () => Promise.resolve());
     expect(await screen.findByText('Humanité')).toBeTruthy();
     expect(screen.getByText('À la une')).toBeTruthy();
   });

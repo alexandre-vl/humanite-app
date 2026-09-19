@@ -29,6 +29,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0018](0018-images-et-symboles-natifs.md)                                   | Images et symboles natifs                                   | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | proposé | `dependency`, `data-format`                                                |
 | [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 
 ## Confirmation
 
@@ -267,6 +268,15 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/api/**`, `apps/mobile/s
 | ----- | ----------- | ----------------------------------------------------------- |
 | R1    | NE DOIT PAS | `guardrail/module-huma-mock-api`                            |
 | R2    | DOIT        | `guardrail/query-options`, `guardrail/query-options-exempt` |
+
+### ADR-0022 · Liste virtualisée native derrière une primitive
+
+Statut : proposé. Périmètre : `apps/mobile/src/shared/ui/primitives/list/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                          |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-shopify-flash-list`                                                                                                                                                                                                                                            |
+| R2    | DOIT        | convention : La primitive List rend la seule région défilante de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. |
 
 ## Référentiel
 

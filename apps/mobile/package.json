@@ -16,6 +16,7 @@
     "#api": "./src/shared/api/index.ts"
   },
   "dependencies": {
+    "@babel/runtime": "catalog:",
     "@expo-google-fonts/anton": "catalog:",
     "@expo-google-fonts/overpass": "catalog:",
     "@expo/dom-webview": "catalog:",
@@ -24,6 +25,7 @@
     "@huma/contracts": "workspace:*",
     "@huma/design-tokens": "workspace:*",
     "@huma/mock-api": "workspace:*",
+    "@shopify/flash-list": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-persist-client": "catalog:",
     "expo": "catalog:",
