@@ -35,14 +35,27 @@ const notFound = (id: ArticleId): never => {
   throw new ContentApiError('not-found', `article introuvable : ${id}`);
 };
 
-const matches = (summary: ArticleSummary, query: string): boolean => {
-  const needle = query.toLowerCase();
-  return (
-    summary.title.toLowerCase().includes(needle) ||
-    summary.standfirst.toLowerCase().includes(needle) ||
-    summary.tags.some((tag) => tag.toLowerCase().includes(needle))
-  );
-};
+/**
+ * A text as search compares it: no case, no accents, no ligature. French is written with them and searched without —
+ * a reader who types `ecole` means `école`, and on this corpus 45 of the 117 subjects carry an accent. Hermes has both
+ * `normalize('NFD')` and the `\p{…}` escapes this needs, measured in the app itself (journal 0a, vérification 15).
+ *
+ * `œ` is spelt out first because NFD leaves it whole: it is one letter, not an `o` wearing a mark. The corpus writes
+ * it eight times — cœur, œil, œuvre, vœux — and nothing at all with `æ`, which is why only one ligature is named.
+ */
+const fold = (text: string): string => text.toLowerCase().split('œ').join('oe').normalize('NFD').replace(/\p{M}/gu, '');
+
+/** A summary beside the text search reads it by, folded once rather than once per query. */
+type Indexed = Readonly<{ summary: ArticleSummary; searchable: string }>;
+
+/**
+ * What search looks through: the title, the standfirst and the subjects of every article, and nothing of the body. The
+ * body is not in a summary at all, so searching it would mean holding the whole corpus a second time.
+ */
+const INDEXED: readonly Indexed[] = CHRONOLOGICAL.map((summary) => ({
+  summary,
+  searchable: fold([summary.title, summary.standfirst, ...summary.tags].join(' ')),
+}));
 
 const page = (
   items: readonly ArticleSummary[],
@@ -118,8 +131,9 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
     },
     search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
       await guard('search');
+      const needle = fold(query.text.trim());
       return page(
-        CHRONOLOGICAL.filter((summary) => matches(summary, query.text)),
+        INDEXED.filter((indexed) => indexed.searchable.includes(needle)).map((indexed) => indexed.summary),
         query.cursor,
         query.limit,
       );

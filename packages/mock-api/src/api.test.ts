@@ -37,9 +37,39 @@ test('getArticle returns the body and rejects an unknown id', async () => {
   await expect(contentApi.getArticle(ARTICLE_ID.parse('zzz-a1'))).rejects.toBeInstanceOf(ContentApiError);
 });
 
-test('search matches titles, standfirsts and tags', async () => {
-  const results = await contentApi.search({ text: 'budget' });
-  expect(results.items.length).toBeGreaterThan(0);
+test('search matches titles, standfirsts and tags, and nothing of the body', async () => {
+  const byTitle = await contentApi.search({ text: 'conseil municipal' });
+  expect(byTitle.items.map((item) => item.id)).toContain('pol-a5');
+  const byStandfirst = await contentApi.search({ text: 'cantines' });
+  expect(byStandfirst.items.map((item) => item.id)).toContain('pol-a5');
+  const byTag = await contentApi.search({ text: 'budget' });
+  expect(byTag.total).toBeGreaterThan(0);
+  // A word the body of pol-a5 holds and none of its three searchable fields does: a summary carries no body at all.
+  const body = await contentApi.getArticle(ARTICLE_ID.parse('pol-a5'));
+  expect(JSON.stringify(body.blocks)).toContain('délibération');
+  await expect(contentApi.search({ text: 'délibération' })).resolves.toMatchObject({ total: 0 });
+});
+
+test('search reads French as it is typed, not as it is written', async () => {
+  const written = await contentApi.search({ text: 'école' });
+  const typed = await contentApi.search({ text: 'ecole' });
+  expect(written.total).toBeGreaterThan(0);
+  expect(typed.items).toEqual(written.items);
+  // `œ` is one letter, which NFD leaves whole: only spelling it out makes `coeur` find the standfirst of pol-a5.
+  const ligature = await contentApi.search({ text: 'coeur' });
+  expect(ligature.items.map((item) => item.id)).toEqual(['pol-a5']);
+  const shouted = await contentApi.search({ text: '  ÉCOLE  ' });
+  expect(shouted.items).toEqual(written.items);
+});
+
+test('search answers newest first, and pages like a feed', async () => {
+  const every = await contentApi.search({ text: 'e', limit: 100 });
+  expect(every.total).toBe(72);
+  const dates = every.items.map((item) => item.publishedAt);
+  expect(dates).toEqual([...dates].toSorted((left, right) => right.localeCompare(left)));
+  const first = await contentApi.search({ text: 'e' });
+  expect(first.items).toHaveLength(12);
+  expect(first.nextCursor).toBe('12');
 });
 
 test('getSession reports the mock session, subscriber when asked', async () => {
