@@ -9,6 +9,7 @@ import { collapseDistance, collapseProgress, lerp } from './geometry';
 export type ListProps<Item> = Readonly<{
   items: readonly Item[];
   keyOf: (item: Item) => string;
+  typeOf: (item: Item) => string;
   renderItem: (item: Item) => ReactNode;
   empty?: ReactNode;
   header?: ReactNode;
@@ -72,10 +73,17 @@ const insetOf = (hasHeader: boolean, hasSticky: boolean): 'flush' | 'underHeader
  * The scroll offset arrives on the JavaScript thread: the list replaces the scroll handler of the view it renders with
  * its own (`@shopify/flash-list/dist/recyclerview/RecyclerView.js`, the `CompatScrollView` element), and calls ours back
  * as a plain listener, so a worklet handler has nowhere to attach.
+ *
+ * `typeOf` names the tree an item mounts. A cell is only ever handed to an item of the same type, and measured heights
+ * are averaged type by type, so two items sharing a type must mount the same components in the same order, and two
+ * items of visibly different heights must not share one. It is required rather than optional because the list cannot
+ * see what its items render, while the caller always can — and answering `'row'` for a list of identical items says
+ * so out loud. An item must keep its type for life: changing it throws the cell away and mounts a new one.
  */
 export function List<Item>({
   items,
   keyOf,
+  typeOf,
   renderItem,
   empty,
   header,
@@ -98,6 +106,7 @@ export function List<Item>({
         style={styles.fill}
         data={items}
         keyExtractor={keyOf}
+        getItemType={typeOf}
         renderItem={(info) => <>{renderItem(info.item)}</>}
         ListEmptyComponent={<>{empty}</>}
         contentContainerStyle={[styles[insetOf(header !== undefined, sticky !== undefined)], contentStyle]}

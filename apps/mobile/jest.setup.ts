@@ -46,6 +46,24 @@ jest.mock('react-native-reanimated', () => {
   };
 });
 
+// @shopify/flash-list reads its viewport and its cells through the native layer, which a headless runner answers with
+// zeroes. Given no size it never builds a layout manager, so it neither virtualises nor recycles, and a list test would
+// prove only that the items render. These three measures — the ones the library ships in its own jestSetup, and whose
+// doc calls them "specific method for easier mocking" — give it a 400×900 window of 100 px cells.
+jest.mock('@shopify/flash-list/dist/recyclerview/utils/measureLayout', () => {
+  const viewport = { x: 0, y: 0, width: 400, height: 900 };
+  const cell = { x: 0, y: 0, width: 100, height: 100 };
+  const actual = jest.requireActual<Record<string, unknown>>(
+    '@shopify/flash-list/dist/recyclerview/utils/measureLayout',
+  );
+  return {
+    ...actual,
+    measureParentSize: (): typeof viewport => viewport,
+    measureFirstChildLayout: (): typeof viewport => viewport,
+    measureItemLayout: (): typeof cell => cell,
+  };
+});
+
 // expo-image and expo-symbols reach native modules a headless runner lacks; each renders a plain view so the image and
 // icon primitives mount without touching the native layer.
 jest.mock('expo-image', () => {

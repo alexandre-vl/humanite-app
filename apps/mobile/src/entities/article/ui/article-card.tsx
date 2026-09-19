@@ -2,6 +2,7 @@ import type { Access, ArticleSummary } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { visualOf } from '#api';
+import type { Visual } from '#api';
 import { Badge } from '#components/badge';
 import { t } from '#i18n';
 import { formatDate } from '#lib/format';
@@ -22,6 +23,35 @@ const HERO_RATIO = 16 / 9;
  */
 const MARKED = { free: false, premium: true } satisfies Readonly<Record<Access, boolean>>;
 
+/** The trees a card mounts, one name per branch the render below takes. */
+export type CardShape = 'picture' | 'pictureMarked' | 'text' | 'textMarked';
+
+/** Whether a card of this shape carries the reserved mark. The render reads it, so it can never mark what the shape denies. */
+const MARKS = {
+  picture: false,
+  pictureMarked: true,
+  text: false,
+  textMarked: true,
+} satisfies Readonly<Record<CardShape, boolean>>;
+
+/** The illustration a card draws for an item, or nothing: a brief and a column are written without one. */
+const pictureOf = (summary: ArticleSummary): Visual | null =>
+  summary.hero === undefined ? null : visualOf(summary.hero.key, 'card');
+
+/**
+ * Which tree a card mounts for an item. A list hands a cell to another item only when both answer the same shape, and
+ * averages measured heights shape by shape — so this names what is rendered, never what the item editorially is:
+ * naming the six kinds the corpus distinguishes would split cells that mount the very same tree into six pools that
+ * never meet, and buy nothing for the two heights they actually take.
+ */
+export const shapeOf = (summary: ArticleSummary): CardShape => {
+  const marked = MARKED[summary.access];
+  if (pictureOf(summary) === null) {
+    return marked ? 'textMarked' : 'text';
+  }
+  return marked ? 'pictureMarked' : 'picture';
+};
+
 const useStyles = createStyles((theme) => ({
   card: { gap: SPACING.xs, padding: SPACING.lg, borderRadius: RADII.md, backgroundColor: theme.card },
   hero: {
@@ -36,13 +66,13 @@ const useStyles = createStyles((theme) => ({
 /** One article as a feed announces it: its picture, who may read it, its title, the standfirst, and its date. */
 export function ArticleCard({ summary }: ArticleCardProps): ReactNode {
   const styles = useStyles();
-  const visual = summary.hero === undefined ? null : visualOf(summary.hero.key, 'card');
+  const visual = pictureOf(summary);
   return (
     <Box style={styles.card}>
       {visual === null ? null : (
         <Image source={visual.source} recyclingKey={summary.id} thumbhash={visual.thumbhash} style={styles.hero} />
       )}
-      {MARKED[summary.access] ? <Badge label={t('article.premium')} /> : null}
+      {MARKS[shapeOf(summary)] ? <Badge label={t('article.premium')} /> : null}
       <Text variant="title" numberOfLines={3}>
         {summary.title}
       </Text>
