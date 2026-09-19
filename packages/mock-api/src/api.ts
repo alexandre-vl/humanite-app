@@ -102,7 +102,21 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
 
   const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
 
-  const summaryOf = (id: ArticleId): ArticleSummary => SUMMARIES.get(id) ?? notFound(id);
+  /**
+   * The summaries of the ids that name an article, in the order they were asked for and no other — the caller's order
+   * is the only one it can be, a batch being asked by whoever already knows how its answers are to be read.
+   *
+   * An id that names nothing is left out rather than raised. A batch is not a lookup: the ids come from somewhere that
+   * outlives the paper — a body pointing at a piece since withdrawn, a reader's own list kept on the phone across a
+   * corpus that has changed under it — and a whole screen that fails because one line of it no longer exists tells the
+   * reader nothing true. What is still printed is served; what is not, is not there. The caller can always see which,
+   * having handed over the ids.
+   */
+  const summariesOf = (ids: readonly ArticleId[]): readonly ArticleSummary[] =>
+    ids.flatMap((id) => {
+      const summary = SUMMARIES.get(id);
+      return summary === undefined ? [] : [summary];
+    });
 
   return {
     getSections: async (): Promise<readonly Section[]> => {
@@ -127,7 +141,7 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
     },
     getSummaries: async (ids: readonly ArticleId[]): Promise<readonly ArticleSummary[]> => {
       await guard('getSummaries');
-      return ids.map(summaryOf);
+      return summariesOf(ids);
     },
     search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
       await guard('search');

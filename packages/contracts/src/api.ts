@@ -13,7 +13,13 @@ export type LiveQuery = Readonly<{ cursor?: string; limit?: number }>;
 /** What a search query selects: the text, a page cursor and a page size. */
 export type SearchQuery = Readonly<{ text: string; cursor?: string; limit?: number }>;
 
-/** The read surface of the content, which the mock and the app both speak. */
+/**
+ * The read surface of the content, which the mock and the app both speak.
+ *
+ * `getArticle` names one piece and fails when it is not there — asking for it is opening it. `getSummaries` names
+ * several and answers with those that exist, in the order asked: its ids come from lists that outlive the paper, and
+ * one withdrawn piece must not cost the reader the rest of them.
+ */
 export type ContentApi = Readonly<{
   getSections: () => Promise<readonly Section[]>;
   getAuthors: () => Promise<readonly Author[]>;

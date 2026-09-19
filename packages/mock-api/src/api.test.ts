@@ -79,11 +79,22 @@ test('getSession reports the mock session, subscriber when asked', async () => {
   await expect(premium.getSession()).resolves.toEqual({ isSubscriber: true });
 });
 
-test('getSummaries answers in the order asked and rejects an unknown id', async () => {
+test('getSummaries answers in the order asked', async () => {
   const ids = [ARTICLE_ID.parse('mon-a2'), ARTICLE_ID.parse('pol-a1')];
   const summaries = await contentApi.getSummaries(ids);
   expect(summaries.map((summary) => summary.id)).toEqual(ids);
-  await expect(contentApi.getSummaries([ARTICLE_ID.parse('zzz-a1')])).rejects.toBeInstanceOf(ContentApiError);
+});
+
+test('getSummaries leaves out an id the paper no longer prints, and serves the rest', async () => {
+  const withdrawn = ARTICLE_ID.parse('zzz-a1');
+  const kept = ARTICLE_ID.parse('pol-a1');
+  const summaries = await contentApi.getSummaries([withdrawn, kept, ARTICLE_ID.parse('mon-a2')]);
+  expect(summaries.map((summary) => summary.id)).toEqual([kept, ARTICLE_ID.parse('mon-a2')]);
+  await expect(contentApi.getSummaries([withdrawn])).resolves.toEqual([]);
+});
+
+test('getArticle still refuses an id the paper no longer prints', async () => {
+  await expect(contentApi.getArticle(ARTICLE_ID.parse('zzz-a1'))).rejects.toBeInstanceOf(ContentApiError);
 });
 
 /** One call per method of the contract: a method added without its call here is a type error, not a silent gap. */
