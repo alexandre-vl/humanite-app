@@ -2,6 +2,7 @@
 export const FR = {
   'action.retry': 'Réessayer',
   'app.name': 'Humanité',
+  'article.premium': 'Abonnés',
   'error.title': 'L’écran n’a pas pu s’afficher',
   'error.message': 'Une erreur est survenue.',
   'feed.empty.title': 'Rien à lire pour l’instant',
