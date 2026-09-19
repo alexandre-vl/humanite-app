@@ -1,18 +1,18 @@
 import { SPACING } from '@huma/design-tokens';
-import { useInfiniteQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { List } from '#primitives/list';
-import type { FeedOptions } from '../api/queries';
+import type { PagedFeed } from '../api/queries';
+import { usePagedFeed } from '../model/paged-feed';
 import type { WireRow as Row } from '../model/wire';
 import { rowKey, rowKind, rowPins, wireRows } from '../model/wire';
-import { FeedStandIn, stateOf } from './feed-stand-in';
+import { FeedStandIn } from './feed-stand-in';
 import { WireDay } from './wire-day';
 import { WireHero } from './wire-hero';
 import { WireRow } from './wire-row';
 
-export type ArticleWireProps = Readonly<{ query: FeedOptions }>;
+export type ArticleWireProps = Readonly<{ query: PagedFeed }>;
 
 const useStyles = createStyles(() => ({
   wire: { paddingBottom: SPACING.xl },
@@ -28,8 +28,8 @@ const useStyles = createStyles(() => ({
  */
 export function ArticleWire({ query }: ArticleWireProps): ReactNode {
   const styles = useStyles();
-  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);
-  const rows = wireRows(data?.pages.flatMap((page) => page.items) ?? []);
+  const feed = usePagedFeed(query);
+  const rows = wireRows(feed.items);
   const render = (row: Row): ReactNode => {
     switch (row.kind) {
       case 'hero':
@@ -52,19 +52,8 @@ export function ArticleWire({ query }: ArticleWireProps): ReactNode {
       pinned={rowPins}
       renderItem={render}
       contentStyle={styles.wire}
-      empty={
-        <FeedStandIn
-          state={stateOf(isPending, isError)}
-          onRetry={() => {
-            void refetch();
-          }}
-        />
-      }
-      onEndReached={() => {
-        if (hasNextPage && !isFetchingNextPage) {
-          void fetchNextPage();
-        }
-      }}
+      empty={<FeedStandIn state={feed.state} onRetry={feed.retry} />}
+      onEndReached={feed.onEndReached}
     />
   );
 }

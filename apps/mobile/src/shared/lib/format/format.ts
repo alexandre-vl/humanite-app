@@ -16,12 +16,6 @@ const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
   minute: '2-digit',
 });
 
-const SECOND = 1000;
-const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
-const WEEK = 7 * DAY;
-
 const PER_MINUTE = 60;
 const PER_HOUR = 60 * PER_MINUTE;
 
@@ -106,29 +100,6 @@ export const formatDayLabel = (instant: string): DisplayText => {
   const clock = readClock(parseInstant(instant));
   const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
   return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
-};
-
-/**
- * How long ago an item was published, read against `now` rather than the wall clock so a test can fix the moment.
- * `min` and `h` are symbols and take no plural; `jour` does, and French turns at two, not at one. Past a week the
- * relative form stops helping and the printed date takes over. An instant still to come reads as the present.
- */
-export const formatRelativeTime = (instant: string, now: number): DisplayText => {
-  const elapsed = now - parseInstant(instant);
-  if (elapsed < MINUTE) {
-    return asDisplayText("à l'instant");
-  }
-  if (elapsed < HOUR) {
-    return asDisplayText(`il y a ${String(Math.floor(elapsed / MINUTE))} min`);
-  }
-  if (elapsed < DAY) {
-    return asDisplayText(`il y a ${String(Math.floor(elapsed / HOUR))} h`);
-  }
-  if (elapsed < WEEK) {
-    const days = Math.floor(elapsed / DAY);
-    return asDisplayText(`il y a ${String(days)} ${days < 2 ? 'jour' : 'jours'}`);
-  }
-  return formatDate(instant);
 };
 
 /** A running time, as a player prints it: `4:18`, and `1:04:18` once past the hour. */

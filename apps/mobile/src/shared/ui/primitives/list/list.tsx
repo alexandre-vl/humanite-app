@@ -70,15 +70,20 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-/** The inset the scrolled content needs: each band the list carries hides its own height at the top. */
-const insetOf = (hasHeader: boolean, hasSticky: boolean): 'flush' | 'underHeader' | 'underSticky' | 'underBoth' => {
-  if (hasHeader && hasSticky) {
+/**
+ * The inset the scrolled content needs: each band the list carries hides its own height at the top. It takes the bands
+ * by name rather than two flags in a row, which nothing would stop a caller from handing over the wrong way round.
+ */
+const insetOf = (
+  bands: Readonly<{ header: boolean; sticky: boolean }>,
+): 'flush' | 'underHeader' | 'underSticky' | 'underBoth' => {
+  if (bands.header && bands.sticky) {
     return 'underBoth';
   }
-  if (hasHeader) {
+  if (bands.header) {
     return 'underHeader';
   }
-  if (hasSticky) {
+  if (bands.sticky) {
     return 'underSticky';
   }
   return 'flush';
@@ -145,7 +150,7 @@ export function List<Item>({
         renderItem={(info) => <>{renderItem(info.item)}</>}
         stickyHeaderIndices={pinnedPlaces}
         ListEmptyComponent={<>{empty}</>}
-        contentContainerStyle={[styles[insetOf(hasHeader, sticky !== undefined)], contentStyle]}
+        contentContainerStyle={[styles[insetOf({ header: hasHeader, sticky: sticky !== undefined })], contentStyle]}
         onEndReached={onEndReached}
         onEndReachedThreshold={END_THRESHOLD}
         onScroll={(event) => {

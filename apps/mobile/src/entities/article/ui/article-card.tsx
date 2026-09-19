@@ -22,14 +22,6 @@ const MARKED = { free: false, premium: true } satisfies Readonly<Record<Access, 
 /** The trees a card mounts, one name per branch the render below takes. */
 export type CardShape = 'picture' | 'pictureMarked' | 'text' | 'textMarked';
 
-/** Whether a card of this shape carries the reserved mark. The render reads it, so it can never mark what the shape denies. */
-const MARKS = {
-  picture: false,
-  pictureMarked: true,
-  text: false,
-  textMarked: true,
-} satisfies Readonly<Record<CardShape, boolean>>;
-
 /**
  * Which tree a card mounts for an item. A list hands a cell to another item only when both answer the same shape, and
  * averages measured heights shape by shape — so this names what is rendered, never what the item editorially is:
@@ -64,7 +56,7 @@ export function ArticleCard({ summary }: ArticleCardProps): ReactNode {
       {visual === null ? null : (
         <Image source={visual.source} recyclingKey={summary.id} thumbhash={visual.thumbhash} style={styles.hero} />
       )}
-      {MARKS[shapeOf(summary)] ? <Badge label={t('article.premium')} /> : null}
+      {MARKED[summary.access] ? <Badge label={t('article.premium')} /> : null}
       <Text variant="title" numberOfLines={3}>
         {summary.title}
       </Text>

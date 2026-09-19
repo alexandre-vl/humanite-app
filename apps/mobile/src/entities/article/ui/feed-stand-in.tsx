@@ -6,19 +6,7 @@ import { Skeleton } from '#components/skeleton';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
-
-/** Why a feed is showing no article: it has not answered yet, it failed, or it truly holds none. */
-export type FeedState = 'pending' | 'error' | 'empty';
-
-export const stateOf = (isPending: boolean, isError: boolean): FeedState => {
-  if (isPending) {
-    return 'pending';
-  }
-  if (isError) {
-    return 'error';
-  }
-  return 'empty';
-};
+import type { FeedState } from '../model/paged-feed';
 
 export type FeedStandInProps = Readonly<{ state: FeedState; onRetry: () => void }>;
 

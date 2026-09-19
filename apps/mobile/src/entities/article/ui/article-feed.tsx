@@ -1,14 +1,14 @@
 import { SPACING } from '@huma/design-tokens';
-import { useInfiniteQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { List } from '#primitives/list';
-import type { FeedOptions } from '../api/queries';
+import type { PagedFeed } from '../api/queries';
+import { usePagedFeed } from '../model/paged-feed';
 import { ArticleCard, shapeOf } from './article-card';
-import { FeedStandIn, stateOf } from './feed-stand-in';
+import { FeedStandIn } from './feed-stand-in';
 
-export type ArticleFeedProps = Readonly<{ query: FeedOptions; header?: ReactNode; sticky?: ReactNode }>;
+export type ArticleFeedProps = Readonly<{ query: PagedFeed; header?: ReactNode; sticky?: ReactNode }>;
 
 const useStyles = createStyles(() => ({
   feed: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xl },
@@ -18,11 +18,10 @@ const useStyles = createStyles(() => ({
 /** A paged feed of articles, under the bands its screen supplies, asking for the next page as the end comes near. */
 export function ArticleFeed({ query, header, sticky }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
-  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);
-  const summaries = data?.pages.flatMap((page) => page.items) ?? [];
+  const feed = usePagedFeed(query);
   return (
     <List
-      items={summaries}
+      items={feed.items}
       keyOf={(summary) => summary.id}
       typeOf={shapeOf}
       renderItem={(summary) => (
@@ -33,19 +32,8 @@ export function ArticleFeed({ query, header, sticky }: ArticleFeedProps): ReactN
       contentStyle={styles.feed}
       header={header}
       sticky={sticky}
-      empty={
-        <FeedStandIn
-          state={stateOf(isPending, isError)}
-          onRetry={() => {
-            void refetch();
-          }}
-        />
-      }
-      onEndReached={() => {
-        if (hasNextPage && !isFetchingNextPage) {
-          void fetchNextPage();
-        }
-      }}
+      empty={<FeedStandIn state={feed.state} onRetry={feed.retry} />}
+      onEndReached={feed.onEndReached}
     />
   );
 }
