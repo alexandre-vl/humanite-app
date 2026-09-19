@@ -18,6 +18,12 @@ export type TextStyle = Readonly<{
   textAlign?: TextAlign;
 }>;
 
+/** The face, the size and the colour a variant is set in: everything about its letters, nothing about its lines. */
+const faceOf = (variant: TextVariant, theme: Theme, tone: TextTone | undefined): TextStyle => {
+  const role = TYPOGRAPHY[variant];
+  return { fontFamily: role.family, fontSize: role.size, color: theme[tone ?? role.tone] };
+};
+
 /** The style a named variant paints with, in the theme in force, with the tone and the alignment a caller may set. */
 export function textStyle(
   variant: TextVariant,
@@ -27,13 +33,19 @@ export function textStyle(
 ): TextStyle {
   const role = TYPOGRAPHY[variant];
   return {
-    fontFamily: role.family,
-    fontSize: role.size,
+    ...faceOf(variant, theme, tone),
     lineHeight: role.size * role.leading,
-    color: theme[tone ?? role.tone],
     ...(align === undefined ? {} : { textAlign: align }),
   };
 }
+
+/**
+ * The style typed text carries: the variant's own, less the line height. A field holds one line, so it has no lines to
+ * stack; and Android lays a line height out from the top of the box rather than around the letters, which lifts what
+ * is being typed off the baseline its placeholder sat on. The face and the size are read from the same table as a
+ * paragraph's, so a field and the text around it are set in the same type.
+ */
+export const inputStyle = (variant: TextVariant, theme: Theme): TextStyle => faceOf(variant, theme, undefined);
 
 /**
  * The style one run inside a paragraph departs by: a face when it is set apart, the primary colour when it answers a

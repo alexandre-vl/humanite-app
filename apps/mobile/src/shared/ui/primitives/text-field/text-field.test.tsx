@@ -1,0 +1,49 @@
+import { describe, expect, it, jest } from '@jest/globals';
+import { PALETTE, TYPOGRAPHY } from '@huma/design-tokens';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { asDisplayText } from '../../../lib/display-text';
+import { TextField } from './text-field';
+
+const PLACEHOLDER = 'Saisissez ici le sujet';
+
+const isLayers = (value: unknown): value is readonly unknown[] => Array.isArray(value);
+
+/**
+ * The letters the field is set in, read back from the pair React Native takes: the box first, the type second. The
+ * palette is read rather than the theme, which no file outside the theme's own core may import.
+ */
+const letters = (): Readonly<Record<string, unknown>> => {
+  const style: unknown = screen.getByPlaceholderText(PLACEHOLDER).props['style'];
+  const [, typed] = isLayers(style) ? style : [];
+  if (typeof typed !== 'object' || typed === null) {
+    throw new Error('le champ ne porte pas de type lisible');
+  }
+  return { ...typed };
+};
+
+describe('TextField', () => {
+  it('montre le texte de substitution, et rapporte ce qu’on y tape', async () => {
+    const change = jest.fn();
+    await render(<TextField value="" onChange={change} placeholder={asDisplayText(PLACEHOLDER)} />);
+    await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), 'climat');
+    expect(change).toHaveBeenCalledWith('climat');
+  });
+
+  it('prend la fonte, la taille et la couleur de son variant', async () => {
+    await render(<TextField value="" onChange={() => undefined} placeholder={asDisplayText(PLACEHOLDER)} />);
+    expect(letters()).toEqual({
+      fontFamily: TYPOGRAPHY.body.family,
+      fontSize: TYPOGRAPHY.body.size,
+      color: PALETTE.aubergine,
+    });
+  });
+
+  /**
+   * An input is one line, and Android lays a line height out from the top of the box rather than around the letters:
+   * a field that carried one would type above the line its own placeholder sat on.
+   */
+  it('n’emporte pas l’interligne de son variant, qu’une ligne unique n’a pas à empiler', async () => {
+    await render(<TextField value="" onChange={() => undefined} placeholder={asDisplayText(PLACEHOLDER)} />);
+    expect(Object.keys(letters())).not.toContain('lineHeight');
+  });
+});
