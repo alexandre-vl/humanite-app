@@ -41,9 +41,16 @@ const useStyles = createStyles(() => ({
     height: SIZES.headerExpanded,
     overflow: 'hidden',
   },
-  sticky: {
+  stickyUnderHeader: {
     position: 'absolute',
     top: SIZES.headerExpanded,
+    left: SPACING.none,
+    right: SPACING.none,
+    height: SIZES.sectionBar,
+  },
+  stickyAtTop: {
+    position: 'absolute',
+    top: SPACING.none,
     left: SPACING.none,
     right: SPACING.none,
     height: SIZES.sectionBar,
@@ -93,12 +100,16 @@ export function List<Item>({
 }: ListProps<Item>): ReactNode {
   const styles = useStyles();
   const scrollY = useSharedValue(0);
+  const hasHeader = header !== undefined;
+  // What the header gives back as it collapses, and therefore how far the band under it follows: nothing at all when
+  // the list carries no header, since a band that follows nothing has nowhere to go.
+  const slide = hasHeader ? DISTANCE : 0;
   const mastheadStyle = useAnimatedStyle(() => {
     const progress = collapseProgress(scrollY.get(), DISTANCE);
     return { opacity: lerp(1, 0, progress), transform: [{ translateY: lerp(0, -DISTANCE, progress) }] };
   });
   const stickyStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: lerp(0, -DISTANCE, collapseProgress(scrollY.get(), DISTANCE)) }],
+    transform: [{ translateY: lerp(0, -slide, collapseProgress(scrollY.get(), DISTANCE)) }],
   }));
   return (
     <Animated.View style={styles.frame}>
@@ -109,7 +120,7 @@ export function List<Item>({
         getItemType={typeOf}
         renderItem={(info) => <>{renderItem(info.item)}</>}
         ListEmptyComponent={<>{empty}</>}
-        contentContainerStyle={[styles[insetOf(header !== undefined, sticky !== undefined)], contentStyle]}
+        contentContainerStyle={[styles[insetOf(hasHeader, sticky !== undefined)], contentStyle]}
         onEndReached={onEndReached}
         onEndReachedThreshold={END_THRESHOLD}
         onScroll={(event) => {
@@ -118,7 +129,11 @@ export function List<Item>({
         scrollEventThrottle={SCROLL_PERIOD}
       />
       {header === undefined ? null : <Animated.View style={[styles.masthead, mastheadStyle]}>{header}</Animated.View>}
-      {sticky === undefined ? null : <Animated.View style={[styles.sticky, stickyStyle]}>{sticky}</Animated.View>}
+      {sticky === undefined ? null : (
+        <Animated.View style={[styles[hasHeader ? 'stickyUnderHeader' : 'stickyAtTop'], stickyStyle]}>
+          {sticky}
+        </Animated.View>
+      )}
     </Animated.View>
   );
 }
