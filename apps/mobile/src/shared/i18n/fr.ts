@@ -9,6 +9,8 @@ export const FR = {
   'app.name': 'Humanité',
   'article.premium': 'Abonnés',
   'article.related': 'Sur le même thème',
+  'article.error.title': 'L’article ne s’affiche pas',
+  'article.error.message': 'Cet article n’a pas pu être chargé.',
   'bookmark.tab': 'Favoris',
   'bookmark.add': 'Ajouter aux favoris',
   'bookmark.remove': 'Retirer des favoris',

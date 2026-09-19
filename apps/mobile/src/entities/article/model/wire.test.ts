@@ -45,6 +45,7 @@ describe('wireRows', () => {
   it('range chaque item sous la journée que son en-tête annonce', async () => {
     const rows = wireRows(await twoPages());
     let heading = '';
+    let filed = 0;
     for (const row of rows) {
       if (row.kind === 'day') {
         heading = row.day;
@@ -52,8 +53,11 @@ describe('wireRows', () => {
       }
       if (row.kind === 'item') {
         expect(formatDayKey(row.summary.publishedAt)).toBe(heading);
+        filed += 1;
       }
     }
+    // Counted, because a loop over nothing asserts nothing: a wire that stopped rendering rows would pass in silence.
+    expect(filed).toBeGreaterThan(1);
   });
 
   it('ne rend rien d’un fil vide', () => {

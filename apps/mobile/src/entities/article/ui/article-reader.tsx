@@ -2,6 +2,7 @@ import type { Article, ArticleId, ArticleSummary, Author } from '@huma/contracts
 import { RADII, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Scroll } from '#primitives/scroll';
@@ -73,6 +74,7 @@ export function ArticleReader({ id, onFollow }: ArticleReaderProps): ReactNode {
         onRetry={() => {
           void refetch();
         }}
+        error={{ title: t('article.error.title'), message: t('article.error.message') }}
       />
     );
   }
