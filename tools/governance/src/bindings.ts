@@ -865,13 +865,13 @@ export const BINDINGS = {
   },
   'ADR-0022': {
     scope: {
-      paths: ['apps/mobile/src/shared/ui/primitives/list/**'],
+      paths: ['apps/mobile/src/shared/ui/primitives/list/**', 'apps/mobile/src/shared/ui/primitives/scroll/**'],
     },
     rules: {
       R1: ['guardrail/module-shopify-flash-list'],
       R2: {
         convention:
-          'La primitive List rend la seule région défilante verticale de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. Une bande qui défile en travers prend l’autre axe et ne lui dispute aucun geste.',
+          'La primitive List rend la seule région défilante verticale de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. L’autre région défilante de l’app, la primitive Scroll, exige son axe : aucun appel ne peut prendre l’axe vertical sans l’écrire, et une bande qui défile en travers ne dispute aucun geste à la liste.',
       },
     },
   },

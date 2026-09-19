@@ -29,7 +29,7 @@ export function CataloguePage(): ReactNode {
   const styles = useStyles();
   return (
     <Surface>
-      <Scroll contentStyle={styles.content}>
+      <Scroll axis="vertical" contentStyle={styles.content}>
         {LEVELS.map((level) => (
           <Box key={level} style={styles.section}>
             <Text>{asDisplayText(level)}</Text>
