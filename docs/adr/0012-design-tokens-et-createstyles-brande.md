@@ -37,7 +37,7 @@ Option retenue : « createStyles brandé sur les tokens », parce que c’est la
 - **R1** — Une valeur de style DOIT être un token brandé, le type `Style` refusant un nombre ou une couleur bruts.
 - **R2** — La prop `style` d’une primitive DOIT être le type `StyleRef` que `createStyles` produit.
 - **R3** — Un objet de style en ligne NE DOIT PAS paraître dans le JSX.
-- **R4** — Hors du contexte de thème et de sa racine, un style NE DOIT PAS importer un thème figé ; il reçoit le thème en vigueur du paramètre de `createStyles`.
+- **R4** — Hors du noyau du thème (son contexte, sa racine et la portée qui en nomme un pour un sous-arbre), un style NE DOIT PAS importer un thème figé ; il reçoit le thème en vigueur du paramètre de `createStyles`.
 
 ### Conséquences
 
@@ -73,5 +73,6 @@ Option retenue : « createStyles brandé sur les tokens », parce que c’est la
 ## Informations complémentaires
 
 - L’interdiction d’un style en ligne et celle d’un thème figé hors de son contexte sont prouvées par des fixtures des garde-fous ; R1 et R2 sont des conventions que le système de types tient.
-- Les valeurs d’une animation Reanimated — une opacité ou un `translateY` interpolés image par image — ne sont pas des tokens : le type `Style` n’a pas de `transform`, et la sortie de `useAnimatedStyle` est une valeur de mouvement calculée à l’exécution. Une primitive L0 l’applique à sa vue `Animated.View` interne, hors de la prop `style` brandée ; les bornes de l’interpolation restent des tokens.
+- La typographie est absente du type `Style`. `textStyle` est le seul constructeur qui change un nom de variant en une fonte, une taille, une couleur et l’interligne qu’il en dérive ; les primitives de texte sont seules à l’appeler, et aucune prop ne transporte ce qu’il rend.
+- Le type `Style` ne porte qu’une transformation, une rotation par un angle nommé : celle à laquelle le journal pose son papier. Les valeurs d’une animation Reanimated — une opacité ou un `translateY` interpolés image par image — ne sont pas des tokens, la sortie de `useAnimatedStyle` étant calculée à l’exécution. Une primitive L0 l’applique à sa vue `Animated.View` interne, hors de la prop `style` brandée ; les bornes de l’interpolation restent des tokens.
 - Réévaluation : React Native fige une API de style strict qui rend le brandage redondant, ou `createStyles` devient un goulet mesuré au profilage.

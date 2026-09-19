@@ -33,7 +33,7 @@ Comment garantir qu’un texte affiché vienne du dictionnaire, d’un formateur
 Option retenue : « DisplayText brandé et dictionnaire t() », parce que c’est la seule option qui n’admet qu’une source sanctionnée (C1), donne au texte une source unique en français (C2) et ferme la prop `children` d’une primitive de texte à toute autre chaîne (C3).
 
 - **R1** — Un texte affiché DOIT être un `DisplayText`, que produisent `t()`, les formateurs et les champs de prose des contrats.
-- **R2** — La prop `children` d’une primitive de texte DOIT être le type `DisplayText`.
+- **R2** — Le texte qu’une primitive de texte reçoit DOIT être le type `DisplayText`, qu’elle le prenne en `children` ou en fragments d’une phrase.
 - **R3** — Un texte brut, hors espaces, NE DOIT PAS paraître dans le JSX.
 
 ### Conséquences
