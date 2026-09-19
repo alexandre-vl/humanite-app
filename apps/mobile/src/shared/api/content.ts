@@ -1,4 +1,4 @@
-import type { ContentApi } from '@huma/contracts';
+import type { ContentApi, ContentErrorCode } from '@huma/contracts';
 import { ContentApiError } from '@huma/contracts';
 import { contentApi } from '@huma/mock-api';
 
@@ -10,7 +10,16 @@ import { contentApi } from '@huma/mock-api';
 export const content: ContentApi = contentApi;
 
 /**
- * Whether asking again could answer differently. An article the content does not have stays missing however often it is
- * asked for, so only a failure that may pass — a service unavailable, a read that timed out — is worth another try.
+ * Whether asking again could answer differently, code by code. An article the content does not have stays missing
+ * however often it is asked for; a service unavailable and a read that timed out may both pass on the next try. The
+ * table answers for every code the contract declares, so a code added there stops the build here rather than becoming
+ * retryable by default — a wrong answer nothing would report.
  */
-export const isRetryable = (error: Error): boolean => error instanceof ContentApiError && error.code !== 'not-found';
+const RETRYABLE = {
+  'not-found': false,
+  unavailable: true,
+  timeout: true,
+} satisfies Readonly<Record<ContentErrorCode, boolean>>;
+
+/** Whether asking again could answer differently, for an error of any origin. */
+export const isRetryable = (error: Error): boolean => error instanceof ContentApiError && RETRYABLE[error.code];

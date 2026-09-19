@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react-native';
 import { LivePage } from './live-page';
 
 describe('LivePage', () => {
-  it('affiche le libellé de la rubrique', async () => {
+  it('affiche son titre au-dessus du fil', async () => {
     await render(
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0 } } })}>
         <LivePage />

@@ -7,14 +7,16 @@ import { ArticleFeed } from './article-feed';
 
 describe('ArticleFeed', () => {
   it('affiche les articles que le contenu sert', async () => {
-    const page = await content.getFeed({});
-    const first = page.items[0];
+    const [first] = (await content.getFeed({})).items;
+    if (first === undefined) {
+      throw new Error('le contenu ne sert aucun article : le test ne vérifierait rien');
+    }
     await render(
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0 } } })}>
         <ArticleFeed query={feedQuery} />
       </QueryClientProvider>,
     );
-    expect(await screen.findByText(first?.title ?? '')).toBeTruthy();
-    expect(await screen.findByText(first?.standfirst ?? '')).toBeTruthy();
+    expect(await screen.findByText(first.title)).toBeTruthy();
+    expect(await screen.findByText(first.standfirst)).toBeTruthy();
   });
 });

@@ -5,7 +5,11 @@ import { content } from '#api';
 /** The root every article key starts with: one entity, one namespace in the cache the app persists. */
 const ARTICLES = 'articles';
 
-/** No cursor at all: the content serves the first page to a query that asks for none. */
+/**
+ * No cursor at all: the content serves the first page to a query that asks for none. It is an empty string rather than
+ * `null` because the cursor type is read off this value — `null` would fix it to `null` and the cursors the content
+ * mints would no longer fit.
+ */
 const FIRST = '';
 
 /** The query that reads the page `cursor` opens, a cursor staying an opaque string the content alone mints. */
