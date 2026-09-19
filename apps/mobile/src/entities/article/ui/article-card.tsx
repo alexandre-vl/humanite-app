@@ -39,7 +39,9 @@ export function ArticleCard({ summary }: ArticleCardProps): ReactNode {
   const visual = summary.hero === undefined ? null : visualOf(summary.hero.key, 'card');
   return (
     <Box style={styles.card}>
-      {visual === null ? null : <Image source={visual.source} thumbhash={visual.thumbhash} style={styles.hero} />}
+      {visual === null ? null : (
+        <Image source={visual.source} recyclingKey={summary.id} thumbhash={visual.thumbhash} style={styles.hero} />
+      )}
       {MARKED[summary.access] ? <Badge label={t('article.premium')} /> : null}
       <Text variant="title" numberOfLines={3}>
         {summary.title}

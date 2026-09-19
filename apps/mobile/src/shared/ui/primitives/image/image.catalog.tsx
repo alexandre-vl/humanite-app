@@ -12,7 +12,7 @@ const useStyles = createStyles(() => ({ demo: { width: SIZES.headerExpanded, hei
 
 function ImageDemo(): ReactNode {
   const styles = useStyles();
-  return <Image source={{ thumbhash: DEMO }} style={styles.demo} />;
+  return <Image source={{ thumbhash: DEMO }} recyclingKey="demo" style={styles.demo} />;
 }
 
 export const catalog: CatalogEntry = {
