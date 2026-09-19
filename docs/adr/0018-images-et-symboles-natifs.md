@@ -31,7 +31,7 @@ Comment rendre l’image et l’icône natives sans qu’un module natif fuie ho
 Option retenue : « modules Expo confinés et registre d’icônes typé », parce qu’elle seule confine les modules natifs aux primitives (C1), ferme les noms d’icônes à un registre typé (C2) et prend les modules du SDK (C3).
 
 - **R1** — expo-image et expo-symbols NE DOIVENT PAS être importées hors des primitives.
-- **R2** — Un Icon DOIT nommer son symbole par une clé du registre typé, jamais une chaîne libre.
+- **R2** — Un symbole de plateforme NE DOIT PAS être nommé hors du registre typé des icônes.
 
 ### Conséquences
 
@@ -57,5 +57,6 @@ Option retenue : « modules Expo confinés et registre d’icônes typé », par
 ## Informations complémentaires
 
 - expo-symbols exige la forme objet du nom sur Android ; le registre porte les deux noms et la primitive passe `{ ios, android }`.
+- La barre d’onglets native dessine ses symboles elle-même, sans passer par la primitive : le typage du registre ne l’atteignait pas, et la règle s’arrêtait donc en deçà du critère qui la fonde.
 - Les contrôles et surfaces natifs — feuilles, menus, curseurs — restent à décider dans un ADR distinct.
 - Réévaluation : Expo unifie les noms de symboles entre plateformes, ou un besoin d’icône hors SF Symbols et Material Symbols apparaît.

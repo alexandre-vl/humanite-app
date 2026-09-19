@@ -829,10 +829,7 @@ export const BINDINGS = {
     },
     rules: {
       R1: ['guardrail/module-expo-image', 'guardrail/module-expo-symbols'],
-      R2: {
-        convention:
-          'Un Icon nomme son symbole par une clé du registre typé ICONS (IconName = keyof typeof ICONS, chaque clé mappée à { ios: SFSymbol, android: AndroidSymbol }) ; une chaîne de plateforme libre ne compile pas.',
-      },
+      R2: ['guardrail/icon-symbol'],
     },
   },
   'ADR-0020': {

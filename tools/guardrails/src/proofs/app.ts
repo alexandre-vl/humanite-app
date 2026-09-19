@@ -234,6 +234,20 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/list.ts': "export { FlashList } from '@shopify/flash-list';\n" }),
     ),
     define(
+      'guardrail/icon-symbol',
+      'la barre d’onglets, qui écrit le nom d’un symbole de plateforme au lieu de le lire du registre',
+      ['icon/symbol'],
+      linted({
+        'src/_app/routes/tab-icons.tsx': `import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import type { ReactNode } from 'react';
+
+export function TabIcons(): ReactNode {
+  return <NativeTabs.Trigger.Icon sf="house" />;
+}
+`,
+      }),
+    ),
+    define(
       'guardrail/nav-js-tabs',
       'la couche app, qui compose la barre par les onglets JS',
       ['nav/js-tabs'],

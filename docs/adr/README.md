@@ -246,10 +246,10 @@ Statut : proposé. Périmètre : `apps/mobile/src/_app/model/fonts.ts`, `apps/mo
 
 Statut : proposé. Périmètre : `apps/mobile/src/shared/ui/primitives/image/**`, `apps/mobile/src/shared/ui/primitives/icon/**`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                                   |
-| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | NE DOIT PAS | `guardrail/module-expo-image`, `guardrail/module-expo-symbols`                                                                                                                                                            |
-| R2    | DOIT        | convention : Un Icon nomme son symbole par une clé du registre typé ICONS (IconName = keyof typeof ICONS, chaque clé mappée à { ios: SFSymbol, android: AndroidSymbol }) ; une chaîne de plateforme libre ne compile pas. |
+| Règle | Niveau      | Preuves                                                        |
+| ----- | ----------- | -------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/module-expo-image`, `guardrail/module-expo-symbols` |
+| R2    | NE DOIT PAS | `guardrail/icon-symbol`                                        |
 
 ### ADR-0020 · Contenu simulé en corpus fictif et visuels générés
 

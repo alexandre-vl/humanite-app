@@ -84,6 +84,15 @@ const STYLE_SYNTAX: readonly SyntaxRestriction[] = [
 /** UI text comes from the dictionary through a DisplayText: raw text written in the JSX, whitespace aside, escapes it. */
 const TEXT_SYNTAX: readonly SyntaxRestriction[] = [{ policy: 'text/jsx', selector: String.raw`JSXText[value=/\S/]` }];
 
+/**
+ * An icon is named by a key of the typed registry. The native tab bar draws its own symbols rather than mounting the
+ * Icon primitive, so the registry's type never reaches it: written there as a literal, a symbol name would be decided
+ * in a second place.
+ */
+const ICON_SYNTAX: readonly SyntaxRestriction[] = [
+  { policy: 'icon/symbol', selector: String.raw`JSXAttribute[name.name=/^(?:sf|md)$/] Literal` },
+];
+
 /** The tab bar is composed with NativeTabs: the JS tabs of Expo Router, imported directly or as the deprecated Tabs, do not render a native bar. */
 const NAV_SYNTAX: readonly SyntaxRestriction[] = [
   { policy: 'nav/js-tabs', selector: String.raw`ImportDeclaration[source.value='expo-router/js-tabs']` },
@@ -242,6 +251,7 @@ const HERMES: Runtime = {
     ...STYLE_SYNTAX,
     ...THEME_SYNTAX,
     ...TEXT_SYNTAX,
+    ...ICON_SYNTAX,
     ...NAV_SYNTAX,
     ...QUERY_SYNTAX,
     ...ROUTE_PARAMS_SYNTAX,
