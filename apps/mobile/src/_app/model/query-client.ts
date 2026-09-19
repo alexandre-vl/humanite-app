@@ -4,8 +4,17 @@ import { isRetryable } from '#api';
 import { CACHE_BUSTER } from './cache-buster';
 import { mmkvPersister } from './persister';
 
+const MINUTE = 1000 * 60;
+
 /** How long a persisted cache stays valid; the query gcTime matches it, so gcTime never falls below the persister maxAge. */
-const CACHE_MAX_AGE = 1000 * 60 * 60 * 24;
+const CACHE_MAX_AGE = 24 * 60 * MINUTE;
+
+/**
+ * How long a read stays fresh before a screen coming back to it asks again. Asking again for a paged feed asks for
+ * every page already read, so a reader who leaves a wire scrolled deep and returns would pay the whole scroll over;
+ * a newspaper publishes by the minute at most, so a minute of trust loses nothing and spares that.
+ */
+const FRESH_FOR = MINUTE;
 
 /** How many times a read that may still pass is tried again before a screen says it failed. */
 const RETRIES = 2;
@@ -15,6 +24,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       gcTime: CACHE_MAX_AGE,
+      staleTime: FRESH_FOR,
       retry: (failureCount: number, error: Error) => failureCount < RETRIES && isRetryable(error),
     },
   },
