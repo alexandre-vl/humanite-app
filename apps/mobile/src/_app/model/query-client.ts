@@ -1,6 +1,7 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query';
 import type { PersistQueryClientOptions } from '@tanstack/react-query-persist-client';
 import { isRetryable } from '#api';
+import { isSearchKey } from '#entities/article';
 import { CACHE_BUSTER } from './cache-buster';
 import { mmkvPersister } from './persister';
 
@@ -30,9 +31,21 @@ export const queryClient = new QueryClient({
   },
 });
 
+/**
+ * What of the cache is written to disk. A reading of the paper is worth keeping: the same pages will be wanted
+ * tomorrow, and finding them already there is the whole point of persisting anything. A reader's question is not: it
+ * is answered from the corpus the app already carries, it is asked once and rarely twice, and keeping it would file
+ * every question ever typed beside the journal — and re-serialise them all on each of the next day's writes. It stays
+ * in memory, where the reader still on the screen finds it, and goes no further.
+ */
+const isWorthKeeping = (query: Readonly<{ queryKey: readonly unknown[] }>): boolean => !isSearchKey(query.queryKey);
+
 /** The persistence options the provider applies: the MMKV persister, the contracts-hash buster, and the max cache age. */
 export const persistOptions: Omit<PersistQueryClientOptions, 'queryClient'> = {
   persister: mmkvPersister,
   buster: CACHE_BUSTER,
   maxAge: CACHE_MAX_AGE,
+  dehydrateOptions: {
+    shouldDehydrateQuery: (query) => defaultShouldDehydrateQuery(query) && isWorthKeeping(query),
+  },
 };

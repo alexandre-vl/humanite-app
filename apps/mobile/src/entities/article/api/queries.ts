@@ -1,9 +1,26 @@
-import type { Article, ArticleId, ArticleSummary, FeedQuery, LiveQuery, Page, SectionId } from '@huma/contracts';
+import type {
+  Article,
+  ArticleId,
+  ArticleSummary,
+  FeedQuery,
+  LiveQuery,
+  Page,
+  SearchQuery,
+  SectionId,
+} from '@huma/contracts';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
+import { searchable } from '../model/search';
 
 /** The root every article key starts with: one entity, one namespace in the cache the app persists. */
 const ARTICLES = 'articles';
+
+/**
+ * The branch a reader's question is filed under. It is named apart from the other keys because the app asks about it:
+ * a question is worth answering from memory while the reader is still on the screen, and not worth keeping on disk
+ * after — see the persistence options, which read this and nothing else about a key.
+ */
+const SEARCH = 'search';
 
 /**
  * The newsroom's own namespace. The roster is read from here rather than from an author entity of its own: an article
@@ -30,21 +47,28 @@ const KEYS = {
   feed: (): readonly string[] => [ARTICLES, 'feed'],
   section: (section: SectionId): readonly string[] => [ARTICLES, 'section', section],
   live: (): readonly string[] => [ARTICLES, 'live'],
+  search: (text: string): readonly string[] => [ARTICLES, SEARCH, text],
   one: (id: ArticleId): readonly string[] => [ARTICLES, 'one', id],
   summaries: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, 'summaries', ...ids],
   authors: (): readonly string[] => [AUTHORS],
 } as const;
 
 /**
- * A feed read page by page: the key it is filed under, and the reading that turns a cursor into a page. Where the
- * pages come from is all that separates the three below, so it is all they state.
+ * A feed read page by page: the key it is filed under, the reading that turns a cursor into a page, and whether it is
+ * to be read at all. Where the pages come from is nearly all that separates the four below, so it is nearly all they
+ * state.
  */
-const paged = (queryKey: readonly string[], read: (query: LiveQuery) => Promise<Page<ArticleSummary>>) =>
+const paged = (
+  queryKey: readonly string[],
+  read: (query: LiveQuery) => Promise<Page<ArticleSummary>>,
+  enabled = true,
+) =>
   infiniteQueryOptions({
     queryKey,
     queryFn: async ({ pageParam }) => read(at(pageParam)),
     initialPageParam: FIRST,
     getNextPageParam: (page) => page.nextCursor,
+    enabled,
   });
 
 /**
@@ -69,6 +93,24 @@ export const sectionFeedQuery = (section: SectionId): PagedFeed =>
 
 /** The same articles as a running wire: what the En continu screen reads. */
 export const liveFeedQuery = paged(KEYS.live(), async (query) => content.getLiveFeed(query));
+
+/**
+ * The articles a reader's question reaches, newest first, by pages. The question is asked of the content only once it
+ * is one: an empty field would otherwise fetch the whole paper — the content matches every article against nothing —
+ * and a single letter very nearly all of it.
+ */
+export const searchQuery = (text: string): PagedFeed =>
+  paged(
+    KEYS.search(text),
+    async (query) => {
+      const asked: SearchQuery = { ...query, text };
+      return content.search(asked);
+    },
+    searchable(text),
+  );
+
+/** Whether a key in the cache is a reader's question rather than a reading of the paper. */
+export const isSearchKey = (key: readonly unknown[]): boolean => key[0] === ARTICLES && key[1] === SEARCH;
 
 /** One reading of the content under one key, whatever it answers with. */
 const single = <Value>(queryKey: readonly string[], read: () => Promise<Value>) =>

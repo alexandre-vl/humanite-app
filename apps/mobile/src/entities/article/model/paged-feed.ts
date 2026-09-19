@@ -19,9 +19,14 @@ const STAND_IN = {
 
 export const stateOf = (status: QueryStatus): FeedState => STAND_IN[status];
 
-/** A feed read page by page: what has arrived, what stands in while nothing has, and how to ask for the rest. */
+/**
+ * A feed read page by page: what has arrived, how many there are in all, what stands in while nothing has, and how to
+ * ask for the rest. The count is the whole feed's and not the pages read so far, because that is the only one worth
+ * telling a reader: a screen that filters says what it found, not what it has got as far as showing.
+ */
 export type ReadFeed = Readonly<{
   items: readonly ArticleSummary[];
+  total: number;
   state: FeedState;
   retry: () => void;
   onEndReached: () => void;
@@ -39,6 +44,7 @@ export function usePagedFeed(query: PagedFeed): ReadFeed {
   const { data, status, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);
   return {
     items: data?.pages.flatMap((page) => page.items) ?? [],
+    total: data?.pages[0]?.total ?? 0,
     state: stateOf(status),
     retry: () => {
       void refetch();

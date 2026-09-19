@@ -1,27 +1,27 @@
-import { SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleFeed, feedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar } from '#entities/section';
 import { t } from '#i18n';
-import { createStyles, useTheme } from '#lib/styles';
+import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
-import { Icon } from '#primitives/icon';
 import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
 
 const useStyles = createStyles((theme) => ({
   masthead: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.border },
-  search: { position: 'absolute', right: SPACING.lg },
 }));
 
 /**
  * The À la une screen: every section at once, under a masthead that collapses behind the band of sections as the feed
  * scrolls. No section is named here, so the band shows none as the one being read; choosing one opens its own screen.
+ *
+ * The masthead carries the paper's name and nothing else. It held a magnifier for a while, drawn but answering to
+ * nothing; searching is now a destination of its own, and a second way in that scrolls away with the masthead would
+ * be a worse one.
  */
 export function HomePage(): ReactNode {
   const styles = useStyles();
-  const theme = useTheme();
   const feed = usePagedFeed(feedQuery);
   return (
     <Surface>
@@ -33,9 +33,6 @@ export function HomePage(): ReactNode {
         header={
           <Box style={styles.masthead}>
             <Text variant="display">{t('app.name')}</Text>
-            <Box style={styles.search}>
-              <Icon name="search" size={SPACING.lg} tintColor={theme.primary} />
-            </Box>
           </Box>
         }
         sticky={

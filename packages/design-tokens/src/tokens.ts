@@ -61,8 +61,9 @@ export const FONT_FAMILIES = {
 
 /**
  * Component sizes in points: the collapsible header's expanded and collapsed bands, its sticky section bar, and the
- * scroll inset those add up to — heights the four-point SPACING grid does not reach. `stroke` and `ring` draw the
- * rule a timeline hangs its items from, finer than the grid's smallest step.
+ * scroll inset those add up to — heights the four-point SPACING grid does not reach. `stroke` is the rule the paper
+ * draws where it draws one — the line a timeline hangs its items from, the line a field is typed on — and `ring` the
+ * hollow mark on it: both finer than the grid's smallest step.
  */
 const HEADER_EXPANDED = 64;
 const SECTION_BAR = 40;

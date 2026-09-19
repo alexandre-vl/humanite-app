@@ -7,6 +7,7 @@ import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
 import type { ReadFeed } from '../model/paged-feed';
 import { ArticleCard, shapeOf } from './article-card';
+import type { EmptyWords } from './feed-stand-in';
 import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleFeedProps = Readonly<{
@@ -14,6 +15,7 @@ export type ArticleFeedProps = Readonly<{
   onOpen: (id: ArticleId) => void;
   header?: ReactNode;
   sticky?: ReactNode;
+  empty?: EmptyWords;
 }>;
 
 const useStyles = createStyles(() => ({
@@ -27,7 +29,7 @@ const useStyles = createStyles(() => ({
  * It reports which article was pressed and goes nowhere itself: an entity may not name a route, and the screen that
  * mounts the feed is the one that knows what opening an article means for it.
  */
-export function ArticleFeed({ feed, onOpen, header, sticky }: ArticleFeedProps): ReactNode {
+export function ArticleFeed({ feed, onOpen, header, sticky, empty }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
   return (
     <List
@@ -48,7 +50,7 @@ export function ArticleFeed({ feed, onOpen, header, sticky }: ArticleFeedProps):
       contentStyle={styles.feed}
       header={header}
       sticky={sticky}
-      empty={<FeedStandIn state={feed.state} onRetry={feed.retry} />}
+      empty={<FeedStandIn state={feed.state} onRetry={feed.retry} empty={empty} />}
       onEndReached={feed.onEndReached}
     />
   );
