@@ -4,6 +4,7 @@ import { catalog as imageCatalog } from '#primitives/image';
 import { catalog as pressableCatalog } from '#primitives/pressable';
 import { catalog as surfaceCatalog } from '#primitives/surface';
 import { catalog as textCatalog } from '#primitives/text';
+import { catalog as themeCatalog } from '#primitives/theme';
 import { catalog as badgeCatalog } from '#components/badge';
 import { catalog as buttonCatalog } from '#components/button';
 import { catalog as chipCatalog } from '#components/chip';
@@ -20,6 +21,7 @@ export const REGISTRY: readonly CatalogItem[] = [
   { level: 'L0', entry: pressableCatalog },
   { level: 'L0', entry: surfaceCatalog },
   { level: 'L0', entry: textCatalog },
+  { level: 'L0', entry: themeCatalog },
   { level: 'L1', entry: badgeCatalog },
   { level: 'L1', entry: buttonCatalog },
   { level: 'L1', entry: chipCatalog },

@@ -53,13 +53,15 @@ export const ENTRY_FILES: readonly string[] = PLACE_NAMES.flatMap((name) => {
 });
 
 /**
- * The theme's trusted core, as paths relative to the workspace root: the context that holds the theme and the root that
- * resolves it from the system scheme. These two files alone import a frozen theme; every other file receives the theme
- * in force from createStyles, so a component cannot pin a colour that ignores dark mode.
+ * The theme's trusted core, as paths relative to the workspace root: the context that holds the theme, the root that
+ * resolves it from the system scheme, and the scope that hands a named one to a subtree. These three files alone
+ * import a frozen theme; every other file receives the theme in force from createStyles, so a component cannot pin a
+ * colour that ignores dark mode — and one that wants a theme other than the reader's names it rather than paints it.
  */
 export const THEME_FILES: readonly string[] = [
   `${APP_DIRECTORY}/src/shared/lib/styles/theme.tsx`,
   `${APP_DIRECTORY}/src/shared/ui/primitives/theme/theme-root.tsx`,
+  `${APP_DIRECTORY}/src/shared/ui/primitives/theme/theme-scope.tsx`,
 ];
 
 /**

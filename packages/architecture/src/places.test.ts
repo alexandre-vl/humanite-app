@@ -86,10 +86,11 @@ describe('what the tools derive from the places', () => {
     ]);
   });
 
-  test('the theme’s trusted core is the context and its root', () => {
+  test('the theme’s trusted core is the context, its root and the scope that names one', () => {
     expect(THEME_FILES).toEqual([
       'apps/mobile/src/shared/lib/styles/theme.tsx',
       'apps/mobile/src/shared/ui/primitives/theme/theme-root.tsx',
+      'apps/mobile/src/shared/ui/primitives/theme/theme-scope.tsx',
     ]);
   });
 });

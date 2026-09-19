@@ -9,6 +9,7 @@ export type LineHeight = Brand<number, 'LineHeight'>;
 export type Duration = Brand<number, 'Duration'>;
 export type FontFamily = Brand<string, 'FontFamily'>;
 export type Color = Brand<string, 'Color'>;
+export type Angle = Brand<string, 'Angle'>;
 
 const HEX = /^#[0-9a-f]{6}$/u;
 const isFiniteNonNegative = (value: number): boolean => Number.isFinite(value) && value >= 0;
@@ -20,6 +21,9 @@ const isLineHeight = (value: number): value is LineHeight => Number.isFinite(val
 const isDuration = (value: number): value is Duration => isFiniteNonNegative(value);
 const isFontFamily = (value: string): value is FontFamily => value.length > 0;
 const isColor = (value: string): value is Color => HEX.test(value);
+const isAngle = (value: string): value is Angle => DEGREES.test(value);
+
+const DEGREES = /^-?\d+(?:\.\d+)?deg$/u;
 
 const invalid = (kind: string, value: number | string): never => {
   throw new RangeError(`${kind} invalide : ${String(value)}`);
@@ -32,3 +36,9 @@ export const lineHeight = (value: number): LineHeight => (isLineHeight(value) ? 
 export const duration = (value: number): Duration => (isDuration(value) ? value : invalid('durée', value));
 export const fontFamily = (value: string): FontFamily => (isFontFamily(value) ? value : invalid('police', value));
 export const color = (value: string): Color => (isColor(value) ? value : invalid('couleur', value));
+
+/** A rotation in degrees, carried as the string React Native reads: a turn to the left is a negative one. */
+export const angle = (degrees: number): Angle => {
+  const written = `${String(degrees)}deg`;
+  return isAngle(written) ? written : invalid('angle', degrees);
+};

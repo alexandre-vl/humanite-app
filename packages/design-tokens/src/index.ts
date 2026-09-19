@@ -1,6 +1,7 @@
-export type { Brand, Color, Duration, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
+export type { Angle, Brand, Color, Duration, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
 export { PALETTE } from './palette.ts';
 export {
+  ANGLES,
   DURATIONS,
   FONT_FAMILIES,
   FONT_SIZES,
