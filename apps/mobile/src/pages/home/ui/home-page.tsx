@@ -23,6 +23,10 @@ const SHOWING: readonly LabelBarItem<Showing>[] = [
 
 const useStyles = createStyles((theme) => ({
   masthead: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.border },
+  // The band fills the rows the list reserved for it, and its bars share them. Without a height of its own it would
+  // size to its content, and its bars — which stretch to the band rather than measure themselves — would find nothing
+  // to stretch to and collapse: an empty strip over a gap the list had already left for it.
+  bands: { flex: 1 },
 }));
 
 /**
@@ -58,7 +62,7 @@ export function HomePage(): ReactNode {
           </Box>
         }
         sticky={
-          <Box>
+          <Box style={styles.bands}>
             <LabelBar items={SHOWING} active={showing} onSelect={setShowing} />
             {onBookmarks ? null : (
               <SectionBar
