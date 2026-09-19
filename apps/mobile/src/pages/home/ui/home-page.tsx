@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ArticleFeed, feedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar } from '#entities/section';
 import { t } from '#i18n';
+import { articleHref } from '#lib/routing';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Surface } from '#primitives/surface';
@@ -28,7 +29,7 @@ export function HomePage(): ReactNode {
       <ArticleFeed
         feed={feed}
         onOpen={(id) => {
-          router.push({ pathname: '/article/[id]', params: { id } });
+          router.push(articleHref(id));
         }}
         header={
           <Box style={styles.masthead}>

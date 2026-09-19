@@ -6,7 +6,7 @@ import { EmptyState } from '#components/empty-state';
 import { ArticleFeed, sectionFeedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar, sectionsQuery } from '#entities/section';
 import { t } from '#i18n';
-import { useRouteParams } from '#lib/routing';
+import { articleHref, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
 /**
@@ -35,7 +35,7 @@ export function SectionPage(): ReactNode {
         <ArticleFeed
           feed={feed}
           onOpen={(article) => {
-            router.push({ pathname: '/article/[id]', params: { id: article } });
+            router.push(articleHref(article));
           }}
           sticky={
             <SectionBar

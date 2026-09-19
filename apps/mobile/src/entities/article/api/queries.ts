@@ -112,9 +112,9 @@ export const searchQuery = (text: string): PagedFeed =>
 /** Whether a key in the cache is a reader's question rather than a reading of the paper. */
 export const isSearchKey = (key: readonly unknown[]): boolean => key[0] === ARTICLES && key[1] === SEARCH;
 
-/** One reading of the content under one key, whatever it answers with. */
-const single = <Value>(queryKey: readonly string[], read: () => Promise<Value>) =>
-  queryOptions({ queryKey, queryFn: async () => read() });
+/** One reading of the content under one key, whatever it answers with, and whether it is to be read at all. */
+const single = <Value>(queryKey: readonly string[], read: () => Promise<Value>, enabled = true) =>
+  queryOptions({ queryKey, queryFn: async () => read(), enabled });
 
 /** The options of one such reading, read off the factory rather than off any one of the readings below. */
 type Single<Value> = ReturnType<typeof single<Value>>;
@@ -124,12 +124,16 @@ export const articleQuery = (id: ArticleId): Single<Article> =>
   single(KEYS.one(id), async () => content.getArticle(id));
 
 /**
- * The summaries a reading screen needs to announce the articles a body points at. They are read as summaries and not
- * as articles: a summary carries everything a card shows and none of the body behind it, which over the corpus is a
- * fifth of the bytes, and one call answers for however many the body names.
+ * The summaries a screen needs to announce a set of articles it already knows the ids of. They are read as summaries
+ * and not as articles: a summary carries everything a card shows and none of the body behind it, which over the corpus
+ * is a fifth of the bytes, and one call answers for however many are named.
+ *
+ * No ids, no question. A screen asks before it knows which articles it is announcing — a body that has not arrived
+ * names none, a reader who has kept none has none — and an empty list asked for is still a reading, filed in the cache
+ * and written to disk with the rest.
  */
 export const summariesQuery = (ids: readonly ArticleId[]): Single<readonly ArticleSummary[]> =>
-  single(KEYS.summaries(ids), async () => content.getSummaries(ids));
+  single(KEYS.summaries(ids), async () => content.getSummaries(ids), ids.length > 0);
 
 /**
  * The newsroom, which a byline reads to turn the ids an article carries into names. Like the sections it is the

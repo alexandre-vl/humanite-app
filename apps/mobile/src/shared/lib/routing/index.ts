@@ -1,1 +1,1 @@
-export { useRouteParams } from './routing';
+export { articleHref, useRouteParams } from './routing';

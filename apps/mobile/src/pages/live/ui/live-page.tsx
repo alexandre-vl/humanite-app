@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleWire, liveFeedQuery, usePagedFeed } from '#entities/article';
+import { articleHref } from '#lib/routing';
 import { createStyles } from '#lib/styles';
 import { Surface } from '#primitives/surface';
 
@@ -22,7 +23,7 @@ export function LivePage(): ReactNode {
       <ArticleWire
         feed={feed}
         onOpen={(id) => {
-          router.push({ pathname: '/article/[id]', params: { id } });
+          router.push(articleHref(id));
         }}
       />
     </Surface>

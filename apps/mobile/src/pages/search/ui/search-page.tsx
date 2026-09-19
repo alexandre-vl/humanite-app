@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { EmptyState } from '#components/empty-state';
 import { ArticleFeed, searchQuery, searchable, usePagedFeed } from '#entities/article';
 import { t } from '#i18n';
+import { articleHref } from '#lib/routing';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Surface } from '#primitives/surface';
@@ -45,7 +46,7 @@ export function SearchPage(): ReactNode {
         <ArticleFeed
           feed={feed}
           onOpen={(id) => {
-            router.push({ pathname: '/article/[id]', params: { id } });
+            router.push(articleHref(id));
           }}
           empty={{ title: t('search.none.title', { query: asked }), message: t('search.none.message') }}
         />

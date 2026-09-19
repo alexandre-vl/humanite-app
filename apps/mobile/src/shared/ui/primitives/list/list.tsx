@@ -14,7 +14,9 @@ type ListCore<Item> = Readonly<{
   typeOf: (item: Item) => string;
   renderItem: (item: Item) => ReactNode;
   empty?: ReactNode;
-  onEndReached?: () => void;
+  // Spelt with `undefined` because it is forwarded: a feed read in one call has no next page to ask for, and under
+  // `exactOptionalPropertyTypes` handing that absence over is not the same as leaving the prop out.
+  onEndReached?: (() => void) | undefined;
   contentStyle?: StyleRef;
 }>;
 

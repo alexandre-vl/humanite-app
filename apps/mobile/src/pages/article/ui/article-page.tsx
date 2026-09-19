@@ -2,7 +2,7 @@ import { ARTICLE_ID } from '@huma/contracts';
 import { Stack, router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleReader } from '#entities/article';
-import { useRouteParams } from '#lib/routing';
+import { articleHref, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
 /**
@@ -30,7 +30,7 @@ export function ArticlePage(): ReactNode {
         id={id}
         onFollow={(target) => {
           if (target.kind === 'article') {
-            router.replace({ pathname: '/article/[id]', params: { id: target.id } });
+            router.replace(articleHref(target.id));
           }
         }}
       />

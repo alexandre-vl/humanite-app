@@ -1,7 +1,19 @@
+import type { ArticleId } from '@huma/contracts';
 import { useLocalSearchParams } from 'expo-router';
 
 /** The parameters of a route as it hands them over: strings, one or several under a name, or none at all. */
 export type RawParams = Readonly<Record<string, string | readonly string[] | undefined>>;
+
+/** Where one article is read, as the router takes it. */
+export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly<{ id: ArticleId }> }>;
+
+/**
+ * Where to send a reader who chose an article. Five screens open one — the front page, the wire, a section, a search
+ * and an article following its own link — and each wrote out the same route and the same parameter name. Written five
+ * times, a route is five places to change and four chances to miss one; the file name that mints it stays the single
+ * source, and this is the one sentence the rest of the app says about it.
+ */
+export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
 
 /**
  * The parameters of the route a screen is showing, read by `read`.

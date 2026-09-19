@@ -20,17 +20,23 @@ const STAND_IN = {
 export const stateOf = (status: QueryStatus): FeedState => STAND_IN[status];
 
 /**
- * A feed read page by page: what has arrived, how many there are in all, what stands in while nothing has, and how to
- * ask for the rest. The count is the whole feed's and not the pages read so far, because that is the only one worth
- * telling a reader: a screen that filters says what it found, not what it has got as far as showing.
+ * A feed as the view that draws it reads it: what has arrived, what stands in while nothing has, and — when there is
+ * more than one page — how to ask for the rest. A feed read in one call answers the first three and leaves the last
+ * alone, which is why the view asks for no more than it draws.
  */
 export type ReadFeed = Readonly<{
   items: readonly ArticleSummary[];
-  total: number;
   state: FeedState;
   retry: () => void;
-  onEndReached: () => void;
+  onEndReached?: (() => void) | undefined;
 }>;
+
+/**
+ * A paged feed, which also knows how many there are in all. The count is the whole feed's and not the pages read so
+ * far, because that is the only one worth telling a reader: a screen that filters says what it found, not what it has
+ * got as far as showing. It stays out of what a view reads, no view having ever had anything to say about it.
+ */
+export type PagedRead = ReadFeed & Readonly<{ total: number }>;
 
 /**
  * Reads a paged feed. Every screen that shows one reads it this way: the pages already fetched, flattened; one more
@@ -40,7 +46,7 @@ export type ReadFeed = Readonly<{
  * The screen reads it, not the view it hands it to. A view that read its own feed would be the only one to know what
  * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
-export function usePagedFeed(query: PagedFeed): ReadFeed {
+export function usePagedFeed(query: PagedFeed): PagedRead {
   const { data, status, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);
   return {
     items: data?.pages.flatMap((page) => page.items) ?? [],
