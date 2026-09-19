@@ -2,7 +2,6 @@ import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { ArticleFeed, feedQuery } from '#entities/article';
 import { t } from '#i18n';
-import { useStartup } from '#lib/startup';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -23,11 +22,10 @@ const useStyles = createStyles((theme) => ({
 
 /** The À la une screen: the masthead collapses behind the section bar as the feed scrolls. */
 export function HomePage(): ReactNode {
-  const { signalFirstLayout } = useStartup();
   const styles = useStyles();
   const theme = useTheme();
   return (
-    <Surface onLayout={signalFirstLayout}>
+    <Surface>
       <ArticleFeed
         query={feedQuery}
         header={
