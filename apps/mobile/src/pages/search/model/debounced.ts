@@ -17,12 +17,17 @@ const SETTLE = 300;
 export function useDebounced(value: string): string {
   const [settled, setSettled] = useState(value);
   useEffect(() => {
+    // Nothing is waited on when nothing has changed — the first render included, where a wait would only ever end by
+    // setting the value it already holds, well after the screen had stopped caring.
+    if (value === settled) {
+      return undefined;
+    }
     const timer = setTimeout(() => {
       setSettled(value);
     }, SETTLE);
     return () => {
       clearTimeout(timer);
     };
-  }, [value]);
+  }, [value, settled]);
   return settled;
 }

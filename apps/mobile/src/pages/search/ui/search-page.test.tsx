@@ -1,4 +1,4 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
@@ -19,6 +19,11 @@ const renderPage = async (): Promise<void> => {
   );
 };
 
+/** One more turn, for the answer to land: a question still on its way when a test ends answers during the next one. */
+const settle = async (): Promise<void> => {
+  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+};
+
 /**
  * Types into the field and lets the screen settle. Two turns are needed, not one: the first runs past the wait the
  * field keeps before asking anything, and the answer only reaches the screen on the next one. Measured — with a single
@@ -28,8 +33,12 @@ const renderPage = async (): Promise<void> => {
 const type = async (text: string): Promise<void> => {
   await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), text);
   await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await settle();
 };
+
+// A list unmounted between two tests finishes its own work on the next turn: letting that turn run here keeps the
+// update inside act, where React can account for it.
+afterEach(settle);
 
 describe('SearchPage', () => {
   /**
@@ -50,6 +59,7 @@ describe('SearchPage', () => {
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
     await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
     expect(screen.queryByText('Cherchez dans le journal')).toBeNull();
+    await settle();
   });
 
   it('sert les articles qu’une question atteint, et dit combien elle en a trouvé', async () => {
@@ -62,6 +72,7 @@ describe('SearchPage', () => {
     await type('climat');
     expect(await screen.findByText(first.title)).toBeTruthy();
     expect(screen.getByText(`${String(found.total)} résultats pour « climat »`)).toBeTruthy();
+    await settle();
   });
 
   it('trouve un article accentué à partir de ce qu’un lecteur tape sans accent', async () => {
@@ -73,6 +84,7 @@ describe('SearchPage', () => {
     await renderPage();
     await type('ecole');
     expect(await screen.findByText(first.title)).toBeTruthy();
+    await settle();
   });
 
   it('nomme la question à laquelle rien ne répond, plutôt que d’annoncer un journal vide', async () => {
@@ -80,6 +92,7 @@ describe('SearchPage', () => {
     await type('zzzz');
     expect(await screen.findByText('Aucun résultat pour « zzzz »')).toBeTruthy();
     expect(screen.queryByText('Rien à lire pour l’instant')).toBeNull();
+    await settle();
   });
 
   it('rend la question au lecteur quand il efface, et revient à ce qu’elle cherche', async () => {
@@ -88,6 +101,7 @@ describe('SearchPage', () => {
     await fireEvent.press(screen.getByLabelText('Effacer la recherche'));
     await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
+    await settle();
   });
 
   it('ouvre l’article pressé sur sa propre route', async () => {
@@ -99,5 +113,6 @@ describe('SearchPage', () => {
     await type('climat');
     await fireEvent.press(await screen.findByText(first.title));
     expect(jest.mocked(router.push)).toHaveBeenCalledWith({ pathname: '/article/[id]', params: { id: first.id } });
+    await settle();
   });
 });
