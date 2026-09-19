@@ -54,7 +54,8 @@ export const FONT_FAMILIES = {
 
 /**
  * Component sizes in points: the collapsible header's expanded and collapsed bands, its sticky section bar, and the
- * scroll inset those add up to — heights the four-point SPACING grid does not reach.
+ * scroll inset those add up to — heights the four-point SPACING grid does not reach. `stroke` and `ring` draw the
+ * rule a timeline hangs its items from, finer than the grid's smallest step.
  */
 const HEADER_EXPANDED = 64;
 const SECTION_BAR = 40;
@@ -63,6 +64,8 @@ export const SIZES = {
   headerCollapsed: space(0),
   sectionBar: space(SECTION_BAR),
   headerBlock: space(HEADER_EXPANDED + SECTION_BAR),
+  stroke: space(2),
+  ring: space(12),
 } as const satisfies Readonly<Record<string, Space>>;
 
 /** Animation durations in milliseconds. */

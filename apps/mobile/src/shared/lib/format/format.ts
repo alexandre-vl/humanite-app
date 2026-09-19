@@ -46,6 +46,36 @@ const parseInstant = (instant: string): number => {
 
 const pad = (value: number): string => String(value).padStart(2, '0');
 
+/**
+ * The weekdays as `getUTCDay` numbers them, Sunday first, and the months as the clock numbers them, January first.
+ * They are written here rather than asked of `Intl` in French: the clock above is pinned to one locale precisely so
+ * the printed forms do not follow the device's own data, and a heading that did would read differently from one phone
+ * to the next while the rest of the screen did not.
+ */
+const WEEKDAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'] as const;
+const MONTHS = [
+  'janvier',
+  'février',
+  'mars',
+  'avril',
+  'mai',
+  'juin',
+  'juillet',
+  'août',
+  'septembre',
+  'octobre',
+  'novembre',
+  'décembre',
+] as const;
+
+const nameAt = (names: readonly string[], index: number): string => {
+  const name = names[index];
+  if (name === undefined) {
+    throw new RangeError(`aucun nom au rang ${String(index)}`);
+  }
+  return name;
+};
+
 /** The day an item was published, in the one form the newspaper prints: `12/09/2026`. */
 export const formatDate = (instant: string): DisplayText => {
   const clock = readClock(parseInstant(instant));
@@ -56,6 +86,26 @@ export const formatDate = (instant: string): DisplayText => {
 export const formatDateTime = (instant: string): DisplayText => {
   const clock = readClock(parseInstant(instant));
   return asDisplayText(`${pad(clock.day)}/${pad(clock.month)}, ${pad(clock.hour)}:${pad(clock.minute)}`);
+};
+
+/**
+ * The calendar day an instant falls on, on the newsroom's clock: `2026-09-13`. It is a key, not a text — a timeline
+ * compares it to tell one run of items from the next, and never shows it.
+ */
+export const formatDayKey = (instant: string): string => {
+  const clock = readClock(parseInstant(instant));
+  return `${String(clock.year)}-${pad(clock.month)}-${pad(clock.day)}`;
+};
+
+/**
+ * That same day as a timeline heads the run it opens: `samedi 13 septembre`. The year is left out, a wire reaching
+ * back weeks at most; the weekday is read from the Paris calendar date rather than from the instant, so a publication
+ * just before Paris midnight heads the day the newsroom filed it under, not the one UTC was already on.
+ */
+export const formatDayLabel = (instant: string): DisplayText => {
+  const clock = readClock(parseInstant(instant));
+  const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
+  return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
 
 /**

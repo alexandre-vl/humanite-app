@@ -1,14 +1,23 @@
 import type { ReactNode } from 'react';
-import { SectionTitle } from '#components/section-title';
-import { ArticleFeed, liveFeedQuery } from '#entities/article';
-import { t } from '#i18n';
+import { ArticleWire, liveFeedQuery } from '#entities/article';
+import { createStyles } from '#lib/styles';
 import { Surface } from '#primitives/surface';
 
-/** The En continu screen: the same articles as a wire, under a title that slides away as the wire scrolls. */
+const useStyles = createStyles((theme) => ({
+  wire: { backgroundColor: theme.primary },
+}));
+
+/**
+ * The En continu screen: the day's items as a running wire, on the ground the paper gives that wire.
+ *
+ * It carries no title band of its own. The tab bar already names the screen, the screen it copies shows no such band,
+ * and the list pins the head of each day at the very top of its frame — which is exactly where a band would sit.
+ */
 export function LivePage(): ReactNode {
+  const styles = useStyles();
   return (
-    <Surface>
-      <ArticleFeed query={liveFeedQuery} header={<SectionTitle title={t('nav.live')} />} />
+    <Surface style={styles.wire}>
+      <ArticleWire query={liveFeedQuery} />
     </Surface>
   );
 }

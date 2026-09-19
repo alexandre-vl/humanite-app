@@ -100,6 +100,25 @@ describe('List', () => {
     expect(mounted).toBeLessThan(MANY.length);
   });
 
+  it('holds a pinned item at the top, over the run it opens', async () => {
+    const isHead = (item: number): boolean => item === 0;
+    await render(
+      <List
+        items={MANY}
+        keyOf={(item) => String(item)}
+        typeOf={(item) => (isHead(item) ? 'head' : 'row')}
+        pinned={isHead}
+        renderItem={(item) => <View testID={isHead(item) ? 'head' : 'row'} />}
+      />,
+    );
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    // A pinned item is mounted twice: once where the data puts it, once laid over the top of the frame. The single
+    // head of this list is the one in force at rest, so it is the copy that shows. Nothing else about pinning shows
+    // in this runner — every cell measures the same height here, so how one head pushes the next off is fiction.
+    expect(screen.queryAllByTestId('head')).toHaveLength(2);
+    expect(screen.queryAllByTestId('row').length).toBeGreaterThan(0);
+  });
+
   it('asks every item it mounts which tree it is', async () => {
     const asked: number[] = [];
     await render(

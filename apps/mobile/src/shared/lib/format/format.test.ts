@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatDate, formatDateTime, formatDuration, formatRelativeTime } from './index';
+import { formatDate, formatDateTime, formatDayKey, formatDayLabel, formatDuration, formatRelativeTime } from './index';
 
 const NOW = Date.parse('2026-09-13T09:00:00.000Z');
 const MINUTE = 60_000;
@@ -26,6 +26,55 @@ describe('formatDateTime', () => {
 
   it('pads both halves of a small hour', () => {
     expect(formatDateTime('2026-09-12T22:05:00.000Z')).toBe('13/09, 00:05');
+  });
+});
+
+describe('formatDayKey', () => {
+  it('names the calendar day an instant falls on', () => {
+    expect(formatDayKey('2026-09-12T17:52:00.000Z')).toBe('2026-09-12');
+  });
+
+  it('tells two runs apart by the newsroom day, not the UTC one', () => {
+    expect(formatDayKey('2026-09-12T22:30:00.000Z')).toBe('2026-09-13');
+    expect(formatDayKey('2026-09-12T21:30:00.000Z')).toBe('2026-09-12');
+  });
+
+  it('pads both halves so the key of a small month still sorts', () => {
+    expect(formatDayKey('2026-01-05T09:00:00.000Z')).toBe('2026-01-05');
+  });
+});
+
+describe('formatDayLabel', () => {
+  it('heads a run with its weekday, its day and its month', () => {
+    expect(formatDayLabel('2026-09-12T17:52:00.000Z')).toBe('samedi 12 septembre');
+  });
+
+  it('reads the weekday from the Paris date, so a late evening heads the next day', () => {
+    expect(formatDayLabel('2026-09-12T22:30:00.000Z')).toBe('dimanche 13 septembre');
+  });
+
+  it('leaves a single-figure day unpadded', () => {
+    expect(formatDayLabel('2026-01-01T09:00:00.000Z')).toBe('jeudi 1 janvier');
+  });
+
+  it('names every month', () => {
+    const months = [...Array.from({ length: 12 }).keys()].map((index) =>
+      formatDayLabel(`2026-${String(index + 1).padStart(2, '0')}-15T09:00:00.000Z`),
+    );
+    expect(months).toEqual([
+      'jeudi 15 janvier',
+      'dimanche 15 février',
+      'dimanche 15 mars',
+      'mercredi 15 avril',
+      'vendredi 15 mai',
+      'lundi 15 juin',
+      'mercredi 15 juillet',
+      'samedi 15 août',
+      'mardi 15 septembre',
+      'jeudi 15 octobre',
+      'dimanche 15 novembre',
+      'mardi 15 décembre',
+    ]);
   });
 });
 

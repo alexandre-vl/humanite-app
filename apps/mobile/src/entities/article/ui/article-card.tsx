@@ -1,8 +1,6 @@
 import type { Access, ArticleSummary } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { visualOf } from '#api';
-import type { Visual } from '#api';
 import { Badge } from '#components/badge';
 import { t } from '#i18n';
 import { formatDate } from '#lib/format';
@@ -10,11 +8,9 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
+import { HERO_RATIO, pictureOf } from '../model/picture';
 
 export type ArticleCardProps = Readonly<{ summary: ArticleSummary }>;
-
-/** The frame a card crops its picture to, which is the shape the corpus draws them in. */
-const HERO_RATIO = 16 / 9;
 
 /**
  * Whether a card tells the reader the item is reserved, access by access. The table answers for every access the
@@ -34,10 +30,6 @@ const MARKS = {
   textMarked: true,
 } satisfies Readonly<Record<CardShape, boolean>>;
 
-/** The illustration a card draws for an item, or nothing: a brief and a column are written without one. */
-const pictureOf = (summary: ArticleSummary): Visual | null =>
-  summary.hero === undefined ? null : visualOf(summary.hero.key, 'card');
-
 /**
  * Which tree a card mounts for an item. A list hands a cell to another item only when both answer the same shape, and
  * averages measured heights shape by shape — so this names what is rendered, never what the item editorially is:
@@ -46,7 +38,7 @@ const pictureOf = (summary: ArticleSummary): Visual | null =>
  */
 export const shapeOf = (summary: ArticleSummary): CardShape => {
   const marked = MARKED[summary.access];
-  if (pictureOf(summary) === null) {
+  if (pictureOf(summary, 'card') === null) {
     return marked ? 'textMarked' : 'text';
   }
   return marked ? 'pictureMarked' : 'picture';
@@ -66,7 +58,7 @@ const useStyles = createStyles((theme) => ({
 /** One article as a feed announces it: its picture, who may read it, its title, the standfirst, and its date. */
 export function ArticleCard({ summary }: ArticleCardProps): ReactNode {
   const styles = useStyles();
-  const visual = pictureOf(summary);
+  const visual = pictureOf(summary, 'card');
   return (
     <Box style={styles.card}>
       {visual === null ? null : (
