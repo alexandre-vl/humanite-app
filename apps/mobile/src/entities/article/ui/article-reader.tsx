@@ -16,13 +16,18 @@ import { ArticleBody } from './article-body';
 import { ArticleLead, ArticleTitle } from './article-lead';
 import { FeedStandIn } from './feed-stand-in';
 
-export type ArticleReaderProps = Readonly<{ id: ArticleId; onFollow: (target: LinkTarget) => void }>;
+export type ArticleReaderProps = Readonly<{
+  id: ArticleId;
+  onFollow: (target: LinkTarget) => void;
+  onSupport: () => void;
+}>;
 
 type ReadingProps = Readonly<{
   article: Article;
   related: readonly ArticleSummary[];
   roster: readonly Author[];
   onFollow: (target: LinkTarget) => void;
+  onSupport: () => void;
 }>;
 
 const useStyles = createStyles((theme) => ({
@@ -41,14 +46,14 @@ const useStyles = createStyles((theme) => ({
  * corner. On the dark template the sheet and the ground take the same value, so the sheet stops showing and the page
  * runs edge to edge — which is exactly what the video article of the current app does, without a rule of its own.
  */
-function Reading({ article, related, roster, onFollow }: ReadingProps): ReactNode {
+function Reading({ article, related, roster, onFollow, onSupport }: ReadingProps): ReactNode {
   const styles = useStyles();
   return (
     <Scroll axis="vertical" style={styles.ground} contentStyle={styles.column}>
       <ArticleTitle title={article.title} />
       <Box style={styles.sheet}>
         <ArticleLead article={article} byline={bylineOf(article, roster)} />
-        <ArticleBody article={article} related={related} onFollow={onFollow} />
+        <ArticleBody article={article} related={related} onFollow={onFollow} onSupport={onSupport} />
       </Box>
     </Scroll>
   );
@@ -63,7 +68,7 @@ function Reading({ article, related, roster, onFollow }: ReadingProps): ReactNod
  * being read, not to a setting: the current app prints its videos on it and everything else on the light sheet, and a
  * reader who has chosen dark keeps it for every other article.
  */
-export function ArticleReader({ id, onFollow }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, onFollow, onSupport }: ArticleReaderProps): ReactNode {
   const { data: article, status, refetch } = useQuery(articleQuery(id));
   const related = useQuery(summariesQuery(article === undefined ? [] : relatedIds(article.blocks))).data ?? [];
   const roster = useQuery(authorsQuery).data ?? [];
@@ -78,6 +83,8 @@ export function ArticleReader({ id, onFollow }: ArticleReaderProps): ReactNode {
       />
     );
   }
-  const reading = <Reading article={article} related={related} roster={roster} onFollow={onFollow} />;
+  const reading = (
+    <Reading article={article} related={related} roster={roster} onFollow={onFollow} onSupport={onSupport} />
+  );
   return article.format === 'video' ? <ThemeScope name="dark">{reading}</ThemeScope> : reading;
 }

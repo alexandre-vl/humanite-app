@@ -1,4 +1,5 @@
 import type { ArticleId, SectionId } from '@huma/contracts';
+import { openURL } from 'expo-linking';
 import { useLocalSearchParams } from 'expo-router';
 
 /** The parameters of a route as it hands them over: strings, one or several under a name, or none at all. */
@@ -20,6 +21,20 @@ export type SectionHref = Readonly<{ pathname: '/section/[id]'; params: Readonly
 
 /** Where to send a reader who chose a section, for the same reason: the front page opens one, a section replaces itself. */
 export const sectionHref = (id: SectionId): SectionHref => ({ pathname: '/section/[id]', params: { id } });
+
+/** Where the reader sets how the paper is printed for them. */
+export const SETTINGS_HREF = '/settings' as const;
+
+/**
+ * Hands a page outside the app to whatever the phone opens pages with.
+ *
+ * It sits beside the routes for the same reason they do: this module is where the app says where something leads, and
+ * a page it does not hold is still somewhere it sends a reader. Whether anything answered is not reported back — the
+ * reader watches their own browser open, and an app that has already left the screen has nothing left to say about it.
+ */
+export function openExternal(url: string): void {
+  void openURL(url);
+}
 
 /**
  * The parameters of the route a screen is showing, read by `read`.

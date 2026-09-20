@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { EmptyState } from '#components/empty-state';
 import { ArticleFeed, sectionFeedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar, sectionsQuery } from '#entities/section';
+import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref, sectionHref, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
@@ -40,6 +41,7 @@ export function SectionPage(): ReactNode {
           onOpen={(article) => {
             router.push(articleHref(article));
           }}
+          action={(summary) => <BookmarkToggle id={summary.id} />}
           sticky={
             <SectionBar
               active={id}

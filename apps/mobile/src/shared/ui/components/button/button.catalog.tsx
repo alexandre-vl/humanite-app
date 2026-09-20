@@ -4,5 +4,5 @@ import { Button } from './button';
 
 export const catalog: CatalogEntry = {
   name: asDisplayText('Button'),
-  render: () => <Button label={asDisplayText('Bouton')} />,
+  render: () => <Button label={asDisplayText('Bouton')} onPress={() => undefined} />,
 };

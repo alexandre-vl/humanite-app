@@ -883,6 +883,7 @@ export const BINDINGS = {
     rules: {
       R1: ['guardrail/module-expo-router'],
       R2: ['guardrail/route-params', 'guardrail/route-params-exempt'],
+      R4: ['guardrail/module-expo-linking'],
       R3: {
         convention:
           'Un identifiant du domaine est une chaîne marquée que seul l’analyseur des contrats produit : un écran qui en déclare un ne peut pas l’obtenir d’un paramètre brut, et la marque est inimitable puisque l’assertion de type est interdite partout.',

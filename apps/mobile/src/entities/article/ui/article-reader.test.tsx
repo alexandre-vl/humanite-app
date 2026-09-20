@@ -6,10 +6,14 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { ArticleReader } from './article-reader';
 
-const read = async (article: Article, onFollow: () => void = () => undefined): Promise<void> => {
+const read = async (
+  article: Article,
+  onFollow: () => void = () => undefined,
+  onSupport: () => void = () => undefined,
+): Promise<void> => {
   await render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <ArticleReader id={article.id} onFollow={onFollow} />
+      <ArticleReader id={article.id} onFollow={onFollow} onSupport={onSupport} />
     </QueryClientProvider>,
   );
   await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
@@ -110,14 +114,21 @@ describe('ArticleReader', () => {
     expect(light).toMatchObject({ color: PALETTE.uiRed });
   });
 
-  it('donne un bouton à l’encart de soutien, que la capture n’en montre pas', async () => {
+  /**
+   * The capture shows an appeal with nothing to press, which the reference document counts as a fault. Showing a
+   * button is not enough to have fixed it: a button that is drawn and answers nothing is the same fault, wearing the
+   * shape of its repair. So the press is what the test makes, and the word carried up is what it reads.
+   */
+  it('donne à l’encart de soutien un bouton qui répond, que la capture n’en montre pas', async () => {
     const article = await holding('callout');
     const callout = article.blocks.find((block) => block.type === 'callout');
     if (callout === undefined) {
       throw new Error('encart introuvable');
     }
-    await read(article);
+    const support = jest.fn();
+    await read(article, () => undefined, support);
     expect(await screen.findByText(callout.title)).toBeTruthy();
-    expect(screen.getByText(callout.button)).toBeTruthy();
+    await fireEvent.press(screen.getByText(callout.button));
+    expect(support).toHaveBeenCalledTimes(1);
   });
 });

@@ -7,7 +7,12 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
 
-export type ArticleCalloutProps = Readonly<{ title: DisplayText; text: DisplayText; button: DisplayText }>;
+export type ArticleCalloutProps = Readonly<{
+  title: DisplayText;
+  text: DisplayText;
+  button: DisplayText;
+  onPress: () => void;
+}>;
 
 const useStyles = createStyles(() => ({
   block: { paddingHorizontal: SPACING.xl },
@@ -18,10 +23,11 @@ const useStyles = createStyles(() => ({
  * The call for support an article carries, on a piece of paper like the linked card, and narrower than the column —
  * measured on capture 16 at 903 points against the column's 1006.
  *
- * It carries its button. The capture shows none, and the reference document lists that as a fault: an appeal with
- * nothing to press is an appeal that cannot be answered. The contract has carried the button's words all along.
+ * It carries its button, and the button answers. The capture shows none, and the reference document lists that as a
+ * fault: an appeal with nothing to press is an appeal that cannot be answered. The contract has carried the button's
+ * words all along; where pressing it leads is the screen's to say, an entity naming neither a route nor an address.
  */
-export function ArticleCallout({ title, text, button }: ArticleCalloutProps): ReactNode {
+export function ArticleCallout({ title, text, button, onPress }: ArticleCalloutProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.block}>
@@ -29,7 +35,7 @@ export function ArticleCallout({ title, text, button }: ArticleCalloutProps): Re
         <Text variant="headline">{title}</Text>
         <Text variant="prose">{text}</Text>
         <Box style={styles.action}>
-          <Button label={button} />
+          <Button label={button} onPress={onPress} />
         </Box>
       </Paper>
     </Box>

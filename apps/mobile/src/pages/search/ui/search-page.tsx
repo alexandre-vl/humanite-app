@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { EmptyState } from '#components/empty-state';
 import { ArticleFeed, searchQuery, searchable, usePagedFeed } from '#entities/article';
+import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref } from '#lib/routing';
 import { createStyles } from '#lib/styles';
@@ -48,6 +49,7 @@ export function SearchPage(): ReactNode {
           onOpen={(id) => {
             router.push(articleHref(id));
           }}
+          action={(summary) => <BookmarkToggle id={summary.id} />}
           empty={{ title: t('search.none.title', { query: asked }), message: t('search.none.message') }}
         />
       ) : (

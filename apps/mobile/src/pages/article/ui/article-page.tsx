@@ -3,7 +3,8 @@ import { Stack, router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleReader } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
-import { articleHref, useRouteParams } from '#lib/routing';
+import { NEWSROOM } from '#config';
+import { articleHref, openExternal, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
 /**
@@ -24,7 +25,9 @@ import { Surface } from '#primitives/surface';
  *
  * Following a link inside the body leads to another article by replacing this screen rather than stacking one more,
  * the way one section replaces another: a reader who followed four links back to back should step back to the feed,
- * not walk every article already read.
+ * not walk every article already read. A link that points outside the paper leaves the app entirely, and so does the
+ * call for support an article carries: both are pages the newsroom keeps on the open web, and the screen is where
+ * that is decided — the article knows it is sending a reader somewhere, never where.
  */
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
@@ -36,7 +39,12 @@ export function ArticlePage(): ReactNode {
         onFollow={(target) => {
           if (target.kind === 'article') {
             router.replace(articleHref(target.id));
+            return;
           }
+          openExternal(target.url);
+        }}
+        onSupport={() => {
+          openExternal(NEWSROOM.subscription);
         }}
       />
     </Surface>

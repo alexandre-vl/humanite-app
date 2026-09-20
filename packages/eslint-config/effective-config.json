@@ -3458,6 +3458,113 @@
                 },
                 {
                   "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-linking"
+                  }
+                }
+              },
+              "message": "[module/expo-linking] expo-linking ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "feature"
                   }
                 },
@@ -4886,6 +4993,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-linking'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-linking] expo-linking ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='expo-router'] > ImportNamespaceSpecifier",
@@ -6895,6 +7006,113 @@
                 },
                 {
                   "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-linking"
+                  }
+                }
+              },
+              "message": "[module/expo-linking] expo-linking ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "feature"
                   }
                 },
@@ -8326,6 +8544,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-linking'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-linking] expo-linking ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='expo-router'] > ImportNamespaceSpecifier",
@@ -10331,6 +10553,113 @@
                 },
                 {
                   "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-linking"
+                  }
+                }
+              },
+              "message": "[module/expo-linking] expo-linking ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "feature"
                   }
                 },
@@ -11762,6 +12091,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-font'] > ImportNamespaceSpecifier",
           "message": "[module/expo-font] expo-font ne s’importe que depuis : app"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-linking'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-linking] expo-linking ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='expo-router'] > ImportNamespaceSpecifier",

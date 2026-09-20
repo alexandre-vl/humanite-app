@@ -17,6 +17,7 @@ export type ArticleBodyProps = Readonly<{
   article: Article;
   related: readonly ArticleSummary[];
   onFollow: (target: LinkTarget) => void;
+  onSupport: () => void;
 }>;
 
 type BlockProps = ArticleBodyProps & Readonly<{ block: Block }>;
@@ -39,7 +40,7 @@ const useStyles = createStyles((theme) => ({
  * A body picture carries a caption and no credit: the contract gives a credit only to the article's own picture, so a
  * figure inside the body has none to show, and says so by not showing one.
  */
-function BlockView({ block, article, related, onFollow }: BlockProps): ReactNode {
+function BlockView({ block, article, related, onFollow, onSupport }: BlockProps): ReactNode {
   const styles = useStyles();
   switch (block.type) {
     case 'paragraph':
@@ -88,7 +89,7 @@ function BlockView({ block, article, related, onFollow }: BlockProps): ReactNode
       );
     }
     case 'callout':
-      return <ArticleCallout title={block.title} text={block.text} button={block.button} />;
+      return <ArticleCallout title={block.title} text={block.text} button={block.button} onPress={onSupport} />;
   }
 }
 
@@ -105,11 +106,18 @@ const place = (blocks: readonly Block[]): readonly PlacedBlock[] => {
 };
 
 /** The body of an article, block by block, in the order it was written. */
-export function ArticleBody({ article, related, onFollow }: ArticleBodyProps): ReactNode {
+export function ArticleBody({ article, related, onFollow, onSupport }: ArticleBodyProps): ReactNode {
   return (
     <>
       {place(article.blocks).map(({ key, block }) => (
-        <BlockView key={key} block={block} article={article} related={related} onFollow={onFollow} />
+        <BlockView
+          key={key}
+          block={block}
+          article={article}
+          related={related}
+          onFollow={onFollow}
+          onSupport={onSupport}
+        />
       ))}
     </>
   );

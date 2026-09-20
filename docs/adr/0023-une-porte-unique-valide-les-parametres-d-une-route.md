@@ -35,6 +35,7 @@ Option retenue : « un module de routage qui lit les paramètres, l’écran en 
 - **R1** — Expo Router NE DOIT PAS être importée hors de la couche app, des écrans et du module de routage.
 - **R2** — Le lecteur de paramètres d’Expo Router NE DOIT PAS être nommé hors du module de routage.
 - **R3** — Un écran DOIT obtenir ses paramètres par un analyseur des contrats.
+- **R4** — Une adresse hors de l’app NE DOIT PAS être ouverte ailleurs que par le module de routage.
 
 ### Conséquences
 

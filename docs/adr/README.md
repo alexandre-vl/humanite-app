@@ -288,6 +288,7 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/routing/**`.
 | ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | NE DOIT PAS | `guardrail/module-expo-router`                                                                                                                                                                                                                                 |
 | R2    | NE DOIT PAS | `guardrail/route-params`, `guardrail/route-params-exempt`                                                                                                                                                                                                      |
+| R4    | NE DOIT PAS | `guardrail/module-expo-linking`                                                                                                                                                                                                                                |
 | R3    | DOIT        | convention : Un identifiant du domaine est une chaîne marquée que seul l’analyseur des contrats produit : un écran qui en déclare un ne peut pas l’obtenir d’un paramètre brut, et la marque est inimitable puisque l’assertion de type est interdite partout. |
 
 ### ADR-0024 · État du lecteur en magasin Zustand et format versionné

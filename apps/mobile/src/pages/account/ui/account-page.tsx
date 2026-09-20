@@ -3,6 +3,7 @@ import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
+import { SETTINGS_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -96,7 +97,7 @@ export function AccountPage(): ReactNode {
           <OpenRow
             label={t('settings.title')}
             onPress={() => {
-              router.push('/settings');
+              router.push(SETTINGS_HREF);
             }}
           />
         </Group>
