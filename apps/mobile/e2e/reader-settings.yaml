@@ -7,8 +7,10 @@ appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn: 'Mon compte'
-- tapOn: 'Réglages'
-- assertVisible: 'Préférences d’affichage'
+- tapOn: 'Préférences d’affichage'
+- extendedWaitUntil:
+    visible: 'Apparence'
+    timeout: 20000
 - tapOn: 'Sombre'
 - tapOn: 'Très grand'
 - assertVisible: 'Aperçu'

@@ -3,6 +3,9 @@
 # Le mot cherché n’est pas quoté : ce qu’un lecteur tape n’est pas un texte de l’interface et n’a rien à faire dans le
 # dictionnaire. « climat » traverse le corpus entier et survit au repli des accents que le moteur applique des deux
 # côtés.
+#
+# La question est effacée lettre par lettre plutôt qu’en touchant la croix du champ : cette croix vit en haut à
+# droite, sous le menu flottant du client de développement, et la toucher ouvrirait ce menu au lieu du champ.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
@@ -14,5 +17,5 @@ appId: ${APP_ID}
     notVisible: 'Cherchez dans le journal'
     timeout: 20000
 - takeScreenshot: search-results
-- tapOn: 'Effacer la recherche'
+- eraseText
 - assertVisible: 'Cherchez dans le journal'

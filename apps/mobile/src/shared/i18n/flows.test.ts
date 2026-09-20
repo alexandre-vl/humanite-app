@@ -68,4 +68,20 @@ describe('les parcours Maestro', () => {
     const quoted = flowFiles().flatMap(([, text]) => quotedIn(text));
     expect(quoted.length).toBeGreaterThanOrEqual(20);
   });
+
+  /**
+   * Clearing the package's data is refused, and the app is not the reason.
+   *
+   * It also clears what the development client remembers of itself, so the launch that follows is a first launch and
+   * it opens its own developer menu over the app. That sheet is modal for accessibility, which takes the whole app
+   * out of the tree a flow reads: `À la une` is painted on the screen and no flow can see one word of it. Every flow
+   * that ran after the first `clearState` failed for three minutes on its first assertion, and none recovered until
+   * two screens were dismissed by hand. A flow that wants a known state builds it and puts it back, which is also
+   * the only way to say what it found.
+   */
+  it('ne remettent jamais à zéro les données du paquet', () => {
+    for (const [path, text] of flowFiles()) {
+      expect(text.includes('clearState') ? `${path} efface l’état` : path).toBe(path);
+    }
+  });
 });

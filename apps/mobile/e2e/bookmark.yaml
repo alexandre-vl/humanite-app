@@ -1,0 +1,24 @@
+# Ce qu’un lecteur garde est encore là quand il rouvre le journal.
+#
+# C’est le seul parcours qui traverse vraiment le disque : le reste de l’app se sert de mémoire, et rien d’autre ne
+# dirait qu’un marque-page a survécu à la fermeture. Il est posé depuis le fil, sur une carte, où le menu flottant du
+# client de développement ne recouvre rien — l’en-tête d’un article, lui, partage son coin avec ce menu.
+#
+# Le parcours repose l’app comme il l’a trouvée, et c’est sa dernière ligne qui le prouve : on ne revient à l’état
+# vide qu’en étant parti de lui. Un marque-page laissé par une session précédente ferait échouer cette ligne au lieu
+# de passer inaperçu — ce qui vaut mieux qu’un état remis à zéro, qui rend au client de développement son premier
+# lancement et couvre l’app entière de son menu.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn: 'Ajouter aux favoris'
+- assertVisible: 'Retirer des favoris'
+- tapOn: 'Favoris'
+- assertNotVisible: 'Aucun article gardé'
+- takeScreenshot: bookmarks-kept
+- runFlow: parts/launch.yaml
+- tapOn: 'Favoris'
+- assertNotVisible: 'Aucun article gardé'
+- takeScreenshot: bookmarks-survived
+- tapOn: 'Retirer des favoris'
+- assertVisible: 'Aucun article gardé'

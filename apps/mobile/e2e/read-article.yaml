@@ -1,29 +1,22 @@
-# Un article s’ouvre, se garde, et ce qui a été gardé survit à la fermeture de l’app.
+# Un article s’ouvre en plein écran, et le retour rend le fil.
 #
 # La carte est touchée par un point plutôt que par son titre : les titres viennent du corpus, pas du dictionnaire, et
-# un parcours qui en recopierait un dirait deux fois ce qui n’est écrit qu’une. Ce que l’article montre et que le
-# parcours peut nommer, c’est le marque-page de son en-tête : un symbole de plateforme ne rend rien hors d’un appareil,
-# et son libellé d’accessibilité est la seule chose qu’on puisse à la fois atteindre et lire.
+# un parcours qui en recopierait un dirait deux fois ce qui n’est écrit qu’une. Ce qui prouve qu’un article s’est
+# ouvert est la disparition de la bande du fil : un article est poussé à la racine de la pile et couvre la barre du
+# bas, ce que la cible demande et que rien d’autre sur cet écran ne fait.
+#
+# Le marque-page de l’en-tête n’est pas touché ici, et ce n’est pas un oubli : le menu flottant du client de
+# développement occupe exactement ce coin, et un parcours qui l’ouvrirait à chaque passage mesurerait le client, pas
+# l’app. Ce que le marque-page fait est vérifié depuis le fil, où rien ne le recouvre.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn:
     point: 50%,62%
 - extendedWaitUntil:
-    visible: 'Ajouter aux favoris'
+    notVisible: 'À la une'
     timeout: 20000
-- tapOn: 'Ajouter aux favoris'
-- assertVisible: 'Retirer des favoris'
-- takeScreenshot: article-kept
+- takeScreenshot: article
 - back
+- assertVisible: 'À la une'
 - assertVisible: 'Humanité'
-- tapOn: 'Favoris'
-- assertNotVisible: 'Aucun article gardé'
-- stopApp
-- openLink: ${DEV_CLIENT_LINK}
-- extendedWaitUntil:
-    visible: 'À la une'
-    timeout: 180000
-- tapOn: 'Favoris'
-- assertNotVisible: 'Aucun article gardé'
-- takeScreenshot: bookmarks-survived
