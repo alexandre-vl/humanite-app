@@ -21,6 +21,8 @@ export const ICONS = {
   clear: { ios: 'xmark.circle.fill', android: 'cancel' },
   headline: { ios: 'house', android: 'home' },
   live: { ios: 'bolt', android: 'bolt' },
+  // The mark a row carries when touching it opens another screen.
+  next: { ios: 'chevron.right', android: 'chevron_right' },
   newsstand: { ios: 'newspaper', android: 'newspaper' },
   play: { ios: 'play.fill', android: 'play_arrow' },
   search: { ios: 'magnifyingglass', android: 'search' },

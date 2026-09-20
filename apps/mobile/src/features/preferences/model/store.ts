@@ -25,6 +25,7 @@ type Reading = Settings &
     chooseTheme: (theme: ThemeChoice) => void;
     chooseScale: (scale: TextScale) => void;
     chooseFaces: (faces: FaceSet) => void;
+    reset: () => void;
   }>;
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
@@ -70,6 +71,9 @@ export const usePreferences = create<Reading>()(
       },
       chooseFaces: (faces: FaceSet): void => {
         set({ faces });
+      },
+      reset: (): void => {
+        set(DEFAULTS);
       },
     }),
     {

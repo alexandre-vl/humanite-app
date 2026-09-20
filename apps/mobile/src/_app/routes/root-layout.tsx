@@ -2,12 +2,11 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { Stack } from 'expo-router';
 import { preventAutoHideAsync } from 'expo-splash-screen';
 import type { ReactNode } from 'react';
-import { usePreferences } from '#features/preferences';
 import { StartupProvider } from '#lib/startup';
-import { TypesettingProvider, useTheme } from '#lib/styles';
+import { useTheme } from '#lib/styles';
 import { SafeAreaRoot } from '#primitives/safe-area';
-import { ThemeRoot } from '#primitives/theme';
 import { persistOptions, queryClient } from '../model/query-client';
+import { ReaderSettings } from './reader-settings';
 import { StartupGate } from './startup-gate';
 
 void preventAutoHideAsync();
@@ -35,35 +34,16 @@ function ThemedStack(): ReactNode {
   );
 }
 
-/**
- * The whole app, printed the way the reader asked for it.
- *
- * This is the one place that reads what they set, because it is the one place allowed to: the settings are kept by a
- * store, a store belongs to the layer of actions, and neither a primitive nor a shared library may reach that layer.
- * Below here, a theme and a typesetting travel on contexts of their own and every style resolves through them, so no
- * screen and no component ever names a setting.
- */
-function AsTheReaderAsked({ children }: Readonly<{ children: ReactNode }>): ReactNode {
-  const choice = usePreferences((settings) => settings.theme);
-  const scale = usePreferences((settings) => settings.scale);
-  const faces = usePreferences((settings) => settings.faces);
-  return (
-    <ThemeRoot choice={choice}>
-      <TypesettingProvider typesetting={{ scale, faces }}>{children}</TypesettingProvider>
-    </ThemeRoot>
-  );
-}
-
 export function RootLayout(): ReactNode {
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       <StartupProvider>
         <StartupGate>
-          <AsTheReaderAsked>
+          <ReaderSettings>
             <SafeAreaRoot>
               <ThemedStack />
             </SafeAreaRoot>
-          </AsTheReaderAsked>
+          </ReaderSettings>
         </StartupGate>
       </StartupProvider>
     </PersistQueryClientProvider>

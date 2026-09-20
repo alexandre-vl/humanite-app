@@ -5,6 +5,12 @@
  * group a title comes before the message it heads, reading order rather than alphabetical.
  */
 export const FR = {
+  'account.reading': 'Réglages',
+  'account.contact': 'Nous contacter',
+  'account.contact.mail': 'relationlecteur@humanite.fr',
+  'account.contact.mail.hint': 'Par courriel',
+  'account.contact.phone': '01 55 84 40 30',
+  'account.contact.phone.hint': 'Par téléphone',
   'action.retry': 'Réessayer',
   'app.name': 'Humanité',
   'article.premium': 'Abonnés',
@@ -37,4 +43,20 @@ export const FR = {
   'search.none.message': 'Essayez un autre mot, ou un thème plus large.',
   'section.unknown.title': 'Rubrique introuvable',
   'section.unknown.message': 'Cette rubrique n’est pas au sommaire du journal.',
+  'settings.title': 'Préférences d’affichage',
+  'settings.appearance': 'Apparence',
+  'settings.appearance.system': 'Système',
+  'settings.appearance.light': 'Clair',
+  'settings.appearance.dark': 'Sombre',
+  'settings.size': 'Taille du texte',
+  'settings.size.small': 'Petit',
+  'settings.size.normal': 'Normal',
+  'settings.size.large': 'Grand',
+  'settings.size.huge': 'Très grand',
+  'settings.faces': 'Lisibilité renforcée',
+  'settings.faces.hint': 'Une police qui écarte les lettres qu’on confond : le l du I, le O du 0, le b du d.',
+  'settings.preview': 'Aperçu',
+  'settings.preview.text':
+    'Les grévistes de la raffinerie ont voté la reconduction du mouvement jusqu’à lundi, au terme d’une assemblée générale qui a réuni près de six cents salariés.',
+  'settings.reset': 'Réinitialiser',
 } as const satisfies Readonly<Record<string, string>>;
