@@ -3,6 +3,7 @@ import { catalog as iconCatalog } from '#primitives/icon';
 import { catalog as imageCatalog } from '#primitives/image';
 import { catalog as pressableCatalog } from '#primitives/pressable';
 import { catalog as surfaceCatalog } from '#primitives/surface';
+import { catalog as switchCatalog } from '#primitives/switch';
 import { catalog as textCatalog } from '#primitives/text';
 import { catalog as textFieldCatalog } from '#primitives/text-field';
 import { catalog as themeCatalog } from '#primitives/theme';
@@ -13,6 +14,7 @@ import { catalog as emptyStateCatalog } from '#components/empty-state';
 import { catalog as labelBarCatalog } from '#components/label-bar';
 import { catalog as paperCatalog } from '#components/paper';
 import { catalog as sectionTitleCatalog } from '#components/section-title';
+import { catalog as segmentedControlCatalog } from '#components/segmented-control';
 import { catalog as skeletonCatalog } from '#components/skeleton';
 import type { CatalogItem } from '#lib/catalogue';
 
@@ -23,6 +25,7 @@ export const REGISTRY: readonly CatalogItem[] = [
   { level: 'L0', entry: imageCatalog },
   { level: 'L0', entry: pressableCatalog },
   { level: 'L0', entry: surfaceCatalog },
+  { level: 'L0', entry: switchCatalog },
   { level: 'L0', entry: textCatalog },
   { level: 'L0', entry: textFieldCatalog },
   { level: 'L0', entry: themeCatalog },
@@ -33,5 +36,6 @@ export const REGISTRY: readonly CatalogItem[] = [
   { level: 'L1', entry: labelBarCatalog },
   { level: 'L1', entry: paperCatalog },
   { level: 'L1', entry: sectionTitleCatalog },
+  { level: 'L1', entry: segmentedControlCatalog },
   { level: 'L1', entry: skeletonCatalog },
 ];
