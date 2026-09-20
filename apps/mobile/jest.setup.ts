@@ -78,8 +78,10 @@ jest.mock('@shopify/flash-list/dist/recyclerview/utils/measureLayout', () => {
 });
 
 // expo-image and expo-symbols reach native modules a headless runner lacks; each renders a plain view so the image and
-// icon primitives mount without touching the native layer. The picture keeps a name: a view with nothing on it cannot
-// be told from any other view, and whether a card carries a picture at all is part of the tree it promises to mount.
+// icon primitives mount without touching the native layer. Both keep a name: a view with nothing on it cannot be told
+// from any other view, and which mark a row carries — a picture at all, a chevron rather than a bookmark — is part of
+// the tree each promises to mount. The symbol carries the platform name it was given rather than the key it was named
+// by, because that is all it receives; a test reads the key through the registry, which stays the single source.
 jest.mock('expo-image', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
@@ -91,7 +93,8 @@ jest.mock('expo-image', () => {
 jest.mock('expo-symbols', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const symbolView = (): unknown => react.createElement(reactNative.View, null);
+  const symbolView = (props: { name?: { android?: string } }): unknown =>
+    react.createElement(reactNative.View, { testID: `symbol:${props.name?.android ?? ''}` });
   return { __esModule: true, SymbolView: symbolView };
 });
 

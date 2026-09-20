@@ -11,12 +11,19 @@ const writeDisk = async (state: unknown): Promise<void> => {
   await usePreferences.persist.rehydrate();
 };
 
+// The store is one module and outlives a test, so each starts from the button a reader has: the one that puts every
+// setting back. Seeding the three values by hand would have left the first test below asserting what this line had
+// just written — the harness, not the store.
 beforeEach(() => {
-  usePreferences.setState({ theme: 'system', scale: 'normal', faces: 'paper' });
+  usePreferences.getState().reset();
 });
 
 describe('usePreferences', () => {
-  it('part du téléphone pour les couleurs, et du journal pour les lettres', () => {
+  it('remis à zéro, part du téléphone pour les couleurs et du journal pour les lettres', () => {
+    usePreferences.getState().chooseTheme('dark');
+    usePreferences.getState().chooseScale('huge');
+    usePreferences.getState().chooseFaces('legible');
+    usePreferences.getState().reset();
     expect(usePreferences.getState().theme).toBe('system');
     expect(usePreferences.getState().scale).toBe('normal');
     expect(usePreferences.getState().faces).toBe('paper');

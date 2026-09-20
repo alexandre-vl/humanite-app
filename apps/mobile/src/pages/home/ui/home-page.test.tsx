@@ -1,4 +1,5 @@
 import type { ArticleSummary, Section } from '@huma/contracts';
+import { SIZES } from '@huma/design-tokens';
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -50,6 +51,37 @@ const frontArticle = async (): Promise<ArticleSummary> => {
   return found;
 };
 
+/**
+ * The height the list reserved for the strip that stays, read back from the layer it laid the strip in.
+ *
+ * The page is the only one that knows how many rows it put there — the list cannot see inside a band — so this is
+ * what holds the page to its own arrangement. Without it, the count could say two while the band drew one, and the
+ * screen would keep a row of empty ground it had already reserved: the fault this exact band shipped with once, and
+ * which no bench caught because jest lays nothing out and the words were all findable on a blank screen.
+ */
+const heightIn = (style: unknown): number | undefined => {
+  const layers: readonly unknown[] = Array.isArray(style) ? style : [style];
+  for (const layer of layers) {
+    const height: unknown = typeof layer === 'object' && layer !== null ? Reflect.get(layer, 'height') : undefined;
+    if (typeof height === 'number') {
+      return height;
+    }
+  }
+  return undefined;
+};
+
+const bandHeight = (): number => {
+  let node = screen.getByText('À la une').parent;
+  while (node !== null) {
+    const height = heightIn(node.props['style']);
+    if (height !== undefined) {
+      return height;
+    }
+    node = node.parent;
+  }
+  throw new Error('aucune bande ne porte de hauteur : le test ne vérifierait rien');
+};
+
 const firstSection = async (): Promise<Section> => {
   const [first] = await content.getSections();
   if (first === undefined) {
@@ -94,6 +126,13 @@ describe('HomePage', () => {
     expect(await screen.findByText(section.label)).toBeTruthy();
     await show('Favoris');
     expect(screen.queryByText(section.label)).toBeNull();
+  });
+
+  it('rend au fil la rangée que la barre des rubriques libère', async () => {
+    await renderPage();
+    expect(bandHeight()).toBe(SIZES.bandPair);
+    await show('Favoris');
+    expect(bandHeight()).toBe(SIZES.band);
   });
 
   it('garde un article depuis le fil, et le retrouve parmi les favoris', async () => {
