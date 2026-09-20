@@ -6,7 +6,7 @@ import { EmptyState } from '#components/empty-state';
 import { ArticleFeed, sectionFeedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar, sectionsQuery } from '#entities/section';
 import { t } from '#i18n';
-import { articleHref, useRouteParams } from '#lib/routing';
+import { articleHref, sectionHref, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
 /**
@@ -19,6 +19,9 @@ import { Surface } from '#primitives/surface';
  *
  * Choosing another section replaces this screen instead of stacking one more, so going back leaves the sections rather
  * than walking every one already visited.
+ *
+ * The header is named from the first frame, empty until the list answers: a screen that waits for its title to render
+ * one at all leaves the navigator showing the route's own segment in the meantime.
  */
 export function SectionPage(): ReactNode {
   const id = useRouteParams((raw) => SECTION_ID.parse(raw['id']));
@@ -28,7 +31,7 @@ export function SectionPage(): ReactNode {
   const feed = usePagedFeed(sectionFeedQuery(id));
   return (
     <Surface>
-      {section === null ? null : <Stack.Screen options={{ title: section.label }} />}
+      <Stack.Screen options={{ title: section?.label ?? '' }} />
       {unknown ? (
         <EmptyState title={t('section.unknown.title')} message={t('section.unknown.message')} />
       ) : (
@@ -41,7 +44,7 @@ export function SectionPage(): ReactNode {
             <SectionBar
               active={id}
               onSelect={(chosen) => {
-                router.replace({ pathname: '/section/[id]', params: { id: chosen } });
+                router.replace(sectionHref(chosen));
               }}
             />
           }

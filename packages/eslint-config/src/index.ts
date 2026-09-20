@@ -76,9 +76,14 @@ const ENTRY_SYNTAX: readonly SyntaxRestriction[] = [
   { policy: 'entry/re-export', selector: 'Program > :not(ExportNamedDeclaration[source])' },
 ];
 
-/** Styles come from createStyles, the one constructor that turns tokens into a StyleRef: an inline style object escapes it, even nested in a style array. */
+/**
+ * Styles come from a constructor that turns tokens into a style: an inline style object escapes it, even nested in a
+ * style array. Every prop whose name ends in `style` carries one — a native navigator names its own `labelStyle`,
+ * `headerStyle`, `contentStyle` — so the rule reads the suffix rather than the one name `style`, which let the tab
+ * bar's label colour through.
+ */
 const STYLE_SYNTAX: readonly SyntaxRestriction[] = [
-  { policy: 'style/inline', selector: 'JSXAttribute[name.name="style"] > JSXExpressionContainer ObjectExpression' },
+  { policy: 'style/inline', selector: 'JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression' },
 ];
 
 /** UI text comes from the dictionary through a DisplayText: raw text written in the JSX, whitespace aside, escapes it. */

@@ -4932,8 +4932,8 @@
           "message": "[module/zustand] zustand ne s’importe que depuis : feature"
         },
         {
-          "selector": "JSXAttribute[name.name=\"style\"] > JSXExpressionContainer ObjectExpression",
-          "message": "[style/inline] construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés"
+          "selector": "JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression",
+          "message": "[style/inline] construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés"
         },
         {
           "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]",
@@ -8360,8 +8360,8 @@
           "message": "[module/zustand] zustand ne s’importe que depuis : feature"
         },
         {
-          "selector": "JSXAttribute[name.name=\"style\"] > JSXExpressionContainer ObjectExpression",
-          "message": "[style/inline] construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés"
+          "selector": "JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression",
+          "message": "[style/inline] construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés"
         },
         {
           "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]",
@@ -11784,8 +11784,8 @@
           "message": "[module/zustand] zustand ne s’importe que depuis : feature"
         },
         {
-          "selector": "JSXAttribute[name.name=\"style\"] > JSXExpressionContainer ObjectExpression",
-          "message": "[style/inline] construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés"
+          "selector": "JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression",
+          "message": "[style/inline] construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés"
         },
         {
           "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]",

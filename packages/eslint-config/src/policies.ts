@@ -36,7 +36,8 @@ const WRITTEN = {
   'route/error-boundary':
     'une route exporte un ErrorBoundary : sans lui, une erreur de rendu remonte jusqu’à la racine',
   'entry/re-export': 'une entrée publique ne fait que réexporter ce que les fichiers de son unité définissent',
-  'style/inline': 'construire les styles avec createStyles : un objet de style en ligne échappe aux tokens brandés',
+  'style/inline':
+    'construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés',
   'style/theme':
     'recevoir le thème du paramètre de createStyles : un thème figé importé en dur ignore le schéma de couleurs en vigueur',
   'text/jsx': 'rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire',

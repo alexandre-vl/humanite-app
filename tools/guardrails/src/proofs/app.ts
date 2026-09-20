@@ -411,6 +411,20 @@ export function Surface(): ReactNode {
       }),
     ),
     define(
+      'guardrail/style-inline-named',
+      'une mise en page qui écrit un style en ligne sous un autre nom que style',
+      ['style/inline'],
+      linted({
+        'src/_app/routes/tabs-layout.tsx': `import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import type { ReactNode } from 'react';
+
+export function TabsLayout(): ReactNode {
+  return <NativeTabs labelStyle={{ opacity: 1 }} />;
+}
+`,
+      }),
+    ),
+    define(
       'guardrail/style-theme',
       'une page qui lit un thème figé au lieu de le recevoir de createStyles',
       ['style/theme'],

@@ -1,4 +1,4 @@
-import type { ArticleId } from '@huma/contracts';
+import type { ArticleId, SectionId } from '@huma/contracts';
 import { useLocalSearchParams } from 'expo-router';
 
 /** The parameters of a route as it hands them over: strings, one or several under a name, or none at all. */
@@ -14,6 +14,12 @@ export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly
  * source, and this is the one sentence the rest of the app says about it.
  */
 export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
+
+/** Where one section is read, as the router takes it. */
+export type SectionHref = Readonly<{ pathname: '/section/[id]'; params: Readonly<{ id: SectionId }> }>;
+
+/** Where to send a reader who chose a section, for the same reason: the front page opens one, a section replaces itself. */
+export const sectionHref = (id: SectionId): SectionHref => ({ pathname: '/section/[id]', params: { id } });
 
 /**
  * The parameters of the route a screen is showing, read by `read`.

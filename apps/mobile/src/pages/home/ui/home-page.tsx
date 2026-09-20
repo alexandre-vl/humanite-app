@@ -7,7 +7,7 @@ import { ArticleFeed, feedQuery, useKeptFeed, usePagedFeed } from '#entities/art
 import { SectionBar } from '#entities/section';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
-import { articleHref } from '#lib/routing';
+import { articleHref, sectionHref } from '#lib/routing';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Surface } from '#primitives/surface';
@@ -67,7 +67,7 @@ export function HomePage(): ReactNode {
             {onBookmarks ? null : (
               <SectionBar
                 onSelect={(section) => {
-                  router.push({ pathname: '/section/[id]', params: { id: section } });
+                  router.push(sectionHref(section));
                 }}
               />
             )}

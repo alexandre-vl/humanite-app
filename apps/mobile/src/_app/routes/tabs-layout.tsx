@@ -1,7 +1,7 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
-import { useTheme } from '#lib/styles';
+import { chromeStyle, useTheme } from '#lib/styles';
 import { ICONS } from '#primitives/icon';
 
 /**
@@ -20,7 +20,7 @@ export function TabsLayout(): ReactNode {
       iconColor={theme.textMuted}
       indicatorColor={theme.card}
       rippleColor={theme.border}
-      labelStyle={{ color: theme.textMuted }}
+      labelStyle={chromeStyle('textMuted', theme)}
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf={ICONS.headline.ios} md={ICONS.headline.android} />
