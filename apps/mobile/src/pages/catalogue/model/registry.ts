@@ -9,11 +9,9 @@ import { catalog as textFieldCatalog } from '#primitives/text-field';
 import { catalog as themeCatalog } from '#primitives/theme';
 import { catalog as badgeCatalog } from '#components/badge';
 import { catalog as buttonCatalog } from '#components/button';
-import { catalog as chipCatalog } from '#components/chip';
 import { catalog as emptyStateCatalog } from '#components/empty-state';
 import { catalog as labelBarCatalog } from '#components/label-bar';
 import { catalog as paperCatalog } from '#components/paper';
-import { catalog as sectionTitleCatalog } from '#components/section-title';
 import { catalog as segmentedControlCatalog } from '#components/segmented-control';
 import { catalog as skeletonCatalog } from '#components/skeleton';
 import type { CatalogItem } from '#lib/catalogue';
@@ -31,11 +29,9 @@ export const REGISTRY: readonly CatalogItem[] = [
   { level: 'L0', entry: themeCatalog },
   { level: 'L1', entry: badgeCatalog },
   { level: 'L1', entry: buttonCatalog },
-  { level: 'L1', entry: chipCatalog },
   { level: 'L1', entry: emptyStateCatalog },
   { level: 'L1', entry: labelBarCatalog },
   { level: 'L1', entry: paperCatalog },
-  { level: 'L1', entry: sectionTitleCatalog },
   { level: 'L1', entry: segmentedControlCatalog },
   { level: 'L1', entry: skeletonCatalog },
 ];

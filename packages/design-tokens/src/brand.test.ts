@@ -1,12 +1,11 @@
 import { expect, test } from 'vitest';
-import { color, duration, fontFamily, fontSize, lineHeight, radius, space } from './brand.ts';
+import { color, fontFamily, fontSize, lineHeight, radius, space } from './brand.ts';
 
 test('constructors accept valid values and return them', () => {
   expect(space(8)).toBe(8);
   expect(radius(12)).toBe(12);
   expect(fontSize(16)).toBe(16);
   expect(lineHeight(1.4)).toBe(1.4);
-  expect(duration(0)).toBe(0);
   expect(fontFamily('Overpass_400Regular')).toBe('Overpass_400Regular');
   expect(color('#e30613')).toBe('#e30613');
 });

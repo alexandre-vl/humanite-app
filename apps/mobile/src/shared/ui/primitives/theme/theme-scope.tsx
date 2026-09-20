@@ -1,9 +1,7 @@
 import { THEMES } from '@huma/design-tokens';
+import type { ThemeName } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '../../../lib/styles';
-
-/** The name of a theme the app publishes. */
-export type ThemeName = keyof typeof THEMES;
 
 export type ThemeScopeProps = Readonly<{ name: ThemeName; children: ReactNode }>;
 

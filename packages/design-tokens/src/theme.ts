@@ -65,16 +65,28 @@ export const DARK_THEME = {
   border: PALETTE.darkBorder,
 } as const satisfies Theme;
 
+/**
+ * The themes the paper publishes, named once.
+ *
+ * The list comes before the table rather than out of it: `Object.keys` answers with plain strings, and the one cast
+ * that would narrow them back is the cast this repository forbids. Written this way, the `satisfies` below refuses a
+ * name without a theme and a theme without a name, and the reader's choices below are built from the same list.
+ */
+export const THEME_NAMES = ['light', 'dark'] as const;
+
+/** The name of a theme. */
+export type ThemeName = (typeof THEME_NAMES)[number];
+
 /** The themes by name. */
-export const THEMES = { light: LIGHT_THEME, dark: DARK_THEME } as const satisfies Readonly<Record<string, Theme>>;
+export const THEMES = { light: LIGHT_THEME, dark: DARK_THEME } as const satisfies Readonly<Record<ThemeName, Theme>>;
 
 /**
  * What a reader may set the paper's colours to: either theme by name, or whichever the phone is in.
  *
- * `system` is not a third theme but the absence of a choice, which is why it is named here beside the two rather than
- * added to them: a table of themes answers with colours, and this answers which of them to ask for.
+ * `system` is not a third theme but the absence of a choice, which is why it is named here beside the others rather
+ * than added to them: a table of themes answers with colours, and this answers which of them to ask for.
  */
-export const THEME_CHOICES = ['system', 'light', 'dark'] as const;
+export const THEME_CHOICES = ['system', ...THEME_NAMES] as const;
 
 /** The name of a theme choice. */
 export type ThemeChoice = (typeof THEME_CHOICES)[number];

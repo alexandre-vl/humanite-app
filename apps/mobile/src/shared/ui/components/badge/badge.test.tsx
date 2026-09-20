@@ -1,9 +1,9 @@
+import type { ThemeName } from '@huma/design-tokens';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { asDisplayText } from '../../../lib/display-text';
 import { Text } from '../../primitives/text';
-import type { ThemeName } from '../../primitives/theme';
 import { ThemeScope } from '../../primitives/theme';
 import { Badge } from './badge';
 

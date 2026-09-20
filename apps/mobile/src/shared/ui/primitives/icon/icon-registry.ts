@@ -26,7 +26,6 @@ export const ICONS = {
   newsstand: { ios: 'newspaper', android: 'newspaper' },
   play: { ios: 'play.fill', android: 'play_arrow' },
   search: { ios: 'magnifyingglass', android: 'search' },
-  share: { ios: 'square.and.arrow.up', android: 'ios_share' },
 } as const satisfies Readonly<Record<string, IconSymbol>>;
 
 /** An icon's props: a semantic name from ICONS (an unknown name is a build error), sized and tinted by tokens. */

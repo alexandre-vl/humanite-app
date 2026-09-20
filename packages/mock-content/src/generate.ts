@@ -35,7 +35,8 @@ const manifest = [
   '',
 ].join('\n');
 writeFileSync(new URL('visuals.ts', directory), manifest);
-process.stdout.write(`visuels : ${String(visuals.length)} clés, ${String(visuals.length * 4)} fichiers écrits\n`);
+const written = visuals.length * VISUAL_WIDTHS.length;
+process.stdout.write(`visuels : ${String(visuals.length)} clés, ${String(written)} fichiers écrits\n`);
 
 /**
  * Last, the registry that puts those files in the bundle. Metro reads an asset specifier at build time, so each width

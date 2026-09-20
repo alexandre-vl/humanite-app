@@ -1,5 +1,5 @@
 import type { DisplayText } from '@huma/contracts';
-import { PALETTE, RADII, SIZES, SPACING } from '@huma/design-tokens';
+import { PALETTE, RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import type { Visual } from '#api';
 import { formatDuration } from '#lib/format';
@@ -67,7 +67,7 @@ export function ArticleVideo({ title, durationSeconds, poster, recyclingKey }: A
           />
         )}
         <Box style={styles.badge}>
-          <Icon name="play" size={SIZES.ring} tintColor={theme.onPrimary} />
+          <Icon name="play" size={SPACING.md} tintColor={theme.onPrimary} />
           <Text variant="label" tone="onPrimary">
             {formatDuration(durationSeconds)}
           </Text>

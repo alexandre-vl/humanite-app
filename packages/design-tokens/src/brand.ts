@@ -6,7 +6,6 @@ export type Space = Brand<number, 'Space'>;
 export type Radius = Brand<number, 'Radius'>;
 export type FontSize = Brand<number, 'FontSize'>;
 export type LineHeight = Brand<number, 'LineHeight'>;
-export type Duration = Brand<number, 'Duration'>;
 export type FontFamily = Brand<string, 'FontFamily'>;
 export type Color = Brand<string, 'Color'>;
 export type Angle = Brand<string, 'Angle'>;
@@ -18,7 +17,6 @@ const isSpace = (value: number): value is Space => isFiniteNonNegative(value);
 const isRadius = (value: number): value is Radius => isFiniteNonNegative(value);
 const isFontSize = (value: number): value is FontSize => Number.isFinite(value) && value > 0;
 const isLineHeight = (value: number): value is LineHeight => Number.isFinite(value) && value > 0;
-const isDuration = (value: number): value is Duration => isFiniteNonNegative(value);
 const isFontFamily = (value: string): value is FontFamily => value.length > 0;
 const isColor = (value: string): value is Color => HEX.test(value);
 const isAngle = (value: string): value is Angle => DEGREES.test(value);
@@ -33,7 +31,6 @@ export const space = (value: number): Space => (isSpace(value) ? value : invalid
 export const radius = (value: number): Radius => (isRadius(value) ? value : invalid('rayon', value));
 export const fontSize = (value: number): FontSize => (isFontSize(value) ? value : invalid('taille', value));
 export const lineHeight = (value: number): LineHeight => (isLineHeight(value) ? value : invalid('interligne', value));
-export const duration = (value: number): Duration => (isDuration(value) ? value : invalid('durée', value));
 export const fontFamily = (value: string): FontFamily => (isFontFamily(value) ? value : invalid('police', value));
 export const color = (value: string): Color => (isColor(value) ? value : invalid('couleur', value));
 

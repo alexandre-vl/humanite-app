@@ -55,7 +55,6 @@ jest.mock('react-native-reanimated', () => {
     __esModule: true,
     default: reactNative,
     useSharedValue,
-    useAnimatedScrollHandler: () => jest.fn(),
     useAnimatedStyle: (updater: () => unknown): unknown => updater(),
   };
 });

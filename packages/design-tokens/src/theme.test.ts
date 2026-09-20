@@ -1,12 +1,21 @@
 import { describe, expect, test } from 'vitest';
-import { contrastRatio, PALETTE, THEMES } from './index.ts';
+import { contrastRatio, PALETTE, THEME_CHOICES, THEME_NAMES, THEMES } from './index.ts';
 import type { Color, Theme } from './index.ts';
 
 /** Every theme the tokens publish, read from the table instead of listed again beside it. */
 const themes: readonly (readonly [string, Theme])[] = Object.entries(THEMES);
 
 test('the tokens publish a light and a dark theme', () => {
-  expect(Object.keys(THEMES)).toEqual(['light', 'dark']);
+  expect(THEME_NAMES).toEqual(['light', 'dark']);
+});
+
+/**
+ * The names are the one list, and both the table and the reader's choices are read off it. Without this, a third
+ * theme could reach the table and never be offered — or be offered and have no colours.
+ */
+test('every theme is named, every name has a theme, and every name can be chosen', () => {
+  expect(Object.keys(THEMES)).toEqual([...THEME_NAMES]);
+  expect(THEME_CHOICES).toEqual(['system', ...THEME_NAMES]);
 });
 
 /**

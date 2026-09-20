@@ -21,8 +21,8 @@ const useStyles = createStyles((theme) => ({
     borderColor: theme.onPrimary,
   },
   ring: {
-    width: SIZES.ring,
-    height: SIZES.ring,
+    width: SPACING.md,
+    height: SPACING.md,
     marginTop: SPACING.lg,
     borderRadius: RADII.pill,
     borderWidth: SIZES.stroke,

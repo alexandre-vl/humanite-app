@@ -1,5 +1,5 @@
-import type { Angle, Duration, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
-import { angle, duration, fontFamily, fontSize, lineHeight, radius, space } from './brand.ts';
+import type { Angle, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
+import { angle, fontFamily, fontSize, lineHeight, radius, space } from './brand.ts';
 
 /** Spacing scale in points, on a four-point grid. */
 export const SPACING = {
@@ -15,11 +15,12 @@ export const SPACING = {
 
 /**
  * Corner radii in points; the current app favours generous rounding (docs/app-actuelle). `sheet` is the one a reading
- * screen turns the top-left corner of its sheet by, measured on capture 13 as a circle of radius 129 px — 49 points —
- * fitted over 134 rows to within half a pixel, against a top-right corner left square.
+ * screen turns the top-left corner of its sheet by, measured on capture 13 as a circle of radius 129 px — 49,1 points
+ * — fitted over 134 rows to within half a pixel, against a top-right corner left square. It is written as 48, the step
+ * the scale already holds: a point of difference on a corner of fifty is not a corner anyone can tell apart, and a
+ * scale that gains a step for every measurement stops being a scale.
  */
 export const RADII = {
-  none: radius(0),
   sm: radius(6),
   md: radius(12),
   lg: radius(20),
@@ -33,7 +34,6 @@ export const FONT_SIZES = {
   sm: fontSize(14),
   md: fontSize(16),
   lg: fontSize(20),
-  xl: fontSize(26),
   xxl: fontSize(34),
 } as const satisfies Readonly<Record<string, FontSize>>;
 
@@ -92,7 +92,7 @@ export const FONT_FAMILIES = {
  * arrangement adds up to is named too, because a style table is built once and cannot add.
  *
  * `stroke` is the rule the paper draws where it draws one — the line a timeline hangs its items from, the line a field
- * is typed on — and `ring` the hollow mark on it: both finer than the grid's smallest step.
+ * is typed on. It is here rather than on the spacing grid because it is finer than the grid's smallest step.
  *
  * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst. It is a width,
  * not a height, and the only one the paper names: everything else a card lays out is a share of the screen it is
@@ -109,7 +109,6 @@ export const SIZES = {
   headerBand: space(HEADER_EXPANDED + BAND),
   headerBandPair: space(HEADER_EXPANDED + BAND * 2),
   stroke: space(2),
-  ring: space(12),
   thumbnail: space(96),
 } as const satisfies Readonly<Record<string, Space>>;
 
@@ -121,19 +120,3 @@ export const SIZES = {
 export const ANGLES = {
   paper: angle(-1.4),
 } as const satisfies Readonly<Record<string, Angle>>;
-
-/** Animation durations in milliseconds. */
-export const DURATIONS = {
-  instant: duration(0),
-  fast: duration(150),
-  normal: duration(250),
-  slow: duration(400),
-} as const satisfies Readonly<Record<string, Duration>>;
-
-/** The same durations with motion removed, for the reduce-motion setting. */
-export const REDUCED_DURATIONS = {
-  instant: duration(0),
-  fast: duration(0),
-  normal: duration(0),
-  slow: duration(0),
-} as const satisfies Readonly<Record<keyof typeof DURATIONS, Duration>>;

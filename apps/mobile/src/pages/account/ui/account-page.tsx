@@ -60,7 +60,7 @@ function OpenRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: () 
       <Box style={styles.words}>
         <Text variant="body">{label}</Text>
       </Box>
-      <Icon name="next" size={SIZES.ring} tintColor={theme.textMuted} />
+      <Icon name="next" size={SPACING.md} tintColor={theme.textMuted} />
     </Pressable>
   );
 }
