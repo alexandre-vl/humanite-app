@@ -3,7 +3,7 @@ import type { TextVariant } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { TextInput as NativeTextInput } from 'react-native';
 import type { StyleRef } from '../../../lib/styles';
-import { inputStyle, useTheme } from '../../../lib/styles';
+import { inputStyle, useTextScale, useTheme } from '../../../lib/styles';
 
 export type TextFieldProps = Readonly<{
   value: string;
@@ -25,6 +25,7 @@ export type TextFieldProps = Readonly<{
  */
 export function TextField({ value, onChange, placeholder, variant = 'body', style }: TextFieldProps): ReactNode {
   const theme = useTheme();
+  const scale = useTextScale();
   return (
     <NativeTextInput
       value={value}
@@ -36,7 +37,7 @@ export function TextField({ value, onChange, placeholder, variant = 'body', styl
       selectionHandleColor={theme.primary}
       autoCorrect={false}
       autoCapitalize="none"
-      style={[style, inputStyle(variant, theme)]}
+      style={[style, inputStyle(variant, theme, scale)]}
     />
   );
 }

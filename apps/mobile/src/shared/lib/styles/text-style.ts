@@ -1,5 +1,15 @@
-import type { Color, FontFamily, FontSize, RunFace, TextTone, TextVariant, Theme } from '@huma/design-tokens';
-import { RUN_FACES, TYPOGRAPHY } from '@huma/design-tokens';
+import type {
+  Color,
+  FontFamily,
+  FontSize,
+  RunFace,
+  TextScale,
+  TextTone,
+  TextVariant,
+  Theme,
+  Typography,
+} from '@huma/design-tokens';
+import { RUN_FACES, typographyAt } from '@huma/design-tokens';
 
 /** How a run of text sits across its column. */
 export type TextAlign = 'left' | 'center';
@@ -18,22 +28,28 @@ export type TextStyle = Readonly<{
   textAlign?: TextAlign;
 }>;
 
-/** The face, the size and the colour a variant is set in: everything about its letters, nothing about its lines. */
-const faceOf = (variant: TextVariant, theme: Theme, tone: TextTone | undefined): TextStyle => {
-  const role = TYPOGRAPHY[variant];
-  return { fontFamily: role.family, fontSize: role.size, color: theme[tone ?? role.tone] };
-};
+/** The face, the size and the colour a role is set in: everything about its letters, nothing about its lines. */
+const faceOf = (role: Typography, theme: Theme, tone: TextTone | undefined): TextStyle => ({
+  fontFamily: role.family,
+  fontSize: role.size,
+  color: theme[tone ?? role.tone],
+});
 
-/** The style a named variant paints with, in the theme in force, with the tone and the alignment a caller may set. */
+/**
+ * The style a named variant paints with: in the theme in force and at the step the reader set, with the tone and the
+ * alignment a caller may override. The step reaches every letter of the app through here, and the line height with
+ * them, being a multiple of a size rather than a length of its own.
+ */
 export function textStyle(
   variant: TextVariant,
   theme: Theme,
+  scale: TextScale,
   tone: TextTone | undefined,
   align: TextAlign | undefined,
 ): TextStyle {
-  const role = TYPOGRAPHY[variant];
+  const role = typographyAt(variant, scale);
   return {
-    ...faceOf(variant, theme, tone),
+    ...faceOf(role, theme, tone),
     lineHeight: role.size * role.leading,
     ...(align === undefined ? {} : { textAlign: align }),
   };
@@ -45,7 +61,8 @@ export function textStyle(
  * is being typed off the baseline its placeholder sat on. The face and the size are read from the same table as a
  * paragraph's, so a field and the text around it are set in the same type.
  */
-export const inputStyle = (variant: TextVariant, theme: Theme): TextStyle => faceOf(variant, theme, undefined);
+export const inputStyle = (variant: TextVariant, theme: Theme, scale: TextScale): TextStyle =>
+  faceOf(typographyAt(variant, scale), theme, undefined);
 
 /**
  * The colour a piece of text the platform draws itself is set in — a label under a tab bar, a title in a native

@@ -1,11 +1,12 @@
 import type { FontFamily, FontSize, LineHeight } from './brand.ts';
+import { fontSize } from './brand.ts';
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from './tokens.ts';
 
 /** The theme colour a run of text paints with: a subset of the theme's colour roles, named where a text style is set. */
 export type TextTone = 'textPrimary' | 'textMuted' | 'onPrimary' | 'headline' | 'primary';
 
 /** A named text style: a face, a size, a line-height multiple and the tone it paints with unless a caller overrides it. */
-type Typography = Readonly<{ family: FontFamily; size: FontSize; leading: LineHeight; tone: TextTone }>;
+export type Typography = Readonly<{ family: FontFamily; size: FontSize; leading: LineHeight; tone: TextTone }>;
 
 /**
  * The face a run takes inside a paragraph, where the paragraph's own face is not the one to use. A run changes its
@@ -68,3 +69,37 @@ export const TYPOGRAPHY = {
   },
   caption: { family: FONT_FAMILIES.body.regular, size: FONT_SIZES.sm, leading: LINE_HEIGHTS.normal, tone: 'textMuted' },
 } as const satisfies Readonly<Record<TextVariant, Typography>>;
+
+/** The steps a reader may set the text at, from the smallest to the largest. */
+export const TEXT_SCALES = ['small', 'normal', 'large', 'huge'] as const;
+
+/** The name of a text step. */
+export type TextScale = (typeof TEXT_SCALES)[number];
+
+/**
+ * What each step multiplies a size by. The steps are eighths around the one the paper is set at, so the body text
+ * reads 14, 16, 18 and 20 points — the range the current app's own slider covers, in four named stops rather than a
+ * continuum a finger cannot hold. Sizes are rounded to the point: a face is hinted at whole sizes, and a table of
+ * fractions would print the same letters while reading worse.
+ */
+const FACTORS = {
+  small: 0.875,
+  normal: 1,
+  large: 1.125,
+  huge: 1.25,
+} as const satisfies Readonly<Record<TextScale, number>>;
+
+/**
+ * A variant as it is set at a chosen step: its own face, tone and line-height multiple, at the size the step gives.
+ *
+ * The arithmetic is here and not in the app because a size is a branded token, and only this package mints one; an
+ * app that could multiply a size could write any number into a style. The line height follows for nothing, being a
+ * multiple of the size rather than a length.
+ *
+ * This is the app's own step, not the system's. A phone already scales every text by the setting its owner chose, and
+ * this app has always obeyed it; what a reader sets here multiplies that, for the one reading they do in this paper.
+ */
+export const typographyAt = (variant: TextVariant, scale: TextScale): Typography => {
+  const role = TYPOGRAPHY[variant];
+  return { ...role, size: fontSize(Math.round(role.size * FACTORS[scale])) };
+};

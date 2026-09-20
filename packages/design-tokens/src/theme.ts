@@ -61,3 +61,14 @@ export const DARK_THEME = {
 
 /** The themes by name. */
 export const THEMES = { light: LIGHT_THEME, dark: DARK_THEME } as const satisfies Readonly<Record<string, Theme>>;
+
+/**
+ * What a reader may set the paper's colours to: either theme by name, or whichever the phone is in.
+ *
+ * `system` is not a third theme but the absence of a choice, which is why it is named here beside the two rather than
+ * added to them: a table of themes answers with colours, and this answers which of them to ask for.
+ */
+export const THEME_CHOICES = ['system', 'light', 'dark'] as const;
+
+/** The name of a theme choice. */
+export type ThemeChoice = (typeof THEME_CHOICES)[number];

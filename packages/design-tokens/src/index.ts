@@ -14,7 +14,7 @@ export {
 export { contrastRatio } from './contrast.ts';
 export type { SectionCode } from './sections.ts';
 export { SECTION_COLORS, sectionCode, sectionColor } from './sections.ts';
-export type { Theme } from './theme.ts';
-export { DARK_THEME, LIGHT_THEME, THEMES } from './theme.ts';
-export type { RunFace, TextTone, TextVariant } from './typography.ts';
-export { RUN_FACES, TEXT_VARIANTS, TYPOGRAPHY } from './typography.ts';
+export type { Theme, ThemeChoice } from './theme.ts';
+export { DARK_THEME, LIGHT_THEME, THEME_CHOICES, THEMES } from './theme.ts';
+export type { RunFace, TextScale, TextTone, TextVariant, Typography } from './typography.ts';
+export { RUN_FACES, TEXT_SCALES, TEXT_VARIANTS, TYPOGRAPHY, typographyAt } from './typography.ts';

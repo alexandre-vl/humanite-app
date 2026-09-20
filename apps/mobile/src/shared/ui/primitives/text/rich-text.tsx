@@ -3,7 +3,7 @@ import type { RunFace, TextTone, TextVariant } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { Text as NativeText } from 'react-native';
 import type { TextAlign } from '../../../lib/styles';
-import { runStyle, textStyle, useTheme } from '../../../lib/styles';
+import { runStyle, textStyle, useTextScale, useTheme } from '../../../lib/styles';
 
 /** One stretch of a sentence: its words, the face that sets it apart, and what a press on it does. */
 export type TextRun = Readonly<{ text: DisplayText; face?: RunFace; onPress?: () => void }>;
@@ -35,8 +35,9 @@ const place = (runs: readonly TextRun[]): readonly PlacedRun[] => {
  */
 export function RichText({ runs, variant = 'prose', tone, align }: RichTextProps): ReactNode {
   const theme = useTheme();
+  const scale = useTextScale();
   return (
-    <NativeText style={textStyle(variant, theme, tone, align)}>
+    <NativeText style={textStyle(variant, theme, scale, tone, align)}>
       {place(runs).map(({ at, run }) => (
         <NativeText key={at} onPress={run.onPress} style={runStyle(run.face, run.onPress !== undefined, theme)}>
           {run.text}

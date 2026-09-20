@@ -10,7 +10,7 @@ significance: [dependency, guarded-config, boundary, data-format]
 
 - Le cache des lectures est persisté en entier sous une clé unique, invalidé par l’empreinte des contrats, et ce qui en revient mal formé est refusé plutôt que migré (ADR-0015).
 - La bibliothèque de stockage synchrone n’est importable que depuis les bibliothèques partagées, le grain du confinement étant la place entière (ADR-0015).
-- Hors ce cache, l’app n’écrit rien sur le disque : le registre des clés n’en déclare qu’une (`cat apps/mobile/src/shared/lib/storage/keys.ts`).
+- Hors ce cache, tout ce que l’app écrit sur le disque passe par le registre des clés, qui les déclare toutes (`cat apps/mobile/src/shared/lib/storage/keys.ts`).
 - Ce que le lecteur garde n’est pas une lecture du journal : la surface du contenu ne s’écrit pas, et rien n’y remet ce qu’il a fait (`cat packages/contracts/src/api.ts`).
 - Le corpus est embarqué avec l’app et change avec elle, quand le disque du téléphone survit à la mise à jour (`cat packages/mock-content/src/generated/corpus.ts`).
 - Une lecture par lot sert les articles encore imprimés et laisse les autres, plutôt que d’échouer sur le premier absent (`cat packages/mock-api/src/api.ts`).
@@ -32,18 +32,18 @@ Où vit ce que le lecteur a fait du journal, et que devient-il quand l’app a c
 
 ## Décision
 
-Option retenue : « un magasin Zustand persisté par le registre des clés, dans la couche des actions », parce qu’elle écrit sous sa propre clé, versionnée, ce qu’un redémarrage doit retrouver (C1), relit ce qui revient du disque par l’analyseur des contrats avant de le servir (C2), se tient par le confinement du paquet à une seule place (C3), et passe par la façade du stockage, qui n’accepte que les clés déclarées (C4).
+Option retenue : « un magasin Zustand persisté par le registre des clés, dans la couche des actions », parce qu’elle écrit sous sa propre clé, versionnée, ce qu’un redémarrage doit retrouver (C1), relit valeur par valeur ce qui revient du disque avant de le servir (C2), se tient par le confinement du paquet à une seule place (C3), et passe par la façade du stockage, qui n’accepte que les clés déclarées (C4).
 
 - **R1** — Zustand NE DOIT PAS être importée hors de la couche des actions.
 - **R2** — Une clé écrite sur le disque DOIT être déclarée au registre des clés.
 - **R3** — Un format persisté DOIT porter une version.
-- **R4** — Ce qui revient du disque DOIT être relu par un analyseur des contrats avant d’être servi.
+- **R4** — Ce qui revient du disque DOIT être relu valeur par valeur avant d’être servi, par l’analyseur des contrats quand la valeur en est une, et sinon contre la liste close de ce qu’elle peut être.
 
 ### Conséquences
 
 - Bien, parce que ce que le lecteur a gardé ne dépend ni du réseau ni du cache des lectures, et se retrouve hors ligne.
 - Bien, parce qu’un identifiant que le journal n’imprime plus disparaît de l’écran sans emporter le reste de la liste.
-- Neutre, parce que la version d’un format n’a pas encore de migration à décrire : elle nomme le premier état d’une suite.
+- Neutre, parce que la version n’a pas de migration à décrire : elle nomme le premier état d’une suite, et un réglage ajouté plus tard ne l’en fait pas sortir, la relecture rendant la valeur du journal pour un nom absent du disque.
 - Mauvais, parce que le confinement se règle par place : tout module de la couche des actions peut déclarer un magasin, non le seul qui en a besoin.
 - Mauvais, parce qu’un identifiant devenu introuvable reste sur le disque, invisible, tant que le lecteur ne le repose pas.
 
@@ -73,4 +73,4 @@ Option retenue : « un magasin Zustand persisté par le registre des clés, dans
 
 - Le paquet ne déclare que des pairs facultatifs, dont React, déjà là : rien ne s’ajoute à l’installation (`pnpm deps:check`).
 - La façade du stockage rend une absence là où le paquet attend une valeur nulle : l’adaptateur vit auprès d’elle, seule place qui touche le disque (`cat apps/mobile/src/shared/lib/storage/storage.ts`).
-- Réévaluation : un second magasin apparaît, ou un format persisté doit être migré plutôt qu’écarté.
+- Réévaluation : un format persisté doit être migré plutôt qu’écarté, ou un magasin demande autre chose qu’une clé, une version et une relecture.
