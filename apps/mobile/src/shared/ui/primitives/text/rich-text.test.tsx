@@ -1,11 +1,14 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { FONT_FAMILIES, TYPOGRAPHY } from '@huma/design-tokens';
+import { FONT_FAMILIES, typographyAt } from '@huma/design-tokens';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
 import type { TextRun } from './rich-text';
 import { RichText } from './rich-text';
 
 const plain = (text: string): TextRun => ({ text: asDisplayText(text) });
+
+/** A role as the paper sets it, at the step nobody has moved. */
+const prose = typographyAt('prose', 'normal', 'paper');
 
 /** What a rendered run paints with, flattened: React Native accepts an array of styles, and a run gets one object. */
 const styleOf = (text: string): Readonly<Record<string, unknown>> => {
@@ -22,16 +25,16 @@ describe('RichText', () => {
 
   it('ne donne au fragment penché que sa fonte, pour qu’il hérite du reste de la phrase', async () => {
     await render(<RichText runs={[plain('avant '), { text: asDisplayText('penché'), face: 'italic' }]} />);
-    expect(styleOf('penché')).toEqual({ fontFamily: FONT_FAMILIES.body.lightItalic });
+    expect(styleOf('penché')).toEqual({ fontFamily: FONT_FAMILIES.paper.lightItalic });
   });
 
   it('donne à la phrase la taille et l’interligne de son variant', async () => {
     await render(<RichText runs={[plain('une phrase')]} variant="prose" />);
     const sentence: unknown = screen.getByText('une phrase').parent?.props['style'];
     expect(sentence).toMatchObject({
-      fontFamily: FONT_FAMILIES.body.light,
-      fontSize: TYPOGRAPHY.prose.size,
-      lineHeight: TYPOGRAPHY.prose.size * TYPOGRAPHY.prose.leading,
+      fontFamily: prose.family,
+      fontSize: prose.size,
+      lineHeight: prose.size * prose.leading,
     });
   });
 

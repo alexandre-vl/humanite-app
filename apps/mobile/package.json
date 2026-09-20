@@ -18,6 +18,7 @@
   "dependencies": {
     "@babel/runtime": "catalog:",
     "@expo-google-fonts/anton": "catalog:",
+    "@expo-google-fonts/atkinson-hyperlegible": "catalog:",
     "@expo-google-fonts/overpass": "catalog:",
     "@expo/dom-webview": "catalog:",
     "@expo/log-box": "catalog:",

@@ -21,6 +21,9 @@ catalogs:
     '@expo-google-fonts/anton':
       specifier: 0.4.1
       version: 0.4.1
+    '@expo-google-fonts/atkinson-hyperlegible':
+      specifier: 0.4.1
+      version: 0.4.1
     '@expo-google-fonts/overpass':
       specifier: 0.4.2
       version: 0.4.2
@@ -270,6 +273,9 @@ importers:
         specifier: 'catalog:'
         version: 7.29.7
       '@expo-google-fonts/anton':
+        specifier: 'catalog:'
+        version: 0.4.1
+      '@expo-google-fonts/atkinson-hyperlegible':
         specifier: 'catalog:'
         version: 0.4.1
       '@expo-google-fonts/overpass':
@@ -1755,6 +1761,9 @@ packages:
 
   '@expo-google-fonts/anton@0.4.1':
     resolution: {integrity: sha512-Th+4RgdpMjD/LSTk+Ymozkq2ZXinGiV8rK55r6rIOUgwAd5VN0m91Z2YCs+d5gK2/l2Lvp998sRsQOWt3eN5QQ==}
+
+  '@expo-google-fonts/atkinson-hyperlegible@0.4.1':
+    resolution: {integrity: sha512-Xr1XAguU7oEVHy28WxCBmdjPT2BNwH5lFZF2adHb9Cy6qtNgXwDzeAgvESkoq4mQmYW5RzqJZknqQxrTkEm0Xw==}
 
   '@expo-google-fonts/material-symbols@0.4.47':
     resolution: {integrity: sha512-5G4ObZlyGvDzx6g/+NC+RAMeeCc3dc0/HLu/llY5dYZUlNDYzaZWQZwPUzoTixf27riT8I7ur9mQKPYCPFDJzQ==}
@@ -7865,6 +7874,8 @@ snapshots:
       levn: 0.4.1
 
   '@expo-google-fonts/anton@0.4.1': {}
+
+  '@expo-google-fonts/atkinson-hyperlegible@0.4.1': {}
 
   '@expo-google-fonts/material-symbols@0.4.47': {}
 

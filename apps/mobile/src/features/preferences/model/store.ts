@@ -1,5 +1,5 @@
-import type { TextScale, ThemeChoice } from '@huma/design-tokens';
-import { TEXT_SCALES, THEME_CHOICES } from '@huma/design-tokens';
+import type { FaceSet, TextScale, ThemeChoice } from '@huma/design-tokens';
+import { FACE_SETS, TEXT_SCALES, THEME_CHOICES } from '@huma/design-tokens';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { STORAGE_KEYS, stateStorage } from '#lib/storage';
@@ -15,15 +15,16 @@ import { STORAGE_KEYS, stateStorage } from '#lib/storage';
 const VERSION = 1;
 
 /** What the reader has set about how the paper is printed for them. */
-type Settings = Readonly<{ theme: ThemeChoice; scale: TextScale }>;
+type Settings = Readonly<{ theme: ThemeChoice; scale: TextScale; faces: FaceSet }>;
 
 /** What the paper does when nothing has been set: the phone's colours, and the size the paper is written at. */
-const DEFAULTS = { theme: 'system', scale: 'normal' } as const satisfies Settings;
+const DEFAULTS = { theme: 'system', scale: 'normal', faces: 'paper' } as const satisfies Settings;
 
 type Reading = Settings &
   Readonly<{
     chooseTheme: (theme: ThemeChoice) => void;
     chooseScale: (scale: TextScale) => void;
+    chooseFaces: (faces: FaceSet) => void;
   }>;
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
@@ -47,6 +48,7 @@ const oneOf = <Value extends string>(allowed: readonly Value[], held: unknown, f
 const settingsOf = (persisted: unknown): Settings => ({
   theme: oneOf(THEME_CHOICES, field(persisted, 'theme'), DEFAULTS.theme),
   scale: oneOf(TEXT_SCALES, field(persisted, 'scale'), DEFAULTS.scale),
+  faces: oneOf(FACE_SETS, field(persisted, 'faces'), DEFAULTS.faces),
 });
 
 /**
@@ -66,12 +68,15 @@ export const usePreferences = create<Reading>()(
       chooseScale: (scale: TextScale): void => {
         set({ scale });
       },
+      chooseFaces: (faces: FaceSet): void => {
+        set({ faces });
+      },
     }),
     {
       name: STORAGE_KEYS.preferences,
       version: VERSION,
       storage: createJSONStorage(() => stateStorage(STORAGE_KEYS.preferences)),
-      partialize: (reading) => ({ theme: reading.theme, scale: reading.scale }),
+      partialize: (reading) => ({ theme: reading.theme, scale: reading.scale, faces: reading.faces }),
       merge: (persisted, current) => ({ ...current, ...settingsOf(persisted) }),
     },
   ),

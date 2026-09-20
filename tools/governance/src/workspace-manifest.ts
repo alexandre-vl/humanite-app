@@ -42,6 +42,7 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     '@cspell/eslint-plugin': '10.3.1',
     '@eslint/js': '10.0.1',
     '@expo-google-fonts/anton': '0.4.1',
+    '@expo-google-fonts/atkinson-hyperlegible': '0.4.1',
     '@expo-google-fonts/overpass': '0.4.2',
     '@expo/dom-webview': '57.0.1',
     '@expo/log-box': '57.0.4',

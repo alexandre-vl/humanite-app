@@ -45,19 +45,44 @@ export const LINE_HEIGHTS = {
 } as const satisfies Readonly<Record<string, LineHeight>>;
 
 /**
- * Font families: Overpass for body text, one face per weight; Anton for display titles (docs/app-actuelle). A slanted
- * face is loaded rather than asked for, because Android synthesises no italic: naming a family that has no italic file
- * and asking for one leaves the text upright, silently.
+ * The name of a face: four weights of body type, and the one a title is displayed in. It is written as a union and not
+ * read off a list, nothing ever walking the faces — a set names all of them at once, and a role names exactly one.
+ */
+export type Face = 'light' | 'lightItalic' | 'regular' | 'bold' | 'display';
+
+/** Which set of faces the paper is printed in; read off this list wherever a reader's choice is checked against it. */
+export const FACE_SETS = ['paper', 'legible'] as const;
+
+/** The name of a set of faces. */
+export type FaceSet = (typeof FACE_SETS)[number];
+
+/**
+ * The faces, by set. The paper's own are Overpass for body text, one file per weight, and Anton for display titles
+ * (docs/app-actuelle). A slanted face is loaded rather than asked for, because Android synthesises no italic: naming a
+ * family that has no italic file and asking for one leaves the text upright, silently.
+ *
+ * The other set is Atkinson Hyperlegible, drawn by the Braille Institute to pull apart the letters that a reader most
+ * often confuses — the l from the I and the 1, the O from the 0, the b from the d — and offered to a reader who asks
+ * for it. It has four files where the paper has five faces, so it answers the light weight with its regular and the
+ * display face with its bold: a set that reads more easily has no business printing a masthead in a display face
+ * nobody chose it for.
  */
 export const FONT_FAMILIES = {
-  body: {
+  paper: {
     light: fontFamily('Overpass_300Light'),
     lightItalic: fontFamily('Overpass_300Light_Italic'),
     regular: fontFamily('Overpass_400Regular'),
     bold: fontFamily('Overpass_700Bold'),
+    display: fontFamily('Anton_400Regular'),
   },
-  display: fontFamily('Anton_400Regular'),
-} as const satisfies Readonly<{ body: Readonly<Record<string, FontFamily>>; display: FontFamily }>;
+  legible: {
+    light: fontFamily('AtkinsonHyperlegible_400Regular'),
+    lightItalic: fontFamily('AtkinsonHyperlegible_400Regular_Italic'),
+    regular: fontFamily('AtkinsonHyperlegible_400Regular'),
+    bold: fontFamily('AtkinsonHyperlegible_700Bold'),
+    display: fontFamily('AtkinsonHyperlegible_700Bold'),
+  },
+} as const satisfies Readonly<Record<FaceSet, Readonly<Record<Face, FontFamily>>>>;
 
 /**
  * Component sizes in points — heights the four-point SPACING grid does not reach.

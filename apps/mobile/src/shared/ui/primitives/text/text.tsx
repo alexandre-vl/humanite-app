@@ -3,7 +3,7 @@ import type { TextTone, TextVariant } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { Text as NativeText } from 'react-native';
 import type { TextAlign } from '../../../lib/styles';
-import { textStyle, useTextScale, useTheme } from '../../../lib/styles';
+import { textStyle, useTheme, useTypesetting } from '../../../lib/styles';
 
 export type TextProps = Readonly<{
   children: DisplayText;
@@ -21,9 +21,9 @@ export type TextProps = Readonly<{
  */
 export function Text({ children, variant = 'body', tone, align, numberOfLines }: TextProps): ReactNode {
   const theme = useTheme();
-  const scale = useTextScale();
+  const typesetting = useTypesetting();
   return (
-    <NativeText numberOfLines={numberOfLines} style={textStyle(variant, theme, scale, tone, align)}>
+    <NativeText numberOfLines={numberOfLines} style={textStyle(variant, theme, typesetting, tone, align)}>
       {children}
     </NativeText>
   );

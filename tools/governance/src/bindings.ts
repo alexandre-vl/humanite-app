@@ -821,7 +821,7 @@ export const BINDINGS = {
       R1: ['guardrail/module-expo-font', 'guardrail/module-expo-splash-screen'],
       R2: {
         convention:
-          'Une famille de police est un token FontFamily de @huma/design-tokens (FONT_FAMILIES), assemblé dans les variants TYPOGRAPHY ; la primitive Text prend un nom de variant, jamais une chaîne, donc aucune police libre n’entre dans le rendu.',
+          'Une famille de police est un token FontFamily de @huma/design-tokens (FONT_FAMILIES), nommée par jeu de faces et résolue pour un variant par typographyAt, seule porte de la table ; la primitive Text prend un nom de variant, jamais une chaîne, donc aucune police libre n’entre dans le rendu.',
       },
     },
   },

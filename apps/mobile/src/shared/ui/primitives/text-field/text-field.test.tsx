@@ -1,5 +1,5 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { PALETTE, TYPOGRAPHY } from '@huma/design-tokens';
+import { PALETTE, typographyAt } from '@huma/design-tokens';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
 import { TextField } from './text-field';
@@ -32,8 +32,8 @@ describe('TextField', () => {
   it('prend la fonte, la taille et la couleur de son variant', async () => {
     await render(<TextField value="" onChange={() => undefined} placeholder={asDisplayText(PLACEHOLDER)} />);
     expect(letters()).toEqual({
-      fontFamily: TYPOGRAPHY.body.family,
-      fontSize: TYPOGRAPHY.body.size,
+      fontFamily: typographyAt('body', 'normal', 'paper').family,
+      fontSize: typographyAt('body', 'normal', 'paper').size,
       color: PALETTE.aubergine,
     });
   });

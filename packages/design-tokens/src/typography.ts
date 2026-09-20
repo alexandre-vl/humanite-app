@@ -1,11 +1,15 @@
 import type { FontFamily, FontSize, LineHeight } from './brand.ts';
 import { fontSize } from './brand.ts';
+import type { Face, FaceSet } from './tokens.ts';
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from './tokens.ts';
 
 /** The theme colour a run of text paints with: a subset of the theme's colour roles, named where a text style is set. */
 export type TextTone = 'textPrimary' | 'textMuted' | 'onPrimary' | 'headline' | 'primary';
 
-/** A named text style: a face, a size, a line-height multiple and the tone it paints with unless a caller overrides it. */
+/** A role of the table: which face it is set in, at what size, on what multiple, and the tone it paints with. */
+type Role = Readonly<{ face: Face; size: FontSize; leading: LineHeight; tone: TextTone }>;
+
+/** A role resolved for a reader: the family, size, multiple and tone a run of text is actually set in. */
 export type Typography = Readonly<{ family: FontFamily; size: FontSize; leading: LineHeight; tone: TextTone }>;
 
 /**
@@ -15,9 +19,9 @@ export type Typography = Readonly<{ family: FontFamily; size: FontSize; leading:
  * the only role that carries runs, and that is the face prose is set in.
  */
 export const RUN_FACES = {
-  italic: FONT_FAMILIES.body.lightItalic,
-  strong: FONT_FAMILIES.body.bold,
-} as const satisfies Readonly<Record<string, FontFamily>>;
+  italic: 'lightItalic',
+  strong: 'bold',
+} as const satisfies Readonly<Record<string, Face>>;
 
 /** The name of a run's face. */
 export type RunFace = keyof typeof RUN_FACES;
@@ -48,27 +52,27 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * closely. Prose differs from body by its face alone, and that is the measured difference: the current app sets its
  * article copy in a light face, scored 1.000 against Roboto Light and 0.943 against a regular one (README:97).
  */
-export const TYPOGRAPHY = {
-  headline: { family: FONT_FAMILIES.display, size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },
-  display: { family: FONT_FAMILIES.display, size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
-  title: { family: FONT_FAMILIES.body.bold, size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
+const TYPOGRAPHY = {
+  headline: { face: 'display', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },
+  display: { face: 'display', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
+  title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   standfirst: {
-    family: FONT_FAMILIES.body.bold,
+    face: 'bold',
     size: FONT_SIZES.md,
     leading: LINE_HEIGHTS.normal,
     tone: 'textPrimary',
   },
-  prose: { family: FONT_FAMILIES.body.light, size: FONT_SIZES.md, leading: LINE_HEIGHTS.loose, tone: 'textPrimary' },
-  body: { family: FONT_FAMILIES.body.regular, size: FONT_SIZES.md, leading: LINE_HEIGHTS.loose, tone: 'textPrimary' },
-  label: { family: FONT_FAMILIES.body.bold, size: FONT_SIZES.sm, leading: LINE_HEIGHTS.normal, tone: 'textPrimary' },
+  prose: { face: 'light', size: FONT_SIZES.md, leading: LINE_HEIGHTS.loose, tone: 'textPrimary' },
+  body: { face: 'regular', size: FONT_SIZES.md, leading: LINE_HEIGHTS.loose, tone: 'textPrimary' },
+  label: { face: 'bold', size: FONT_SIZES.sm, leading: LINE_HEIGHTS.normal, tone: 'textPrimary' },
   legend: {
-    family: FONT_FAMILIES.body.lightItalic,
+    face: 'lightItalic',
     size: FONT_SIZES.xs,
     leading: LINE_HEIGHTS.normal,
     tone: 'textPrimary',
   },
-  caption: { family: FONT_FAMILIES.body.regular, size: FONT_SIZES.sm, leading: LINE_HEIGHTS.normal, tone: 'textMuted' },
-} as const satisfies Readonly<Record<TextVariant, Typography>>;
+  caption: { face: 'regular', size: FONT_SIZES.sm, leading: LINE_HEIGHTS.normal, tone: 'textMuted' },
+} as const satisfies Readonly<Record<TextVariant, Role>>;
 
 /** The steps a reader may set the text at, from the smallest to the largest. */
 export const TEXT_SCALES = ['small', 'normal', 'large', 'huge'] as const;
@@ -99,7 +103,12 @@ const FACTORS = {
  * This is the app's own step, not the system's. A phone already scales every text by the setting its owner chose, and
  * this app has always obeyed it; what a reader sets here multiplies that, for the one reading they do in this paper.
  */
-export const typographyAt = (variant: TextVariant, scale: TextScale): Typography => {
+export const typographyAt = (variant: TextVariant, scale: TextScale, faces: FaceSet): Typography => {
   const role = TYPOGRAPHY[variant];
-  return { ...role, size: fontSize(Math.round(role.size * FACTORS[scale])) };
+  return {
+    family: FONT_FAMILIES[faces][role.face],
+    size: fontSize(Math.round(role.size * FACTORS[scale])),
+    leading: role.leading,
+    tone: role.tone,
+  };
 };

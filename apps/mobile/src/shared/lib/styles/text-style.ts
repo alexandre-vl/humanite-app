@@ -1,15 +1,16 @@
 import type {
   Color,
+  FaceSet,
   FontFamily,
   FontSize,
   RunFace,
-  TextScale,
   TextTone,
   TextVariant,
   Theme,
   Typography,
 } from '@huma/design-tokens';
-import { RUN_FACES, typographyAt } from '@huma/design-tokens';
+import { FONT_FAMILIES, RUN_FACES, typographyAt } from '@huma/design-tokens';
+import type { Typesetting } from './typesetting';
 
 /** How a run of text sits across its column. */
 export type TextAlign = 'left' | 'center';
@@ -43,11 +44,11 @@ const faceOf = (role: Typography, theme: Theme, tone: TextTone | undefined): Tex
 export function textStyle(
   variant: TextVariant,
   theme: Theme,
-  scale: TextScale,
+  typesetting: Typesetting,
   tone: TextTone | undefined,
   align: TextAlign | undefined,
 ): TextStyle {
-  const role = typographyAt(variant, scale);
+  const role = typographyAt(variant, typesetting.scale, typesetting.faces);
   return {
     ...faceOf(role, theme, tone),
     lineHeight: role.size * role.leading,
@@ -61,8 +62,8 @@ export function textStyle(
  * is being typed off the baseline its placeholder sat on. The face and the size are read from the same table as a
  * paragraph's, so a field and the text around it are set in the same type.
  */
-export const inputStyle = (variant: TextVariant, theme: Theme, scale: TextScale): TextStyle =>
-  faceOf(typographyAt(variant, scale), theme, undefined);
+export const inputStyle = (variant: TextVariant, theme: Theme, typesetting: Typesetting): TextStyle =>
+  faceOf(typographyAt(variant, typesetting.scale, typesetting.faces), theme, undefined);
 
 /**
  * The colour a piece of text the platform draws itself is set in — a label under a tab bar, a title in a native
@@ -76,9 +77,9 @@ export const chromeStyle = (tone: TextTone, theme: Theme): TextStyle => ({ color
  * press. Everything it leaves out — the size, the line height, the colour of the paragraph — React Native inherits
  * from the text that encloses it, which is what keeps a slanted word on its neighbours' baseline.
  */
-export function runStyle(face: RunFace | undefined, pressable: boolean, theme: Theme): TextStyle {
+export function runStyle(face: RunFace | undefined, pressable: boolean, theme: Theme, faces: FaceSet): TextStyle {
   return {
-    ...(face === undefined ? {} : { fontFamily: RUN_FACES[face] }),
+    ...(face === undefined ? {} : { fontFamily: FONT_FAMILIES[faces][RUN_FACES[face]] }),
     ...(pressable ? { color: theme.primary } : {}),
   };
 }

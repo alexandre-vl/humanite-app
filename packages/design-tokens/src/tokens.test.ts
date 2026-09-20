@@ -25,9 +25,10 @@ test('radii, font sizes, line heights and families are branded tokens', () => {
   expectTypeOf(FONT_SIZES.md).toEqualTypeOf<FontSize>();
   expect(FONT_SIZES.md).toBe(16);
   expectTypeOf(LINE_HEIGHTS.normal).toEqualTypeOf<LineHeight>();
-  expectTypeOf(FONT_FAMILIES.body.regular).toEqualTypeOf<FontFamily>();
-  expect(FONT_FAMILIES.body.bold).toBe('Overpass_700Bold');
-  expect(FONT_FAMILIES.display).toBe('Anton_400Regular');
+  expectTypeOf(FONT_FAMILIES.paper.regular).toEqualTypeOf<FontFamily>();
+  expect(FONT_FAMILIES.paper.bold).toBe('Overpass_700Bold');
+  expect(FONT_FAMILIES.paper.display).toBe('Anton_400Regular');
+  expect(FONT_FAMILIES.legible.bold).toBe('AtkinsonHyperlegible_700Bold');
 });
 
 test('durations have a reduced-motion counterpart of zero', () => {

@@ -12,19 +12,21 @@ const writeDisk = async (state: unknown): Promise<void> => {
 };
 
 beforeEach(() => {
-  usePreferences.setState({ theme: 'system', scale: 'normal' });
+  usePreferences.setState({ theme: 'system', scale: 'normal', faces: 'paper' });
 });
 
 describe('usePreferences', () => {
-  it('part du téléphone pour les couleurs et du journal pour la taille', () => {
+  it('part du téléphone pour les couleurs, et du journal pour les lettres', () => {
     expect(usePreferences.getState().theme).toBe('system');
     expect(usePreferences.getState().scale).toBe('normal');
+    expect(usePreferences.getState().faces).toBe('paper');
   });
 
   it('écrit sous la clé du registre, avec la version de ce qu’il écrit', () => {
     usePreferences.getState().chooseTheme('dark');
     usePreferences.getState().chooseScale('large');
-    expect(onDisk()).toEqual({ state: { theme: 'dark', scale: 'large' }, version: 1 });
+    usePreferences.getState().chooseFaces('legible');
+    expect(onDisk()).toEqual({ state: { theme: 'dark', scale: 'large', faces: 'legible' }, version: 1 });
   });
 
   /**
@@ -32,9 +34,10 @@ describe('usePreferences', () => {
    * it may be, so nothing downstream ever paints in a theme that does not exist or sets type at a step never measured.
    */
   it('ne croit pas sur parole ce que le disque dit d’un réglage', async () => {
-    await writeDisk({ theme: 'sépia', scale: 42 });
+    await writeDisk({ theme: 'sépia', scale: 42, faces: ['legible'] });
     expect(usePreferences.getState().theme).toBe('system');
     expect(usePreferences.getState().scale).toBe('normal');
+    expect(usePreferences.getState().faces).toBe('paper');
   });
 
   it('repart de rien quand le disque ne porte pas la forme attendue', async () => {
@@ -50,5 +53,6 @@ describe('usePreferences', () => {
     await writeDisk({ theme: 'light' });
     expect(usePreferences.getState().theme).toBe('light');
     expect(usePreferences.getState().scale).toBe('normal');
+    expect(usePreferences.getState().faces).toBe('paper');
   });
 });
