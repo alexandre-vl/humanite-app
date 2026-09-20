@@ -1,6 +1,7 @@
 import type { Access, ArticleSummary, DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
+import { pictureOf } from '#api';
 import { Badge } from '#components/badge';
 import { t } from '#i18n';
 import { formatDate } from '#lib/format';
@@ -8,7 +9,8 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
-import { HERO_RATIO, pictureOf } from '../model/picture';
+
+import { HERO_RATIO } from '../model/picture';
 import type { CardShape } from '../model/rhythm';
 
 export type ArticleCardProps = Readonly<{

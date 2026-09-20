@@ -1,6 +1,7 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
+import { pictureOf } from '#api';
 import { Paper } from '#components/paper';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
@@ -8,7 +9,7 @@ import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
 import { Text } from '#primitives/text';
-import { HERO_RATIO, pictureOf } from '../model/picture';
+import { HERO_RATIO } from '../model/picture';
 
 export type ArticleRelatedProps = Readonly<{ summary: ArticleSummary; onOpen: () => void }>;
 

@@ -1,11 +1,11 @@
 import type { Article, ArticleSummary, Block } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { visualOf } from '#api';
+import { pictureOf, visualOf } from '#api';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { RichText, Text } from '#primitives/text';
-import { pictureOf } from '../model/picture';
+
 import type { LinkTarget } from '../model/spans';
 import { runsOf } from '../model/spans';
 import { ArticleCallout } from './article-callout';

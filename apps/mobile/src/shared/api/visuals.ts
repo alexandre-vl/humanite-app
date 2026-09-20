@@ -1,4 +1,4 @@
-import type { ImageKey } from '@huma/contracts';
+import type { ArticleSummary, ImageKey } from '@huma/contracts';
 import { VISUALS } from '@huma/mock-content';
 import { ASSETS } from '@huma/mock-content/assets';
 import type { AssetWidth } from '@huma/mock-content/assets';
@@ -36,3 +36,16 @@ export const visualOf = (key: ImageKey, size: VisualSize): Visual | null => {
   }
   return { source: widths[PLACE_WIDTHS[size]], thumbhash };
 };
+
+/**
+ * The illustration an item carries at the size asked for, or nothing: a brief and a column are written without one.
+ * The corpus holds no brief with a picture today, but nothing in the contracts forbids one — the schema makes `hero`
+ * optional on every item, and the corpus rule only stops requiring it of a brief — so the question is asked of the
+ * item, never of its kind.
+ *
+ * It is asked here, beside the key resolver, because more than one entity asks it and no entity may ask another: a
+ * card of the feed and the cover of a numéro both need the picture of an item, and the item is the content's shape,
+ * which is what this door answers for.
+ */
+export const pictureOf = (summary: ArticleSummary, size: VisualSize): Visual | null =>
+  summary.hero === undefined ? null : visualOf(summary.hero.key, size);

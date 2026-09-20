@@ -1,7 +1,6 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
-import { content } from '#api';
-import { pictureOf } from './picture';
+import { content, pictureOf } from '#api';
 import type { FeedRow } from './rhythm';
 import { feedRows, rowName, rowShape } from './rhythm';
 

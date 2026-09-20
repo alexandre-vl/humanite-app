@@ -1,11 +1,12 @@
 import type { Article, DisplayText } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
+import { pictureOf } from '#api';
 import { formatDate } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
-import { pictureOf } from '../model/picture';
+
 import { ArticleFigure } from './article-figure';
 
 export type ArticleTitleProps = Readonly<{ title: DisplayText }>;

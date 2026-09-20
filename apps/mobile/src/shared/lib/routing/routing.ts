@@ -1,4 +1,4 @@
-import type { ArticleId, SectionId } from '@huma/contracts';
+import type { ArticleId, IssueId, SectionId } from '@huma/contracts';
 import { openURL } from 'expo-linking';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -21,6 +21,12 @@ export type SectionHref = Readonly<{ pathname: '/section/[id]'; params: Readonly
 
 /** Where to send a reader who chose a section, for the same reason: the front page opens one, a section replaces itself. */
 export const sectionHref = (id: SectionId): SectionHref => ({ pathname: '/section/[id]', params: { id } });
+
+/** Where one numéro is read, as the router takes it. */
+export type IssueHref = Readonly<{ pathname: '/issue/[id]'; params: Readonly<{ id: IssueId }> }>;
+
+/** Where to send a reader who took a numéro off the shelf. */
+export const issueHref = (id: IssueId): IssueHref => ({ pathname: '/issue/[id]', params: { id } });
 
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;

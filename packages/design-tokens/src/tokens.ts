@@ -94,10 +94,12 @@ export const FONT_FAMILIES = {
  * `stroke` is the rule the paper draws where it draws one — the line a timeline hangs its items from, the line a field
  * is typed on. It is here rather than on the spacing grid because it is finer than the grid's smallest step.
  *
- * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst. It is a width,
- * not a height, and the only one the paper names: everything else a card lays out is a share of the screen it is
- * given, while this one has to be read against the width the picture was written at, and 320 points over 96 is the
- * three-to-one a dense screen asks for.
+ * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst, and `cover` the
+ * width of a numéro standing on the newsstand's shelf. Both are widths, not heights, and the only two the paper names:
+ * everything else a card lays out is a share of the screen it is given, while these have to be read against the width
+ * the picture was written at — 320 points over 96 is the three-to-one a dense screen asks for, and a cover at 140 is
+ * served by the 1080 the corpus writes. The shelf's own measurement is 138,3 points, read on capture 04 as a slot of
+ * 363 pixels at 2,625 pixels per point; 140 is the step the grid holds nearest it.
  */
 const HEADER_EXPANDED = 64;
 const BAND = 40;
@@ -110,6 +112,7 @@ export const SIZES = {
   headerBandPair: space(HEADER_EXPANDED + BAND * 2),
   stroke: space(2),
   thumbnail: space(96),
+  cover: space(140),
 } as const satisfies Readonly<Record<string, Space>>;
 
 /**

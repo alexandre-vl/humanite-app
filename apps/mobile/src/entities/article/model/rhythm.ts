@@ -1,5 +1,6 @@
 import type { ArticleId, ArticleSummary } from '@huma/contracts';
-import { openerOf, pictureOf } from './picture';
+import { pictureOf } from '#api';
+import { openerOf } from './picture';
 
 /**
  * The trees a feed card mounts, one name per shape the cards take.
