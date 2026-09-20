@@ -25,7 +25,7 @@ type ListCore<Item> = Readonly<{
  * content by exactly its height, so it has to be told: a band is composed by the screen, and what a screen puts in one
  * is not something a list can see.
  */
-type BandRows = 1 | 2;
+export type BandRows = 1 | 2;
 
 /**
  * Bands the list draws over its own content: a masthead that slides away, a strip that stays under it, and how many

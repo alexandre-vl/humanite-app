@@ -1,7 +1,7 @@
-import type { DisplayText } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { Button } from '#components/button';
+import type { EmptyStateProps } from '#components/empty-state';
 import { EmptyState } from '#components/empty-state';
 import { Skeleton } from '#components/skeleton';
 import { t } from '#i18n';
@@ -9,8 +9,14 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import type { FeedState } from '../model/paged-feed';
 
-/** What a screen says in place of a feed that holds nothing, when its own words are truer than the paper's. */
-export type EmptyWords = Readonly<{ title: DisplayText; message: DisplayText }>;
+/**
+ * What a screen says in place of a feed that holds nothing, when its own words are truer than the paper's.
+ *
+ * It is the component's own props under another name rather than the same two fields written again: the words are
+ * handed on untouched, so a third field added to the stand-in would otherwise have to be added here too, and the
+ * screens that pass these words would keep type-checking while dropping it.
+ */
+export type EmptyWords = EmptyStateProps;
 
 export type FeedStandInProps = Readonly<{
   state: FeedState;

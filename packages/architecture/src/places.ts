@@ -28,8 +28,17 @@ type Groups = typeof ORDER;
 
 export type Place = Groups[number][number];
 
-/** Places of the shared kernel, which may import one another along the edges `IMPORTS` lists. */
-type KernelPlace = Groups[7][number];
+/** The last element of a tuple, whatever its length. */
+type Last<Tuple extends readonly unknown[]> = Tuple extends readonly [...unknown[], infer Tail] ? Tail : never;
+
+/**
+ * Places of the shared kernel, which may import one another along the edges `IMPORTS` lists.
+ *
+ * It is the last group by definition — the sentence above `ORDER` says so — and it is read as the last rather than
+ * as the eighth. A group inserted anywhere above would otherwise leave this pointing at whatever landed at seven,
+ * and `Importable` would quietly permit the wrong edges with nothing failing.
+ */
+type KernelPlace = Last<Groups>[number];
 
 /** The places of the groups after the one holding `Current`. */
 type Below<Remaining extends readonly (readonly string[])[], Current extends string> = Remaining extends readonly [

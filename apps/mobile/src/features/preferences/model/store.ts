@@ -2,7 +2,7 @@ import type { FaceSet, TextScale, ThemeChoice } from '@huma/design-tokens';
 import { FACE_SETS, TEXT_SCALES, THEME_CHOICES } from '@huma/design-tokens';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { STORAGE_KEYS, stateStorage } from '#lib/storage';
+import { STORAGE_KEYS, field, stateStorage } from '#lib/storage';
 
 /**
  * The version of what this writes to disk. It names the first shape rather than describing a change, and is read back
@@ -27,12 +27,6 @@ type Reading = Settings &
     chooseFaces: (faces: FaceSet) => void;
     reset: () => void;
   }>;
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null;
-
-/** What a disk holds under one name, whatever it holds. */
-const field = (persisted: unknown, name: string): unknown => (isRecord(persisted) ? persisted[name] : undefined);
 
 /** The one of `allowed` a disk holds, or the paper's own value when it holds anything else. */
 const oneOf = <Value extends string>(allowed: readonly Value[], held: unknown, fallback: Value): Value =>

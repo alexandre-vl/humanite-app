@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
+import type { BandRows } from '#primitives/list';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
 import { authorsQuery } from '../api/queries';
@@ -22,7 +23,7 @@ export type ArticleFeedProps = Readonly<{
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
   header?: ReactNode;
   sticky?: ReactNode;
-  stickyRows?: 1 | 2 | undefined;
+  stickyRows?: BandRows | undefined;
   empty?: EmptyWords | undefined;
 }>;
 

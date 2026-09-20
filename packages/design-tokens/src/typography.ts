@@ -49,8 +49,10 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * The three reading roles are set from the article captures, read at 2.625 px per point (the 24-point gesture bar
  * measures 63 px): a headline steps 47.0 points and the table gives 34 × 1.4 = 47.6; a legend steps 16.0 and the table
  * gives 12 × 1.4 = 16.8; prose steps 23.8 against the table's 16 × 1.6 = 25.6, the one role the scale reaches least
- * closely. Prose differs from body by its face alone, and that is the measured difference: the current app sets its
- * article copy in a light face, scored 1.000 against Roboto Light and 0.943 against a regular one (README:97).
+ * closely. Prose differs from body by its face alone, and that is what was measured: the current app sets its article
+ * copy in a light weight, matched word for word at 1.000 against Roboto Light, the next candidate — Overpass Light —
+ * scoring 0.943 (README:97). It is the weight that carries over and not the family: the site declares Overpass and
+ * this app is set in it throughout, while the current app shows its copy in Roboto (README:103).
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },

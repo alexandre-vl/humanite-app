@@ -2,7 +2,7 @@ import type { ArticleId } from '@huma/contracts';
 import { ARTICLE_ID } from '@huma/contracts';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { STORAGE_KEYS, stateStorage } from '#lib/storage';
+import { STORAGE_KEYS, field, stateStorage } from '#lib/storage';
 
 /**
  * The version of what this writes to disk. It names the first shape rather than describing a change — a list of ids —
@@ -27,10 +27,7 @@ const isList = (value: unknown): value is readonly unknown[] => Array.isArray(va
  * does not come out of it is left behind — so nothing downstream ever handles an `ArticleId` that is not one.
  */
 const keptIds = (persisted: unknown): readonly ArticleId[] => {
-  if (typeof persisted !== 'object' || persisted === null || !('ids' in persisted)) {
-    return [];
-  }
-  const { ids } = persisted;
+  const ids = field(persisted, 'ids');
   if (!isList(ids)) {
     return [];
   }
