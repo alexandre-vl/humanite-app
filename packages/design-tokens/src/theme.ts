@@ -24,7 +24,6 @@ export type Theme = Readonly<{
   primary: Color;
   premium: Color;
   border: Color;
-  systemBar: Color;
 }>;
 
 /** The light theme, built from the measured palette. */
@@ -40,7 +39,6 @@ export const LIGHT_THEME = {
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
-  systemBar: PALETTE.systemBarRed,
 } as const satisfies Theme;
 
 /** The dark theme, derived from the measured dark background #141414. */
@@ -56,7 +54,6 @@ export const DARK_THEME = {
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.darkBorder,
-  systemBar: PALETTE.darkBackground,
 } as const satisfies Theme;
 
 /** The themes by name. */

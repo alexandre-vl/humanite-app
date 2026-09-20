@@ -745,6 +745,7 @@ export const BINDINGS = {
         'guardrail/style-inline-nested',
       ],
       R4: ['guardrail/style-theme', 'guardrail/style-theme-exempt'],
+      R5: ['guardrail/module-expo-system-ui'],
     },
   },
   'ADR-0013': {

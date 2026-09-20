@@ -278,6 +278,12 @@ export function TabIcons(): ReactNode {
       linted({ 'src/pages/home/model/open.ts': "export { openURL } from 'expo-linking';\n" }),
     ),
     define(
+      'guardrail/module-expo-system-ui',
+      'une page qui peint elle-même la fenêtre du système',
+      ['module/expo-system-ui'],
+      linted({ 'src/pages/home/model/window.ts': "export { setBackgroundColorAsync } from 'expo-system-ui';\n" }),
+    ),
+    define(
       'guardrail/module-zustand',
       'une entité qui garde de son côté ce que le lecteur a fait',
       ['module/zustand'],

@@ -33,6 +33,10 @@ jest.mock('expo-splash-screen', () => ({ preventAutoHideAsync: jest.fn(), hideAs
 
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
 
+// expo-system-ui paints the window through a native module a headless runner lacks; the theme root calls it on every
+// change of theme, and a test that mounts one would otherwise fail before rendering anything.
+jest.mock('expo-system-ui', () => ({ setBackgroundColorAsync: jest.fn() }));
+
 // react-native-reanimated (and its own mock) eagerly loads the worklets native module a headless runner lacks. This stand-in
 // gives Animated views the plain react-native ones, a shared value backed by a closure, and an animated style that runs its
 // updater once — enough for the collapsible header to render and its geometry to be exercised on the JS thread.

@@ -40,7 +40,7 @@ test('durations have a reduced-motion counterpart of zero', () => {
 
 test('the palette exposes the measured colours', () => {
   expect(PALETTE.uiRed).toBe('#f13c47');
-  expectTypeOf(PALETTE.logoRed).toEqualTypeOf<Color>();
+  expectTypeOf(PALETTE.uiRed).toEqualTypeOf<Color>();
 });
 
 test('the paper is laid at a turn to the left, written as React Native reads it', () => {

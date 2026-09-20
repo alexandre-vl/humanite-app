@@ -38,6 +38,7 @@ Option retenue : « createStyles brandé sur les tokens », parce que c’est la
 - **R2** — La prop `style` d’une primitive DOIT être le type `StyleRef` que `createStyles` produit.
 - **R3** — Un objet de style en ligne NE DOIT PAS paraître dans le JSX.
 - **R4** — Hors du noyau du thème (son contexte, sa racine et la portée qui en nomme un pour un sous-arbre), un style NE DOIT PAS importer un thème figé ; il reçoit le thème en vigueur du paramètre de `createStyles`.
+- **R5** — La fenêtre du système NE DOIT PAS être peinte hors de la racine du thème.
 
 ### Conséquences
 

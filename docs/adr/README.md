@@ -195,6 +195,7 @@ Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 | R2    | DOIT        | convention : La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.                                         |
 | R3    | NE DOIT PAS | `guardrail/style-inline`, `guardrail/style-inline-array`, `guardrail/style-inline-named`, `guardrail/style-inline-nested`                                                                                     |
 | R4    | NE DOIT PAS | `guardrail/style-theme`, `guardrail/style-theme-exempt`                                                                                                                                                       |
+| R5    | NE DOIT PAS | `guardrail/module-expo-system-ui`                                                                                                                                                                             |
 
 ### ADR-0013 · Textes UI en dictionnaire français typé
 
