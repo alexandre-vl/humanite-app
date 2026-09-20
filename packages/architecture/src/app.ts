@@ -79,6 +79,33 @@ export const QUERY_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.entity
 export const ROUTING_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.lib.directory}/routing/*.ts`];
 
 /**
+ * Where a string may be vouched for as display text, as globs relative to the workspace root. The brand carries no
+ * evidence a machine can re-check, so the list says who is trusted to vouch: the dictionary, the formatters it cannot
+ * reach, and the module that holds the brander. The rest is dev text belonging to no dictionary — a catalogue naming a
+ * component, a probe a test renders — which shows a component rather than the newspaper. What the list leaves out is
+ * the point: a screen, a block or an entity that minted its own text would put a reader's words outside the dictionary.
+ */
+export const DISPLAY_TEXT_FILES: readonly string[] = [
+  `${APP_DIRECTORY}/${PLACES.i18n.directory}/translate.ts`,
+  `${APP_DIRECTORY}/${PLACES.lib.directory}/display-text/${ENTRY_FILE}`,
+  `${APP_DIRECTORY}/${PLACES.lib.directory}/display-text/display-text.ts`,
+  `${APP_DIRECTORY}/${PLACES.lib.directory}/format/*.ts`,
+  `${APP_DIRECTORY}/src/**/*.catalog.tsx`,
+  `${APP_DIRECTORY}/src/**/*.test.{ts,tsx}`,
+  `${APP_DIRECTORY}/${PLACES.page.directory}/catalogue/**/*.tsx`,
+];
+
+/**
+ * The brander's own public door, the one file of the list above that is also the entry of a module. Handing out what
+ * the files of its own unit define is what an entry is for, so it is no more laundering than the definition itself —
+ * but it has to be named apart, because the rules of an entry are applied after those of a place and would otherwise
+ * take back the exemption.
+ */
+export const DISPLAY_TEXT_ENTRY: readonly string[] = [
+  `${APP_DIRECTORY}/${PLACES.lib.directory}/display-text/${ENTRY_FILE}`,
+];
+
+/**
  * The `imports` field of the app's `package.json`: one `#` alias per importable place, pointing at public entries only,
  * so a file behind an entry cannot even be resolved from outside its slice or module (journal 0a, correction 12).
  */

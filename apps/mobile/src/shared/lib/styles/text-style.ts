@@ -66,13 +66,6 @@ export const inputStyle = (variant: TextVariant, theme: Theme, typesetting: Type
   faceOf(typographyAt(variant, typesetting.scale, typesetting.faces), theme, undefined);
 
 /**
- * The colour a piece of text the platform draws itself is set in — a label under a tab bar, a title in a native
- * header. Such a bar lays its own letters out and takes no table of styles; the colour is the one thing it lets the
- * app decide, and it is a theme's to give, so it is named here rather than written at the bar.
- */
-export const chromeStyle = (tone: TextTone, theme: Theme): TextStyle => ({ color: theme[tone] });
-
-/**
  * The style one run inside a paragraph departs by: a face when it is set apart, the primary colour when it answers a
  * press. Everything it leaves out — the size, the line height, the colour of the paragraph — React Native inherits
  * from the text that encloses it, which is what keeps a slanted word on its neighbours' baseline.

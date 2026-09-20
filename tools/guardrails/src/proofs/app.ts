@@ -425,6 +425,41 @@ export function TabsLayout(): ReactNode {
       }),
     ),
     define(
+      'guardrail/style-inline-nested',
+      'une mise en page qui cache un style en ligne sous une propriété des réglages d’un écran',
+      ['style/inline'],
+      linted({
+        'src/_app/routes/root-layout.tsx': `import { Stack } from 'expo-router';
+import type { ReactNode } from 'react';
+
+export function RootLayout(): ReactNode {
+  return <Stack screenOptions={{ headerStyle: { opacity: 1 } }} />;
+}
+`,
+      }),
+    ),
+    define(
+      'guardrail/text-mint',
+      'un écran qui sanctionne lui-même une chaîne au lieu de la prendre au dictionnaire',
+      ['text/mint'],
+      linted({
+        'src/shared/lib/display-text/index.ts': "export { asDisplayText } from './display-text';\n",
+        'src/shared/lib/display-text/display-text.ts': 'export const asDisplayText = (text: string): string => text;\n',
+        'src/pages/home/ui/home-page.tsx': `import { asDisplayText } from '#lib/display-text';
+
+export const HomePage = asDisplayText;
+`,
+      }),
+    ),
+    define(
+      'guardrail/text-mint-reexport',
+      'une entité qui fait passer le blanchisseur de texte à qui n’y a pas droit',
+      ['text/mint'],
+      linted({
+        'src/entities/article/model/article.ts': "export { asDisplayText as articleTitle } from '#lib/display-text';\n",
+      }),
+    ),
+    define(
       'guardrail/style-theme',
       'une page qui lit un thème figé au lieu de le recevoir de createStyles',
       ['style/theme'],

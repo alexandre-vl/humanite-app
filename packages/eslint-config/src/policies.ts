@@ -41,6 +41,8 @@ const WRITTEN = {
   'style/theme':
     'recevoir le thème du paramètre de createStyles : un thème figé importé en dur ignore le schéma de couleurs en vigueur',
   'text/jsx': 'rendre le texte par Text et un DisplayText : un texte brut dans le JSX échappe au dictionnaire',
+  'text/mint':
+    'prendre le texte de t(), d’un formateur ou d’un champ des contrats : sanctionner soi-même une chaîne la met hors du dictionnaire',
   'icon/symbol':
     'nommer l’icône par une clé du registre typé : un symbole de plateforme écrit ailleurs ouvre un second endroit où les icônes se décident',
   'nav/js-tabs': 'composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native',

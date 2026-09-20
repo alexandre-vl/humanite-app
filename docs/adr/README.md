@@ -193,7 +193,7 @@ Statut : proposé. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | DOIT        | convention : Le type Style de apps/mobile/src/shared/lib/styles n’accepte comme valeur dimensionnelle ou colorée qu’un token brandé de @huma/design-tokens, hors de portée d’un nombre ou d’une chaîne bruts. |
 | R2    | DOIT        | convention : La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.                                         |
-| R3    | NE DOIT PAS | `guardrail/style-inline`, `guardrail/style-inline-array`, `guardrail/style-inline-named`                                                                                                                      |
+| R3    | NE DOIT PAS | `guardrail/style-inline`, `guardrail/style-inline-array`, `guardrail/style-inline-named`, `guardrail/style-inline-nested`                                                                                     |
 | R4    | NE DOIT PAS | `guardrail/style-theme`, `guardrail/style-theme-exempt`                                                                                                                                                       |
 
 ### ADR-0013 · Textes UI en dictionnaire français typé
@@ -202,7 +202,7 @@ Statut : proposé. Périmètre : `packages/contracts/src/display-text.ts`, `apps
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                |
 | ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1    | DOIT        | convention : Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un.        |
+| R1    | DOIT        | `guardrail/text-mint`, `guardrail/text-mint-reexport`                                                                                                                                                                  |
 | R2    | DOIT        | convention : Le texte qu’une primitive de texte reçoit est typé DisplayText, la marque opaque des contrats, qu’il entre par children ou par les fragments d’une phrase ; une chaîne quelconque n’y est pas assignable. |
 | R3    | NE DOIT PAS | `guardrail/text-jsx`                                                                                                                                                                                                   |
 

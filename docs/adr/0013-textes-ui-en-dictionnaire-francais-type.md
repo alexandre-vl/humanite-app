@@ -65,6 +65,6 @@ Option retenue : « DisplayText brandé et dictionnaire t() », parce que c’es
 
 ## Informations complémentaires
 
-- L’interdiction d’un texte brut dans le JSX est prouvée par une fixture des garde-fous ; R1 et R2 sont des conventions que le système de types tient.
+- L’interdiction d’un texte brut dans le JSX est prouvée par une fixture des garde-fous, et celle de sanctionner soi-même une chaîne par une autre : la marque ne porte aucune preuve qu’une machine puisse relire, alors la liste des fichiers autorisés à la poser dit qui est cru. R2 reste une convention que le système de types tient.
 - Un texte du dictionnaire peut laisser des blancs, et les noms de ces blancs sont lus dans le français lui-même : un blanc non rempli, une valeur sans blanc pour la prendre et un nom mal écrit sont refusés à la compilation. C’est ce qui permet d’écrire une phrase autour d’un nombre ou d’un mot du lecteur sans la composer hors du dictionnaire. L’accord au nombre est écrit une fois, à côté : le singulier français court jusqu’à un inclus, et Hermes n’a pas de quoi le demander.
 - Réévaluation : Expo fournit une API i18n typée équivalente, ou le dictionnaire grossit au point d’être découpé par domaine.

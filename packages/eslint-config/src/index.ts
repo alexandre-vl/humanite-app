@@ -3,6 +3,8 @@ import type { HermesGap } from '@huma/architecture';
 import {
   BUNDLED_FILES,
   CONFINED_MODULES,
+  DISPLAY_TEXT_ENTRY,
+  DISPLAY_TEXT_FILES,
   ENTRY_FILES,
   HERMES_FILES,
   HERMES_GAP_NAMES,
@@ -80,14 +82,37 @@ const ENTRY_SYNTAX: readonly SyntaxRestriction[] = [
  * Styles come from a constructor that turns tokens into a style: an inline style object escapes it, even nested in a
  * style array. Every prop whose name ends in `style` carries one — a native navigator names its own `labelStyle`,
  * `headerStyle`, `contentStyle` — so the rule reads the suffix rather than the one name `style`, which let the tab
- * bar's label colour through.
+ * bar's label colour through. A navigator also takes its styles a level down, under a prop that carries the options of
+ * a whole screen, so the same suffix is read on a property of an object as well as on a prop: `screenOptions` ends in
+ * neither, and that is how a header's colours escaped both this rule and every token it names.
  */
 const STYLE_SYNTAX: readonly SyntaxRestriction[] = [
   { policy: 'style/inline', selector: 'JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression' },
+  {
+    policy: 'style/inline',
+    selector: 'JSXAttribute > JSXExpressionContainer Property[key.name=/[Ss]tyle$/] > ObjectExpression',
+  },
 ];
 
 /** UI text comes from the dictionary through a DisplayText: raw text written in the JSX, whitespace aside, escapes it. */
 const TEXT_SYNTAX: readonly SyntaxRestriction[] = [{ policy: 'text/jsx', selector: String.raw`JSXText[value=/\S/]` }];
+
+/**
+ * The brand of a display text vouches for words a machine cannot re-check, so only the places that know where the
+ * words came from may reach the brander. Reading the import rather than the call catches the alias too: a file that
+ * cannot name it cannot use it. Re-exporting it is restricted beside importing it, since a module that passes it on
+ * launders it just as well.
+ */
+const TEXT_MINT_SYNTAX: readonly SyntaxRestriction[] = [
+  {
+    policy: 'text/mint',
+    selector: String.raw`ImportDeclaration > ImportSpecifier[imported.name='asDisplayText']`,
+  },
+  {
+    policy: 'text/mint',
+    selector: String.raw`ExportNamedDeclaration[source] > ExportSpecifier[local.name='asDisplayText']`,
+  },
+];
 
 /**
  * An icon is named by a key of the typed registry. The native tab bar draws its own symbols rather than mounting the
@@ -256,6 +281,7 @@ const HERMES: Runtime = {
     ...STYLE_SYNTAX,
     ...THEME_SYNTAX,
     ...TEXT_SYNTAX,
+    ...TEXT_MINT_SYNTAX,
     ...ICON_SYNTAX,
     ...NAV_SYNTAX,
     ...QUERY_SYNTAX,
@@ -403,12 +429,20 @@ export function defineWorkspaceConfig({
       rules: restrictions(exempt(HERMES, ROUTE_PARAMS_SYNTAX), policies),
     },
     {
+      files: [...DISPLAY_TEXT_FILES],
+      rules: restrictions(exempt(HERMES, TEXT_MINT_SYNTAX), policies),
+    },
+    {
       files: [...ROUTE_FILES],
       rules: restrictions(narrowed(HERMES, ROUTE_SYNTAX), policies),
     },
     {
       files: [...ENTRY_FILES],
       rules: restrictions(narrowed(HERMES, ENTRY_SYNTAX), policies),
+    },
+    {
+      files: [...DISPLAY_TEXT_ENTRY],
+      rules: restrictions(narrowed(exempt(HERMES, TEXT_MINT_SYNTAX), ENTRY_SYNTAX), policies),
     },
     ...namingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
     spellingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),

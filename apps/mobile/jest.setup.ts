@@ -1,6 +1,16 @@
 import { jest } from '@jest/globals';
 import type { ReactNode } from 'react';
 
+// A frame never arrives without a screen, so the runner's requestAnimationFrame fires on a timer of its own, after the
+// test that scheduled it has ended. @shopify/flash-list schedules the end of its first layout that way, and the state
+// it then sets lands outside every act() scope — which React reports, on a file chosen by whichever test happened to be
+// running. Calling back at once puts that state where the render that asked for it is, and the report has no cause
+// left. Nothing in the app schedules a frame itself, so this stands in for the library alone.
+globalThis.requestAnimationFrame = (callback: (time: number) => void): number => {
+  callback(0);
+  return 0;
+};
+
 // react-native-mmkv reaches its native NitroModules TurboModule at import, which no headless runner provides. The
 // storage lib only calls getString/set/remove, so an in-memory map stands in and lets the persister round-trip.
 jest.mock('react-native-mmkv', () => {

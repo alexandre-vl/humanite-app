@@ -738,7 +738,12 @@ export const BINDINGS = {
         convention:
           'La prop style d’une primitive est typée StyleRef, la marque opaque que seule createStyles produit ; un objet de style quelconque n’y est pas assignable.',
       },
-      R3: ['guardrail/style-inline', 'guardrail/style-inline-array', 'guardrail/style-inline-named'],
+      R3: [
+        'guardrail/style-inline',
+        'guardrail/style-inline-array',
+        'guardrail/style-inline-named',
+        'guardrail/style-inline-nested',
+      ],
       R4: ['guardrail/style-theme', 'guardrail/style-theme-exempt'],
     },
   },
@@ -753,10 +758,7 @@ export const BINDINGS = {
       ],
     },
     rules: {
-      R1: {
-        convention:
-          'Un texte affiché est un DisplayText, la marque de packages/contracts que produisent t() du dictionnaire, les formateurs et les champs de prose des schémas Zod ; une chaîne brute n’en est pas un.',
-      },
+      R1: ['guardrail/text-mint', 'guardrail/text-mint-reexport'],
       R2: {
         convention:
           'Le texte qu’une primitive de texte reçoit est typé DisplayText, la marque opaque des contrats, qu’il entre par children ou par les fragments d’une phrase ; une chaîne quelconque n’y est pas assignable.',
