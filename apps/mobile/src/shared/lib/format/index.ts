@@ -1,1 +1,9 @@
-export { formatByline, formatDate, formatDateTime, formatDayKey, formatDayLabel, formatDuration } from './format';
+export {
+  formatByline,
+  formatDate,
+  formatDateTime,
+  formatDayDate,
+  formatDayKey,
+  formatDayLabel,
+  formatDuration,
+} from './format';

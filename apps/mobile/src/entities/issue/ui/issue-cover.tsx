@@ -3,7 +3,7 @@ import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { t } from '#i18n';
-import { formatDayLabel } from '#lib/format';
+import { formatDayDate } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
@@ -61,7 +61,7 @@ export function IssueCover({ issue }: IssueCoverProps): ReactNode {
             {t('app.name')}
           </Text>
           <Text variant="caption" tone="onPrimary" numberOfLines={1}>
-            {formatDayLabel(issue.opener.publishedAt)}
+            {formatDayDate(issue.opener.publishedAt)}
           </Text>
         </Box>
         <Box style={styles.page}>

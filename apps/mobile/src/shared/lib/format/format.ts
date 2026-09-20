@@ -103,6 +103,21 @@ export const formatDayLabel = (instant: string): DisplayText => {
 };
 
 /**
+ * That same day as a front page carries it: `13 septembre`.
+ *
+ * The weekday is left off, and not to save room for its own sake. A wire needs it because a wire spans days and a
+ * reader arriving in the middle of one is orienting themself in time; a cover is dated, and on a shelf of consecutive
+ * numéros the number is what tells one from the next. Measured on an A065: the longest of the four days the paper has
+ * printed asks 141 points of a cover that has 124, so the weekday was not being read anyway — it was pushing the month
+ * off the edge. Letting it wrap instead would have split two covers of four onto two lines and left their pictures
+ * starting at different heights, side by side on the same shelf.
+ */
+export const formatDayDate = (instant: string): DisplayText => {
+  const clock = readClock(parseInstant(instant));
+  return asDisplayText(`${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
+};
+
+/**
  * The signature under an article: `Par Lisa Guillemin`, and `Par Lisa Guillemin et Yves Kerlan` for two. The contract
  * allows no more than two names, so a list needs no comma — and the joining word is written here, with the weekdays
  * above, for the same reason: a formatter may not reach the dictionary, and the words it prints are its own.
