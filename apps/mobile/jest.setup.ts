@@ -79,11 +79,13 @@ jest.mock('@shopify/flash-list/dist/recyclerview/utils/measureLayout', () => {
 });
 
 // expo-image and expo-symbols reach native modules a headless runner lacks; each renders a plain view so the image and
-// icon primitives mount without touching the native layer.
+// icon primitives mount without touching the native layer. The picture keeps a name: a view with nothing on it cannot
+// be told from any other view, and whether a card carries a picture at all is part of the tree it promises to mount.
 jest.mock('expo-image', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const image = (): unknown => react.createElement(reactNative.View, null);
+  const image = (props: { recyclingKey?: string }): unknown =>
+    react.createElement(reactNative.View, { testID: 'picture', accessibilityLabel: props.recyclingKey });
   return { __esModule: true, Image: image };
 });
 

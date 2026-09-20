@@ -11,10 +11,17 @@ import { PALETTE } from './palette.ts';
  * `ground` is what a reading screen lays its sheet of `background` on, and `headline` the colour a headline takes
  * there. The dark article of the current app needs no rule of its own for either: its ground and its sheet are the
  * same value, so the sheet stops showing, and its headline turns white where the light one is red (captures 11, 13).
+ *
+ * `block` is the second ground a feed prints on, taken in turn with the page's own so a run of cards reads as one
+ * block and the next as another (captures 18, 19). It is its own role because no other holds in both themes: the
+ * reading screen's `ground` is the page itself once the theme is dark, and a grouped list's `card` is a shade the
+ * light theme keeps for the settings it groups, and which measured 1.09 to 1 against the page: on a real screen, an
+ * alternation nobody sees.
  */
 export type Theme = Readonly<{
   background: Color;
   ground: Color;
+  block: Color;
   surface: Color;
   card: Color;
   textPrimary: Color;
@@ -30,6 +37,7 @@ export type Theme = Readonly<{
 export const LIGHT_THEME = {
   background: PALETTE.white,
   ground: PALETTE.blueGrey,
+  block: PALETTE.blueGrey,
   surface: PALETTE.white,
   card: PALETTE.paleGrey,
   textPrimary: PALETTE.aubergine,
@@ -45,6 +53,7 @@ export const LIGHT_THEME = {
 export const DARK_THEME = {
   background: PALETTE.darkBackground,
   ground: PALETTE.darkBackground,
+  block: PALETTE.darkCard,
   surface: PALETTE.darkSurface,
   card: PALETTE.darkCard,
   textPrimary: PALETTE.paleGrey,

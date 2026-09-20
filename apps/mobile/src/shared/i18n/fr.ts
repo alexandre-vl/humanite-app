@@ -14,6 +14,7 @@ export const FR = {
   'action.retry': 'Réessayer',
   'app.name': 'Humanité',
   'article.premium': 'Abonnés',
+  'article.column': 'Chronique',
   'article.related': 'Sur le même thème',
   'article.error.title': 'L’article ne s’affiche pas',
   'article.error.message': 'Cet article n’a pas pu être chargé.',

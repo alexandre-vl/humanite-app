@@ -93,6 +93,11 @@ export const FONT_FAMILIES = {
  *
  * `stroke` is the rule the paper draws where it draws one — the line a timeline hangs its items from, the line a field
  * is typed on — and `ring` the hollow mark on it: both finer than the grid's smallest step.
+ *
+ * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst. It is a width,
+ * not a height, and the only one the paper names: everything else a card lays out is a share of the screen it is
+ * given, while this one has to be read against the width the picture was written at, and 320 points over 96 is the
+ * three-to-one a dense screen asks for.
  */
 const HEADER_EXPANDED = 64;
 const BAND = 40;
@@ -105,6 +110,7 @@ export const SIZES = {
   headerBandPair: space(HEADER_EXPANDED + BAND * 2),
   stroke: space(2),
   ring: space(12),
+  thumbnail: space(96),
 } as const satisfies Readonly<Record<string, Space>>;
 
 /**

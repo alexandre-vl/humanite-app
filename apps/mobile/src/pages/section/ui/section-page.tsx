@@ -38,6 +38,7 @@ export function SectionPage(): ReactNode {
       ) : (
         <ArticleFeed
           feed={feed}
+          rhythm="paper"
           onOpen={(article) => {
             router.push(articleHref(article));
           }}

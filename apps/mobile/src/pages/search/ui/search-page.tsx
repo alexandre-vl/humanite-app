@@ -46,6 +46,7 @@ export function SearchPage(): ReactNode {
       {searchable(asked) ? (
         <ArticleFeed
           feed={feed}
+          rhythm="list"
           onOpen={(id) => {
             router.push(articleHref(id));
           }}

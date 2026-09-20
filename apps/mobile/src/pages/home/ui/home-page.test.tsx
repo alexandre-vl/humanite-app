@@ -36,6 +36,20 @@ const firstArticle = async (): Promise<ArticleSummary> => {
   return first;
 };
 
+/**
+ * The article the front page opens on, worked out beside the code under test rather than by it: the first the feed
+ * serves that carries a picture. The feed arrives newest first and a morning's newest items are briefs filed before
+ * the desk has pictures, so this is not the first item — and a test that pressed the first mark on the screen while
+ * naming the first item of the feed would be naming two different articles.
+ */
+const frontArticle = async (): Promise<ArticleSummary> => {
+  const found = (await content.getFeed({})).items.find((item) => item.hero !== undefined);
+  if (found === undefined) {
+    throw new Error('le journal ne sert aucun article illustré : le test ne vérifierait rien');
+  }
+  return found;
+};
+
 const firstSection = async (): Promise<Section> => {
   const [first] = await content.getSections();
   if (first === undefined) {
@@ -83,7 +97,7 @@ describe('HomePage', () => {
   });
 
   it('garde un article depuis le fil, et le retrouve parmi les favoris', async () => {
-    const article = await firstArticle();
+    const article = await frontArticle();
     await renderPage();
     expect(await screen.findByText(article.title)).toBeTruthy();
     const [mark] = screen.getAllByLabelText('Ajouter aux favoris');
@@ -98,7 +112,7 @@ describe('HomePage', () => {
   });
 
   it('annonce par son étiquette qu’un article gardé peut être rendu', async () => {
-    const article = await firstArticle();
+    const article = await frontArticle();
     await renderPage();
     expect(await screen.findByText(article.title)).toBeTruthy();
     const [mark] = screen.getAllByLabelText('Ajouter aux favoris');

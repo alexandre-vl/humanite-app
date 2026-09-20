@@ -20,3 +20,13 @@ export const LEAD_RATIO = 1058 / 493;
  */
 export const pictureOf = (summary: ArticleSummary, size: VisualSize): Visual | null =>
   summary.hero === undefined ? null : visualOf(summary.hero.key, size);
+
+/**
+ * The item a run of articles opens on: the first of them that carries a picture, or nothing at all.
+ *
+ * Both the wire and a page of the paper open on a picture, and both are handed their items newest first — so both
+ * ask this, rather than each keeping its own idea of what an opener is. The question is asked of the picture the app
+ * can actually draw, not of the key an item names: a key whose file never arrived would open a page on a grey box.
+ */
+export const openerOf = (summaries: readonly ArticleSummary[]): ArticleSummary | undefined =>
+  summaries.find((summary) => pictureOf(summary, 'card') !== null);

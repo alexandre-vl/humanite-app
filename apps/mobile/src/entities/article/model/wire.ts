@@ -1,5 +1,6 @@
 import type { ArticleSummary, DisplayText } from '@huma/contracts';
 import { formatDayKey, formatDayLabel } from '#lib/format';
+import { openerOf } from './picture';
 
 /** One line of the wire: the picture it opens on, the head of a day, or an item of that day. */
 export type WireRow =
@@ -16,7 +17,7 @@ export type WireRow =
  * reader's: an item filed at half past eleven on a Paris evening belongs to the day the newsroom filed it under.
  */
 export const wireRows = (summaries: readonly ArticleSummary[]): readonly WireRow[] => {
-  const opener = summaries.find((summary) => summary.hero !== undefined);
+  const opener = openerOf(summaries);
   const rows: WireRow[] = opener === undefined ? [] : [{ kind: 'hero', summary: opener }];
   let heading = '';
   for (const summary of summaries) {

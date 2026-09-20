@@ -52,7 +52,7 @@ function Reading({ article, related, roster, onFollow, onSupport }: ReadingProps
     <Scroll axis="vertical" style={styles.ground} contentStyle={styles.column}>
       <ArticleTitle title={article.title} />
       <Box style={styles.sheet}>
-        <ArticleLead article={article} byline={bylineOf(article, roster)} />
+        <ArticleLead article={article} byline={bylineOf(article.authors, roster)} />
         <ArticleBody article={article} related={related} onFollow={onFollow} onSupport={onSupport} />
       </Box>
     </Scroll>

@@ -52,6 +52,7 @@ export function HomePage(): ReactNode {
     <Surface>
       <ArticleFeed
         feed={onBookmarks ? kept : paper}
+        rhythm={onBookmarks ? 'list' : 'paper'}
         onOpen={(id) => {
           router.push(articleHref(id));
         }}

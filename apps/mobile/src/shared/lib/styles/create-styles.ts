@@ -52,6 +52,7 @@ type Style = Readonly<{
   right?: Space;
   borderRadius?: Radius;
   borderTopLeftRadius?: Radius;
+  borderTopRightRadius?: Radius;
   borderWidth?: Space;
   borderLeftWidth?: Space;
   borderBottomWidth?: Space;
