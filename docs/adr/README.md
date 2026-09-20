@@ -228,13 +228,14 @@ Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/storage/**`, `apps/
 
 ### ADR-0016 · Tests par environnement Vitest jest-expo et Maestro
 
-Statut : proposé. Périmètre : `apps/mobile/jest.config.cjs`, `apps/mobile/jest.setup.ts`, `apps/mobile/**/*.test.ts`, `apps/mobile/**/*.test.tsx`.
+Statut : proposé. Périmètre : `apps/mobile/e2e/**`, `apps/mobile/jest.config.cjs`, `apps/mobile/jest.setup.ts`, `apps/mobile/**/*.test.ts`, `apps/mobile/**/*.test.tsx`.
 
-| Règle | Niveau      | Preuves                                                                                                                                                                                                      |
-| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| R1    | NE DOIT PAS | `guardrail/test-describe-only`, `guardrail/test-it-only`, `guardrail/test-test-only`                                                                                                                         |
-| R2    | DOIT        | convention : Les composants et la logique de apps/mobile sont testés par jest-expo et RNTL, configurés par apps/mobile/jest.config.cjs ; Vitest teste les paquets et les outils, Maestro teste les parcours. |
-| R3    | DOIT        | convention : Les tests de apps/mobile passent par la commande test:app de pnpm verify, déclarée dans tools/governance/src/commands.ts ; le pre-commit rejoue la vérification, donc chaque commit les passe.  |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                      |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/test-describe-only`, `guardrail/test-it-only`, `guardrail/test-test-only`                                                                                                                                                         |
+| R4    | NE DOIT PAS | convention : Les mots que citent les parcours de apps/mobile/e2e sont relus contre le dictionnaire par apps/mobile/src/shared/i18n/flows.test.ts, qui nomme le fichier fautif : une clé renommée sans son parcours échoue à la vérification. |
+| R2    | DOIT        | convention : Les composants et la logique de apps/mobile sont testés par jest-expo et RNTL, configurés par apps/mobile/jest.config.cjs ; Vitest teste les paquets et les outils, Maestro teste les parcours.                                 |
+| R3    | DOIT        | convention : Les tests de apps/mobile passent par la commande test:app de pnpm verify, déclarée dans tools/governance/src/commands.ts ; le pre-commit rejoue la vérification, donc chaque commit les passe.                                  |
 
 ### ADR-0017 · Typographie et licences des polices
 

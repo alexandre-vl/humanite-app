@@ -1,0 +1,16 @@
+# Le retour système dépile au lieu de fermer l’app.
+#
+# C’est la garde que le journal du spike réclame nommément : React Native 0.86 n’enregistre son rappel de retour que
+# sur les appareils d’API 36, et sans la contre-mesure du fichier de configuration le retour système ferme l’app au
+# lieu de revenir en arrière. La phase 3 a poussé trois écrans par-dessus les onglets ; celui des réglages est le seul
+# qu’on atteigne sans toucher un titre du corpus, donc le seul dont ce parcours peut nommer chaque étape.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn: 'Mon compte'
+- tapOn: 'Réglages'
+- assertVisible: 'Préférences d’affichage'
+- back
+- assertVisible: 'Mon compte'
+- back
+- assertVisible: 'Humanité'

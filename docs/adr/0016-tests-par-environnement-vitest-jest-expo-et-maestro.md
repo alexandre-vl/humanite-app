@@ -36,6 +36,7 @@ Option retenue : « Vitest pour les paquets et les outils, jest-expo et RNTL pou
 - **R1** — Un test focalisé NE DOIT PAS être commité.
 - **R2** — Les composants et la logique de l’app DOIVENT être testés par jest-expo et RNTL.
 - **R3** — Les tests de l’app DOIVENT s’exécuter dans la vérification.
+- **R4** — Un parcours NE DOIT PAS citer un texte que le dictionnaire ne porte pas.
 
 ### Conséquences
 
@@ -65,7 +66,7 @@ Option retenue : « Vitest pour les paquets et les outils, jest-expo et RNTL pou
 
 ## Informations complémentaires
 
-- Le rendu natif réel et le parcours Maestro « lancement » se vérifient sur l’émulateur, hors de la vérification locale, qui reste sans appareil.
+- Le rendu natif réel et les parcours Maestro se vérifient sur l’émulateur ou sur un téléphone, hors de la vérification locale, qui reste sans appareil. Maestro atteint un élément par les lettres qu’il porte : un parcours cite donc le français de l’app, et c’est le seul endroit où ce français est écrit deux fois. La vérification tient ce doublon même sans appareil, en relisant ce que les parcours citent contre le dictionnaire.
 - react-native-mmkv atteint son module natif à l’import ; un mock en mémoire le remplace sous jest, la pile de données gardant son aller-retour réel pour l’émulateur.
 - Les tests de l’app vivent à côté du code qu’ils couvrent, sous les mêmes règles de couches que lui.
 - Réévaluation : jest-expo cesse de suivre les versions d’Expo, ou un exécuteur unique sait à la fois rendre les composants natifs et tester les paquets Node.

@@ -1,0 +1,15 @@
+# Le fil « En continu » s’ouvre et défile.
+#
+# Le défilement est le geste qu’aucun banc sans écran ne fait : les cellules d’une liste virtualisée ne sont recyclées
+# que quand il y a une fenêtre à quitter, et une bande qui s’effondre à zéro y reste invisible.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn: 'En continu'
+- takeScreenshot: live-top
+- scroll
+- scroll
+- scroll
+- takeScreenshot: live-scrolled
+- tapOn: 'À la une'
+- assertVisible: 'Humanité'

@@ -794,6 +794,7 @@ export const BINDINGS = {
   'ADR-0016': {
     scope: {
       paths: [
+        'apps/mobile/e2e/**',
         'apps/mobile/jest.config.cjs',
         'apps/mobile/jest.setup.ts',
         'apps/mobile/**/*.test.ts',
@@ -802,6 +803,10 @@ export const BINDINGS = {
     },
     rules: {
       R1: ['guardrail/test-describe-only', 'guardrail/test-it-only', 'guardrail/test-test-only'],
+      R4: {
+        convention:
+          'Les mots que citent les parcours de apps/mobile/e2e sont relus contre le dictionnaire par apps/mobile/src/shared/i18n/flows.test.ts, qui nomme le fichier fautif : une clé renommée sans son parcours échoue à la vérification.',
+      },
       R2: {
         convention:
           'Les composants et la logique de apps/mobile sont testés par jest-expo et RNTL, configurés par apps/mobile/jest.config.cjs ; Vitest teste les paquets et les outils, Maestro teste les parcours.',

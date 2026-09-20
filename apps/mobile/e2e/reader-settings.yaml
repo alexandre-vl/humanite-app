@@ -1,0 +1,22 @@
+# Les préférences d’affichage s’appliquent au journal entier, sous le doigt.
+#
+# L’écran est son propre aperçu : l’échantillon posé sous les contrôles est de la prose d’article, à la taille et dans
+# la face qu’un article prendra. Toucher un cran repeint donc l’écran qui le porte, ce qu’aucun test unitaire ne voit —
+# il n’y a pas de mise en page sous un banc sans écran.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn: 'Mon compte'
+- tapOn: 'Réglages'
+- assertVisible: 'Préférences d’affichage'
+- tapOn: 'Sombre'
+- tapOn: 'Très grand'
+- assertVisible: 'Aperçu'
+- takeScreenshot: settings-dark-huge
+- tapOn: 'Lisibilité renforcée'
+- takeScreenshot: settings-legible
+- tapOn: 'Réinitialiser'
+- assertVisible: 'Aperçu'
+- takeScreenshot: settings-reset
+- back
+- assertVisible: 'Mon compte'

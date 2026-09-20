@@ -1,0 +1,29 @@
+# Un article s’ouvre, se garde, et ce qui a été gardé survit à la fermeture de l’app.
+#
+# La carte est touchée par un point plutôt que par son titre : les titres viennent du corpus, pas du dictionnaire, et
+# un parcours qui en recopierait un dirait deux fois ce qui n’est écrit qu’une. Ce que l’article montre et que le
+# parcours peut nommer, c’est le marque-page de son en-tête : un symbole de plateforme ne rend rien hors d’un appareil,
+# et son libellé d’accessibilité est la seule chose qu’on puisse à la fois atteindre et lire.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn:
+    point: 50%,62%
+- extendedWaitUntil:
+    visible: 'Ajouter aux favoris'
+    timeout: 20000
+- tapOn: 'Ajouter aux favoris'
+- assertVisible: 'Retirer des favoris'
+- takeScreenshot: article-kept
+- back
+- assertVisible: 'Humanité'
+- tapOn: 'Favoris'
+- assertNotVisible: 'Aucun article gardé'
+- stopApp
+- openLink: ${DEV_CLIENT_LINK}
+- extendedWaitUntil:
+    visible: 'À la une'
+    timeout: 180000
+- tapOn: 'Favoris'
+- assertNotVisible: 'Aucun article gardé'
+- takeScreenshot: bookmarks-survived

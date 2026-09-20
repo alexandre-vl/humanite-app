@@ -1,0 +1,18 @@
+# La recherche répond quand la frappe se pose, sans bouton à presser.
+#
+# Le mot cherché n’est pas quoté : ce qu’un lecteur tape n’est pas un texte de l’interface et n’a rien à faire dans le
+# dictionnaire. « climat » traverse le corpus entier et survit au repli des accents que le moteur applique des deux
+# côtés.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn: 'Recherche'
+- assertVisible: 'Cherchez dans le journal'
+- tapOn: 'Saisissez ici le sujet'
+- inputText: climat
+- extendedWaitUntil:
+    notVisible: 'Cherchez dans le journal'
+    timeout: 20000
+- takeScreenshot: search-results
+- tapOn: 'Effacer la recherche'
+- assertVisible: 'Cherchez dans le journal'

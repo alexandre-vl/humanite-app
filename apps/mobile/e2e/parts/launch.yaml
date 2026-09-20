@@ -1,0 +1,9 @@
+# Démarre l’app par le lien profond du dev client, servie par Metro, et attend l’écran d’accueil. Chaque parcours
+# commence par là : le dev client n’a pas d’icône à toucher, et l’app ne tourne pas tant que Metro ne l’a pas servie.
+appId: ${APP_ID}
+---
+- stopApp
+- openLink: ${DEV_CLIENT_LINK}
+- extendedWaitUntil:
+    visible: 'À la une'
+    timeout: 180000

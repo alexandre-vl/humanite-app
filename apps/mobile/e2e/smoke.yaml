@@ -1,11 +1,7 @@
-# Démarre l'app par le lien profond du dev client, servie par Metro, et attend l'écran d'accueil. La barre d'onglets
-# native affiche « À la une », un libellé propre à l'app absent du lanceur, ce qui prouve que l'app elle-même tourne.
+# Le journal s’ouvre. Le fronton porte le nom du journal, un mot de l’app absent du lanceur comme du dev client, ce
+# qui prouve que c’est bien l’app qui est à l’écran et pas la coquille qui l’a chargée.
 appId: ${APP_ID}
 ---
-- stopApp
-- openLink: ${DEV_CLIENT_LINK}
-- extendedWaitUntil:
-    visible: 'À la une'
-    timeout: 180000
+- runFlow: parts/launch.yaml
 - assertVisible: 'Humanité'
 - takeScreenshot: home
