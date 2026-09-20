@@ -33,6 +33,9 @@ const LEGIBLE: FaceSet = 'legible';
 const PAPER: FaceSet = 'paper';
 
 const useStyles = createStyles((theme) => ({
+  // The frame is given its height, not left to find one: a scrolling region inside a ground that fills the
+  // screen sizes to its content otherwise, and a short page would leave the rest of the ground unreachable.
+  frame: { flex: 1 },
   page: { padding: SPACING.lg, gap: SPACING.xl },
   setting: { gap: SPACING.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: SPACING.lg },
@@ -79,7 +82,7 @@ export function SettingsPage(): ReactNode {
   return (
     <Surface>
       <Stack.Screen options={{ title: t('settings.title') }} />
-      <Scroll axis="vertical" contentStyle={styles.page}>
+      <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
         <Setting label={t('settings.appearance')}>
           <SegmentedControl items={APPEARANCES} active={theme} onSelect={chooseTheme} />
         </Setting>

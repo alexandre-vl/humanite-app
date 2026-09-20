@@ -57,7 +57,7 @@ export function SegmentedControl<Id extends string>({ items, active, onSelect }:
             onSelect(item.id);
           }}
         >
-          <Text variant="label" tone={item.id === active ? 'onPrimary' : 'textPrimary'} numberOfLines={1}>
+          <Text variant="label" tone={item.id === active ? 'onPrimary' : 'textPrimary'} align="center">
             {item.label}
           </Text>
         </Pressable>
