@@ -40,12 +40,29 @@ describe('framesOf', () => {
 });
 
 describe('displayOf', () => {
-  it('retient le mode le plus rapide que l’écran déclare', () => {
-    const output = '1080 x 2400, 120.000 fps, supportedModes [{fps=120.000}, {fps=60.000}]';
-    expect(displayOf(output)).toEqual({ read: 'answered', value: { hz: 120 } });
+  /**
+   * The phone this was written against lists three modes, the fastest at a hundred and twenty, and renders the app
+   * at ninety. Reading the panel's best instead of the rate in force would file every measurement under a rate the
+   * app never saw — which is what the first version of this reader did, until a real dump was looked at.
+   */
+  it('retient la fréquence en vigueur, pas la meilleure dont l’écran est capable', () => {
+    const output = [
+      '  mSupportedRefreshRates=[120.00001, 90.0, 60.000004]',
+      '      DisplayMode{id=0, peakRefreshRate=120.00001, vsyncRate=120.00001}',
+      '    mActiveRenderFrameRate=90.0',
+      '      DisplayModeRecord{mMode={id=1, fps=120.00001, vsync=120.00001}}',
+    ].join('\n');
+    expect(displayOf(output)).toEqual({ read: 'answered', value: { hz: 90 } });
   });
 
-  it('refuse une réponse sans aucun mode', () => {
+  it('se rabat sur ce que l’écran s’est vu offrir quand la fréquence en vigueur manque', () => {
+    expect(displayOf('DisplayDeviceInfo{1080 x 2412, modeId 2, renderFrameRate 60.0}')).toEqual({
+      read: 'answered',
+      value: { hz: 60 },
+    });
+  });
+
+  it('refuse une réponse sans aucune fréquence', () => {
     expect(displayOf('Display Devices: size=0').read).toBe('unreadable');
   });
 });

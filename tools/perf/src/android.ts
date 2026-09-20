@@ -67,17 +67,22 @@ export function framesOf(output: string): Read<Frames> {
 export type Display = Readonly<{ hz: number }>;
 
 /**
- * Reads `adb shell dumpsys display` for the rate the panel is running at. It answers no budget of its own — the jank
- * count already holds the deadline — and is recorded because a reading taken at sixty hertz and one taken at a
- * hundred and twenty are not the same reading, whatever their percentages agree on. Several modes are listed; the
- * fastest is the one a phone left alone will reach.
+ * Reads `adb shell dumpsys display` for the rate the app is actually being rendered at.
+ *
+ * It answers no budget of its own — the jank count already holds the deadline — and is recorded because a reading
+ * taken at sixty hertz and one taken at a hundred and twenty are not the same reading, whatever their percentages
+ * agree on. Which makes it worth reading right: a panel lists every mode it can run, and the phone this was written
+ * against lists three, of which the fastest is a hundred and twenty. It was rendering the app at ninety. Taking the
+ * fastest mode would have filed every measurement under a rate the app never saw, and nothing would have said so —
+ * so what is read is the rate in force, not what the panel is capable of.
  */
 export function displayOf(output: string): Read<Display> {
-  const rates = [...output.matchAll(/(\d+(?:\.\d+)?)\s*fps/gu)].map((found) => Number(found[1]));
-  const fastest = rates.reduce((highest, rate) => (rate > highest ? rate : highest), 0);
-  return fastest === 0
-    ? { read: 'unreadable', wanted: 'un mode en fps', saw: gist(output) }
-    : answered({ hz: fastest });
+  const active = numberAt(output, /mActiveRenderFrameRate=\s*(\d+(?:\.\d+)?)/u);
+  const offered = numberAt(output, /renderFrameRate\s+(\d+(?:\.\d+)?)/u);
+  const hz = active ?? offered;
+  return hz === null || hz === 0
+    ? { read: 'unreadable', wanted: 'une fréquence de rendu en vigueur', saw: gist(output) }
+    : answered({ hz: Math.round(hz) });
 }
 
 /** What the phone and the build under measurement are, as far as a budget is concerned. */

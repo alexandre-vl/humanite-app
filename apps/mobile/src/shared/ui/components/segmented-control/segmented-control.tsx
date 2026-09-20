@@ -27,8 +27,24 @@ const useStyles = createStyles((theme) => ({
     borderRadius: RADII.md,
     overflow: 'hidden',
   },
-  option: { flex: 1, paddingVertical: SPACING.md, alignItems: 'center', backgroundColor: theme.surface },
-  optionActive: { flex: 1, paddingVertical: SPACING.md, alignItems: 'center', backgroundColor: theme.primary },
+  // A choice keeps a margin of its own on either side, so a name that grows with the reader's step wraps onto a second
+  // line rather than running to the edges of its cell. Measured on an A065 without it: « Très grand » at the largest
+  // step, in the face meant for readers who need one, left one pixel on the left and three on the right — a label that
+  // fitted by luck, and would not have fitted the next French word.
+  option: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
+    alignItems: 'center',
+    backgroundColor: theme.surface,
+  },
+  optionActive: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
+    alignItems: 'center',
+    backgroundColor: theme.primary,
+  },
 }));
 
 /**

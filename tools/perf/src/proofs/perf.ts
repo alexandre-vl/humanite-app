@@ -42,8 +42,20 @@ const SHIPPED = `Package [dev.humanite.app] (3f2a1b8):
     flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
     versionName=0.0.0`;
 
+/**
+ * What `dumpsys display` prints, trimmed from what an A065 on Android 16 actually answered. The panel lists three
+ * modes and the fastest is a hundred and twenty; the rate in force is ninety. Both are kept here because reading the
+ * wrong one is the mistake this excerpt exists to catch.
+ */
 const DISPLAY = `Display Devices: size=1
-  DisplayDeviceInfo{"Écran intégré": uniqueId="local:4619827259835644672", 1080 x 2400, 120.000 fps, supportedModes [{id=1, width=1080, height=2400, fps=120.000}, {id=2, width=1080, height=2400, fps=60.000}]}`;
+  DisplayDeviceInfo{"Built-in Screen": uniqueId="local:4630946639017191809", 1080 x 2412, modeId 2, renderFrameRate 90.0, hasArrSupport false}
+    mSupportedRefreshRates=[120.00001, 90.0, 60.000004]
+      DisplayMode{id=0, width=1080, height=2412, peakRefreshRate=120.00001, vsyncRate=120.00001}
+      DisplayMode{id=1, width=1080, height=2412, peakRefreshRate=90.0, vsyncRate=90.0}
+      DisplayMode{id=2, width=1080, height=2412, peakRefreshRate=60.000004, vsyncRate=60.000004}
+    mActiveRenderFrameRate=90.0
+      DisplayModeRecord{mMode={id=1, width=1080, height=2412, fps=120.00001, vsync=120.00001}}
+      DisplayModeRecord{mMode={id=2, width=1080, height=2412, fps=90.0, vsync=90.0}}`;
 
 /** A session whose three answers are read and whose two budgets hold. */
 const WITHIN: Answers = {

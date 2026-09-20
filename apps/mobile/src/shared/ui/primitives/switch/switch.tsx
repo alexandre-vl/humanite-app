@@ -20,6 +20,13 @@ export type SwitchProps = Readonly<{
  *
  * The label is what it is announced by: the text beside it belongs to the row, not to the control, so the control
  * would otherwise be a nameless target under a finger that cannot see.
+ *
+ * The colours are the ones a control needs, not the ones a card needs. Drawn in the border and the surface — the two
+ * roles a rule and a sheet are drawn in — it measured 1.13 to 1 against the page in the light theme on an A065: a
+ * control nobody could find, on the screen a reader opens because they cannot see well. Off, the track now takes the
+ * colour muted text takes, which the themes already hold above three to one against their ground; the knob takes the
+ * ground itself, so it reads against the track in both states. What tells the states apart is the knob's side as much
+ * as the colour, which is what keeps them apart for a reader who sees no red.
  */
 export function Switch({ value, onChange, label }: SwitchProps): ReactNode {
   const theme = useTheme();
@@ -28,9 +35,9 @@ export function Switch({ value, onChange, label }: SwitchProps): ReactNode {
       value={value}
       onValueChange={onChange}
       accessibilityLabel={label}
-      trackColor={{ false: theme.border, true: theme.primary }}
-      thumbColor={theme.surface}
-      ios_backgroundColor={theme.border}
+      trackColor={{ false: theme.textMuted, true: theme.primary }}
+      thumbColor={theme.background}
+      ios_backgroundColor={theme.textMuted}
     />
   );
 }
