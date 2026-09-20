@@ -3,13 +3,13 @@
   "include": ["src"],
   "references": [
     {
+      "path": "../../packages/architecture"
+    },
+    {
       "path": "../adr"
     },
     {
       "path": "../agents"
-    },
-    {
-      "path": "../../packages/architecture"
     },
     {
       "path": "../deps"
@@ -34,6 +34,9 @@
     },
     {
       "path": "../lint"
+    },
+    {
+      "path": "../perf"
     },
     {
       "path": "../structure"

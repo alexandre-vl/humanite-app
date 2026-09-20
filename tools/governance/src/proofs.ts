@@ -8,6 +8,7 @@ import { runFixture } from '@huma/fixtures';
 import { GIT_HOOK_PROOFS } from '@huma/git-hooks/proofs';
 import { GUARDRAIL_PROOFS } from '@huma/guardrails/proofs';
 import { LINT_PROOFS } from '@huma/lint/proofs';
+import { PERF_PROOFS } from '@huma/perf/proofs';
 import { STRUCTURE_PROOFS } from '@huma/structure/proofs';
 import { COMMIT_HISTORY_FIXTURES } from './proofs/commit-history.ts';
 import { COMMIT_REFS_FIXTURES } from './proofs/commit-refs.ts';
@@ -25,6 +26,7 @@ export type ProofId =
   | IdOf<typeof GIT_HOOK_PROOFS>
   | IdOf<typeof GUARDRAIL_PROOFS>
   | IdOf<typeof LINT_PROOFS>
+  | IdOf<typeof PERF_PROOFS>
   | IdOf<typeof STRUCTURE_PROOFS>
   | IdOf<typeof GOVERNANCE_FIXTURES>
   | IdOf<typeof COMMIT_HISTORY_FIXTURES>
@@ -44,6 +46,7 @@ const PROOF_LISTS: readonly (readonly Fixture<ProofId, string>[])[] = [
   GIT_HOOK_PROOFS,
   GUARDRAIL_PROOFS,
   LINT_PROOFS,
+  PERF_PROOFS,
   STRUCTURE_PROOFS,
   GOVERNANCE_FIXTURES,
   COMMIT_HISTORY_FIXTURES,

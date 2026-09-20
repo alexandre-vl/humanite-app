@@ -141,9 +141,9 @@ const AWAITING_FOUNDATION_ADRS = [
   'claude-hook/stop-unverifiable-once',
 ];
 
-/** Whether a proof awaits an ADR of the foundations: every dependency, Expo, git hook, guardrail, lint, root guard and structure proof, and the agent proofs above. */
+/** Whether a proof answers for something other than the ADR process: dependencies, Expo, git hooks, guardrails, lint, performance budgets, the root guard and the structure, plus the agent proofs above. */
 const awaitsFoundationAdr = (id: string): boolean =>
-  ['deps/', 'emulator/', 'expo/', 'git/', 'guardrail/', 'lint/', 'root/', 'structure/'].some((prefix) =>
+  ['deps/', 'emulator/', 'expo/', 'git/', 'guardrail/', 'lint/', 'perf/', 'root/', 'structure/'].some((prefix) =>
     id.startsWith(prefix),
   ) || AWAITING_FOUNDATION_ADRS.includes(id);
 

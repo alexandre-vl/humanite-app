@@ -1,0 +1,21 @@
+{
+  "name": "@huma/perf",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./android": "./src/android.ts",
+    "./budgets": "./src/budgets.ts",
+    "./check": "./src/check.ts",
+    "./measure": "./src/measure.ts",
+    "./proofs": "./src/proofs/registry.ts"
+  },
+  "dependencies": {
+    "@huma/fixtures": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

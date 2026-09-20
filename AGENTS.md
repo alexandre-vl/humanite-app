@@ -35,6 +35,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm hooks:install`    | installe les hooks git du dépôt                                                                        |
 | `pnpm knip`             | cherche les fichiers, exports et dépendances que rien n’emploie                                        |
 | `pnpm lint`             | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré                    |
+| `pnpm perf:check`       | juge une session de mesures prise sur un téléphone contre les budgets de performance                   |
 | `pnpm structure:check`  | vérifie la structure Feature-Sliced de chaque app avec Steiger et y cherche les cycles d’imports       |
 | `pnpm test`             | tests et fixtures des outils                                                                           |
 | `pnpm test:app`         | tests jest-expo et RNTL de l’app                                                                       |

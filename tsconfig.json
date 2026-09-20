@@ -62,6 +62,9 @@
       "path": "./tools/lint"
     },
     {
+      "path": "./tools/perf"
+    },
+    {
       "path": "./tools/structure"
     }
   ]

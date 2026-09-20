@@ -32,6 +32,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
+| [ADR-0025](0025-budgets-de-performance-et-outils-de-mesure.md)                  | Budgets de performance et outils de mesure                  | proposé | `guarded-config`, `reversal-cost`                                          |
 
 ## Confirmation
 
@@ -302,6 +303,18 @@ Statut : proposé. Périmètre : `apps/mobile/src/features/**`, `apps/mobile/src
 | R2    | DOIT        | convention : La façade du stockage n’accepte qu’une clé du registre : son paramètre est typé sur les valeurs de la table, si bien qu’une clé écrite à la main ne compile pas, et le registre reste le seul endroit où lire ce que l’app pose sur le disque.                                                                                                                                                                                                                                                             |
 | R3    | DOIT        | convention : Chaque magasin nomme la version du format qu’il écrit et le middleware de persistance l’inscrit dans l’enveloppe posée sur le disque ; elle est relue à la restauration, et un format d’une autre version passe par la migration ou est écarté. Un test par magasin relit l’enveloppe écrite et y vérifie la version, le middleware laissant par défaut une version nulle à qui ne la nomme pas.                                                                                                           |
 | R4    | DOIT        | convention : Ce qui revient du disque est une chaîne quelconque, qu’un fichier modifié à la main peut avoir remplacée : chaque magasin la relit valeur par valeur avant de rien servir — par l’analyseur marqué des contrats quand la valeur est un identifiant, contre la liste close des valeurs admises quand c’est un réglage — et ce qui n’en ressort pas est laissé pour la valeur du journal, si bien qu’un disque modifié ne peut pas placer dans un magasin une valeur que le reste de l’app croirait validée. |
+
+### ADR-0025 · Budgets de performance et outils de mesure
+
+Statut : proposé. Périmètre : `tools/perf/**`, `tools/governance/src/cli/perf-check.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                        |
+| ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `perf/unreadable-startup`, `perf/unreadable-frames`, `perf/unreadable-display`, `perf/unreadable-provenance`, `perf/no-frames-rendered`                                                                        |
+| R2    | DOIT        | `perf/within-budget`, `perf/cold-start-exceeded`, `perf/scroll-jank-exceeded`                                                                                                                                  |
+| R3    | NE DOIT PAS | `perf/emulator-refused`, `perf/emulator-refused-qemu`                                                                                                                                                          |
+| R4    | NE DOIT PAS | `perf/debuggable-refused`                                                                                                                                                                                      |
+| R5    | DOIT        | convention : La table des budgets ne porte que des seuils ; ce qu’une session a relevé vit dans docs/spikes, et la commande perf:check lit une session depuis un dossier plutôt que de l’écrire dans le dépôt. |
 
 ## Référentiel
 

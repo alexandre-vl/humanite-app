@@ -811,6 +811,9 @@ importers:
       '@huma/lint':
         specifier: workspace:*
         version: link:../lint
+      '@huma/perf':
+        specifier: workspace:*
+        version: link:../perf
       '@huma/structure':
         specifier: workspace:*
         version: link:../structure
@@ -898,6 +901,25 @@ importers:
       prettier:
         specifier: 'catalog:'
         version: 3.9.6
+    devDependencies:
+      '@huma/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.4
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@types/node@24.13.4)(jsdom@20.0.3(supports-color@8.1.1))(vite@8.3.0(@types/node@24.13.4)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.1))
+
+  tools/perf:
+    dependencies:
+      '@huma/fixtures':
+        specifier: workspace:*
+        version: link:../fixtures
     devDependencies:
       '@huma/tsconfig':
         specifier: workspace:*

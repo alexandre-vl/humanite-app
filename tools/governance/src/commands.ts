@@ -115,6 +115,12 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'supprime le conteneur de l’émulateur et attend que le garde root ait restauré l’hôte',
   },
+  'perf:check': {
+    program: cli('perf-check'),
+    arguments: [],
+    audience: 'everyone',
+    summary: 'juge une session de mesures prise sur un téléphone contre les budgets de performance',
+  },
   'emulator:e2e': {
     program: cli('emulator-e2e'),
     arguments: [],

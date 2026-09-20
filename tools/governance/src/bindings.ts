@@ -891,6 +891,27 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0025': {
+    scope: {
+      paths: ['tools/perf/**', 'tools/governance/src/cli/perf-check.ts'],
+    },
+    rules: {
+      R1: [
+        'perf/unreadable-startup',
+        'perf/unreadable-frames',
+        'perf/unreadable-display',
+        'perf/unreadable-provenance',
+        'perf/no-frames-rendered',
+      ],
+      R2: ['perf/within-budget', 'perf/cold-start-exceeded', 'perf/scroll-jank-exceeded'],
+      R3: ['perf/emulator-refused', 'perf/emulator-refused-qemu'],
+      R4: ['perf/debuggable-refused'],
+      R5: {
+        convention:
+          'La table des budgets ne porte que des seuils ; ce qu’une session a relevé vit dans docs/spikes, et la commande perf:check lit une session depuis un dossier plutôt que de l’écrire dans le dépôt.',
+      },
+    },
+  },
   'ADR-0024': {
     scope: {
       paths: ['apps/mobile/src/features/**', 'apps/mobile/src/shared/lib/storage/**'],

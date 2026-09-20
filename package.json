@@ -33,6 +33,7 @@
     "hooks:install": "node tools/governance/src/cli/hooks-install.ts",
     "knip": "knip --no-progress --no-config-hints",
     "lint": "node tools/governance/src/cli/lint.ts",
+    "perf:check": "node tools/governance/src/cli/perf-check.ts",
     "structure:check": "node tools/governance/src/cli/structure-check.ts",
     "test": "vitest run",
     "test:app": "node tools/governance/src/cli/test-app.ts",
