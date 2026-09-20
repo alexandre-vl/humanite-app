@@ -12,13 +12,30 @@ const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
   second: '2-digit',
 });
 
-/** How far the newsroom runs ahead of UTC at an instant, in milliseconds: an hour in winter, two in summer. */
-const offsetAt = (instant: number): number => {
-  const parts = new Map<string, string>(
+/** What the newsroom's clock reads at an instant, field by field: the separators it puts between them vary, they do not. */
+const clockAt = (instant: number): Map<string, string> =>
+  new Map<string, string>(
     NEWSROOM_CLOCK.formatToParts(instant).map((part): readonly [string, string] => [part.type, part.value]),
   );
+
+/** How far the newsroom runs ahead of UTC at an instant, in milliseconds: an hour in winter, two in summer. */
+const offsetAt = (instant: number): number => {
+  const parts = clockAt(instant);
   const read = (type: string): number => Number(parts.get(type) ?? '0');
   return Date.UTC(read('year'), read('month') - 1, read('day'), read('hour'), read('minute'), read('second')) - instant;
+};
+
+/**
+ * The calendar day an instant falls on, on the newsroom's clock: `2026-09-13`.
+ *
+ * That day is what a numéro of a daily paper is, so this is what names one. It is read on the newsroom's clock and not
+ * on the reader's, for the same reason the stamps below are: an item filed at half past midnight in Paris belongs to
+ * the paper that was made that night, wherever it is opened. Written widest first, it sorts in the order it reads.
+ */
+export const dayOf = (instant: string): string => {
+  const parts = clockAt(Date.parse(instant));
+  const read = (type: string): string => parts.get(type) ?? '';
+  return `${read('year')}-${read('month')}-${read('day')}`;
 };
 
 /**

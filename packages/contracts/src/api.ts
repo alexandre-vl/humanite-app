@@ -1,6 +1,7 @@
 import type { Article, ArticleSummary } from './article.ts';
 import type { Author, Section } from './content.ts';
-import type { ArticleId, SectionId } from './ids.ts';
+import type { ArticleId, IssueId, SectionId } from './ids.ts';
+import type { IssueSummary } from './issue.ts';
 import type { Page } from './page.ts';
 import type { Session } from './session.ts';
 
@@ -19,6 +20,10 @@ export type SearchQuery = Readonly<{ text: string; cursor?: string; limit?: numb
  * `getArticle` names one piece and fails when it is not there — asking for it is opening it. `getSummaries` names
  * several and answers with those that exist, in the order asked: its ids come from lists that outlive the paper, and
  * one withdrawn piece must not cost the reader the rest of them.
+ *
+ * `getIssues` answers with every numéro at once and `getIssue` with a whole one: a day's paper is a closed thing of a
+ * few dozen pieces, laid out in the order the newsroom runs its sections in, and a reader opens it to see what was in
+ * it. Neither takes a cursor, because neither has a next page — that is what tells a numéro from a feed.
  */
 export type ContentApi = Readonly<{
   getSections: () => Promise<readonly Section[]>;
@@ -27,6 +32,8 @@ export type ContentApi = Readonly<{
   getLiveFeed: (query: LiveQuery) => Promise<Page<ArticleSummary>>;
   getArticle: (id: ArticleId) => Promise<Article>;
   getSummaries: (ids: readonly ArticleId[]) => Promise<readonly ArticleSummary[]>;
+  getIssues: () => Promise<readonly IssueSummary[]>;
+  getIssue: (id: IssueId) => Promise<readonly ArticleSummary[]>;
   search: (query: SearchQuery) => Promise<Page<ArticleSummary>>;
   getSession: () => Promise<Session>;
 }>;

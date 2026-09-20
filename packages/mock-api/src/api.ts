@@ -1,4 +1,4 @@
-import { ARTICLE_SUMMARY, ContentApiError } from '@huma/contracts';
+import { ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY } from '@huma/contracts';
 import type {
   Article,
   ArticleId,
@@ -7,6 +7,8 @@ import type {
   ContentApi,
   ContentErrorCode,
   FeedQuery,
+  IssueId,
+  IssueSummary,
   LiveQuery,
   Page,
   SearchQuery,
@@ -14,7 +16,7 @@ import type {
   SectionId,
   Session,
 } from '@huma/contracts';
-import { AUTHORS, CORPUS, SECTIONS } from '@huma/mock-content';
+import { AUTHORS, CORPUS, SECTIONS, dayOf } from '@huma/mock-content';
 
 const DEFAULT_LIMIT = 12;
 
@@ -33,6 +35,62 @@ const SUMMARIES = new Map(CHRONOLOGICAL.map((summary): readonly [ArticleId, Arti
 
 const notFound = (id: ArticleId): never => {
   throw new ContentApiError('not-found', `article introuvable : ${id}`);
+};
+
+/** Where a section runs in the paper, by id: the order the newsroom lays a printed edition out in. */
+const RUNNING_ORDER = new Map(SECTIONS.map((section): readonly [SectionId, number] => [section.id, section.order]));
+
+const runsAt = (summary: ArticleSummary): number => RUNNING_ORDER.get(summary.section) ?? SECTIONS.length;
+
+/** How a numéro is laid out: section by section as the paper runs them, and inside one, the freshest first. */
+const inPaper = (left: ArticleSummary, right: ArticleSummary): number => {
+  const byRun = runsAt(left) - runsAt(right);
+  return byRun === 0 ? right.publishedAt.localeCompare(left.publishedAt) : byRun;
+};
+
+/** A day's paper while it is being gathered: what it holds, and what it will open on. */
+type Gathering = Readonly<{ items: ArticleSummary[] }> & { opener: ArticleSummary };
+
+/**
+ * The corpus gathered into numéros, one per day on the newsroom's clock.
+ *
+ * Nothing in the corpus says which numéro an item belongs to, and nothing should: a daily paper's numéro *is* its day,
+ * so the day an item was filed on already says it. Inventing a field would be inventing an editorial decision the
+ * fiction never made, and would let the two disagree.
+ *
+ * The opener is the freshest illustrated item of the day, which is the same rule the front page follows — a paper opens
+ * on a picture, and the newest items of a morning are briefs filed before the desk has one. A day holding no picture
+ * at all opens on its freshest item, so every numéro has a cover.
+ */
+const gathered = new Map<string, Gathering>();
+for (const summary of CHRONOLOGICAL) {
+  const day = dayOf(summary.publishedAt);
+  const held = gathered.get(day);
+  if (held === undefined) {
+    gathered.set(day, { items: [summary], opener: summary });
+  } else {
+    held.items.push(summary);
+    if (held.opener.hero === undefined && summary.hero !== undefined) {
+      held.opener = summary;
+    }
+  }
+}
+
+/** Each numéro's items, laid out as the paper runs them. */
+const ISSUES: ReadonlyMap<string, readonly ArticleSummary[]> = new Map(
+  [...gathered].map(([day, held]): readonly [string, readonly ArticleSummary[]] => [
+    day,
+    [...held.items].sort(inPaper),
+  ]),
+);
+
+/** The shelf: every numéro, the most recent first, as the newsstand stands them. */
+const SHELF: readonly IssueSummary[] = [...gathered]
+  .map(([day, held]) => ISSUE_SUMMARY.parse({ id: day, opener: held.opener, count: held.items.length }))
+  .sort((left, right) => right.id.localeCompare(left.id));
+
+const noIssue = (id: IssueId): never => {
+  throw new ContentApiError('not-found', `numéro introuvable : ${id}`);
 };
 
 /**
@@ -142,6 +200,14 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
     getSummaries: async (ids: readonly ArticleId[]): Promise<readonly ArticleSummary[]> => {
       await guard('getSummaries');
       return summariesOf(ids);
+    },
+    getIssues: async (): Promise<readonly IssueSummary[]> => {
+      await guard('getIssues');
+      return SHELF;
+    },
+    getIssue: async (id: IssueId): Promise<readonly ArticleSummary[]> => {
+      await guard('getIssue');
+      return ISSUES.get(id) ?? noIssue(id);
     },
     search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
       await guard('search');

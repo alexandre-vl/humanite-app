@@ -1,12 +1,14 @@
 export { ACCESS, ARTICLE_FORMAT, ARTICLE_KIND } from './enums.ts';
 export type { Access, ArticleFormat, ArticleKind } from './enums.ts';
-export { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
-export type { ArticleId, AuthorId, ImageKey, SectionId } from './ids.ts';
+export { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, ISSUE_ID, SECTION_ID } from './ids.ts';
+export type { ArticleId, AuthorId, ImageKey, IssueId, SectionId } from './ids.ts';
 export type { DisplayText } from './display-text.ts';
 export { AUTHOR, BLOCK, SECTION, SPAN } from './content.ts';
 export type { Author, Block, BlockInput, Section, Span, SpanInput } from './content.ts';
 export { ARTICLE, ARTICLE_SUMMARY, HERO } from './article.ts';
 export type { Article, ArticleSummary, Hero } from './article.ts';
+export { ISSUE_SUMMARY } from './issue.ts';
+export type { IssueSummary } from './issue.ts';
 export { SESSION } from './session.ts';
 export type { Session } from './session.ts';
 export type { Page } from './page.ts';

@@ -20,6 +20,18 @@ export const IMAGE_KEY = z
   .brand('ImageKey');
 export type ImageKey = z.infer<typeof IMAGE_KEY>;
 
+/**
+ * An issue id: the calendar day the paper carries that day's date, on the newsroom's clock — `2026-09-13`.
+ *
+ * A numéro of a daily paper is a day, so the day is its name. Written widest first, it sorts as a string in the order
+ * it reads, and it is the same key a wire groups its runs under: one instant belongs to exactly one issue.
+ */
+export const ISSUE_ID = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/u)
+  .brand('IssueId');
+export type IssueId = z.infer<typeof ISSUE_ID>;
+
 /** A section id, its slug: `culture-et-savoir`. */
 export const SECTION_ID = z.string().regex(SLUG).brand('SectionId');
 export type SectionId = z.infer<typeof SECTION_ID>;

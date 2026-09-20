@@ -40,6 +40,7 @@ export const BUNDLED_FILES: readonly string[] = [
   'packages/mock-content/src/assets.ts',
   'packages/mock-content/src/index.ts',
   'packages/mock-content/src/registries.ts',
+  'packages/mock-content/src/time.ts',
   'packages/mock-content/src/generated/**/*.ts',
 ];
 
