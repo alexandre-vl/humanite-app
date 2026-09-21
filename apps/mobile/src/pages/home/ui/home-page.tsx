@@ -9,7 +9,7 @@ import { ArticleFeed, feedQuery, sectionFeedQuery, usePagedFeed } from '#entitie
 import { useSectionNames, useSections } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
-import { articleHref, BOOKMARKS_HREF, SETTINGS_HREF } from '#lib/routing';
+import { articleHref, SETTINGS_HREF } from '#lib/routing';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Pager } from '#primitives/pager';
@@ -58,10 +58,12 @@ function Sheet({ leaf }: SheetProps): ReactNode {
  * read, was the only part of the paper a reader could not reach by reading. Here the sections are pages of the front
  * screen, the band names the one in hand, and either a press or a swipe turns to another.
  *
- * The masthead is a bar and not a block that slides away. It carries what a reader wants from anywhere in the paper
- * and could reach from nowhere: what they kept, and how the paper is set for them. A masthead that scrolled off took
- * both with it — and a masthead shared by nine pages, each scrolled to its own place, would be somewhere different
- * from the page under it the moment a reader swiped.
+ * The masthead is a bar and not a block that slides away. A masthead shared by nine pages, each scrolled to its own
+ * place, would be somewhere different from the page under it the moment a reader swiped.
+ *
+ * It carries one control, and used to carry two. The other was the way to what the reader kept — put here because it
+ * was reachable from nowhere else, which was true of the front page and of no other screen. What one keeps is a tab
+ * now, so the mark on this bar was a second door to the destination standing directly under it.
  */
 export function HomePage(): ReactNode {
   const styles = useStyles();
@@ -79,22 +81,13 @@ export function HomePage(): ReactNode {
         title={t('app.name')}
         names="paper"
         actions={
-          <>
-            <TopBarButton
-              icon="bookmark"
-              label={t('bookmark.title')}
-              onPress={() => {
-                router.push(BOOKMARKS_HREF);
-              }}
-            />
-            <TopBarButton
-              icon="reading"
-              label={t('settings.title')}
-              onPress={() => {
-                router.push(SETTINGS_HREF);
-              }}
-            />
-          </>
+          <TopBarButton
+            icon="reading"
+            label={t('settings.title')}
+            onPress={() => {
+              router.push(SETTINGS_HREF);
+            }}
+          />
         }
       />
       <LabelBar

@@ -1,5 +1,13 @@
-# Démarre l’app par le lien profond du dev client, servie par Metro, et attend l’écran d’accueil. Chaque parcours
-# commence par là : le dev client n’a pas d’icône à toucher, et l’app ne tourne pas tant que Metro ne l’a pas servie.
+# Démarre l’app par le lien profond du dev client, servie par Metro, et la pose sur la une. Chaque parcours commence
+# par là : le dev client n’a pas d’icône à toucher, et l’app ne tourne pas tant que Metro ne l’a pas servie.
+#
+# Attendre « À la une » ne suffit plus à savoir où l’on est. Tant que la barre du bas ne nommait que son onglet actif,
+# ce mot n’était à l’écran que sur la une ; elle les nomme tous les cinq maintenant, si bien qu’il est à l’écran sur
+# n’importe quel onglet. L’app rouvre sur le dernier onglet visité, et un parcours a démarré sur l’étagère vide en
+# croyant être sur la une — il y a cherché un marque-page à poser et n’en a trouvé aucun.
+#
+# Donc on y va, au lieu de supposer y être : on touche le nom de la une, puis on vérifie le fronton du journal, qui
+# est le seul mot qu’aucun autre onglet ne porte.
 appId: ${APP_ID}
 ---
 - stopApp
@@ -7,3 +15,5 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible: 'À la une'
     timeout: 180000
+- tapOn: 'À la une'
+- assertVisible: 'L’Humanité'

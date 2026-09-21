@@ -1,6 +1,16 @@
 import { expect, expectTypeOf, test } from 'vitest';
 import { angle } from './brand.ts';
-import { ANGLES, FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, PALETTE, RADII, SIZES, SPACING } from './index.ts';
+import {
+  ANGLES,
+  FONT_FAMILIES,
+  FONT_SIZES,
+  LINE_HEIGHTS,
+  PALETTE,
+  RADII,
+  SIZES,
+  SPACING,
+  typographyAt,
+} from './index.ts';
 import type { Angle, Color, FontFamily, FontSize, LineHeight, Radius, Space } from './index.ts';
 
 test('the spacing scale is a four-point grid from zero', () => {
@@ -33,7 +43,12 @@ test('the paper is laid at a turn to the left, written as React Native reads it'
 });
 
 test('sizes give a list its bands and the scroll inset each arrangement adds up to', () => {
-  expect(SIZES.headerExpanded).toBe(64);
+  // Sixteen points of air, one line of display type at the largest step a reader can choose, and what is left over
+  // is the air the same name has on a screen that lays it in a plain scrolling page. Held against the table it is
+  // derived from, so a change to the type or to the steps fails here rather than clipping a name on a phone.
+  expect(SIZES.headerExpanded).toBe(48);
+  const largest = typographyAt('display', 'huge', 'paper');
+  expect(SPACING.lg + largest.size * largest.leading).toBeLessThan(SIZES.headerExpanded);
   expect(SIZES.band).toBe(40);
   expect(SIZES.bandPair).toBe(SIZES.band * 2);
   expect(SIZES.headerBand).toBe(SIZES.headerExpanded + SIZES.band);

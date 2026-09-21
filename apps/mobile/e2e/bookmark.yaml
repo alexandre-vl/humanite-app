@@ -9,8 +9,9 @@
 # de passer inaperçu — ce qui vaut mieux qu’un état remis à zéro, qui rend au client de développement son premier
 # lancement et couvre l’app entière de son menu.
 #
-# Ce qui est gardé ne vit plus sur la une : la marque du fronton ouvre une étagère à elle, et c’est là que le
-# parcours va le relire.
+# Ce qui est gardé ne vit plus sur la une : c’est un onglet de la barre du bas, et c’est là que le parcours va le
+# relire. Le même mot nomme l’onglet et le fronton de l’écran qu’il ouvre, ce qui est voulu — un onglet porte le nom
+# de son écran — et le parcours ne le touche que depuis la une, où seul l’onglet le porte.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml

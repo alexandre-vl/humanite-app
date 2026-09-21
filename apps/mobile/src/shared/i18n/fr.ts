@@ -6,6 +6,7 @@
  */
 export const FR = {
   'account.reading': 'Réglages',
+  'account.paper': 'Le journal',
   'account.contact': 'Nous contacter',
   'account.contact.mail': 'relationlecteur@humanite.fr',
   'account.contact.mail.hint': 'Par courriel',

@@ -133,7 +133,22 @@ export const TRACKING = {
  * served by the 1080 the corpus writes. The shelf's own measurement is 138,3 points, read on capture 04 as a slot of
  * 363 pixels at 2,625 pixels per point; 140 is the step the grid holds nearest it.
  */
-const HEADER_EXPANDED = 64;
+/**
+ * What the sliding band holds, worked out rather than picked: one line of `display` type on the page's own margin,
+ * which is what a screen with nothing better to print at its top prints there.
+ *
+ * Sixteen points of air above it, the type itself, and eight under — eight because the first row of a feed carries
+ * sixteen of its own, and the twenty-four those add up to is the air the account screen leaves under its own name, a
+ * screen that lays the same block in a plain scrolling page. At the step the paper is set at the type stands 20 × 1.15
+ * = 23, so 16 + 23 + 8 = 47, and forty-eight is the grid step above it.
+ *
+ * A band is a fixed height and type is not, so the largest step a reader can choose is what decides whether the number
+ * holds: 25 × 1.15 = 28.75, and 16 + 28.75 = 44.75 fits inside forty-eight with three to spare. The air under the name
+ * closes from twenty-four points to nineteen as the type grows, which is what fixed room does and what nothing clipped
+ * looks like. It was sixty-four, which no reading justified and which left the name floating seventeen points further
+ * from the page than the same name on the account screen.
+ */
+const HEADER_EXPANDED = 48;
 const BAND = 40;
 export const SIZES = {
   headerExpanded: space(HEADER_EXPANDED),

@@ -1,17 +1,24 @@
 # Le kiosque range les numéros, et dit où ils s’ouvrent.
 #
+# Il n’est plus un onglet : chaque geste qu’on y fait finit dans un navigateur, donc il se pousse depuis le compte,
+# où vit le reste des affaires du journal. Le parcours y va comme un lecteur : l’onglet du compte, puis la ligne qui
+# nomme le kiosque, puis le retour que tout écran empilé doit.
+#
 # Aucune couverture n’est touchée ici, et ce n’est pas un oubli : un numéro se lit désormais sur humanite.fr, et une
 # couverture touchée quitterait l’app pour un navigateur — le parcours mesurerait alors le navigateur, laisserait un
 # onglet ouvert sur le téléphone, et ne reviendrait au kiosque que par un retour système qui ne prouve rien. Ce que
 # le lien fait est vérifié là où on peut le lire sans partir : le test de l’écran, qui relit l’adresse remise au
 # téléphone.
 #
-# « L’Humanité » est le fronton que chaque couverture porte. Sur l’onglet du kiosque, c’est le seul endroit où le mot
-# est peint : l’écran d’accueil porte le sien, mais il n’est pas à l’écran.
+# « L’Humanité » est le fronton que chaque couverture porte. Sur cet écran, c’est le seul endroit où le mot est
+# peint : l’écran d’accueil porte le sien, mais il n’est pas à l’écran.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
+- tapOn: 'Mon compte'
 - tapOn: 'Kiosque'
 - assertVisible: 'L’Humanité'
 - assertVisible: 'Chaque numéro s’ouvre sur humanite.fr.'
 - takeScreenshot: newsstand
+- tapOn: 'Revenir'
+- assertVisible: 'Le journal'

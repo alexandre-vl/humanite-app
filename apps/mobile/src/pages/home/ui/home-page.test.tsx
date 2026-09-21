@@ -81,12 +81,15 @@ describe('HomePage', () => {
    * The two things a reader wants from anywhere in the paper and could reach from nowhere. They are in the masthead
    * and not in the feed, so they are there at the top of the paper and there again at the bottom of it.
    */
-  it('offre depuis le fronton ce qu’on a gardé et la façon dont le journal est composé', async () => {
+  /**
+   * One control, where there were two. The other opened what the reader kept, and it was here because that shelf was
+   * reachable from nowhere else; it has a tab now, standing directly under this bar, so the mark was a second door.
+   */
+  it('offre depuis le fronton la façon dont le journal est composé, et rien d’autre', async () => {
     await renderPage();
-    await fireEvent.press(screen.getByLabelText('Mes lectures'));
-    expect(jest.mocked(router.push)).toHaveBeenCalledWith('/bookmarks');
     await fireEvent.press(screen.getByLabelText('Préférences d’affichage'));
     expect(jest.mocked(router.push)).toHaveBeenCalledWith('/settings');
+    expect(screen.queryByLabelText('Mes lectures')).toBeNull();
   });
 
   /** What the front page no longer holds: the shelf of what one kept, which is a screen of its own. */

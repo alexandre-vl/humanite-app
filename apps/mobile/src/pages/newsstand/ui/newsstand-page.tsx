@@ -1,12 +1,13 @@
 import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { EmptyState } from '#components/empty-state';
+import { TopBar } from '#components/top-bar';
 import { NEWSROOM } from '#config';
 import { t } from '#i18n';
 import { openExternal } from '#lib/routing';
 import { createStyles } from '#lib/styles';
-import { Box } from '#primitives/box';
 import { Pressable } from '#primitives/pressable';
 import { Scroll } from '#primitives/scroll';
 import { Surface } from '#primitives/surface';
@@ -20,8 +21,6 @@ const useStyles = createStyles(() => ({
   // sizes to its content otherwise, and a short page would leave the rest of the ground unreachable.
   frame: { flex: 1 },
   page: { padding: SPACING.lg, gap: SPACING.lg },
-  // The title and the sentence under it are one thing said, so they are set closer to each other than to the shelf.
-  masthead: { gap: SPACING.xs },
   shelf: { gap: SPACING.lg, paddingBottom: SPACING.sm },
 }));
 
@@ -42,21 +41,27 @@ const useStyles = createStyles(() => ({
  * moves. The app used to push a sommaire of its own — the day's articles, every one of them dressed as a headline —
  * which was a third feed of the same cards the front page and the wire already lay out, and the one screen in the
  * app that answered a question nobody had asked. A kiosk sells the paper; it does not reprint it.
+ *
+ * And a kiosk is not a tab. Every press on this screen ends in a browser, so it held a fifth of the app's own
+ * navigation to lead out of it, while what the reader keeps was two presses behind a menu. It is pushed from the
+ * account now, where the paper's own business — what it costs, how to reach it — is, and it carries the way back a
+ * pushed screen owes.
  */
 export function NewsstandPage(): ReactNode {
   const styles = useStyles();
   const issues = useQuery(issuesQuery).data ?? [];
   return (
     <Surface>
+      <TopBar
+        title={t('nav.newsstand')}
+        onBack={() => {
+          router.back();
+        }}
+      />
       <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
-        <Box style={styles.masthead}>
-          <Text variant="display" heading>
-            {t('nav.newsstand')}
-          </Text>
-          {/* Said once, above the shelf, and not on every cover: a reader leaving the app should read it coming, and
-              four covers repeating the same sentence would be the shelf telling them four times. */}
-          <Text variant="caption">{t('newsstand.web')}</Text>
-        </Box>
+        {/* Said once, above the shelf, and not on every cover: a reader leaving the app should read it coming, and
+            four covers repeating the same sentence would be the shelf telling them four times. */}
+        <Text variant="caption">{t('newsstand.web')}</Text>
         {issues.length === 0 ? (
           <EmptyState title={t('newsstand.empty.title')} message={t('newsstand.empty.message')} />
         ) : (

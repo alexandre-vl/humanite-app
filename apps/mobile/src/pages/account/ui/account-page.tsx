@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { BOOKMARKS_HREF, SETTINGS_HREF } from '#lib/routing';
+import { NEWSSTAND_HREF, SETTINGS_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -85,8 +85,13 @@ function Group({ label, children }: Readonly<{ label: DisplayText; children: Rea
  * It holds what this app actually has, and nothing else. There is no account to sign into, nothing to buy and no
  * library to open, so the screen does not draw rows that would lead nowhere — the current one lists eight, five of
  * which cannot mean anything here, and puts deleting an account in the same type as everything around it. What is
- * left is true: where the reader sets how the paper is printed for them, and how to reach the newsroom, which the
- * current app only shows once one is signed out.
+ * left is true: where the reader sets how the paper is printed for them, where the numéros stand, and how to reach
+ * the newsroom, which the current app only shows once one is signed out.
+ *
+ * What the reader kept is no longer a row here. It was, and it was also a mark on the front page's masthead, because
+ * it was in the bar at the bottom nowhere — which made this screen the only way to it from the wire, the search and
+ * the newsstand. It has a tab of its own now, so a row leading to the destination beside this one would be a third
+ * door to one room.
  */
 export function AccountPage(): ReactNode {
   const styles = useStyles();
@@ -97,18 +102,20 @@ export function AccountPage(): ReactNode {
           {t('nav.account')}
         </Text>
         <Group label={t('account.reading')}>
-          {/* What one kept is reached from the masthead, where one is reading; it is also here, because this is the
-              screen a reader opens when they are looking for something of their own rather than for the paper's. */}
-          <OpenRow
-            label={t('bookmark.title')}
-            onPress={() => {
-              router.push(BOOKMARKS_HREF);
-            }}
-          />
           <OpenRow
             label={t('settings.title')}
             onPress={() => {
               router.push(SETTINGS_HREF);
+            }}
+          />
+        </Group>
+        {/* The shelf of numéros, which was a tab and is a row. Every press on it ends in a browser, so it belongs
+            where the rest of the paper's own business is rather than in the bar a reader navigates the app by. */}
+        <Group label={t('account.paper')}>
+          <OpenRow
+            label={t('nav.newsstand')}
+            onPress={() => {
+              router.push(NEWSSTAND_HREF);
             }}
           />
         </Group>

@@ -5,6 +5,14 @@ import { chromeStyle, useTheme } from '#lib/styles';
 import { ICONS } from '#primitives/icon';
 
 /**
+ * The bar holds what a reader comes back to, and the newsstand is not that any more. Taking a numéro off its shelf
+ * opens the paper on the web, so a fifth of the app's own navigation led out of the app; and what the reader keeps —
+ * the one collection in here they make themselves — was not in the bar at all, reachable only from the masthead of
+ * the front page or two rows into the account. From the wire, the search and the newsstand there was no way to it.
+ * The app this one replaces put FAVORIS in the band above both the front page and the wire (docs/app-actuelle,
+ * README:43), so burying it was a step back from the thing being replaced. They have swapped places: the shelf is
+ * pushed from the account, where the paper's own business is, and what one kept has a tab.
+ *
  * The native bottom tab bar: five destinations declared by route name, since a layout never imports a page. Each
  * carries an icon — an SF Symbol on iOS, a Material Symbol on Android — so the bar shows every tab, not only the
  * active label. The symbols are read from the icon registry rather than written here: the navigator draws them itself,
@@ -48,9 +56,11 @@ export function TabsLayout(): ReactNode {
         <NativeTabs.Trigger.Icon sf={ICONS.search.ios} md={ICONS.search.android} />
         <NativeTabs.Trigger.Label>{t('nav.search')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="newsstand">
-        <NativeTabs.Trigger.Icon sf={ICONS.newsstand.ios} md={ICONS.newsstand.android} />
-        <NativeTabs.Trigger.Label>{t('nav.newsstand')}</NativeTabs.Trigger.Label>
+      {/* Named from the screen's own title rather than from a `nav.` key of its own: every other tab names a screen
+          that is called nothing anywhere else, and this one has a bar across its top already saying what it is. */}
+      <NativeTabs.Trigger name="bookmarks">
+        <NativeTabs.Trigger.Icon sf={ICONS.bookmark.ios} md={ICONS.bookmark.android} />
+        <NativeTabs.Trigger.Label>{t('bookmark.title')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="account">
         <NativeTabs.Trigger.Icon sf={ICONS.account.ios} md={ICONS.account.android} />

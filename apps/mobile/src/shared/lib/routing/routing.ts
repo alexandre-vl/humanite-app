@@ -28,8 +28,16 @@ export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/articl
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;
 
-/** Where the reader finds again what they kept of the paper. */
-export const BOOKMARKS_HREF = '/bookmarks' as const;
+/**
+ * Where the numéros stand. It is a screen pushed from the account and no longer a tab: everything a reader does on
+ * that shelf leaves the app for humanite.fr, and a destination one comes back to is not the same thing as a door out.
+ */
+export const NEWSSTAND_HREF = '/newsstand' as const;
+
+// What the reader kept has no address written here any more. It is a tab, and a tab is not pushed: the bar at the
+// bottom stands on it directly, so nothing in the app sends a reader there — the front page's masthead did, and the
+// account did, and both were doors to a destination already under them. The route file still holds the address, and
+// a deep link still finds it; this module names what the app itself asks for.
 
 /**
  * Hands a page outside the app to whatever the phone opens pages with.

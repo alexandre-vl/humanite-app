@@ -1,4 +1,5 @@
 import type { ArticleSummary } from '@huma/contracts';
+import { typographyAt } from '@huma/design-tokens';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
@@ -81,9 +82,27 @@ describe('BookmarksPage', () => {
     expect(await screen.findByText('Aucun article gardé')).toBeTruthy();
   });
 
-  it('se quitte par la barre qui l’a nommé', async () => {
+  /**
+   * The two tabs that have nothing better to print at the top than their own name print it the same way: the display
+   * type, on the page, where the account screen prints its own. It was set here in a bar across the top, centred and
+   * four points smaller — the shape a pushed screen takes, where the name shares its row with the way back out.
+   *
+   * The size is read from the table rather than written as a number, that table being where a variant is what it is.
+   */
+  it('se nomme dans le type dont le compte se nomme, et pas dans celui d’une barre', async () => {
     await renderPage();
-    await fireEvent.press(screen.getByLabelText('Revenir'));
-    expect(jest.mocked(router.back)).toHaveBeenCalledTimes(1);
+    const style: unknown = screen.getByText('Mes lectures').props['style'];
+    const size: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'fontSize') : undefined;
+    expect(size).toBe(typographyAt('display', 'normal', 'paper').size);
+    expect(size).not.toBe(typographyAt('label', 'normal', 'paper').size);
+  });
+
+  /**
+   * Nothing pushes this screen any more — it is a tab, left by choosing another — so it carries no way back. A screen
+   * that offered one would offer to leave a screen nothing had entered.
+   */
+  it('n’offre pas de retour, rien ne l’ayant empilé', async () => {
+    await renderPage();
+    expect(screen.queryByLabelText('Revenir')).toBeNull();
   });
 });

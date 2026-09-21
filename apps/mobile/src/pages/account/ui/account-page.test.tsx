@@ -1,3 +1,4 @@
+import { typographyAt } from '@huma/design-tokens';
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
@@ -16,11 +17,29 @@ describe('AccountPage', () => {
     expect(jest.mocked(router.push)).toHaveBeenCalledWith('/settings');
   });
 
-  /** The shelf is reached from the masthead where one is reading, and from here where one is looking for it. */
-  it('ouvre ce que le lecteur a gardé quand on touche la ligne qui le nomme', async () => {
+  /** The shelf of numéros is reached from here, the paper's own business being what this screen holds. */
+  it('ouvre le kiosque quand on touche la ligne qui le nomme', async () => {
     await render(<AccountPage />);
-    await fireEvent.press(screen.getByText('Mes lectures'));
-    expect(jest.mocked(router.push)).toHaveBeenCalledWith('/bookmarks');
+    await fireEvent.press(screen.getByText('Kiosque'));
+    expect(jest.mocked(router.push)).toHaveBeenCalledWith('/newsstand');
+  });
+
+  /** What the reader kept has a tab of its own; a row here would be a third door to the room next door. */
+  it('n’offre pas une seconde porte vers ce que le lecteur a gardé', async () => {
+    await render(<AccountPage />);
+    expect(screen.queryByText('Mes lectures')).toBeNull();
+  });
+
+  /**
+   * The other end of the pair: this screen and the shelf beside it are the two tabs that have nothing better to print
+   * at the top than their own name, and they print it in the same type. Each holds the promise from its own side, so
+   * whichever of the two drifts is the one that fails.
+   */
+  it('se nomme dans le type dont l’étagère voisine se nomme', async () => {
+    await render(<AccountPage />);
+    const style: unknown = screen.getByText('Mon compte').props['style'];
+    const size: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'fontSize') : undefined;
+    expect(size).toBe(typographyAt('display', 'normal', 'paper').size);
   });
 
   /**
@@ -36,7 +55,7 @@ describe('AccountPage', () => {
     expect(screen.getByText('relationlecteur@humanite.fr')).toBeTruthy();
     expect(screen.getByText('01 55 84 40 30')).toBeTruthy();
     // The mark is hidden from a screen reader — the row it sits in already says where it goes — so it is counted here
-    // as a view rather than as something announced. Two rows open something: what one kept, and how one reads.
+    // as a view rather than as something announced. Two rows open something: how one reads, and where the numéros are.
     expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(2);
   });
 });
