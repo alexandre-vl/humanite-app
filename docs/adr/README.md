@@ -14,7 +14,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                 | TypeScript 6 ultra-strict en version unique                 | accepté | `dependency`, `guarded-config`                                             |
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                 | Lint et format bloquants sans désactivation                 | accepté | `guarded-config`                                                           |
 | [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)         | Architecture FSD avec routes hors src et couche _app        | accepté | `guarded-config`, `boundary`                                               |
-| [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                               | Niveaux de composants L0 à L4                               | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                               | Niveaux de composants L0 à L4                               | accepté | `guarded-config`, `boundary`                                               |
 | [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                   | Glossaire et orthographe des identifiants                   | proposé | `guarded-config`                                                           |
 | [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)         | Contrôles locaux par hooks git et garde-fous testés         | proposé | `guarded-config`                                                           |
 | [ADR-0009](0009-permissions-des-agents.md)                                      | Permissions des agents                                      | proposé | `guarded-config`                                                           |
@@ -121,7 +121,7 @@ Statut : accepté. Périmètre : `apps/mobile/app/**`, `apps/mobile/src/**`, `pa
 
 ### ADR-0006 · Niveaux de composants L0 à L4
 
-Statut : proposé. Périmètre : `packages/architecture/**`, `packages/eslint-config/src/index.ts`.
+Statut : accepté. Périmètre : `packages/architecture/**`, `packages/eslint-config/src/index.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                              |
 | ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
