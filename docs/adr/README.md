@@ -16,7 +16,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)         | Architecture FSD avec routes hors src et couche _app        | accepté | `guarded-config`, `boundary`                                               |
 | [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                               | Niveaux de composants L0 à L4                               | accepté | `guarded-config`, `boundary`                                               |
 | [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                   | Glossaire et orthographe des identifiants                   | accepté | `guarded-config`                                                           |
-| [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)         | Contrôles locaux par hooks git et garde-fous testés         | proposé | `guarded-config`                                                           |
+| [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)         | Contrôles locaux par hooks git et garde-fous testés         | accepté | `guarded-config`                                                           |
 | [ADR-0009](0009-permissions-des-agents.md)                                      | Permissions des agents                                      | proposé | `guarded-config`                                                           |
 | [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                    | Émulateur Android Redroid sur le serveur                    | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                  | Contrats de données en Zod                                  | proposé | `dependency`, `guarded-config`, `data-format`                              |
@@ -142,7 +142,7 @@ Statut : accepté. Périmètre : `packages/architecture/src/glossary.ts`, `packa
 
 ### ADR-0008 · Contrôles locaux par hooks git et garde-fous testés
 
-Statut : proposé. Périmètre : `tools/git-hooks/**`, `tools/fixtures/**`, `tools/governance/src/cli/git-hook.ts`, `tools/governance/src/cli/hooks-check.ts`, `tools/governance/src/cli/hooks-install.ts`.
+Statut : accepté. Périmètre : `tools/git-hooks/**`, `tools/fixtures/**`, `tools/governance/src/cli/git-hook.ts`, `tools/governance/src/cli/hooks-check.ts`, `tools/governance/src/cli/hooks-install.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                               |
 | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
