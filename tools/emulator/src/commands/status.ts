@@ -22,7 +22,7 @@ import {
 import { binderFindings, readBinder } from '../host/binder.ts';
 import { missedThresholds, sampleMemory } from '../host/memory.ts';
 import { residueFindings, residueOf, sampleHost } from '../host/sample.ts';
-import { cacheDirectory, debugApk } from '../session.ts';
+import { cacheDirectory, variantApk } from '../session.ts';
 import { runningBuildUnit } from './build.ts';
 
 /** One line of the report: a fact that holds, one that blocks the emulator with its findings, or a piece of state. */
@@ -177,10 +177,14 @@ async function buildLines(root: string, config: EmulatorConfig): Promise<readonl
           .split('\n')
           .filter((line) => line.trim() !== '')
           .at(-1) ?? '(vide)');
-  const apk = await stat(debugApk(root)).catch(() => null);
+  const apk = await stat(variantApk(root, 'debug')).catch(() => null);
   return [
     info(running === null ? 'aucun build en cours' : `build en cours dans ${running}`),
     ...(latest === undefined ? [] : [info(`dernier journal ${join(cache, latest)} : ${lastLine ?? ''}`)]),
-    info(apk === null ? 'APK absent : pnpm emulator:build' : `APK du ${apk.mtime.toISOString()} : ${debugApk(root)}`),
+    info(
+      apk === null
+        ? 'APK absent : pnpm emulator:build'
+        : `APK du ${apk.mtime.toISOString()} : ${variantApk(root, 'debug')}`,
+    ),
   ];
 }

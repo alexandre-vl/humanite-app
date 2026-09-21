@@ -6,7 +6,9 @@ import { describeExit, runAttached } from '@huma/kit/process';
 import { readApkManifest } from '../android/apk.ts';
 import { hostCalmWatch, waitForCalm } from '../host/memory.ts';
 import type { Session } from '../session.ts';
-import { aapt2Executable, androidHome, appRoot, debugApk } from '../session.ts';
+import { aapt2Executable, androidHome, appRoot, variantApk } from '../session.ts';
+import type { Build } from '../variant.ts';
+import { VARIANTS } from '../variant.ts';
 import { toolDirectory } from '../tools.ts';
 
 /** The last line the build prints when the APK is built. */
@@ -25,7 +27,7 @@ export const cpuCount = (affinity: string): number =>
  * ignores the Gradle workers. The quota of the scope says the same in the scheduler's terms, so a process that sets
  * its own affinity gains nothing. A scope keeps the caller's terminal, working directory and environment.
  */
-export const gradleScopeArguments = (session: Session): readonly string[] => {
+export const gradleScopeArguments = (session: Session, asked: Build): readonly string[] => {
   const { build } = session.config;
   return [
     '--user',
@@ -46,8 +48,9 @@ export const gradleScopeArguments = (session: Session): readonly string[] => {
     '1000',
     '--',
     './gradlew',
-    'assembleDebug',
-    `-PreactNativeArchitectures=${build.architectures}`,
+    VARIANTS[asked.variant].task,
+    `-PreactNativeArchitectures=${asked.abi}`,
+    ...VARIANTS[asked.variant].properties,
     '-Pkotlin.compiler.execution.strategy=in-process',
     `-Dorg.gradle.jvmargs=${build.gradleJvmArgs}`,
     '--no-daemon',
@@ -66,8 +69,8 @@ export const gradleEnvironment = (session: Session, javaHome: string, environmen
   PATH: [join(javaHome, 'bin'), join(session.root, 'node_modules', '.bin'), environment['PATH'] ?? ''].join(':'),
 });
 
-/** Waits for a calm host, then builds the debug APK with Gradle in its capped scope and reads back its manifest. */
-export async function emulatorGradle(session: Session): Promise<ExitCode> {
+/** Waits for a calm host, then builds the asked APK with Gradle in its capped scope and reads back its manifest. */
+export async function emulatorGradle(session: Session, asked: Build): Promise<ExitCode> {
   const { calm } = session.config.build;
   session.print(`▶ ${new Date().toISOString()} attente d’un créneau calme sur l’hôte`);
   const reached = await waitForCalm(
@@ -82,8 +85,10 @@ export async function emulatorGradle(session: Session): Promise<ExitCode> {
     return 1;
   }
   const javaHome = await toolDirectory(session, 'java');
-  session.print(`▶ ${new Date().toISOString()} Gradle dans ${session.config.build.unit}.scope`);
-  const exit = await runAttached('systemd-run', gradleScopeArguments(session), {
+  session.print(
+    `▶ ${new Date().toISOString()} Gradle ${VARIANTS[asked.variant].task} pour ${asked.abi} dans ${session.config.build.unit}.scope`,
+  );
+  const exit = await runAttached('systemd-run', gradleScopeArguments(session, asked), {
     cwd: join(appRoot(session.root), 'android'),
     env: gradleEnvironment(session, javaHome, process.env),
     signal: session.signal,
@@ -92,7 +97,7 @@ export async function emulatorGradle(session: Session): Promise<ExitCode> {
     session.print(`✗ ${new Date().toISOString()} Gradle : ${describeExit(exit)}`);
     return 1;
   }
-  const apk = debugApk(session.root);
+  const apk = variantApk(session.root, asked.variant);
   await access(apk);
   const manifest = await readApkManifest(aapt2Executable(session.config), apk, session.root);
   session.print(

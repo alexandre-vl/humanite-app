@@ -7,7 +7,7 @@ import { adbFor, deviceShell, deviceState, parseReverseList, runAdb } from '../a
 import { devClientScheme, readApkManifest } from '../android/apk.ts';
 import type { EmulatorConfig } from '../config.ts';
 import type { Session } from '../session.ts';
-import { aapt2Executable, adbSerial, cacheDirectory, debugApk } from '../session.ts';
+import { aapt2Executable, adbSerial, cacheDirectory, variantApk } from '../session.ts';
 import { toolDirectory } from '../tools.ts';
 import { metroRunning } from './metro.ts';
 
@@ -58,7 +58,11 @@ export async function emulatorE2e(session: Session): Promise<ExitCode> {
     session.print(problems.map((problem) => `✗ ${problem}`).join('\n'));
     return 1;
   }
-  const manifest = await readApkManifest(aapt2Executable(session.config), debugApk(session.root), session.root);
+  const manifest = await readApkManifest(
+    aapt2Executable(session.config),
+    variantApk(session.root, 'debug'),
+    session.root,
+  );
   const installed = (await runAdb(adb, deviceShell(['pm', 'path', manifest.packageName]))).trim();
   if (!installed.startsWith('package:')) {
     session.print(`✗ ${manifest.packageName} non installé : pnpm emulator:install`);

@@ -4,6 +4,8 @@
  * commands, the root guard and the table the guard reads all take them from here.
  */
 
+import type { Abi } from './variant.ts';
+
 /** When the shared host is calm enough for a native build: every threshold holds on several samples in a row. */
 export type CalmThresholds = Readonly<{
   minAvailableMib: number;
@@ -78,7 +80,8 @@ export type EmulatorConfig = Readonly<{
     cpuAffinity: string;
     gradleJvmArgs: string;
     gradleWorkers: number;
-    architectures: string;
+    /** The machine the container runs, which is what a build is asked for unless another is named. */
+    architectures: Abi;
     calm: CalmThresholds;
   }>;
   /** Directory of the Android SDK, relative to the home directory. */

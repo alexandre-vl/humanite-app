@@ -2,6 +2,8 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { APP_DIRECTORY } from '@huma/architecture';
 import type { Environment } from '@huma/kit/process';
+import type { VariantName } from './variant.ts';
+import { VARIANTS } from './variant.ts';
 import type { EmulatorConfig } from './config.ts';
 
 /** What every emulator command runs with: the workspace, the configuration, what stops it and where it reports. */
@@ -33,9 +35,9 @@ export const expoCli = (root: string): string => join(appRoot(root), 'node_modul
 /** The environment Expo runs with, off telemetry: no version check reaches the network from a command of the emulator. */
 export const expoEnvironment = (environment: Environment): Environment => ({ ...environment, EXPO_NO_TELEMETRY: '1' });
 
-/** The APK of the dev client Gradle builds. */
-export const debugApk = (root: string): string =>
-  join(appRoot(root), 'android', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
+/** The APK a variant of Gradle writes: the dev client the container runs, or the package a budget is read on. */
+export const variantApk = (root: string, variant: VariantName): string =>
+  join(appRoot(root), 'android', 'app', 'build', 'outputs', 'apk', ...VARIANTS[variant].output);
 
 /** Where the emulator commands keep what one of them leaves for another: never committed, never shared. */
 export const cacheDirectory = (root: string): string => join(root, 'node_modules', '.cache', 'emulator');

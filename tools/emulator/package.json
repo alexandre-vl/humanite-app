@@ -15,7 +15,8 @@
     "./session": "./src/session.ts",
     "./status": "./src/commands/status.ts",
     "./tracked": "./src/guard/tracked.ts",
-    "./up": "./src/commands/up.ts"
+    "./up": "./src/commands/up.ts",
+    "./variant": "./src/variant.ts"
   },
   "dependencies": {
     "@huma/architecture": "workspace:*",

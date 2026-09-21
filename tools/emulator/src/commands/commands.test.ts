@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { EMULATOR } from '../config.ts';
+import type { Build, VariantName } from '../variant.ts';
 import { commandSession } from '../session.ts';
 import { buildServiceArguments, prebuildArguments } from './build.ts';
 import { downSteps } from './down.ts';
@@ -71,8 +72,30 @@ test('the build outlives whoever starts it: the wait and Gradle run in a transie
   expect(prebuildArguments({ clean: true })).toEqual(['prebuild', '--platform', 'android', '--no-install']);
 });
 
-test('Gradle runs in a capped scope, without swap, first to be killed, on bound CPUs; never through expo run', () => {
-  const args = gradleScopeArguments(session);
+/**
+ * What Gradle is asked, variant by variant, and the ABI each is asked for. The lock is the whole argv after `--`, so
+ * a flag added anywhere fails here rather than reaching a build nobody reads: the release one exists because a budget
+ * cannot be read on a debuggable package, and the ABI because the phone the budgets are measured on is not the
+ * machine the container runs.
+ */
+const ASSEMBLED = {
+  debug: {
+    asked: { variant: 'debug', abi: 'x86_64' },
+    tail: ['assembleDebug', '-PreactNativeArchitectures=x86_64'],
+  },
+  release: {
+    asked: { variant: 'release', abi: 'arm64-v8a' },
+    tail: [
+      'assembleRelease',
+      '-PreactNativeArchitectures=arm64-v8a',
+      '-Pandroid.enableMinifyInReleaseBuilds=true',
+      '-Pandroid.enableShrinkResourcesInReleaseBuilds=true',
+    ],
+  },
+} as const satisfies Readonly<Record<VariantName, Readonly<{ asked: Build; tail: readonly string[] }>>>;
+
+test('Gradle runs in a capped scope, without swap, first to be killed, on bound CPUs', () => {
+  const args = gradleScopeArguments(session, ASSEMBLED.debug.asked);
   expect(args.slice(0, args.indexOf('--'))).toEqual([
     '--user',
     '--scope',
@@ -84,6 +107,14 @@ test('Gradle runs in a capped scope, without swap, first to be killed, on bound 
     '--property=MemorySwapMax=0',
     '--property=CPUQuota=200%',
   ]);
+  expect(gradleEnvironment(session, '/java', { PATH: '/usr/bin' })).toMatchObject({
+    JAVA_HOME: '/java',
+    PATH: '/java/bin:/work/humanite/node_modules/.bin:/usr/bin',
+  });
+});
+
+test.each(Object.values(ASSEMBLED))('assembled by Gradle itself, never through expo run', (asked) => {
+  const args = gradleScopeArguments(session, asked.asked);
   expect(args.slice(args.indexOf('--'))).toEqual([
     '--',
     'taskset',
@@ -94,8 +125,7 @@ test('Gradle runs in a capped scope, without swap, first to be killed, on bound 
     '1000',
     '--',
     './gradlew',
-    'assembleDebug',
-    '-PreactNativeArchitectures=x86_64',
+    ...asked.tail,
     '-Pkotlin.compiler.execution.strategy=in-process',
     '-Dorg.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8',
     '--no-daemon',
@@ -105,10 +135,6 @@ test('Gradle runs in a capped scope, without swap, first to be killed, on bound 
     '--console=plain',
   ]);
   expect(args.join(' ')).not.toContain('run:android');
-  expect(gradleEnvironment(session, '/java', { PATH: '/usr/bin' })).toMatchObject({
-    JAVA_HOME: '/java',
-    PATH: '/java/bin:/work/humanite/node_modules/.bin:/usr/bin',
-  });
 });
 
 test('the CPU cap of the scope says what the affinity says: one list of CPUs, two ways of binding it', () => {
@@ -116,7 +142,7 @@ test('the CPU cap of the scope says what the affinity says: one list of CPUs, tw
   expect(cpuCount('3')).toBe(1);
   expect(cpuCount('0,3')).toBe(2);
   expect(cpuCount('0-1,4-6')).toBe(5);
-  expect(gradleScopeArguments(session)).toContain(
+  expect(gradleScopeArguments(session, ASSEMBLED.debug.asked)).toContain(
     `--property=CPUQuota=${String(cpuCount(EMULATOR.build.cpuAffinity) * 100)}%`,
   );
 });

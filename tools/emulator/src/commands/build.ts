@@ -12,7 +12,10 @@ import { QUERY_TIMEOUT_MS } from '../tools.ts';
 
 export type BuildOptions = Readonly<{
   clean: boolean;
-  /** The command that waits for a calm host and runs Gradle, `emulator:gradle`, as absolute paths. */
+  /**
+   * The command that waits for a calm host and runs Gradle, `emulator:gradle`, as absolute paths and with what it is
+   * asked to assemble. The service that runs it has no terminal and no shell: what it builds has to be in its argv.
+   */
   gradleCommand: readonly [string, ...string[]];
 }>;
 

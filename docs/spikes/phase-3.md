@@ -36,9 +36,14 @@ fonctionnement, sur sa première session réelle.
 
 ## Ce qui reste à mesurer
 
-Un build release, que l'outillage ne sait pas encore produire : la chaîne Gradle est câblée sur `assembleDebug` et
-`x86_64`, et `minifyEnabled` est faux parce que la propriété qui l'active n'est définie nulle part. Tant que cela dure,
-aucune session ne peut passer `perf/debuggable-refused`, ce qui est exactement ce qu'on attend d'elle.
+Un build release. Au 20/09 l'outillage ne savait pas le produire : la chaîne Gradle était câblée sur `assembleDebug` et
+`x86_64`, et `minifyEnabled` restait faux, la propriété qui l'allume n'étant définie nulle part. Tant que cela a duré,
+aucune session ne pouvait passer `perf/debuggable-refused`, ce qui est exactement ce qu'on attendait d'elle.
+
+Le 21/09, la chaîne sait le produire : `pnpm emulator:build --variant release --abi arm64-v8a` assemble pour la machine
+du téléphone, R8 et le rétrécissement des ressources allumés par l'argv, puisque `android/` est régénéré à chaque build
+et ne peut rien retenir. **Rien n'a encore été mesuré dessus** : le plafond de 6 Gio est calibré sur un `assembleDebug`
+sans R8 ni bundle Hermes, et c'est la première chose que le premier build dira.
 
 ## Défauts trouvés en regardant l'écran, le 20/09/2026
 

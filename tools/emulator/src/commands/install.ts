@@ -4,7 +4,7 @@ import { describeError } from '@huma/kit/errors';
 import { adbFor, deviceShell, deviceState, runAdb } from '../android/adb.ts';
 import { readApkManifest } from '../android/apk.ts';
 import type { Session } from '../session.ts';
-import { aapt2Executable, debugApk } from '../session.ts';
+import { aapt2Executable, variantApk } from '../session.ts';
 
 const INSTALL_TIMEOUT_MS = 300_000;
 
@@ -15,7 +15,7 @@ export async function emulatorInstall(session: Session): Promise<ExitCode> {
     session.print(`✗ ${adb.serial} n’est pas connecté : pnpm emulator:up`);
     return 1;
   }
-  const apk = debugApk(session.root);
+  const apk = variantApk(session.root, 'debug');
   try {
     await access(apk);
   } catch (error) {
