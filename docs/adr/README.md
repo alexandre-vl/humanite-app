@@ -33,6 +33,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0025](0025-budgets-de-performance-et-outils-de-mesure.md)                  | Budgets de performance et outils de mesure                  | proposé | `guarded-config`, `reversal-cost`                                          |
+| [ADR-0026](0026-accessibilite-annoncee-et-contraste-deduit-de-la-taille.md)     | Accessibilité annoncée et contraste déduit de la taille     | proposé | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -316,6 +317,18 @@ Statut : proposé. Périmètre : `tools/perf/**`, `tools/governance/src/cli/perf
 | R3    | NE DOIT PAS | `perf/emulator-refused`, `perf/emulator-refused-qemu`                                                                                                                                                          |
 | R4    | NE DOIT PAS | `perf/debuggable-refused`                                                                                                                                                                                      |
 | R5    | DOIT        | convention : La table des budgets ne porte que des seuils ; ce qu’une session a relevé vit dans docs/spikes, et la commande perf:check lit une session depuis un dossier plutôt que de l’écrire dans le dépôt. |
+
+### ADR-0026 · Accessibilité annoncée et contraste déduit de la taille
+
+Statut : proposé. Périmètre : `apps/mobile/src/shared/lib/announce/**`, `apps/mobile/src/shared/ui/primitives/icon/**`, `apps/mobile/src/shared/ui/primitives/image/**`, `packages/design-tokens/src/legibility.ts`, `packages/design-tokens/src/legibility.test.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | convention : Les props de la primitive d’image et de celle de symbole portent un champ annonces obligatoire, du type Announcement : ou bien une marque DisplayText, ou bien le mot qui dit que la vue est là pour l’œil seul. Rien n’est répandu et le cast est interdit, donc une image ou un symbole monté sans réponse ne compile pas, et le test de chaque primitive relit les deux branches sur la vue rendue. |
+| R2    | DOIT        | convention : La primitive de texte porte un champ facultatif qui pose le rôle d’en-tête de la plateforme. Aucun outil ne sait ce qu’un titre ouvre — la même variante sert un grand titre et le titre d’une carte dans un fil — donc c’est l’écran qui le déclare ; le test de la primitive tient les deux cas, et les écrans qui en posent un sont relus.                                                          |
+| R3    | DOIT        | convention : Le seuil qu’applique le test de lisibilité est calculé par requiredRatio sur la taille que la table de typographie donne à la plus petite composition où chaque couleur est posée, au plus petit cran qu’un lecteur puisse choisir ; aucun nombre n’est écrit à côté d’une paire. Le test parcourt chaque thème, chaque couleur de texte et chaque fond déclaré.                                       |
+| R4    | DOIT        | convention : Chaque écart déclaré porte la mesure relevée, et le test refuse une paire tombée sous ce plancher : un écart ne peut pas empirer sans que la ligne qui le décrit devienne fausse.                                                                                                                                                                                                                      |
+| R5    | NE DOIT PAS | convention : Le même test refuse une paire déclarée en écart qui atteint désormais le seuil : une justification écrite pour un défaut réparé est une phrase fausse dans les jetons, et elle fait échouer le test qui la lit.                                                                                                                                                                                        |
 
 ## Référentiel
 

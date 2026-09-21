@@ -937,4 +937,37 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0026': {
+    scope: {
+      paths: [
+        'apps/mobile/src/shared/lib/announce/**',
+        'apps/mobile/src/shared/ui/primitives/icon/**',
+        'apps/mobile/src/shared/ui/primitives/image/**',
+        'packages/design-tokens/src/legibility.ts',
+        'packages/design-tokens/src/legibility.test.ts',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Les props de la primitive d’image et de celle de symbole portent un champ annonces obligatoire, du type Announcement : ou bien une marque DisplayText, ou bien le mot qui dit que la vue est là pour l’œil seul. Rien n’est répandu et le cast est interdit, donc une image ou un symbole monté sans réponse ne compile pas, et le test de chaque primitive relit les deux branches sur la vue rendue.',
+      },
+      R2: {
+        convention:
+          'La primitive de texte porte un champ facultatif qui pose le rôle d’en-tête de la plateforme. Aucun outil ne sait ce qu’un titre ouvre — la même variante sert un grand titre et le titre d’une carte dans un fil — donc c’est l’écran qui le déclare ; le test de la primitive tient les deux cas, et les écrans qui en posent un sont relus.',
+      },
+      R3: {
+        convention:
+          'Le seuil qu’applique le test de lisibilité est calculé par requiredRatio sur la taille que la table de typographie donne à la plus petite composition où chaque couleur est posée, au plus petit cran qu’un lecteur puisse choisir ; aucun nombre n’est écrit à côté d’une paire. Le test parcourt chaque thème, chaque couleur de texte et chaque fond déclaré.',
+      },
+      R4: {
+        convention:
+          'Chaque écart déclaré porte la mesure relevée, et le test refuse une paire tombée sous ce plancher : un écart ne peut pas empirer sans que la ligne qui le décrit devienne fausse.',
+      },
+      R5: {
+        convention:
+          'Le même test refuse une paire déclarée en écart qui atteint désormais le seuil : une justification écrite pour un défaut réparé est une phrase fausse dans les jetons, et elle fait échouer le test qui la lit.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;
