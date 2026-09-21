@@ -4,7 +4,11 @@ import { PALETTE } from '@huma/design-tokens';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
+import { asDisplayText } from '#lib/display-text';
 import { ArticleReader } from './article-reader';
+
+/** What the screen answers when the reader asks which section an article ran in, in one word the corpus never uses. */
+const SECTION = asDisplayText('Rubrique');
 
 const read = async (
   article: Article,
@@ -13,7 +17,7 @@ const read = async (
 ): Promise<void> => {
   await render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <ArticleReader id={article.id} onFollow={onFollow} onSupport={onSupport} />
+      <ArticleReader id={article.id} names={() => SECTION} onFollow={onFollow} onSupport={onSupport} />
     </QueryClientProvider>,
   );
   await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
@@ -44,6 +48,18 @@ const holdingSeveralRuns = async (): Promise<Article> =>
   );
 
 describe('ArticleReader', () => {
+  /**
+   * An article opened from a search, from a shelf of kept pieces or from a link inside another article arrived with
+   * nothing saying which part of the paper it came from. The word is the screen's to supply — the sections belong to
+   * another entity — and it is asked for the section the article itself declares.
+   */
+  it('nomme au-dessus du titre la rubrique où l’article a paru', async () => {
+    const article = await first('n’importe quel article', () => true);
+    await read(article);
+    expect(await screen.findByText(article.title)).toBeTruthy();
+    expect(screen.getByText(SECTION)).toBeTruthy();
+  });
+
   it('rend le titre, le chapô et chaque fragment de chaque paragraphe', async () => {
     const article = await holdingSeveralRuns();
     await read(article);

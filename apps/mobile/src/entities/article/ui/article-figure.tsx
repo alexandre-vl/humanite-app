@@ -40,7 +40,13 @@ export function ArticleFigure({ visual, recyclingKey, caption, credit }: Article
       />
       <Box style={styles.words}>
         <Text variant="legend">{caption}</Text>
-        {credit === undefined ? null : <Text variant="legend">{credit}</Text>}
+        {/* Quieter than the caption it follows. The two were set in the very same type, so a sentence describing a
+            picture and the name of whoever took it read as one paragraph of two sentences. */}
+        {credit === undefined ? null : (
+          <Text variant="legend" tone="textMuted">
+            {credit}
+          </Text>
+        )}
       </Box>
     </Box>
   );

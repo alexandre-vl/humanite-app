@@ -1,4 +1,4 @@
-import type { Article, ArticleId, ArticleSummary, Author } from '@huma/contracts';
+import type { Article, ArticleId, ArticleSummary, Author, DisplayText, SectionId } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -18,12 +18,18 @@ import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleReaderProps = Readonly<{
   id: ArticleId;
+  /**
+   * What the newsroom calls the section an article ran in. It is answered by the screen because the sections are
+   * another entity's, and an entity may not reach sideways for one.
+   */
+  names: (section: SectionId) => DisplayText | null;
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;
 
 type ReadingProps = Readonly<{
   article: Article;
+  name: DisplayText | null;
   related: readonly ArticleSummary[];
   roster: readonly Author[];
   onFollow: (target: LinkTarget) => void;
@@ -46,11 +52,11 @@ const useStyles = createStyles((theme) => ({
  * corner. On the dark template the sheet and the ground take the same value, so the sheet stops showing and the page
  * runs edge to edge — which is exactly what the video article of the current app does, without a rule of its own.
  */
-function Reading({ article, related, roster, onFollow, onSupport }: ReadingProps): ReactNode {
+function Reading({ article, name, related, roster, onFollow, onSupport }: ReadingProps): ReactNode {
   const styles = useStyles();
   return (
     <Scroll axis="vertical" style={styles.ground} contentStyle={styles.column}>
-      <ArticleTitle title={article.title} />
+      <ArticleTitle title={article.title} name={name} />
       <Box style={styles.sheet}>
         <ArticleLead article={article} byline={bylineOf(article.authors, roster)} />
         <ArticleBody article={article} related={related} onFollow={onFollow} onSupport={onSupport} />
@@ -68,7 +74,7 @@ function Reading({ article, related, roster, onFollow, onSupport }: ReadingProps
  * being read, not to a setting: the current app prints its videos on it and everything else on the light sheet, and a
  * reader who has chosen dark keeps it for every other article.
  */
-export function ArticleReader({ id, onFollow, onSupport }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, names, onFollow, onSupport }: ArticleReaderProps): ReactNode {
   const { data: article, status, refetch } = useQuery(articleQuery(id));
   const related = useQuery(summariesQuery(article === undefined ? [] : relatedIds(article.blocks))).data ?? [];
   const roster = useQuery(authorsQuery).data ?? [];
@@ -84,7 +90,14 @@ export function ArticleReader({ id, onFollow, onSupport }: ArticleReaderProps): 
     );
   }
   const reading = (
-    <Reading article={article} related={related} roster={roster} onFollow={onFollow} onSupport={onSupport} />
+    <Reading
+      article={article}
+      name={names(article.section)}
+      related={related}
+      roster={roster}
+      onFollow={onFollow}
+      onSupport={onSupport}
+    />
   );
   return article.format === 'video' ? <ThemeScope name="dark">{reading}</ThemeScope> : reading;
 }

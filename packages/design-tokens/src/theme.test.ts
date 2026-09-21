@@ -61,6 +61,15 @@ describe.each(themes)('%s theme', (name, theme) => {
     expect(onPage('textSecondary')).toBeGreaterThan(onPage('textMuted') * 1.3);
   });
 
+  /**
+   * A line drawn where nobody sees one is not a line. WCAG asks nothing of a rule that carries no meaning of its own,
+   * so the bar here is only that it is there at all — and the value the paper was drawing it in, the light theme's
+   * ground for a block, measured 1.13 to one against the page it was cutting.
+   */
+  test(`${name}: the rule can be told from the page it cuts`, () => {
+    expect(contrastRatio(theme.rule, theme.background)).toBeGreaterThan(1.3);
+  });
+
   test(`${name}: every colour it paints with is named in the palette`, () => {
     const named = new Set<Color>(Object.values(PALETTE));
     for (const [role, value] of Object.entries(theme)) {

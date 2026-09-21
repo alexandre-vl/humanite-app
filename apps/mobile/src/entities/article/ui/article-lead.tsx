@@ -9,24 +9,34 @@ import { Text } from '#primitives/text';
 
 import { ArticleFigure } from './article-figure';
 
-export type ArticleTitleProps = Readonly<{ title: DisplayText }>;
+export type ArticleTitleProps = Readonly<{ title: DisplayText; name: DisplayText | null }>;
 export type ArticleLeadProps = Readonly<{ article: Article; byline: DisplayText | null }>;
 
 const useStyles = createStyles((theme) => ({
-  title: { padding: SPACING.xl },
+  title: { padding: SPACING.xl, gap: SPACING.sm },
   standfirst: { paddingHorizontal: SPACING.lg },
   meta: { gap: SPACING.xs, paddingHorizontal: SPACING.lg },
-  rule: { height: SIZES.stroke, marginHorizontal: SPACING.lg, backgroundColor: theme.border },
+  rule: { height: SIZES.stroke, marginHorizontal: SPACING.lg, backgroundColor: theme.rule },
 }));
 
 /**
- * An article's headline. It sits on the ground rather than on the sheet the article is printed on, centred, in the
- * colour the theme gives a headline — red on the light template, white on the dark one (captures 11 and 13).
+ * An article's headline, under the name of the section it ran in. It sits on the ground rather than on the sheet the
+ * article is printed on, centred, in the colour the theme gives a headline — red on the light template, white on the
+ * dark one (captures 11 and 13).
+ *
+ * The section over it is what every paper worth copying prints there and what this one printed nowhere: an article
+ * opened from a search, from a shelf of kept pieces or from a link inside another article arrived with nothing at all
+ * saying which part of the paper it came from.
  */
-export function ArticleTitle({ title }: ArticleTitleProps): ReactNode {
+export function ArticleTitle({ title, name }: ArticleTitleProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.title}>
+      {name === null ? null : (
+        <Text variant="kicker" align="center">
+          {name}
+        </Text>
+      )}
       <Text variant="headline" align="center" heading>
         {title}
       </Text>

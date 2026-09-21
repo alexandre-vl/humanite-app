@@ -30,6 +30,12 @@ import { PALETTE } from './palette.ts';
  * has to be light enough. The paper's own red answers only the last of those — 4.81 to 1 on the dark page, 3.83 on
  * the light one — so the light theme writes its links in the deeper `inkRed` and the dark theme in the red itself.
  *
+ * `rule` is the line the paper actually draws, and `border` is not it. The one rule in the app — under what an
+ * article says about itself, before the article itself — was painted in `border`, which is the light theme's ground
+ * for a block: 1.13 to one against the page, a separator nobody has ever seen. A rule is not a ground and owes
+ * nothing to WCAG, which asks nothing of a line carrying no meaning of its own; it owes only to be there, and at
+ * 1.43 on the light page and 1.52 on the dark one it is.
+ *
  * `control` is the track of a switch when it is off, and it is one value in both themes although the light theme
  * paints muted text the same. A muted word owes one thing: to be read on the page. A track owes three — to be found
  * on the page, to be told from the knob riding on it, and to stay told from it when the knob is the text colour. Only
@@ -52,6 +58,7 @@ export type Theme = Readonly<{
   primary: Color;
   premium: Color;
   border: Color;
+  rule: Color;
   control: Color;
 }>;
 
@@ -71,6 +78,7 @@ export const LIGHT_THEME = {
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
+  rule: PALETTE.ruleGrey,
   control: PALETTE.dateGrey,
 } as const satisfies Theme;
 
@@ -90,6 +98,7 @@ export const DARK_THEME = {
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.darkBorder,
+  rule: PALETTE.darkRule,
   control: PALETTE.dateGrey,
 } as const satisfies Theme;
 
