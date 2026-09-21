@@ -1,4 +1,4 @@
-import { ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY } from '@huma/contracts';
+import { ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY, issueIdAt } from '@huma/contracts';
 import type {
   Article,
   ArticleId,
@@ -16,7 +16,7 @@ import type {
   SectionId,
   Session,
 } from '@huma/contracts';
-import { AUTHORS, CORPUS, SECTIONS, dayOf } from '@huma/mock-content';
+import { AUTHORS, CORPUS, SECTIONS } from '@huma/mock-content';
 
 const DEFAULT_LIMIT = 12;
 
@@ -62,9 +62,9 @@ type Gathering = Readonly<{ items: ArticleSummary[] }> & { opener: ArticleSummar
  * on a picture, and the newest items of a morning are briefs filed before the desk has one. A day holding no picture
  * at all opens on its freshest item, so every numéro has a cover.
  */
-const gathered = new Map<string, Gathering>();
+const gathered = new Map<IssueId, Gathering>();
 for (const summary of CHRONOLOGICAL) {
-  const day = dayOf(summary.publishedAt);
+  const day = issueIdAt(summary.publishedAt);
   const held = gathered.get(day);
   if (held === undefined) {
     gathered.set(day, { items: [summary], opener: summary });
@@ -77,8 +77,8 @@ for (const summary of CHRONOLOGICAL) {
 }
 
 /** Each numéro's items, laid out as the paper runs them. */
-const ISSUES: ReadonlyMap<string, readonly ArticleSummary[]> = new Map(
-  [...gathered].map(([day, held]): readonly [string, readonly ArticleSummary[]] => [
+const ISSUES: ReadonlyMap<IssueId, readonly ArticleSummary[]> = new Map(
+  [...gathered].map(([day, held]): readonly [IssueId, readonly ArticleSummary[]] => [
     day,
     [...held.items].sort(inPaper),
   ]),

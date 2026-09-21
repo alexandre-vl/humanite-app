@@ -135,6 +135,30 @@ test('getIssue lays a numéro out in the order the newsroom runs its sections', 
   expect(new Set(runs).size).toBeGreaterThan(1);
 });
 
+/**
+ * And inside one rubrique it runs the freshest first, which nothing held. Reversing that half of the comparison left
+ * the whole suite green: the order of the rubriques is untouched by it, and the page's own test derives what it
+ * expects from this very call, so it would have agreed with whatever came back.
+ */
+test('getIssue runs the freshest first inside one rubrique', async () => {
+  const items = await contentApi.getIssue(ISSUE_ID.parse('2026-09-11'));
+  const laid = items.map((item) => ({ section: item.section, at: item.publishedAt }));
+  let compared = 0;
+  for (const [rank, item] of laid.entries()) {
+    const before = laid[rank - 1];
+    if (before === undefined) {
+      continue;
+    }
+    if (before.section !== item.section) {
+      continue;
+    }
+    compared += 1;
+    expect(before.at.localeCompare(item.at)).toBeGreaterThan(0);
+  }
+  // Counted, because a loop over nothing asserts nothing: a numéro of one item per rubrique would pass in silence.
+  expect(compared).toBeGreaterThan(1);
+});
+
 test('getIssue refuses a day the paper never printed', async () => {
   await expect(contentApi.getIssue(ISSUE_ID.parse('1998-07-12'))).rejects.toBeInstanceOf(ContentApiError);
 });

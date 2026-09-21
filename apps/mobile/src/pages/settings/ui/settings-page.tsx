@@ -1,6 +1,6 @@
 import type { DisplayText } from '@huma/contracts';
 import type { FaceSet, TextScale, ThemeChoice } from '@huma/design-tokens';
-import { RADII, SPACING } from '@huma/design-tokens';
+import { RADII, SPACING, TEXT_SCALES, THEME_CHOICES } from '@huma/design-tokens';
 import { Stack } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Button } from '#components/button';
@@ -15,18 +15,32 @@ import { Surface } from '#primitives/surface';
 import { Switch } from '#primitives/switch';
 import { Text } from '#primitives/text';
 
-const APPEARANCES: readonly SegmentedItem<ThemeChoice>[] = [
-  { id: 'system', label: t('settings.appearance.system') },
-  { id: 'light', label: t('settings.appearance.light') },
-  { id: 'dark', label: t('settings.appearance.dark') },
-];
+/**
+ * The word each choice is offered under, and the choices themselves read off the tokens rather than listed again here.
+ *
+ * Written as a row of items, this screen could offer three of four steps and nothing would say so: the type held each
+ * `id` to the union and never held the list to it. A table keyed by the union cannot miss one, and a list built from
+ * the tokens' own cannot offer one the paper does not have, nor put them in an order the tokens do not.
+ */
+const APPEARANCE_WORDS = {
+  system: t('settings.appearance.system'),
+  light: t('settings.appearance.light'),
+  dark: t('settings.appearance.dark'),
+} as const satisfies Readonly<Record<ThemeChoice, DisplayText>>;
 
-const STEPS: readonly SegmentedItem<TextScale>[] = [
-  { id: 'small', label: t('settings.size.small') },
-  { id: 'normal', label: t('settings.size.normal') },
-  { id: 'large', label: t('settings.size.large') },
-  { id: 'huge', label: t('settings.size.huge') },
-];
+const APPEARANCES: readonly SegmentedItem<ThemeChoice>[] = THEME_CHOICES.map((id) => ({
+  id,
+  label: APPEARANCE_WORDS[id],
+}));
+
+const STEP_WORDS = {
+  small: t('settings.size.small'),
+  normal: t('settings.size.normal'),
+  large: t('settings.size.large'),
+  huge: t('settings.size.huge'),
+} as const satisfies Readonly<Record<TextScale, DisplayText>>;
+
+const STEPS: readonly SegmentedItem<TextScale>[] = TEXT_SCALES.map((id) => ({ id, label: STEP_WORDS[id] }));
 
 /** Which set of faces the switch stands for, read and written as an on-off. */
 const LEGIBLE: FaceSet = 'legible';

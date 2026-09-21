@@ -1,13 +1,17 @@
 import type { DisplayText } from '@huma/contracts';
+import { NEWSROOM_ZONE } from '@huma/contracts';
 import { asDisplayText } from '../display-text';
 
 /**
  * The newspaper's own clock. A publication time is a Paris time, so a card shows the day the newsroom published on
  * whatever the reader's device is set to — and a test reads the same string on any machine. Hermes has neither
  * `Intl.RelativeTimeFormat` nor `Intl.PluralRules` (journal 0a, vérification 15), so the words below are written here.
+ *
+ * The zone comes from the contracts: this clock says what an instant looks like, not which instant it is, and which
+ * one it is was settled where the paper's own day is named.
  */
 const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Europe/Paris',
+  timeZone: NEWSROOM_ZONE,
   hourCycle: 'h23',
   year: 'numeric',
   month: '2-digit',
@@ -82,14 +86,9 @@ export const formatDateTime = (instant: string): DisplayText => {
   return asDisplayText(`${pad(clock.day)}/${pad(clock.month)}, ${pad(clock.hour)}:${pad(clock.minute)}`);
 };
 
-/**
- * The calendar day an instant falls on, on the newsroom's clock: `2026-09-13`. It is a key, not a text — a timeline
- * compares it to tell one run of items from the next, and never shows it.
- */
-export const formatDayKey = (instant: string): string => {
-  const clock = readClock(parseInstant(instant));
-  return `${String(clock.year)}-${pad(clock.month)}-${pad(clock.day)}`;
-};
+// The calendar day an instant falls on is not here. It was, and it was the second place the paper computed it — the
+// content door mints a numéro from the same reading, and `ISSUE_ID` already said of itself that the two were one key.
+// `issueIdAt` in the contracts is that key now, and a wire groups its runs by it.
 
 /**
  * That same day as a timeline heads the run it opens: `samedi 13 septembre`. The year is left out, a wire reaching

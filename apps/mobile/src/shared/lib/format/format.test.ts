@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatDate, formatDateTime, formatDayDate, formatDayKey, formatDayLabel, formatDuration } from './index';
+import { formatDate, formatDateTime, formatDayDate, formatDayLabel, formatDuration } from './index';
 
 describe('formatDate', () => {
   it('prints the day the newsroom published on', () => {
@@ -21,20 +21,8 @@ describe('formatDateTime', () => {
   });
 });
 
-describe('formatDayKey', () => {
-  it('names the calendar day an instant falls on', () => {
-    expect(formatDayKey('2026-09-12T17:52:00.000Z')).toBe('2026-09-12');
-  });
-
-  it('tells two runs apart by the newsroom day, not the UTC one', () => {
-    expect(formatDayKey('2026-09-12T22:30:00.000Z')).toBe('2026-09-13');
-    expect(formatDayKey('2026-09-12T21:30:00.000Z')).toBe('2026-09-12');
-  });
-
-  it('pads both halves so the key of a small month still sorts', () => {
-    expect(formatDayKey('2026-01-05T09:00:00.000Z')).toBe('2026-01-05');
-  });
-});
+// The calendar day an instant falls on is held by `issueIdAt` in the contracts, beside the brand whose own words say
+// it is the key a wire groups its runs under. It was computed twice, here and in the content package, from two clocks.
 
 describe('formatDayDate', () => {
   it('dates a front page by its day and its month, sans le jour de la semaine', () => {

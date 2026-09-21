@@ -1,11 +1,19 @@
-import type { Article, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
+import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
+import { SECTION_ID } from '@huma/contracts';
 import { AUTHORS, SECTIONS } from './registries.ts';
 import { toInstant } from './time.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
 
-/** Per-section counts of the special formats, by section slug. */
-const EXPECTED = new Map<string, Quota>([
+/**
+ * Per-section counts of the special formats, by section slug.
+ *
+ * A section id is a brand and not a closed union, so no type can say this table answers for every section the registry
+ * names. Two things are done instead: each key is read through the brand, so a slug of the wrong shape stops the
+ * module, and a section the table has no line for is reported below rather than quietly exempted from every quota it
+ * should have had.
+ */
+const QUOTAS: readonly (readonly [string, Quota])[] = [
   ['politique', { video: 1, column: 0, callout: 0 }],
   ['social-eco', { video: 0, column: 1, callout: 0 }],
   ['societe', { video: 0, column: 0, callout: 0 }],
@@ -14,15 +22,25 @@ const EXPECTED = new Map<string, Quota>([
   ['feminisme', { video: 0, column: 0, callout: 0 }],
   ['environnement', { video: 0, column: 0, callout: 0 }],
   ['sport', { video: 1, column: 0, callout: 0 }],
-]);
+];
 
-/** Accepted word counts per item kind. */
-const WORDS: Readonly<Record<string, Readonly<{ min: number; max: number }>>> = {
+const EXPECTED: ReadonlyMap<SectionId, Quota> = new Map(
+  QUOTAS.map(([id, quota]): readonly [SectionId, Quota] => [SECTION_ID.parse(id), quota]),
+);
+
+/** What a length is measured against. */
+type Words = Readonly<{ min: number; max: number }>;
+
+/**
+ * Accepted word counts per item kind. Keyed by the union the contracts declare and not by `string`: a fourth format
+ * added there used to leave every item of it exempt from any length at all, and the corpus would have validated.
+ */
+const WORDS = {
   article: { min: 300, max: 800 },
   video: { min: 120, max: 420 },
   column: { min: 350, max: 700 },
   brief: { min: 50, max: 180 },
-};
+} as const satisfies Readonly<Record<ArticleFormat | 'brief', Words>>;
 
 /** The newsroom hours the corpus covers, written on its own clock and compared as instants. */
 const WINDOW = { start: toInstant('2026-09-10 07:00'), end: toInstant('2026-09-13 09:55') } as const;
@@ -52,8 +70,7 @@ const blockWords = (block: Block): number => {
 
 const wordCount = (article: Article): number => article.blocks.reduce((sum, block) => sum + blockWords(block), 0);
 
-const wordRange = (article: Article): Readonly<{ min: number; max: number }> =>
-  WORDS[article.kind === 'brief' ? 'brief' : article.format] ?? { min: 0, max: Number.POSITIVE_INFINITY };
+const wordRange = (article: Article): Words => WORDS[article.kind === 'brief' ? 'brief' : article.format];
 
 /** Every picture an item names: its lead illustration, then the images of its body. */
 export const imageKeys = (article: Article): readonly ImageKey[] => [
@@ -205,7 +222,9 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
   if (briefs.filter((article) => article.emphasis === true).length !== 1) {
     errors.push(`${folder} : une brève emphasis attendue`);
   }
-  if (quota !== undefined) {
+  if (quota === undefined) {
+    errors.push(`${folder} : aucun quota de formats déclaré pour cette rubrique`);
+  } else {
     for (const key of ['video', 'column', 'callout'] as const) {
       if (counts[key] !== quota[key]) {
         errors.push(`${folder} : ${String(counts[key])} ${key} (attendu ${String(quota[key])})`);

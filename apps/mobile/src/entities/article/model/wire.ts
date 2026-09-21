@@ -1,11 +1,12 @@
-import type { ArticleSummary, DisplayText } from '@huma/contracts';
-import { formatDayKey, formatDayLabel } from '#lib/format';
+import type { ArticleSummary, DisplayText, IssueId } from '@huma/contracts';
+import { issueIdAt } from '@huma/contracts';
+import { formatDayLabel } from '#lib/format';
 import { openerOf } from './picture';
 
 /** One line of the wire: the picture it opens on, the head of a day, or an item of that day. */
 export type WireRow =
   | Readonly<{ kind: 'hero'; summary: ArticleSummary }>
-  | Readonly<{ kind: 'day'; day: string; label: DisplayText }>
+  | Readonly<{ kind: 'day'; day: IssueId; label: DisplayText }>
   | Readonly<{ kind: 'item'; summary: ArticleSummary }>;
 
 /**
@@ -14,7 +15,8 @@ export type WireRow =
  *
  * The wire arrives newest first, so a day ends exactly where the next begins and a single pass finds every run —
  * which is as well, Hermes having no `Object.groupBy`. Days are told apart by the newsroom's calendar, not by the
- * reader's: an item filed at half past eleven on a Paris evening belongs to the day the newsroom filed it under.
+ * reader's: an item filed at half past eleven on a Paris evening belongs to the day the newsroom filed it under. That
+ * day is the numéro it would have been printed in, and it is named by the same reading the newsstand uses.
  */
 export const wireRows = (summaries: readonly ArticleSummary[]): readonly WireRow[] => {
   const opener = openerOf(summaries);
@@ -22,7 +24,7 @@ export const wireRows = (summaries: readonly ArticleSummary[]): readonly WireRow
   let heading = '';
   for (const summary of summaries) {
     if (summary.id !== opener?.id) {
-      const day = formatDayKey(summary.publishedAt);
+      const day = issueIdAt(summary.publishedAt);
       if (day !== heading) {
         heading = day;
         rows.push({ kind: 'day', day, label: formatDayLabel(summary.publishedAt) });

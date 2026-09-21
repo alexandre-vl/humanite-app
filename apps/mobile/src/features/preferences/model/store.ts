@@ -74,7 +74,10 @@ export const usePreferences = create<Reading>()(
       name: STORAGE_KEYS.preferences,
       version: VERSION,
       storage: createJSONStorage(() => stateStorage(STORAGE_KEYS.preferences)),
-      partialize: (reading) => ({ theme: reading.theme, scale: reading.scale, faces: reading.faces }),
+      // Typed, because it is the third place the shape of a setting is written and the only one the compiler was not
+      // holding to it: a setting added to `Settings` breaks `DEFAULTS` and `settingsOf` at once, and used to leave
+      // this one compiling — which would have written everything but the new one, and reset it on every cold start.
+      partialize: (reading): Settings => ({ theme: reading.theme, scale: reading.scale, faces: reading.faces }),
       merge: (persisted, current) => ({ ...current, ...settingsOf(persisted) }),
     },
   ),

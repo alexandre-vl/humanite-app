@@ -1,8 +1,8 @@
-/** The clock the corpus is written on: front matter names newsroom hours, so a bare stamp is a Paris reading. */
-const NEWSROOM = 'Europe/Paris';
+import { NEWSROOM_ZONE } from '@huma/contracts';
 
+/** The clock the corpus is written on: front matter names newsroom hours, so a bare stamp is a Paris reading. */
 const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
-  timeZone: NEWSROOM,
+  timeZone: NEWSROOM_ZONE,
   hourCycle: 'h23',
   year: 'numeric',
   month: '2-digit',
@@ -23,19 +23,6 @@ const offsetAt = (instant: number): number => {
   const parts = clockAt(instant);
   const read = (type: string): number => Number(parts.get(type) ?? '0');
   return Date.UTC(read('year'), read('month') - 1, read('day'), read('hour'), read('minute'), read('second')) - instant;
-};
-
-/**
- * The calendar day an instant falls on, on the newsroom's clock: `2026-09-13`.
- *
- * That day is what a numéro of a daily paper is, so this is what names one. It is read on the newsroom's clock and not
- * on the reader's, for the same reason the stamps below are: an item filed at half past midnight in Paris belongs to
- * the paper that was made that night, wherever it is opened. Written widest first, it sorts in the order it reads.
- */
-export const dayOf = (instant: string): string => {
-  const parts = clockAt(Date.parse(instant));
-  const read = (type: string): string => parts.get(type) ?? '';
-  return `${read('year')}-${read('month')}-${read('day')}`;
 };
 
 /**

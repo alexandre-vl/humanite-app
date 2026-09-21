@@ -1,7 +1,8 @@
 import type { ArticleSummary } from '@huma/contracts';
+import { issueIdAt } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { content } from '#api';
-import { formatDayKey, formatDayLabel } from '#lib/format';
+import { formatDayLabel } from '#lib/format';
 import { rowKey, rowKind, rowPins, wireRows } from './wire';
 
 /** The first two pages of the wire, which is what a reader who scrolls once has read. */
@@ -38,7 +39,7 @@ describe('wireRows', () => {
     const opener = openerOf(items);
     const headed = wireRows(items).flatMap((row) => (row.kind === 'day' ? [row.day] : []));
     const listed = items.filter((item) => item.id !== opener?.id);
-    expect(headed).toEqual([...new Set(listed.map((item) => formatDayKey(item.publishedAt)))]);
+    expect(headed).toEqual([...new Set(listed.map((item) => issueIdAt(item.publishedAt)))]);
     expect(headed.length).toBeGreaterThan(1);
   });
 
@@ -52,7 +53,7 @@ describe('wireRows', () => {
         expect(row.label).toBe(formatDayLabel(`${row.day}T12:00:00.000Z`));
       }
       if (row.kind === 'item') {
-        expect(formatDayKey(row.summary.publishedAt)).toBe(heading);
+        expect(issueIdAt(row.summary.publishedAt)).toBe(heading);
         filed += 1;
       }
     }
