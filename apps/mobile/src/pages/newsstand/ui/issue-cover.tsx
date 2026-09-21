@@ -9,6 +9,7 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
+
 import { countLabel } from '../model/count';
 
 export type IssueCoverProps = Readonly<{ issue: IssueSummary }>;

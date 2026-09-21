@@ -107,14 +107,22 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * the front page opened on a name no larger than the first headline under it. It is set in the red the paper is
  * printed in, which a smaller size would forbid: see the note on `xl` beside the sizes. That red is `mark` and not
  * `headline`, which turns white on the dark page along with every other headline; a headline is type and a masthead
- * is the paper.
+ * is the paper. It measures what a headline measures and is a role of its own all the same: one is a line that never
+ * wraps and the other is four that do, and what they may be asked to do next is not the same thing.
+ *
+ * `headline` sets an article's own title and nothing else. It used to set three more things — the crossheads inside a
+ * body, the label over a linked article, the title of a call for support — so an article printed its own title four
+ * times over in the same twenty-four-point red, each shouting as loud as the piece it belonged to. A headline is the
+ * one line of a screen that must be read first; a table that hands the same type to whatever else wants to be large
+ * has no way of saying so. Its leading is `tight` because that is what a headline set over four lines wants, and what
+ * the Guardian's own `headlineMedium28` and the BBC's mobile rule both set: 1.15 and 1.21.
  *
  * `kicker` is the word that names what a card belongs to, set above its title in small capitals. It is the one role
  * whose letters are set apart — the only way twelve points of type reads as a label and not as the first line of the
  * title under it.
  */
 const TYPOGRAPHY = {
-  headline: { face: 'display', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },
+  headline: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
   masthead: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'mark' },
   display: { face: 'display', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },

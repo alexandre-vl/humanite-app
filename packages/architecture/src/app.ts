@@ -65,11 +65,19 @@ export const THEME_FILES: readonly string[] = [
 ];
 
 /**
- * Where a query is declared, as globs relative to the workspace root: the `api` segment of an entity. These files alone
- * build query options, so the key of an entity and the call that reads it stay in one place, and a screen composes
- * options it did not write.
+ * Where a query is declared, as globs relative to the workspace root: the `api` segment of a slice. These files alone
+ * build query options, so the key of what is asked for and the call that reads it stay in one place, and a screen
+ * composes options it did not write in the body of a component.
+ *
+ * A page has one as well as an entity, and it has to. Two rules of this architecture met over the newsstand and could
+ * not both hold: a query lives in an `api` segment, and a slice one single screen refers to lives in that screen
+ * (Steiger's `insignificant-slice`, which the shelf tripped the day the sommaire it also fed was taken out). The
+ * segment is what the rule was ever about — a `model` that wrote its own options would still be refused, on a page as
+ * in an entity — so the layer is what gives way.
  */
-export const QUERY_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.entity.directory}/*/api/*.ts`];
+export const QUERY_FILES: readonly string[] = [PLACES.entity, PLACES.page].map(
+  ({ directory }) => `${APP_DIRECTORY}/${directory}/*/api/*.ts`,
+);
 
 /**
  * Where the parameters of a route are read, as globs relative to the workspace root: the routing module of the shared

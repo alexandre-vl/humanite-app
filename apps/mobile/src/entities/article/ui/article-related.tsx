@@ -1,5 +1,5 @@
 import type { ArticleSummary } from '@huma/contracts';
-import { RADII, SPACING } from '@huma/design-tokens';
+import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { Paper } from '#components/paper';
@@ -16,7 +16,10 @@ export type ArticleRelatedProps = Readonly<{ summary: ArticleSummary; onOpen: ()
 
 const useStyles = createStyles((theme) => ({
   block: { gap: SPACING.sm, paddingHorizontal: SPACING.lg },
-  label: { alignItems: 'center' },
+  // A line across the column and the word under it: what divides a body from what it points at is a rule, which is
+  // how all three of the papers that print one divide anything. It was a centred headline in the paper's red — a
+  // label announcing another article, set louder than the article one was reading.
+  rule: { height: SIZES.stroke, backgroundColor: theme.rule },
   picture: { alignSelf: 'stretch', aspectRatio: HERO_RATIO, borderRadius: RADII.sm, backgroundColor: theme.border },
 }));
 
@@ -32,11 +35,10 @@ export function ArticleRelated({ summary, onOpen }: ArticleRelatedProps): ReactN
   const visual = pictureOf(summary, 'card');
   return (
     <Box style={styles.block}>
-      <Box style={styles.label}>
-        <Text variant="headline" align="center" heading>
-          {t('article.related')}
-        </Text>
-      </Box>
+      <Box style={styles.rule} />
+      <Text variant="kicker" heading>
+        {t('article.related')}
+      </Text>
       <Paper>
         <Pressable role="link" onPress={onOpen}>
           {visual === null ? null : (

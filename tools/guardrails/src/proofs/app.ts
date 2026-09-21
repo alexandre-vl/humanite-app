@@ -266,6 +266,12 @@ export function TabIcons(): ReactNode {
       linted({ 'src/entities/article/api/queries.ts': queryModule('articleQuery') }),
     ),
     define(
+      'guardrail/query-options-page-exempt',
+      'le segment api d’une page, qui déclare la requête que cette page seule lit',
+      [],
+      linted({ 'src/pages/newsstand/api/queries.ts': queryModule('issuesQuery') }),
+    ),
+    define(
       'guardrail/module-expo-router',
       'une entité qui pousse elle-même un écran sur la pile',
       ['module/expo-router'],

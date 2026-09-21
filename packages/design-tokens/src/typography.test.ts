@@ -35,12 +35,30 @@ test('a line height derives from a size times its multiple', () => {
 });
 
 /**
- * The step the article captures measure, read at 2.625 px per point. The headline and the legend are the two roles the
- * scale reaches to within a point, so a step that drifts is a token someone changed without re-reading the capture.
+ * The step a picture's legend takes, read off the article captures at 2.625 px per point: measured 42.0 px = 16.0
+ * points against the table's 12 × 1.4 = 16.8, the closest the scale comes to any of them.
+ *
+ * The headline was held here too, at the 47.6 the captures gave it, and it is no longer: the current app's headline is
+ * not the measurement this one wants. Three papers set a mobile headline at twenty-eight — none of them in a condensed
+ * face — and this one is set in Anton, whose x-height is 0.732 em against Overpass's 0.511. What the old step held was
+ * a headline standing as tall as forty-nine points of the text it opens. What holds it now is the note beside `xl`,
+ * and the rule that derives a contrast bar from a size: at twenty-eight it may be printed in the paper's red, and at
+ * the step under it may not.
  */
-test('the reading roles step as the article captures measure them', () => {
-  expect(paper('headline').size * paper('headline').leading).toBeCloseTo(47.6, 1); // mesuré 123,5 px = 47,0
+test('a picture’s legend steps as the article captures measure it', () => {
   expect(paper('legend').size * paper('legend').leading).toBeCloseTo(16.8, 1); // mesuré 42,0 px = 16,0
+});
+
+/**
+ * A headline is set over four lines and a masthead over one, so they are two roles; they are the one size because the
+ * size is what lets either be printed in the paper's red at all. What this refuses is the drift that would follow from
+ * that coincidence — a headline given the masthead's job of never wrapping, and set tighter or looser than the papers
+ * that set one at this size do.
+ */
+test('a headline is set at the size a phone sets a headline, and led as one', () => {
+  expect(paper('headline').size).toBe(28);
+  expect(paper('headline').size).toBe(paper('masthead').size);
+  expect(paper('headline').leading).toBeLessThanOrEqual(1.25); // Guardian 1,15 · BBC 34/28 = 1,21
 });
 
 /** The four stops the body text reads at, which is the range the current app's own slider covers. */

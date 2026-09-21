@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatDate, formatDateTime, formatDayDate, formatDayLabel, formatDuration } from './index';
+import { formatDate, formatDateTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
 
 describe('formatDate', () => {
   it('prints the day the newsroom published on', () => {
@@ -43,6 +43,24 @@ describe('formatDayDate', () => {
     );
     expect(days).toEqual(['10 septembre', '11 septembre', '12 septembre', '13 septembre']);
     expect(Math.max(...days.map((day) => day.length))).toBeLessThan('dimanche 13 septembre'.length);
+  });
+});
+
+describe('formatLongDate', () => {
+  it('dates an article with its day, its month and its year', () => {
+    expect(formatLongDate('2026-09-13T09:00:00.000Z')).toBe('13 septembre 2026');
+  });
+
+  /** The Paris day, like every other reading of the clock: an article filed at 00:30 in Paris is that day's. */
+  it('reads the day from the Paris date, so a late evening dates the next day', () => {
+    expect(formatLongDate('2026-12-31T23:30:00.000Z')).toBe('1 janvier 2027');
+  });
+
+  /** It is the one date the paper writes out, and the one that carries a year: nothing else here does both. */
+  it('carries the year, which no other date the paper prints does', () => {
+    expect(formatLongDate('2026-09-13T09:00:00.000Z')).toContain('2026');
+    expect(formatDayLabel('2026-09-13T09:00:00.000Z')).not.toContain('2026');
+    expect(formatDayDate('2026-09-13T09:00:00.000Z')).not.toContain('2026');
   });
 });
 

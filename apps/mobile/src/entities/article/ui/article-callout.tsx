@@ -32,7 +32,9 @@ export function ArticleCallout({ title, text, button, onPress }: ArticleCalloutP
   return (
     <Box style={styles.block}>
       <Paper>
-        <Text variant="headline" heading>
+        {/* An appeal, set as the title of an appeal. It was set as a headline — an article's own type, in an article's
+            own red — so the loudest line of a piece was the call for support printed in the middle of it. */}
+        <Text variant="title" heading>
           {title}
         </Text>
         <Text variant="prose">{text}</Text>

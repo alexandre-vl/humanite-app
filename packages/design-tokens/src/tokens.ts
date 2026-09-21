@@ -31,10 +31,17 @@ export const RADII = {
 /**
  * Font sizes in points; the body text measures 16 (docs/app-actuelle).
  *
- * `xl` is the paper's own name, and its value is not free: WCAG reads type as large from twenty-four points up, and a
- * reader may set the paper an eighth smaller than it is written. Twenty-eight is the first step of the scale that
- * still clears twenty-four once taken down — 24.5, set at 25 — which is what lets the masthead be printed in the red
- * of the masthead at all. At 20 it would owe four and a half to one, and the paper's red gives 3.83 on a white page.
+ * `xl` is the largest the paper sets anything in, and it carries the two things printed in red: the paper's own name
+ * and the headline of an article. Its value is not free. WCAG reads type as large from twenty-four points up, and a
+ * reader may set the paper an eighth smaller than it is written; twenty-eight is the first step of the scale that
+ * still clears twenty-four once taken down — 24.5, set at 25 — which is what lets either be printed in that red at
+ * all. At 20 they would owe four and a half to one, and the paper's red gives 3.83 on a white page.
+ *
+ * There was a step above it, at thirty-four, and the headline was set in it. Three unrelated papers set a mobile
+ * headline at twenty-eight — the Guardian's `headlineMedium28`, the BBC's own `max-width:599px` rule, Le Figaro's
+ * `.fig-headline` — and none of the three is set in a condensed face. This one is: measured over the vendored files,
+ * Anton's x-height is 0.732 em against Overpass's 0.511, so thirty-four points of Anton stand as tall as forty-nine
+ * points of the text face. The headline was not a step larger than the reference; it was three quarters larger.
  */
 export const FONT_SIZES = {
   xs: fontSize(12),
@@ -42,7 +49,6 @@ export const FONT_SIZES = {
   md: fontSize(16),
   lg: fontSize(20),
   xl: fontSize(28),
-  xxl: fontSize(34),
 } as const satisfies Readonly<Record<string, FontSize>>;
 
 /** Line heights as a multiple of the font size. */

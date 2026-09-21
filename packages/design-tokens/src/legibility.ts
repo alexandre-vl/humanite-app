@@ -61,8 +61,9 @@ export const PRINTINGS = {
   textMuted: { smallest: 'kicker', grounds: ['background', 'block', 'card', 'surface'] },
   // The wire, the pill of a button, the mark on a column, the masthead of a cover: all the paper's own red.
   onPrimary: { smallest: 'caption', grounds: ['primary'] },
-  // A headline stands on the sheet of an article, or on the torn paper of a callout.
-  headline: { smallest: 'headline', grounds: ['background', 'ground'] },
+  // An article's own title, on the page it is read on. It stood on a second ground as well — the torn paper of a
+  // callout, which set its own title in the same type — and a call for support is not a headline.
+  headline: { smallest: 'headline', grounds: ['background'] },
   // The paper's own name, in the bar across the top of the front page and in no other type. Its size is the reason
   // it may be printed in this red at all: a step under twenty-four would put it under a bar it cannot clear.
   mark: { smallest: 'masthead', grounds: ['background'] },

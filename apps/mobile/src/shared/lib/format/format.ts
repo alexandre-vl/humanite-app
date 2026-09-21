@@ -117,6 +117,19 @@ export const formatDayDate = (instant: string): DisplayText => {
 };
 
 /**
+ * The day an article was published, written out where an article prints it: `13 septembre 2026`.
+ *
+ * It is the one place in the paper that carries a year, and the one that carries a month in letters. Nielsen's
+ * homepage guideline says both halves of that: a front page of one week's stories needs no date on each card, and the
+ * full article needs one printed prominently. The weekday is left off — a wire needs it because a wire spans days and
+ * a reader is orienting themself in time, an article carries its own date and the year is what places it.
+ */
+export const formatLongDate = (instant: string): DisplayText => {
+  const clock = readClock(parseInstant(instant));
+  return asDisplayText(`${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)} ${String(clock.year)}`);
+};
+
+/**
  * The signature under an article: `Par Lisa Guillemin`, and `Par Lisa Guillemin et Yves Kerlan` for two. The contract
  * allows no more than two names, so a list needs no comma — and the joining word is written here, with the weekdays
  * above, for the same reason: a formatter may not reach the dictionary, and the words it prints are its own.

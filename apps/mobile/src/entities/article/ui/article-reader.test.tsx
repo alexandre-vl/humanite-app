@@ -5,10 +5,68 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { asDisplayText } from '#lib/display-text';
+import { formatLongDate } from '#lib/format';
 import { ArticleReader } from './article-reader';
 
 /** What the screen answers when the reader asks which section an article ran in, in one word the corpus never uses. */
 const SECTION = asDisplayText('Rubrique');
+
+const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
+
+/** Every run of text the page prints, in the order it prints them — which is the order they are read in. */
+const inOrder = (node: unknown): readonly string[] => {
+  if (typeof node === 'string') {
+    return [node];
+  }
+  const children: unknown = typeof node === 'object' && node !== null ? Reflect.get(node, 'children') : null;
+  return isList(children) ? children.flatMap(inOrder) : [];
+};
+
+/**
+ * Every corner any surface of the page turns by itself, named.
+ *
+ * Every style a node carries is read and not only the one called `style`: a scrolling region styles what it scrolls
+ * under a second name, and the first version of this looked at one of the two — it passed a page whose content had
+ * been given back the turned corner, which is exactly the regression it exists to catch.
+ */
+const cornersTurned = (node: unknown): readonly string[] => {
+  if (typeof node !== 'object' || node === null) {
+    return [];
+  }
+  const props: unknown = Reflect.get(node, 'props');
+  const styles: readonly unknown[] =
+    typeof props === 'object' && props !== null
+      ? Object.entries(props)
+          .filter(([name]) => name === 'style' || name.endsWith('Style'))
+          .map(([, value]: readonly [string, unknown]) => value)
+      : [];
+  const turned = styles
+    .flatMap((style) => (isList(style) ? style : [style]))
+    .flatMap((layer) =>
+      typeof layer === 'object' && layer !== null
+        ? Object.keys(layer).filter((key) => /^borderTop(?:Left|Right)Radius$/u.test(key))
+        : [],
+    );
+  const children: unknown = Reflect.get(node, 'children');
+  return [...turned, ...(isList(children) ? children.flatMap(cornersTurned) : [])];
+};
+
+/** How a run of text is set, read back off the style the primitive resolved for it. */
+type Typeset = Readonly<{ fontSize: number; color: string }>;
+
+const isTypeset = (value: unknown): value is Typeset =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof Reflect.get(value, 'fontSize') === 'number' &&
+  typeof Reflect.get(value, 'color') === 'string';
+
+const typesetOf = (text: string): Typeset => {
+  const style: unknown = screen.getByText(text).props['style'];
+  if (!isTypeset(style)) {
+    throw new Error(`« ${text} » n’est posé dans aucune taille ni aucune encre : le test ne comparerait rien`);
+  }
+  return style;
+};
 
 const read = async (
   article: Article,
@@ -71,6 +129,76 @@ describe('ArticleReader', () => {
     for (const run of words) {
       expect(screen.getByText(run)).toBeTruthy();
     }
+  });
+
+  /**
+   * A crosshead was set in the article's own type: twenty-eight points of Anton in the paper's red, the same as the
+   * title over it. A piece with three of them said its own title four times, each as loud as the last. What is asked
+   * here is the order itself — smaller than the title, and in another ink — rather than a size and a colour, which
+   * would be the table written out a second time.
+   */
+  it('donne aux intertitres une taille et une encre sous celles du titre de l’article', async () => {
+    const article = await holding('heading');
+    const crosshead = article.blocks.find((block) => block.type === 'heading');
+    if (crosshead === undefined) {
+      throw new Error('intertitre introuvable');
+    }
+    await read(article);
+    await screen.findByText(article.title);
+    const title = typesetOf(article.title);
+    const under = typesetOf(crosshead.text);
+    expect(under.fontSize).toBeLessThan(title.fontSize);
+    expect(under.color).not.toBe(title.color);
+  });
+
+  /**
+   * Who wrote a piece belongs to the head of it, with the standfirst and the date, which is where the Guardian's own
+   * mobile template for a comment piece puts it and where the BBC wraps it together with the time. It was under the
+   * picture: an article opened on a photograph credited to one name and was signed, four lines later and past that
+   * credit, by another.
+   */
+  it('signe l’article avant la photo, et non sous la légende de la photo', async () => {
+    const article = await first(
+      'une photo légendée et une signature',
+      (candidate) => candidate.hero !== undefined && candidate.format !== 'video',
+    );
+    const hero = article.hero;
+    if (hero === undefined) {
+      throw new Error('photo introuvable');
+    }
+    const roster = await content.getAuthors();
+    const signer = roster.find((author) => author.id === article.authors[0]);
+    if (signer === undefined) {
+      throw new Error('l’article n’est signé de personne que la rédaction connaisse');
+    }
+    await read(article);
+    await screen.findByText(article.title);
+    const order = inOrder(screen.toJSON());
+    expect(order.indexOf(`Par ${signer.name}`)).toBeGreaterThan(order.indexOf(article.standfirst));
+    expect(order.indexOf(`Par ${signer.name}`)).toBeLessThan(order.indexOf(hero.caption));
+  });
+
+  /**
+   * The article was printed on a white sheet laid over a coloured ground, with its top-left corner turned by
+   * forty-eight points and its top-right left square. No paper prints an article that way: a turned top corner is
+   * what a phone draws round a modal, and Le Figaro's own stylesheet gives that radius to its share sheet and to
+   * nothing else. What the rule catches is the shape, whatever colour it is painted.
+   */
+  it('imprime l’article sur une page, et non sur une feuille au coin retourné', async () => {
+    const article = await holding('paragraph');
+    await read(article);
+    await screen.findByText(article.title);
+    expect(cornersTurned(screen.toJSON())).toEqual([]);
+  });
+
+  /**
+   * Nielsen's homepage guideline both ways round: a front page of one week's stories needs no date on each card, and
+   * the full article needs one printed prominently. The cards lost theirs; this is where the paper says the day.
+   */
+  it('date l’article en toutes lettres, la seule date que le journal écrive ainsi', async () => {
+    const article = await holding('paragraph');
+    await read(article);
+    expect(await screen.findByText(formatLongDate(article.publishedAt))).toBeTruthy();
   });
 
   it('signe l’article des noms de la rédaction, et non des identifiants', async () => {

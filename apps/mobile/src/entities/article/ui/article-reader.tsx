@@ -1,10 +1,9 @@
 import type { Article, ArticleId, ArticleSummary, Author, DisplayText, SectionId } from '@huma/contracts';
-import { RADII, SPACING } from '@huma/design-tokens';
+import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
-import { Box } from '#primitives/box';
 import { Scroll } from '#primitives/scroll';
 import { ThemeScope } from '#primitives/theme';
 import { articleQuery, authorsQuery, summariesQuery } from '../api/queries';
@@ -37,30 +36,32 @@ type ReadingProps = Readonly<{
 }>;
 
 const useStyles = createStyles((theme) => ({
-  ground: { flex: 1, backgroundColor: theme.ground },
-  column: { paddingBottom: SPACING.xxxl },
-  sheet: {
-    gap: SPACING.lg,
-    paddingVertical: SPACING.xl,
-    borderTopLeftRadius: RADII.sheet,
-    backgroundColor: theme.background,
-  },
+  page: { flex: 1, backgroundColor: theme.background },
+  // One measure down the page, and one gap between everything on it: the head, the picture, every paragraph and
+  // every crosshead are all things read in a row, and a gap that changed between them would be saying they are not.
+  column: { gap: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.xxxl },
 }));
 
 /**
- * The article as it is read: the headline on the ground, then the sheet it is printed on, turned at its top-left
- * corner. On the dark template the sheet and the ground take the same value, so the sheet stops showing and the page
- * runs edge to edge — which is exactly what the video article of the current app does, without a rule of its own.
+ * The article as it is read: one page, one ground, from the section over the headline down to the last paragraph.
+ *
+ * It was two — a coloured band carrying the headline, and under it a white sheet with its top-left corner turned by
+ * forty-eight points. Neither half survives inspection. Of the six papers worth copying, none prints an article body
+ * on a card: the Guardian, the BBC and Le Monde all draw a front and an article on one ground and separate things
+ * with a hairline, and the only rounded-top surfaces in any of their stylesheets are modals and share sheets — Le
+ * Figaro's own CSS gives that radius to `.fig-share-tools` and to a tooltip turned into a bottom modal. On a phone
+ * the turned corner is a promise that the thing can be swiped away, which an article cannot keep.
+ *
+ * The dark theme had already said as much by accident: there its ground and its sheet take the same value, the sheet
+ * stops showing, and the page runs edge to edge — which is what every article does now.
  */
 function Reading({ article, name, related, roster, onFollow, onSupport }: ReadingProps): ReactNode {
   const styles = useStyles();
   return (
-    <Scroll axis="vertical" style={styles.ground} contentStyle={styles.column}>
+    <Scroll axis="vertical" style={styles.page} contentStyle={styles.column}>
       <ArticleTitle title={article.title} name={name} />
-      <Box style={styles.sheet}>
-        <ArticleLead article={article} byline={bylineOf(article.authors, roster)} />
-        <ArticleBody article={article} related={related} onFollow={onFollow} onSupport={onSupport} />
-      </Box>
+      <ArticleLead article={article} byline={bylineOf(article.authors, roster)} />
+      <ArticleBody article={article} related={related} onFollow={onFollow} onSupport={onSupport} />
     </Scroll>
   );
 }

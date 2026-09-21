@@ -7,7 +7,7 @@ export const catalog: CatalogEntry = {
   name: asDisplayText('Paper'),
   render: () => (
     <Paper>
-      <Text variant="headline">{asDisplayText('Sur le même thème')}</Text>
+      <Text variant="title">{asDisplayText('Sur le même thème')}</Text>
       <Text variant="prose">{asDisplayText('Un morceau de papier tombé sur la page, et toujours clair.')}</Text>
     </Paper>
   ),

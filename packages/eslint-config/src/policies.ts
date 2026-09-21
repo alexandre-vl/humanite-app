@@ -47,7 +47,7 @@ const WRITTEN = {
     'nommer l’icône par une clé du registre typé : un symbole de plateforme écrit ailleurs ouvre un second endroit où les icônes se décident',
   'nav/js-tabs': 'composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native',
   'query/options':
-    'déclarer la requête dans le segment api de son entité : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit',
+    'déclarer la requête dans le segment api de sa tranche : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit',
   'route/params':
     'lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran',
 } as const satisfies Readonly<Record<`${string}/${string}`, string>>;

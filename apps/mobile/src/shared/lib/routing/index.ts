@@ -1,1 +1,1 @@
-export { articleHref, BOOKMARKS_HREF, issueHref, openExternal, SETTINGS_HREF, useRouteParams } from './routing';
+export { articleHref, BOOKMARKS_HREF, openExternal, SETTINGS_HREF, useRouteParams } from './routing';

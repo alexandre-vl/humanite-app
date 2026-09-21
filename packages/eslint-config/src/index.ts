@@ -140,7 +140,7 @@ const THEME_SYNTAX: readonly SyntaxRestriction[] = [
   },
 ];
 
-/** A query is declared where its entity lives: the api segment of a slice builds the options, every screen composes them. */
+/** A query is declared where its data lives: the api segment of a slice builds the options, every screen composes them. */
 const QUERY_SYNTAX: readonly SyntaxRestriction[] = [
   {
     policy: 'query/options',

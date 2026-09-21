@@ -1,4 +1,4 @@
-import type { ArticleId, IssueId } from '@huma/contracts';
+import type { ArticleId } from '@huma/contracts';
 import { openURL } from 'expo-linking';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -21,11 +21,9 @@ export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/articl
 // a page to turn to. What the app had was a route nothing could reach except that band, and a screen that replaced
 // itself every time another section was chosen.
 
-/** Where one numéro is read, as the router takes it. */
-export type IssueHref = Readonly<{ pathname: '/issue/[id]'; params: Readonly<{ id: IssueId }> }>;
-
-/** Where to send a reader who took a numéro off the shelf. */
-export const issueHref = (id: IssueId): IssueHref => ({ pathname: '/issue/[id]', params: { id } });
+// A numéro has no address in the app any more either, and for a plainer reason than a section: it is not read here.
+// The shelf still stands every numéro the paper printed, and taking one off it opens the paper on the web — which is
+// an address the newsroom owns and this module names among the others, under `NEWSROOM`.
 
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;

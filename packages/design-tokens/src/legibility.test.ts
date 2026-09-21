@@ -22,8 +22,9 @@ const sizeOf = (variant: TextVariant): number => typographyAt(variant, SMALLEST,
  */
 test('two roles are large text, and every other variant owes the full bar', () => {
   const bars = TEXT_VARIANTS.map((variant) => [variant, requiredRatio(sizeOf(variant))] as const);
-  // The two set in the paper's red, and the only two: both clear twenty-four points at the smallest step a reader
-  // can ask for — the headline with room to spare, the masthead by half a point, which is why it is twenty-eight.
+  // The two set in the paper's red, and the only two. Both clear twenty-four points at the smallest step a reader can
+  // ask for, and both clear it by the same half point: they are the one size, and twenty-eight is the first step of
+  // the scale that survives being taken down an eighth.
   expect(bars.filter(([, bar]) => bar === 3).map(([variant]) => variant)).toEqual(['headline', 'masthead']);
   expect(sizeOf('masthead')).toBeGreaterThanOrEqual(24);
   // Counted off the list rather than written down: a variant added to the table joins one side or the other here,

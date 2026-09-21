@@ -1,11 +1,14 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { router } from 'expo-router';
 import { content } from '#api';
+import { NEWSROOM } from '#config';
+import { openExternal } from '#lib/routing';
 import { NewsstandPage } from './newsstand-page';
 
-jest.mock('expo-router', () => ({ __esModule: true, router: { push: jest.fn() } }));
+// The app's own door out, doubled rather than the phone's: the screen hands a page over and is told nothing back, so
+// what a test can read is which page it handed over — and that is what this module is for.
+jest.mock('#lib/routing', () => ({ __esModule: true, openExternal: jest.fn() }));
 
 const renderPage = async (): Promise<void> => {
   await render(
@@ -62,7 +65,12 @@ describe('NewsstandPage', () => {
     expect(screen.getAllByTestId('picture', { includeHiddenElements: true })).toHaveLength(shelf.length);
   });
 
-  it('ouvre le numéro qu’on prend sur l’étagère', async () => {
+  /**
+   * A numéro is read on the paper's own site, so taking one off the shelf leaves the app. The app used to push a
+   * sommaire of its own instead — the day's articles laid out as a third feed of the same cards — and what makes
+   * that a change rather than a removal is here: the cover still answers a press, and answers it with the paper.
+   */
+  it('ouvre le journal sur le web quand on prend un numéro sur l’étagère', async () => {
     const shelf = await content.getIssues();
     const first = shelf[0];
     if (first === undefined) {
@@ -70,6 +78,12 @@ describe('NewsstandPage', () => {
     }
     await renderPage();
     await fireEvent.press(await screen.findByText(first.opener.title));
-    expect(jest.mocked(router.push)).toHaveBeenCalledWith({ pathname: '/issue/[id]', params: { id: first.id } });
+    expect(jest.mocked(openExternal)).toHaveBeenCalledWith(NEWSROOM.site);
+  });
+
+  /** A reader thrown into a browser without warning was given none; the shelf says where its covers lead. */
+  it('dit où mènent les couvertures avant qu’on en touche une', async () => {
+    await renderPage();
+    expect(await screen.findByText('Chaque numéro s’ouvre sur humanite.fr.')).toBeTruthy();
   });
 });

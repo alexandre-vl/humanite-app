@@ -24,6 +24,9 @@ type BlockProps = ArticleBodyProps & Readonly<{ block: Block }>;
 
 const useStyles = createStyles((theme) => ({
   words: { paddingHorizontal: SPACING.lg },
+  // More air above a crosshead than under it. The column sets one gap between everything on it, which leaves a
+  // crosshead floating equidistant from the paragraph it closes and the one it opens — and it opens one.
+  crosshead: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
   quote: {
     gap: SPACING.xs,
     marginHorizontal: SPACING.lg,
@@ -50,9 +53,13 @@ function BlockView({ block, article, related, onFollow, onSupport }: BlockProps)
         </Box>
       );
     case 'heading':
+      // A crosshead, not a second headline. It was set in the very type the article's own title is set in — the same
+      // twenty-eight points of the same red — so a piece with three of them shouted its title four times, each as
+      // loud as the last, and the reader had nothing left to tell which one was the article. Twenty points of the
+      // text face, in the ink of the text: a step down from the title and a step up from the paragraphs it opens.
       return (
-        <Box style={styles.words}>
-          <Text variant="headline" heading>
+        <Box style={styles.crosshead}>
+          <Text variant="title" heading>
             {block.text}
           </Text>
         </Box>
