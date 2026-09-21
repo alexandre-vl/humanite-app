@@ -78,7 +78,7 @@ export function ArticleVideo({ title, durationSeconds, poster, recyclingKey }: A
           </Text>
         </Box>
       </Box>
-      <Text variant="standfirst">{title}</Text>
+      <Text variant="title">{title}</Text>
     </Box>
   );
 }

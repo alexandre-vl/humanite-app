@@ -17,14 +17,18 @@ export type TextAlign = 'left' | 'center';
 
 /**
  * A style a run of text carries. It is the other half of what `createStyles` builds: that one dresses views and holds
- * no typography, this one holds nothing else. A line height is the one plain number either side allows, because it is
- * not a token but a size times its multiple, derived here and nowhere else. It needs no opaque handle the way a
- * `StyleRef` does: no prop takes one, so the only styles that reach a native text are the two this module returns.
+ * no typography, this one holds nothing else. Two plain numbers are allowed here and nowhere else — the line height
+ * and the letter spacing — because neither is a token: each is a size times a ratio the table holds, derived here so
+ * that a role set at four reader steps opens its lines and its letters by the same share at every one of them. The
+ * style needs no opaque handle the way a `StyleRef` does: no prop takes one, so the only styles that reach a native
+ * text are the two this module returns.
  */
 export type TextStyle = Readonly<{
   fontFamily?: FontFamily;
   fontSize?: FontSize;
   lineHeight?: number;
+  letterSpacing?: number;
+  textTransform?: 'uppercase';
   color?: Color;
   textAlign?: TextAlign;
 }>;
@@ -52,6 +56,8 @@ export function textStyle(
   return {
     ...faceOf(role, theme, tone),
     lineHeight: role.size * role.leading,
+    letterSpacing: role.size * role.tracking,
+    ...(role.caps ? { textTransform: 'uppercase' } : {}),
     ...(align === undefined ? {} : { textAlign: align }),
   };
 }

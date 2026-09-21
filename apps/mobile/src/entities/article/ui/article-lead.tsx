@@ -58,7 +58,9 @@ export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
         <ArticleFigure visual={visual} recyclingKey={article.id} caption={hero.caption} credit={hero.credit} />
       )}
       <Box style={styles.meta}>
-        {byline === null ? null : <Text>{byline}</Text>}
+        {/* Named a label rather than left to the default: the signature fell to the body's own type, so who wrote a
+            piece was set in the same letters, at the same size and in the same ink as the piece itself. */}
+        {byline === null ? null : <Text variant="label">{byline}</Text>}
         <Text variant="caption">{formatDate(article.publishedAt)}</Text>
       </Box>
       <Box style={styles.rule} />

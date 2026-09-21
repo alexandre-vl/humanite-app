@@ -104,7 +104,8 @@ describe('HomePage', () => {
     const section = await firstSection();
     await renderPage();
     expect(await screen.findByText('Humanité')).toBeTruthy();
-    expect(await screen.findByText(section.label)).toBeTruthy();
+    // All of them: the band names every section, and each card now names the one it ran in over its own title.
+    expect(await screen.findAllByText(section.label)).not.toHaveLength(0);
     expect(await screen.findByText(article.title)).toBeTruthy();
   });
 
@@ -123,9 +124,9 @@ describe('HomePage', () => {
   it('retire la barre des rubriques des favoris, qui n’appartiennent à aucune', async () => {
     const section = await firstSection();
     await renderPage();
-    expect(await screen.findByText(section.label)).toBeTruthy();
+    expect(await screen.findAllByText(section.label)).not.toHaveLength(0);
     await show('Favoris');
-    expect(screen.queryByText(section.label)).toBeNull();
+    expect(screen.queryAllByText(section.label)).toHaveLength(0);
   });
 
   it('rend au fil la rangée que la barre des rubriques libère', async () => {

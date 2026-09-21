@@ -1,4 +1,4 @@
-import type { ArticleSummary } from '@huma/contracts';
+import type { ArticleSummary, DisplayText } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { content } from '#api';
@@ -28,6 +28,15 @@ const illustrated = (items: readonly ArticleSummary[]): ArticleSummary => {
  */
 const pictures = (): number => screen.queryAllByTestId('picture', { includeHiddenElements: true }).length;
 
+/** The colour a run of text was actually painted in, read back off the style the primitive gave it. */
+const inkOf = (text: DisplayText): unknown => {
+  const style: unknown = screen.getByText(text).props['style'];
+  if (typeof style !== 'object' || style === null) {
+    throw new Error('ce texte ne porte aucun style : le test ne lirait aucune encre');
+  }
+  return Reflect.get(style, 'color');
+};
+
 /**
  * How many pictures each shape mounts. A list hands a cell to another item only when both answered the same shape,
  * so a shape that stopped agreeing with its tree would not fail anywhere — the cells would simply be passed between
@@ -56,6 +65,18 @@ describe('ArticleCard', () => {
     expect(screen.getByText(summary.title)).toBeTruthy();
     expect(screen.getByText(summary.standfirst)).toBeTruthy();
     expect(screen.getByText(formatDate(summary.publishedAt))).toBeTruthy();
+  });
+
+  /**
+   * A card says two things and has to say them in that order. Both were printed in the ink of a title and in the
+   * weight of one, four points apart — so the sentence that answers the headline read as a second, smaller headline,
+   * and which to read first was left to the sizes alone. The ink is the claim: not which colour, only that the two
+   * are not one.
+   */
+  it.each(SHAPES)('sépare sur %s l’encre du titre de celle du chapô', async (shape) => {
+    const summary = illustrated(await everything());
+    await render(<ArticleCard shape={shape} summary={summary} />);
+    expect(inkOf(summary.title)).not.toBe(inkOf(summary.standfirst));
   });
 
   it.each(SHAPES)('porte sur %s ce que l’écran permet de faire de l’article', async (shape) => {
@@ -94,5 +115,29 @@ describe('ArticleCard', () => {
   it.each(SHAPES.filter((shape) => shape !== 'column'))('ne dit pas « Chronique » sur %s', async (shape) => {
     await render(<ArticleCard shape={shape} summary={illustrated(await everything())} />);
     expect(screen.queryByText('Chronique')).toBeNull();
+  });
+
+  /**
+   * The section is drawn only where a screen supplies it. A front page and a search both mix sections and a card
+   * that did not say which it came from left the reader nothing to sort by; inside one section the very same word on
+   * every card says nothing, so the screen decides and the card obeys. A chronicle is the exception: it already
+   * carries a mark saying what it is, and two labels stacked over one title are one too many.
+   */
+  it.each(SHAPES.filter((shape) => shape !== 'column'))(
+    'nomme sur %s la rubrique que l’écran lui donne',
+    async (shape) => {
+      const summary = illustrated(await everything());
+      const view = await render(<ArticleCard shape={shape} summary={summary} name={asDisplayText('Monde')} />);
+      expect(screen.getByText('Monde')).toBeTruthy();
+      await view.rerender(<ArticleCard shape={shape} summary={summary} />);
+      expect(screen.queryByText('Monde')).toBeNull();
+    },
+  );
+
+  it('ne nomme pas deux fois ce qu’une chronique est déjà marquée être', async () => {
+    const summary = illustrated(await everything());
+    await render(<ArticleCard shape="column" summary={summary} name={asDisplayText('Monde')} />);
+    expect(screen.getByText('Chronique')).toBeTruthy();
+    expect(screen.queryByText('Monde')).toBeNull();
   });
 });

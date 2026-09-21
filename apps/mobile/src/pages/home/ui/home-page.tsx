@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { LabelBarItem } from '#components/label-bar';
 import { LabelBar } from '#components/label-bar';
 import { ArticleFeed, feedQuery, useKeptFeed, usePagedFeed } from '#entities/article';
-import { SectionBar } from '#entities/section';
+import { SectionBar, useSectionNames } from '#entities/section';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref, sectionHref } from '#lib/routing';
@@ -45,6 +45,7 @@ const useStyles = createStyles((theme) => ({
 export function HomePage(): ReactNode {
   const styles = useStyles();
   const [showing, setShowing] = useState<Showing>('headline');
+  const nameOf = useSectionNames();
   const paper = usePagedFeed(feedQuery);
   const kept = useKeptFeed(useBookmarks((state) => state.ids));
   const onBookmarks = showing === 'bookmarks';
@@ -57,6 +58,7 @@ export function HomePage(): ReactNode {
           router.push(articleHref(id));
         }}
         action={(summary) => <BookmarkToggle id={summary.id} />}
+        name={(summary) => nameOf(summary.section)}
         header={
           <Box style={styles.masthead}>
             <Text variant="display" heading>

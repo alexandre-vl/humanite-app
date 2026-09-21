@@ -11,7 +11,17 @@ const paper = (variant: TextVariant): Typography => typographyAt(variant, 'norma
 
 test('the typography table answers for every variant, and for no other', () => {
   expectTypeOf<TextVariant>().toEqualTypeOf<
-    'headline' | 'display' | 'title' | 'standfirst' | 'prose' | 'body' | 'label' | 'legend' | 'caption'
+    | 'headline'
+    | 'display'
+    | 'title'
+    | 'standfirst'
+    | 'summary'
+    | 'prose'
+    | 'body'
+    | 'label'
+    | 'legend'
+    | 'caption'
+    | 'kicker'
   >();
   for (const variant of TEXT_VARIANTS) {
     expect(paper(variant).size).toBeGreaterThan(0);
@@ -64,6 +74,26 @@ test('a set of faces answers for every role, and none falls back to the other se
     expect(paper(variant).family).toMatch(/^(?:Overpass|Anton)_/u);
     expect(typographyAt(variant, 'normal', 'legible').family).toMatch(/^AtkinsonHyperlegible_/u);
   }
+});
+
+/**
+ * Capitals and the air between them are one decision and are made once. A kicker set in capitals without tracking
+ * reads as a single long word, and a role tracked without being set in capitals is just a loose line; the paper has
+ * exactly one role that wants both, and none that wants either on its own.
+ */
+test('the kicker is the one role set in capitals, and the one role whose letters are opened', () => {
+  expect(TEXT_VARIANTS.filter((variant) => paper(variant).caps)).toEqual(['kicker']);
+  expect(TEXT_VARIANTS.filter((variant) => paper(variant).tracking > 0)).toEqual(['kicker']);
+});
+
+/** Tracking is a share of the size, like a line height, so the same air opens the letters at every reader step. */
+test('the letters of a kicker open by the same share at every step', () => {
+  const opened = TEXT_SCALES.map((scale) => {
+    const role = typographyAt('kicker', scale, 'paper');
+    return role.size * role.tracking;
+  });
+  expect(opened).toEqual([...opened].sort((left, right) => left - right));
+  expect(new Set(TEXT_SCALES.map((scale) => typographyAt('kicker', scale, 'paper').tracking)).size).toBe(1);
 });
 
 test('a set of faces changes the letters and nothing else', () => {

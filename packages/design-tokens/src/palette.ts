@@ -20,11 +20,19 @@ import { color } from './brand.ts';
  * taken down until it can be read as a letter on a light page, `uiRed` itself reaching only 3.83 there. The red is
  * untouched where it is a ground rather than a letter: that is the paper's, and the rule names the departure instead
  * of hiding it.
+ *
+ * `inkGrey` and `darkSecondary` are the middle step of an ink that had only two. A card sets a title and the summary
+ * under it, and both were printed in the same colour at the same weight — so the summary read as a second title
+ * rather than as what answers one. The two new values sit between the ink and the muted grey at roughly half the
+ * contrast of the step above them: 18.45, 9.74, 5.30 on the light page, 16.90, 11.21, 8.00 on the dark one. Each was
+ * chosen to sit between the two it separates rather than beside one of them — the dark page's, which had least room,
+ * stands 1.51 under the ink above it and 1.40 over the grey below.
  */
 export const PALETTE = {
   uiRed: color('#f13c47'),
   inkRed: color('#ca323c'),
   aubergine: color('#230434'),
+  inkGrey: color('#4c3f57'),
   premiumYellow: color('#ffd603'),
   blueGrey: color('#ecf2f2'),
   paleGrey: color('#f5f5f5'),
@@ -32,6 +40,7 @@ export const PALETTE = {
   darkSurface: color('#1e1e1e'),
   darkCard: color('#242424'),
   darkMuted: color('#b0a8b6'),
+  darkSecondary: color('#cfc7d5'),
   darkBorder: color('#333333'),
   dateGrey: color('#74677a'),
   white: color('#ffffff'),

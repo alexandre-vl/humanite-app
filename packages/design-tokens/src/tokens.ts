@@ -1,5 +1,5 @@
-import type { Angle, FontFamily, FontSize, LineHeight, Radius, Space } from './brand.ts';
-import { angle, fontFamily, fontSize, lineHeight, radius, space } from './brand.ts';
+import type { Angle, FontFamily, FontSize, LineHeight, Radius, Space, Tracking } from './brand.ts';
+import { angle, fontFamily, fontSize, lineHeight, radius, space, tracking } from './brand.ts';
 
 /** Spacing scale in points, on a four-point grid. */
 export const SPACING = {
@@ -83,6 +83,19 @@ export const FONT_FAMILIES = {
     display: fontFamily('AtkinsonHyperlegible_700Bold'),
   },
 } as const satisfies Readonly<Record<FaceSet, Readonly<Record<Face, FontFamily>>>>;
+
+/**
+ * How far a role opens its letters, as a share of its own size rather than a length.
+ *
+ * It is a ratio for the same reason a line height is: a role is set at four sizes, one per reader step, and a spacing
+ * written in points would be right at one of them and wrong at the other three. `wide` is what a line of small
+ * capitals needs to stop reading as a word with its letters stuck together; everything else asks for nothing, and
+ * says so.
+ */
+export const TRACKING = {
+  none: tracking(0),
+  wide: tracking(0.06),
+} as const satisfies Readonly<Record<string, Tracking>>;
 
 /**
  * Component sizes in points — heights the four-point SPACING grid does not reach.

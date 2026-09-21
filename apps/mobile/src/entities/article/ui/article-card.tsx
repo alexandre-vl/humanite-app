@@ -19,6 +19,8 @@ export type ArticleCardProps = Readonly<{
   summary: ArticleSummary;
   action?: ReactNode | undefined;
   signature?: DisplayText | null | undefined;
+  /** What the article belongs to, named over its title. A screen that is already one section names none. */
+  name?: DisplayText | null | undefined;
 }>;
 
 /**
@@ -78,10 +80,29 @@ function Facts({ summary, action }: FactsProps): ReactNode {
   );
 }
 
-type BodyProps = Readonly<{ summary: ArticleSummary; action: ReactNode; signature: DisplayText | null }>;
+type BodyProps = Readonly<{
+  summary: ArticleSummary;
+  action: ReactNode;
+  signature: DisplayText | null;
+  name: DisplayText | null;
+}>;
+
+/**
+ * The section a card belongs to, set over its title in small capitals.
+ *
+ * Without it a front page is a column of headlines with nothing to say which part of the paper each came from — the
+ * one thing a reader sorting twenty cards actually uses. It is drawn only where the screen supplies a name: inside a
+ * section, every card would carry the same word and say nothing.
+ */
+function Kicker({ name }: Readonly<{ name: DisplayText | null }>): ReactNode {
+  if (name === null) {
+    return null;
+  }
+  return <Text variant="kicker">{name}</Text>;
+}
 
 /** The front of a page: the picture first, at the width of the block, then the words under it. */
-function Lead({ summary, action }: BodyProps): ReactNode {
+function Lead({ summary, action, name }: BodyProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'card');
   return (
@@ -95,10 +116,11 @@ function Lead({ summary, action }: BodyProps): ReactNode {
           style={styles.picture}
         />
       )}
+      <Kicker name={name} />
       <Text variant="title" numberOfLines={3}>
         {summary.title}
       </Text>
-      <Text variant="standfirst" numberOfLines={3}>
+      <Text variant="summary" numberOfLines={3}>
         {summary.standfirst}
       </Text>
       <Facts summary={summary} action={action} />
@@ -107,11 +129,12 @@ function Lead({ summary, action }: BodyProps): ReactNode {
 }
 
 /** The card a block opens on: the title is read first and the picture answers it (capture 18). */
-function Stacked({ summary, action }: BodyProps): ReactNode {
+function Stacked({ summary, action, name }: BodyProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'card');
   return (
     <Box style={styles.card}>
+      <Kicker name={name} />
       <Text variant="title" numberOfLines={3}>
         {summary.title}
       </Text>
@@ -124,7 +147,7 @@ function Stacked({ summary, action }: BodyProps): ReactNode {
           style={styles.picture}
         />
       )}
-      <Text variant="standfirst" numberOfLines={4}>
+      <Text variant="summary" numberOfLines={4}>
         {summary.standfirst}
       </Text>
       <Facts summary={summary} action={action} />
@@ -133,11 +156,12 @@ function Stacked({ summary, action }: BodyProps): ReactNode {
 }
 
 /** A card in a line: the title across the block, then a small picture and the standfirst beside it (captures 09, 19). */
-function Line({ summary, action }: BodyProps): ReactNode {
+function Line({ summary, action, name }: BodyProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'thumbnail');
   return (
     <Box style={styles.card}>
+      <Kicker name={name} />
       <Text variant="title" numberOfLines={2}>
         {summary.title}
       </Text>
@@ -152,7 +176,7 @@ function Line({ summary, action }: BodyProps): ReactNode {
           />
         )}
         <Box style={styles.rest}>
-          <Text variant="standfirst" numberOfLines={3}>
+          <Text variant="summary" numberOfLines={3}>
             {summary.standfirst}
           </Text>
         </Box>
@@ -187,7 +211,7 @@ function Column({ summary, action, signature }: BodyProps): ReactNode {
       <Text variant="title" numberOfLines={3}>
         {summary.title}
       </Text>
-      <Text variant="standfirst" numberOfLines={3}>
+      <Text variant="summary" numberOfLines={3}>
         {summary.standfirst}
       </Text>
       <Facts summary={summary} action={action} />
@@ -196,14 +220,15 @@ function Column({ summary, action, signature }: BodyProps): ReactNode {
 }
 
 /** An item written without a picture: its words are the whole card (capture 02). */
-function Brief({ summary, action }: BodyProps): ReactNode {
+function Brief({ summary, action, name }: BodyProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
+      <Kicker name={name} />
       <Text variant="title" numberOfLines={3}>
         {summary.title}
       </Text>
-      <Text variant="standfirst" numberOfLines={3}>
+      <Text variant="summary" numberOfLines={3}>
         {summary.standfirst}
       </Text>
       <Facts summary={summary} action={action} />
@@ -219,12 +244,13 @@ function Brief({ summary, action }: BodyProps): ReactNode {
  * that laid it out. The five shapes are kept in this one file so that what separates them — the order of the same
  * four things, and the frame around the picture — can be read at a glance rather than diffed across five.
  *
- * `action` is whatever the screen lets a reader do to the article from the feed, and `signature` who signed it. The
- * card takes both already made: an entity may not name a route, hold an action of its own, nor ask for the newsroom's
- * roster from inside a cell that is mounted and thrown away as the reader scrolls.
+ * `action` is whatever the screen lets a reader do to the article from the feed, `signature` who signed it, and
+ * `name` the section it ran in. The card takes all three already made: an entity may not name a route, hold an
+ * action of its own, nor ask another entity for the newsroom's sections from inside a cell that is mounted and
+ * thrown away as the reader scrolls.
  */
-export function ArticleCard({ shape, summary, action, signature = null }: ArticleCardProps): ReactNode {
-  const body = { summary, action, signature };
+export function ArticleCard({ shape, summary, action, signature = null, name = null }: ArticleCardProps): ReactNode {
+  const body = { summary, action, signature, name };
   switch (shape) {
     case 'lead': {
       return <Lead {...body} />;

@@ -18,6 +18,12 @@ import { PALETTE } from './palette.ts';
  * light theme keeps for the settings it groups, and which measured 1.09 to 1 against the page: on a real screen, an
  * alternation nobody sees.
  *
+ * `textSecondary` is the middle of three inks, and it exists because a card has three things to say and had only two
+ * voices for them. The title and the summary under it were printed in the same colour and the same weight, four
+ * points apart: two titles, one of them inexplicably small. An ink sits between them now — near half the contrast of
+ * the one above, near twice the one below — so the order in which a card is read is set by the ink and not only by
+ * the size.
+ *
  * `link` is the red a word takes when pressing it goes somewhere, and it is not `primary` for the reason `headline`
  * is not one value either: a ground and a letter want the red from opposite ends. A ground carrying white has to be
  * dark enough to carry it; a letter on a light page has to be dark enough to be read, and a letter on a dark page
@@ -38,6 +44,7 @@ export type Theme = Readonly<{
   surface: Color;
   card: Color;
   textPrimary: Color;
+  textSecondary: Color;
   textMuted: Color;
   onPrimary: Color;
   headline: Color;
@@ -56,6 +63,7 @@ export const LIGHT_THEME = {
   surface: PALETTE.white,
   card: PALETTE.paleGrey,
   textPrimary: PALETTE.aubergine,
+  textSecondary: PALETTE.inkGrey,
   textMuted: PALETTE.dateGrey,
   onPrimary: PALETTE.white,
   headline: PALETTE.uiRed,
@@ -74,6 +82,7 @@ export const DARK_THEME = {
   surface: PALETTE.darkSurface,
   card: PALETTE.darkCard,
   textPrimary: PALETTE.paleGrey,
+  textSecondary: PALETTE.darkSecondary,
   textMuted: PALETTE.darkMuted,
   onPrimary: PALETTE.white,
   headline: PALETTE.white,

@@ -53,4 +53,14 @@ describe('TopBar', () => {
     await render(<TopBar title={asDisplayText(NAME)} />);
     expect(screen.queryByLabelText(t('action.back'))).toBeNull();
   });
+
+  /**
+   * A screen whose name is not known yet — a section waiting on the list that names it — carries none, and carries
+   * nothing in its place either. What the platform's own bar did instead was print the route's segment, so a reader
+   * arriving at a section read its address for a moment before reading its name.
+   */
+  it('carries no name where the screen has none to give', async () => {
+    await render(<TopBar onBack={jest.fn()} />);
+    expect(screen.queryByRole('header')).toBeNull();
+  });
 });

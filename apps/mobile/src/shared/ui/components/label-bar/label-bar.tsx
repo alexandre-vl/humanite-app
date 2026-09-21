@@ -51,7 +51,13 @@ export function LabelBar<Id extends string>({ items, active, onSelect }: LabelBa
             onSelect(item.id);
           }}
         >
-          <Text variant="label">{item.label}</Text>
+          {/* The label of the choice in force is set in the page's own ink and the others in the quiet one. The rule
+              under it was the only thing that changed, which asks a reader to compare two labels to see which is
+              which; the ink says it on each label by itself. A band that names no choice sets them all alike — there
+              is nothing quieter than the rest when there is no rest. */}
+          <Text variant="label" tone={active !== undefined && item.id !== active ? 'textMuted' : 'textPrimary'}>
+            {item.label}
+          </Text>
           <Box style={styles[item.id === active ? 'ruleActive' : 'rule']} />
         </Pressable>
       ))}

@@ -1,8 +1,8 @@
-import type { FontFamily, FontSize, LineHeight } from './brand.ts';
+import type { FontFamily, FontSize, LineHeight, Tracking } from './brand.ts';
 import { fontSize } from './brand.ts';
 import type { Theme } from './theme.ts';
 import type { Face, FaceSet } from './tokens.ts';
-import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from './tokens.ts';
+import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, TRACKING } from './tokens.ts';
 
 /**
  * The colours a run of text paints with: the subset of the theme's roles a text style may name.
@@ -13,6 +13,7 @@ import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from './tokens.ts';
  */
 export const TEXT_TONES = [
   'textPrimary',
+  'textSecondary',
   'textMuted',
   'onPrimary',
   'headline',
@@ -22,11 +23,32 @@ export const TEXT_TONES = [
 /** The name of a text colour. */
 export type TextTone = (typeof TEXT_TONES)[number];
 
-/** A role of the table: which face it is set in, at what size, on what multiple, and the tone it paints with. */
-type Role = Readonly<{ face: Face; size: FontSize; leading: LineHeight; tone: TextTone }>;
+/**
+ * A role of the table: which face it is set in, at what size, on what multiple, and the tone it paints with.
+ *
+ * Two roles also say how their letters stand. `caps` sets a line in capitals, which is what tells a reader that a
+ * word above a headline names the section rather than opening the sentence; `tracking` opens the letters, because
+ * capitals set at a word's spacing read as one long word. Both are left out wherever they are not wanted, so a table
+ * row says only what departs from plain setting.
+ */
+type Role = Readonly<{
+  face: Face;
+  size: FontSize;
+  leading: LineHeight;
+  tone: TextTone;
+  caps?: true;
+  tracking?: Tracking;
+}>;
 
-/** A role resolved for a reader: the family, size, multiple and tone a run of text is actually set in. */
-export type Typography = Readonly<{ family: FontFamily; size: FontSize; leading: LineHeight; tone: TextTone }>;
+/** A role resolved for a reader: everything a run of text is actually set in, with nothing left to decide. */
+export type Typography = Readonly<{
+  family: FontFamily;
+  size: FontSize;
+  leading: LineHeight;
+  tone: TextTone;
+  caps: boolean;
+  tracking: Tracking;
+}>;
 
 /**
  * The face a run takes inside a paragraph, where the paragraph's own face is not the one to use. A run changes its
@@ -48,11 +70,13 @@ export const TEXT_VARIANTS = [
   'display',
   'title',
   'standfirst',
+  'summary',
   'prose',
   'body',
   'label',
   'legend',
   'caption',
+  'kicker',
 ] as const;
 
 /** The name of a text style. */
@@ -69,16 +93,33 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * copy in a light weight, matched word for word at 1.000 against Roboto Light, the next candidate — Overpass Light —
  * scoring 0.943 (README:97). It is the weight that carries over and not the family: the site declares Overpass and
  * this app is set in it throughout, while the current app shows its copy in Roboto (README:103).
+ *
+ * `standfirst` and `summary` were one role and had to become two. A card and an article both carry a sentence under
+ * their title, and the two are not the same sentence: on an article it is the opening of the piece, read straight
+ * after a headline of thirty-four points and before the body; on a card it is what answers the title in a list of
+ * twenty others. Set as one, it was bold and in the ink of the title — so on a card it read as a second title, and
+ * on an article it read as no larger than the body it introduced. The article's is now regular at twenty points and
+ * keeps the ink; the card's is regular at sixteen in the middle ink.
+ *
+ * `kicker` is the word that names what a card belongs to, set above its title in small capitals. It is the one role
+ * whose letters are set apart — the only way twelve points of type reads as a label and not as the first line of the
+ * title under it.
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },
   display: { face: 'display', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   standfirst: {
-    face: 'bold',
-    size: FONT_SIZES.md,
+    face: 'regular',
+    size: FONT_SIZES.lg,
     leading: LINE_HEIGHTS.normal,
     tone: 'textPrimary',
+  },
+  summary: {
+    face: 'regular',
+    size: FONT_SIZES.md,
+    leading: LINE_HEIGHTS.normal,
+    tone: 'textSecondary',
   },
   prose: { face: 'light', size: FONT_SIZES.md, leading: LINE_HEIGHTS.loose, tone: 'textPrimary' },
   body: { face: 'regular', size: FONT_SIZES.md, leading: LINE_HEIGHTS.loose, tone: 'textPrimary' },
@@ -90,6 +131,14 @@ const TYPOGRAPHY = {
     tone: 'textPrimary',
   },
   caption: { face: 'regular', size: FONT_SIZES.sm, leading: LINE_HEIGHTS.normal, tone: 'textMuted' },
+  kicker: {
+    face: 'bold',
+    size: FONT_SIZES.xs,
+    leading: LINE_HEIGHTS.normal,
+    tone: 'textMuted',
+    caps: true,
+    tracking: TRACKING.wide,
+  },
 } as const satisfies Readonly<Record<TextVariant, Role>>;
 
 /** The steps a reader may set the text at, from the smallest to the largest. */
@@ -122,11 +171,16 @@ const FACTORS = {
  * this app has always obeyed it; what a reader sets here multiplies that, for the one reading they do in this paper.
  */
 export const typographyAt = (variant: TextVariant, scale: TextScale, faces: FaceSet): Typography => {
-  const role = TYPOGRAPHY[variant];
+  // Widened to the role type on the way out: the table is written `as const`, so a row that sets neither capitals nor
+  // tracking has no such property at all, and asking a literal for a field it does not carry is an error rather than
+  // an absence. Read as a `Role`, the two are optional and answer `undefined`, which is what they mean.
+  const role: Role = TYPOGRAPHY[variant];
   return {
     family: FONT_FAMILIES[faces][role.face],
     size: fontSize(Math.round(role.size * FACTORS[scale])),
     leading: role.leading,
     tone: role.tone,
+    caps: role.caps ?? false,
+    tracking: role.tracking ?? TRACKING.none,
   };
 };

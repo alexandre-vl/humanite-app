@@ -1,4 +1,4 @@
-import type { ArticleId, ArticleSummary } from '@huma/contracts';
+import type { ArticleId, ArticleSummary, DisplayText } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -21,6 +21,12 @@ export type ArticleFeedProps = Readonly<{
   rhythm: FeedRhythm;
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
+  /**
+   * What each article belongs to, if the screen wants its cards to say so. It is answered by the screen because the
+   * sections are another entity's, and an entity may not reach sideways for one; a screen may, and a screen already
+   * showing one section has nothing to gain from writing its name on every card.
+   */
+  name?: ((summary: ArticleSummary) => DisplayText | null) | undefined;
   header?: ReactNode;
   sticky?: ReactNode;
   stickyRows?: BandRows | undefined;
@@ -61,6 +67,7 @@ export function ArticleFeed({
   rhythm,
   onOpen,
   action,
+  name,
   header,
   sticky,
   stickyRows,
@@ -91,6 +98,7 @@ export function ArticleFeed({
             summary={row.summary}
             action={action?.(row.summary)}
             signature={row.shape === 'column' ? bylineOf(row.summary.authors, roster) : null}
+            name={name?.(row.summary) ?? null}
           />
         </Pressable>
       </Box>

@@ -47,6 +47,20 @@ describe.each(themes)('%s theme', (name, theme) => {
     expect(contrastRatio(theme.background, theme.block)).toBeGreaterThan(1.1);
   });
 
+  /**
+   * The three inks have to be three. What `legibility.ts` asks of each is that it be readable on its ground, and two
+   * roles holding the very same value answer that perfectly while saying nothing — which is what the paper did: a
+   * card's title and the sentence under it were printed in one colour, and the order they are read in rested on four
+   * points of size. The bar here is the order itself, and that each step is a step: a third of the contrast of the
+   * one above it, at least, so no two of them can be mistaken for one.
+   */
+  test(`${name}: the three inks step down, each clearly lighter than the one above`, () => {
+    const onPage = (tone: 'textPrimary' | 'textSecondary' | 'textMuted'): number =>
+      contrastRatio(theme[tone], theme.background);
+    expect(onPage('textPrimary')).toBeGreaterThan(onPage('textSecondary') * 1.3);
+    expect(onPage('textSecondary')).toBeGreaterThan(onPage('textMuted') * 1.3);
+  });
+
   test(`${name}: every colour it paints with is named in the palette`, () => {
     const named = new Set<Color>(Object.values(PALETTE));
     for (const [role, value] of Object.entries(theme)) {

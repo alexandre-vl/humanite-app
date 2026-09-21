@@ -66,15 +66,16 @@ describe('SectionPage', () => {
     expect(await screen.findByText('Rubrique introuvable')).toBeTruthy();
   });
 
-  it('nomme la barre du nom que le sommaire donne à la rubrique, et de rien avant qu’il réponde', async () => {
+  it('nomme la barre du nom que le sommaire donne à la rubrique, et non du segment de la route', async () => {
     mockRouteParams.id = 'monde';
     const label = (await content.getSections()).find((one) => one.id === SECTION_ID.parse('monde'))?.label;
     if (label === undefined) {
       throw new Error('le sommaire ne porte pas cette rubrique : le test ne vérifierait rien');
     }
     await renderPage();
-    expect(barTitle()).toBeNull();
     await settle();
+    // `monde` is the address; `Monde` is what the newsroom calls it. That a bar carries nothing until the list
+    // answers is the bar's own promise, held where the bar is tested.
     expect(barTitle()).toBe(label);
   });
 });

@@ -7,6 +7,7 @@ import { TopBar } from '#components/top-bar';
 import { ArticleFeed, stateOf } from '#entities/article';
 import type { ReadFeed } from '#entities/article';
 import { issueQuery, issuesQuery } from '#entities/issue';
+import { useSectionNames } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { formatDayLabel } from '#lib/format';
@@ -32,6 +33,7 @@ import { Surface } from '#primitives/surface';
  */
 export function IssuePage(): ReactNode {
   const id = useRouteParams((raw) => ISSUE_ID.parse(raw['id']));
+  const nameOf = useSectionNames();
   const shelf = useQuery(issuesQuery).data;
   const issue = shelf?.find((one) => one.id === id) ?? null;
   const unknown = shelf !== undefined && issue === null;
@@ -61,6 +63,7 @@ export function IssuePage(): ReactNode {
             router.push(articleHref(article));
           }}
           action={(summary) => <BookmarkToggle id={summary.id} />}
+          name={(summary) => nameOf(summary.section)}
         />
       )}
     </Surface>

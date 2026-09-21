@@ -54,8 +54,11 @@ export const PRINTINGS = {
     smallest: 'legend',
     grounds: ['background', 'ground', 'block', 'surface', 'card', 'border'],
   },
-  // A date under a card, the count under a cover, the hint under a row of settings.
-  textMuted: { smallest: 'caption', grounds: ['background', 'block', 'card'] },
+  // What answers a title on a card, on the page and on the ground a feed alternates onto.
+  textSecondary: { smallest: 'summary', grounds: ['background', 'block'] },
+  // A date under a card, the count under a cover, the hint under a row of settings, and the smallest of them all: the
+  // section named in capitals over a card's title.
+  textMuted: { smallest: 'kicker', grounds: ['background', 'block', 'card', 'surface'] },
   // The wire, the pill of a button, the mark on a column, the masthead of a cover: all the paper's own red.
   onPrimary: { smallest: 'caption', grounds: ['primary'] },
   // A headline stands on the sheet of an article, or on the torn paper of a callout.

@@ -20,10 +20,12 @@ const sizeOf = (variant: TextVariant): number => typographyAt(variant, SMALLEST,
  * large enough for WCAG's easier bar. Everything else — including a caption held at three to one until now — owes the
  * full four and a half.
  */
-test('one variant of the nine is large text, and the other eight owe the full bar', () => {
+test('the headline alone is large text, and every other variant owes the full bar', () => {
   const bars = TEXT_VARIANTS.map((variant) => [variant, requiredRatio(sizeOf(variant))] as const);
   expect(bars.filter(([, bar]) => bar === 3).map(([variant]) => variant)).toEqual(['headline']);
-  expect(bars.filter(([, bar]) => bar === 4.5)).toHaveLength(8);
+  // Counted off the list rather than written down: a variant added to the table joins one side or the other here,
+  // and a number in this line would have to be edited to keep saying something true.
+  expect(bars.filter(([, bar]) => bar === 4.5)).toHaveLength(TEXT_VARIANTS.length - 1);
 });
 
 describe.each(themes)('%s theme', (name, theme) => {
