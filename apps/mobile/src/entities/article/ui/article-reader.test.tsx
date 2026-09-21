@@ -51,6 +51,25 @@ const cornersTurned = (node: unknown): readonly string[] => {
   return [...turned, ...(isList(children) ? children.flatMap(cornersTurned) : [])];
 };
 
+/** One node of the rendered page, named off what the screen hands back rather than off the renderer's own types. */
+type Node = ReturnType<typeof screen.getByText>;
+
+/** Everything a node is laid inside, innermost first. */
+const ancestorsOf = (node: Node): readonly Node[] => {
+  const climbed: Node[] = [];
+  for (let walked = node.parent; walked !== null; walked = walked.parent) {
+    climbed.push(walked);
+  }
+  return climbed;
+};
+
+/** How far apart a box sets the things it holds, or nothing at all, which is the answer that was wrong. */
+const spaceInside = (node: Node): number => {
+  const style: unknown = node.props['style'];
+  const gap: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'gap') : null;
+  return typeof gap === 'number' ? gap : 0;
+};
+
 /** How a run of text is set, read back off the style the primitive resolved for it. */
 type Typeset = Readonly<{ fontSize: number; color: string }>;
 
@@ -212,6 +231,35 @@ describe('ArticleReader', () => {
     await read(article);
     expect(await screen.findByText(`Par ${signer.name}`, { exact: false })).toBeTruthy();
     expect(screen.queryByText(signer.id)).toBeNull();
+  });
+
+  /**
+   * The linked card sets its own parts apart, and the sheet under it cannot do it for them.
+   *
+   * A torn sheet of paper spaces the things laid on it, and this card laid exactly one thing on it — the target
+   * holding the picture, the title and the sentence — so the spacing went to a single child and none of the three
+   * got any. Measured on an A065: the title's box began twenty-two pixels inside the picture's, and the sentence
+   * twenty-two inside the title's. The callout printed a few lines above lays its three parts on the sheet itself
+   * and never showed it, which is why nothing here said the sheet's own gap had stopped reaching anybody.
+   */
+  it('écarte la photo, le titre et la phrase de la carte liée', async () => {
+    const article = await holding('related');
+    const related = article.blocks.find((block) => block.type === 'related');
+    if (related === undefined) {
+      throw new Error('bloc lié introuvable');
+    }
+    const target = await content.getArticle(related.id);
+    await read(article);
+    const title = await screen.findByText(target.title);
+    // The one thing on a reading screen that answers a press of its own: prose sets its links as words, without a
+    // role, so the card is the only node the page announces as one.
+    const card = screen.getByRole('link');
+    expect(spaceInside(card)).toBeGreaterThan(0);
+    // And the box between the title and that target — the pair of words — sets them apart too, more closely than
+    // the picture is set from them, which is how a card of the feed groups the very same three things.
+    const pair = ancestorsOf(title).find((node) => spaceInside(node) > 0);
+    expect(pair).not.toBe(card);
+    expect(spaceInside(pair ?? card)).toBeLessThan(spaceInside(card));
   });
 
   it('annonce l’article lié par son titre, et le rapporte quand on le presse', async () => {
