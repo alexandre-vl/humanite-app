@@ -1,13 +1,19 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatDateTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
+import { formatClockTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
 
-describe('formatDateTime', () => {
-  it('prints the day and the hour a timeline row carries', () => {
-    expect(formatDateTime('2026-09-12T17:52:00.000Z')).toBe('12/09, 19:52');
+describe('formatClockTime', () => {
+  it('prints the hour a row of the wire carries, and nothing of the day over it', () => {
+    expect(formatClockTime('2026-09-12T17:52:00.000Z')).toBe('19:52');
   });
 
   it('pads both halves of a small hour', () => {
-    expect(formatDateTime('2026-09-12T22:05:00.000Z')).toBe('13/09, 00:05');
+    expect(formatClockTime('2026-09-12T22:05:00.000Z')).toBe('00:05');
+  });
+
+  // The hour is the newsroom's, like every other reading here: an instant filed just before Paris midnight shows the
+  // hour Paris was on, under the head of the day Paris was on.
+  it('lit l’heure de Paris, donc une fin de soirée passe minuit avec elle', () => {
+    expect(formatClockTime('2026-09-12T23:30:00.000Z')).toBe('01:30');
   });
 });
 

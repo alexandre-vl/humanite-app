@@ -29,6 +29,10 @@ export type ReadFeed = Readonly<{
   items: readonly ArticleSummary[];
   state: FeedState;
   retry: () => void;
+  /** Reading the feed again from its first page, which is what a pull down the screen asks for. */
+  refresh: () => void;
+  /** Whether that reading is under way, and only that one: asking for the next page is not a refresh. */
+  refreshing: boolean;
   onEndReached?: (() => void) | undefined;
 }>;
 
@@ -48,7 +52,8 @@ export type PagedRead = ReadFeed & Readonly<{ total: number }>;
  * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
 export function usePagedFeed(query: PagedFeed): PagedRead {
-  const { data, status, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(query);
+  const { data, status, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(query);
   return {
     items: data?.pages.flatMap((page) => page.items) ?? [],
     total: data?.pages[0]?.total ?? 0,
@@ -56,6 +61,13 @@ export function usePagedFeed(query: PagedFeed): PagedRead {
     retry: () => {
       void refetch();
     },
+    refresh: () => {
+      void refetch();
+    },
+    // An infinite query calls itself refetching while it reaches for the next page too, and a spinner at the top of a
+    // list the reader has scrolled to the bottom of says nothing true. The page being asked for is what tells the two
+    // apart.
+    refreshing: isRefetching && !isFetchingNextPage,
     onEndReached: () => {
       if (hasNextPage && !isFetchingNextPage) {
         void fetchNextPage();
@@ -72,12 +84,16 @@ export function usePagedFeed(query: PagedFeed): PagedRead {
  * whole list is one call, however long it is.
  */
 export function useKeptFeed(ids: readonly ArticleId[]): ReadFeed {
-  const { data, status, refetch } = useQuery(keptQuery(ids));
+  const { data, status, refetch, isRefetching } = useQuery(keptQuery(ids));
   return {
     items: data ?? [],
     state: ids.length === 0 ? 'empty' : stateOf(status),
     retry: () => {
       void refetch();
     },
+    refresh: () => {
+      void refetch();
+    },
+    refreshing: isRefetching,
   };
 }

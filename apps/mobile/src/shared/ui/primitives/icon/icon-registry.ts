@@ -18,8 +18,12 @@ export const ICONS = {
   // The way out of a screen that was pushed. The platforms draw it differently and mean the same thing: iOS points
   // back along the edge it slid in from, Android points at the screen underneath.
   back: { ios: 'chevron.left', android: 'arrow_back' },
-  // The two states of one mark, outline then solid. The platforms name them the other way round from each other: an
-  // `ios` bookmark is the outline and Material's is the solid one, so the pair is spelt out rather than guessed.
+  // The two states of one mark. iOS draws them as a pair, outline then solid. Android cannot: the font this library
+  // ships is `MaterialSymbols_400Regular`, a static instance of Material Symbols at FILL 0, so every name in it is an
+  // outline. Rendered from that file at 96 points, `bookmark`, `bookmark_border`, `turned_in` and `turned_in_not` all
+  // ink 43 % of the same 56 × 73 box — one glyph under four names. The kept state is therefore said by the disc the
+  // toggle fills behind the mark, not by the mark, which is Material's own answer for a toggle and the only one
+  // available here. The pair is kept all the same, so iOS draws the fill it has.
   bookmark: { ios: 'bookmark', android: 'bookmark_border' },
   bookmarkKept: { ios: 'bookmark.fill', android: 'bookmark' },
   clear: { ios: 'xmark.circle.fill', android: 'cancel' },

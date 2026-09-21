@@ -78,10 +78,18 @@ const nameAt = (names: readonly string[], index: number): string => {
 // long as the whole of a front is of the week — and this paper's corpus is three days of one — no card needs a date,
 // and the article needs one printed prominently. The article's is `formatLongDate`, in letters.
 
-/** The moment an item was published, as a timeline row carries it: `12/09, 19:52`. */
-export const formatDateTime = (instant: string): DisplayText => {
+/**
+ * The hour an item was filed, as a row of the wire carries it: `19:52`.
+ *
+ * It carried the day as well — `12/09, 19:52` — under a band that stayed pinned at the top of the same screen reading
+ * `samedi 12 septembre`. The same date, printed once over the run and again on each of the dozen rows inside it. What
+ * that cost is a width and not a line: measured on an A065, the pair took 83 points of a 411-point screen and, with
+ * the rail beside it, pushed every title to start 140 points in — so the titles wrapped to four lines where they had
+ * the room for three. The hour alone takes 34.
+ */
+export const formatClockTime = (instant: string): DisplayText => {
   const clock = readClock(parseInstant(instant));
-  return asDisplayText(`${pad(clock.day)}/${pad(clock.month)}, ${pad(clock.hour)}:${pad(clock.minute)}`);
+  return asDisplayText(`${pad(clock.hour)}:${pad(clock.minute)}`);
 };
 
 // The calendar day an instant falls on is not here. It was, and it was the second place the paper computed it — the

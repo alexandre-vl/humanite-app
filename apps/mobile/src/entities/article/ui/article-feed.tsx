@@ -107,6 +107,8 @@ export function ArticleFeed({
       stickyRows={stickyRows}
       empty={<FeedStandIn state={feed.state} onRetry={feed.retry} empty={empty} />}
       onEndReached={feed.onEndReached}
+      refreshing={feed.refreshing}
+      onRefresh={feed.refresh}
     />
   );
 }

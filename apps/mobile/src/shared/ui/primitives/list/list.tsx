@@ -17,6 +17,13 @@ type ListCore<Item> = Readonly<{
   // Spelt with `undefined` because it is forwarded: a feed read in one call has no next page to ask for, and under
   // `exactOptionalPropertyTypes` handing that absence over is not the same as leaving the prop out.
   onEndReached?: (() => void) | undefined;
+  /**
+   * What a pull down the top of the list asks for, and whether that asking is under way. The pair is the platform's:
+   * the list hands both to the view under it, which draws the system's own spinner and holds it up until `refreshing`
+   * turns back. A list given neither shows no spinner and answers no pull.
+   */
+  onRefresh?: (() => void) | undefined;
+  refreshing?: boolean | undefined;
   contentStyle?: StyleRef;
 }>;
 
@@ -159,6 +166,8 @@ export function List<Item>({
   sticky,
   stickyRows = 1,
   onEndReached,
+  onRefresh,
+  refreshing,
   contentStyle,
 }: ListProps<Item>): ReactNode {
   const styles = useStyles();
@@ -195,6 +204,8 @@ export function List<Item>({
         contentContainerStyle={[styles[INSETS[above][rows]], contentStyle]}
         onEndReached={onEndReached}
         onEndReachedThreshold={END_THRESHOLD}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
         onScroll={(event) => {
           scrollY.set(event.nativeEvent.contentOffset.y);
         }}

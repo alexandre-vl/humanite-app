@@ -2,7 +2,8 @@ import { describe, expect, it } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
-import { formatDateTime, formatDayLabel } from '#lib/format';
+import { t } from '#i18n';
+import { formatClockTime, formatDayLabel } from '#lib/format';
 import { LivePage } from './live-page';
 
 const renderPage = async (): Promise<void> => {
@@ -16,24 +17,64 @@ const renderPage = async (): Promise<void> => {
   await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
 };
 
+/** The newest item of the wire, which every case below reads something of. */
+const newest = async () => {
+  const [item] = (await content.getLiveFeed({})).items;
+  if (item === undefined) {
+    throw new Error('le contenu ne sert aucun item : le test ne vérifierait rien');
+  }
+  return item;
+};
+
 describe('LivePage', () => {
-  it('coiffe le fil de la journée que ses items portent', async () => {
-    const [newest] = (await content.getLiveFeed({})).items;
-    if (newest === undefined) {
-      throw new Error('le contenu ne sert aucun item : le test ne vérifierait rien');
-    }
+  // Twice over: the list mounts the head of a run where the run begins, and again pinned at the top of its frame.
+  it('coiffe le fil de la journée que ses items portent, et l’y retient', async () => {
+    const item = await newest();
     await renderPage();
-    expect(await screen.findByText(formatDayLabel(newest.publishedAt))).toBeTruthy();
+    expect(await screen.findAllByText(formatDayLabel(item.publishedAt))).toHaveLength(2);
   });
 
-  it('donne à chaque item son heure et son titre, l’ouverture mise à part', async () => {
-    const { items } = await content.getLiveFeed({});
-    const listed = items.find((item) => item.hero === undefined);
-    if (listed === undefined) {
-      throw new Error('le contenu ne sert aucun item sans illustration : le test ne vérifierait rien');
+  // The wire opened on the newest illustrated item, laid across the screen with its title over the picture, and left
+  // it out of the list below. A wire has no front page: the item at the top is at the top because it is the newest.
+  it('donne à chaque item son heure et son titre, le plus récent compris', async () => {
+    const item = await newest();
+    await renderPage();
+    expect(await screen.findByText(item.title)).toBeTruthy();
+    expect(await screen.findAllByText(formatClockTime(item.publishedAt))).not.toHaveLength(0);
+  });
+
+  /**
+   * The day was printed twice: once on the band pinned over the run, and again on each of the dozen rows under it, as
+   * `12/09, 19:52`. Nothing else this screen prints writes a day and a month as two numbers, so that is what the
+   * second printing can be caught by.
+   */
+  it('n’écrit la date nulle part sous la journée qui la porte déjà', async () => {
+    const item = await newest();
+    await renderPage();
+    await screen.findByText(item.title);
+    expect(screen.queryByText(/\d{2}\/\d{2}/)).toBeNull();
+  });
+
+  it('nomme la rubrique de chaque ligne, huit rubriques tenant une seule colonne', async () => {
+    const item = await newest();
+    const ran = (await content.getSections()).find((section) => section.id === item.section);
+    if (ran === undefined) {
+      throw new Error('le contenu ne nomme pas la rubrique de cet item : le test ne vérifierait rien');
     }
     await renderPage();
-    expect(await screen.findByText(listed.title)).toBeTruthy();
-    expect(await screen.findByText(formatDateTime(listed.publishedAt))).toBeTruthy();
+    expect(await screen.findAllByText(ran.label)).not.toHaveLength(0);
+  });
+
+  /**
+   * The newsroom's own mark was a font weight and nothing else — the reference document asks what a title set in bold
+   * on this screen is supposed to mean, and leaves the question open. A word answers it.
+   */
+  it('dit en toutes lettres ce que la rédaction a marqué', async () => {
+    const { items } = await content.getLiveFeed({});
+    if (!items.some((item) => item.emphasis === true)) {
+      throw new Error('la première page ne porte aucun item marqué : le test ne vérifierait rien');
+    }
+    await renderPage();
+    expect(await screen.findAllByText(t('wire.marked'))).not.toHaveLength(0);
   });
 });

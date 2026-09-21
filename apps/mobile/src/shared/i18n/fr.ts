@@ -68,4 +68,7 @@ export const FR = {
   'settings.preview.text':
     'Les grévistes de la raffinerie ont voté la reconduction du mouvement jusqu’à lundi, au terme d’une assemblée générale qui a réuni près de six cents salariés.',
   'settings.reset': 'Réinitialiser',
+  // What the newsroom marked on the wire, said in a word. It was said in a font weight and nothing else, and the
+  // reference document asks, of the screen this replaces, what a title in bold there is supposed to mean.
+  'wire.marked': 'L’essentiel',
 } as const satisfies Readonly<Record<string, string>>;

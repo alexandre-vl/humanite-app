@@ -15,31 +15,20 @@ const twoPages = async (): Promise<readonly ArticleSummary[]> => {
   return [...first.items, ...second.items];
 };
 
-/** The item the wire opens on, worked out beside the code under test rather than by it. */
-const openerOf = (items: readonly ArticleSummary[]): ArticleSummary | undefined =>
-  items.find((item) => item.hero !== undefined);
-
 describe('wireRows', () => {
-  it('ouvre le fil sur l’item illustré le plus récent', async () => {
-    const items = await twoPages();
-    const [opener] = wireRows(items);
-    expect(opener?.kind).toBe('hero');
-    expect(opener?.kind === 'hero' ? opener.summary.id : null).toBe(openerOf(items)?.id);
-  });
-
-  it('ne liste pas une seconde fois l’item sur lequel il ouvre', async () => {
+  // The wire opened on the newest illustrated item, printed the width of the screen with its title over the picture,
+  // and left it out of the list below. It is a card of the front page, and this screen has no front page: what is at
+  // the top of a wire is at the top because it is the newest.
+  it('liste chaque item du fil, sans en réserver un à une ouverture', async () => {
     const items = await twoPages();
     const listed = wireRows(items).flatMap((row) => (row.kind === 'item' ? [row.summary.id] : []));
-    expect(listed).not.toContain(openerOf(items)?.id);
-    expect(listed).toHaveLength(items.length - 1);
+    expect(listed).toEqual(items.map((item) => item.id));
   });
 
   it('coiffe chaque journée d’un seul en-tête, par-dessus les bornes de page', async () => {
     const items = await twoPages();
-    const opener = openerOf(items);
     const headed = wireRows(items).flatMap((row) => (row.kind === 'day' ? [row.day] : []));
-    const listed = items.filter((item) => item.id !== opener?.id);
-    expect(headed).toEqual([...new Set(listed.map((item) => issueIdAt(item.publishedAt)))]);
+    expect(headed).toEqual([...new Set(items.map((item) => issueIdAt(item.publishedAt)))]);
     expect(headed.length).toBeGreaterThan(1);
   });
 
@@ -81,8 +70,8 @@ describe('les lignes du fil', () => {
     expect([...pinned]).toEqual(['day']);
   });
 
-  it('nomment trois arbres, un par sorte de ligne', async () => {
+  it('nomment deux arbres, un par sorte de ligne', async () => {
     const kinds = [...new Set(wireRows(await twoPages()).map(rowKind))];
-    expect(kinds.sort((left, right) => left.localeCompare(right))).toEqual(['day', 'hero', 'item']);
+    expect(kinds.sort((left, right) => left.localeCompare(right))).toEqual(['day', 'item']);
   });
 });

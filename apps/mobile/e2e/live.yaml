@@ -1,11 +1,16 @@
-# Le fil « En continu » s’ouvre et défile.
+# Le fil « En continu » s’ouvre, coiffé de sa journée, et défile.
 #
 # Le défilement est le geste qu’aucun banc sans écran ne fait : les cellules d’une liste virtualisée ne sont recyclées
 # que quand il y a une fenêtre à quitter, et une bande qui s’effondre à zéro y reste invisible.
+#
+# La journée est écrite ici sans guillemets : c’est une date du corpus, pas un mot du dictionnaire. Elle est aussi la
+# seule ligne du fil qu’aucune capitale ne transforme — une rubrique et la marque de la rédaction sont composées en
+# petites capitales par le type, et ce que la hiérarchie donne à lire n’est plus ce que le dictionnaire écrit.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn: 'En continu'
+- assertVisible: dimanche 13 septembre
 - takeScreenshot: live-top
 - scroll
 - scroll
