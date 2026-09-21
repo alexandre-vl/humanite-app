@@ -1,6 +1,7 @@
 import { ARTICLE_ID } from '@huma/contracts';
-import { Stack, router } from 'expo-router';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
+import { TopBar } from '#components/top-bar';
 import { ArticleReader } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
 import { NEWSROOM } from '#config';
@@ -16,10 +17,10 @@ import { Surface } from '#primitives/surface';
  *
  * The route is pushed at the root of the stack rather than inside the tabs, so reading covers the tab bar — which is
  * what the current app does, and what the reference calls for: `Article — plein écran, retour ‹, sans barre du bas`.
- * The native header stays, carrying the back chevron and no title: an article's own headline is already the first
- * thing under it, and repeating it in a bar would say it twice.
+ * The bar across the top carries the way back and no name: an article's own headline is already the first thing
+ * under it, and repeating it in a bar would say it twice.
  *
- * Keeping the article is offered from that same header, opposite the chevron. The screen this copies puts the mark in
+ * Keeping the article is offered from that same bar, opposite the chevron. The screen this copies puts the mark in
  * the flow of the text, where it scrolls out of reach of a reader who has read down to the end and decided: the two
  * things one does to an article one is reading — leave it, keep it — belong together and stay.
  *
@@ -33,7 +34,12 @@ export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
   return (
     <Surface>
-      <Stack.Screen options={{ title: '', headerRight: () => <BookmarkToggle id={id} /> }} />
+      <TopBar
+        onBack={() => {
+          router.back();
+        }}
+        actions={<BookmarkToggle id={id} />}
+      />
       <ArticleReader
         id={id}
         onFollow={(target) => {

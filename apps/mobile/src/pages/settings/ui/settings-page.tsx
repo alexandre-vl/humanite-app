@@ -1,9 +1,10 @@
 import type { DisplayText } from '@huma/contracts';
 import type { FaceSet, TextScale, ThemeChoice } from '@huma/design-tokens';
 import { RADII, SPACING, TEXT_SCALES, THEME_CHOICES } from '@huma/design-tokens';
-import { Stack } from 'expo-router';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Button } from '#components/button';
+import { TopBar } from '#components/top-bar';
 import type { SegmentedItem } from '#components/segmented-control';
 import { SegmentedControl } from '#components/segmented-control';
 import { usePreferences } from '#features/preferences';
@@ -97,7 +98,12 @@ export function SettingsPage(): ReactNode {
   const reset = usePreferences((settings) => settings.reset);
   return (
     <Surface>
-      <Stack.Screen options={{ title: t('settings.title') }} />
+      <TopBar
+        title={t('settings.title')}
+        onBack={() => {
+          router.back();
+        }}
+      />
       <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
         <Setting label={t('settings.appearance')}>
           <SegmentedControl items={APPEARANCES} active={theme} onSelect={chooseTheme} />

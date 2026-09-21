@@ -14,15 +14,12 @@ void preventAutoHideAsync();
 /**
  * The stack of pushed screens, in the colours in force.
  *
- * A native header is drawn by the platform and takes none of the style table the app builds, so the colours it needs
- * come from the one constructor that names them — or it stays the system's white slab over a paper printed dark.
+ * No screen is named here any more. The one that was — the tab group, the only screen that asked for no header —
+ * said by its exception that the header was the rule; now that every screen draws its own bar, the rule is the
+ * exception and the stack is told once, for all of them.
  */
 function ThemedStack(): ReactNode {
-  return (
-    <Stack screenOptions={chromeOptions(useTheme())}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
-  );
+  return <Stack screenOptions={chromeOptions(useTheme())} />;
 }
 
 export function RootLayout(): ReactNode {

@@ -11,15 +11,11 @@ import { ArticlePage } from './article-page';
 // Both doubles are built inside their factory: jest hoists the calls above everything else in the file, so anything
 // they read from outside would still be undefined when the screen first asks. The routing module keeps everything
 // else it holds — the screen reads its own parameter through it, and the article route is built from it.
-jest.mock('expo-router', () => {
-  const stackScreen = (): null => null;
-  return {
-    __esModule: true,
-    router: { replace: jest.fn() },
-    Stack: { Screen: stackScreen },
-    useLocalSearchParams: (): Readonly<Record<string, string>> => ({ id: mockRead.id }),
-  };
-});
+jest.mock('expo-router', () => ({
+  __esModule: true,
+  router: { replace: jest.fn(), back: jest.fn() },
+  useLocalSearchParams: (): Readonly<Record<string, string>> => ({ id: mockRead.id }),
+}));
 
 jest.mock('#lib/routing', () => ({
   __esModule: true,

@@ -1,13 +1,9 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import type { ReactNode } from 'react';
 import { usePreferences } from '#features/preferences';
 import { SettingsPage } from './settings-page';
 
-jest.mock('expo-router', () => {
-  const stackScreen = (): ReactNode => null;
-  return { __esModule: true, Stack: { Screen: stackScreen } };
-});
+jest.mock('expo-router', () => ({ __esModule: true, router: { back: jest.fn() } }));
 
 /** The sample the screen sets in an article's own prose, named once so the assertions read as the screen does. */
 const SAMPLE =

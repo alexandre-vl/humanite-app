@@ -94,6 +94,11 @@ export const FONT_FAMILIES = {
  * `stroke` is the rule the paper draws where it draws one — the line a timeline hangs its items from, the line a field
  * is typed on. It is here rather than on the spacing grid because it is finer than the grid's smallest step.
  *
+ * `bar` is the height of the bar every screen draws across its top, and `barSide` the width kept free at each of its
+ * ends for the controls it hangs there. The name in the middle is laid over the row between those two margins rather
+ * than placed in it, so it sits in the middle of the screen whether the bar carries one control or three — which is
+ * what a bar the platform lays out does, and what the app had to take over when it stopped drawing one.
+ *
  * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst, and `cover` the
  * width of a numéro standing on the newsstand's shelf. Both are widths, not heights, and the only two the paper names:
  * everything else a card lays out is a share of the screen it is given, while these have to be read against the width
@@ -110,6 +115,8 @@ export const SIZES = {
   bandPair: space(BAND * 2),
   headerBand: space(HEADER_EXPANDED + BAND),
   headerBandPair: space(HEADER_EXPANDED + BAND * 2),
+  bar: space(56),
+  barSide: space(88),
   stroke: space(2),
   thumbnail: space(96),
   cover: space(140),

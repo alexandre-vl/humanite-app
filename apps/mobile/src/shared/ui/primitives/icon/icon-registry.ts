@@ -15,6 +15,9 @@ type IconSymbol = Readonly<{ ios: SFSymbol; android: AndroidSymbol }>;
  */
 export const ICONS = {
   account: { ios: 'person', android: 'person' },
+  // The way out of a screen that was pushed. The platforms draw it differently and mean the same thing: iOS points
+  // back along the edge it slid in from, Android points at the screen underneath.
+  back: { ios: 'chevron.left', android: 'arrow_back' },
   // The two states of one mark, outline then solid. The platforms name them the other way round from each other: an
   // `ios` bookmark is the outline and Material's is the solid one, so the pair is spelt out rather than guessed.
   bookmark: { ios: 'bookmark', android: 'bookmark_border' },

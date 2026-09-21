@@ -1,8 +1,9 @@
 import { SECTION_ID } from '@huma/contracts';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, router } from 'expo-router';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { EmptyState } from '#components/empty-state';
+import { TopBar } from '#components/top-bar';
 import { ArticleFeed, sectionFeedQuery, usePagedFeed } from '#entities/article';
 import { SectionBar, sectionsQuery } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
@@ -21,8 +22,8 @@ import { Surface } from '#primitives/surface';
  * Choosing another section replaces this screen instead of stacking one more, so going back leaves the sections rather
  * than walking every one already visited.
  *
- * The header is named from the first frame, empty until the list answers: a screen that waits for its title to render
- * one at all leaves the navigator showing the route's own segment in the meantime.
+ * The bar is named as soon as the list answers and carries no name before then: a section is named by the newsroom,
+ * and a screen that guessed one from the address would print whatever the address happened to spell.
  */
 export function SectionPage(): ReactNode {
   const id = useRouteParams((raw) => SECTION_ID.parse(raw['id']));
@@ -32,7 +33,12 @@ export function SectionPage(): ReactNode {
   const feed = usePagedFeed(sectionFeedQuery(id));
   return (
     <Surface>
-      <Stack.Screen options={{ title: section?.label ?? '' }} />
+      <TopBar
+        title={section?.label}
+        onBack={() => {
+          router.back();
+        }}
+      />
       {unknown ? (
         <EmptyState title={t('section.unknown.title')} message={t('section.unknown.message')} />
       ) : (

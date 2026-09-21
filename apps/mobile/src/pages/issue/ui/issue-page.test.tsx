@@ -2,7 +2,6 @@ import { ISSUE_ID } from '@huma/contracts';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen } from '@testing-library/react-native';
-import type { ReactNode } from 'react';
 import { content } from '#api';
 import { IssuePage } from './issue-page';
 
@@ -10,21 +9,11 @@ import { IssuePage } from './issue-page';
  * factory below is allowed to read it. */
 const mockRouteParams = { id: '2026-09-11' };
 
-/** Every title the screen has handed the navigator, in the order it did: the first is what the bar shows at once. */
-const mockScreenTitles: string[] = [];
-
-jest.mock('expo-router', () => {
-  const stackScreen = ({ options }: Readonly<{ options: Readonly<{ title: string }> }>): ReactNode => {
-    mockScreenTitles.push(options.title);
-    return null;
-  };
-  return {
-    __esModule: true,
-    useLocalSearchParams: (): typeof mockRouteParams => mockRouteParams,
-    router: { push: jest.fn() },
-    Stack: { Screen: stackScreen },
-  };
-});
+jest.mock('expo-router', () => ({
+  __esModule: true,
+  useLocalSearchParams: (): typeof mockRouteParams => mockRouteParams,
+  router: { push: jest.fn(), back: jest.fn() },
+}));
 
 const renderPage = async (): Promise<void> => {
   await render(
@@ -37,7 +26,6 @@ const renderPage = async (): Promise<void> => {
 
 describe('IssuePage', () => {
   beforeEach(() => {
-    mockScreenTitles.splice(0);
     mockRouteParams.id = '2026-09-11';
   });
 
@@ -64,9 +52,10 @@ describe('IssuePage', () => {
     expect(places).toEqual([...places].sort((left, right) => left - right));
   });
 
-  it('nomme la barre du jour que le numéro porte, dès la première image', async () => {
+  it('nomme la barre du jour que le numéro porte', async () => {
     await renderPage();
-    expect(mockScreenTitles.at(-1)).toBe('vendredi 11 septembre');
+    // The day in full is written nowhere else on this screen: the cards under it carry `11/09/2026`.
+    expect(await screen.findByText('vendredi 11 septembre')).toBeTruthy();
   });
 
   it('dit qu’un jour que le journal n’a jamais imprimé est introuvable', async () => {

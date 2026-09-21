@@ -1,8 +1,9 @@
 import { ISSUE_ID } from '@huma/contracts';
 import { useQuery } from '@tanstack/react-query';
-import { Stack, router } from 'expo-router';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { EmptyState } from '#components/empty-state';
+import { TopBar } from '#components/top-bar';
 import { ArticleFeed, stateOf } from '#entities/article';
 import type { ReadFeed } from '#entities/article';
 import { issueQuery, issuesQuery } from '#entities/issue';
@@ -26,8 +27,8 @@ import { Surface } from '#primitives/surface';
  * for the shelf and says a numéro is not on it, rather than showing an empty sommaire that would read as a day the
  * newsroom filed nothing on. The shelf never goes stale and is already in hand for a reader who came from it.
  *
- * The day is named in the navigator's own bar, as every pushed screen names itself, and read off the shelf rather than
- * off the sommaire: arriving from the newsstand, the bar carries the day from the first frame.
+ * The day is named in the bar, as every pushed screen names itself, and read off the shelf rather than off the
+ * sommaire: arriving from the newsstand, the bar carries the day from the first frame.
  */
 export function IssuePage(): ReactNode {
   const id = useRouteParams((raw) => ISSUE_ID.parse(raw['id']));
@@ -44,7 +45,12 @@ export function IssuePage(): ReactNode {
   };
   return (
     <Surface>
-      <Stack.Screen options={{ title: issue === null ? '' : formatDayLabel(issue.opener.publishedAt) }} />
+      <TopBar
+        title={issue === null ? undefined : formatDayLabel(issue.opener.publishedAt)}
+        onBack={() => {
+          router.back();
+        }}
+      />
       {unknown ? (
         <EmptyState title={t('issue.unknown.title')} message={t('issue.unknown.message')} />
       ) : (

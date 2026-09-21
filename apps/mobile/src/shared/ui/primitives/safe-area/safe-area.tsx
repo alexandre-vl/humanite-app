@@ -1,27 +1,20 @@
 import type { ReactNode } from 'react';
-import { View } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '../../../lib/styles';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export type SafeAreaRootProps = Readonly<{ children: ReactNode }>;
 
 /**
- * Holds every screen clear of the status bar and paints the theme's ground behind it. An edge-to-edge window draws
- * under the system bars, so the inset is the app's to apply; it is a device measurement, not a token, which is why it
- * reaches the view outside a style.
+ * Measures the window and offers what the system bars cover to whoever draws under them.
+ *
+ * It holds the measurement and nothing else. It used to pay the top inset itself, for the whole stack at once, and
+ * that was a second payment: a pushed screen also carried a native header, and `react-native-screens` pads that
+ * header from the window's own decor view whatever the app has already done above it
+ * (`CustomToolbar.kt`, `shouldApplyTopInset` hard-coded true since SDK 35). A tab root paid the inset once and a
+ * pushed screen paid it twice, which is the empty band the reader saw at the top of every sub-screen.
+ *
+ * The app draws its own bar now, so the inset is paid once, by the ground each screen draws on — which is also what
+ * lets a screen printed red run its colour up behind the clock instead of leaving a white strip over it.
  */
-function SafeAreaFrame({ children }: SafeAreaRootProps): ReactNode {
-  const insets = useSafeAreaInsets();
-  const theme = useTheme();
-  const frame = { flex: 1, paddingTop: insets.top, backgroundColor: theme.background };
-  return <View style={frame}>{children}</View>;
-}
-
-/** Provides the safe-area insets to the whole tree: the one place that reads react-native-safe-area-context. */
 export function SafeAreaRoot({ children }: SafeAreaRootProps): ReactNode {
-  return (
-    <SafeAreaProvider>
-      <SafeAreaFrame>{children}</SafeAreaFrame>
-    </SafeAreaProvider>
-  );
+  return <SafeAreaProvider>{children}</SafeAreaProvider>;
 }

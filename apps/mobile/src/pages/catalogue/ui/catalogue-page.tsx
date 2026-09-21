@@ -1,5 +1,7 @@
 import { SPACING } from '@huma/design-tokens';
+import { router } from 'expo-router';
 import type { ReactNode } from 'react';
+import { TopBar } from '#components/top-bar';
 import type { CatalogLevel } from '#lib/catalogue';
 import { asDisplayText } from '#lib/display-text';
 import { createStyles } from '#lib/styles';
@@ -29,6 +31,11 @@ export function CataloguePage(): ReactNode {
   const styles = useStyles();
   return (
     <Surface>
+      <TopBar
+        onBack={() => {
+          router.back();
+        }}
+      />
       <Scroll axis="vertical" contentStyle={styles.content}>
         {LEVELS.map((level) => (
           <Box key={level} style={styles.section}>

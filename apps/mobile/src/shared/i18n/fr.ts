@@ -11,6 +11,7 @@ export const FR = {
   'account.contact.mail.hint': 'Par courriel',
   'account.contact.phone': '01 55 84 40 30',
   'account.contact.phone.hint': 'Par téléphone',
+  'action.back': 'Revenir',
   'action.retry': 'Réessayer',
   'app.name': 'Humanité',
   'article.premium': 'Abonnés',
