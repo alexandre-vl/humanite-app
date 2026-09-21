@@ -9,7 +9,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | ADR                                                                             | Titre                                                       | Statut  | Importance                                                                 |
 | ------------------------------------------------------------------------------- | ----------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
 | [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md)       | Décisions structurantes en ADR MADR vérifiés et figés       | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`, `reversal-cost` |
-| [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md)  | Monorepo pnpm à catalog strict et versions Expo contrôlées  | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md)  | Monorepo pnpm à catalog strict et versions Expo contrôlées  | accepté | `dependency`, `guarded-config`                                             |
 | [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                  | Plateforme Expo SDK 57 et New Architecture                  | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                 | TypeScript 6 ultra-strict en version unique                 | proposé | `dependency`, `guarded-config`                                             |
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                 | Lint et format bloquants sans désactivation                 | proposé | `guarded-config`                                                           |
@@ -59,7 +59,7 @@ Statut : accepté. Périmètre : `docs/adr/**`, `tools/adr/**`, `tools/agents/sr
 
 ### ADR-0001 · Monorepo pnpm à catalog strict et versions Expo contrôlées
 
-Statut : proposé. Périmètre : `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `package.json`, `apps/*/package.json`, `packages/*/package.json`, `tools/*/package.json`, `tools/deps/**`, `tools/governance/src/cli/deps-check.ts`.
+Statut : accepté. Périmètre : `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `package.json`, `apps/*/package.json`, `packages/*/package.json`, `tools/*/package.json`, `tools/deps/**`, `tools/governance/src/cli/deps-check.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                            |
 | ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
