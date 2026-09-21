@@ -11,7 +11,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0000](0000-decisions-structurantes-en-adr-madr-verifies-et-figes.md)       | Décisions structurantes en ADR MADR vérifiés et figés       | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`, `reversal-cost` |
 | [ADR-0001](0001-monorepo-pnpm-a-catalog-strict-et-versions-expo-controlees.md)  | Monorepo pnpm à catalog strict et versions Expo contrôlées  | accepté | `dependency`, `guarded-config`                                             |
 | [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                  | Plateforme Expo SDK 57 et New Architecture                  | accepté | `dependency`, `guarded-config`, `reversal-cost`                            |
-| [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                 | TypeScript 6 ultra-strict en version unique                 | proposé | `dependency`, `guarded-config`                                             |
+| [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                 | TypeScript 6 ultra-strict en version unique                 | accepté | `dependency`, `guarded-config`                                             |
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                 | Lint et format bloquants sans désactivation                 | proposé | `guarded-config`                                                           |
 | [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)         | Architecture FSD avec routes hors src et couche _app        | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                               | Niveaux de composants L0 à L4                               | proposé | `guarded-config`, `boundary`                                               |
@@ -84,7 +84,7 @@ Statut : accepté. Périmètre : `apps/mobile/app.config.ts`, `apps/mobile/app/*
 
 ### ADR-0003 · TypeScript 6 ultra-strict en version unique
 
-Statut : proposé. Périmètre : `packages/tsconfig/**`, `tsconfig.json`, `apps/*/tsconfig.json`, `packages/*/tsconfig.json`, `tools/*/tsconfig.json`, `tools/governance/src/tsconfig-snapshot.ts`.
+Statut : accepté. Périmètre : `packages/tsconfig/**`, `tsconfig.json`, `apps/*/tsconfig.json`, `packages/*/tsconfig.json`, `tools/*/tsconfig.json`, `tools/governance/src/tsconfig-snapshot.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                  |
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
