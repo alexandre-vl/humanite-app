@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { ScrollView } from 'react-native';
 import type { StyleRef } from '../../../lib/styles';
 
@@ -7,6 +8,12 @@ export type ScrollProps = Readonly<{
   axis: 'vertical' | 'horizontal';
   style?: StyleRef;
   contentStyle?: StyleRef;
+  /**
+   * Where along its own axis the region should be, when something other than the finger decides. A band of labels
+   * wider than the screen uses it to bring the chosen label into view after a swipe chose it elsewhere. It is a
+   * measurement taken from what the region has laid out, not a token, and leaving it out leaves the region alone.
+   */
+  at?: number | undefined;
 }>;
 
 /**
@@ -21,10 +28,19 @@ export type ScrollProps = Readonly<{
  * the question every time makes the answer readable at the call site, which is the only place that knows what else the
  * screen mounts.
  */
-export function Scroll({ children, axis, style, contentStyle }: ScrollProps): ReactNode {
+export function Scroll({ children, axis, style, contentStyle, at }: ScrollProps): ReactNode {
+  const scroll = useRef<ScrollView>(null);
+  const across = axis === 'horizontal';
+  useEffect(() => {
+    if (at === undefined) {
+      return;
+    }
+    scroll.current?.scrollTo(across ? { x: at, animated: true } : { y: at, animated: true });
+  }, [at, across]);
   return (
     <ScrollView
-      horizontal={axis === 'horizontal'}
+      ref={scroll}
+      horizontal={across}
       showsHorizontalScrollIndicator={false}
       style={style}
       contentContainerStyle={contentStyle}

@@ -1,4 +1,4 @@
-import type { ArticleId, IssueId, SectionId } from '@huma/contracts';
+import type { ArticleId, IssueId } from '@huma/contracts';
 import { openURL } from 'expo-linking';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -16,11 +16,10 @@ export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly
  */
 export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
 
-/** Where one section is read, as the router takes it. */
-export type SectionHref = Readonly<{ pathname: '/section/[id]'; params: Readonly<{ id: SectionId }> }>;
-
-/** Where to send a reader who chose a section, for the same reason: the front page opens one, a section replaces itself. */
-export const sectionHref = (id: SectionId): SectionHref => ({ pathname: '/section/[id]', params: { id } });
+// A section has no address of its own any more, and no screen. It is a page of the front screen, turned by swiping
+// across it or by pressing its name in the band, so there is nowhere to send a reader who chose one — there is only
+// a page to turn to. What the app had was a route nothing could reach except that band, and a screen that replaced
+// itself every time another section was chosen.
 
 /** Where one numéro is read, as the router takes it. */
 export type IssueHref = Readonly<{ pathname: '/issue/[id]'; params: Readonly<{ id: IssueId }> }>;

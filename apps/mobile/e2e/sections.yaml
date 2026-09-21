@@ -1,0 +1,22 @@
+# Une rubrique est une page de la une, et non un écran posé par-dessus.
+#
+# Ce que le parcours tient est le fronton : avant, toucher une rubrique poussait un écran dont la barre portait le nom
+# de la rubrique, et le nom du journal disparaissait. Il reste maintenant, parce qu’on n’a pas quitté l’écran — on a
+# tourné une page.
+#
+# « Monde » est écrit sans guillemets : c’est un nom que la rédaction publie, pas un mot du dictionnaire de l’app. Même
+# raison qu’au kiosque, où une couverture se touche par un point plutôt que par les mots qu’un formateur y écrit.
+#
+# Le balayage ne s’assortit d’aucune assertion : rien de ce qui distingue une rubrique de la suivante n’est un mot du
+# dictionnaire. Ce sont les deux captures qui le disent.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- assertVisible: 'À la une'
+- tapOn: Monde
+- assertVisible: 'L’Humanité'
+- takeScreenshot: section-tapped
+- swipe:
+    direction: RIGHT
+- takeScreenshot: section-swiped
+- assertVisible: 'À la une'

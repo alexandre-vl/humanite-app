@@ -10,6 +10,12 @@ export type PressableProps = Readonly<{
   label?: DisplayText | undefined;
   role?: 'radio' | 'button' | 'link' | undefined;
   selected?: boolean | undefined;
+  /**
+   * Where the target came to rest inside whatever laid it out, once that is known. A band of choices wider than the
+   * screen reads it to know how far along the chosen one sits, which is the only way to bring it into view: what a
+   * label measures depends on the word, the face and the step the reader set, and none of those is known in advance.
+   */
+  onMeasure?: ((frame: Readonly<{ x: number; width: number }>) => void) | undefined;
 }>;
 
 /**
@@ -26,7 +32,7 @@ export type PressableProps = Readonly<{
  * something else. Without one a target is announced as a name and nothing more, and a reader hears what it says
  * without being told they may press it.
  */
-export function Pressable({ children, style, onPress, label, role, selected }: PressableProps): ReactNode {
+export function Pressable({ children, style, onPress, label, role, selected, onMeasure }: PressableProps): ReactNode {
   return (
     <NativePressable
       style={style}
@@ -34,6 +40,13 @@ export function Pressable({ children, style, onPress, label, role, selected }: P
       accessibilityLabel={label}
       accessibilityRole={role}
       accessibilityState={selected === undefined ? undefined : { selected }}
+      onLayout={
+        onMeasure === undefined
+          ? undefined
+          : (event) => {
+              onMeasure({ x: event.nativeEvent.layout.x, width: event.nativeEvent.layout.width });
+            }
+      }
     >
       {children}
     </NativePressable>

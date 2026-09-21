@@ -1,28 +1,78 @@
+import type { DisplayText, SectionId } from '@huma/contracts';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
+import { useState } from 'react';
+import type { LabelBarItem } from '#components/label-bar';
+import { LabelBar } from '#components/label-bar';
 import { TopBar, TopBarButton } from '#components/top-bar';
-import { ArticleFeed, feedQuery, usePagedFeed } from '#entities/article';
-import { SectionBar, useSectionNames } from '#entities/section';
+import { ArticleFeed, feedQuery, sectionFeedQuery, usePagedFeed } from '#entities/article';
+import { useSectionNames, useSections } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
-import { articleHref, BOOKMARKS_HREF, sectionHref, SETTINGS_HREF } from '#lib/routing';
+import { articleHref, BOOKMARKS_HREF, SETTINGS_HREF } from '#lib/routing';
+import { createStyles } from '#lib/styles';
+import { Box } from '#primitives/box';
+import { Pager } from '#primitives/pager';
 import { Surface } from '#primitives/surface';
 
+/** The identifier the band reports for the front page itself, which is no section and has none. */
+const FRONT = 'front';
+
+/** One page of the paper: the whole of it, or one section of it. */
+type Leaf = Readonly<{ id: string; label: DisplayText; section: SectionId | null }>;
+
+const useStyles = createStyles(() => ({ page: { flex: 1 } }));
+
+type SheetProps = Readonly<{ leaf: Leaf }>;
+
 /**
- * The À la une screen: every section at once, under the paper's own name and the band that names the sections.
+ * One page's feed: the whole paper, or one section of it.
  *
- * The masthead is a bar and no longer a block that slides away as the feed scrolls. It carries what a reader wants
- * from anywhere in the paper and could reach from nowhere: what they kept, and how the paper is set for them. A
- * masthead that scrolled off took those with it, and gave back sixty-four points of a screen that has two thousand.
+ * A page is a component of its own because each asks for its own feed, and a hook cannot be called in a loop over a
+ * list whose length arrives from the newsroom. Only the front page names the section each card ran in: inside a
+ * section, the same word over every card says nothing at all.
+ */
+function Sheet({ leaf }: SheetProps): ReactNode {
+  const nameOf = useSectionNames();
+  const section = leaf.section;
+  const feed = usePagedFeed(section === null ? feedQuery : sectionFeedQuery(section));
+  return (
+    <ArticleFeed
+      feed={feed}
+      rhythm="paper"
+      onOpen={(id) => {
+        router.push(articleHref(id));
+      }}
+      action={(summary) => <BookmarkToggle id={summary.id} />}
+      name={section === null ? (summary) => nameOf(summary.section) : undefined}
+    />
+  );
+}
+
+/**
+ * The front screen: the paper's own name, the band of its sections, and the paper itself — read by turning its
+ * sections under the finger rather than by opening one and coming back out of it.
  *
- * What the reader kept has a screen of its own now. It was the second choice of a band above the sections — the shape
- * the app this one follows uses, and the one none of the papers worth copying does: a front page is today's paper,
- * and a shelf of what one has already chosen is not a way of reading it. The band that named the two is gone with it,
- * and the sections have the row it was taking.
+ * A section used to be a screen pushed over this one, and choosing another replaced that screen. Reading two of them
+ * meant a press, a read, a press back, a press; and the band, which is the one thing that says what else there is to
+ * read, was the only part of the paper a reader could not reach by reading. Here the sections are pages of the front
+ * screen, the band names the one in hand, and either a press or a swipe turns to another.
+ *
+ * The masthead is a bar and not a block that slides away. It carries what a reader wants from anywhere in the paper
+ * and could reach from nowhere: what they kept, and how the paper is set for them. A masthead that scrolled off took
+ * both with it — and a masthead shared by nine pages, each scrolled to its own place, would be somewhere different
+ * from the page under it the moment a reader swiped.
  */
 export function HomePage(): ReactNode {
-  const nameOf = useSectionNames();
-  const paper = usePagedFeed(feedQuery);
+  const styles = useStyles();
+  const sections = useSections();
+  const [at, setAt] = useState(0);
+  const leaves: readonly Leaf[] = [
+    { id: FRONT, label: t('nav.headline'), section: null },
+    ...sections.map((section) => ({ id: section.id, label: section.label, section: section.id })),
+  ];
+  const items: readonly LabelBarItem<string>[] = leaves;
+  const shown = Math.min(at, leaves.length - 1);
   return (
     <Surface>
       <TopBar
@@ -47,22 +97,27 @@ export function HomePage(): ReactNode {
           </>
         }
       />
-      <ArticleFeed
-        feed={paper}
-        rhythm="paper"
-        onOpen={(id) => {
-          router.push(articleHref(id));
+      <LabelBar
+        items={items}
+        active={leaves[shown]?.id}
+        onSelect={(id) => {
+          const chosen = leaves.findIndex((leaf) => leaf.id === id);
+          if (chosen >= 0) {
+            setAt(chosen);
+          }
         }}
-        action={(summary) => <BookmarkToggle id={summary.id} />}
-        name={(summary) => nameOf(summary.section)}
-        sticky={
-          <SectionBar
-            onSelect={(section) => {
-              router.push(sectionHref(section));
-            }}
-          />
-        }
       />
+      <Box style={styles.page}>
+        <Pager
+          count={leaves.length}
+          active={shown}
+          onActive={setAt}
+          renderPage={(index) => {
+            const leaf = leaves[index];
+            return leaf === undefined ? null : <Sheet leaf={leaf} />;
+          }}
+        />
+      </Box>
     </Surface>
   );
 }

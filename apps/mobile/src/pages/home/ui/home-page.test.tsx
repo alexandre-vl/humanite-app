@@ -29,6 +29,9 @@ const renderPage = async (): Promise<void> => {
       </StartupProvider>
     </QueryClientProvider>,
   );
+  // Twice: the sections answer on the first turn and the feed of each page mounted answers on the next, so a screen
+  // settled once is a screen still finishing while the test reads it.
+  await settle();
   await settle();
 };
 
@@ -92,6 +95,26 @@ describe('HomePage', () => {
     expect(screen.queryByText('Aucun article gardé')).toBeNull();
     // The mark in the masthead opens the shelf; it does not show it, and nothing on this screen is that shelf.
     expect(screen.queryAllByText('Mes lectures')).toHaveLength(0);
+  });
+
+  /**
+   * A section is a page of this screen now, not a screen pushed over it. What the band reports is which page is in
+   * hand; which pages that mounts is the pager's own promise, held beside the pager.
+   */
+  it('tourne à la rubrique qu’on nomme dans la bande, et le dit sur la bande', async () => {
+    await renderPage();
+    const [front, first] = screen.getAllByRole('radio');
+    if (front === undefined || first === undefined) {
+      throw new Error('la bande ne nomme pas la une et une rubrique : le test ne vérifierait rien');
+    }
+    expect(front.props['accessibilityState']).toEqual({ selected: true });
+    await fireEvent.press(first);
+    await settle();
+    const [turnedFront, turnedFirst] = screen.getAllByRole('radio');
+    expect(turnedFront?.props['accessibilityState']).toEqual({ selected: false });
+    expect(turnedFirst?.props['accessibilityState']).toEqual({ selected: true });
+    // The masthead has not moved: turning a section turns a page of this screen, it does not open another.
+    expect(screen.getByText('L’Humanité')).toBeTruthy();
   });
 
   it('annonce par son étiquette qu’un article gardé peut être rendu', async () => {
