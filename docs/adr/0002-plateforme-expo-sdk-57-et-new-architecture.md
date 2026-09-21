@@ -1,6 +1,6 @@
 ---
 format: 1
-status: proposed
+status: accepted
 significance: [dependency, guarded-config, reversal-cost]
 ---
 
