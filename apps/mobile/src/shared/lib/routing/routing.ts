@@ -31,6 +31,9 @@ export const issueHref = (id: IssueId): IssueHref => ({ pathname: '/issue/[id]',
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;
 
+/** Where the reader finds again what they kept of the paper. */
+export const BOOKMARKS_HREF = '/bookmarks' as const;
+
 /**
  * Hands a page outside the app to whatever the phone opens pages with.
  *

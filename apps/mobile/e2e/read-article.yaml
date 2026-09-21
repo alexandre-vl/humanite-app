@@ -19,4 +19,4 @@ appId: ${APP_ID}
 - takeScreenshot: article
 - back
 - assertVisible: 'À la une'
-- assertVisible: 'Humanité'
+- assertVisible: 'L’Humanité'

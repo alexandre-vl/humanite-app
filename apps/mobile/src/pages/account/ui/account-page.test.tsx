@@ -16,6 +16,13 @@ describe('AccountPage', () => {
     expect(jest.mocked(router.push)).toHaveBeenCalledWith('/settings');
   });
 
+  /** The shelf is reached from the masthead where one is reading, and from here where one is looking for it. */
+  it('ouvre ce que le lecteur a gardé quand on touche la ligne qui le nomme', async () => {
+    await render(<AccountPage />);
+    await fireEvent.press(screen.getByText('Mes lectures'));
+    expect(jest.mocked(router.push)).toHaveBeenCalledWith('/bookmarks');
+  });
+
   /**
    * Five of the eight rows the current app lists cannot mean anything here — there is no account to sign into, nothing
    * to buy and no library to open — so the screen holds what is true and draws nothing that would lead nowhere.
@@ -29,7 +36,7 @@ describe('AccountPage', () => {
     expect(screen.getByText('relationlecteur@humanite.fr')).toBeTruthy();
     expect(screen.getByText('01 55 84 40 30')).toBeTruthy();
     // The mark is hidden from a screen reader — the row it sits in already says where it goes — so it is counted here
-    // as a view rather than as something announced.
-    expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(1);
+    // as a view rather than as something announced. Two rows open something: what one kept, and how one reads.
+    expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(2);
   });
 });

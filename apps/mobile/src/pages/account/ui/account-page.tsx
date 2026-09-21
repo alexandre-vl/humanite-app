@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { SETTINGS_HREF } from '#lib/routing';
+import { BOOKMARKS_HREF, SETTINGS_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -97,6 +97,14 @@ export function AccountPage(): ReactNode {
           {t('nav.account')}
         </Text>
         <Group label={t('account.reading')}>
+          {/* What one kept is reached from the masthead, where one is reading; it is also here, because this is the
+              screen a reader opens when they are looking for something of their own rather than for the paper's. */}
+          <OpenRow
+            label={t('bookmark.title')}
+            onPress={() => {
+              router.push(BOOKMARKS_HREF);
+            }}
+          />
           <OpenRow
             label={t('settings.title')}
             onPress={() => {

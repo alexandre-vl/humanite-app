@@ -12,4 +12,4 @@ appId: ${APP_ID}
 - scroll
 - takeScreenshot: live-scrolled
 - tapOn: 'À la une'
-- assertVisible: 'Humanité'
+- assertVisible: 'L’Humanité'

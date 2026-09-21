@@ -3,5 +3,5 @@
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
-- assertVisible: 'Humanité'
+- assertVisible: 'L’Humanité'
 - takeScreenshot: home

@@ -28,12 +28,20 @@ export const RADII = {
   pill: radius(999),
 } as const satisfies Readonly<Record<string, Radius>>;
 
-/** Font sizes in points; the body text measures 16 (docs/app-actuelle). */
+/**
+ * Font sizes in points; the body text measures 16 (docs/app-actuelle).
+ *
+ * `xl` is the paper's own name, and its value is not free: WCAG reads type as large from twenty-four points up, and a
+ * reader may set the paper an eighth smaller than it is written. Twenty-eight is the first step of the scale that
+ * still clears twenty-four once taken down — 24.5, set at 25 — which is what lets the masthead be printed in the red
+ * of the masthead at all. At 20 it would owe four and a half to one, and the paper's red gives 3.83 on a white page.
+ */
 export const FONT_SIZES = {
   xs: fontSize(12),
   sm: fontSize(14),
   md: fontSize(16),
   lg: fontSize(20),
+  xl: fontSize(28),
   xxl: fontSize(34),
 } as const satisfies Readonly<Record<string, FontSize>>;
 

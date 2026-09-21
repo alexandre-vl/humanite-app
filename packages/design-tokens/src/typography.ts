@@ -67,6 +67,7 @@ export type RunFace = keyof typeof RUN_FACES;
 /** The names of the app's text styles, in the order a catalogue lists them: widest first, down to the finest print. */
 export const TEXT_VARIANTS = [
   'headline',
+  'masthead',
   'display',
   'title',
   'standfirst',
@@ -101,12 +102,17 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * on an article it read as no larger than the body it introduced. The article's is now regular at twenty points and
  * keeps the ink; the card's is regular at sixteen in the middle ink.
  *
+ * `masthead` is the paper's own name, which was set in `display` — twenty points, the size of a card's title — so
+ * the front page opened on a name no larger than the first headline under it. It is set in the red the paper is
+ * printed in, which a smaller size would forbid: see the note on `xl` beside the sizes.
+ *
  * `kicker` is the word that names what a card belongs to, set above its title in small capitals. It is the one role
  * whose letters are set apart — the only way twelve points of type reads as a label and not as the first line of the
  * title under it.
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },
+  masthead: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
   display: { face: 'display', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   standfirst: {

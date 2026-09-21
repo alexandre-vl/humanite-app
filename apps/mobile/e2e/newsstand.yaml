@@ -7,13 +7,13 @@
 # Ce qui prouve qu’un numéro s’est ouvert est la disparition de « Kiosque » : le sommaire est poussé à la racine de la
 # pile et couvre la barre du bas, comme un article, et rien d’autre sur cet écran ne fait disparaître la barre.
 #
-# « Humanité » est le fronton que chaque couverture porte. Sur l’onglet du kiosque, c’est le seul endroit où le mot
+# « L’Humanité » est le fronton que chaque couverture porte. Sur l’onglet du kiosque, c’est le seul endroit où le mot
 # est peint : l’écran d’accueil porte le sien, mais il n’est pas à l’écran.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn: 'Kiosque'
-- assertVisible: 'Humanité'
+- assertVisible: 'L’Humanité'
 - takeScreenshot: newsstand
 - tapOn:
     point: 21%,20%
@@ -23,4 +23,4 @@ appId: ${APP_ID}
 - takeScreenshot: issue
 - back
 - assertVisible: 'Kiosque'
-- assertVisible: 'Humanité'
+- assertVisible: 'L’Humanité'

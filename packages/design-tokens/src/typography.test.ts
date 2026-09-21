@@ -12,6 +12,7 @@ const paper = (variant: TextVariant): Typography => typographyAt(variant, 'norma
 test('the typography table answers for every variant, and for no other', () => {
   expectTypeOf<TextVariant>().toEqualTypeOf<
     | 'headline'
+    | 'masthead'
     | 'display'
     | 'title'
     | 'standfirst'

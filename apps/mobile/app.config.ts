@@ -5,7 +5,10 @@ import type { ExpoConfig } from 'expo/config/index.js';
  * as knip load it with another context.
  */
 const config: ExpoConfig = {
-  name: 'Humanité',
+  // The name the phone prints under the icon, and the one the paper is called: the store lists it as
+  // « L'Humanité - Le Journal », published by la Société Nouvelle du Journal l'Humanité. The article is part of the
+  // name and the launcher had been dropping it.
+  name: 'L’Humanité',
   slug: 'humanite',
   scheme: 'humanite',
   version: '0.0.0',

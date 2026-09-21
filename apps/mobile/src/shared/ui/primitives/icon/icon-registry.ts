@@ -29,6 +29,9 @@ export const ICONS = {
   next: { ios: 'chevron.right', android: 'chevron_right' },
   newsstand: { ios: 'newspaper', android: 'newspaper' },
   play: { ios: 'play.fill', android: 'play_arrow' },
+  // How the reader sets the paper's own type. The letters are the signifier on both platforms, not a cogwheel: what
+  // lies behind it is the size, the faces and the light or the dark, and none of those is a setting of the machine.
+  reading: { ios: 'textformat.size', android: 'format_size' },
   search: { ios: 'magnifyingglass', android: 'search' },
 } as const satisfies Readonly<Record<string, IconSymbol>>;
 

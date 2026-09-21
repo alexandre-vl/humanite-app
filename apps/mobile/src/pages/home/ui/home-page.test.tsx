@@ -1,12 +1,20 @@
 import type { ArticleSummary, Section } from '@huma/contracts';
-import { SIZES } from '@huma/design-tokens';
-import { beforeEach, describe, expect, it } from '@jest/globals';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { StartupProvider } from '#lib/startup';
 import { HomePage } from './home-page';
+
+// The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
+// declared outside would still be undefined when the screen first reaches for it.
+jest.mock('expo-router', () => ({
+  __esModule: true,
+  router: { push: jest.fn() },
+  useLocalSearchParams: (): Readonly<Record<string, string>> => ({}),
+}));
 
 /** One more turn, for what the screen asked on the turn before to reach it. */
 const settle = async (): Promise<void> => {
@@ -24,19 +32,6 @@ const renderPage = async (): Promise<void> => {
   await settle();
 };
 
-const show = async (band: string): Promise<void> => {
-  await fireEvent.press(screen.getByText(band));
-  await settle();
-};
-
-const firstArticle = async (): Promise<ArticleSummary> => {
-  const [first] = (await content.getFeed({})).items;
-  if (first === undefined) {
-    throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
-  }
-  return first;
-};
-
 /**
  * The article the front page opens on, worked out beside the code under test rather than by it: the first the feed
  * serves that carries a picture. The feed arrives newest first and a morning's newest items are briefs filed before
@@ -51,37 +46,6 @@ const frontArticle = async (): Promise<ArticleSummary> => {
   return found;
 };
 
-/**
- * The height the list reserved for the strip that stays, read back from the layer it laid the strip in.
- *
- * The page is the only one that knows how many rows it put there — the list cannot see inside a band — so this is
- * what holds the page to its own arrangement. Without it, the count could say two while the band drew one, and the
- * screen would keep a row of empty ground it had already reserved: the fault this exact band shipped with once, and
- * which no bench caught because jest lays nothing out and the words were all findable on a blank screen.
- */
-const heightIn = (style: unknown): number | undefined => {
-  const layers: readonly unknown[] = Array.isArray(style) ? style : [style];
-  for (const layer of layers) {
-    const height: unknown = typeof layer === 'object' && layer !== null ? Reflect.get(layer, 'height') : undefined;
-    if (typeof height === 'number') {
-      return height;
-    }
-  }
-  return undefined;
-};
-
-const bandHeight = (): number => {
-  let node = screen.getByText('À la une').parent;
-  while (node !== null) {
-    const height = heightIn(node.props['style']);
-    if (height !== undefined) {
-      return height;
-    }
-    node = node.parent;
-  }
-  throw new Error('aucune bande ne porte de hauteur : le test ne vérifierait rien');
-};
-
 const firstSection = async (): Promise<Section> => {
   const [first] = await content.getSections();
   if (first === undefined) {
@@ -93,62 +57,41 @@ const firstSection = async (): Promise<Section> => {
 // The store outlives a test: it is one module, read by every screen that shows what the reader kept. The act is
 // awaited — React 19 hands one back to be waited on, and one left unawaited holds its scope open over what follows.
 beforeEach(async () => {
+  jest.mocked(router.push).mockClear();
   await act(() => {
     useBookmarks.setState({ ids: [] });
   });
 });
 
 describe('HomePage', () => {
-  it('sert le journal sous son fronton et ses deux bandes', async () => {
-    const article = await firstArticle();
+  it('sert le journal sous le nom du journal et la bande des rubriques', async () => {
+    const article = await frontArticle();
     const section = await firstSection();
     await renderPage();
-    expect(await screen.findByText('Humanité')).toBeTruthy();
+    expect(await screen.findByText('L’Humanité')).toBeTruthy();
     // All of them: the band names every section, and each card now names the one it ran in over its own title.
     expect(await screen.findAllByText(section.label)).not.toHaveLength(0);
     expect(await screen.findByText(article.title)).toBeTruthy();
   });
 
   /**
-   * An empty shelf of one's own is not an unpublished paper. The screen it copies says « Aucun article » and nothing
-   * else, which its own reference marks as a fault: nothing there tells a reader how one gets an article onto it.
+   * The two things a reader wants from anywhere in the paper and could reach from nowhere. They are in the masthead
+   * and not in the feed, so they are there at the top of the paper and there again at the bottom of it.
    */
-  it('dit comment garder un article quand rien ne l’est, au lieu d’annoncer un journal vide', async () => {
+  it('offre depuis le fronton ce qu’on a gardé et la façon dont le journal est composé', async () => {
     await renderPage();
-    await show('Favoris');
-    expect(await screen.findByText('Aucun article gardé')).toBeTruthy();
-    expect(screen.getByText('Touchez le marque-page d’un article pour le retrouver ici.')).toBeTruthy();
-    expect(screen.queryByText('Rien à lire pour l’instant')).toBeNull();
+    await fireEvent.press(screen.getByLabelText('Mes lectures'));
+    expect(jest.mocked(router.push)).toHaveBeenCalledWith('/bookmarks');
+    await fireEvent.press(screen.getByLabelText('Préférences d’affichage'));
+    expect(jest.mocked(router.push)).toHaveBeenCalledWith('/settings');
   });
 
-  it('retire la barre des rubriques des favoris, qui n’appartiennent à aucune', async () => {
-    const section = await firstSection();
+  /** What the front page no longer holds: the shelf of what one kept, which is a screen of its own. */
+  it('ne montre pas sur la une ce que le lecteur a gardé', async () => {
     await renderPage();
-    expect(await screen.findAllByText(section.label)).not.toHaveLength(0);
-    await show('Favoris');
-    expect(screen.queryAllByText(section.label)).toHaveLength(0);
-  });
-
-  it('rend au fil la rangée que la barre des rubriques libère', async () => {
-    await renderPage();
-    expect(bandHeight()).toBe(SIZES.bandPair);
-    await show('Favoris');
-    expect(bandHeight()).toBe(SIZES.band);
-  });
-
-  it('garde un article depuis le fil, et le retrouve parmi les favoris', async () => {
-    const article = await frontArticle();
-    await renderPage();
-    expect(await screen.findByText(article.title)).toBeTruthy();
-    const [mark] = screen.getAllByLabelText('Ajouter aux favoris');
-    if (mark === undefined) {
-      throw new Error('aucune carte ne porte de marque-page : le test ne vérifierait rien');
-    }
-    await fireEvent.press(mark);
-    await settle();
-    await show('Favoris');
-    expect(await screen.findByText(article.title)).toBeTruthy();
     expect(screen.queryByText('Aucun article gardé')).toBeNull();
+    // The mark in the masthead opens the shelf; it does not show it, and nothing on this screen is that shelf.
+    expect(screen.queryAllByText('Mes lectures')).toHaveLength(0);
   });
 
   it('annonce par son étiquette qu’un article gardé peut être rendu', async () => {

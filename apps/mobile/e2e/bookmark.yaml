@@ -8,16 +8,19 @@
 # vide qu’en étant parti de lui. Un marque-page laissé par une session précédente ferait échouer cette ligne au lieu
 # de passer inaperçu — ce qui vaut mieux qu’un état remis à zéro, qui rend au client de développement son premier
 # lancement et couvre l’app entière de son menu.
+#
+# Ce qui est gardé ne vit plus sur la une : la marque du fronton ouvre une étagère à elle, et c’est là que le
+# parcours va le relire.
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn: 'Ajouter aux favoris'
 - assertVisible: 'Retirer des favoris'
-- tapOn: 'Favoris'
+- tapOn: 'Mes lectures'
 - assertNotVisible: 'Aucun article gardé'
 - takeScreenshot: bookmarks-kept
 - runFlow: parts/launch.yaml
-- tapOn: 'Favoris'
+- tapOn: 'Mes lectures'
 - assertNotVisible: 'Aucun article gardé'
 - takeScreenshot: bookmarks-survived
 - tapOn: 'Retirer des favoris'

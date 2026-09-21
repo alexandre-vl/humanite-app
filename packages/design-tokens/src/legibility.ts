@@ -61,8 +61,10 @@ export const PRINTINGS = {
   textMuted: { smallest: 'kicker', grounds: ['background', 'block', 'card', 'surface'] },
   // The wire, the pill of a button, the mark on a column, the masthead of a cover: all the paper's own red.
   onPrimary: { smallest: 'caption', grounds: ['primary'] },
-  // A headline stands on the sheet of an article, or on the torn paper of a callout.
-  headline: { smallest: 'headline', grounds: ['background', 'ground'] },
+  // A headline stands on the sheet of an article or on the torn paper of a callout, and the paper's own name stands
+  // in the bar across the top of the front page. The name is the smaller of the two, and the reason its size is what
+  // it is: a step under twenty-four would put this red under a bar it cannot clear.
+  headline: { smallest: 'masthead', grounds: ['background', 'ground'] },
   // A word that answers a press lives inside prose, and takes the size of the paragraph around it.
   link: { smallest: 'prose', grounds: ['background'] },
 } as const satisfies Readonly<Record<TextTone, Printing>>;

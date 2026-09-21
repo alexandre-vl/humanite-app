@@ -20,4 +20,4 @@ appId: ${APP_ID}
 - assertVisible: 'Mon compte'
 - assertNotVisible: 'Apparence'
 - tapOn: 'À la une'
-- assertVisible: 'Humanité'
+- assertVisible: 'L’Humanité'
