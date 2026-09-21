@@ -7,7 +7,7 @@ import { applyPatchMessage, commitMessage, preCommit, prepareCommitMessage } fro
 import { GIT_HOOK_NAMES, isGitHookName } from '@huma/git-hooks/shims';
 import { findWorkspaceRoot, printError, readArguments, runCommand, UsageError } from '@huma/kit/cli';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
-import { ownRepository } from '@huma/kit/git';
+import { ownRepository, stagedPaths } from '@huma/kit/git';
 import { commitPolicy } from '../commit-policy.ts';
 import { expectedRefs } from '../commit-refs.ts';
 import { runVerify } from '../verify.ts';
@@ -23,7 +23,14 @@ await runCommand(async () => {
   const root = await findWorkspaceRoot();
   const repository = ownRepository(root);
   const verify = async (): Promise<Verification> => {
-    const outcome = await runVerify(root, { staged: true, output: 'attached', env: process.env });
+    // The index is what is about to be committed, so it is what the plan is told about: a step blind to every one of
+    // these paths has nothing to look at, and skipping it is not a shortcut — it is the same answer, unasked.
+    const outcome = await runVerify(root, {
+      staged: true,
+      output: 'attached',
+      touched: await stagedPaths(repository),
+      env: process.env,
+    });
     // A run that wrote in the tree it judged is not a failure of a step: pre-commit writes the tree again after the
     // checks and refuses the commit itself, with the code that says the tree moved.
     return outcome.kind === 'failed'

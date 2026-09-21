@@ -266,24 +266,52 @@ export type VerifyEntry = Readonly<{
   budgetMs: number;
   /** Arguments it takes when verify judges the index about to be committed rather than the working tree. */
   staged?: readonly string[];
+  /**
+   * Globs of files this step cannot read. A run told which paths a commit changes skips the step when every one of
+   * them matches one of these.
+   *
+   * It says what a step is blind to and not what it judges, and the difference is which way a mistake falls. A list
+   * of what a step reads has to be exhaustive to be safe: one input left out of it, and the step is skipped over a
+   * change it would have caught. A list of what it ignores is safe by default — a step that declares none always
+   * runs, a path nobody thought of always runs everything, and each entry is a single claim that can be checked on
+   * its own rather than a claim about everything else.
+   */
+  blindTo?: readonly string[];
 }>;
+
+/**
+ * Prose under `docs/`, which eight of the twelve steps below cannot read. Each of them was checked rather than
+ * assumed: ESLint declares `files` of JavaScript and TypeScript only (`packages/eslint-config/src/index.ts`), jest
+ * roots at `apps/mobile/src`, vitest covers `packages` and `tools` — and of the tests there, every mention of `docs/`
+ * is a synthetic path in a fixture, none reads the folder — knip names no `docs` project, Steiger walks the app's
+ * `src`, `deps:check` reads manifests, `expo:types` reads routes and `tsc` reads the TypeScript projects.
+ *
+ * It is markdown and not all of `docs/`, because `docs/glossary.ts` lives there and the lint configuration imports
+ * it: a glob spanning the whole folder would make a change to the paper's own vocabulary skip the check that spends
+ * it.
+ */
+const DOCUMENTATION = ['docs/**/*.md'] as const;
 
 /**
  * The steps of `pnpm verify`, cheapest first: the run stops at the first failure. One row per step, so a step can
  * neither lose its budget nor keep index arguments no step of the plan claims.
+ *
+ * Four rows carry no `blindTo` and so always run. `format:check` because Prettier formats markdown as it formats
+ * everything else; `gen:check` because `docs/adr/README.md` is derived from the ADRs themselves; `hooks:check`
+ * because it reads the message of the commit being written; and `adr:check` because the documents are its subject.
  */
 export const VERIFY_PLAN = [
   { step: 'gen:check', budgetMs: 120_000 },
   { step: 'hooks:check', budgetMs: 120_000, staged: ['--staged'] },
-  { step: 'deps:check', budgetMs: 120_000 },
+  { step: 'deps:check', budgetMs: 120_000, blindTo: DOCUMENTATION },
   { step: 'format:check', budgetMs: 180_000 },
-  { step: 'expo:types', budgetMs: 120_000 },
-  { step: 'structure:check', budgetMs: 180_000 },
-  { step: 'knip', budgetMs: 180_000 },
-  { step: 'lint', budgetMs: 600_000 },
-  { step: 'typecheck', budgetMs: 600_000 },
-  { step: 'test', budgetMs: 900_000 },
-  { step: 'test:app', budgetMs: 600_000 },
+  { step: 'expo:types', budgetMs: 120_000, blindTo: DOCUMENTATION },
+  { step: 'structure:check', budgetMs: 180_000, blindTo: DOCUMENTATION },
+  { step: 'knip', budgetMs: 180_000, blindTo: DOCUMENTATION },
+  { step: 'lint', budgetMs: 600_000, blindTo: DOCUMENTATION },
+  { step: 'typecheck', budgetMs: 600_000, blindTo: DOCUMENTATION },
+  { step: 'test', budgetMs: 900_000, blindTo: DOCUMENTATION },
+  { step: 'test:app', budgetMs: 600_000, blindTo: DOCUMENTATION },
   { step: 'adr:check', budgetMs: 300_000, staged: ['--source', 'index'] },
 ] as const satisfies readonly VerifyEntry[];
 

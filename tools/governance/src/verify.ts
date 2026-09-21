@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { print } from '@huma/kit/cli';
 import { readTextIfExists } from '@huma/kit/fs';
+import { compileGlob } from '@huma/adr/globs';
 import { ownRepository, worktreeTreeId } from '@huma/kit/git';
 import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
 import type { Environment } from '@huma/kit/process';
@@ -30,9 +31,33 @@ export type VerifyOptions = Readonly<{
   /** `attached` streams each step to the terminal; `captured` keeps the output for a hook to report. */
   output: 'attached' | 'captured';
   env: Environment;
+  /**
+   * The paths the commit changes, when the caller knows them. A step every one of them is blind to is skipped: the
+   * files are not its subject, so running it would judge the same tree it judged last time and answer the same thing.
+   *
+   * Left out, nothing is skipped. `pnpm verify` run by hand takes no list and therefore runs the whole plan, which is
+   * what a command that says it runs every check of the repository has to do.
+   */
+  touched?: readonly string[] | undefined;
   /** Aborting it stops the captured step in flight, which then fails: a caller with a deadline sets it. */
   signal?: AbortSignal;
 }>;
+
+/**
+ * Whether a step has nothing to look at: the caller named the paths that changed, there is at least one, and every
+ * one of them matches something the step declares itself blind to.
+ *
+ * All three conditions are the safe side of the question. No list means the caller does not know what changed; an
+ * empty list means a commit of nothing, which is not a reason to trust anything; and one path outside the globs is
+ * enough to run the step, because what a step is blind to is stated narrowly and everything else is unknown.
+ */
+export const stepIsBlind = (entry: VerifyEntry, touched: readonly string[] | undefined): boolean => {
+  if (touched === undefined || touched.length === 0 || entry.blindTo === undefined) {
+    return false;
+  }
+  const globs = entry.blindTo.flatMap((glob) => compileGlob(glob) ?? []);
+  return globs.length === entry.blindTo.length && touched.every((path) => globs.some((glob) => glob.test(path)));
+};
 
 /** What the step runs: the Node running this process for an entry of the repository, a linked binary otherwise. */
 const stepCommand = (root: string, entry: VerifyEntry, staged: boolean): readonly [string, ...string[]] => {
@@ -56,6 +81,12 @@ export async function runVerify(root: string, options: VerifyOptions): Promise<V
   const env = { ...options.env, PATH: `${join(root, BIN_DIRECTORY)}:${options.env['PATH'] ?? ''}` };
   const signal = options.signal === undefined ? {} : { signal: options.signal };
   for (const entry of VERIFY_PLAN) {
+    if (stepIsBlind(entry, options.touched)) {
+      if (options.output === 'attached') {
+        print(`· ${entry.step} : rien de ce que le commit change n’est de son ressort`);
+      }
+      continue;
+    }
     const [command, ...args] = stepCommand(root, entry, options.staged);
     const child = { cwd: root, env, timeoutMs: entry.budgetMs, ...signal };
     if (options.output === 'attached') {
