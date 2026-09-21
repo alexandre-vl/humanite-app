@@ -13,7 +13,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0002](0002-plateforme-expo-sdk-57-et-new-architecture.md)                  | Plateforme Expo SDK 57 et New Architecture                  | accepté | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0003](0003-typescript-6-ultra-strict-en-version-unique.md)                 | TypeScript 6 ultra-strict en version unique                 | accepté | `dependency`, `guarded-config`                                             |
 | [ADR-0004](0004-lint-et-format-bloquants-sans-desactivation.md)                 | Lint et format bloquants sans désactivation                 | accepté | `guarded-config`                                                           |
-| [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)         | Architecture FSD avec routes hors src et couche _app        | proposé | `guarded-config`, `boundary`                                               |
+| [ADR-0005](0005-architecture-fsd-avec-routes-hors-src-et-couche-app.md)         | Architecture FSD avec routes hors src et couche _app        | accepté | `guarded-config`, `boundary`                                               |
 | [ADR-0006](0006-niveaux-de-composants-l0-a-l4.md)                               | Niveaux de composants L0 à L4                               | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                   | Glossaire et orthographe des identifiants                   | proposé | `guarded-config`                                                           |
 | [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)         | Contrôles locaux par hooks git et garde-fous testés         | proposé | `guarded-config`                                                           |
@@ -109,7 +109,7 @@ Statut : accepté. Périmètre : `packages/eslint-config/**`, `tools/lint/**`, `
 
 ### ADR-0005 · Architecture FSD avec routes hors src et couche _app
 
-Statut : proposé. Périmètre : `apps/mobile/app/**`, `apps/mobile/src/**`, `packages/architecture/**`, `tools/structure/**`, `tools/governance/src/cli/structure-check.ts`.
+Statut : accepté. Périmètre : `apps/mobile/app/**`, `apps/mobile/src/**`, `packages/architecture/**`, `tools/structure/**`, `tools/governance/src/cli/structure-check.ts`.
 
 | Règle | Niveau | Preuves                                                                                                                                                                                                                                                                                  |
 | ----- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
