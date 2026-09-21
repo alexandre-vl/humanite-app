@@ -8,10 +8,10 @@ significance: [dependency, guarded-config, boundary]
 
 ## Contexte et problème
 
-- Le texte de l’app s’affiche dans la police Overpass, une famille par graisse (`cat packages/design-tokens/src/tokens.ts`).
+- Le texte de l’app s’affiche dans la police Overpass, une famille par graisse, et le lecteur peut lui préférer un second jeu de faces (`cat packages/design-tokens/src/tokens.ts`).
 - Les polices se chargent au démarrage par expo-font, confiné à la couche app (`cat packages/architecture/src/places.ts`).
 - Le splash reste affiché jusqu’au chargement des polices, à la restauration du cache et au premier onLayout (`cat apps/mobile/src/_app/routes/startup-gate.tsx`).
-- Overpass et Anton sont des polices Google sous licence libre, embarquées par @expo-google-fonts (`cat apps/mobile/package.json`).
+- Overpass, Anton et Atkinson Hyperlegible sont des polices Google sous licence libre, embarquées par @expo-google-fonts (`cat apps/mobile/package.json`).
 - Une famille est un token de @huma/design-tokens, jamais une chaîne brute (`cat apps/mobile/src/shared/lib/styles/create-styles.ts`).
 
 Comment donner à l’app ses polices sans laisser une chaîne libre ni une licence non respectée entrer dans le rendu ?
@@ -65,5 +65,5 @@ Option retenue : « Polices Google embarquées par @expo-google-fonts, familles 
 ## Informations complémentaires
 
 - Le rendu réel des polices se vérifie sur l’émulateur, hors de la vérification locale sans appareil.
-- Une police display sous licence restrictive se détecte au moment de la configuration et se charge si présente, sans jamais entrer dans le dépôt ; la police d’accessibilité et la police d’article s’ajoutent avec les écrans qui les portent.
+- Une police display sous licence restrictive se détecte au moment de la configuration et se charge si présente, sans jamais entrer dans le dépôt ; la police d’accessibilité est en place, offerte au lecteur par les préférences d’affichage ; une police d’article s’ajouterait avec l’écran qui la porterait.
 - Réévaluation : @expo-google-fonts cesse de suivre les versions d’Expo, ou une police devient indispensable qu’aucune licence libre ne couvre.

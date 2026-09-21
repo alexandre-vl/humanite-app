@@ -41,7 +41,7 @@ Option retenue : « Visuels dessinés et générés », parce qu’elle illustre
 ### Conséquences
 
 - Bien, parce que l’app montre une illustration dès sa première ouverture, sans réseau (C2).
-- Bien, parce que les deux cent cinquante-deux fichiers pèsent moins que le corpus lui-même (C4).
+- Bien, parce que les cent quatre-vingt-neuf fichiers pèsent moins que le corpus lui-même (C4).
 - Mauvais, parce que le dépôt suit désormais des binaires générés, qu’une relecture ne lit pas (C4).
 - Mauvais, parce qu’un dessin ne montre pas la scène que sa légende décrit (C2).
 

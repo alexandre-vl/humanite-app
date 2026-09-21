@@ -70,6 +70,6 @@ Option retenue : « des annonces requises par les types, et un contraste déduit
 
 ## Informations complémentaires
 
-- WCAG 1.4.3 demande quatre et demi pour un, et trois au-delà de vingt-quatre pixels ; des neuf variantes du journal, une seule — le titre, à trente-quatre points — dépasse ce seuil.
+- WCAG 1.4.3 demande quatre et demi pour un, et trois au-delà de vingt-quatre pixels ; des douze variantes, deux — le titre et le fronton, à vingt-huit points — dépassent ce seuil.
 - Les deux plateformes retirent une vue du parcours différemment, par `accessibilityElementsHidden` et par `importantForAccessibility` : n’en poser qu’un annonce la vue sur un téléphone et pas sur l’autre.
 - Réévaluation : un greffon de lint d’accessibilité déclare la version d’ESLint du dépôt, ou une plateforme cesse de lire l’un des deux attributs de retrait.

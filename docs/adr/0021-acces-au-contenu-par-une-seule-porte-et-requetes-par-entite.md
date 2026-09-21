@@ -10,7 +10,7 @@ significance: [dependency, guarded-config, boundary]
 
 - L’écran « À la une » affichait huit rectangles identiques tirés d’un tableau de lettres écrit dans sa propre page (`apps/mobile/src/pages/home/ui/home-page.tsx`).
 - Le corpus fictif et l’api qui le sert existent depuis la phase 1, mais aucun manifeste de l’app ne les déclarait (`apps/mobile/package.json`).
-- Le contrat de lecture compte huit méthodes, dont trois rendent une page ouverte par un curseur opaque (`packages/contracts/src/api.ts`).
+- Le contrat de lecture compte dix méthodes, dont trois rendent une page ouverte par un curseur opaque (`packages/contracts/src/api.ts`).
 - Le cache persisté et son client sont décidés et montés, sans qu’une seule requête existe (ADR-0015).
 - Une place `api` est déclarée et aliasée depuis la phase 2, et reste vide (`packages/architecture/src/places.ts`).
 
@@ -34,7 +34,7 @@ Par où le contenu entre-t-il dans l’app, et où se déclare une requête ?
 Option retenue : « Une porte unique et des requêtes par entité », parce qu’elle laisse un seul module connaître la source du contenu et réunit la clé d’une entité et sa lecture (C1, C2, C3).
 
 - **R1** — le contenu simulé NE DOIT PAS être importé hors de la place `api`
-- **R2** — une requête DOIT être déclarée dans le segment `api` de son entité
+- **R2** — une requête DOIT être déclarée dans le segment `api` de la tranche qu’elle sert
 
 ### Conséquences
 
@@ -64,6 +64,7 @@ Option retenue : « Une porte unique et des requêtes par entité », parce qu�
 ## Informations complémentaires
 
 - Le plugin de lint du client de requêtes est classé règle par règle ; une règle de plus dans une version suivante fait échouer la configuration au lieu d’entrer sans être lue (`packages/eslint-config/src/query.ts`).
+- Le segment est ce que R2 vise, et pas la couche. Deux règles de cette architecture se sont rencontrées au-dessus du kiosque sans pouvoir tenir ensemble — une requête vit dans un segment `api`, et une tranche qu’un seul écran référence vit dans cet écran — alors la couche a cédé : un écran déclare ses requêtes comme une entité, et un `model` qui écrirait les siennes reste refusé des deux côtés (`packages/architecture/src/app.ts`).
 - Les curseurs restent opaques : une requête n’en fabrique aucun, elle rend celui que la page précédente a donné (`packages/contracts/src/page.ts`).
 - Les visuels passent par la même porte : le corpus expose un registre d’imports statiques que l’empaqueteur résout, et la place `api` seule le lit pour rendre, d’une clé d’image, le module et son thumbhash (`packages/mock-content/src/assets.ts`).
 - Réévaluation : un service distant remplace le contenu simulé, ou la pagination cesse de reposer sur un curseur.

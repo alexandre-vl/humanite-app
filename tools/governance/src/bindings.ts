@@ -863,11 +863,19 @@ export const BINDINGS = {
   },
   'ADR-0021': {
     scope: {
-      paths: ['apps/mobile/src/shared/api/**', 'apps/mobile/src/entities/**', 'packages/eslint-config/src/query.ts'],
+      // A page declares queries as an entity does, so its `api` segment is in scope as well: R2 is about the segment
+      // and not about the layer, and a scope that stopped at the entities would leave the one file the rule had to
+      // give way for — the newsstand's — changing without ever citing the ADR that governs it.
+      paths: [
+        'apps/mobile/src/shared/api/**',
+        'apps/mobile/src/entities/**',
+        'apps/mobile/src/pages/*/api/**',
+        'packages/eslint-config/src/query.ts',
+      ],
     },
     rules: {
       R1: ['guardrail/module-huma-mock-api', 'guardrail/module-huma-mock-content'],
-      R2: ['guardrail/query-options', 'guardrail/query-options-exempt'],
+      R2: ['guardrail/query-options', 'guardrail/query-options-exempt', 'guardrail/query-options-page-exempt'],
     },
   },
   'ADR-0022': {
