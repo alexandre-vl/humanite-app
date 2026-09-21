@@ -14,17 +14,17 @@ export const SPACING = {
 } as const satisfies Readonly<Record<string, Space>>;
 
 /**
- * Corner radii in points; the current app favours generous rounding (docs/app-actuelle). `sheet` is the one a reading
- * screen turns the top-left corner of its sheet by, measured on capture 13 as a circle of radius 129 px — 49,1 points
- * — fitted over 134 rows to within half a pixel, against a top-right corner left square. It is written as 48, the step
- * the scale already holds: a point of difference on a corner of fifty is not a corner anyone can tell apart, and a
- * scale that gains a step for every measurement stops being a scale.
+ * Corner radii in points; the current app favours generous rounding (docs/app-actuelle).
+ *
+ * There was a fifth, `sheet`, at forty-eight: the corner a reading screen turned its white sheet by over the coloured
+ * ground under it, and the corner the feed turned where one block of cards gave way to the next. Both are gone, and
+ * the step goes with them. A corner that big is not how a paper prints anything — it is how a phone draws a modal,
+ * and of the papers measured the only rounded-top surfaces in any stylesheet are share sheets and bottom modals.
  */
 export const RADII = {
   sm: radius(6),
   md: radius(12),
   lg: radius(20),
-  sheet: radius(48),
   pill: radius(999),
 } as const satisfies Readonly<Record<string, Radius>>;
 

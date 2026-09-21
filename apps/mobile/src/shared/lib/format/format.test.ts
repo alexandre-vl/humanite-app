@@ -1,15 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatDate, formatDateTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
-
-describe('formatDate', () => {
-  it('prints the day the newsroom published on', () => {
-    expect(formatDate('2026-09-12T17:52:00.000Z')).toBe('12/09/2026');
-  });
-
-  it('reads the newspaper clock, not UTC: an evening in Paris is already the next day', () => {
-    expect(formatDate('2026-09-12T22:30:00.000Z')).toBe('13/09/2026');
-  });
-});
+import { formatDateTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
 
 describe('formatDateTime', () => {
   it('prints the day and the hour a timeline row carries', () => {
@@ -111,6 +101,6 @@ describe('formatDuration', () => {
 
 describe('an instant nothing can read', () => {
   it('is refused rather than printed as a stray value', () => {
-    expect(() => formatDate('hier matin')).toThrow(/instant invalide/u);
+    expect(() => formatLongDate('hier matin')).toThrow(/instant invalide/u);
   });
 });

@@ -11,8 +11,11 @@ import { useBookmarks } from '../model/store';
 export type BookmarkToggleProps = Readonly<{ id: ArticleId }>;
 
 const useStyles = createStyles(() => ({
-  target: { width: SPACING.xxxl, height: SPACING.xxxl, alignItems: 'center', justifyContent: 'center' },
+  target: { width: SPACING.xl, height: SPACING.xl, alignItems: 'center', justifyContent: 'center' },
 }));
+
+/** What the target answers past its own edges, which brings a finger's whole grid step back around the mark. */
+const REACH = SPACING.md;
 
 /**
  * Keeps an article, or stops keeping it.
@@ -21,8 +24,11 @@ const useStyles = createStyles(() => ({
  * the label that names the gesture is also the only thing a reader who cannot see it is told, and the only thing a
  * test can read: a platform symbol renders as nothing at all off a device.
  *
- * The target is a whole grid step square, well past what a finger needs, where the screen it copies draws one of about
- * twenty-nine points and asks the reader to aim.
+ * The mark takes the room a mark takes, and the finger is given its whole grid step around it rather than inside it.
+ * Drawn at the size of the touch, it made the line it hangs on as tall as a finger — and on a screen where that line
+ * carries nothing else, a card opened on forty-eight points of empty page with one bookmark floating at the end.
+ * The screen this copies draws a target of about twenty-nine points and asks the reader to aim; this one is reachable
+ * over forty-eight and visible over twenty-four.
  */
 export function BookmarkToggle({ id }: BookmarkToggleProps): ReactNode {
   const styles = useStyles();
@@ -32,6 +38,7 @@ export function BookmarkToggle({ id }: BookmarkToggleProps): ReactNode {
   return (
     <Pressable
       style={styles.target}
+      hitSlop={REACH}
       label={t(kept ? 'bookmark.remove' : 'bookmark.add')}
       role="button"
       onPress={() => {

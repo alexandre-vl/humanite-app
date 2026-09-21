@@ -23,7 +23,12 @@ function Mark({ label }: BadgeProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.badge}>
-      <Text variant="label">{label}</Text>
+      {/* Set in the type of the word it stands beside, which is the smallest the paper sets anything in. It was set
+          two points larger and in lower case, so a filled block of yellow was the loudest thing on a front page of
+          headlines — and what it says is worth knowing before pressing a card, not instead of reading it. */}
+      <Text variant="kicker" tone="textPrimary">
+        {label}
+      </Text>
     </Box>
   );
 }

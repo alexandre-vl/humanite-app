@@ -22,7 +22,6 @@ import type { TextTone, TextVariant } from './typography.ts';
 export const GROUNDS = [
   'background',
   'ground',
-  'block',
   'surface',
   'card',
   'border',
@@ -48,17 +47,18 @@ type Printing = Readonly<{ smallest: TextVariant; grounds: readonly Ground[] }>;
  * not a number so that a change of type carries here by itself.
  */
 export const PRINTINGS = {
-  // The page and the block a feed alternates onto, the sheet a group of rows is laid on, the bar a row of labels sits
-  // in, and the masthead of the front page, which is painted in the rule colour. Smallest in a picture's legend.
+  // The page a feed and an article are printed on, the torn paper a linked card is dropped on, the sheet a group of
+  // rows is laid on, the bar a row of labels sits in, and the masthead of the front page, which is painted in the
+  // rule colour. Smallest in a picture's legend, and in the word that marks a column.
   textPrimary: {
     smallest: 'legend',
-    grounds: ['background', 'ground', 'block', 'surface', 'card', 'border'],
+    grounds: ['background', 'ground', 'surface', 'card', 'border'],
   },
-  // What answers a title on a card, on the page and on the ground a feed alternates onto.
-  textSecondary: { smallest: 'summary', grounds: ['background', 'block'] },
-  // A date under a card, the count under a cover, the hint under a row of settings, and the smallest of them all: the
-  // section named in capitals over a card's title.
-  textMuted: { smallest: 'kicker', grounds: ['background', 'block', 'card', 'surface'] },
+  // What answers a title on a card, and the standfirst of an article.
+  textSecondary: { smallest: 'summary', grounds: ['background'] },
+  // The count under a cover, the hint under a row of settings, the signature of a column, and the smallest of them
+  // all: the section named in capitals over a card's title.
+  textMuted: { smallest: 'kicker', grounds: ['background', 'card', 'surface'] },
   // The wire, the pill of a button, the mark on a column, the masthead of a cover: all the paper's own red.
   onPrimary: { smallest: 'caption', grounds: ['primary'] },
   // An article's own title, on the page it is read on. It stood on a second ground as well — the torn paper of a

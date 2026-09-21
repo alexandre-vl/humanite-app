@@ -43,20 +43,13 @@ test('the paper’s name is one red, whichever page it is printed on', () => {
 /**
  * What every colour of text owes the ground it is printed on is not here, nor is what a drawn control owes: both are
  * derived by `legibility.ts` and the test beside it, one from the size the text is set in and one from the parts a
- * reader has to tell apart. What stayed here is what neither rule can reach — the two grounds of a feed telling each
- * other apart, and that every role is a colour the palette names.
+ * reader has to tell apart. What stayed here is what neither rule can reach — the order of the three inks, the rule
+ * being visible at all, and that every role is a colour the palette names.
+ *
+ * A fourth stood here and is gone with what it held: the two grounds a feed alternated between had to be told apart,
+ * and the paper alternates between no two grounds now. It prints on one and draws a rule where a card ends.
  */
 describe.each(themes)('%s theme', (name, theme) => {
-  /**
-   * And the alternation has to be seen at all. WCAG asks nothing of two grounds carrying the same words, so the bar
-   * here is only that the second ground is a second ground: the values the paper alternates on measure 1.13 to 1 in
-   * the light theme and 1.19 in the dark. What this refuses is the shortcut of reaching for a role that happens to
-   * equal the page in one theme — the reading screen's ground does, and the alternation would simply not be there.
-   */
-  test(`${name}: the two grounds of a feed can be told apart`, () => {
-    expect(contrastRatio(theme.background, theme.block)).toBeGreaterThan(1.1);
-  });
-
   /**
    * The three inks have to be three. What `legibility.ts` asks of each is that it be readable on its ground, and two
    * roles holding the very same value answer that perfectly while saying nothing — which is what the paper did: a

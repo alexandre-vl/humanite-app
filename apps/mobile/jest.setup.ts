@@ -103,11 +103,15 @@ const mockAnnounced = (props: Announced): Announced => ({
   importantForAccessibility: props.importantForAccessibility,
 });
 
+// The picture's stand-in carries the style it was handed, like the symbol's below and for the same reason: how a
+// picture is laid out is a thing that can be wrong. It dropped it, and a bench that cannot read a picture's layout
+// cannot report one — eight points of margin under a lead picture came off its height, and a box held to a ratio
+// lost thirty-seven pixels of width with it, on a front page six green chains had just called clean.
 jest.mock('expo-image', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const image = (props: Announced): unknown =>
-    react.createElement(reactNative.View, { testID: 'picture', ...mockAnnounced(props) });
+  const image = (props: Announced & { style?: StyleProp<ViewStyle> }): unknown =>
+    react.createElement(reactNative.View, { testID: 'picture', style: props.style, ...mockAnnounced(props) });
   return { __esModule: true, Image: image };
 });
 

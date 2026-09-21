@@ -1,4 +1,4 @@
-import type { ArticleId, ArticleSummary } from '@huma/contracts';
+import type { ArticleSummary } from '@huma/contracts';
 import { pictureOf } from '#api';
 import { openerOf } from './picture';
 
@@ -8,42 +8,47 @@ import { openerOf } from './picture';
  * These name what is rendered, never what an item editorially is: a list hands a cell to another item only when both
  * answer the same name, and two items that mount different components under one name would leave the wrong views
  * behind. So the paper's own words — a brief, a column — appear here only where they really do change the tree.
+ *
+ * There were five, and `stacked` was the fifth: the title, then the picture, then the standfirst under it. Reading
+ * one after a `lead` meant learning a second order for the same four things, and what told them apart was not what
+ * they were but where they fell. Le Monde runs a hundred and seven cards off one component, varying which parts are
+ * present and never where they sit; Nielsen's own rule for a grid of cards is to keep the internal template identical
+ * so a reader learns it once, and that variation must carry meaning rather than whimsy. The four left are one order —
+ * picture, section, title, standfirst — at two sizes, with or without a picture, plus the one the paper itself marks.
  */
-export type CardShape = 'lead' | 'stacked' | 'line' | 'column' | 'brief';
-
-/** Which of the two grounds a block of the feed is printed on. */
-type FeedGround = 'paper' | 'lifted';
+export type CardShape = 'lead' | 'line' | 'column' | 'brief';
 
 /**
  * What kind of feed is being laid out, which is what its rhythm follows.
  *
- * A page of the paper opens on one article in full and alternates the ground under the blocks that follow. A list is
- * what a reader asked for — a search, their own bookmarks — and answers in the order asked, every item on one line,
- * because a rank in a list of answers is the answer's, not the paper's, and dressing the first one as a front page
- * would say the newsroom chose it (captures 09 and 17).
+ * A page of the paper opens on one article in full and raises another every few items. A list is what a reader asked
+ * for — a search, their own bookmarks — and answers in the order asked, every item on one line, because a rank in a
+ * list of answers is the answer's, not the paper's, and dressing the first one as a front page would say the newsroom
+ * chose it (captures 09 and 17).
  */
 export type FeedRhythm = 'paper' | 'list';
 
-/** One row of a feed: a card, or the seam where one block of cards gives way to the next. */
-export type FeedRow =
-  | Readonly<{ kind: 'card'; shape: CardShape; ground: FeedGround; summary: ArticleSummary }>
-  | Readonly<{ kind: 'seam'; ground: FeedGround; opens: ArticleId }>;
-
-/** How many cards a block holds before the ground changes under them. */
-const BLOCK = 3;
+/** One row of a feed: an article, in the shape the feed's rhythm gave it. */
+export type FeedRow = Readonly<{ shape: CardShape; summary: ArticleSummary }>;
 
 /**
- * Which block a rank falls in. The opening article is a block of its own, so the runs that follow it all start on a
- * card of the same shape rather than one beginning a beat late.
+ * How many items a page of the paper runs before it raises another in full.
+ *
+ * It is a rhythm and no longer a container. There were two grounds under these blocks, taken in turn, with a seam
+ * where one gave way to the other — a full-width band edge and a corner rounded over it every three cards. None of
+ * the four fronts measured does anything of the kind: the Guardian, the BBC, Le Monde and NPR each print one ground
+ * and separate with a hairline, and the Guardian's own container palettes are reserved for a container the desk has
+ * marked, never for every third card. What the band actually said is what NN/g calls the illusion of completeness: a
+ * contrasting full-width edge reads as the end of the page, and a reader stops there.
  */
-const blockOf = (rank: number): number => (rank === 0 ? 0 : 1 + Math.floor((rank - 1) / BLOCK));
+const BLOCK = 4;
 
 /**
  * The shape an item takes at its rank.
  *
  * What the item is comes first: a column is a column wherever it falls, and an item written without a picture cannot
- * be given one by its place in the page. Only then does the rank speak, and only on a page of the paper — which opens
- * on one article in full, then opens each block on a stacked card and runs it on in lines.
+ * be given one by its place in the page. Only then does the rank speak, and only on a page of the paper — which
+ * raises one article in full at the top and again every fourth item, and runs everything between them on one line.
  */
 const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): CardShape => {
   if (summary.format === 'column') {
@@ -55,10 +60,7 @@ const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): Car
   if (rhythm === 'list') {
     return 'line';
   }
-  if (rank === 0) {
-    return 'lead';
-  }
-  return (rank - 1) % BLOCK === 0 ? 'stacked' : 'line';
+  return rank % BLOCK === 0 ? 'lead' : 'line';
 };
 
 /**
@@ -77,8 +79,7 @@ const paperOrder = (summaries: readonly ArticleSummary[]): readonly ArticleSumma
 };
 
 /**
- * The rows a feed shows, in order: every item as a card, and — on a page of the paper — a seam wherever the ground
- * changes under them.
+ * The rows a feed shows, in order: every item as a card, in the shape its rank and its own nature give it.
  *
  * The shape is decided once, here, and never by a screen: a screen that chose a card would have to know the rhythm of
  * every other screen to keep one, and the list would be handed two items answering the same name that mount different
@@ -90,29 +91,11 @@ const paperOrder = (summaries: readonly ArticleSummary[]): readonly ArticleSumma
  */
 export const feedRows = (summaries: readonly ArticleSummary[], rhythm: FeedRhythm): readonly FeedRow[] => {
   const ordered = rhythm === 'paper' ? paperOrder(summaries) : summaries;
-  const rows: FeedRow[] = [];
-  let drawn = -1;
-  for (const [rank, summary] of ordered.entries()) {
-    const shape = shapeAt(summary, rank, rhythm);
-    if (rhythm === 'list') {
-      rows.push({ kind: 'card', shape, ground: 'paper', summary });
-      continue;
-    }
-    const block = blockOf(rank);
-    const ground: FeedGround = block % 2 === 0 ? 'paper' : 'lifted';
-    if (block !== drawn) {
-      drawn = block;
-      if (rank > 0) {
-        rows.push({ kind: 'seam', ground, opens: summary.id });
-      }
-    }
-    rows.push({ kind: 'card', shape, ground, summary });
-  }
-  return rows;
+  return ordered.map((summary, rank) => ({ shape: shapeAt(summary, rank, rhythm), summary }));
 };
 
 /** What tells one row of a feed from another for the list: each shape mounts its own tree, and only its own. */
-export const rowShape = (row: FeedRow): string => (row.kind === 'seam' ? 'seam' : row.shape);
+export const rowShape = (row: FeedRow): string => row.shape;
 
 /** The name a row keeps for as long as it is in the feed. */
-export const rowName = (row: FeedRow): string => (row.kind === 'seam' ? `seam:${row.opens}` : row.summary.id);
+export const rowName = (row: FeedRow): string => row.summary.id;

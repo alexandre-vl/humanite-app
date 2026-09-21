@@ -74,11 +74,9 @@ const nameAt = (names: readonly string[], index: number): string => {
   return name;
 };
 
-/** The day an item was published, in the one form the newspaper prints: `12/09/2026`. */
-export const formatDate = (instant: string): DisplayText => {
-  const clock = readClock(parseInstant(instant));
-  return asDisplayText(`${pad(clock.day)}/${pad(clock.month)}/${String(clock.year)}`);
-};
+// The bare `12/09/2026` a card used to carry is not written anywhere now. Nielsen's homepage guideline says why: as
+// long as the whole of a front is of the week — and this paper's corpus is three days of one — no card needs a date,
+// and the article needs one printed prominently. The article's is `formatLongDate`, in letters.
 
 /** The moment an item was published, as a timeline row carries it: `12/09, 19:52`. */
 export const formatDateTime = (instant: string): DisplayText => {

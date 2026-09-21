@@ -1,5 +1,5 @@
 import type { ArticleId, ArticleSummary, DisplayText } from '@huma/contracts';
-import { RADII, SPACING } from '@huma/design-tokens';
+import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
@@ -35,18 +35,18 @@ export type ArticleFeedProps = Readonly<{
 
 const useStyles = createStyles((theme) => ({
   feed: { paddingBottom: SPACING.xxxl },
-  // A card is printed on the ground of its block and carries no ground of its own: the block is what the reader
-  // sees, and a card drawn as a tile on top of it would be a second ground inside the first (captures 18, 19).
-  cardPaper: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md, backgroundColor: theme.background },
-  cardLifted: { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md, backgroundColor: theme.block },
-  underPaper: { backgroundColor: theme.background },
-  underLifted: { backgroundColor: theme.block },
-  // The seam is the incoming ground rising over the outgoing one, rounded at one corner. The page's own ground turns
-  // at its left, as the current app's white block does (capture 19), and the other turns at its right — so the page
-  // zigzags down. The corner can follow the ground because the two strictly alternate, which is what keeps this to
-  // two entries rather than one per ground and per side.
-  joinPaper: { height: SPACING.xxl, backgroundColor: theme.background, borderTopLeftRadius: RADII.sheet },
-  joinLifted: { height: SPACING.xxl, backgroundColor: theme.block, borderTopRightRadius: RADII.sheet },
+  // One ground, and a rule where one card gives way to the next. The feed alternated two grounds every three cards,
+  // with a corner rounded over the seam between them; none of the four fronts measured does anything of the sort —
+  // the Guardian, the BBC, Le Monde and NPR all print one ground and separate with a hairline. What the band was
+  // actually saying is what NN/g calls the illusion of completeness: a contrasting full-width edge reads as the
+  // bottom of the page, and a reader stops scrolling at it.
+  card: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
+    borderBottomWidth: SIZES.stroke,
+    borderColor: theme.rule,
+    backgroundColor: theme.background,
+  },
 }));
 
 /**
@@ -75,35 +75,26 @@ export function ArticleFeed({
 }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
   const roster = useQuery(authorsQuery).data ?? [];
-  const render = (row: FeedRow): ReactNode => {
-    if (row.kind === 'seam') {
-      return (
-        <Box style={row.ground === 'paper' ? styles.underLifted : styles.underPaper}>
-          <Box style={row.ground === 'paper' ? styles.joinPaper : styles.joinLifted} />
-        </Box>
-      );
-    }
-    return (
-      <Box style={row.ground === 'paper' ? styles.cardPaper : styles.cardLifted}>
-        {/* No label: a card's own words are its name, and they are better than any summary of them — the title, the
-            standfirst and the date are read in one breath, and the next swipe is the next article. */}
-        <Pressable
-          role="link"
-          onPress={() => {
-            onOpen(row.summary.id);
-          }}
-        >
-          <ArticleCard
-            shape={row.shape}
-            summary={row.summary}
-            action={action?.(row.summary)}
-            signature={row.shape === 'column' ? bylineOf(row.summary.authors, roster) : null}
-            name={name?.(row.summary) ?? null}
-          />
-        </Pressable>
-      </Box>
-    );
-  };
+  const render = (row: FeedRow): ReactNode => (
+    <Box style={styles.card}>
+      {/* No label: a card's own words are its name, and they are better than any summary of them — the section, the
+          title and the sentence under it are read in one breath, and the next swipe is the next article. */}
+      <Pressable
+        role="link"
+        onPress={() => {
+          onOpen(row.summary.id);
+        }}
+      >
+        <ArticleCard
+          shape={row.shape}
+          summary={row.summary}
+          action={action?.(row.summary)}
+          signature={row.shape === 'column' ? bylineOf(row.summary.authors, roster) : null}
+          name={name?.(row.summary) ?? null}
+        />
+      </Pressable>
+    </Box>
+  );
   return (
     <List
       items={feedRows(feed.items, rhythm)}

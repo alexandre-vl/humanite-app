@@ -1,4 +1,5 @@
 import type { DisplayText } from '@huma/contracts';
+import type { Space } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { Pressable as NativePressable } from 'react-native';
 import type { StyleRef } from '../../../lib/styles';
@@ -10,6 +11,16 @@ export type PressableProps = Readonly<{
   label?: DisplayText | undefined;
   role?: 'radio' | 'button' | 'link' | undefined;
   selected?: boolean | undefined;
+  /**
+   * How far past its own edges the target answers a finger.
+   *
+   * A finger needs more room than a mark needs, and until now the only way to give it any was to draw the mark inside
+   * a box the size of the finger — which spends that room twice, once on the touch and once on the layout. A control
+   * hung at the end of a line of small capitals then made the whole line as tall as a finger, and on a screen where
+   * that line had nothing else to say it was a band of empty page with one mark floating in it. Given here, the room
+   * is spent on the touch alone and the mark takes the space a mark takes.
+   */
+  hitSlop?: Space | undefined;
   /**
    * Where the target came to rest inside whatever laid it out, once that is known. A band of choices wider than the
    * screen reads it to know how far along the chosen one sits, which is the only way to bring it into view: what a
@@ -32,10 +43,20 @@ export type PressableProps = Readonly<{
  * something else. Without one a target is announced as a name and nothing more, and a reader hears what it says
  * without being told they may press it.
  */
-export function Pressable({ children, style, onPress, label, role, selected, onMeasure }: PressableProps): ReactNode {
+export function Pressable({
+  children,
+  style,
+  onPress,
+  label,
+  role,
+  selected,
+  hitSlop,
+  onMeasure,
+}: PressableProps): ReactNode {
   return (
     <NativePressable
       style={style}
+      hitSlop={hitSlop}
       onPress={onPress}
       accessibilityLabel={label}
       accessibilityRole={role}
