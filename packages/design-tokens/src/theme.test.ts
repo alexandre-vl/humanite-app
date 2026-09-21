@@ -31,6 +31,16 @@ test('the premium yellow is one value, and carries the light theme’s text', ()
 });
 
 /**
+ * The paper's name is the one thing that does not change with the page it is printed on. It is held beside the
+ * premium yellow because it is the same kind of fact: one value, both themes, and a reason — there the mark builds
+ * itself in a forced light scope, here the mark is the paper.
+ */
+test('the paper’s name is one red, whichever page it is printed on', () => {
+  expect(THEMES.dark.mark).toBe(THEMES.light.mark);
+  expect(THEMES.light.mark).toBe(PALETTE.uiRed);
+});
+
+/**
  * What every colour of text owes the ground it is printed on is not here, nor is what a drawn control owes: both are
  * derived by `legibility.ts` and the test beside it, one from the size the text is set in and one from the parts a
  * reader has to tell apart. What stayed here is what neither rule can reach — the two grounds of a feed telling each

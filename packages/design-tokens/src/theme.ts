@@ -18,6 +18,12 @@ import { PALETTE } from './palette.ts';
  * light theme keeps for the settings it groups, and which measured 1.09 to 1 against the page: on a real screen, an
  * alternation nobody sees.
  *
+ * `mark` is the paper's name, and it is the one red that is the same in both themes. It was set in `headline` and
+ * turned white on the dark page with every other headline — which is right for a headline and wrong for a masthead:
+ * a headline is type, and a masthead is the paper. The red reads on both pages (3.83 on the light one, where the
+ * name is large enough to owe only three, and 4.81 on the dark one), so the one thing that never changes is the one
+ * thing that never changes.
+ *
  * `textSecondary` is the middle of three inks, and it exists because a card has three things to say and had only two
  * voices for them. The title and the summary under it were printed in the same colour and the same weight, four
  * points apart: two titles, one of them inexplicably small. An ink sits between them now — near half the contrast of
@@ -54,6 +60,7 @@ export type Theme = Readonly<{
   textMuted: Color;
   onPrimary: Color;
   headline: Color;
+  mark: Color;
   link: Color;
   primary: Color;
   premium: Color;
@@ -74,6 +81,7 @@ export const LIGHT_THEME = {
   textMuted: PALETTE.dateGrey,
   onPrimary: PALETTE.white,
   headline: PALETTE.uiRed,
+  mark: PALETTE.uiRed,
   link: PALETTE.inkRed,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
@@ -94,6 +102,7 @@ export const DARK_THEME = {
   textMuted: PALETTE.darkMuted,
   onPrimary: PALETTE.white,
   headline: PALETTE.white,
+  mark: PALETTE.uiRed,
   link: PALETTE.uiRed,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,

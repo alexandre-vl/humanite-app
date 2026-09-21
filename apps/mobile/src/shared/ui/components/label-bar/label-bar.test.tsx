@@ -33,4 +33,22 @@ describe('LabelBar', () => {
     await fireEvent.press(screen.getByLabelText('Favoris'));
     expect(chosen).toHaveBeenCalledWith('kept');
   });
+
+  /**
+   * The band measures its labels and takes nothing more. It used to fill a band a list laid out for it, at a height
+   * the list had already decided, and `flex: 1` meant « fill that band »; standing on the screen itself it meant
+   * « take half the screen », and the front page opened on two hundred and eighty points of nothing between the
+   * masthead and the sections. No bench saw it — a headless runner lays nothing out and every word was findable on a
+   * blank screen — so what is held here is the share itself.
+   */
+  it('ne prend aucune part de la hauteur qu’on lui offre', async () => {
+    await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} />);
+    let node = screen.getByLabelText('Favoris').parent;
+    while (node !== null && node.type !== 'RCTScrollView') {
+      node = node.parent;
+    }
+    const style: unknown = node?.props['style'];
+    const share: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'flexGrow') : undefined;
+    expect(share).toBe(0);
+  });
 });

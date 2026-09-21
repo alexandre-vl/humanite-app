@@ -18,7 +18,10 @@ export type LabelBarProps<Id extends string> = Readonly<{
 }>;
 
 const useStyles = createStyles((theme) => ({
-  bar: { flex: 1, backgroundColor: theme.surface },
+  // No height of its own, and no share of what is going. It used to fill a band the list laid out for it, at a height
+  // the list had already decided; standing on the screen itself, `flex: 1` made it take half of it. What it measures
+  // is what its labels measure, which is what has to grow when the reader asks for larger type.
+  bar: { flexGrow: 0, flexShrink: 0, backgroundColor: theme.surface },
   labels: { alignItems: 'flex-end', paddingHorizontal: SPACING.sm },
   label: { paddingHorizontal: SPACING.md, paddingTop: SPACING.sm },
   // The rule under a choice is drawn whether or not it is the one showing, in the ground's own colour when it is not:

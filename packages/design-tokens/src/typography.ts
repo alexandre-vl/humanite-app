@@ -17,6 +17,7 @@ export const TEXT_TONES = [
   'textMuted',
   'onPrimary',
   'headline',
+  'mark',
   'link',
 ] as const satisfies readonly (keyof Theme)[];
 
@@ -104,7 +105,9 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  *
  * `masthead` is the paper's own name, which was set in `display` — twenty points, the size of a card's title — so
  * the front page opened on a name no larger than the first headline under it. It is set in the red the paper is
- * printed in, which a smaller size would forbid: see the note on `xl` beside the sizes.
+ * printed in, which a smaller size would forbid: see the note on `xl` beside the sizes. That red is `mark` and not
+ * `headline`, which turns white on the dark page along with every other headline; a headline is type and a masthead
+ * is the paper.
  *
  * `kicker` is the word that names what a card belongs to, set above its title in small capitals. It is the one role
  * whose letters are set apart — the only way twelve points of type reads as a label and not as the first line of the
@@ -112,7 +115,7 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.normal, tone: 'headline' },
-  masthead: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
+  masthead: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'mark' },
   display: { face: 'display', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   standfirst: {

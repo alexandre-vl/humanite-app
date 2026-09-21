@@ -78,6 +78,15 @@ test('a set of faces answers for every role, and none falls back to the other se
 });
 
 /**
+ * The paper's name is set in the paper's own red and in nothing else. It shared the headline's tone for a while,
+ * which turns white on the dark page along with every other headline — right for a headline, wrong for a masthead.
+ */
+test('the masthead is set in the paper’s mark, and no other role is', () => {
+  expect(paper('masthead').tone).toBe('mark');
+  expect(TEXT_VARIANTS.filter((variant) => paper(variant).tone === 'mark')).toEqual(['masthead']);
+});
+
+/**
  * Capitals and the air between them are one decision and are made once. A kicker set in capitals without tracking
  * reads as a single long word, and a role tracked without being set in capitals is just a loose line; the paper has
  * exactly one role that wants both, and none that wants either on its own.
