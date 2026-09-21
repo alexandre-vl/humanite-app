@@ -9,26 +9,26 @@ import { Switch } from './switch';
 const LABEL = 'Lisibilité renforcée';
 
 const useRoles = createStyles((theme) => ({
-  muted: { backgroundColor: theme.textMuted },
+  control: { backgroundColor: theme.control },
   primary: { backgroundColor: theme.primary },
-  page: { backgroundColor: theme.background },
+  ink: { backgroundColor: theme.textPrimary },
 }));
 
 /**
  * The three theme roles the control is meant to be drawn in, painted beside it so a test can read them back.
  *
  * Naming a theme here would prove nothing about the other one, and the lint forbids it anyway; what the control owes
- * is that it takes these roles, whichever theme is in force. That the roles themselves hold — muted text and the page
- * above three to one, the page and the paper's red above three to one — is measured in the tokens' own test, so the
- * two together are the whole of WCAG 1.4.11 for this control.
+ * is that it takes these roles, whichever theme is in force. That the roles themselves hold — the five adjacencies a
+ * reader needs to find the control and to see which way it is set — is measured in the tokens' own test, so the two
+ * together are the whole of WCAG 1.4.11 for this control.
  */
 function Roles(): ReactNode {
   const styles = useRoles();
   return (
     <View>
-      <View testID="muted" style={styles.muted} />
+      <View testID="control" style={styles.control} />
       <View testID="primary" style={styles.primary} />
-      <View testID="page" style={styles.page} />
+      <View testID="ink" style={styles.ink} />
     </View>
   );
 }
@@ -53,12 +53,13 @@ describe('Switch', () => {
   });
 
   /**
-   * The defect this holds was found on an A065 and measured there: drawn in the roles of a rule and a sheet, the
-   * control stood at 1,13 to 1 against the page in the light theme — invisible, on the one screen a reader opens
-   * because they see badly. Nothing in the chain saw it, and nothing would have seen it come back: the two tests
-   * above pass whatever the control is painted in.
+   * Two defects this holds, both found on an A065 and measured there. Drawn in the roles of a rule and a sheet, the
+   * control stood at 1,13 to 1 against the page: a control nobody could find. Given the page's own colour for its
+   * knob, it stood at 1,00 against the page — and the platform draws the knob wider than the track, so three of the
+   * four states were a hole and a crescent rather than a switch. Nothing in the chain saw either: the two tests above
+   * pass whatever the control is painted in.
    */
-  it('prend les rôles d’un contrôle, et non ceux d’un filet et d’une feuille', async () => {
+  it('prend les rôles d’un contrôle, et non ceux d’un filet, d’une feuille ou de la page', async () => {
     await render(
       <>
         <Roles />
@@ -68,8 +69,8 @@ describe('Switch', () => {
     // React Native spreads the pair of track colours and the knob into three props of its own before handing them to
     // the platform, so these are the names the control is actually drawn from, not the ones it was given.
     const control = screen.getByLabelText(LABEL);
-    expect(control.props['tintColor']).toBe(roleColor('muted'));
+    expect(control.props['tintColor']).toBe(roleColor('control'));
     expect(control.props['onTintColor']).toBe(roleColor('primary'));
-    expect(control.props['thumbTintColor']).toBe(roleColor('page'));
+    expect(control.props['thumbTintColor']).toBe(roleColor('ink'));
   });
 });

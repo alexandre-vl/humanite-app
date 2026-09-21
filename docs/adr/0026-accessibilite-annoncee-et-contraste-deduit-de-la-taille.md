@@ -9,8 +9,8 @@ significance: [guarded-config, boundary]
 ## Contexte et problème
 
 - Les props d’une primitive sont fermées : rien n’est répandu, et le cast est interdit, donc une vue native ne porte que ce que son type déclare (ADR-0003, ADR-0006).
-- Avant cette décision, toute l’app portait quatre attributs d’accessibilité, dans deux primitives, et ni `Image`, ni `Icon`, ni `Text` ne pouvait en recevoir un (`git show 1e6e0d2~1 -- apps/mobile/src/shared/ui/primitives`).
-- Les seuils de contraste étaient choisis à la main, un par paire à laquelle quelqu’un avait pensé ; l’un d’eux tenait une légende de quatorze points à la barre du grand texte (`git show 1e6e0d2~1 -- packages/design-tokens/src/theme.test.ts`).
+- Avant cette décision, l’app portait quatre attributs d’accessibilité dans deux primitives, et ni `Image`, ni `Icon`, ni `Text` ne pouvait en recevoir (`git show 1e6e0d2~1 -- apps/mobile/src/shared/ui/primitives`).
+- Les seuils de contraste étaient choisis à la main : l’un tenait une légende de quatorze points à la barre du grand texte (`git show 1e6e0d2~1 -- packages/design-tokens/src/theme.test.ts`).
 - Le document de référence ne mesure ni contraste ni comportement de lecteur d’écran : il n’y a pas d’état de l’art à copier (`grep -c contraste docs/app-actuelle/README.md`).
 - La taille d’une variante et le pas du lecteur vivent déjà dans une table unique, que l’app ne peut pas contourner (ADR-0012).
 
@@ -37,13 +37,15 @@ Option retenue : « des annonces requises par les types, et un contraste déduit
 - **R3** — Le contraste exigé d’une couleur de texte DOIT être déduit de la plus petite composition où le journal la pose.
 - **R4** — Un écart au contraste exigé DOIT porter la mesure qui le constate.
 - **R5** — Un écart qui a cessé d’en être un NE DOIT PAS rester écrit.
+- **R6** — Chaque part d’un contrôle qui dit où il est ou comment il est réglé DOIT se distinguer de ce qu’elle touche.
 
 ### Conséquences
 
-- Bien, parce que la question a été posée quinze fois d’un coup : quatorze images et symboles répètent les mots posés à côté d’eux, un seul en porte un — et aucun des quinze n’était décidé avant.
+- Bien, parce que la question a été posée quinze fois d’un coup : quatorze de ces vues répètent les mots posés à côté d’elles, une seule en porte un, et aucune n’était décidée avant.
 - Bien, parce que la règle déduite a trouvé quatre paires sous la barre que la chaîne verte tenait pour bonnes, dont la date sous chaque carte du journal.
-- Bien, parce qu’un écart ne peut plus dormir : celui du blanc sur le rouge porte sa mesure, et le jour où le rouge descendra, la ligne qui l’explique tombera avec lui.
-- Mauvais, parce que la table des fonds qu’une couleur rencontre est déclarée et non déduite : un écran qui poserait un texte sur un fond que personne n’a nommé ne serait tenu par rien.
+- Bien, parce qu’un écart ne peut plus dormir : celui du blanc sur le rouge porte sa mesure, et le jour où le rouge descendra, la ligne qui l’explique tombera avec.
+- Bien, parce que la règle a livré un second défaut sur l’unique contrôle dessiné : son curseur avait la couleur de la page, que la plateforme peint plus large que la piste — trois états sur quatre étaient un trou et un croissant.
+- Mauvais, parce que les fonds qu’une couleur rencontre sont déclarés et non déduits : un texte posé sur un fond que personne n’a nommé ne serait tenu par rien.
 - Mauvais, parce que le rôle d’une cible tactile reste facultatif, faute d’un type qui sache ce qu’une pression fait.
 
 ## Avantages et inconvénients des options
@@ -62,12 +64,12 @@ Option retenue : « des annonces requises par les types, et un contraste déduit
 
 ### une relecture d’accessibilité écran par écran
 
-- Bien, parce qu’elle juge le sens, qu’aucun outil ne juge, et peut donc voir ce qu’une image dit de plus que les mots posés à côté d’elle (C1).
+- Bien, parce qu’elle juge le sens, qu’aucun outil ne juge, et voit donc ce qu’une image dit de plus que les mots d’à côté (C1).
 - Mauvais, parce qu’une vue ajoutée plus tard ne rencontre aucune contrainte (C1).
 - Mauvais, parce que rien n’échoue : un écart y reste une note, et une note ne se périme pas (C3).
 
 ## Informations complémentaires
 
-- WCAG 1.4.3 demande quatre et demi pour un, et trois pour un au-delà de vingt-quatre pixels ; des neuf variantes du journal, une seule — le titre, à trente-quatre points — dépasse ce seuil.
-- Les deux plateformes retirent une vue du parcours différemment, l’une par `accessibilityElementsHidden` et l’autre par `importantForAccessibility` : une vue qui n’en poserait qu’un serait annoncée sur un téléphone et pas sur l’autre.
+- WCAG 1.4.3 demande quatre et demi pour un, et trois au-delà de vingt-quatre pixels ; des neuf variantes du journal, une seule — le titre, à trente-quatre points — dépasse ce seuil.
+- Les deux plateformes retirent une vue du parcours différemment, par `accessibilityElementsHidden` et par `importantForAccessibility` : n’en poser qu’un annonce la vue sur un téléphone et pas sur l’autre.
 - Réévaluation : un greffon de lint d’accessibilité déclare la version d’ESLint du dépôt, ou une plateforme cesse de lire l’un des deux attributs de retrait.

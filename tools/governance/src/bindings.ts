@@ -968,6 +968,10 @@ export const BINDINGS = {
         convention:
           'Le même test refuse une paire déclarée en écart qui atteint désormais le seuil : une justification écrite pour un défaut réparé est une phrase fausse dans les jetons, et elle fait échouer le test qui la lit.',
       },
+      R6: {
+        convention:
+          'Les adjacences du seul contrôle que l’app dessine sont listées dans la table des formes : la piste contre la page dans chacun de ses deux états, le curseur contre chacune des deux pistes, et le curseur contre la page. Le test les tient toutes à trois pour un dans les deux thèmes, et le test de la primitive tient qu’elle prend bien ces rôles-là.',
+      },
     },
   },
 } as const satisfies Bindings<ProofId>;

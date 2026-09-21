@@ -23,6 +23,13 @@ import { PALETTE } from './palette.ts';
  * dark enough to carry it; a letter on a light page has to be dark enough to be read, and a letter on a dark page
  * has to be light enough. The paper's own red answers only the last of those — 4.81 to 1 on the dark page, 3.83 on
  * the light one — so the light theme writes its links in the deeper `inkRed` and the dark theme in the red itself.
+ *
+ * `control` is the track of a switch when it is off, and it is one value in both themes although the light theme
+ * paints muted text the same. A muted word owes one thing: to be read on the page. A track owes three — to be found
+ * on the page, to be told from the knob riding on it, and to stay told from it when the knob is the text colour. Only
+ * a value near the middle of the two pages answers all three, and the dark theme's muted grey does not: the knob
+ * measured 2.11 to 1 against it. The switch is the app's one drawn control, so the role is named for what it draws
+ * rather than for the one component that uses it.
  */
 export type Theme = Readonly<{
   background: Color;
@@ -38,6 +45,7 @@ export type Theme = Readonly<{
   primary: Color;
   premium: Color;
   border: Color;
+  control: Color;
 }>;
 
 /** The light theme, built from the measured palette. */
@@ -55,6 +63,7 @@ export const LIGHT_THEME = {
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
+  control: PALETTE.dateGrey,
 } as const satisfies Theme;
 
 /** The dark theme, derived from the measured dark background #141414. */
@@ -72,6 +81,7 @@ export const DARK_THEME = {
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.darkBorder,
+  control: PALETTE.dateGrey,
 } as const satisfies Theme;
 
 /**

@@ -80,6 +80,29 @@ const AA_NORMAL = 4.5;
 /** The contrast a run of text at this size owes the ground under it. */
 export const requiredRatio = (size: number): number => (size >= LARGE_TEXT ? AA_LARGE : AA_NORMAL);
 
+/** What WCAG 1.4.11 asks of the parts of a control that say where it is and which state it is in. */
+export const SHAPE_RATIO = AA_LARGE;
+
+/** Two roles that touch, and which a reader has to tell apart to use the control they draw. */
+type Adjacency = Readonly<{ part: keyof Theme; against: keyof Theme; says: string }>;
+
+/**
+ * The adjacencies of the app's one drawn control, the switch of the reading settings.
+ *
+ * A control is not a word, and the bar is not the same one: three to one, of everything that says where the control
+ * is and which way it is set. It is listed rather than inferred because the platform draws the control and only this
+ * file knows which of its parts take which role — and because the last line below is the one that was missing. The
+ * knob had the page's own colour; the platform paints it wider than the track, so where it sat there was a hole and
+ * where it did not there was a crescent. Nothing said so: every other pair held.
+ */
+export const SHAPES = [
+  { part: 'control', against: 'background', says: 'where the switch is, set off' },
+  { part: 'primary', against: 'background', says: 'where the switch is, set on' },
+  { part: 'textPrimary', against: 'control', says: 'which side the knob rests on, set off' },
+  { part: 'textPrimary', against: 'primary', says: 'which side the knob rests on, set on' },
+  { part: 'textPrimary', against: 'background', says: 'that the knob is a knob, and not a hole in the page' },
+] as const satisfies readonly Adjacency[];
+
 /** A pairing the paper prints knowing it is under the bar, with the reading that says how far under. */
 type Departure = Readonly<{
   tone: TextTone;

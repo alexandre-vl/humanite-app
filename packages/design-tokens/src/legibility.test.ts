@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { contrastRatio } from './contrast.ts';
-import { DEPARTURES, GROUNDS, PRINTINGS, requiredRatio } from './legibility.ts';
+import { DEPARTURES, GROUNDS, PRINTINGS, requiredRatio, SHAPE_RATIO, SHAPES } from './legibility.ts';
 import type { Theme } from './theme.ts';
 import { THEMES } from './theme.ts';
 import type { TextVariant } from './typography.ts';
@@ -45,6 +45,14 @@ describe.each(themes)('%s theme', (name, theme) => {
         expect(ratio).toBeLessThan(required);
       });
     }
+  }
+});
+
+describe.each(themes)('%s theme, drawn', (name, theme) => {
+  for (const shape of SHAPES) {
+    test(`${name}: ${shape.part} on ${shape.against} shows ${shape.says}`, () => {
+      expect(contrastRatio(theme[shape.part], theme[shape.against])).toBeGreaterThanOrEqual(SHAPE_RATIO);
+    });
   }
 });
 

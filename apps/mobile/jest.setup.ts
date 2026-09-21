@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 import type { ReactNode } from 'react';
-import type { AccessibilityRole } from 'react-native';
+import type { AccessibilityRole, StyleProp, ViewStyle } from 'react-native';
 
 // A frame never arrives without a screen, so the runner's requestAnimationFrame fires on a timer of its own, after the
 // test that scheduled it has ended. @shopify/flash-list schedules the end of its first layout that way, and the state
@@ -111,12 +111,18 @@ jest.mock('expo-image', () => {
   return { __esModule: true, Image: image };
 });
 
+// The symbol's stand-in also lays itself out the way the library does — a box of the size it was handed, then the
+// style it was given — because on Android that size is a font size and the box is not, and the primitive undoes the
+// reader's step on one of the two. A stand-in that dropped the size would let that come apart unseen.
 jest.mock('expo-symbols', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const symbolView = (props: Announced & { name?: { android?: string } }): unknown =>
+  const symbolView = (
+    props: Announced & { name?: { android?: string }; size?: number; style?: StyleProp<ViewStyle> },
+  ): unknown =>
     react.createElement(reactNative.View, {
       testID: `symbol:${props.name?.android ?? ''}`,
+      style: [{ width: props.size, height: props.size }, props.style],
       ...mockAnnounced(props),
     });
   return { __esModule: true, SymbolView: symbolView };

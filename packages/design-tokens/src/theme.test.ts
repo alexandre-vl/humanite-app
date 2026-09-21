@@ -31,23 +31,12 @@ test('the premium yellow is one value, and carries the light theme’s text', ()
 });
 
 /**
- * What every colour of text owes the ground it is printed on is not here: it is derived from the size that text is
- * set in, by `legibility.ts` and the test beside it. What stayed here is what is not text — a control's own shape,
- * the two grounds of a feed telling each other apart, and the mark that builds itself in a light scope.
+ * What every colour of text owes the ground it is printed on is not here, nor is what a drawn control owes: both are
+ * derived by `legibility.ts` and the test beside it, one from the size the text is set in and one from the parts a
+ * reader has to tell apart. What stayed here is what neither rule can reach — the two grounds of a feed telling each
+ * other apart, and that every role is a colour the palette names.
  */
 describe.each(themes)('%s theme', (name, theme) => {
-  /**
-   * A control is not text: what has to be found is its own shape, and WCAG asks three to one of the parts that say
-   * which state it is in. The switch of the settings screen is drawn from these roles — the ground is its knob, the
-   * muted colour its track when off, the primary colour its track when on — after a version drawn from the border
-   * and the surface measured 1.13 to 1 against the page on a real phone, on the screen a reader opens precisely
-   * because they cannot see well. The muted colour is held against the grounds it is printed on by the legibility
-   * rule, which reads the size it is set in; this is the other pair, and it is a shape rather than a word.
-   */
-  test(`${name}: a control drawn on the primary colour keeps its own shape`, () => {
-    expect(contrastRatio(theme.background, theme.primary)).toBeGreaterThanOrEqual(3);
-  });
-
   /**
    * And the alternation has to be seen at all. WCAG asks nothing of two grounds carrying the same words, so the bar
    * here is only that the second ground is a second ground: the values the paper alternates on measure 1.13 to 1 in

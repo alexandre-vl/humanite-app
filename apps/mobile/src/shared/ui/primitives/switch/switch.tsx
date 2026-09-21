@@ -21,12 +21,18 @@ export type SwitchProps = Readonly<{
  * The label is what it is announced by: the text beside it belongs to the row, not to the control, so the control
  * would otherwise be a nameless target under a finger that cannot see.
  *
- * The colours are the ones a control needs, not the ones a card needs. Drawn in the border and the surface — the two
- * roles a rule and a sheet are drawn in — it measured 1.13 to 1 against the page in the light theme on an A065: a
- * control nobody could find, on the screen a reader opens because they cannot see well. Off, the track now takes the
- * colour muted text takes, which the themes already hold above three to one against their ground; the knob takes the
- * ground itself, so it reads against the track in both states. What tells the states apart is the knob's side as much
- * as the colour, which is what keeps them apart for a reader who sees no red.
+ * The colours are the ones a control needs, not the ones a card needs, and it took two readings on an A065 to find
+ * them. Drawn in the border and the surface — the roles a rule and a sheet take — it measured 1.13 to 1 against the
+ * page: a control nobody could find. Given the knob the page's own colour, it measured 1.00 against the page: the
+ * platform draws the knob wider than the track and paints it over the middle of the pill, so a knob the colour of the
+ * page leaves a hole where it sits and a crescent where it does not. Both themes showed it; three of the four states
+ * were a shape nobody would name a switch.
+ *
+ * So the knob takes the colour the paper writes in, and the track a value both pages are far from — the same one in
+ * either theme, a muted grey being too pale to be told from a pale knob on a dark page. The five adjacencies a reader
+ * needs are then held together by the tokens: the track against the page in each state, the knob against each track,
+ * and the knob against the page, which is the one that had vanished. What tells the states apart is the knob's side
+ * as much as the colour, which keeps them apart for a reader who sees no red.
  */
 export function Switch({ value, onChange, label }: SwitchProps): ReactNode {
   const theme = useTheme();
@@ -35,9 +41,9 @@ export function Switch({ value, onChange, label }: SwitchProps): ReactNode {
       value={value}
       onValueChange={onChange}
       accessibilityLabel={label}
-      trackColor={{ false: theme.textMuted, true: theme.primary }}
-      thumbColor={theme.background}
-      ios_backgroundColor={theme.textMuted}
+      trackColor={{ false: theme.control, true: theme.primary }}
+      thumbColor={theme.textPrimary}
+      ios_backgroundColor={theme.control}
     />
   );
 }
