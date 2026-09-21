@@ -30,37 +30,22 @@ test('the premium yellow is one value, and carries the light theme’s text', ()
   expect(contrastRatio(THEMES.light.textPrimary, THEMES.light.premium)).toBeGreaterThanOrEqual(4.5);
 });
 
+/**
+ * What every colour of text owes the ground it is printed on is not here: it is derived from the size that text is
+ * set in, by `legibility.ts` and the test beside it. What stayed here is what is not text — a control's own shape,
+ * the two grounds of a feed telling each other apart, and the mark that builds itself in a light scope.
+ */
 describe.each(themes)('%s theme', (name, theme) => {
-  test(`${name}: primary text meets WCAG AA against the background`, () => {
-    expect(contrastRatio(theme.textPrimary, theme.background)).toBeGreaterThanOrEqual(4.5);
-  });
-
-  test(`${name}: muted text meets WCAG AA for large text against the background`, () => {
-    expect(contrastRatio(theme.textMuted, theme.background)).toBeGreaterThanOrEqual(3);
-  });
-
-  test(`${name}: text on the primary colour meets WCAG AA for large text`, () => {
-    expect(contrastRatio(theme.onPrimary, theme.primary)).toBeGreaterThanOrEqual(3);
-  });
-
   /**
    * A control is not text: what has to be found is its own shape, and WCAG asks three to one of the parts that say
    * which state it is in. The switch of the settings screen is drawn from these roles — the ground is its knob, the
    * muted colour its track when off, the primary colour its track when on — after a version drawn from the border
    * and the surface measured 1.13 to 1 against the page on a real phone, on the screen a reader opens precisely
-   * because they cannot see well. The muted colour is already held against the ground above; this is the other pair.
+   * because they cannot see well. The muted colour is held against the grounds it is printed on by the legibility
+   * rule, which reads the size it is set in; this is the other pair, and it is a shape rather than a word.
    */
   test(`${name}: a control drawn on the primary colour keeps its own shape`, () => {
     expect(contrastRatio(theme.background, theme.primary)).toBeGreaterThanOrEqual(3);
-  });
-
-  /**
-   * A feed prints its blocks on two grounds in turn, and the same words are read on both. The page's own ground is
-   * held above; this is the other one, which nothing held until the blocks alternated onto it.
-   */
-  test(`${name}: text holds on the ground a block alternates onto`, () => {
-    expect(contrastRatio(theme.textPrimary, theme.block)).toBeGreaterThanOrEqual(4.5);
-    expect(contrastRatio(theme.textMuted, theme.block)).toBeGreaterThanOrEqual(3);
   });
 
   /**

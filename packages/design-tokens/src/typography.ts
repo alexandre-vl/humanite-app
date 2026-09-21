@@ -1,10 +1,26 @@
 import type { FontFamily, FontSize, LineHeight } from './brand.ts';
 import { fontSize } from './brand.ts';
+import type { Theme } from './theme.ts';
 import type { Face, FaceSet } from './tokens.ts';
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from './tokens.ts';
 
-/** The theme colour a run of text paints with: a subset of the theme's colour roles, named where a text style is set. */
-export type TextTone = 'textPrimary' | 'textMuted' | 'onPrimary' | 'headline' | 'primary';
+/**
+ * The colours a run of text paints with: the subset of the theme's roles a text style may name.
+ *
+ * It is a list and not a bare union for the same reason the themes are, and it is held against the theme's own keys:
+ * a tone that named a role no theme carries would read a colour that is not there, and the `satisfies` below refuses
+ * it before anything renders.
+ */
+export const TEXT_TONES = [
+  'textPrimary',
+  'textMuted',
+  'onPrimary',
+  'headline',
+  'link',
+] as const satisfies readonly (keyof Theme)[];
+
+/** The name of a text colour. */
+export type TextTone = (typeof TEXT_TONES)[number];
 
 /** A role of the table: which face it is set in, at what size, on what multiple, and the tone it paints with. */
 type Role = Readonly<{ face: Face; size: FontSize; leading: LineHeight; tone: TextTone }>;

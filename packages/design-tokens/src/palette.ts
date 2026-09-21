@@ -12,9 +12,18 @@ import { color } from './brand.ts';
  * and the blue of a browser slider. No theme paints with any of them — three name a control this app draws itself in
  * the paper's own colours, and the fourth names a fault the reference document reports. What the current app looks
  * like is recorded where it is measured; this table is what is painted.
+ *
+ * Two values depart from the measurement, both because a reading of the current app's own colours failed the rule in
+ * `legibility.ts` — which is the whole reason that rule was written down. `dateGrey` measured `#918199`, and the
+ * caption it prints is fourteen points of regular type, which WCAG holds to four and a half to one: it reached 3.62
+ * on the page, 3.32 on a grouped card and 3.20 on the ground a feed alternates onto. `inkRed` is the paper's red
+ * taken down until it can be read as a letter on a light page, `uiRed` itself reaching only 3.83 there. The red is
+ * untouched where it is a ground rather than a letter: that is the paper's, and the rule names the departure instead
+ * of hiding it.
  */
 export const PALETTE = {
   uiRed: color('#f13c47'),
+  inkRed: color('#ca323c'),
   aubergine: color('#230434'),
   premiumYellow: color('#ffd603'),
   blueGrey: color('#ecf2f2'),
@@ -24,7 +33,7 @@ export const PALETTE = {
   darkCard: color('#242424'),
   darkMuted: color('#b0a8b6'),
   darkBorder: color('#333333'),
-  dateGrey: color('#918199'),
+  dateGrey: color('#74677a'),
   white: color('#ffffff'),
   black: color('#000000'),
 } as const satisfies Readonly<Record<string, Color>>;

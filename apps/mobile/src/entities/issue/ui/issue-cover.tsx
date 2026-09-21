@@ -28,9 +28,11 @@ const useStyles = createStyles((theme) => ({
     backgroundColor: theme.primary,
   },
   masthead: { paddingHorizontal: SPACING.sm, paddingTop: SPACING.sm, paddingBottom: SPACING.xs },
-  // The page of the cover is painted in the block ground rather than left clear: a numéro whose opening item lost its
-  // picture would otherwise stand as a hole in the shelf the width of every other cover.
-  page: { flex: 1, backgroundColor: theme.block },
+  // The page of the cover is painted rather than left clear: a numéro whose opening item lost its picture would
+  // otherwise stand as a hole in the shelf the width of every other cover. It is painted in the paper's red and not
+  // in the block ground, because the headline laid over it is white — on the block ground that title measured 1.15
+  // to 1, a front page with no words on it for as long as the picture took to arrive.
+  page: { flex: 1, backgroundColor: theme.primary },
   picture: { position: 'absolute', top: SPACING.none, bottom: SPACING.none, left: SPACING.none, right: SPACING.none },
   lead: { position: 'absolute', left: SPACING.none, right: SPACING.none, bottom: SPACING.none, padding: SPACING.sm },
 }));

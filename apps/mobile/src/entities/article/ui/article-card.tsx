@@ -41,8 +41,9 @@ const useStyles = createStyles((theme) => ({
     backgroundColor: theme.border,
   },
   rest: { flex: 1 },
-  // The word and the writer are printed together on the paper's red, which is where the current app puts them, and
-  // the themes already hold the text it lays on that red above three to one.
+  // The word and the writer are printed together on the paper's red, which is where the current app puts them. White
+  // on that red is the one pairing this paper prints under the WCAG bar, at 3.83 to 1: the tokens name the departure
+  // and hold it there rather than leave it unsaid.
   mark: {
     alignSelf: 'flex-start',
     flexDirection: 'row',

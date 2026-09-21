@@ -17,6 +17,12 @@ import { PALETTE } from './palette.ts';
  * reading screen's `ground` is the page itself once the theme is dark, and a grouped list's `card` is a shade the
  * light theme keeps for the settings it groups, and which measured 1.09 to 1 against the page: on a real screen, an
  * alternation nobody sees.
+ *
+ * `link` is the red a word takes when pressing it goes somewhere, and it is not `primary` for the reason `headline`
+ * is not one value either: a ground and a letter want the red from opposite ends. A ground carrying white has to be
+ * dark enough to carry it; a letter on a light page has to be dark enough to be read, and a letter on a dark page
+ * has to be light enough. The paper's own red answers only the last of those — 4.81 to 1 on the dark page, 3.83 on
+ * the light one — so the light theme writes its links in the deeper `inkRed` and the dark theme in the red itself.
  */
 export type Theme = Readonly<{
   background: Color;
@@ -28,6 +34,7 @@ export type Theme = Readonly<{
   textMuted: Color;
   onPrimary: Color;
   headline: Color;
+  link: Color;
   primary: Color;
   premium: Color;
   border: Color;
@@ -44,6 +51,7 @@ export const LIGHT_THEME = {
   textMuted: PALETTE.dateGrey,
   onPrimary: PALETTE.white,
   headline: PALETTE.uiRed,
+  link: PALETTE.inkRed,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
@@ -60,6 +68,7 @@ export const DARK_THEME = {
   textMuted: PALETTE.darkMuted,
   onPrimary: PALETTE.white,
   headline: PALETTE.white,
+  link: PALETTE.uiRed,
   primary: PALETTE.uiRed,
   premium: PALETTE.premiumYellow,
   border: PALETTE.darkBorder,

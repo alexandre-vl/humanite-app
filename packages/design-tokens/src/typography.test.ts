@@ -1,27 +1,13 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import type { Theme } from './theme.ts';
-import { LIGHT_THEME } from './theme.ts';
-import type { TextTone, TextVariant, Typography } from './typography.ts';
+import type { TextVariant, Typography } from './typography.ts';
 import { TEXT_SCALES, TEXT_VARIANTS, typographyAt } from './typography.ts';
-
-/** The colour roles a text may take, each proven a real key of the theme by the `satisfies`. */
-const TONE_ROLES = [
-  'textPrimary',
-  'textMuted',
-  'onPrimary',
-  'headline',
-  'primary',
-] as const satisfies readonly (keyof Theme)[];
 
 /** A role as the paper sets it, at the step nobody has moved: the table as it stood before a reader could touch it. */
 const paper = (variant: TextVariant): Typography => typographyAt(variant, 'normal', 'paper');
 
-test('the text tones are exactly the theme colour roles a text may take', () => {
-  expectTypeOf<TextTone>().toEqualTypeOf<(typeof TONE_ROLES)[number]>();
-  for (const role of TONE_ROLES) {
-    expect(LIGHT_THEME).toHaveProperty(role);
-  }
-});
+// What stood here — a second list of the tones, and a loop asking the light theme whether it had each of them — is
+// gone: `TEXT_TONES` is now the one list, and its own `satisfies readonly (keyof Theme)[]` refuses a tone that names
+// no role. A test that re-listed what the type already holds could only ever agree with itself.
 
 test('the typography table answers for every variant, and for no other', () => {
   expectTypeOf<TextVariant>().toEqualTypeOf<

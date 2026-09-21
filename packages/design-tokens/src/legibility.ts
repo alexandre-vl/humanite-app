@@ -1,0 +1,107 @@
+import type { Theme } from './theme.ts';
+import type { TextTone, TextVariant } from './typography.ts';
+
+/**
+ * What the paper owes a reader who has to be able to see it, written so a test can ask rather than a person remember.
+ *
+ * What stood here before was a set of thresholds chosen by hand, one per pair somebody had thought of, each named
+ * after the bar it had picked — and one of them read "muted text meets WCAG AA for large text", asking three to one
+ * of a caption set in fourteen points of regular type, which is not large text and never was. The bar was right for
+ * its name and the name was wrong for the text, and nothing could say so: the table that holds how big a variant is
+ * set and the table that holds what contrast it owes did not know about each other.
+ *
+ * So the threshold is derived instead, from the smallest type each colour is ever set in, at the smallest step a
+ * reader can choose. Of the nine variants exactly one — the headline, at thirty-four points — is large text by WCAG's
+ * measure. The other eight owe four and a half to one, and six of them were being held to three.
+ */
+
+/**
+ * The roles a screen paints behind text. `premium` is not among them: the one mark printed on it builds itself inside
+ * a light scope, so that pairing is a single fixed one rather than one per theme, and the theme test pins it there.
+ */
+export const GROUNDS = [
+  'background',
+  'ground',
+  'block',
+  'surface',
+  'card',
+  'border',
+  'primary',
+] as const satisfies readonly (keyof Theme)[];
+
+/** A role of the theme a screen paints behind text. */
+type Ground = (typeof GROUNDS)[number];
+
+/** Where one colour of text is printed: in the smallest type it is ever set in, and on the grounds it is laid on. */
+type Printing = Readonly<{ smallest: TextVariant; grounds: readonly Ground[] }>;
+
+/**
+ * Where each colour of text is printed, read off the screens that print it.
+ *
+ * It is a declaration and not a derivation because nothing in a style table says which text lands on which ground: a
+ * background is set on one view and a colour on another, and only the screen between them knows the two meet. Naming
+ * the pairs is what lets the rule ask about the pairs the paper prints instead of every pair it could — white on the
+ * red of the wire is a pairing the paper prints, white on the page is not, and a rule that asked about both would
+ * fail on a screen nobody has drawn.
+ *
+ * `smallest` is what fixes the bar, a smaller type owing more contrast than a larger one. It names the variant and
+ * not a number so that a change of type carries here by itself.
+ */
+export const PRINTINGS = {
+  // The page and the block a feed alternates onto, the sheet a group of rows is laid on, the bar a row of labels sits
+  // in, and the masthead of the front page, which is painted in the rule colour. Smallest in a picture's legend.
+  textPrimary: {
+    smallest: 'legend',
+    grounds: ['background', 'ground', 'block', 'surface', 'card', 'border'],
+  },
+  // A date under a card, the count under a cover, the hint under a row of settings.
+  textMuted: { smallest: 'caption', grounds: ['background', 'block', 'card'] },
+  // The wire, the pill of a button, the mark on a column, the masthead of a cover: all the paper's own red.
+  onPrimary: { smallest: 'caption', grounds: ['primary'] },
+  // A headline stands on the sheet of an article, or on the torn paper of a callout.
+  headline: { smallest: 'headline', grounds: ['background', 'ground'] },
+  // A word that answers a press lives inside prose, and takes the size of the paragraph around it.
+  link: { smallest: 'prose', grounds: ['background'] },
+} as const satisfies Readonly<Record<TextTone, Printing>>;
+
+/**
+ * The size, in points, at and above which WCAG 2 reads text as large. The guideline says eighteen points, or fourteen
+ * bold, and notes that eighteen points is about twenty-four CSS pixels; React Native sets type in density-independent
+ * points, which are those pixels. The bold half is left out deliberately: reading every face as if it were light is
+ * the stricter reading, it asks for no second table saying what a face weighs, and it changes no verdict here — the
+ * one variant that clears twenty-four clears it at any weight.
+ */
+const LARGE_TEXT = 24;
+
+/** What WCAG AA asks of large text, and of everything else. */
+const AA_LARGE = 3;
+const AA_NORMAL = 4.5;
+
+/** The contrast a run of text at this size owes the ground under it. */
+export const requiredRatio = (size: number): number => (size >= LARGE_TEXT ? AA_LARGE : AA_NORMAL);
+
+/** A pairing the paper prints knowing it is under the bar, with the reading that says how far under. */
+type Departure = Readonly<{
+  tone: TextTone;
+  ground: Ground;
+  /** The ratio measured today. A departure carries its own floor, so the pairing can never quietly get worse. */
+  floor: number;
+  because: string;
+}>;
+
+/**
+ * Where the paper knowingly prints under the bar.
+ *
+ * A departure is not an exemption: it is a measurement with a reason attached, and it is held from both sides — the
+ * pairing may not fall below the floor written here, and it may not rise above the bar either, because a departure
+ * that has stopped being one is a line of prose claiming something untrue about the paper.
+ */
+export const DEPARTURES = [
+  {
+    tone: 'onPrimary',
+    ground: 'primary',
+    floor: 3.83,
+    because:
+      'the red is the paper, measured on the current app, and nothing is lighter than the white laid on it: meeting the bar would mean no longer printing in the colour the masthead is printed in',
+  },
+] as const satisfies readonly Departure[];
