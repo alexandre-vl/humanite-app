@@ -78,7 +78,10 @@ export function ArticleFeed({
     }
     return (
       <Box style={row.ground === 'paper' ? styles.cardPaper : styles.cardLifted}>
+        {/* No label: a card's own words are its name, and they are better than any summary of them — the title, the
+            standfirst and the date are read in one breath, and the next swipe is the next article. */}
         <Pressable
+          role="link"
           onPress={() => {
             onOpen(row.summary.id);
           }}

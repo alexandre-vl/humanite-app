@@ -38,7 +38,7 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
       case 'hero':
         return (
           <Box style={styles.opener}>
-            <Pressable onPress={open(row.summary.id)}>
+            <Pressable role="link" onPress={open(row.summary.id)}>
               <WireHero summary={row.summary} />
             </Pressable>
           </Box>
@@ -47,7 +47,7 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
         return <WireDay label={row.label} />;
       case 'item':
         return (
-          <Pressable onPress={open(row.summary.id)}>
+          <Pressable role="link" onPress={open(row.summary.id)}>
             <WireRow summary={row.summary} />
           </Pressable>
         );

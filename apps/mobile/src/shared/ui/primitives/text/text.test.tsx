@@ -52,4 +52,19 @@ describe('Text', () => {
     expect(legible['fontFamily']).toBe(FONT_FAMILIES.legible.regular);
     expect(legible['fontSize']).toBe(own['fontSize']);
   });
+
+  /**
+   * A line that opens what follows it says so, which is how a reader listening to the paper moves through it: a screen
+   * reader offers to jump from one heading to the next, and a page with none can only be walked word by word. Read on
+   * the role the native text carries, because that is the whole of what the platform is told.
+   */
+  it('annonce qu’elle ouvre ce qui la suit, quand elle l’ouvre', async () => {
+    await render(<Text heading>{asDisplayText(WORDS)}</Text>);
+    expect(screen.getByText(WORDS).props['accessibilityRole']).toBe('header');
+  });
+
+  it('n’annonce rien de tel quand elle n’ouvre rien', async () => {
+    await render(<Text>{asDisplayText(WORDS)}</Text>);
+    expect(screen.getByText(WORDS).props['accessibilityRole']).toBeUndefined();
+  });
 });

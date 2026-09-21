@@ -27,7 +27,7 @@ const useStyles = createStyles((theme) => ({
 export function Button({ label, onPress }: ButtonProps): ReactNode {
   const styles = useStyles();
   return (
-    <Pressable style={styles.button} onPress={onPress}>
+    <Pressable style={styles.button} onPress={onPress} label={label} role="button">
       <Text variant="label" tone="onPrimary">
         {label}
       </Text>

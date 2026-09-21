@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { Paper } from '#components/paper';
 import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
@@ -32,16 +33,17 @@ export function ArticleRelated({ summary, onOpen }: ArticleRelatedProps): ReactN
   return (
     <Box style={styles.block}>
       <Box style={styles.label}>
-        <Text variant="headline" align="center">
+        <Text variant="headline" align="center" heading>
           {t('article.related')}
         </Text>
       </Box>
       <Paper>
-        <Pressable onPress={onOpen}>
+        <Pressable role="link" onPress={onOpen}>
           {visual === null ? null : (
             <Image
               source={visual.source}
               recyclingKey={summary.id}
+              announces={DECORATIVE}
               thumbhash={visual.thumbhash}
               style={styles.picture}
             />

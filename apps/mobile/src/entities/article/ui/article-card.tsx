@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { Badge } from '#components/badge';
 import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { formatDate } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -86,7 +87,13 @@ function Lead({ summary, action }: BodyProps): ReactNode {
   return (
     <Box style={styles.card}>
       {visual === null ? null : (
-        <Image source={visual.source} recyclingKey={summary.id} thumbhash={visual.thumbhash} style={styles.picture} />
+        <Image
+          source={visual.source}
+          recyclingKey={summary.id}
+          announces={DECORATIVE}
+          thumbhash={visual.thumbhash}
+          style={styles.picture}
+        />
       )}
       <Text variant="title" numberOfLines={3}>
         {summary.title}
@@ -109,7 +116,13 @@ function Stacked({ summary, action }: BodyProps): ReactNode {
         {summary.title}
       </Text>
       {visual === null ? null : (
-        <Image source={visual.source} recyclingKey={summary.id} thumbhash={visual.thumbhash} style={styles.picture} />
+        <Image
+          source={visual.source}
+          recyclingKey={summary.id}
+          announces={DECORATIVE}
+          thumbhash={visual.thumbhash}
+          style={styles.picture}
+        />
       )}
       <Text variant="standfirst" numberOfLines={4}>
         {summary.standfirst}
@@ -133,6 +146,7 @@ function Line({ summary, action }: BodyProps): ReactNode {
           <Image
             source={visual.source}
             recyclingKey={summary.id}
+            announces={DECORATIVE}
             thumbhash={visual.thumbhash}
             style={styles.thumbnail}
           />

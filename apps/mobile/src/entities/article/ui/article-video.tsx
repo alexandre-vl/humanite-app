@@ -2,6 +2,8 @@ import type { DisplayText } from '@huma/contracts';
 import { PALETTE, RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import type { Visual } from '#api';
+import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { formatDuration } from '#lib/format';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -62,12 +64,15 @@ export function ArticleVideo({ title, durationSeconds, poster, recyclingKey }: A
           <Image
             source={poster.source}
             recyclingKey={recyclingKey}
+            announces={DECORATIVE}
             thumbhash={poster.thumbhash}
             style={styles.poster}
           />
         )}
+        {/* The mark is the only thing that says this is a video at all: the running time beside it would otherwise be
+            read out as a bare number. It is the one symbol in the app that carries a word of its own. */}
         <Box style={styles.badge}>
-          <Icon name="play" size={SPACING.md} tintColor={theme.onPrimary} />
+          <Icon name="play" announces={t('article.video')} size={SPACING.md} tintColor={theme.onPrimary} />
           <Text variant="label" tone="onPrimary">
             {formatDuration(durationSeconds)}
           </Text>

@@ -23,7 +23,7 @@ export function WireDay({ label }: WireDayProps): ReactNode {
   return (
     <Box style={styles.ground}>
       <Box style={styles.band}>
-        <Text variant="label" tone="onPrimary">
+        <Text variant="label" tone="onPrimary" heading>
           {label}
         </Text>
       </Box>

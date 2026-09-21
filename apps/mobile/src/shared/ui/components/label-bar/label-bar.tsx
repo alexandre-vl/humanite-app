@@ -38,9 +38,15 @@ export function LabelBar<Id extends string>({ items, active, onSelect }: LabelBa
   return (
     <Scroll axis="horizontal" style={styles.bar} contentStyle={styles.labels}>
       {items.map((item) => (
+        // The rule under the chosen label is a colour and nothing else, which the reference itself logs as a fault of
+        // the screen it copies: a state told by colour alone is no state at all to a reader who cannot see it. Named
+        // a choice, and told which one is in force, the band is announced the way the platform's own controls are.
         <Pressable
           key={item.id}
           style={styles.label}
+          label={item.label}
+          role={active === undefined ? undefined : 'radio'}
+          selected={active === undefined ? undefined : item.id === active}
           onPress={() => {
             onSelect(item.id);
           }}

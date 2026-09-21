@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import type { ReactNode } from 'react';
+import type { AccessibilityRole } from 'react-native';
 
 // A frame never arrives without a screen, so the runner's requestAnimationFrame fires on a timer of its own, after the
 // test that scheduled it has ended. @shopify/flash-list schedules the end of its first layout that way, and the state
@@ -82,19 +83,42 @@ jest.mock('@shopify/flash-list/dist/recyclerview/utils/measureLayout', () => {
 // from any other view, and which mark a row carries — a picture at all, a chevron rather than a bookmark — is part of
 // the tree each promises to mount. The symbol carries the platform name it was given rather than the key it was named
 // by, because that is all it receives; a test reads the key through the registry, which stays the single source.
+//
+// Both also carry through what they were told to announce. A stand-in that dropped those props would let a picture
+// claim to be passed over by a screen reader and a test agree with it, which is the one thing these two primitives
+// now promise; so the stand-in repeats them and a test can read what the real view would have carried.
+type Announced = Readonly<{
+  accessible?: boolean | undefined;
+  accessibilityRole?: AccessibilityRole | undefined;
+  accessibilityLabel?: string | undefined;
+  accessibilityElementsHidden?: boolean | undefined;
+  importantForAccessibility?: 'yes' | 'no-hide-descendants' | undefined;
+}>;
+
+const mockAnnounced = (props: Announced): Announced => ({
+  accessible: props.accessible,
+  accessibilityRole: props.accessibilityRole,
+  accessibilityLabel: props.accessibilityLabel,
+  accessibilityElementsHidden: props.accessibilityElementsHidden,
+  importantForAccessibility: props.importantForAccessibility,
+});
+
 jest.mock('expo-image', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const image = (props: { recyclingKey?: string }): unknown =>
-    react.createElement(reactNative.View, { testID: 'picture', accessibilityLabel: props.recyclingKey });
+  const image = (props: Announced): unknown =>
+    react.createElement(reactNative.View, { testID: 'picture', ...mockAnnounced(props) });
   return { __esModule: true, Image: image };
 });
 
 jest.mock('expo-symbols', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const symbolView = (props: { name?: { android?: string } }): unknown =>
-    react.createElement(reactNative.View, { testID: `symbol:${props.name?.android ?? ''}` });
+  const symbolView = (props: Announced & { name?: { android?: string } }): unknown =>
+    react.createElement(reactNative.View, {
+      testID: `symbol:${props.name?.android ?? ''}`,
+      ...mockAnnounced(props),
+    });
   return { __esModule: true, SymbolView: symbolView };
 });
 

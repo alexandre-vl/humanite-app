@@ -20,8 +20,13 @@ const illustrated = (items: readonly ArticleSummary[]): ArticleSummary => {
   return found;
 };
 
-/** How many pictures a card put on the screen, which is what tells one shape's tree from another's. */
-const pictures = (): number => screen.queryAllByTestId('picture').length;
+/**
+ * How many pictures a card put on the screen, which is what tells one shape's tree from another's. Hidden ones are
+ * counted because every picture a card lays out is hidden on purpose: the headline beside it already says what it
+ * shows, and a reader listening to the paper would otherwise hear each article twice. The primitive's own test holds
+ * that; this one is only counting views.
+ */
+const pictures = (): number => screen.queryAllByTestId('picture', { includeHiddenElements: true }).length;
 
 /**
  * How many pictures each shape mounts. A list hands a cell to another item only when both answered the same shape,

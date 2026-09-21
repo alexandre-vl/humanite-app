@@ -2,6 +2,7 @@ import type { DisplayText } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import type { Visual } from '#api';
+import { DECORATIVE } from '#lib/announce';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
@@ -29,7 +30,14 @@ export function ArticleFigure({ visual, recyclingKey, caption, credit }: Article
   const styles = useStyles();
   return (
     <Box style={styles.figure}>
-      <Image source={visual.source} recyclingKey={recyclingKey} thumbhash={visual.thumbhash} style={styles.picture} />
+      {/* The legend under it is the picture's own words, read out as text: announced again here, it would be read twice. */}
+      <Image
+        source={visual.source}
+        recyclingKey={recyclingKey}
+        announces={DECORATIVE}
+        thumbhash={visual.thumbhash}
+        style={styles.picture}
+      />
       <Box style={styles.words}>
         <Text variant="legend">{caption}</Text>
         {credit === undefined ? null : <Text variant="legend">{credit}</Text>}

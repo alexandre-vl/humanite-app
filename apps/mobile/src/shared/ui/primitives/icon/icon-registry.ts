@@ -1,5 +1,6 @@
 import type { AndroidSymbol, SFSymbol } from 'expo-symbols';
 import type { Color, Space } from '@huma/design-tokens';
+import type { Announcement } from '../../../lib/announce';
 import type { StyleRef } from '../../../lib/styles';
 
 /** One semantic icon key mapped to its platform symbol: an SF Symbol on iOS, a Material Symbol on Android. */
@@ -28,5 +29,15 @@ export const ICONS = {
   search: { ios: 'magnifyingglass', android: 'search' },
 } as const satisfies Readonly<Record<string, IconSymbol>>;
 
-/** An icon's props: a semantic name from ICONS (an unknown name is a build error), sized and tinted by tokens. */
-export type IconProps = Readonly<{ name: keyof typeof ICONS; size?: Space; tintColor?: Color; style?: StyleRef }>;
+/**
+ * An icon's props: a semantic name from ICONS (an unknown name is a build error), sized and tinted by tokens, and what
+ * it says to a reader listening rather than looking. A symbol is drawn and not written, so unless it announces itself
+ * it announces nothing at all; the answer is required so that nothing is passed over by accident.
+ */
+export type IconProps = Readonly<{
+  name: keyof typeof ICONS;
+  announces: Announcement;
+  size?: Space;
+  tintColor?: Color;
+  style?: StyleRef;
+}>;

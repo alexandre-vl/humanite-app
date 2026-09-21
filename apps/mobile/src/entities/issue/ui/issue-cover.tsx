@@ -3,6 +3,7 @@ import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { formatDayDate } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -68,7 +69,13 @@ export function IssueCover({ issue }: IssueCoverProps): ReactNode {
         </Box>
         <Box style={styles.page}>
           {visual === null ? null : (
-            <Image source={visual.source} recyclingKey={issue.id} thumbhash={visual.thumbhash} style={styles.picture} />
+            <Image
+              source={visual.source}
+              recyclingKey={issue.id}
+              announces={DECORATIVE}
+              thumbhash={visual.thumbhash}
+              style={styles.picture}
+            />
           )}
           <Box style={styles.lead}>
             <Text variant="label" tone="onPrimary" numberOfLines={3}>

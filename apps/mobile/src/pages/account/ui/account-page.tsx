@@ -3,6 +3,7 @@ import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { SETTINGS_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -56,11 +57,11 @@ function OpenRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: () 
   const styles = useStyles();
   const theme = useTheme();
   return (
-    <Pressable style={styles.row} onPress={onPress}>
+    <Pressable style={styles.row} onPress={onPress} role="link">
       <Box style={styles.words}>
         <Text variant="body">{label}</Text>
       </Box>
-      <Icon name="next" size={SPACING.md} tintColor={theme.textMuted} />
+      <Icon name="next" announces={DECORATIVE} size={SPACING.md} tintColor={theme.textMuted} />
     </Pressable>
   );
 }
@@ -70,7 +71,7 @@ function Group({ label, children }: Readonly<{ label: DisplayText; children: Rea
   const styles = useStyles();
   return (
     <Box style={styles.group}>
-      <Text variant="label" align="center">
+      <Text variant="label" align="center" heading>
         {label}
       </Text>
       <Box style={styles.card}>{children}</Box>
@@ -92,7 +93,9 @@ export function AccountPage(): ReactNode {
   return (
     <Surface>
       <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
-        <Text variant="display">{t('nav.account')}</Text>
+        <Text variant="display" heading>
+          {t('nav.account')}
+        </Text>
         <Group label={t('account.reading')}>
           <OpenRow
             label={t('settings.title')}

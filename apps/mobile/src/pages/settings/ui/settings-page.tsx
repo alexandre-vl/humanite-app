@@ -56,7 +56,9 @@ function Setting({ label, children }: SettingProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.setting}>
-      <Text variant="label">{label}</Text>
+      <Text variant="label" heading>
+        {label}
+      </Text>
       {children}
     </Box>
   );

@@ -32,7 +32,9 @@ export function ArticleCallout({ title, text, button, onPress }: ArticleCalloutP
   return (
     <Box style={styles.block}>
       <Paper>
-        <Text variant="headline">{title}</Text>
+        <Text variant="headline" heading>
+          {title}
+        </Text>
         <Text variant="prose">{text}</Text>
         <Box style={styles.action}>
           <Button label={button} onPress={onPress} />

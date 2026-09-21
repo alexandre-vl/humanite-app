@@ -8,7 +8,7 @@ export type PressableProps = Readonly<{
   style?: StyleRef;
   onPress?: (() => void) | undefined;
   label?: DisplayText | undefined;
-  role?: 'radio' | undefined;
+  role?: 'radio' | 'button' | 'link' | undefined;
   selected?: boolean | undefined;
 }>;
 
@@ -21,8 +21,10 @@ export type PressableProps = Readonly<{
  *
  * A target that is one option among several says so too: the role names what it is and `selected` whether it is the
  * one in force, so a row of choices the app draws itself is announced the way the platform's own would be. The role is
- * a closed set rather than the platform's whole list — it holds the one shape the app has, and grows when a second
- * appears.
+ * a closed set rather than the platform's whole list — it holds the shapes the app has, and grows when another
+ * appears. The paper has three: a choice in a band, a thing that acts where it stands, and a thing that opens
+ * something else. Without one a target is announced as a name and nothing more, and a reader hears what it says
+ * without being told they may press it.
  */
 export function Pressable({ children, style, onPress, label, role, selected }: PressableProps): ReactNode {
   return (

@@ -1,6 +1,7 @@
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -36,16 +37,17 @@ export function SearchField({ value, onChange }: SearchFieldProps): ReactNode {
   const theme = useTheme();
   return (
     <Box style={styles.bar}>
-      <Icon name="search" size={SPACING.lg} tintColor={theme.primary} />
+      <Icon name="search" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.primary} />
       <TextField value={value} onChange={onChange} placeholder={t('search.placeholder')} style={styles.input} />
       {value === '' ? null : (
         <Pressable
           label={t('search.clear')}
+          role="button"
           onPress={() => {
             onChange('');
           }}
         >
-          <Icon name="clear" size={SPACING.lg} tintColor={theme.textMuted} />
+          <Icon name="clear" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.textMuted} />
         </Pressable>
       )}
     </Box>

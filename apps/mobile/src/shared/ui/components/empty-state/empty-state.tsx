@@ -16,7 +16,9 @@ export function EmptyState({ title, message }: EmptyStateProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.container}>
-      <Text variant="title">{title}</Text>
+      <Text variant="title" heading>
+        {title}
+      </Text>
       <Text variant="caption">{message}</Text>
     </Box>
   );

@@ -2,6 +2,7 @@ import type { ArticleId } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
+import { DECORATIVE } from '#lib/announce';
 import { createStyles, useTheme } from '#lib/styles';
 import { Icon } from '#primitives/icon';
 import { Pressable } from '#primitives/pressable';
@@ -32,11 +33,16 @@ export function BookmarkToggle({ id }: BookmarkToggleProps): ReactNode {
     <Pressable
       style={styles.target}
       label={t(kept ? 'bookmark.remove' : 'bookmark.add')}
+      role="button"
       onPress={() => {
         toggle(id);
       }}
     >
-      <Icon name={kept ? 'bookmarkKept' : 'bookmark'} tintColor={kept ? theme.primary : theme.textMuted} />
+      <Icon
+        name={kept ? 'bookmarkKept' : 'bookmark'}
+        announces={DECORATIVE}
+        tintColor={kept ? theme.primary : theme.textMuted}
+      />
     </Pressable>
   );
 }

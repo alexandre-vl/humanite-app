@@ -27,7 +27,7 @@ export function ArticleTitle({ title }: ArticleTitleProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.title}>
-      <Text variant="headline" align="center">
+      <Text variant="headline" align="center" heading>
         {title}
       </Text>
     </Box>

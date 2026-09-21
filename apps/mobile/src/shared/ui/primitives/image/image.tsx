@@ -1,11 +1,14 @@
 import { Image as ExpoImage } from 'expo-image';
 import type { ImageSource } from 'expo-image';
 import type { ReactNode } from 'react';
+import type { Announcement } from '../../../lib/announce';
+import { announcedAs } from '../../../lib/announce';
 import type { StyleRef } from '../../../lib/styles';
 
 export type ImageProps = Readonly<{
   source: ImageSource | number;
   recyclingKey: string;
+  announces: Announcement;
   thumbhash?: string;
   style?: StyleRef;
 }>;
@@ -25,8 +28,12 @@ export type ImageProps = Readonly<{
  * Every picture the paper lays out fills its box and is cropped to it, so the fit is written here rather than asked
  * for: the boxes are the paper's, the pictures are all written at one shape, and a caller choosing between five fits
  * would be a caller deciding what the paper looks like from inside a card.
+ *
+ * `announces` is what the picture says to a reader listening to the paper, and it is required for the same reason
+ * `recyclingKey` is: no type can tell whether a picture repeats the words beside it or carries something they do not,
+ * so the question is asked every time rather than answered by silence.
  */
-export function Image({ source, recyclingKey, thumbhash, style }: ImageProps): ReactNode {
+export function Image({ source, recyclingKey, announces, thumbhash, style }: ImageProps): ReactNode {
   return (
     <ExpoImage
       source={source}
@@ -34,6 +41,7 @@ export function Image({ source, recyclingKey, thumbhash, style }: ImageProps): R
       placeholder={thumbhash === undefined ? null : { thumbhash }}
       contentFit="cover"
       style={style}
+      {...announcedAs(announces)}
     />
   );
 }

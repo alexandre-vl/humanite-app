@@ -52,7 +52,9 @@ function BlockView({ block, article, related, onFollow, onSupport }: BlockProps)
     case 'heading':
       return (
         <Box style={styles.words}>
-          <Text variant="headline">{block.text}</Text>
+          <Text variant="headline" heading>
+            {block.text}
+          </Text>
         </Box>
       );
     case 'quote':

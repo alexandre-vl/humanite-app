@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { EmptyState } from '#components/empty-state';
-import { IssueCover, issuesQuery } from '#entities/issue';
+import { coverLabel, IssueCover, issuesQuery } from '#entities/issue';
 import { t } from '#i18n';
 import { issueHref } from '#lib/routing';
 import { createStyles } from '#lib/styles';
@@ -39,7 +39,9 @@ export function NewsstandPage(): ReactNode {
   return (
     <Surface>
       <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
-        <Text variant="display">{t('nav.newsstand')}</Text>
+        <Text variant="display" heading>
+          {t('nav.newsstand')}
+        </Text>
         {issues.length === 0 ? (
           <EmptyState title={t('newsstand.empty.title')} message={t('newsstand.empty.message')} />
         ) : (
@@ -47,6 +49,8 @@ export function NewsstandPage(): ReactNode {
             {issues.map((issue) => (
               <Pressable
                 key={issue.id}
+                label={coverLabel(issue)}
+                role="link"
                 onPress={() => {
                   router.push(issueHref(issue.id));
                 }}

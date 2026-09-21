@@ -59,7 +59,9 @@ export function HomePage(): ReactNode {
         action={(summary) => <BookmarkToggle id={summary.id} />}
         header={
           <Box style={styles.masthead}>
-            <Text variant="display">{t('app.name')}</Text>
+            <Text variant="display" heading>
+              {t('app.name')}
+            </Text>
           </Box>
         }
         sticky={

@@ -28,6 +28,8 @@ describe('AccountPage', () => {
     await render(<AccountPage />);
     expect(screen.getByText('relationlecteur@humanite.fr')).toBeTruthy();
     expect(screen.getByText('01 55 84 40 30')).toBeTruthy();
-    expect(screen.getAllByTestId(OPENS)).toHaveLength(1);
+    // The mark is hidden from a screen reader — the row it sits in already says where it goes — so it is counted here
+    // as a view rather than as something announced.
+    expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(1);
   });
 });

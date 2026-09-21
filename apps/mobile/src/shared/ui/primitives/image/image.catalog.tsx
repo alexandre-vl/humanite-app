@@ -1,5 +1,6 @@
 import { SIZES } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
+import { DECORATIVE } from '../../../lib/announce';
 import type { CatalogEntry } from '../../../lib/catalogue';
 import { asDisplayText } from '../../../lib/display-text';
 import { createStyles } from '../../../lib/styles';
@@ -16,7 +17,7 @@ const useStyles = createStyles(() => ({ demo: { width: SIZES.headerExpanded, hei
 
 function ImageDemo(): ReactNode {
   const styles = useStyles();
-  return <Image source={{ thumbhash: DEMO }} recyclingKey="demo" style={styles.demo} />;
+  return <Image source={{ thumbhash: DEMO }} recyclingKey="demo" announces={DECORATIVE} style={styles.demo} />;
 }
 
 export const catalog: CatalogEntry = {

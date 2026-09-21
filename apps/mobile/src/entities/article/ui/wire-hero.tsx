@@ -2,6 +2,7 @@ import type { ArticleSummary } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
+import { DECORATIVE } from '#lib/announce';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
@@ -36,7 +37,13 @@ export function WireHero({ summary }: WireHeroProps): ReactNode {
   return (
     <Box style={styles.frame}>
       {visual === null ? null : (
-        <Image source={visual.source} recyclingKey={summary.id} thumbhash={visual.thumbhash} style={styles.picture} />
+        <Image
+          source={visual.source}
+          recyclingKey={summary.id}
+          announces={DECORATIVE}
+          thumbhash={visual.thumbhash}
+          style={styles.picture}
+        />
       )}
       <Box style={styles.caption}>
         <Text variant="display" tone="onPrimary" numberOfLines={3}>
