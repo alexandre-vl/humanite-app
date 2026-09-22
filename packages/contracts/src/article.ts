@@ -2,10 +2,25 @@ import { z } from 'zod';
 import { BLOCK } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
-import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, SECTION_ID } from './ids.ts';
+import { PICTURE } from './picture.ts';
 
-/** The illustration of an item: the key that names its picture, with the caption and the credit that go under it. */
-export const HERO = z.object({ key: IMAGE_KEY, caption: DISPLAY_TEXT, credit: DISPLAY_TEXT });
+/**
+ * The illustration of an item: its picture, with the caption and the credit that go under it.
+ *
+ * The picture was a key into the corpus, and nothing else could be: a key is built on the grammar of the corpus's own
+ * ids, which no item of the journal carries, so every real item came through with no picture at all and no parse
+ * failed to say so. It is now either of the two sources a picture has.
+ *
+ * The caption and the credit are what the journal may leave out. Of the 519 items of a capture, 353 carry a caption,
+ * 111 carry no such field and 55 carry it empty; none carries a credit, which the journal writes into the caption —
+ * « | Source : istock » — when it writes one at all. A picture without words under it is still a picture.
+ */
+export const HERO = z.object({
+  picture: PICTURE,
+  caption: DISPLAY_TEXT.optional(),
+  credit: DISPLAY_TEXT.optional(),
+});
 export type Hero = z.infer<typeof HERO>;
 
 /**

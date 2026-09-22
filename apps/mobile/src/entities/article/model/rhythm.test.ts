@@ -1,3 +1,4 @@
+import { ARTICLE_SUMMARY } from '@huma/contracts';
 import type { ArticleSummary } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { content, pictureOf } from '#api';
@@ -103,5 +104,25 @@ describe('rowShape et rowName', () => {
     const rows = feedRows(await everything(), 'paper');
     expect(new Set(rows.map(rowName)).size).toBe(rows.length);
     expect(new Set(rows.map(rowShape))).toEqual(new Set(['lead', 'line', 'column', 'brief']));
+  });
+});
+
+/**
+ * The blocker the picture of the journal removed, held from the screen's side. An item of the journal named its
+ * picture by an address, which the contract could not hold until it could hold either source; until then every one
+ * of them reached this module bare, came out a brief, and a page of the real paper would never once have opened on
+ * a picture — with no parse anywhere failing to say so.
+ */
+describe('feedRows, sur un article du journal illustré', () => {
+  it('lui donne une carte illustrée, et non celle d’une brève', async () => {
+    const [sample] = await everything();
+    if (sample === undefined) {
+      throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
+    }
+    const url = 'https://www.humanite.fr/wp-content/uploads/2026/09/x.jpg?w=1200';
+    const filed = ARTICLE_SUMMARY.parse({ ...sample, id: '3861029', hero: { picture: { kind: 'journal', url } } });
+    const [row] = feedRows([filed], 'paper');
+    expect(row?.shape).toBe('lead');
+    expect(pictureOf(filed, 'card')).toEqual({ source: { uri: url.replace('w=1200', 'w=1080') } });
   });
 });

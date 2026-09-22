@@ -1,4 +1,5 @@
-import type { ArticleSummary, ImageKey } from '@huma/contracts';
+import { atWidth } from '@huma/contracts';
+import type { ArticleSummary, Picture } from '@huma/contracts';
 import { VISUALS } from '@huma/mock-content';
 import { ASSETS } from '@huma/mock-content/assets';
 import type { AssetWidth } from '@huma/mock-content/assets';
@@ -7,6 +8,9 @@ import type { AssetWidth } from '@huma/mock-content/assets';
  * How wide a picture is wanted, named by the place it fills rather than by a count of pixels. A screen knows the box it
  * lays out, not the widths the corpus was written at, so it asks by role and this table answers — and the day the
  * pictures are written at other widths, only this table moves.
+ *
+ * The journal's pictures are asked for at these same widths. Its server resizes to whatever it is asked, so the one
+ * table serves both sources: a thumbnail is a thumbnail whichever of them drew it.
  *
  * It is published because it is one half of a pair: the corpus writes a file per width, this names the places, and
  * nothing but a test can hold the two against each other. A width written for no place is 63 files of bundle a cold
@@ -21,16 +25,25 @@ export const PLACE_WIDTHS = {
 /** The place a picture fills, from a row's thumbnail to the lead picture of an article. */
 export type VisualSize = keyof typeof PLACE_WIDTHS;
 
-/** A picture ready for a native view: what the bundler resolved, and the hash painted until it arrives. */
-export type Visual = Readonly<{ source: number; thumbhash: string }>;
+/**
+ * A picture ready for a native view: the module the bundler resolved or the address the phone asks for, and — for a
+ * picture of the corpus — the hash painted until it arrives. A picture of the journal has no hash to paint: the
+ * service sends none, and the box keeps its ground colour until the picture lands.
+ */
+export type Visual = Readonly<{ source: number | Readonly<{ uri: string }>; thumbhash?: string }>;
 
 /**
- * The picture a key names, at the size asked for. A key that names nothing gives `null` rather than a broken view: the
- * corpus generator guarantees a file per key, and a screen that outlives that guarantee should show its text alone.
+ * A picture at the size asked for. A key of the corpus that names nothing gives `null` rather than a broken view: the
+ * corpus generator guarantees a file per key, and a screen that outlives that guarantee should show its text alone. A
+ * picture of the journal is always an address, which its schema has already held to the journal's own server; it is
+ * asked for at the width of the place it fills and not at the one the service listed.
  */
-export const visualOf = (key: ImageKey, size: VisualSize): Visual | null => {
-  const widths = ASSETS[key];
-  const thumbhash = VISUALS[key];
+export const visualOf = (picture: Picture, size: VisualSize): Visual | null => {
+  if (picture.kind === 'journal') {
+    return { source: { uri: atWidth(picture.url, PLACE_WIDTHS[size]) } };
+  }
+  const widths = ASSETS[picture.key];
+  const thumbhash = VISUALS[picture.key];
   if (widths === undefined || thumbhash === undefined) {
     return null;
   }
@@ -48,4 +61,4 @@ export const visualOf = (key: ImageKey, size: VisualSize): Visual | null => {
  * which is what this door answers for.
  */
 export const pictureOf = (summary: ArticleSummary, size: VisualSize): Visual | null =>
-  summary.hero === undefined ? null : visualOf(summary.hero.key, size);
+  summary.hero === undefined ? null : visualOf(summary.hero.picture, size);

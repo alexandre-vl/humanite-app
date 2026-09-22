@@ -179,11 +179,11 @@ describe('ArticleReader', () => {
   it('signe l’article avant la photo, et non sous la légende de la photo', async () => {
     const article = await first(
       'une photo légendée et une signature',
-      (candidate) => candidate.hero !== undefined && candidate.format !== 'video',
+      (candidate) => candidate.hero?.caption !== undefined && candidate.format !== 'video',
     );
-    const hero = article.hero;
-    if (hero === undefined) {
-      throw new Error('photo introuvable');
+    const caption = article.hero?.caption;
+    if (caption === undefined) {
+      throw new Error('photo légendée introuvable');
     }
     const signature = article.byline;
     if (signature === undefined) {
@@ -193,7 +193,7 @@ describe('ArticleReader', () => {
     await screen.findByText(article.title);
     const order = inOrder(screen.toJSON());
     expect(order.indexOf(`Par ${signature}`)).toBeGreaterThan(order.indexOf(article.standfirst));
-    expect(order.indexOf(`Par ${signature}`)).toBeLessThan(order.indexOf(hero.caption));
+    expect(order.indexOf(`Par ${signature}`)).toBeLessThan(order.indexOf(caption));
   });
 
   /**

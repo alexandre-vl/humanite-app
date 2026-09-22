@@ -72,7 +72,7 @@ function BlockView({ block, article, related, onFollow, onSupport }: BlockProps)
         </Box>
       );
     case 'image': {
-      const visual = visualOf(block.key, 'lead');
+      const visual = visualOf({ kind: 'corpus', key: block.key }, 'lead');
       return visual === null ? null : (
         <ArticleFigure visual={visual} recyclingKey={`${article.id}-${block.key}`} caption={block.caption} />
       );

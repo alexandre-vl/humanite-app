@@ -27,7 +27,11 @@ test('the corpus as built names no picture it should not', () => {
 test('a lead picture keyed to another item is refused', () => {
   const borrowed = ARTICLE.parse({
     ...illustrated(),
-    hero: { key: 'zzz-a1-hero', caption: 'Une légende', credit: 'Photo : X / CC BY 4.0' },
+    hero: {
+      picture: { kind: 'corpus', key: 'zzz-a1-hero' },
+      caption: 'Une légende',
+      credit: 'Photo : X / CC BY 4.0',
+    },
   });
   expect(errorsFor(borrowed)).toEqual([expect.stringContaining('hors de l’item')]);
 });

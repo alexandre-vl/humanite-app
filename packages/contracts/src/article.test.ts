@@ -12,7 +12,11 @@ const validSummary = {
     'Un chapô assez long pour tenir dans la fourchette imposée par le schéma, décrivant en une phrase claire ce que raconte cet article fictif de démonstration destiné à la maquette.',
   byline: 'Lucie Varenne',
   publishedAt: '2026-09-10T08:30:00.000Z',
-  hero: { key: 'pol-a1-hero', caption: 'Une légende', credit: 'Photo : Camille Ancel / CC BY 4.0' },
+  hero: {
+    picture: { kind: 'corpus', key: 'pol-a1-hero' },
+    caption: 'Une légende',
+    credit: 'Photo : Camille Ancel / CC BY 4.0',
+  },
 };
 
 test('ARTICLE_SUMMARY parses a valid summary', () => {
@@ -65,9 +69,22 @@ test('ARTICLE extends the summary with a non-empty body', () => {
   expect(ARTICLE.safeParse({ ...validSummary, blocks: [] }).success).toBe(false);
 });
 
-test('HERO names its picture, its caption and its credit', () => {
-  const hero: Hero = HERO.parse({ key: 'pol-a1-hero', caption: 'c', credit: 'Photo : X' });
+test('HERO names its picture, and the words under it when there are any', () => {
+  const hero: Hero = HERO.parse({ picture: { kind: 'corpus', key: 'pol-a1-hero' }, caption: 'c', credit: 'Photo : X' });
   expectTypeOf(hero).toEqualTypeOf<Hero>();
   expect(HERO.safeParse({ caption: 'c', credit: 'Photo : X' }).success).toBe(false);
-  expect(HERO.safeParse({ key: 'pol-a1', caption: 'c', credit: 'Photo : X' }).success).toBe(false);
+  expect(HERO.safeParse({ picture: { kind: 'corpus', key: 'pol-a1' } }).success).toBe(false);
+});
+
+/**
+ * The blocker this shape removed: a picture could only be a key of the corpus, which is built on the corpus's own id
+ * grammar, so no item of the journal could ever carry one — and nothing failed to say so, every real item simply came
+ * through bare. Its picture is an address, and the journal sets no credit under it and often no caption either.
+ */
+test('HERO takes a picture of the journal, with nothing written under it', () => {
+  const url = 'https://www.humanite.fr/wp-content/uploads/2026/09/x.jpg?w=1200';
+  expect(HERO.safeParse({ picture: { kind: 'journal', url } }).success).toBe(true);
+  expect(
+    ARTICLE_SUMMARY.safeParse({ ...validSummary, id: '3861029', hero: { picture: { kind: 'journal', url } } }).success,
+  ).toBe(true);
 });

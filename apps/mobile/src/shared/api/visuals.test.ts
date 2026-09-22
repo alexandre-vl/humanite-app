@@ -1,6 +1,7 @@
+import { PICTURE } from '@huma/contracts';
 import { ASSET_WIDTHS } from '@huma/mock-content/assets';
 import { describe, expect, it } from '@jest/globals';
-import { PLACE_WIDTHS } from './visuals';
+import { PLACE_WIDTHS, visualOf } from './visuals';
 
 /**
  * The corpus writes a file per key and per width; the app asks for a width by naming a place. Neither list can see the
@@ -21,5 +22,25 @@ describe('les largeurs écrites et les places qui les demandent', () => {
 
   it('ne laissent aucune place demander une largeur que rien n’écrit', () => {
     expect(asked.filter((width) => !written.includes(width))).toEqual([]);
+  });
+});
+
+/**
+ * A picture of the journal is asked for at the width of the place it fills. The service lists each at a width of its
+ * own — twelve hundred pixels, most of the time — and a thumbnail that kept it would download a picture four times as
+ * wide as its box, on every row of every list.
+ */
+describe('une image du journal', () => {
+  const url = 'https://www.humanite.fr/wp-content/uploads/2026/09/p4-duflot_MAR.jpg?w=150&h=150&crop=1';
+  const picture = PICTURE.parse({ kind: 'journal', url });
+
+  it('se demande à la largeur de chaque place, sans perdre ce que son adresse demande d’autre', () => {
+    expect(visualOf(picture, 'thumbnail')).toEqual({ source: { uri: url.replace('w=150', 'w=320') } });
+    expect(visualOf(picture, 'card')).toEqual({ source: { uri: url.replace('w=150', 'w=1080') } });
+    expect(visualOf(picture, 'lead')).toEqual({ source: { uri: url.replace('w=150', 'w=1600') } });
+  });
+
+  it('ne porte aucun hachage à peindre, que le service n’envoie pas', () => {
+    expect(visualOf(picture, 'card')?.thumbhash).toBeUndefined();
   });
 });

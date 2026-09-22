@@ -98,9 +98,12 @@ const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
 
 const wordRange = (article: Article): Words => WORDS[isBrief(article) ? 'brief' : article.format];
 
-/** Every picture an item names: its lead illustration, then the images of its body. */
+/**
+ * Every picture of the corpus an item names: its lead illustration, then the images of its body. A lead picture of the
+ * journal names no file of the corpus, so it is not one of them — and no item of this corpus carries one.
+ */
 export const imageKeys = (article: Article): readonly ImageKey[] => [
-  ...(article.hero === undefined ? [] : [article.hero.key]),
+  ...(article.hero?.picture.kind === 'corpus' ? [article.hero.picture.key] : []),
   ...article.blocks.flatMap((block) => (block.type === 'image' ? [block.key] : [])),
 ];
 

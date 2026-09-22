@@ -40,10 +40,16 @@ const splitList = (value: string | undefined): readonly string[] =>
         .map((part) => part.trim())
         .filter((part) => part.length > 0);
 
-/** A `légende | crédit` hero scalar. Its key is the item's own, so a lead picture is named without being authored. */
-const toHero = (id: string, value: string): Readonly<{ key: string; caption: string; credit: string }> => {
+/**
+ * A `légende | crédit` hero scalar. Its key is the item's own, so a lead picture is named without being authored, and
+ * it is a picture of the corpus: the only kind whose file the bundler holds.
+ */
+const toHero = (
+  id: string,
+  value: string,
+): Readonly<{ picture: Readonly<{ kind: 'corpus'; key: string }>; caption: string; credit: string }> => {
   const [caption, credit] = value.split('|').map((part) => part.trim());
-  return { key: `${id}-hero`, caption: caption ?? '', credit: credit ?? '' };
+  return { picture: { kind: 'corpus', key: `${id}-hero` }, caption: caption ?? '', credit: credit ?? '' };
 };
 
 /** The plain text of inline content, line breaks becoming spaces. */

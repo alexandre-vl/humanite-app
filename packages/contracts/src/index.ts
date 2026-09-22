@@ -7,6 +7,8 @@ export type { DisplayText } from './display-text.ts';
 export { BLOCK, SECTION, SPAN } from './content.ts';
 export type { Block, BlockInput, Section, Span, SpanInput } from './content.ts';
 export { ARTICLE, ARTICLE_SUMMARY, HERO } from './article.ts';
+export { atWidth, judgePicture, PICTURE } from './picture.ts';
+export type { Picture, PictureCode, Resize } from './picture.ts';
 export type { Article, ArticleSummary, Hero } from './article.ts';
 export { judgeProse, readPlain, readProse, THE_BODY } from './prose.ts';
 export type { PlainReader, ProseCode, ProseReader } from './prose.ts';

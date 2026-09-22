@@ -969,9 +969,12 @@ export const BINDINGS = {
   },
   'ADR-0027': {
     scope: {
-      // The wire shapes, the reading that turns a body into blocks, and the answers both are held against. The client
-      // that will call the service is not here yet; its module joins this scope the day it is written.
+      // The wire shapes, the readings that turn the service's markup into text and blocks, the way its pictures are
+      // asked for, and the answers all of them are held against. The client that will call the service is not here
+      // yet; its module joins this scope the day it is written.
       paths: [
+        'packages/contracts/src/picture.ts',
+        'packages/contracts/src/picture.test.ts',
         'packages/contracts/src/prose.ts',
         'packages/contracts/src/prose.test.ts',
         'packages/contracts/src/recorded.ts',
@@ -979,6 +982,7 @@ export const BINDINGS = {
         'packages/contracts/src/remote.test.ts',
         'tools/capture/**',
         'tools/governance/src/cli/capture-read.ts',
+        'tools/guardrails/src/proofs/picture.ts',
         'tools/guardrails/src/proofs/prose.ts',
       ],
     },
@@ -999,6 +1003,7 @@ export const BINDINGS = {
         'prose/nothing-read-plain',
       ],
       R3: ['secret/recorded-clean', 'secret/token', 'secret/password', 'secret/address', 'secret/cookie', 'secret/key'],
+      R5: ['picture/resizer', 'picture/width-ignored', 'picture/address-changed', 'picture/query-lost'],
     },
   },
 } as const satisfies Bindings<ProofId>;
