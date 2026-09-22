@@ -1,6 +1,6 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { AUTHOR, BLOCK, SECTION, SPAN } from './index.ts';
-import type { Author, Block, Section, Span } from './index.ts';
+import { BLOCK, SECTION, SPAN } from './index.ts';
+import type { Block, Section, Span } from './index.ts';
 
 test('SPAN parses each inline kind and validates a link target', () => {
   expectTypeOf(SPAN.parse({ type: 'text', value: 'x' })).toEqualTypeOf<Span>();
@@ -33,9 +33,4 @@ test('SECTION requires a three-letter code', () => {
   const section: Section = SECTION.parse({ id: 'monde', code: 'mon', label: 'Monde', order: 4 });
   expectTypeOf(section).toEqualTypeOf<Section>();
   expect(SECTION.safeParse({ id: 'monde', code: 'monde', label: 'Monde', order: 4 }).success).toBe(false);
-});
-
-test('AUTHOR carries its section and columnist flag', () => {
-  const author: Author = AUTHOR.parse({ id: 'yves-kerlan', name: 'Yves Kerlan', section: 'monde', isColumnist: true });
-  expectTypeOf(author).toEqualTypeOf<Author>();
 });

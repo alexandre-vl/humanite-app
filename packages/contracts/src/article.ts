@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { BLOCK } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
-import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 
 /** The illustration of an item: the key that names its picture, with the caption and the credit that go under it. */
 export const HERO = z.object({ key: IMAGE_KEY, caption: DISPLAY_TEXT, credit: DISPLAY_TEXT });
@@ -25,6 +25,11 @@ export type Hero = z.infer<typeof HERO>;
  * place that needs it, the corpus, reads it off the item's own id. `tags` said what an item was about: no screen ever
  * showed one, and of the sixteen fields the service sends, none is a subject. A field a schema requires and nothing
  * can fill is a field every reading has to invent.
+ *
+ * `byline` is who signed the piece, written out. It was a list of identifiers into a roster of the newsroom, which
+ * the service has no equivalent of: it sends a name and nothing behind it — one name, never two, and `La rédaction`
+ * more often than anyone — so there is nobody to look up and no page to send a reader to. A name that resolves to
+ * itself is a join that costs a request and answers nothing, and it left with the roster.
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
@@ -33,7 +38,7 @@ export const ARTICLE_SUMMARY = z.object({
   access: ACCESS,
   title: DISPLAY_TEXT,
   standfirst: DISPLAY_TEXT,
-  authors: z.array(AUTHOR_ID),
+  byline: DISPLAY_TEXT.optional(),
   publishedAt: z.iso.datetime(),
   hero: HERO.optional(),
   emphasis: z.boolean().optional(),

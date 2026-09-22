@@ -3,7 +3,6 @@ import type {
   Article,
   ArticleId,
   ArticleSummary,
-  Author,
   ContentApi,
   ContentErrorCode,
   FeedQuery,
@@ -14,9 +13,8 @@ import type {
   SearchQuery,
   Section,
   SectionId,
-  Session,
 } from '@huma/contracts';
-import { AUTHORS, CORPUS, SECTIONS } from '@huma/mock-content';
+import { CORPUS, SECTIONS } from '@huma/mock-content';
 
 const DEFAULT_LIMIT = 12;
 
@@ -37,17 +35,6 @@ const notFound = (id: ArticleId): never => {
   throw new ContentApiError('not-found', `article introuvable : ${id}`);
 };
 
-/** Where a section runs in the paper, by id: the order the newsroom lays a printed edition out in. */
-const RUNNING_ORDER = new Map(SECTIONS.map((section): readonly [SectionId, number] => [section.id, section.order]));
-
-const runsAt = (summary: ArticleSummary): number => RUNNING_ORDER.get(summary.section) ?? SECTIONS.length;
-
-/** How a numéro is laid out: section by section as the paper runs them, and inside one, the freshest first. */
-const inPaper = (left: ArticleSummary, right: ArticleSummary): number => {
-  const byRun = runsAt(left) - runsAt(right);
-  return byRun === 0 ? right.publishedAt.localeCompare(left.publishedAt) : byRun;
-};
-
 /** A day's paper while it is being gathered: what it holds, and what it will open on. */
 type Gathering = Readonly<{ items: ArticleSummary[] }> & { opener: ArticleSummary };
 
@@ -61,6 +48,10 @@ type Gathering = Readonly<{ items: ArticleSummary[] }> & { opener: ArticleSummar
  * The opener is the freshest illustrated item of the day, which is the same rule the front page follows — a paper opens
  * on a picture, and the newest items of a morning are briefs filed before the desk has one. A day holding no picture
  * at all opens on its freshest item, so every numéro has a cover.
+ *
+ * Only the cover of a numéro is gathered now. What a numéro holds was served too, laid out desk by desk as a printed
+ * edition runs them, and no screen ever asked: a numéro weighs sixty-two megabytes and is read in its publisher's own
+ * reader, so the newsstand shows the covers and sends a reader to the paper's own site.
  */
 const gathered = new Map<IssueId, Gathering>();
 for (const summary of CHRONOLOGICAL) {
@@ -76,22 +67,10 @@ for (const summary of CHRONOLOGICAL) {
   }
 }
 
-/** Each numéro's items, laid out as the paper runs them. */
-const ISSUES: ReadonlyMap<IssueId, readonly ArticleSummary[]> = new Map(
-  [...gathered].map(([day, held]): readonly [IssueId, readonly ArticleSummary[]] => [
-    day,
-    [...held.items].sort(inPaper),
-  ]),
-);
-
 /** The shelf: every numéro, the most recent first, as the newsstand stands them. */
 const SHELF: readonly IssueSummary[] = [...gathered]
   .map(([day, held]) => ISSUE_SUMMARY.parse({ id: day, opener: held.opener, count: held.items.length }))
   .sort((left, right) => right.id.localeCompare(left.id));
-
-const noIssue = (id: IssueId): never => {
-  throw new ContentApiError('not-found', `numéro introuvable : ${id}`);
-};
 
 /**
  * A text as search compares it: no case, no accents, no ligature. French is written with them and searched without —
@@ -135,28 +114,25 @@ const page = (
   };
 };
 
-/** Options that make the mock testable: a session, a caller-provided delay, and injected failures. */
-export type MockApiOptions = Readonly<{
-  session?: Session;
-  latency?: number;
-  delay?: (ms: number) => Promise<void>;
-  fail?: Partial<Record<keyof ContentApi, ContentErrorCode>>;
-}>;
+/**
+ * What makes the mock testable: a failure per method, named by the method it answers to.
+ *
+ * It carried a latency and a delay to await as well, and nothing in the repository ever passed either — a mock that
+ * answers instantly is what makes a test deterministic, and what a screen does while it waits is shown by holding a
+ * promise open, not by sleeping.
+ */
+export type MockApiOptions = Readonly<{ fail?: Partial<Record<keyof ContentApi, ContentErrorCode>> }>;
 
-/** A content api backed by the fictional corpus, with optional latency and injectable errors. */
+/** A content api backed by the fictional corpus, with injectable errors. */
 export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
-  const session: Session = options.session ?? { isSubscriber: false };
-  const latency = options.latency ?? 0;
-  const { delay, fail } = options;
+  const { fail } = options;
 
   const guard = async (method: keyof ContentApi): Promise<void> => {
-    if (latency > 0 && delay !== undefined) {
-      await delay(latency);
-    }
     const code = fail?.[method];
     if (code !== undefined) {
       throw new ContentApiError(code, `échec simulé de ${method}`);
     }
+    return Promise.resolve();
   };
 
   const inSection = (section: SectionId | undefined): readonly ArticleSummary[] =>
@@ -185,10 +161,6 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
       await guard('getSections');
       return SECTIONS;
     },
-    getAuthors: async (): Promise<readonly Author[]> => {
-      await guard('getAuthors');
-      return AUTHORS;
-    },
     getFeed: async (query: FeedQuery): Promise<Page<ArticleSummary>> => {
       await guard('getFeed');
       return page(inSection(query.section), query.cursor, query.limit);
@@ -209,10 +181,6 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
       await guard('getIssues');
       return SHELF;
     },
-    getIssue: async (id: IssueId): Promise<readonly ArticleSummary[]> => {
-      await guard('getIssue');
-      return ISSUES.get(id) ?? noIssue(id);
-    },
     search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
       await guard('search');
       const needle = fold(query.text.trim());
@@ -221,10 +189,6 @@ export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
         query.cursor,
         query.limit,
       );
-    },
-    getSession: async (): Promise<Session> => {
-      await guard('getSession');
-      return session;
     },
   };
 };

@@ -1,6 +1,6 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
 import { SECTION_ID } from '@huma/contracts';
-import { AUTHORS, SECTIONS } from './registries.ts';
+import { AUTHORS, namesOf, SECTIONS } from './registries.ts';
 import { toInstant } from './time.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
@@ -140,7 +140,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   const errors: string[] = [];
   const where = article.id;
   const section = SECTIONS.find((each) => each.id === folder);
-  const authors = article.authors.map((id) => AUTHORS.find((each) => each.id === id));
+  const authors = namesOf(article.byline).map((name) => AUTHORS.find((each) => each.name === name));
   const known = authors.filter((each) => each !== undefined);
   const kinds = article.blocks.map((block) => block.type);
   const range = wordRange(article);
@@ -165,7 +165,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
       );
     }
   }
-  for (const [field, list, bounds] of [['auteur', article.authors, COUNTS.authors]] as const) {
+  for (const [field, list, bounds] of [['auteur', namesOf(article.byline), COUNTS.authors]] as const) {
     if (list.length < bounds.min || list.length > bounds.max) {
       errors.push(
         `${where} : ${String(list.length)} ${field}(s) (attendu ${String(bounds.min)} à ${String(bounds.max)})`,

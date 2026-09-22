@@ -9,7 +9,7 @@ export const CORPUS_DATA = [
     title: "À Belleroche, la lente renaissance d'une fresque médiévale longtemps cachée sous les enduits",
     standfirst:
       "Dévoilée par hasard lors de travaux dans l'église Saint-Genou, une peinture murale du XIVe siècle fait l'objet d'un chantier de restauration minutieux que suit notre équipe, pinceau après pinceau.",
-    authors: ['helene-marchetti'],
+    byline: 'Hélène Marchetti',
     publishedAt: '2026-09-10T07:15:00.000Z',
     hero: {
       key: 'cul-a1-hero',
@@ -100,7 +100,7 @@ export const CORPUS_DATA = [
     title: 'Le musée Berthelin rouvre ses portes après deux ans de travaux et un accrochage entièrement repensé',
     standfirst:
       "Fermé depuis l'automne 2024, le musée municipal de Villeneuve-sur-Arche accueille de nouveau le public samedi, avec des salles réaménagées, un parcours pour les enfants et une collection enfin sortie des réserves.",
-    authors: ['helene-marchetti', 'paul-delorme'],
+    byline: 'Hélène Marchetti et Paul Delorme',
     publishedAt: '2026-09-10T12:30:00.000Z',
     hero: {
       key: 'cul-a2-hero',
@@ -236,7 +236,7 @@ export const CORPUS_DATA = [
     title: "Chronique : la bibliothèque, dernier lieu où l'on peut entrer sans rien devoir acheter",
     standfirst:
       "Alors que les espaces gratuits se raréfient dans nos villes, nos bibliothèques municipales restent l'un des rares endroits où l'on est accueilli sans condition. Il serait imprudent de les tenir pour acquises.",
-    authors: ['odile-sarrazin'],
+    byline: 'Odile Sarrazin',
     publishedAt: '2026-09-11T06:00:00.000Z',
     blocks: [
       {
@@ -335,7 +335,7 @@ export const CORPUS_DATA = [
     title: 'Un pass culture régional pour les moins de 25 ans : ce que change vraiment le nouveau dispositif',
     standfirst:
       'Voté en juillet, le dispositif entre en vigueur ce mois-ci. Il ouvre aux jeunes un crédit annuel valable dans les musées, cinémas et librairies partenaires, mais son financement suscite déjà des interrogations.',
-    authors: ['paul-delorme', 'helene-marchetti'],
+    byline: 'Paul Delorme et Hélène Marchetti',
     publishedAt: '2026-09-11T14:45:00.000Z',
     hero: {
       key: 'cul-a4-hero',
@@ -489,7 +489,7 @@ export const CORPUS_DATA = [
     title: "À Aval-sur-Loue, des habitants numérisent la mémoire ouvrière de leur vallée avant qu'elle ne s'efface",
     standfirst:
       "Photographies, carnets d'atelier, bulletins de paie : un collectif de bénévoles rassemble et scanne les archives privées d'anciens ouvriers du textile, pour constituer un fonds accessible à tous.",
-    authors: ['helene-marchetti'],
+    byline: 'Hélène Marchetti',
     publishedAt: '2026-09-12T08:20:00.000Z',
     hero: {
       key: 'cul-a5-hero',
@@ -612,7 +612,7 @@ export const CORPUS_DATA = [
     title: "La dernière librairie de Belleroche a failli fermer ; ses clients l'ont rachetée en coopérative",
     standfirst:
       "Menacée de disparition après le départ à la retraite de son gérant, la librairie du Beffroi revit sous la forme d'une coopérative réunissant plus de deux cents habitants, décidés à garder un commerce du livre en centre-ville.",
-    authors: ['paul-delorme'],
+    byline: 'Paul Delorme',
     publishedAt: '2026-09-12T16:05:00.000Z',
     hero: {
       key: 'cul-a6-hero',
@@ -720,7 +720,7 @@ export const CORPUS_DATA = [
     title: "La scène nationale de Courtebief dévoile une saison placée sous le signe des écritures d'aujourd'hui",
     standfirst:
       "Le théâtre a présenté mardi une programmation resserrée autour de la création contemporaine, avec quatorze spectacles et un festival de lectures ouvert aux textes d'auteurs encore inédits.",
-    authors: ['helene-marchetti'],
+    byline: 'Hélène Marchetti',
     publishedAt: '2026-09-11T05:30:00.000Z',
     blocks: [
       {
@@ -763,7 +763,7 @@ export const CORPUS_DATA = [
     title: "Un trésor de monnaies antiques mis au jour lors de travaux d'assainissement près de Mérignial",
     standfirst:
       'Les archéologues ont dégagé un lot de plusieurs centaines de pièces enfouies dans une jarre, une découverte qualifiée de rare pour la région et qui va retarder le chantier de plusieurs semaines.',
-    authors: ['paul-delorme'],
+    byline: 'Paul Delorme',
     publishedAt: '2026-09-12T05:45:00.000Z',
     emphasis: true,
     blocks: [
@@ -807,7 +807,7 @@ export const CORPUS_DATA = [
     title: "L'université de Belleroche crée une chaire consacrée à l'histoire des métiers de l'eau",
     standfirst:
       'Financée pour cinq ans par un mécénat local, la nouvelle chaire réunira historiens et géographes autour du patrimoine fluvial de la région, avec un premier colloque annoncé pour le printemps prochain.',
-    authors: ['helene-marchetti', 'paul-delorme'],
+    byline: 'Hélène Marchetti et Paul Delorme',
     publishedAt: '2026-09-13T06:30:00.000Z',
     blocks: [
       {
@@ -850,7 +850,7 @@ export const CORPUS_DATA = [
     title: 'Fonderies du Vernay : la direction présente un plan de départs, les salariés réclament des garanties',
     standfirst:
       "Le fabricant de pièces métalliques veut supprimer cent vingt postes sur son site du Val d'Arche. La direction évoque des départs volontaires ; les représentants du personnel redoutent, eux, un premier pas vers la fermeture.",
-    authors: ['marion-castel'],
+    byline: 'Marion Castel',
     publishedAt: '2026-09-10T07:05:00.000Z',
     hero: {
       key: 'eco-a1-hero',
@@ -999,7 +999,7 @@ export const CORPUS_DATA = [
     title: "Sur les marchés du Val d'Arche, la flambée des prix pousse les clients à rogner sur les quantités",
     standfirst:
       "Fruits, légumes, fromages : en un an, les étals ont vu leurs tarifs grimper. Commerçants et clients décrivent une même spirale, entre coûts de production en hausse et pouvoir d'achat en berne, à l'approche de l'hiver.",
-    authors: ['julien-ferrand'],
+    byline: 'Julien Ferrand',
     publishedAt: '2026-09-10T13:30:00.000Z',
     hero: {
       key: 'eco-a2-hero',
@@ -1113,7 +1113,7 @@ export const CORPUS_DATA = [
     title: "Après les suppressions de postes, le Val d'Arche cherche à bâtir un plan de reconversion industrielle",
     standfirst:
       "Élus, chambre de commerce et organismes de formation planchent sur l'avenir d'un bassin d'emploi fragilisé. Objectif : anticiper les reconversions plutôt que de les subir, dans un territoire longtemps tourné vers la métallurgie.",
-    authors: ['marion-castel', 'julien-ferrand'],
+    byline: 'Marion Castel et Julien Ferrand',
     publishedAt: '2026-09-11T06:10:00.000Z',
     hero: {
       key: 'eco-a3-hero',
@@ -1230,7 +1230,7 @@ export const CORPUS_DATA = [
     title: "Chronique : ce que la file d'attente d'une épicerie solidaire dit de notre économie",
     standfirst:
       "Derrière les chiffres de la croissance, il y a des files qui s'allongent le samedi matin. Notre chroniqueur revient sur ce que révèle, très concrètement, l'essor discret de l'économie du dépannage et du partage.",
-    authors: ['bernard-quillet'],
+    byline: 'Bernard Quillet',
     publishedAt: '2026-09-12T05:30:00.000Z',
     blocks: [
       {
@@ -1369,7 +1369,7 @@ export const CORPUS_DATA = [
     title: "À Montreuil-l'Abbé, une coopérative rachète l'usine de ses salariés pour éviter la fermeture",
     standfirst:
       "Menacés par le départ à la retraite de leur patron, les employés d'une menuiserie ont repris l'entreprise en société coopérative. Un an après, l'atelier tourne, avec des débuts encourageants mais encore fragiles.",
-    authors: ['julien-ferrand'],
+    byline: 'Julien Ferrand',
     publishedAt: '2026-09-12T12:00:00.000Z',
     hero: {
       key: 'eco-a5-hero',
@@ -1480,7 +1480,7 @@ export const CORPUS_DATA = [
     title: 'Guichets fermés, tournées réduites : la fronde des maires ruraux contre le recul du service postal',
     standfirst:
       "Dans le pays de l'Ombre, plusieurs bureaux ont vu leurs horaires rognés. Les élus dénoncent un abandon silencieux et réclament une concertation avant toute nouvelle fermeture, quand l'opérateur invoque la baisse du courrier.",
-    authors: ['marion-castel'],
+    byline: 'Marion Castel',
     publishedAt: '2026-09-13T07:00:00.000Z',
     hero: {
       key: 'eco-a6-hero',
@@ -1586,7 +1586,7 @@ export const CORPUS_DATA = [
     title: "Le taux de chômage du bassin du Val d'Arche repasse sous la barre des neuf pour cent",
     standfirst:
       "Selon les chiffres trimestriels publiés jeudi, l'emploi progresse légèrement, porté par les services et la construction. Les acteurs locaux restent prudents, à l'ombre des difficultés du secteur industriel.",
-    authors: ['julien-ferrand'],
+    byline: 'Julien Ferrand',
     publishedAt: '2026-09-10T08:40:00.000Z',
     emphasis: true,
     blocks: [
@@ -1620,7 +1620,7 @@ export const CORPUS_DATA = [
     title: 'Une monnaie locale fait ses premiers pas dans les commerces du centre de Sainte-Coline',
     standfirst:
       "Baptisée « l'arche », cette monnaie complémentaire est acceptée depuis lundi par une quarantaine de commerçants. Ses promoteurs y voient un moyen de garder la richesse sur le territoire et de soutenir les circuits courts.",
-    authors: ['marion-castel'],
+    byline: 'Marion Castel',
     publishedAt: '2026-09-11T09:25:00.000Z',
     blocks: [
       {
@@ -1663,7 +1663,7 @@ export const CORPUS_DATA = [
     title: "Grève d'avertissement dans les entrepôts logistiques du Val d'Arche pour réclamer des hausses de salaire",
     standfirst:
       "Une partie des salariés a débrayé jeudi matin sur deux sites. Les représentants du personnel réclament une revalorisation face à l'inflation ; la direction promet d'ouvrir des négociations la semaine prochaine.",
-    authors: ['marion-castel', 'julien-ferrand'],
+    byline: 'Marion Castel et Julien Ferrand',
     publishedAt: '2026-09-13T07:45:00.000Z',
     blocks: [
       {
@@ -1706,7 +1706,7 @@ export const CORPUS_DATA = [
     title: "Sécheresse à Val-Mareuil : la régie des eaux impose des restrictions jusqu'à la fin octobre",
     standfirst:
       "Le niveau de la nappe du bassin de la Sonne n'a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l'arrosage des jardins et à réduire la pression du réseau sur onze communes.",
-    authors: ['hugo-lambert'],
+    byline: 'Hugo Lambert',
     publishedAt: '2026-09-10T06:30:00.000Z',
     hero: {
       key: 'env-a1-hero',
@@ -1858,7 +1858,7 @@ export const CORPUS_DATA = [
     title: "Sur le plateau de Montbrel, le projet de parc solaire divise avant l'ouverture de l'enquête publique",
     standfirst:
       "La société d'économie mixte Énergies du Plateau veut couvrir d'anciennes carrières de panneaux photovoltaïques, mais des riverains s'inquiètent de l'emprise du chantier sur les chemins de randonnée les plus fréquentés.",
-    authors: ['lea-fontanel'],
+    byline: 'Léa Fontanel',
     publishedAt: '2026-09-10T13:10:00.000Z',
     hero: {
       key: 'env-a2-hero',
@@ -2005,7 +2005,7 @@ export const CORPUS_DATA = [
     title: 'Aux marais de Grand-Rieu, la renaturation porte ses premiers fruits deux ans après les travaux',
     standfirst:
       "Le conservatoire des espaces naturels des Trois-Vallées constate le retour d'oiseaux nicheurs sur la zone humide restaurée, un signe encourageant pour un chantier longtemps contesté par les riverains de la vallée.",
-    authors: ['hugo-lambert', 'lea-fontanel'],
+    byline: 'Hugo Lambert et Léa Fontanel',
     publishedAt: '2026-09-11T07:40:00.000Z',
     hero: {
       key: 'env-a3-hero',
@@ -2133,7 +2133,7 @@ export const CORPUS_DATA = [
     title: 'À Villeneuve-sur-Arche, un plan de plantation pour rafraîchir les quartiers les plus minéraux',
     standfirst:
       "L'association Canopée urbaine et la mairie veulent planter deux mille arbres en trois ans dans les rues les plus exposées à la chaleur, après un été où le centre a battu ses records de température nocturne.",
-    authors: ['lea-fontanel'],
+    byline: 'Léa Fontanel',
     publishedAt: '2026-09-11T10:20:00.000Z',
     hero: {
       key: 'env-a4-hero',
@@ -2257,7 +2257,7 @@ export const CORPUS_DATA = [
     title: "La coopérative Champs d'avenir replante des haies pour se passer d'une partie des pesticides",
     standfirst:
       "Sur le plateau, une trentaine de maraîchers misent sur les haies et les bandes fleuries pour attirer les insectes auxiliaires, une stratégie patiente qu'ils veulent mesurer parcelle par parcelle avant de la généraliser.",
-    authors: ['hugo-lambert'],
+    byline: 'Hugo Lambert',
     publishedAt: '2026-09-12T06:15:00.000Z',
     hero: {
       key: 'env-a5-hero',
@@ -2387,7 +2387,7 @@ export const CORPUS_DATA = [
     title: "La recyclerie Le Second Souffle ouvre un atelier de réparation dans l'ancienne gare de Saint-Prieux",
     standfirst:
       'Portée par une trentaine de bénévoles, la structure veut donner une deuxième vie aux objets et apprendre aux habitants à réparer eux-mêmes leur électroménager, dans un local prêté par la commune de Saint-Prieux.',
-    authors: ['lea-fontanel'],
+    byline: 'Léa Fontanel',
     publishedAt: '2026-09-12T15:05:00.000Z',
     hero: {
       key: 'env-a6-hero',
@@ -2515,7 +2515,7 @@ export const CORPUS_DATA = [
     title: "Pic de pollution à l'ozone : la préfecture déclenche l'alerte sur l'agglomération de Val-Mareuil",
     standfirst:
       "La circulation sera différenciée dès jeudi matin et la vitesse abaissée sur les principaux axes, tandis que les personnes fragiles sont invitées à limiter leurs efforts en plein air jusqu'à la fin de l'épisode.",
-    authors: ['hugo-lambert'],
+    byline: 'Hugo Lambert',
     publishedAt: '2026-09-11T05:30:00.000Z',
     emphasis: true,
     blocks: [
@@ -2559,7 +2559,7 @@ export const CORPUS_DATA = [
     title: 'Deux tonnes de déchets retirées de la Sonne lors de la journée de nettoyage des berges',
     standfirst:
       "Le collectif Rives vivantes a mobilisé près de trois cents bénévoles dimanche pour nettoyer les berges de la rivière, entre le pont de Montbrel et l'écluse de Saint-Prieux, sous un soleil de fin d'été.",
-    authors: ['lea-fontanel'],
+    byline: 'Léa Fontanel',
     publishedAt: '2026-09-11T16:40:00.000Z',
     blocks: [
       {
@@ -2602,7 +2602,7 @@ export const CORPUS_DATA = [
     title: 'Villeneuve-sur-Arche lance une aide locale pour les panneaux solaires chez les particuliers',
     standfirst:
       "La commune propose une prime complémentaire aux foyers modestes qui équipent leur toiture, dans la limite d'une enveloppe annuelle et sous condition de ressources, avec des demandes ouvertes dès le mois d'octobre.",
-    authors: ['hugo-lambert', 'lea-fontanel'],
+    byline: 'Hugo Lambert et Léa Fontanel',
     publishedAt: '2026-09-12T08:15:00.000Z',
     blocks: [
       {
@@ -2645,7 +2645,7 @@ export const CORPUS_DATA = [
     title: 'Écart de salaires : dans les métiers du soin à domicile, les femmes gagnent un quart de moins que prévu',
     standfirst:
       'Une étude locale rendue publique mardi chiffre pour la première fois les écarts de rémunération dans un secteur presque entièrement féminin, où le temps partiel subi pèse lourd sur les fiches de paie.',
-    authors: ['claire-vasseur', 'ines-benali'],
+    byline: 'Claire Vasseur et Inès Benali',
     publishedAt: '2026-09-10T06:00:00.000Z',
     hero: {
       key: 'fem-a1-hero',
@@ -2758,7 +2758,7 @@ export const CORPUS_DATA = [
     title: "Un réseau de marraines aide les femmes des quartiers à reprendre le chemin de l'emploi",
     standfirst:
       "Lancé il y a deux ans à Saint-Maur-des-Vignes, le réseau Élan met en relation des professionnelles bénévoles et des femmes éloignées de l'emploi. Un premier bilan, encourageant, vient d'être présenté.",
-    authors: ['claire-vasseur'],
+    byline: 'Claire Vasseur',
     publishedAt: '2026-09-10T15:20:00.000Z',
     hero: {
       key: 'fem-a2-hero',
@@ -2882,7 +2882,7 @@ export const CORPUS_DATA = [
     title: "Conseils municipaux : la parité progresse, mais les femmes restent tenues à l'écart des vrais leviers",
     standfirst:
       'Une analyse des exécutifs locaux de la région montre que si les assemblées sont désormais presque paritaires, les délégations stratégiques — finances, urbanisme, sécurité — demeurent très majoritairement masculines.',
-    authors: ['ines-benali'],
+    byline: 'Inès Benali',
     publishedAt: '2026-09-11T07:40:00.000Z',
     hero: {
       key: 'fem-a3-hero',
@@ -2997,7 +2997,7 @@ export const CORPUS_DATA = [
     title: 'À Courtebief, les footballeuses réclament les mêmes créneaux que les hommes sur le stade municipal',
     standfirst:
       'Reléguées aux horaires du matin et aux terrains annexes, les joueuses du club local ont saisi la mairie. Elles demandent un partage équitable des installations, alors que leurs effectifs ont doublé en trois ans.',
-    authors: ['ines-benali', 'claire-vasseur'],
+    byline: 'Inès Benali et Claire Vasseur',
     publishedAt: '2026-09-11T13:10:00.000Z',
     hero: {
       key: 'fem-a4-hero',
@@ -3127,7 +3127,7 @@ export const CORPUS_DATA = [
     title: "Isolement des femmes en milieu rural : une ligne d'écoute itinérante sillonne les villages de la vallée",
     standfirst:
       "Faute de transports et de services de proximité, de nombreuses femmes âgées ou isolées peinent à demander de l'aide. Un camion-permanence tente d'aller à leur rencontre, marché après marché.",
-    authors: ['claire-vasseur'],
+    byline: 'Claire Vasseur',
     publishedAt: '2026-09-12T09:00:00.000Z',
     hero: {
       key: 'fem-a5-hero',
@@ -3253,7 +3253,7 @@ export const CORPUS_DATA = [
     title: 'Des ateliers pour donner aux collégiennes le goût des sciences et bousculer les idées reçues',
     standfirst:
       'Dans plusieurs collèges de la région, un programme propose aux élèves de rencontrer des femmes ingénieures et chercheuses. Objectif : enrayer le décrochage des filles dès la troisième dans les filières scientifiques.',
-    authors: ['ines-benali'],
+    byline: 'Inès Benali',
     publishedAt: '2026-09-12T14:30:00.000Z',
     hero: {
       key: 'fem-a6-hero',
@@ -3361,7 +3361,7 @@ export const CORPUS_DATA = [
     title: 'Violences conjugales : les signalements en hausse de 12 % dans le département sur un an',
     standfirst:
       "Selon un bilan présenté mercredi, le nombre de signalements a augmenté l'an dernier, une évolution que les associations attribuent autant à une libération de la parole qu'à une réalité préoccupante.",
-    authors: ['claire-vasseur'],
+    byline: 'Claire Vasseur',
     publishedAt: '2026-09-11T05:00:00.000Z',
     emphasis: true,
     blocks: [
@@ -3405,7 +3405,7 @@ export const CORPUS_DATA = [
     title: 'Une chercheuse de Belleroche distinguée pour ses travaux sur le travail invisible des femmes',
     standfirst:
       "La sociologue recevra le mois prochain un prix régional récompensant une décennie d'enquêtes sur les tâches domestiques et le soin, longtemps absentes des statistiques officielles.",
-    authors: ['ines-benali'],
+    byline: 'Inès Benali',
     publishedAt: '2026-09-12T06:15:00.000Z',
     blocks: [
       {
@@ -3448,7 +3448,7 @@ export const CORPUS_DATA = [
     title: "Un forum consacré à l'entrepreneuriat des femmes se tiendra le mois prochain à Villeneuve-sur-Arche",
     standfirst:
       "Rencontres, ateliers et micro-crédit : la manifestation entend accompagner celles qui souhaitent créer leur activité, dans un territoire où elles restent minoritaires parmi les créateurs d'entreprise.",
-    authors: ['claire-vasseur', 'ines-benali'],
+    byline: 'Claire Vasseur et Inès Benali',
     publishedAt: '2026-09-13T07:00:00.000Z',
     blocks: [
       {
@@ -3491,7 +3491,7 @@ export const CORPUS_DATA = [
     title: 'Détroit de Kessel : la Savarie et le Norland signent une trêve sur la pêche après des mois de tension',
     standfirst:
       "Réunis à Port-Méridienne, les représentants des deux pays voisins ont paraphé un accord encadrant les zones de pêche contestées, sous la médiation de l'Union des États du Levant, saluée par les riverains.",
-    authors: ['elise-morvan', 'samir-haddad'],
+    byline: 'Élise Morvan et Samir Haddad',
     publishedAt: '2026-09-10T05:30:00.000Z',
     hero: {
       key: 'mon-a1-hero',
@@ -3636,7 +3636,7 @@ export const CORPUS_DATA = [
     title: "Après les inondations, l'archipel des Cargues attend toujours l'aide promise par ses voisins",
     standfirst:
       "Trois semaines après les crues qui ont ravagé plusieurs îles, les habitants dénoncent la lenteur des secours et le manque d'eau potable, tandis que l'Union des États du Levant peine à coordonner les convois.",
-    authors: ['samir-haddad'],
+    byline: 'Samir Haddad',
     publishedAt: '2026-09-11T07:15:00.000Z',
     hero: {
       key: 'mon-a2-hero',
@@ -3764,7 +3764,7 @@ export const CORPUS_DATA = [
     title: "À Port-Méridienne, l'automatisation du terminal portuaire inquiète les dockers venus de Valdavie",
     standfirst:
       "L'arrivée de portiques automatisés sur le premier terminal à conteneurs de la région fait craindre des centaines de suppressions d'emplois, dans une ville où la manutention fait vivre des quartiers entiers.",
-    authors: ['elise-morvan', 'samir-haddad'],
+    byline: 'Élise Morvan et Samir Haddad',
     publishedAt: '2026-09-12T06:05:00.000Z',
     hero: {
       key: 'mon-a3-hero',
@@ -3901,7 +3901,7 @@ export const CORPUS_DATA = [
     title: 'À Serravia, la jeunesse réinvente le marché de quartier après la fermeture des halles',
     standfirst:
       "Reportage vidéo dans la capitale de la Valdavie, où de jeunes commerçants ont transformé une friche en marché éphémère, faute d'avoir pu reprendre les anciennes halles fermées pour vétusté l'an dernier.",
-    authors: ['elise-morvan'],
+    byline: 'Élise Morvan',
     publishedAt: '2026-09-11T16:30:00.000Z',
     hero: {
       key: 'mon-a4-hero',
@@ -3978,7 +3978,7 @@ export const CORPUS_DATA = [
     title: 'Chronique : la solidarité entre nations ne se décrète pas dans les communiqués, elle se prouve aux quais',
     standfirst:
       "Une trêve signée, un archipel qui attend son eau potable : la même semaine, le monde a offert le meilleur et le pire de la coopération. Il est temps d'en tirer une leçon simple mais exigeante, écrit notre chroniqueur.",
-    authors: ['yves-kerlan'],
+    byline: 'Yves Kerlan',
     publishedAt: '2026-09-12T07:00:00.000Z',
     blocks: [
       {
@@ -4103,7 +4103,7 @@ export const CORPUS_DATA = [
     title: 'Reconstruction en Terragne : le fonds Solidarité Sud peine à réunir les promesses de ses membres',
     standfirst:
       "Un an après la sécheresse historique qui a frappé la région de Terragne, le mécanisme d'aide créé pour financer la reconstruction n'a reçu qu'une fraction des sommes annoncées, révèle un rapport interne.",
-    authors: ['samir-haddad', 'elise-morvan'],
+    byline: 'Samir Haddad et Élise Morvan',
     publishedAt: '2026-09-13T05:40:00.000Z',
     hero: {
       key: 'mon-a6-hero',
@@ -4243,7 +4243,7 @@ export const CORPUS_DATA = [
     title: 'La Valdavie rouvre sa frontière terrestre avec le Norland après six mois de fermeture',
     standfirst:
       "Les deux pays ont annoncé la réouverture du poste-frontière de Vireux, fermé au printemps à la suite d'un différend douanier, une décision saluée par les commerçants transfrontaliers des deux côtés.",
-    authors: ['elise-morvan'],
+    byline: 'Élise Morvan',
     publishedAt: '2026-09-13T07:30:00.000Z',
     emphasis: true,
     blocks: [
@@ -4287,7 +4287,7 @@ export const CORPUS_DATA = [
     title: "L'Union des États du Levant adopte un plan commun de lutte contre les incendies de forêt",
     standfirst:
       "Les pays membres ont validé la création d'une flotte partagée d'avions bombardiers d'eau, mobilisable en quelques heures, après une saison marquée par des feux d'une ampleur inédite dans la région.",
-    authors: ['samir-haddad'],
+    byline: 'Samir Haddad',
     publishedAt: '2026-09-10T10:10:00.000Z',
     blocks: [
       {
@@ -4330,7 +4330,7 @@ export const CORPUS_DATA = [
     title: 'À Serravia, une bibliothèque itinérante dessert les quartiers privés de librairie',
     standfirst:
       'Un ancien bus municipal transformé en médiathèque mobile sillonne depuis la rentrée les quartiers périphériques de la capitale valdave, proposant livres, jeux et accès à Internet aux habitants les plus éloignés.',
-    authors: ['elise-morvan', 'samir-haddad'],
+    byline: 'Élise Morvan et Samir Haddad',
     publishedAt: '2026-09-11T13:50:00.000Z',
     blocks: [
       {
@@ -4373,7 +4373,7 @@ export const CORPUS_DATA = [
     title: "Transports scolaires du Val d'Arche : le département rétablit trois lignes menacées de suppression",
     standfirst:
       "Après un mois de courriers de parents et d'élus ruraux, l'assemblée départementale a voté mardi soir le maintien des trois dessertes que ses services jugeaient trop coûteuses. Le financement reste à confirmer pour la prochaine rentrée.",
-    authors: ['lucie-varenne'],
+    byline: 'Lucie Varenne',
     publishedAt: '2026-09-10T06:30:00.000Z',
     hero: {
       key: 'pol-a1-hero',
@@ -4511,7 +4511,7 @@ export const CORPUS_DATA = [
     title: 'Logements vacants à Sainte-Coline : la commune lance un plan pour remettre cent appartements sur le marché',
     standfirst:
       "La municipalité veut récupérer une centaine de logements laissés vides dans le centre ancien. Elle mise d'abord sur des aides à la rénovation, puis, en dernier recours, sur la réquisition, une piste qui divise déjà le conseil municipal.",
-    authors: ['karim-belhadj'],
+    byline: 'Karim Belhadj',
     publishedAt: '2026-09-10T10:15:00.000Z',
     hero: {
       key: 'pol-a2-hero',
@@ -4626,7 +4626,7 @@ export const CORPUS_DATA = [
     title: "Fusion des intercommunalités : le Val d'Arche et le pays de l'Ombre butent sur le partage du pouvoir",
     standfirst:
       "Engagées depuis un an vers un rapprochement, les deux communautés de communes ne s'accordent ni sur le nombre de vice-présidents ni sur le siège de la future collectivité. Une réunion décisive est prévue la semaine prochaine.",
-    authors: ['lucie-varenne', 'karim-belhadj'],
+    byline: 'Lucie Varenne et Karim Belhadj',
     publishedAt: '2026-09-11T05:45:00.000Z',
     hero: {
       key: 'pol-a3-hero',
@@ -4763,7 +4763,7 @@ export const CORPUS_DATA = [
     title: "Piétonnisation du centre de Villefranche-d'Arvor : la concertation vire au débat passionné",
     standfirst:
       "Commerçants, riverains et associations de cyclistes se sont affrontés lors de la première réunion publique. La mairie promet une décision au printemps, après une phase d'expérimentation dès le mois d'octobre.",
-    authors: ['karim-belhadj'],
+    byline: 'Karim Belhadj',
     publishedAt: '2026-09-11T14:20:00.000Z',
     hero: {
       key: 'pol-a4-hero',
@@ -4898,7 +4898,7 @@ export const CORPUS_DATA = [
     title: 'En immersion dans une séance de nuit du conseil municipal de Sainte-Coline',
     standfirst:
       "Jusqu'à une heure avancée, les élus ont débattu du budget, des cantines et de l'éclairage public. Notre reportage vidéo au cœur d'une assemblée où chaque euro se discute pied à pied, loin des projecteurs.",
-    authors: ['lucie-varenne'],
+    byline: 'Lucie Varenne',
     publishedAt: '2026-09-12T07:10:00.000Z',
     hero: {
       key: 'pol-a5-hero',
@@ -4975,7 +4975,7 @@ export const CORPUS_DATA = [
     title: "Déontologie des élus : la communauté d'agglomération adopte une charte et nomme une référente",
     standfirst:
       "Conflits d'intérêts, cadeaux, marchés publics : la nouvelle charte encadre les pratiques des cent trente élus communautaires. Une déontologue indépendante pourra être saisie par les habitants comme par les agents.",
-    authors: ['lucie-varenne'],
+    byline: 'Lucie Varenne',
     publishedAt: '2026-09-12T16:40:00.000Z',
     hero: {
       key: 'pol-a6-hero',
@@ -5103,7 +5103,7 @@ export const CORPUS_DATA = [
     title: "La préfecture reporte l'enquête publique sur le contournement routier de Montreuil-l'Abbé",
     standfirst:
       "Faute d'un dossier environnemental complet, la consultation prévue en octobre est repoussée à la fin de l'hiver, a indiqué la préfecture dans un bref communiqué diffusé mercredi en fin de journée.",
-    authors: ['karim-belhadj'],
+    byline: 'Karim Belhadj',
     publishedAt: '2026-09-10T05:20:00.000Z',
     emphasis: true,
     blocks: [
@@ -5137,7 +5137,7 @@ export const CORPUS_DATA = [
     title: 'Sainte-Coline expérimente un budget participatif doté de cent mille euros pour ses quartiers',
     standfirst:
       "Les habitants pourront proposer et voter des projets de proximité, du mobilier urbain aux jardins partagés. La commune promet de réaliser les lauréats dès l'année prochaine, dans la limite de l'enveloppe votée.",
-    authors: ['lucie-varenne'],
+    byline: 'Lucie Varenne',
     publishedAt: '2026-09-11T11:05:00.000Z',
     blocks: [
       {
@@ -5170,7 +5170,7 @@ export const CORPUS_DATA = [
     title: "Le conseil départemental vote une aide d'urgence pour les communes touchées par les orages d'août",
     standfirst:
       "Un fonds exceptionnel de deux millions d'euros doit permettre de réparer voiries et bâtiments publics endommagés cet été. Les premières enveloppes seront versées aux communes avant la fin du mois d'octobre.",
-    authors: ['lucie-varenne', 'karim-belhadj'],
+    byline: 'Lucie Varenne et Karim Belhadj',
     publishedAt: '2026-09-13T06:15:00.000Z',
     blocks: [
       {
@@ -5213,7 +5213,7 @@ export const CORPUS_DATA = [
     title: "Hébergement d'urgence à Villeneuve-sur-Arche : le collectif Toits d'abord obtient l'ouverture d'un gymnase",
     standfirst:
       "Après une nuit de veille devant la mairie, la municipalité a accepté mercredi d'ouvrir le gymnase des Charmilles pour accueillir une soixantaine de personnes sans abri avant les premières gelées.",
-    authors: ['nadia-oussedik'],
+    byline: 'Nadia Oussedik',
     publishedAt: '2026-09-11T06:15:00.000Z',
     hero: {
       key: 'soc-a1-hero',
@@ -5353,7 +5353,7 @@ export const CORPUS_DATA = [
     title: "Cantines scolaires de Bourg-Méran : les familles dénoncent des files d'attente qui s'allongent",
     standfirst:
       "Faute de places suffisantes au réfectoire, plusieurs écoles de Bourg-Méran organisent deux services successifs, réduisant le temps du repas à vingt minutes pour certains enfants, s'inquiètent des parents.",
-    authors: ['thomas-lecuyer'],
+    byline: 'Thomas Lécuyer',
     publishedAt: '2026-09-10T07:40:00.000Z',
     hero: {
       key: 'soc-a2-hero',
@@ -5477,7 +5477,7 @@ export const CORPUS_DATA = [
     title: "Déserts médicaux : la maison de santé du Val d'Arche cherche à attirer de jeunes praticiens",
     standfirst:
       "Ouverte il y a un an à Saint-Clair-du-Roc, la structure peine encore à recruter des généralistes, malgré des logements de fonction et une prime d'installation financée par cinq communes réunies.",
-    authors: ['nadia-oussedik', 'thomas-lecuyer'],
+    byline: 'Nadia Oussedik et Thomas Lécuyer',
     publishedAt: '2026-09-12T05:50:00.000Z',
     hero: {
       key: 'soc-a3-hero',
@@ -5616,7 +5616,7 @@ export const CORPUS_DATA = [
     title: "À la résidence Les Tilleuls, des ateliers intergénérationnels pour rompre l'isolement des aînés",
     standfirst:
       "Chaque mardi, des collégiens de Villeneuve-sur-Arche rejoignent les pensionnaires d'une maison de retraite pour cuisiner, jardiner ou simplement discuter, dans le cadre d'un projet lancé au printemps.",
-    authors: ['thomas-lecuyer'],
+    byline: 'Thomas Lécuyer',
     publishedAt: '2026-09-12T08:20:00.000Z',
     hero: {
       key: 'soc-a4-hero',
@@ -5745,7 +5745,7 @@ export const CORPUS_DATA = [
     title: "Transport à la demande : les hameaux de la vallée de l'Arche testent un minibus solidaire",
     standfirst:
       "Lancé pour six mois, un service de navette sur réservation dessert désormais les écarts privés de ligne régulière, avec l'ambition de désenclaver les personnes âgées et les jeunes sans permis.",
-    authors: ['nadia-oussedik'],
+    byline: 'Nadia Oussedik',
     publishedAt: '2026-09-11T09:05:00.000Z',
     hero: {
       key: 'soc-a5-hero',
@@ -5880,7 +5880,7 @@ export const CORPUS_DATA = [
     title: "Épicerie solidaire de Longeval : face à l'afflux, l'association Le Pain partagé cherche des bras",
     standfirst:
       "Fréquentée par un nombre record de familles cette rentrée, l'épicerie sociale du quartier de Longeval lance un appel aux bénévoles pour tenir ses distributions et éviter de réduire ses horaires d'ouverture.",
-    authors: ['nadia-oussedik', 'thomas-lecuyer'],
+    byline: 'Nadia Oussedik et Thomas Lécuyer',
     publishedAt: '2026-09-13T06:30:00.000Z',
     hero: {
       key: 'soc-a6-hero',
@@ -6019,7 +6019,7 @@ export const CORPUS_DATA = [
     title: 'Villeneuve-sur-Arche ouvrira une halte de jour pour les personnes sans domicile cet hiver',
     standfirst:
       "La municipalité a confirmé mercredi la création d'un accueil de jour, ouvert du lundi au samedi, offrant boissons chaudes, laverie et permanence sociale aux personnes à la rue durant la saison froide.",
-    authors: ['nadia-oussedik'],
+    byline: 'Nadia Oussedik',
     publishedAt: '2026-09-13T07:10:00.000Z',
     emphasis: true,
     blocks: [
@@ -6063,7 +6063,7 @@ export const CORPUS_DATA = [
     title: 'La médiathèque de Bourg-Méran prolonge ses horaires pour accueillir les étudiants le soir',
     standfirst:
       "À partir d'octobre, l'équipement municipal restera ouvert jusqu'à vingt-deux heures trois soirs par semaine, une réponse à la demande d'espaces de travail calmes formulée par les jeunes de la commune.",
-    authors: ['thomas-lecuyer'],
+    byline: 'Thomas Lécuyer',
     publishedAt: '2026-09-10T14:45:00.000Z',
     blocks: [
       {
@@ -6106,7 +6106,7 @@ export const CORPUS_DATA = [
     title: 'Saint-Clair-du-Roc expérimente le tri des biodéchets dans trois écoles volontaires',
     standfirst:
       "Des bacs de compostage ont été installés cette semaine dans les cantines de trois établissements, avec l'objectif de sensibiliser les élèves et de réduire d'un tiers le volume des ordures ménagères.",
-    authors: ['nadia-oussedik', 'thomas-lecuyer'],
+    byline: 'Nadia Oussedik et Thomas Lécuyer',
     publishedAt: '2026-09-12T12:20:00.000Z',
     blocks: [
       {
@@ -6149,7 +6149,7 @@ export const CORPUS_DATA = [
     title: "L'Union sportive de Bourg-la-Rivière rêve de montée mais joue son avenir sur un stade vétuste",
     standfirst:
       'Promu au printemps, le club de football amateur enchaîne les bons résultats, mais son stade centenaire ne répond plus aux normes de la division supérieure et la municipalité tarde encore à trancher.',
-    authors: ['maxime-renaud'],
+    byline: 'Maxime Renaud',
     publishedAt: '2026-09-10T07:20:00.000Z',
     hero: {
       key: 'spo-a1-hero',
@@ -6299,7 +6299,7 @@ export const CORPUS_DATA = [
     title: "Les Aiglons de Val-Mareuil, révélation de la saison, portent l'espoir du handball féminin local",
     standfirst:
       'Monté de deux divisions en trois ans, le club féminin attire un public nouveau et bouscule les hiérarchies régionales, porté par une formation patiente et un noyau de joueuses fidèles au maillot.',
-    authors: ['sofia-laurenti'],
+    byline: 'Sofia Laurenti',
     publishedAt: '2026-09-10T14:40:00.000Z',
     hero: {
       key: 'spo-a2-hero',
@@ -6436,7 +6436,7 @@ export const CORPUS_DATA = [
     title: 'En immersion sur la Ronde des Trois-Vallées, la course cycliste qui anime les villages du plateau',
     standfirst:
       "Le temps d'une étape, nous avons suivi les bénévoles, les signaleurs et les coureurs de cette épreuve cycliste amateur qui traverse chaque automne une trentaine de communes du plateau, entre villages pavoisés et cols discrets.",
-    authors: ['maxime-renaud', 'sofia-laurenti'],
+    byline: 'Maxime Renaud et Sofia Laurenti',
     publishedAt: '2026-09-11T09:10:00.000Z',
     hero: {
       key: 'spo-a3-hero',
@@ -6517,7 +6517,7 @@ export const CORPUS_DATA = [
     title: "À seize ans, la sprinteuse Awa Diakité pulvérise les records du club d'athlétisme de Saint-Prieux",
     standfirst:
       'Révélée cet été sur les pistes régionales, la jeune athlète du plateau intéresse déjà les pôles espoirs, mais son club et sa famille veulent avancer sans brûler les étapes ni sacrifier la scolarité.',
-    authors: ['sofia-laurenti'],
+    byline: 'Sofia Laurenti',
     publishedAt: '2026-09-12T07:05:00.000Z',
     hero: {
       key: 'spo-a4-hero',
@@ -6657,7 +6657,7 @@ export const CORPUS_DATA = [
     title: 'Pour survivre, le Racing de Fontenay-les-Prés et le club voisin scellent une fusion historique',
     standfirst:
       "Faute d'effectifs suffisants dans les catégories jeunes, les deux clubs de rugby du canton unissent leurs forces sous de nouvelles couleurs, un mariage de raison longtemps repoussé par les fiertés locales.",
-    authors: ['maxime-renaud'],
+    byline: 'Maxime Renaud',
     publishedAt: '2026-09-12T16:20:00.000Z',
     hero: {
       key: 'spo-a5-hero',
@@ -6785,7 +6785,7 @@ export const CORPUS_DATA = [
     title: 'Après deux ans de travaux, la piscine de Clairefont rouvre ses bassins aux nageurs et aux écoliers',
     standfirst:
       "Fermé pour une rénovation complète, l'équipement rouvre avec un bassin plus sobre en énergie, mais les clubs s'inquiètent déjà du partage des créneaux entre scolaires, associations et public.",
-    authors: ['sofia-laurenti'],
+    byline: 'Sofia Laurenti',
     publishedAt: '2026-09-13T06:30:00.000Z',
     hero: {
       key: 'spo-a6-hero',
@@ -6914,7 +6914,7 @@ export const CORPUS_DATA = [
     title: "Coup de tonnerre sur le marché régional : un buteur confirmé signe à l'Union de Bourg-la-Rivière",
     standfirst:
       "À la surprise générale, l'attaquant vedette du championnat de la saison passée rejoint le promu plutôt qu'un club mieux classé, un renfort de poids qui nourrit les ambitions de montée du club.",
-    authors: ['maxime-renaud'],
+    byline: 'Maxime Renaud',
     publishedAt: '2026-09-11T06:10:00.000Z',
     emphasis: true,
     blocks: [
@@ -6958,7 +6958,7 @@ export const CORPUS_DATA = [
     title: 'Terrain trop froid : le derby de handball entre Val-Mareuil et Saint-Prieux est reporté',
     standfirst:
       'En cause, une panne du système de chauffage de la salle omnisports, jugée trop froide pour accueillir la rencontre, qui sera reprogrammée dans les prochaines semaines par la ligue régionale.',
-    authors: ['sofia-laurenti'],
+    byline: 'Sofia Laurenti',
     publishedAt: '2026-09-12T14:05:00.000Z',
     blocks: [
       {
@@ -7001,7 +7001,7 @@ export const CORPUS_DATA = [
     title: 'Un nouveau terrain synthétique inauguré pour les jeunes footballeurs de Villeneuve-sur-Arche',
     standfirst:
       "Financé par la commune et l'intercommunalité, l'équipement doit permettre aux clubs de jouer même par mauvais temps et de dégager des créneaux supplémentaires pour les écoles de football du secteur.",
-    authors: ['maxime-renaud', 'sofia-laurenti'],
+    byline: 'Maxime Renaud et Sofia Laurenti',
     publishedAt: '2026-09-13T07:15:00.000Z',
     blocks: [
       {

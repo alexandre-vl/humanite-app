@@ -1,14 +1,12 @@
 import type { ArticleId, ArticleSummary, DisplayText } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
-import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import type { BandRows } from '#primitives/list';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
-import { authorsQuery } from '../api/queries';
-import { bylineOf } from '../model/byline';
+import { signatureOf } from '../model/byline';
 import type { ReadFeed } from '../model/paged-feed';
 import type { FeedRhythm, FeedRow } from '../model/rhythm';
 import { feedRows, rowName, rowShape } from '../model/rhythm';
@@ -57,10 +55,10 @@ const useStyles = createStyles((theme) => ({
  * mounts the feed is the one that knows what opening an article means for it. What it does not take from the screen
  * is the shape of a card: that is the feed's own, decided once for every item at a time when their order is known.
  *
- * The newsroom's roster is asked for here rather than by a column's card. A cell is mounted and thrown away as the
- * reader scrolls, and a list that asked once per cell would ask again at every turn of the page; the roster is the
- * paper's own list and never goes stale, so one ask serves every column on screen — and serves the article screen
- * too, which needs the same names the moment a card is pressed.
+ * A column announces its writer and nothing else does, which is why the signature is read here and not by the card:
+ * a card is handed what it draws. It used to be read here for another reason as well — the names came from a roster
+ * the app had to fetch, and a list that asked once per cell would have asked again at every turn of the page. An item
+ * carries its signature itself now, so nothing is fetched and nothing can arrive late.
  */
 export function ArticleFeed({
   feed,
@@ -74,7 +72,6 @@ export function ArticleFeed({
   empty,
 }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
-  const roster = useQuery(authorsQuery).data ?? [];
   const render = (row: FeedRow): ReactNode => (
     <Box style={styles.card}>
       {/* No label: a card's own words are its name, and they are better than any summary of them — the section, the
@@ -89,7 +86,7 @@ export function ArticleFeed({
           shape={row.shape}
           summary={row.summary}
           action={action?.(row.summary)}
-          signature={row.shape === 'column' ? bylineOf(row.summary.authors, roster) : null}
+          signature={row.shape === 'column' ? signatureOf(row.summary) : null}
           name={name?.(row.summary) ?? null}
         />
       </Pressable>

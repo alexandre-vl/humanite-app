@@ -26,13 +26,6 @@ const SEARCH = 'search';
 const KEPT = 'kept';
 
 /**
- * The newsroom's own namespace. The roster is read from here rather than from an author entity of its own: an article
- * names its authors by id, only a reading screen ever needs the names behind them, and a slice with a single reader is
- * one the structure check refuses. It stays a key apart, so the roster is fetched once however many articles are read.
- */
-const AUTHORS = 'authors';
-
-/**
  * No cursor at all: the content serves the first page to a query that asks for none. It is an empty string rather than
  * `null` because the cursor type is read off this value — `null` would fix it to `null` and the cursors the content
  * mints would no longer fit.
@@ -54,7 +47,6 @@ const KEYS = {
   one: (id: ArticleId): readonly string[] => [ARTICLES, 'one', id],
   summaries: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, 'summaries', ...ids],
   kept: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, KEPT, ...ids],
-  authors: (): readonly string[] => [AUTHORS],
 } as const;
 
 /**
@@ -147,13 +139,3 @@ export const summariesQuery = (ids: readonly ArticleId[]): Single<readonly Artic
  */
 export const keptQuery = (ids: readonly ArticleId[]): Single<readonly ArticleSummary[]> =>
   single(KEYS.kept(ids), async () => content.getSummaries(ids), ids.length > 0);
-
-/**
- * The newsroom, which a byline reads to turn the ids an article carries into names. Like the sections it is the
- * paper's own list, not the reader's: nothing a reader does makes it stale.
- */
-export const authorsQuery = queryOptions({
-  queryKey: KEYS.authors(),
-  queryFn: async () => content.getAuthors(),
-  staleTime: Infinity,
-});

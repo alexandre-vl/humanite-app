@@ -1,8 +1,5 @@
 import { z } from 'zod';
 
-/** A kebab-case slug: lowercase words joined by single hyphens. */
-const SLUG = /^[a-z]+(?:-[a-z]+)*$/u;
-
 /** How an item is named: a three-letter section code, then a slot. Shared so an image key is built on it, not beside it. */
 const ITEM = String.raw`[a-z]{3}-(?:a[1-6]|b[1-3])`;
 
@@ -41,10 +38,9 @@ export const ISSUE_ID = z
   .brand('IssueId');
 export type IssueId = z.infer<typeof ISSUE_ID>;
 
-/** A section id, its slug: `culture-et-savoir`. */
-export const SECTION_ID = z.string().regex(SLUG).brand('SectionId');
+/** A section id, its slug — `culture-et-savoir`: lowercase words joined by single hyphens. */
+export const SECTION_ID = z
+  .string()
+  .regex(/^[a-z]+(?:-[a-z]+)*$/u)
+  .brand('SectionId');
 export type SectionId = z.infer<typeof SECTION_ID>;
-
-/** An author id, a kebab-case name: `lucie-varenne`. */
-export const AUTHOR_ID = z.string().regex(SLUG).brand('AuthorId');
-export type AuthorId = z.infer<typeof AUTHOR_ID>;

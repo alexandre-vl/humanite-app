@@ -185,16 +185,15 @@ describe('ArticleReader', () => {
     if (hero === undefined) {
       throw new Error('photo introuvable');
     }
-    const roster = await content.getAuthors();
-    const signer = roster.find((author) => author.id === article.authors[0]);
-    if (signer === undefined) {
-      throw new Error('l’article n’est signé de personne que la rédaction connaisse');
+    const signature = article.byline;
+    if (signature === undefined) {
+      throw new Error('l’article n’est signé de personne');
     }
     await read(article);
     await screen.findByText(article.title);
     const order = inOrder(screen.toJSON());
-    expect(order.indexOf(`Par ${signer.name}`)).toBeGreaterThan(order.indexOf(article.standfirst));
-    expect(order.indexOf(`Par ${signer.name}`)).toBeLessThan(order.indexOf(hero.caption));
+    expect(order.indexOf(`Par ${signature}`)).toBeGreaterThan(order.indexOf(article.standfirst));
+    expect(order.indexOf(`Par ${signature}`)).toBeLessThan(order.indexOf(hero.caption));
   });
 
   /**
@@ -220,17 +219,14 @@ describe('ArticleReader', () => {
     expect(await screen.findByText(formatLongDate(article.publishedAt))).toBeTruthy();
   });
 
-  it('signe l’article des noms de la rédaction, et non des identifiants', async () => {
+  it('signe l’article du nom que le journal écrit, précédé du mot qui l’annonce', async () => {
     const article = await holding('paragraph');
-    const roster = await content.getAuthors();
-    const [signed] = article.authors;
-    const signer = roster.find((author) => author.id === signed);
-    if (signer === undefined) {
-      throw new Error('l’article n’est signé de personne que la rédaction connaisse');
+    const signature = article.byline;
+    if (signature === undefined) {
+      throw new Error('l’article n’est signé de personne');
     }
     await read(article);
-    expect(await screen.findByText(`Par ${signer.name}`, { exact: false })).toBeTruthy();
-    expect(screen.queryByText(signer.id)).toBeNull();
+    expect(await screen.findByText(`Par ${signature}`, { exact: false })).toBeTruthy();
   });
 
   /**

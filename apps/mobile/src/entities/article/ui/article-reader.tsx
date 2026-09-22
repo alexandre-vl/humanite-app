@@ -1,4 +1,4 @@
-import type { Article, ArticleId, ArticleSummary, Author, DisplayText, SectionId } from '@huma/contracts';
+import type { Article, ArticleId, ArticleSummary, DisplayText, SectionId } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -6,8 +6,8 @@ import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Scroll } from '#primitives/scroll';
 import { ThemeScope } from '#primitives/theme';
-import { articleQuery, authorsQuery, summariesQuery } from '../api/queries';
-import { bylineOf } from '../model/byline';
+import { articleQuery, summariesQuery } from '../api/queries';
+import { signatureOf } from '../model/byline';
 import { stateOf } from '../model/paged-feed';
 import type { LinkTarget } from '../model/spans';
 import { relatedIds } from '../model/spans';
@@ -30,7 +30,6 @@ type ReadingProps = Readonly<{
   article: Article;
   name: DisplayText | null;
   related: readonly ArticleSummary[];
-  roster: readonly Author[];
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;
@@ -55,12 +54,12 @@ const useStyles = createStyles((theme) => ({
  * The dark theme had already said as much by accident: there its ground and its sheet take the same value, the sheet
  * stops showing, and the page runs edge to edge — which is what every article does now.
  */
-function Reading({ article, name, related, roster, onFollow, onSupport }: ReadingProps): ReactNode {
+function Reading({ article, name, related, onFollow, onSupport }: ReadingProps): ReactNode {
   const styles = useStyles();
   return (
     <Scroll axis="vertical" style={styles.page} contentStyle={styles.column}>
       <ArticleTitle title={article.title} name={name} />
-      <ArticleLead article={article} byline={bylineOf(article.authors, roster)} />
+      <ArticleLead article={article} byline={signatureOf(article)} />
       <ArticleBody article={article} related={related} onFollow={onFollow} onSupport={onSupport} />
     </Scroll>
   );
@@ -68,8 +67,7 @@ function Reading({ article, name, related, roster, onFollow, onSupport }: Readin
 
 /**
  * One article, read whole. The body arrives first and names the articles it points at; their summaries are asked for
- * in one call rather than one at a time, and the roster of the newsroom — the paper's own list, which nothing a reader
- * does makes stale — turns the ids an article is signed with into names.
+ * in one call rather than one at a time.
  *
  * A video article is laid on the dark theme whatever the reader's phone is set to. That ground belongs to what is
  * being read, not to a setting: the current app prints its videos on it and everything else on the light sheet, and a
@@ -78,7 +76,6 @@ function Reading({ article, name, related, roster, onFollow, onSupport }: Readin
 export function ArticleReader({ id, names, onFollow, onSupport }: ArticleReaderProps): ReactNode {
   const { data: article, status, refetch } = useQuery(articleQuery(id));
   const related = useQuery(summariesQuery(article === undefined ? [] : relatedIds(article.blocks))).data ?? [];
-  const roster = useQuery(authorsQuery).data ?? [];
   if (article === undefined) {
     return (
       <FeedStandIn
@@ -95,7 +92,6 @@ export function ArticleReader({ id, names, onFollow, onSupport }: ArticleReaderP
       article={article}
       name={names(article.section)}
       related={related}
-      roster={roster}
       onFollow={onFollow}
       onSupport={onSupport}
     />

@@ -49,8 +49,11 @@ test('a title or a standfirst outside what this corpus measures is refused', () 
 });
 
 test('an item of this corpus carries a byline', () => {
-  expect(errorsAbout(ARTICLE.parse({ ...illustrated(), authors: [] }), 'auteur(s)')).toEqual([
-    expect.stringContaining('0 auteur(s)'),
+  const signed = illustrated();
+  const unsigned = Object.fromEntries(Object.entries(signed).filter(([field]) => field !== 'byline'));
+  expect(errorsAbout(ARTICLE.parse(unsigned), 'auteur(s)')).toEqual([expect.stringContaining('0 auteur(s)')]);
+  expect(errorsAbout(ARTICLE.parse({ ...signed, byline: 'Quelqu’un d’autre' }), 'auteur')).toEqual([
+    expect.stringContaining('auteur inconnu'),
   ]);
 });
 

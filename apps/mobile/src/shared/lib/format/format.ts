@@ -136,15 +136,19 @@ export const formatLongDate = (instant: string): DisplayText => {
 };
 
 /**
- * The signature under an article: `Par Lisa Guillemin`, and `Par Lisa Guillemin et Yves Kerlan` for two. The contract
- * allows no more than two names, so a list needs no comma — and the joining word is written here, with the weekdays
- * above, for the same reason: a formatter may not reach the dictionary, and the words it prints are its own.
+ * The signature under an article: `Par Lisa Guillemin`.
+ *
+ * It took a list of names and joined them, back when an item carried identifiers into a roster and the app turned
+ * them into names itself. The journal writes the signature out — one name, two joined by a word of its own choosing,
+ * or the newsroom as a whole — so what is left to decide is the word in front of it. That word is written here, with
+ * the weekdays and the months above, for the same reason: a formatter may not reach the dictionary, and the words it
+ * prints are its own.
  */
-export const formatByline = (names: readonly string[]): DisplayText => {
-  if (names.length === 0) {
+export const formatByline = (byline: DisplayText): DisplayText => {
+  if (byline.trim() === '') {
     throw new RangeError('un article est signé');
   }
-  return asDisplayText(`Par ${names.join(' et ')}`);
+  return asDisplayText(`Par ${byline}`);
 };
 
 /** A running time, as a player prints it: `4:18`, and `1:04:18` once past the hour. */

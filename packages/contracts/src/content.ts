@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { DISPLAY_TEXT } from './display-text.ts';
-import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 
 /** Where a link points: another item of the corpus, or an external page. */
 const LINK_TARGET = z.discriminatedUnion('kind', [
@@ -41,12 +41,3 @@ export const SECTION = z.object({
   order: z.number().int().positive(),
 });
 export type Section = z.infer<typeof SECTION>;
-
-/** A member of the newsroom. */
-export const AUTHOR = z.object({
-  id: AUTHOR_ID,
-  name: DISPLAY_TEXT,
-  section: SECTION_ID,
-  isColumnist: z.boolean(),
-});
-export type Author = z.infer<typeof AUTHOR>;

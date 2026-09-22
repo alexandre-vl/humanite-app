@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
-import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './index.ts';
-import type { ArticleId, AuthorId, ImageKey, SectionId } from './index.ts';
+import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './index.ts';
+import type { ArticleId, ImageKey, SectionId } from './index.ts';
 
 describe('ARTICLE_ID', () => {
   test('accepts a well-formed id and brands it', () => {
@@ -37,15 +37,5 @@ describe('SECTION_ID', () => {
   test('rejects an empty or capitalised slug', () => {
     expect(SECTION_ID.safeParse('').success).toBe(false);
     expect(SECTION_ID.safeParse('Politique').success).toBe(false);
-  });
-});
-
-describe('AUTHOR_ID', () => {
-  test('accepts a kebab-case name', () => {
-    expectTypeOf(AUTHOR_ID.parse('lucie-varenne')).toEqualTypeOf<AuthorId>();
-  });
-
-  test('rejects spaces', () => {
-    expect(AUTHOR_ID.safeParse('lucie varenne').success).toBe(false);
   });
 });

@@ -7,7 +7,7 @@ import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import type { BlockContent, DefinitionContent, PhrasingContent, RootContent } from 'mdast';
 import { directive } from 'micromark-extension-directive';
 import { frontmatter } from 'micromark-extension-frontmatter';
-import { SECTIONS } from './registries.ts';
+import { bylineOf, SECTIONS } from './registries.ts';
 import { toInstant } from './time.ts';
 import { validateCorpus } from './validate.ts';
 
@@ -170,6 +170,7 @@ export const parseItem = (text: string): Article => {
   const front = parseFrontmatter(head?.type === 'yaml' ? head.value : '');
   const id = front['id'] ?? '';
   const hero = front['hero'];
+  const byline = bylineOf(splitList(front['authors']));
   const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
   return ARTICLE.parse({
     id,
@@ -178,8 +179,8 @@ export const parseItem = (text: string): Article => {
     access: front['access'],
     title: front['title'],
     standfirst: front['standfirst'],
-    authors: splitList(front['authors']),
     publishedAt: front['published'] === undefined ? undefined : toInstant(front['published']),
+    ...(byline === undefined ? {} : { byline }),
     ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
     ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
     blocks: body.map(toBlock),

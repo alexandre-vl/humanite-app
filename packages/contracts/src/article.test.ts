@@ -10,7 +10,7 @@ const validSummary = {
   title: 'Un titre de longueur raisonnable pour un article de la maquette',
   standfirst:
     'Un chapô assez long pour tenir dans la fourchette imposée par le schéma, décrivant en une phrase claire ce que raconte cet article fictif de démonstration destiné à la maquette.',
-  authors: ['lucie-varenne'],
+  byline: 'Lucie Varenne',
   publishedAt: '2026-09-10T08:30:00.000Z',
   hero: { key: 'pol-a1-hero', caption: 'Une légende', credit: 'Photo : Camille Ancel / CC BY 4.0' },
 };
@@ -21,14 +21,14 @@ test('ARTICLE_SUMMARY parses a valid summary', () => {
 });
 
 /**
- * The field set itself, pinned. Two fields left this schema because nothing could fill them — `kind`, which the
- * service draws no line for, and `tags`, which it never sends — and the way to keep a third from arriving the same
- * way is to make adding one an edit here as well as there.
+ * The field set itself, pinned. Three fields left this schema because nothing could fill them: `kind`, a line the
+ * service does not draw; `tags`, which it never sends; and `authors`, a list of identifiers into a roster it keeps
+ * none of. The way to keep a fourth from arriving unnoticed is to make adding one an edit here as well as there.
  */
 test('a summary carries these fields and no others', () => {
   expect([...Object.keys(ARTICLE_SUMMARY.shape)].sort((left, right) => left.localeCompare(right))).toEqual([
     'access',
-    'authors',
+    'byline',
     'emphasis',
     'format',
     'hero',
@@ -40,11 +40,13 @@ test('a summary carries these fields and no others', () => {
   ]);
 });
 
-test('ARTICLE_SUMMARY takes the lengths the journal actually files, which no bound would have let through', () => {
+test('ARTICLE_SUMMARY takes what the journal actually files, which no bound would have let through', () => {
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'Climat' }).success).toBe(true);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'T'.repeat(226) }).success).toBe(true);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, standfirst: '' }).success).toBe(true);
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, authors: [] }).success).toBe(true);
+  // A whole route of the service signs nothing: fifty-five items of one capture came with no name at all.
+  const unsigned = Object.fromEntries(Object.entries(validSummary).filter(([field]) => field !== 'byline'));
+  expect(ARTICLE_SUMMARY.safeParse(unsigned).success).toBe(true);
 });
 
 test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, and nothing between', () => {

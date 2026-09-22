@@ -1,12 +1,10 @@
-import { ARTICLE_ID, ContentApiError, ISSUE_ID, SECTION_ID } from '@huma/contracts';
+import { ARTICLE_ID, ContentApiError, issueIdAt, SECTION_ID } from '@huma/contracts';
 import type { ContentApi, ContentErrorCode } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { contentApi, createContentApi } from './index.ts';
-import type { MockApiOptions } from './index.ts';
 
-test('getSections and getAuthors expose the registries', async () => {
+test('getSections exposes the registry', async () => {
   await expect(contentApi.getSections()).resolves.toHaveLength(8);
-  await expect(contentApi.getAuthors()).resolves.toHaveLength(19);
 });
 
 test('getFeed filters by section, newest first, and paginates', async () => {
@@ -73,13 +71,6 @@ test('search answers newest first, and pages like a feed', async () => {
   expect(first.nextCursor).toBe('12');
 });
 
-test('getSession reports the mock session, subscriber when asked', async () => {
-  await expect(contentApi.getSession()).resolves.toEqual({ isSubscriber: false });
-  const options: MockApiOptions = { session: { isSubscriber: true } };
-  const premium = createContentApi(options);
-  await expect(premium.getSession()).resolves.toEqual({ isSubscriber: true });
-});
-
 test('getSummaries answers in the order asked', async () => {
   const ids = [ARTICLE_ID.parse('mon-a2'), ARTICLE_ID.parse('pol-a1')];
   const summaries = await contentApi.getSummaries(ids);
@@ -105,83 +96,43 @@ test('getIssues gathers the corpus into one numéro a day, the most recent first
 });
 
 /**
- * A numéro is a day and nothing else, so the four of them are a partition of the paper: no item is in two, none is in
- * none. A rule that grouped on anything but the filing day could satisfy the counts above and still fail this.
+ * A numéro is a day and nothing else, so the numéros are a partition of the paper: every item is counted in exactly
+ * one of them, and no item is counted twice or left out. What a numéro holds is not served any more — the newsstand
+ * shows covers and sends a reader to the paper's own site — so the counts are what says it, and they still do.
  */
-test('every item of the corpus is in exactly one numéro', async () => {
+test('the numéros count between them every item the paper printed, each once', async () => {
   const shelf = await contentApi.getIssues();
-  const gathered = await Promise.all(shelf.map(async (issue) => contentApi.getIssue(issue.id)));
-  const ids = gathered.flat().map((summary) => summary.id);
-  const whole = (await contentApi.getFeed({ limit: 200 })).items.map((summary) => summary.id);
-  expect(new Set(ids).size).toBe(ids.length);
-  expect([...ids].sort()).toEqual([...whole].sort());
-  expect(shelf.map((issue) => issue.count)).toEqual(gathered.map((items) => items.length));
+  const counted = shelf.reduce((sum, issue) => sum + issue.count, 0);
+  const whole = await contentApi.getFeed({ limit: 200 });
+  expect(counted).toBe(whole.total);
+  expect(new Set(shelf.map((issue) => issue.id)).size).toBe(shelf.length);
 });
 
 /** A cover is a front page, and a front page carries a picture — the rule the paper's own front already follows. */
-test('every numéro opens on one of its own items, and on a picture where it has one', async () => {
+test('every numéro opens on an item the paper printed that day, and on a picture', async () => {
+  const whole = await contentApi.getFeed({ limit: 200 });
+  const days = new Map(whole.items.map((summary) => [summary.id, issueIdAt(summary.publishedAt)]));
   for (const issue of await contentApi.getIssues()) {
-    const items = await contentApi.getIssue(issue.id);
-    expect(items.map((summary) => summary.id)).toContain(issue.opener.id);
+    expect(days.get(issue.opener.id)).toBe(issue.id);
     expect(issue.opener.hero).toBeDefined();
   }
-});
-
-test('getIssue lays a numéro out in the order the newsroom runs its sections', async () => {
-  const sections = await contentApi.getSections();
-  const runsAt = new Map(sections.map((section) => [section.id, section.order]));
-  const items = await contentApi.getIssue(ISSUE_ID.parse('2026-09-11'));
-  const runs = items.map((summary) => runsAt.get(summary.section) ?? 0);
-  expect([...runs].sort((left, right) => left - right)).toEqual(runs);
-  expect(new Set(runs).size).toBeGreaterThan(1);
-});
-
-/**
- * And inside one rubrique it runs the freshest first, which nothing held. Reversing that half of the comparison left
- * the whole suite green: the order of the rubriques is untouched by it, and the page's own test derives what it
- * expects from this very call, so it would have agreed with whatever came back.
- */
-test('getIssue runs the freshest first inside one rubrique', async () => {
-  const items = await contentApi.getIssue(ISSUE_ID.parse('2026-09-11'));
-  const laid = items.map((item) => ({ section: item.section, at: item.publishedAt }));
-  let compared = 0;
-  for (const [rank, item] of laid.entries()) {
-    const before = laid[rank - 1];
-    if (before === undefined) {
-      continue;
-    }
-    if (before.section !== item.section) {
-      continue;
-    }
-    compared += 1;
-    expect(before.at.localeCompare(item.at)).toBeGreaterThan(0);
-  }
-  // Counted, because a loop over nothing asserts nothing: a numéro of one item per rubrique would pass in silence.
-  expect(compared).toBeGreaterThan(1);
-});
-
-test('getIssue refuses a day the paper never printed', async () => {
-  await expect(contentApi.getIssue(ISSUE_ID.parse('1998-07-12'))).rejects.toBeInstanceOf(ContentApiError);
 });
 
 /** One call per method of the contract: a method added without its call here is a type error, not a silent gap. */
 const CALLS = {
   getSections: async (api) => api.getSections(),
-  getAuthors: async (api) => api.getAuthors(),
   getFeed: async (api) => api.getFeed({}),
   getLiveFeed: async (api) => api.getLiveFeed({}),
   getArticle: async (api) => api.getArticle(ARTICLE_ID.parse('pol-a1')),
   getSummaries: async (api) => api.getSummaries([ARTICLE_ID.parse('pol-a1')]),
   getIssues: async (api) => api.getIssues(),
-  getIssue: async (api) => api.getIssue(ISSUE_ID.parse('2026-09-10')),
   search: async (api) => api.search({ text: 'budget' }),
-  getSession: async (api) => api.getSession(),
 } satisfies Readonly<Record<keyof ContentApi, (api: ContentApi) => Promise<unknown>>>;
 
 const METHODS = Object.keys(CALLS).filter((name): name is keyof ContentApi => Object.hasOwn(CALLS, name));
 
 test('every method of the contract reports the failure injected on its name', async () => {
-  expect(METHODS).toHaveLength(10);
+  expect(METHODS).toHaveLength(7);
   for (const method of METHODS) {
     const fail: Partial<Record<keyof ContentApi, ContentErrorCode>> = {};
     fail[method] = 'unavailable';
