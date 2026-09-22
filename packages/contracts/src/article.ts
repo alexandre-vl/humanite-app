@@ -8,18 +8,29 @@ import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 export const HERO = z.object({ key: IMAGE_KEY, caption: DISPLAY_TEXT, credit: DISPLAY_TEXT });
 export type Hero = z.infer<typeof HERO>;
 
-/** An item as a feed shows it: everything but the body. */
+/**
+ * An item as a feed shows it: everything but the body.
+ *
+ * Four fields carried a length or a count until this schema had to describe the journal's own service as well as the
+ * corpus. Measured on 375 items the service answered: a title of fifty to a hundred and forty signs misses sixteen
+ * per cent of them, in both directions, and the shortest is « Climat » at six; a standfirst of a hundred and fifty to
+ * three hundred misses forty-eight per cent, and some are empty; the service names exactly one author, never two, and
+ * it names no tag at all. A bound that half the real items break is not a rule, it is a way of losing articles.
+ *
+ * The bounds were not dropped, they moved to where they are true: `packages/mock-content/src/validate.ts` holds them
+ * against the corpus, which is written and so can be held to them.
+ */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
   kind: ARTICLE_KIND,
   section: SECTION_ID,
   format: ARTICLE_FORMAT,
   access: ACCESS,
-  title: DISPLAY_TEXT.min(50).max(140),
-  standfirst: DISPLAY_TEXT.min(150).max(300),
-  authors: z.array(AUTHOR_ID).min(1).max(2),
+  title: DISPLAY_TEXT,
+  standfirst: DISPLAY_TEXT,
+  authors: z.array(AUTHOR_ID),
   publishedAt: z.iso.datetime(),
-  tags: z.array(DISPLAY_TEXT).min(2).max(4),
+  tags: z.array(DISPLAY_TEXT),
   hero: HERO.optional(),
   emphasis: z.boolean().optional(),
 });

@@ -22,14 +22,19 @@ test('ARTICLE_SUMMARY parses a valid summary', () => {
   expectTypeOf(summary).toEqualTypeOf<ArticleSummary>();
 });
 
-test('ARTICLE_SUMMARY rejects a short title and an over-long standfirst', () => {
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'Court' }).success).toBe(false);
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, standfirst: 'B'.repeat(400) }).success).toBe(false);
+test('ARTICLE_SUMMARY takes the lengths the journal actually files, which no bound would have let through', () => {
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'Climat' }).success).toBe(true);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'T'.repeat(226) }).success).toBe(true);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, standfirst: '' }).success).toBe(true);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, authors: [] }).success).toBe(true);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, tags: [] }).success).toBe(true);
 });
 
-test('ARTICLE_SUMMARY rejects zero or three authors', () => {
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, authors: [] }).success).toBe(false);
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, authors: ['a-b', 'c-d', 'e-f'] }).success).toBe(false);
+test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, and nothing between', () => {
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: '3861029' }).success).toBe(true);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: 'pol-z9' }).success).toBe(false);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: '3861029-x' }).success).toBe(false);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: 'pol-a1-hero' }).success).toBe(false);
 });
 
 test('ARTICLE extends the summary with a non-empty body', () => {

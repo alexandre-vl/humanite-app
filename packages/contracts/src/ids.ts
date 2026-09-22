@@ -6,10 +6,19 @@ const SLUG = /^[a-z]+(?:-[a-z]+)*$/u;
 /** How an item is named: a three-letter section code, then a slot. Shared so an image key is built on it, not beside it. */
 const ITEM = String.raw`[a-z]{3}-(?:a[1-6]|b[1-3])`;
 
-/** An article or brief id: a three-letter section code, then a slot — `pol-a1`, `mon-b3`. */
+/** How the journal's own service names an item: the number its newsroom system gave it — `3861029`. */
+const FILED = String.raw`\d+`;
+
+/**
+ * An article or brief id, in either of the two grammars the app reads: a slot of the corpus — `pol-a1`, `mon-b3` — or
+ * the number the journal filed the item under.
+ *
+ * The two are written out rather than loosened into one pattern that would accept both and much else besides. They
+ * are disjoint, so an id says which source it came from, and a typo in either still stops at the parse.
+ */
 export const ARTICLE_ID = z
   .string()
-  .regex(new RegExp(`^${ITEM}$`, 'u'))
+  .regex(new RegExp(`^(?:${ITEM}|${FILED})$`, 'u'))
   .brand('ArticleId');
 export type ArticleId = z.infer<typeof ARTICLE_ID>;
 

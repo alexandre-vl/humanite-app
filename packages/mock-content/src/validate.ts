@@ -42,6 +42,25 @@ const WORDS = {
   brief: { min: 50, max: 180 },
 } as const satisfies Readonly<Record<ArticleFormat | 'brief', Words>>;
 
+/**
+ * What a title, a standfirst, a byline and a tag list of this corpus measure.
+ *
+ * These were written into `ARTICLE_SUMMARY` and held every item the app could ever show, because every item was
+ * written here. They came down the day the schema had also to describe the journal's own service, where a title of
+ * fifty signs misses one item in six and a standfirst of a hundred and fifty misses one in two. A corpus is written,
+ * so it can still be held to them — and it should be, or the shapes the screens were drawn against drift.
+ */
+const SIGNS = {
+  title: { min: 50, max: 140 },
+  standfirst: { min: 150, max: 300 },
+} as const satisfies Readonly<Record<string, Words>>;
+
+/** How many names and how many tags an item of this corpus carries. */
+const COUNTS = {
+  authors: { min: 1, max: 2 },
+  tags: { min: 2, max: 4 },
+} as const satisfies Readonly<Record<string, Words>>;
+
 /** The newsroom hours the corpus covers, written on its own clock and compared as instants. */
 const WINDOW = { start: toInstant('2026-09-10 07:00'), end: toInstant('2026-09-13 09:55') } as const;
 
@@ -131,6 +150,26 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   }
   if (article.title === article.title.toUpperCase()) {
     errors.push(`${where} : titre tout en capitales`);
+  }
+  for (const [field, text, bounds] of [
+    ['titre', article.title, SIGNS.title],
+    ['chapô', article.standfirst, SIGNS.standfirst],
+  ] as const) {
+    if (text.length < bounds.min || text.length > bounds.max) {
+      errors.push(
+        `${where} : ${field} de ${String(text.length)} signes (attendu ${String(bounds.min)} à ${String(bounds.max)})`,
+      );
+    }
+  }
+  for (const [field, list, bounds] of [
+    ['auteur', article.authors, COUNTS.authors],
+    ['mot-clé', article.tags, COUNTS.tags],
+  ] as const) {
+    if (list.length < bounds.min || list.length > bounds.max) {
+      errors.push(
+        `${where} : ${String(list.length)} ${field}(s) (attendu ${String(bounds.min)} à ${String(bounds.max)})`,
+      );
+    }
   }
   if (authors.length !== known.length) {
     errors.push(`${where} : auteur inconnu`);

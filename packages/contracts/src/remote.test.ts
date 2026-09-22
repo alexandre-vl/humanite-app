@@ -9,12 +9,12 @@ import type { RemoteArticle, RemoteFeed, RemoteSections } from './remote.ts';
  */
 
 const FEEDS = [
-  { label: 'la une', body: RECORDED.front },
-  { label: 'le fil', body: RECORDED.wire },
-  { label: 'une rubrique', body: RECORDED.sectionFeed },
+  { label: 'the front', body: RECORDED.front },
+  { label: 'the wire', body: RECORDED.wire },
+  { label: 'a section', body: RECORDED.sectionFeed },
 ] as const;
 
-test.each(FEEDS)('REMOTE_FEED lit ce que le service a répondu pour $label', ({ body }) => {
+test.each(FEEDS)('REMOTE_FEED reads what the service answered for $label', ({ body }) => {
   const feed: RemoteFeed = REMOTE_FEED.parse(body);
   expectTypeOf(feed).toEqualTypeOf<RemoteFeed>();
   expect(feed.posts.length).toBeGreaterThan(0);
@@ -24,7 +24,7 @@ test.each(FEEDS)('REMOTE_FEED lit ce que le service a répondu pour $label', ({ 
   }
 });
 
-test('REMOTE_FEED rend un identifiant en chaîne, que le service l’écrive en nombre ou non', () => {
+test('REMOTE_FEED reads an id as a string, whether the service wrote a number or not', () => {
   const [first] = RECORDED.sectionFeed.posts;
   const asNumber = REMOTE_FEED.parse({ posts: [{ ...first, id: 3_861_029 }] });
   const asString = REMOTE_FEED.parse({ posts: [{ ...first, id: '3861029' }] });
@@ -32,13 +32,13 @@ test('REMOTE_FEED rend un identifiant en chaîne, que le service l’écrive en 
   expect(asString.posts[0]?.id).toBe('3861029');
 });
 
-test('REMOTE_SEARCH lit une recherche et son drapeau', () => {
+test('REMOTE_SEARCH reads a search and the flag it comes behind', () => {
   const found = REMOTE_SEARCH.parse(RECORDED.search);
   expect(found.success).toBe(true);
   expect(found.posts.length).toBeGreaterThan(0);
 });
 
-test('REMOTE_SECTIONS renomme la clé du service et rend les onze rubriques du journal', () => {
+test('REMOTE_SECTIONS renames the service key and answers the journal eleven sections', () => {
   const sections: RemoteSections = REMOTE_SECTIONS.parse(RECORDED.sections);
   expectTypeOf(sections).toEqualTypeOf<RemoteSections>();
   expect(sections.sections).toHaveLength(11);
@@ -46,26 +46,26 @@ test('REMOTE_SECTIONS renomme la clé du service et rend les onze rubriques du j
 });
 
 test.each([
-  { label: 'une tribune', body: RECORDED.opinionArticle },
-  { label: 'une vidéo', body: RECORDED.videoArticle },
-])('REMOTE_ARTICLE lit le corps $label', ({ body }) => {
+  { label: 'an opinion piece', body: RECORDED.opinionArticle },
+  { label: 'a video', body: RECORDED.videoArticle },
+])('REMOTE_ARTICLE reads the body of $label', ({ body }) => {
   const article: RemoteArticle = REMOTE_ARTICLE.parse(body);
   expectTypeOf(article).toEqualTypeOf<RemoteArticle>();
   expect(article.content_array).toHaveLength(1);
   expect(article.content_array[0] ?? '').toContain('form_don');
 });
 
-test('REMOTE_ARTICLE refuse une réponse sans corps, qu’un fil rendrait pourtant', () => {
+test('REMOTE_ARTICLE refuses an answer with no body, which a feed item nonetheless is', () => {
   expect(REMOTE_ARTICLE.safeParse(RECORDED.sectionFeed.posts[0]).success).toBe(false);
 });
 
-test('REMOTE_POST refuse un item dont le service aurait retiré un champ obligatoire', () => {
+test('REMOTE_POST refuses an item the service would have dropped a required field from', () => {
   const [first] = RECORDED.sectionFeed.posts;
   const without = Object.fromEntries(Object.entries(first).filter(([field]) => field !== 'premium'));
   expect(REMOTE_FEED.safeParse({ posts: [without] }).success).toBe(false);
 });
 
-test('un format hors des quatre que le service nomme fait échouer la lecture', () => {
+test('a format outside the four the service names stops the reading', () => {
   const [first] = RECORDED.sectionFeed.posts;
   expect(REMOTE_FEED.safeParse({ posts: [{ ...first, article_format: 'podcast' }] }).success).toBe(false);
 });
