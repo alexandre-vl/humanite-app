@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./artwork": "./src/artwork.ts",
     "./assets": "./src/assets.ts"
   },
   "scripts": {

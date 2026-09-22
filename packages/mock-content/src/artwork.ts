@@ -73,3 +73,61 @@ export const artworkSvg = (key: string, code: SectionCode): string => {
     '</svg>',
   ].join('');
 };
+
+/**
+ * What a reading of the generated visuals can find wrong. One code per thing that can stop being true of the drawing,
+ * so the rule is proven by a fixture that makes exactly its code appear rather than by a test nobody can point at.
+ */
+/**
+ * The name of one thing a reading of the drawing can find wrong. A union rather than a list, nothing ever walking
+ * the codes: a reading names exactly one, and a fixture names the set it expects.
+ */
+export type ArtworkCode = 'artwork/not-deterministic' | 'artwork/key-ignored' | 'artwork/section-ignored';
+
+/** One thing a reading found wrong, and what it drew to find it out. */
+export type ArtworkFinding = Readonly<{ code: ArtworkCode; says: string }>;
+
+/** A way of drawing a visual, which is what the reading below is handed rather than reaching for one. */
+export type Draw = (key: string, code: SectionCode) => string;
+
+/** Two keys of two items, and two sections, which is the least it takes to see whether either is read. */
+const ONE_KEY = 'pol-a1-hero';
+const OTHER_KEY = 'pol-a2-hero';
+const ONE_SECTION: SectionCode = 'pol';
+const OTHER_SECTION: SectionCode = 'env';
+
+/**
+ * Whether a drawing follows from its key and its section's colour, and from nothing else.
+ *
+ * The drawing is handed in rather than read from this module, and that is what makes the rule provable: a reading
+ * that reached for `artworkSvg` could only ever answer about `artworkSvg`, so nothing could show that it answers at
+ * all. Given the drawing, a fixture hands it one that ignores its key, or its section, or that moves between two
+ * calls, and reads the code that comes back — and the generator's own is what the package's test hands it.
+ *
+ * Determinism is what a rebuild rests on: the same name draws the same picture on any machine and in any order, so
+ * regenerating the corpus moves no pixel and adds no file to a commit.
+ */
+export const judgeArtwork = (draw: Draw): readonly ArtworkFinding[] => {
+  const drawn = draw(ONE_KEY, ONE_SECTION);
+  return [
+    ...(drawn === draw(ONE_KEY, ONE_SECTION)
+      ? []
+      : [
+          {
+            code: 'artwork/not-deterministic' as const,
+            says: `deux appels sur « ${ONE_KEY} » ne rendent pas le même dessin`,
+          },
+        ]),
+    ...(drawn === draw(OTHER_KEY, ONE_SECTION)
+      ? [{ code: 'artwork/key-ignored' as const, says: `« ${ONE_KEY} » et « ${OTHER_KEY} » rendent le même dessin` }]
+      : []),
+    ...(drawn === draw(ONE_KEY, OTHER_SECTION)
+      ? [
+          {
+            code: 'artwork/section-ignored' as const,
+            says: `« ${ONE_SECTION} » et « ${OTHER_SECTION} » rendent le même dessin`,
+          },
+        ]
+      : []),
+  ];
+};

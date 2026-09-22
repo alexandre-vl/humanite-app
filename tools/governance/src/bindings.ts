@@ -855,10 +855,7 @@ export const BINDINGS = {
         convention:
           'IMAGE_KEY impose la forme « identifiant d’item, puis sujet » ; validateCorpus refuse une clé qui nomme un autre item ou qui sert deux images, et le test des visuels exige un fichier par clé et par largeur, sans orphelin.',
       },
-      R3: {
-        convention:
-          'artworkSvg ne lit que la clé et la couleur de la rubrique : la graine du dessin est un hachage de la clé, si bien qu’une regénération redonne les mêmes octets, ce qu’un test tient.',
-      },
+      R3: ['artwork/generator', 'artwork/not-deterministic', 'artwork/key-ignored', 'artwork/section-ignored'],
     },
   },
   'ADR-0021': {
@@ -964,22 +961,10 @@ export const BINDINGS = {
         convention:
           'La primitive de texte porte un champ facultatif qui pose le rôle d’en-tête de la plateforme. Aucun outil ne sait ce qu’un titre ouvre — la même variante sert un grand titre et le titre d’une carte dans un fil — donc c’est l’écran qui le déclare ; le test de la primitive tient les deux cas, et les écrans qui en posent un sont relus.',
       },
-      R3: {
-        convention:
-          'Le seuil qu’applique le test de lisibilité est calculé par requiredRatio sur la taille que la table de typographie donne à la plus petite composition où chaque couleur est posée, au plus petit cran qu’un lecteur puisse choisir ; aucun nombre n’est écrit à côté d’une paire. Le test parcourt chaque thème, chaque couleur de texte et chaque fond déclaré.',
-      },
-      R4: {
-        convention:
-          'Chaque écart déclaré porte la mesure relevée, et le test refuse une paire tombée sous ce plancher : un écart ne peut pas empirer sans que la ligne qui le décrit devienne fausse.',
-      },
-      R5: {
-        convention:
-          'Le même test refuse une paire déclarée en écart qui atteint désormais le seuil : une justification écrite pour un défaut réparé est une phrase fausse dans les jetons, et elle fait échouer le test qui la lit.',
-      },
-      R6: {
-        convention:
-          'Les adjacences du seul contrôle que l’app dessine sont listées dans la table des formes : la piste contre la page dans chacun de ses deux états, le curseur contre chacune des deux pistes, et le curseur contre la page. Le test les tient toutes à trois pour un dans les deux thèmes, et le test de la primitive tient qu’elle prend bien ces rôles-là.',
-      },
+      R3: ['legibility/paper-in-order', 'legibility/under-bar', 'legibility/ground-unprinted'],
+      R4: ['legibility/departure-worse', 'legibility/departure-unprinted'],
+      R5: ['legibility/departure-obsolete'],
+      R6: ['legibility/shape-under-bar'],
     },
   },
 } as const satisfies Bindings<ProofId>;

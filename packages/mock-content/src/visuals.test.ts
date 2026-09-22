@@ -2,7 +2,7 @@ import { readdirSync } from 'node:fs';
 import { SECTION_COLORS } from '@huma/design-tokens';
 import { expect, test } from 'vitest';
 import { ASSETS, ASSET_WIDTHS } from './assets.ts';
-import { VISUAL_WIDTHS, artworkSvg } from './artwork.ts';
+import { VISUAL_WIDTHS, artworkSvg, judgeArtwork } from './artwork.ts';
 import { VISUALS } from './generated/visuals.ts';
 import { CORPUS } from './index.ts';
 import { IMAGES, imageName } from './render.ts';
@@ -45,4 +45,12 @@ test('the same key draws the same picture, and two keys draw two', () => {
   expect(artworkSvg('pol-a1-hero', 'pol')).toBe(artworkSvg('pol-a1-hero', 'pol'));
   expect(artworkSvg('pol-a1-hero', 'pol')).not.toBe(artworkSvg('pol-a3-hero', 'pol'));
   expect(artworkSvg('pol-a1-hero', 'pol')).not.toBe(artworkSvg('pol-a1-hero', 'mon'));
+});
+
+/**
+ * The generator follows from the key of the item it illustrates and from the colour of its section, and from nothing
+ * else — the same reading a fixture hands broken drawings to, run here on the real one.
+ */
+test('the generator draws from its key and its section, and from nothing else', () => {
+  expect(judgeArtwork(artworkSvg)).toEqual([]);
 });

@@ -7,9 +7,11 @@
   },
   "dependencies": {
     "@huma/architecture": "workspace:*",
+    "@huma/design-tokens": "workspace:*",
     "@huma/eslint-config": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
+    "@huma/mock-content": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:"
   },

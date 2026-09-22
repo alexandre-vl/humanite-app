@@ -1,5 +1,8 @@
+import { contrastRatio } from './contrast.ts';
 import type { Theme } from './theme.ts';
+import { THEMES } from './theme.ts';
 import type { TextTone, TextVariant } from './typography.ts';
+import { TEXT_SCALES, TEXT_TONES, typographyAt } from './typography.ts';
 
 /**
  * What the paper owes a reader who has to be able to see it, written so a test can ask rather than a person remember.
@@ -20,7 +23,7 @@ import type { TextTone, TextVariant } from './typography.ts';
  * The roles a screen paints behind text. `premium` is not among them: the one mark printed on it builds itself inside
  * a light scope, so that pairing is a single fixed one rather than one per theme, and the theme test pins it there.
  */
-export const GROUNDS = [
+const GROUNDS = [
   'background',
   'ground',
   'surface',
@@ -47,7 +50,7 @@ type Printing = Readonly<{ smallest: TextVariant; grounds: readonly Ground[] }>;
  * `smallest` is what fixes the bar, a smaller type owing more contrast than a larger one. It names the variant and
  * not a number so that a change of type carries here by itself.
  */
-export const PRINTINGS = {
+const PRINTINGS = {
   // The page a feed and an article are printed on, the torn paper a linked card is dropped on, the sheet a group of
   // rows is laid on, the bar a row of labels sits in, and the masthead of the front page, which is painted in the
   // rule colour. Smallest in a picture's legend, and in the word that marks a column.
@@ -89,7 +92,7 @@ const AA_NORMAL = 4.5;
 export const requiredRatio = (size: number): number => (size >= LARGE_TEXT ? AA_LARGE : AA_NORMAL);
 
 /** What WCAG 1.4.11 asks of the parts of a control that say where it is and which state it is in. */
-export const SHAPE_RATIO = AA_LARGE;
+const SHAPE_RATIO = AA_LARGE;
 
 /** Two roles that touch, and which a reader has to tell apart to use the control they draw. */
 type Adjacency = Readonly<{ part: keyof Theme; against: keyof Theme; says: string }>;
@@ -103,7 +106,7 @@ type Adjacency = Readonly<{ part: keyof Theme; against: keyof Theme; says: strin
  * knob had the page's own colour; the platform paints it wider than the track, so where it sat there was a hole and
  * where it did not there was a crescent. Nothing said so: every other pair held.
  */
-export const SHAPES = [
+const SHAPES = [
   { part: 'control', against: 'background', says: 'where the switch is, set off' },
   { part: 'primary', against: 'background', says: 'where the switch is, set on' },
   { part: 'textPrimary', against: 'control', says: 'which side the knob rests on, set off' },
@@ -127,7 +130,7 @@ type Departure = Readonly<{
  * pairing may not fall below the floor written here, and it may not rise above the bar either, because a departure
  * that has stopped being one is a line of prose claiming something untrue about the paper.
  */
-export const DEPARTURES = [
+const DEPARTURES = [
   {
     tone: 'onPrimary',
     ground: 'primary',
@@ -136,3 +139,127 @@ export const DEPARTURES = [
       'the red is the paper, measured on the current app, and nothing is lighter than the white laid on it: meeting the bar would mean no longer printing in the colour the masthead is printed in',
   },
 ] as const satisfies readonly Departure[];
+
+/**
+ * What a reading of the paper's own colours can find wrong. One code per thing that can be untrue, so a rule is
+ * proven by a fixture that makes exactly its code appear rather than by a test nobody can point at.
+ */
+/**
+ * The name of one thing a reading of the paper's own colours can find wrong, one per thing that can be untrue.
+ *
+ * It is written as a union rather than read off a list, nothing ever walking the codes: a reading names exactly one,
+ * and a fixture names the set it expects. A list would be a second place for a code to exist.
+ */
+export type LegibilityCode =
+  | 'legibility/under-bar'
+  | 'legibility/departure-worse'
+  | 'legibility/departure-obsolete'
+  | 'legibility/departure-unprinted'
+  | 'legibility/shape-under-bar'
+  | 'legibility/ground-unprinted';
+
+/** One thing a reading found wrong, and the measurement that says so. */
+export type LegibilityFinding = Readonly<{ code: LegibilityCode; says: string }>;
+
+/**
+ * The tables a reading judges.
+ *
+ * They are handed in rather than read from this module, and that is the whole of what makes the rule provable: a
+ * reading that reached for the paper's own tables could only ever answer about the paper, so nothing could show that
+ * it answers at all. Given the tables, a fixture hands it a broken one and reads the code that comes back — and the
+ * paper's own, `THE_PAPER` below, is what the package's test hands it to say the paper is in order.
+ */
+export type LegibilityTables = Readonly<{
+  themes: Readonly<Record<string, Theme>>;
+  printings: Readonly<Record<TextTone, Printing>>;
+  departures: readonly Departure[];
+  shapes: readonly Adjacency[];
+  grounds: readonly Ground[];
+  /** The size a variant is set at, at the smallest step a reader can choose, which is the step that asks the most. */
+  sizeOf: (variant: TextVariant) => number;
+}>;
+
+const ratioAt = (value: number): string => value.toFixed(2);
+
+/** Every pairing of text and ground the printings name, theme by theme, judged against the bar its size owes. */
+const readPrintings = (tables: LegibilityTables): readonly LegibilityFinding[] =>
+  Object.entries(tables.themes).flatMap(([name, theme]) =>
+    TEXT_TONES.flatMap((tone) => {
+      const printing = tables.printings[tone];
+      const required = requiredRatio(tables.sizeOf(printing.smallest));
+      return printing.grounds.flatMap((ground): readonly LegibilityFinding[] => {
+        const ratio = contrastRatio(theme[tone], theme[ground]);
+        const where = `${name} : ${tone} sur ${ground}, ${ratioAt(ratio)} pour ${ratioAt(required)} exigés`;
+        const departure = tables.departures.find((entry) => entry.tone === tone && entry.ground === ground);
+        if (departure === undefined) {
+          return ratio >= required ? [] : [{ code: 'legibility/under-bar', says: where }];
+        }
+        if (ratio < departure.floor) {
+          return [
+            { code: 'legibility/departure-worse', says: `${where}, sous le plancher ${ratioAt(departure.floor)}` },
+          ];
+        }
+        return ratio < required ? [] : [{ code: 'legibility/departure-obsolete', says: where }];
+      });
+    }),
+  );
+
+/** A departure excusing a pairing no screen prints excuses nothing, and would sit there saying it did. */
+const readDepartures = (tables: LegibilityTables): readonly LegibilityFinding[] =>
+  tables.departures.flatMap((departure) =>
+    tables.printings[departure.tone].grounds.includes(departure.ground)
+      ? []
+      : [
+          {
+            code: 'legibility/departure-unprinted' as const,
+            says: `${departure.tone} n’est pas posé sur ${departure.ground}`,
+          },
+        ],
+  );
+
+/** Each part of the paper's one drawn control, against what it touches. */
+const readShapes = (tables: LegibilityTables): readonly LegibilityFinding[] =>
+  Object.entries(tables.themes).flatMap(([name, theme]) =>
+    tables.shapes.flatMap((shape): readonly LegibilityFinding[] => {
+      const ratio = contrastRatio(theme[shape.part], theme[shape.against]);
+      return ratio >= SHAPE_RATIO
+        ? []
+        : [
+            {
+              code: 'legibility/shape-under-bar' as const,
+              says: `${name} : ${shape.says}, ${ratioAt(ratio)} pour ${ratioAt(SHAPE_RATIO)} exigés`,
+            },
+          ];
+    }),
+  );
+
+/** A ground the rule names that nothing is printed on is a ground it would keep asking about for nothing. */
+const readGrounds = (tables: LegibilityTables): readonly LegibilityFinding[] => {
+  const printed = new Set(Object.values(tables.printings).flatMap((printing) => printing.grounds));
+  return tables.grounds.flatMap((ground) =>
+    printed.has(ground)
+      ? []
+      : [{ code: 'legibility/ground-unprinted' as const, says: `rien n’est posé sur ${ground}` }],
+  );
+};
+
+/** Everything a reading of `tables` finds wrong, in the order the rules are written. */
+export const judgeLegibility = (tables: LegibilityTables): readonly LegibilityFinding[] => [
+  ...readPrintings(tables),
+  ...readDepartures(tables),
+  ...readShapes(tables),
+  ...readGrounds(tables),
+];
+
+/**
+ * The paper's own tables. The size is read at the smallest step a reader can choose and in the paper's own faces: a
+ * face set has no say in a size — a step multiplies the role's own — so either set answers for both.
+ */
+export const THE_PAPER: LegibilityTables = {
+  themes: THEMES,
+  printings: PRINTINGS,
+  departures: DEPARTURES,
+  shapes: SHAPES,
+  grounds: GROUNDS,
+  sizeOf: (variant) => typographyAt(variant, TEXT_SCALES[0], 'paper').size,
+};

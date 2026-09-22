@@ -141,11 +141,21 @@ const AWAITING_FOUNDATION_ADRS = [
   'claude-hook/stop-unverifiable-once',
 ];
 
-/** Whether a proof answers for something other than the ADR process: dependencies, Expo, git hooks, guardrails, lint, performance budgets, the root guard and the structure, plus the agent proofs above. */
+/** Whether a proof answers for something other than the ADR process: the colours the paper is read at, the visuals it draws, dependencies, Expo, git hooks, guardrails, lint, performance budgets, the root guard and the structure, plus the agent proofs above. */
 const awaitsFoundationAdr = (id: string): boolean =>
-  ['deps/', 'emulator/', 'expo/', 'git/', 'guardrail/', 'lint/', 'perf/', 'root/', 'structure/'].some((prefix) =>
-    id.startsWith(prefix),
-  ) || AWAITING_FOUNDATION_ADRS.includes(id);
+  [
+    'artwork/',
+    'deps/',
+    'emulator/',
+    'expo/',
+    'git/',
+    'guardrail/',
+    'legibility/',
+    'lint/',
+    'perf/',
+    'root/',
+    'structure/',
+  ].some((prefix) => id.startsWith(prefix)) || AWAITING_FOUNDATION_ADRS.includes(id);
 
 test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());

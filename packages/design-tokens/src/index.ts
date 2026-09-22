@@ -5,6 +5,10 @@ export type { FaceSet } from './tokens.ts';
 // outside this package. What an app names is a variant, and the letters that variant opens are the table's business.
 export { ANGLES, FACE_SETS, FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, RADII, SIZES, SPACING } from './tokens.ts';
 export { contrastRatio } from './contrast.ts';
+export type { LegibilityCode, LegibilityTables } from './legibility.ts';
+// The tables themselves stay inside the package: what leaves it is the reading of them and the paper's own set, so a
+// bench can hand the reading a broken table and read the code that comes back.
+export { judgeLegibility, THE_PAPER } from './legibility.ts';
 export type { SectionCode } from './sections.ts';
 export { SECTION_COLORS, sectionCode, sectionColor } from './sections.ts';
 export type { Theme, ThemeChoice, ThemeName } from './theme.ts';
