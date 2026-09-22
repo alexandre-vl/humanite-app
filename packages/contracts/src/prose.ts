@@ -58,11 +58,34 @@ const NAMED: Readonly<Record<string, string>> = Object.fromEntries([
   ['hellip', '…'],
   ['laquo', '«'],
   ['lt', '<'],
-  ['nbsp', ' '],
+  ['nbsp', '\u00A0'],
   ['quot', '"'],
   ['raquo', '»'],
   ['rsquo', '’'],
 ]);
+
+/**
+ * Tags that end a line rather than a run: what follows one starts a line of its own, so it leaves a space behind.
+ *
+ * Every other tag can go without a trace, because what it wraps carries on the sentence around it. These cannot:
+ * « la suite<br>et la fin » dropped like the rest reads « la suiteet la fin », one word where the journal wrote two.
+ * The journal writes a break in a standfirst and in a caption, and a closing paragraph wherever it sets two.
+ */
+const BREAKS = /<br\b[^>]*>|<\/(?:p|div|li|h[1-6]|blockquote)>/giu;
+
+/**
+ * Runs of blank that close up, which is every blank but the one the journal put there on purpose.
+ *
+ * French sets a space before a colon, a semicolon, a question mark and a closing quotation mark, and that space does
+ * not break: a line that wrapped there would leave the punctuation alone at the start of the next. The journal writes
+ * it as `&nbsp;` — two hundred and fifteen times in the captions of one capture alone — and a reading that folded it
+ * into an ordinary space would undo, silently, the one piece of typography the wire actually carries.
+ *
+ * It is the only blank spared, because it is the only one the journal sets on purpose: every other blank that is
+ * not an ordinary space appears once or twice in a whole capture, inside a script or a bundle, never a sentence.
+ * Written as an escape, here and in the table above, so the source carries no byte a reader of it cannot see.
+ */
+const BLANKS = /[^\S\u00A0]+/gu;
 
 /**
  * Text as a reader should see it: entities resolved, tags gone, runs of space closed up.
@@ -73,11 +96,12 @@ const NAMED: Readonly<Record<string, string>> = Object.fromEntries([
  */
 const plain = (markup: string): string =>
   markup
+    .replace(BREAKS, ' ')
     .replace(/<[^>]*>/gu, '')
     .replace(/&#(\d+);/gu, (whole, code: string) => String.fromCodePoint(Number(code)))
     .replace(/&#x([0-9a-f]+);/giu, (whole, code: string) => String.fromCodePoint(Number.parseInt(code, 16)))
     .replace(/&([a-z]+);/giu, (whole, name: string) => NAMED[name.toLowerCase()] ?? whole)
-    .replace(/\s+/gu, ' ');
+    .replace(BLANKS, ' ');
 
 /**
  * The same markup with every element of a given class removed, the elements it nests included.
@@ -217,17 +241,44 @@ export const readProse = (html: string): readonly Block[] => {
 };
 
 /**
- * The name of one thing a reading of a body can get wrong. A union rather than a list, nothing ever walking the
- * codes: a reading names exactly one, and a fixture names the set it expects.
+ * The one line a short field of the service holds: a title, a standfirst, the caption under a picture.
+ *
+ * A body is not the only thing the service sends as markup — everything it sends is. Measured on one capture: every
+ * standfirst arrives wrapped in the `<p class="chapo">` the journal's own stylesheet keys on, a hundred and six
+ * apostrophes are written `&#8217;`, three hundred and sixty-nine spaces `&nbsp;`, and captions carry emphasis, a
+ * superscript and the odd link. Put on a screen as they come, a title reads « L&#8217;été » and a standfirst opens
+ * with a paragraph tag.
+ *
+ * What comes back is a line and not a block, because a title is a line: the caller hands it to the schema of the item
+ * it belongs to, and that schema is what brands it. Nothing here brands anything, so nothing here can reach a screen
+ * by itself.
+ */
+export const readPlain = (html: string): string => plain(html).trim();
+
+/**
+ * The name of one thing a reading of the journal's markup can get wrong. A union rather than a list, nothing ever
+ * walking the codes: a reading names exactly one, and a fixture names the set it expects.
  */
 export type ProseCode =
-  'prose/markup-left' | 'prose/entity-left' | 'prose/aside-kept' | 'prose/donation-kept' | 'prose/nothing-read';
+  | 'prose/markup-left'
+  | 'prose/entity-left'
+  | 'prose/aside-kept'
+  | 'prose/donation-kept'
+  | 'prose/break-glued'
+  | 'prose/edges-loose'
+  | 'prose/nothing-read';
 
 /** One thing a judging found wrong, and what it read to find it out. */
 export type ProseFinding = Readonly<{ code: ProseCode; says: string }>;
 
 /** A way of reading a body, which is what the judging below is handed rather than reaching for one. */
 export type ProseReader = (html: string) => readonly Block[];
+
+/** A way of reading a short field, handed in for the same reason. */
+export type PlainReader = (html: string) => string;
+
+/** The two doors the journal's markup comes through: a body becomes blocks, a short field becomes its one line. */
+export type ProseReaders = Readonly<{ prose: ProseReader; plain: PlainReader }>;
 
 /** The words the aside of the sample carries, which belong to another article and must not survive the reading. */
 const ELSEWHERE = 'Le titre d’un autre article';
@@ -246,13 +297,30 @@ const SAMPLE = [
   `<div id="form_don"><p>${APPEAL}</p></div>`,
 ].join('');
 
+/** The words the short sample sets on either side of its line break, which must stay two and not run into one. */
+const BEFORE = 'la suite';
+const AFTER = 'et la fin';
+
 /**
- * The body the judging reads, and the two things in it that belong to the page rather than to the article.
+ * A short field shaped the way this journal shapes one: the paragraph its stylesheet wraps a standfirst in, a run of
+ * emphasis, the space it does not want broken, a line break, and the blank the wrapper leaves at either end.
+ */
+const HEADLINE = `\n\n<p class="chapo">Un <em>mot</em>&nbsp;: ${BEFORE}<br>${AFTER}.</p>\n`;
+
+/**
+ * What the judging reads, and the things in it that must not survive a reading.
  *
  * Exported because a fixture has to be able to hand back a reading that kept one of them — word for word, or the
  * judging would not recognise it — and that is the only way to show the judging would have spoken.
  */
-export const THE_BODY = { html: SAMPLE, elsewhere: ELSEWHERE, appeal: APPEAL } as const;
+export const THE_BODY = {
+  html: SAMPLE,
+  headline: HEADLINE,
+  elsewhere: ELSEWHERE,
+  appeal: APPEAL,
+  before: BEFORE,
+  after: AFTER,
+} as const;
 
 /** The words a block carries, whatever kind of block it is. */
 const textOf = (block: Block): string => {
@@ -275,23 +343,41 @@ const textOf = (block: Block): string => {
 };
 
 /**
- * Whether a reading of a body leaves a screen only prose.
+ * Whether a reading of the journal's markup leaves a screen nothing but text a reader should see.
  *
- * The reading is handed in rather than reached for, and that is what makes the rule provable: a judging that called
+ * The readings are handed in rather than reached for, and that is what makes the rule provable: a judging that called
  * `readProse` itself could only ever answer about `readProse`, so nothing could show that it answers at all. Given
- * the reading, a fixture hands it one that forgets to strip a tag, or to resolve an entity, or to drop what belongs
- * to the page rather than to the article — and reads the code that comes back.
+ * them, a fixture hands in one that forgets to strip a tag, or to resolve an entity, or to drop what belongs to the
+ * page rather than to the article, or to keep two words apart across a line break — and reads the code that comes
+ * back.
+ *
+ * Both doors are judged together because the fault is the same fault on either side: a title with a tag in it is as
+ * unreadable as a paragraph with one, and the reader of one calls the reader of the other. What only a short field
+ * can get wrong — a break swallowed, an edge left loose — has a code of its own; what either can get wrong has one
+ * code between them, so a defect is named once however it arrives.
+ *
+ * A reading that rendered nothing is reported alone: everything below reads what came back, and a judging of nothing
+ * would name every fault at once and tell the reader which to fix last.
  */
-export const judgeProse = (read: ProseReader): readonly ProseFinding[] => {
-  const blocks = read(SAMPLE);
-  if (blocks.length === 0) {
-    return [{ code: 'prose/nothing-read', says: 'un corps qui porte deux phrases n’a rendu aucun bloc' }];
+export const judgeProse = (read: ProseReaders): readonly ProseFinding[] => {
+  const blocks = read.prose(SAMPLE);
+  const line = read.plain(HEADLINE);
+  if (blocks.length === 0 || line === '') {
+    return [
+      {
+        code: 'prose/nothing-read',
+        says:
+          blocks.length === 0
+            ? 'un corps qui porte deux phrases n’a rendu aucun bloc'
+            : 'un champ court qui porte une phrase n’a rendu aucun mot',
+      },
+    ];
   }
-  const words = blocks.map(textOf);
+  const words = [...blocks.map(textOf), line];
   const has = (test: (text: string) => boolean): boolean => words.some(test);
   return [
     ...(has((text) => /<[^>]*>/u.test(text))
-      ? [{ code: 'prose/markup-left' as const, says: 'du balisage est resté dans le texte d’un bloc' }]
+      ? [{ code: 'prose/markup-left' as const, says: 'du balisage est resté dans le texte rendu' }]
       : []),
     ...(has((text) => /&[a-z]+;|&#\d+;/iu.test(text))
       ? [{ code: 'prose/entity-left' as const, says: 'une entité HTML n’a pas été résolue' }]
@@ -302,5 +388,11 @@ export const judgeProse = (read: ProseReader): readonly ProseFinding[] => {
     ...(has((text) => text.includes(APPEAL))
       ? [{ code: 'prose/donation-kept' as const, says: `« ${APPEAL} » appartient au formulaire de don` }]
       : []),
+    ...(line.includes(`${BEFORE} ${AFTER}`)
+      ? []
+      : [{ code: 'prose/break-glued' as const, says: `« ${BEFORE} » et « ${AFTER} » se sont soudés en un mot` }]),
+    ...(line === line.trim()
+      ? []
+      : [{ code: 'prose/edges-loose' as const, says: 'le blanc du gabarit est resté au bord de la phrase' }]),
   ];
 };
