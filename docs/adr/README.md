@@ -25,7 +25,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                   | Navigation Expo Router par onglets natifs                   | accepté | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                    | Cache de données TanStack Query persisté                    | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)         | Tests par environnement Vitest jest-expo et Maestro         | accepté | `dependency`, `guarded-config`                                             |
-| [ADR-0017](0017-typographie-et-licences-des-polices.md)                         | Typographie et licences des polices                         | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0017](0017-typographie-et-licences-des-polices.md)                         | Typographie et licences des polices                         | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0018](0018-images-et-symboles-natifs.md)                                   | Images et symboles natifs                                   | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | proposé | `dependency`, `data-format`                                                |
 | [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | proposé | `dependency`, `guarded-config`, `boundary`                                 |
@@ -240,7 +240,7 @@ Statut : accepté. Périmètre : `apps/mobile/e2e/**`, `apps/mobile/jest.config.
 
 ### ADR-0017 · Typographie et licences des polices
 
-Statut : proposé. Périmètre : `apps/mobile/src/_app/model/fonts.ts`, `apps/mobile/src/_app/routes/startup-gate.tsx`, `apps/mobile/src/shared/lib/startup/**`.
+Statut : accepté. Périmètre : `apps/mobile/src/_app/model/fonts.ts`, `apps/mobile/src/_app/routes/startup-gate.tsx`, `apps/mobile/src/shared/lib/startup/**`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                         |
 | ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
