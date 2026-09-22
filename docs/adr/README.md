@@ -18,7 +18,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0007](0007-glossaire-et-orthographe-des-identifiants.md)                   | Glossaire et orthographe des identifiants                   | accepté | `guarded-config`                                                           |
 | [ADR-0008](0008-controles-locaux-par-hooks-git-et-garde-fous-testes.md)         | Contrôles locaux par hooks git et garde-fous testés         | accepté | `guarded-config`                                                           |
 | [ADR-0009](0009-permissions-des-agents.md)                                      | Permissions des agents                                      | accepté | `guarded-config`                                                           |
-| [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                    | Émulateur Android Redroid sur le serveur                    | proposé | `dependency`, `guarded-config`, `reversal-cost`                            |
+| [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                    | Émulateur Android Redroid sur le serveur                    | accepté | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                  | Contrats de données en Zod                                  | proposé | `dependency`, `guarded-config`, `data-format`                              |
 | [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                        | Design tokens et createStyles brandé                        | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                     | Textes UI en dictionnaire français typé                     | proposé | `guarded-config`, `boundary`, `data-format`                                |
@@ -167,7 +167,7 @@ Statut : accepté. Périmètre : `tools/agents/**`.
 
 ### ADR-0010 · Émulateur Android Redroid sur le serveur
 
-Statut : proposé. Périmètre : `tools/emulator/**`.
+Statut : accepté. Périmètre : `tools/emulator/**`.
 
 | Règle | Niveau | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
