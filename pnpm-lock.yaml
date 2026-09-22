@@ -839,6 +839,9 @@ importers:
       '@huma/architecture':
         specifier: workspace:*
         version: link:../../packages/architecture
+      '@huma/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@huma/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens

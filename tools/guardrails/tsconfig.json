@@ -3,6 +3,7 @@
   "include": ["src"],
   "references": [
     { "path": "../../packages/architecture" },
+    { "path": "../../packages/contracts" },
     { "path": "../../packages/design-tokens" },
     { "path": "../../packages/eslint-config" },
     { "path": "../../packages/mock-content" },

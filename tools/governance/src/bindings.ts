@@ -967,4 +967,32 @@ export const BINDINGS = {
       R6: ['legibility/shape-under-bar'],
     },
   },
+  'ADR-0027': {
+    scope: {
+      // The wire shapes, the reading that turns a body into blocks, and the answers both are held against. The client
+      // that will call the service is not here yet; its module joins this scope the day it is written.
+      paths: [
+        'packages/contracts/src/prose.ts',
+        'packages/contracts/src/prose.test.ts',
+        'packages/contracts/src/recorded.ts',
+        'packages/contracts/src/remote.ts',
+        'packages/contracts/src/remote.test.ts',
+        'tools/guardrails/src/proofs/prose.ts',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Une valeur du domaine ne peut pas exister sans avoir été analysée : chaque champ de prose porte la marque DisplayText, que seul un schéma des contrats produit, et la fonction qui la produit est interdite d’import partout ailleurs. Les formes du fil vivent dans remote.ts, dont le test rejoue sur elles les réponses captées ; la lecture d’un corps se termine sur BLOCK.array().parse, sans quoi son type de retour ne tient pas.',
+      },
+      R2: [
+        'prose/reader',
+        'prose/markup-left',
+        'prose/entity-left',
+        'prose/aside-kept',
+        'prose/donation-kept',
+        'prose/nothing-read',
+      ],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

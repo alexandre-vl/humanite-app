@@ -8,6 +8,8 @@ export { AUTHOR, BLOCK, SECTION, SPAN } from './content.ts';
 export type { Author, Block, BlockInput, Section, Span, SpanInput } from './content.ts';
 export { ARTICLE, ARTICLE_SUMMARY, HERO } from './article.ts';
 export type { Article, ArticleSummary, Hero } from './article.ts';
+export { judgeProse, readProse, THE_BODY } from './prose.ts';
+export type { ProseCode, ProseReader } from './prose.ts';
 export { ISSUE_SUMMARY } from './issue.ts';
 export type { IssueSummary } from './issue.ts';
 export { SESSION } from './session.ts';

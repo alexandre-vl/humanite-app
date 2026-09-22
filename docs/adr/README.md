@@ -332,6 +332,15 @@ Statut : accepté. Périmètre : `apps/mobile/src/shared/lib/announce/**`, `apps
 | R5    | NE DOIT PAS | `legibility/departure-obsolete`                                                                                                                                                                                                                                                                                                                                                                                     |
 | R6    | DOIT        | `legibility/shape-under-bar`                                                                                                                                                                                                                                                                                                                                                                                        |
 
+### ADR-0027 · Client non officiel de l’API L’Humanité
+
+Statut : proposé. Périmètre : `packages/contracts/src/prose.ts`, `packages/contracts/src/prose.test.ts`, `packages/contracts/src/recorded.ts`, `packages/contracts/src/remote.ts`, `packages/contracts/src/remote.test.ts`, `tools/guardrails/src/proofs/prose.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | NE DOIT PAS | convention : Une valeur du domaine ne peut pas exister sans avoir été analysée : chaque champ de prose porte la marque DisplayText, que seul un schéma des contrats produit, et la fonction qui la produit est interdite d’import partout ailleurs. Les formes du fil vivent dans remote.ts, dont le test rejoue sur elles les réponses captées ; la lecture d’un corps se termine sur BLOCK.array().parse, sans quoi son type de retour ne tient pas. |
+| R2    | DOIT        | `prose/reader`, `prose/markup-left`, `prose/entity-left`, `prose/aside-kept`, `prose/donation-kept`, `prose/nothing-read`                                                                                                                                                                                                                                                                                                                              |
+
 ## Référentiel
 
 ### Statuts

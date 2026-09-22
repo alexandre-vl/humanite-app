@@ -37,8 +37,7 @@ Option retenue : « Un client du service derrière la porte existante », parce 
 
 - **R1** — Une réponse du service NE DOIT PAS être servie à un écran sans avoir été relue par un schéma des contrats.
 - **R2** — Le corps d’un article DOIT être rendu en blocs des contrats, sans qu’aucun balisage atteigne une primitive.
-- **R3** — Une image distante DOIT être demandée à la largeur de la place qu’elle remplit.
-- **R4** — Le contenu simulé PEUT rester le corpus déterministe des tests et des parcours.
+- **R3** — Le contenu simulé PEUT rester le corpus déterministe des tests et des parcours.
 
 ### Conséquences
 
@@ -72,5 +71,5 @@ Option retenue : « Un client du service derrière la porte existante », parce 
 - Le service rend deux fils distincts, que l’app a déjà : `wordpress/home` dans l’ordre choisi par la rédaction, et `wordpress/homepage` en ordre strictement antéchronologique, que sa propre configuration nomme « En continu ».
 - Les identifiants du corpus fictif portent la grammaire de la fiction ; ceux du service sont des nombres, et les contraintes de longueur des contrats sont écrites pour un corpus mesuré (`packages/contracts/src/ids.ts`, `packages/contracts/src/article.ts`).
 - Le kiosque reste hors de l’app : un numéro pèse soixante-deux mégaoctets et se lit dans un moteur propriétaire protégé.
-- La connexion du lecteur et le droit de lecture ne sont pas décidés ici ; ils font leur propre ADR, et rien de ce qui précède n’en dépend.
+- La connexion du lecteur et le droit de lecture ne sont pas décidés ici ; ils font leur propre ADR, et rien de ce qui précède n’en dépend. Les images distantes non plus : rien n’en sert encore, et une règle qu’aucun outil ne tient n’est pas une règle.
 - Réévaluation : le service change de forme sans préavis, ou le chemin public cesse de rendre un article lisible.
