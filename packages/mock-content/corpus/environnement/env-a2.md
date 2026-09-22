@@ -1,6 +1,5 @@
 ---
 id: env-a2
-kind: article
 section: environnement
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Sur le plateau de Montbrel, le projet de parc solaire divise avant l'ouve
 standfirst: La société d'économie mixte Énergies du Plateau veut couvrir d'anciennes carrières de panneaux photovoltaïques, mais des riverains s'inquiètent de l'emprise du chantier sur les chemins de randonnée les plus fréquentés.
 authors: lea-fontanel
 published: 2026-09-10 15:10
-tags: énergie, solaire, aménagement
 hero: Les anciennes carrières du plateau de Montbrel | Photo : Théo Vasseur / agence Grand-Angle
 ---
 

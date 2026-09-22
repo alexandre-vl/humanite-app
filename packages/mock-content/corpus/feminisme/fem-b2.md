@@ -1,6 +1,5 @@
 ---
 id: fem-b2
-kind: brief
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Une chercheuse de Belleroche distinguée pour ses travaux sur le travail 
 standfirst: La sociologue recevra le mois prochain un prix régional récompensant une décennie d'enquêtes sur les tâches domestiques et le soin, longtemps absentes des statistiques officielles.
 authors: ines-benali
 published: 2026-09-12 08:15
-tags: recherche, égalité
 ---
 
 Une sociologue de l'université de Belleroche recevra le mois prochain le prix régional des sciences humaines pour l'ensemble de ses travaux sur le travail domestique.

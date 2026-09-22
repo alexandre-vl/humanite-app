@@ -1,6 +1,5 @@
 ---
 id: env-b1
-kind: brief
 section: environnement
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Pic de pollution à l'ozone : la préfecture déclenche l'alerte sur l'ag
 standfirst: La circulation sera différenciée dès jeudi matin et la vitesse abaissée sur les principaux axes, tandis que les personnes fragiles sont invitées à limiter leurs efforts en plein air jusqu'à la fin de l'épisode.
 authors: hugo-lambert
 published: 2026-09-11 07:30
-tags: pollution, santé, air
 emphasis: true
 ---
 

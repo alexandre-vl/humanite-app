@@ -1,6 +1,5 @@
 ---
 id: mon-a2
-kind: article
 section: monde
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Après les inondations, l'archipel des Cargues attend toujours l'aide pro
 standfirst: Trois semaines après les crues qui ont ravagé plusieurs îles, les habitants dénoncent la lenteur des secours et le manque d'eau potable, tandis que l'Union des États du Levant peine à coordonner les convois.
 authors: samir-haddad
 published: 2026-09-11 09:15
-tags: catastrophe, humanitaire, coopération
 hero: Un quartier encore inondé sur l'île principale des Cargues | Photo : Agence Méridien / CC BY 4.0
 ---
 

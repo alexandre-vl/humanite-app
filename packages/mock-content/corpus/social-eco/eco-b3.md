@@ -1,6 +1,5 @@
 ---
 id: eco-b3
-kind: brief
 section: social-eco
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Grève d'avertissement dans les entrepôts logistiques du Val d'Arche pou
 standfirst: Une partie des salariés a débrayé jeudi matin sur deux sites. Les représentants du personnel réclament une revalorisation face à l'inflation ; la direction promet d'ouvrir des négociations la semaine prochaine.
 authors: marion-castel, julien-ferrand
 published: 2026-09-13 09:45
-tags: social, salaires, logistique
 ---
 
 Une grève d'avertissement a été suivie jeudi matin dans deux entrepôts logistiques du Val d'Arche. Selon les organisateurs, près de la moitié des salariés de l'équipe du matin ont débrayé pendant deux heures.

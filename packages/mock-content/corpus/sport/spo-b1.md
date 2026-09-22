@@ -1,6 +1,5 @@
 ---
 id: spo-b1
-kind: brief
 section: sport
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Coup de tonnerre sur le marché régional : un buteur confirmé signe à 
 standfirst: À la surprise générale, l'attaquant vedette du championnat de la saison passée rejoint le promu plutôt qu'un club mieux classé, un renfort de poids qui nourrit les ambitions de montée du club.
 authors: maxime-renaud
 published: 2026-09-11 08:10
-tags: football, transferts, clubs
 emphasis: true
 ---
 

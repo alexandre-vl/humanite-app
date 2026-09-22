@@ -1,6 +1,5 @@
 ---
 id: cul-a4
-kind: article
 section: culture-et-savoir
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Un pass culture régional pour les moins de 25 ans : ce que change vraime
 standfirst: Voté en juillet, le dispositif entre en vigueur ce mois-ci. Il ouvre aux jeunes un crédit annuel valable dans les musées, cinémas et librairies partenaires, mais son financement suscite déjà des interrogations.
 authors: paul-delorme, helene-marchetti
 published: 2026-09-11 16:45
-tags: culture, jeunesse, politique culturelle
 hero: L'entrée d'un cinéma partenaire du nouveau pass | Photo : Léo Barthe / CC BY 4.0
 ---
 

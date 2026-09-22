@@ -1,6 +1,5 @@
 ---
 id: spo-b3
-kind: brief
 section: sport
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Un nouveau terrain synthétique inauguré pour les jeunes footballeurs de
 standfirst: Financé par la commune et l'intercommunalité, l'équipement doit permettre aux clubs de jouer même par mauvais temps et de dégager des créneaux supplémentaires pour les écoles de football du secteur.
 authors: maxime-renaud, sofia-laurenti
 published: 2026-09-13 09:15
-tags: football, équipements, jeunesse
 ---
 
 Villeneuve-sur-Arche a inauguré samedi son premier terrain de football synthétique, aménagé à côté du stade municipal. L'équipement, financé par la commune et l'intercommunalité, était réclamé depuis des années par les clubs du secteur.

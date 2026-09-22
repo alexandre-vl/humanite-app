@@ -1,6 +1,5 @@
 ---
 id: fem-a6
-kind: article
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Des ateliers pour donner aux collégiennes le goût des sciences et bousc
 standfirst: Dans plusieurs collèges de la région, un programme propose aux élèves de rencontrer des femmes ingénieures et chercheuses. Objectif : enrayer le décrochage des filles dès la troisième dans les filières scientifiques.
 authors: ines-benali
 published: 2026-09-12 16:30
-tags: éducation, sciences, égalité
 hero: Une collégienne manipule un petit robot lors d'un atelier | Photo : Yasmine Roux / CC BY 4.0
 ---
 

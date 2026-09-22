@@ -1,6 +1,5 @@
 ---
 id: soc-a2
-kind: article
 section: societe
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Cantines scolaires de Bourg-Méran : les familles dénoncent des files d'
 standfirst: Faute de places suffisantes au réfectoire, plusieurs écoles de Bourg-Méran organisent deux services successifs, réduisant le temps du repas à vingt minutes pour certains enfants, s'inquiètent des parents.
 authors: thomas-lecuyer
 published: 2026-09-10 09:40
-tags: éducation, enfance, restauration scolaire
 hero: Le réfectoire de l'école des Peupliers à l'heure du déjeuner | Photo : Clara Vidonne / CC BY 4.0
 ---
 

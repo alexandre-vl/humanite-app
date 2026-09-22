@@ -1,6 +1,5 @@
 ---
 id: cul-a1
-kind: article
 section: culture-et-savoir
 format: video
 access: free
@@ -8,7 +7,6 @@ title: À Belleroche, la lente renaissance d'une fresque médiévale longtemps c
 standfirst: Dévoilée par hasard lors de travaux dans l'église Saint-Genou, une peinture murale du XIVe siècle fait l'objet d'un chantier de restauration minutieux que suit notre équipe, pinceau après pinceau.
 authors: helene-marchetti
 published: 2026-09-10 09:15
-tags: patrimoine, restauration, moyen âge
 hero: Une restauratrice au travail sur la fresque de l'église Saint-Genou | Photo : atelier Vermeil / CC BY 4.0
 ---
 

@@ -1,6 +1,5 @@
 ---
 id: env-a4
-kind: article
 section: environnement
 format: article
 access: free
@@ -8,7 +7,6 @@ title: À Villeneuve-sur-Arche, un plan de plantation pour rafraîchir les quart
 standfirst: L'association Canopée urbaine et la mairie veulent planter deux mille arbres en trois ans dans les rues les plus exposées à la chaleur, après un été où le centre a battu ses records de température nocturne.
 authors: lea-fontanel
 published: 2026-09-11 12:20
-tags: ville, arbres, climat
 hero: Une rue du centre de Villeneuve-sur-Arche en plein été | Photo : Fanny Delcourt / agence Plein-Cadre
 ---
 

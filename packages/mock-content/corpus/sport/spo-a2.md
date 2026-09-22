@@ -1,6 +1,5 @@
 ---
 id: spo-a2
-kind: article
 section: sport
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Les Aiglons de Val-Mareuil, révélation de la saison, portent l'espoir d
 standfirst: Monté de deux divisions en trois ans, le club féminin attire un public nouveau et bouscule les hiérarchies régionales, porté par une formation patiente et un noyau de joueuses fidèles au maillot.
 authors: sofia-laurenti
 published: 2026-09-10 16:40
-tags: handball, sport féminin, clubs
 hero: Les joueuses des Aiglons à l'entraînement | Photo : Fanny Delcourt / agence Plein-Cadre
 ---
 

@@ -1,6 +1,5 @@
 ---
 id: mon-a4
-kind: article
 section: monde
 format: video
 access: free
@@ -8,7 +7,6 @@ title: À Serravia, la jeunesse réinvente le marché de quartier après la ferm
 standfirst: Reportage vidéo dans la capitale de la Valdavie, où de jeunes commerçants ont transformé une friche en marché éphémère, faute d'avoir pu reprendre les anciennes halles fermées pour vétusté l'an dernier.
 authors: elise-morvan
 published: 2026-09-11 18:30
-tags: villes, jeunesse, économie
 hero: Le marché éphémère installé sur la friche de Serravia | Photo : Agence Méridien / CC BY 4.0
 ---
 

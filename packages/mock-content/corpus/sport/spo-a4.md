@@ -1,6 +1,5 @@
 ---
 id: spo-a4
-kind: article
 section: sport
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: À seize ans, la sprinteuse Awa Diakité pulvérise les records du club d
 standfirst: Révélée cet été sur les pistes régionales, la jeune athlète du plateau intéresse déjà les pôles espoirs, mais son club et sa famille veulent avancer sans brûler les étapes ni sacrifier la scolarité.
 authors: sofia-laurenti
 published: 2026-09-12 09:05
-tags: athlétisme, jeunes, formation
 hero: Awa Diakité à l'entraînement sur la piste de Saint-Prieux | Photo : Camille Ancel
 ---
 

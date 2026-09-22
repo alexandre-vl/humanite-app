@@ -1,6 +1,5 @@
 ---
 id: soc-a6
-kind: article
 section: societe
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Épicerie solidaire de Longeval : face à l'afflux, l'association Le Pain
 standfirst: Fréquentée par un nombre record de familles cette rentrée, l'épicerie sociale du quartier de Longeval lance un appel aux bénévoles pour tenir ses distributions et éviter de réduire ses horaires d'ouverture.
 authors: nadia-oussedik, thomas-lecuyer
 published: 2026-09-13 08:30
-tags: solidarité, précarité, bénévolat
 hero: Les rayons de l'épicerie solidaire de Longeval | Photo : Clara Vidonne / CC BY 4.0
 ---
 

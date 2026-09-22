@@ -1,6 +1,5 @@
 ---
 id: spo-a1
-kind: article
 section: sport
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: L'Union sportive de Bourg-la-Rivière rêve de montée mais joue son aven
 standfirst: Promu au printemps, le club de football amateur enchaîne les bons résultats, mais son stade centenaire ne répond plus aux normes de la division supérieure et la municipalité tarde encore à trancher.
 authors: maxime-renaud
 published: 2026-09-10 09:20
-tags: football, amateurs, équipements
 hero: Les tribunes en bois du stade de Bourg-la-Rivière | Photo : Théo Vasseur / agence Grand-Angle
 ---
 

@@ -1,6 +1,5 @@
 ---
 id: spo-a6
-kind: article
 section: sport
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Après deux ans de travaux, la piscine de Clairefont rouvre ses bassins a
 standfirst: Fermé pour une rénovation complète, l'équipement rouvre avec un bassin plus sobre en énergie, mais les clubs s'inquiètent déjà du partage des créneaux entre scolaires, associations et public.
 authors: sofia-laurenti
 published: 2026-09-13 08:30
-tags: natation, équipements, collectivités
 hero: Le grand bassin rénové de la piscine de Clairefont | Photo : Fanny Delcourt / agence Plein-Cadre
 ---
 

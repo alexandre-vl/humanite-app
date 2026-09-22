@@ -1,6 +1,5 @@
 ---
 id: soc-b2
-kind: brief
 section: societe
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La médiathèque de Bourg-Méran prolonge ses horaires pour accueillir le
 standfirst: À partir d'octobre, l'équipement municipal restera ouvert jusqu'à vingt-deux heures trois soirs par semaine, une réponse à la demande d'espaces de travail calmes formulée par les jeunes de la commune.
 authors: thomas-lecuyer
 published: 2026-09-10 16:45
-tags: culture, jeunesse
 ---
 
 La médiathèque de Bourg-Méran étendra ses horaires dès le mois d'octobre. Trois soirs par semaine, l'établissement restera ouvert jusqu'à vingt-deux heures, avec une équipe renforcée de deux agents et de plusieurs vacataires étudiants.

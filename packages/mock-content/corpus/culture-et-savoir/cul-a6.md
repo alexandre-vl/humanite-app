@@ -1,6 +1,5 @@
 ---
 id: cul-a6
-kind: article
 section: culture-et-savoir
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La dernière librairie de Belleroche a failli fermer ; ses clients l'ont 
 standfirst: Menacée de disparition après le départ à la retraite de son gérant, la librairie du Beffroi revit sous la forme d'une coopérative réunissant plus de deux cents habitants, décidés à garder un commerce du livre en centre-ville.
 authors: paul-delorme
 published: 2026-09-12 18:05
-tags: librairie, coopérative, lecture
 hero: La devanture de la librairie du Beffroi, à Belleroche | Photo : Karim Solère / CC BY 4.0
 ---
 

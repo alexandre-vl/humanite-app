@@ -107,12 +107,16 @@ const fold = (text: string): string => text.toLowerCase().split('œ').join('oe')
 type Indexed = Readonly<{ summary: ArticleSummary; searchable: string }>;
 
 /**
- * What search looks through: the title, the standfirst and the subjects of every article, and nothing of the body. The
- * body is not in a summary at all, so searching it would mean holding the whole corpus a second time.
+ * What search looks through: the title and the standfirst of every article, and nothing of the body. The body is not
+ * in a summary at all, so searching it would mean holding the whole corpus a second time.
+ *
+ * It read the subjects of an item too, until the schema stopped carrying any: nothing ever showed a subject to a
+ * reader, and the journal's own service names none. A word that was only ever a subject — « climat » was three of
+ * them — is now reachable only where the newsroom wrote it, which is what the journal's own search answers on.
  */
 const INDEXED: readonly Indexed[] = CHRONOLOGICAL.map((summary) => ({
   summary,
-  searchable: fold([summary.title, summary.standfirst, ...summary.tags].join(' ')),
+  searchable: fold([summary.title, summary.standfirst].join(' ')),
 }));
 
 const page = (

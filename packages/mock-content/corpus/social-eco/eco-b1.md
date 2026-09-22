@@ -1,6 +1,5 @@
 ---
 id: eco-b1
-kind: brief
 section: social-eco
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Le taux de chômage du bassin du Val d'Arche repasse sous la barre des ne
 standfirst: Selon les chiffres trimestriels publiés jeudi, l'emploi progresse légèrement, porté par les services et la construction. Les acteurs locaux restent prudents, à l'ombre des difficultés du secteur industriel.
 authors: julien-ferrand
 published: 2026-09-10 10:40
-tags: emploi, économie
 emphasis: true
 ---
 

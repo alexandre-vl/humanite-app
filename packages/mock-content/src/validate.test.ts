@@ -33,8 +33,9 @@ test('a lead picture keyed to another item is refused', () => {
 });
 
 /**
- * The four rules below moved here out of `ARTICLE_SUMMARY`, which had to widen to describe the journal's own service
+ * The three rules below moved here out of `ARTICLE_SUMMARY`, which had to widen to describe the journal's own service
  * as well as this corpus. They would otherwise have been dropped rather than moved, and nothing would have said so.
+ * A fourth, on how many subjects an item carries, went with the field itself the day nothing could fill it.
  */
 
 test('a title or a standfirst outside what this corpus measures is refused', () => {
@@ -47,14 +48,23 @@ test('a title or a standfirst outside what this corpus measures is refused', () 
   ]);
 });
 
-test('an item of this corpus carries a byline and its tags', () => {
-  const article = illustrated();
-  expect(errorsAbout(ARTICLE.parse({ ...article, authors: [] }), 'auteur(s)')).toEqual([
+test('an item of this corpus carries a byline', () => {
+  expect(errorsAbout(ARTICLE.parse({ ...illustrated(), authors: [] }), 'auteur(s)')).toEqual([
     expect.stringContaining('0 auteur(s)'),
   ]);
-  expect(errorsAbout(ARTICLE.parse({ ...article, tags: [] }), 'mot-clé(s)')).toEqual([
-    expect.stringContaining('0 mot-clé(s)'),
-  ]);
+});
+
+/**
+ * Brief-ness left the item schema and is read off the id here, so what used to be a check that two fields agreed is
+ * now a check that one of them holds: an item named as a brief is held to a brief's shape and to nothing else.
+ */
+test('an item named as a brief is held to what a brief may hold', () => {
+  const brief = CORPUS.find((each) => /-b[1-3]$/u.test(each.id));
+  if (brief === undefined) {
+    throw new Error('aucune brève dans le corpus');
+  }
+  const swollen = ARTICLE.parse({ ...brief, blocks: [...brief.blocks, ...brief.blocks, ...brief.blocks] });
+  expect(errorsAbout(swollen, 'trois paragraphes')).toEqual([expect.stringContaining('au plus trois paragraphes')]);
 });
 
 test('one picture key cannot serve two pictures', () => {

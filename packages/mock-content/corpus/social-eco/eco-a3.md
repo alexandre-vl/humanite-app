@@ -1,6 +1,5 @@
 ---
 id: eco-a3
-kind: article
 section: social-eco
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Après les suppressions de postes, le Val d'Arche cherche à bâtir un pl
 standfirst: Élus, chambre de commerce et organismes de formation planchent sur l'avenir d'un bassin d'emploi fragilisé. Objectif : anticiper les reconversions plutôt que de les subir, dans un territoire longtemps tourné vers la métallurgie.
 authors: marion-castel, julien-ferrand
 published: 2026-09-11 08:10
-tags: emploi, formation, territoires
 hero: Une friche industrielle en bordure de Villefranche-d'Arvor | Photo : Léo Prat / Studio Arvor
 ---
 

@@ -1,6 +1,5 @@
 ---
 id: env-a6
-kind: article
 section: environnement
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La recyclerie Le Second Souffle ouvre un atelier de réparation dans l'an
 standfirst: Portée par une trentaine de bénévoles, la structure veut donner une deuxième vie aux objets et apprendre aux habitants à réparer eux-mêmes leur électroménager, dans un local prêté par la commune de Saint-Prieux.
 authors: lea-fontanel
 published: 2026-09-12 17:05
-tags: déchets, réemploi, économie circulaire
 hero: L'atelier de réparation installé dans l'ancienne gare | Photo : Yann Mercier
 ---
 

@@ -1,6 +1,5 @@
 ---
 id: spo-b2
-kind: brief
 section: sport
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Terrain trop froid : le derby de handball entre Val-Mareuil et Saint-Prie
 standfirst: En cause, une panne du système de chauffage de la salle omnisports, jugée trop froide pour accueillir la rencontre, qui sera reprogrammée dans les prochaines semaines par la ligue régionale.
 authors: sofia-laurenti
 published: 2026-09-12 16:05
-tags: handball, calendrier, équipements
 ---
 
 Le derby de handball tant attendu entre Val-Mareuil et Saint-Prieux, prévu ce samedi, n'aura pas lieu à la date annoncée. La rencontre a été reportée en raison d'une panne du chauffage de la salle omnisports.

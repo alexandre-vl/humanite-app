@@ -1,6 +1,5 @@
 ---
 id: fem-b1
-kind: brief
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Violences conjugales : les signalements en hausse de 12 % dans le départ
 standfirst: Selon un bilan présenté mercredi, le nombre de signalements a augmenté l'an dernier, une évolution que les associations attribuent autant à une libération de la parole qu'à une réalité préoccupante.
 authors: claire-vasseur
 published: 2026-09-11 07:00
-tags: violences, société
 emphasis: true
 ---
 

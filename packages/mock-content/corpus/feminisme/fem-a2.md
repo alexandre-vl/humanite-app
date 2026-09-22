@@ -1,6 +1,5 @@
 ---
 id: fem-a2
-kind: article
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Un réseau de marraines aide les femmes des quartiers à reprendre le che
 standfirst: Lancé il y a deux ans à Saint-Maur-des-Vignes, le réseau Élan met en relation des professionnelles bénévoles et des femmes éloignées de l'emploi. Un premier bilan, encourageant, vient d'être présenté.
 authors: claire-vasseur
 published: 2026-09-10 17:20
-tags: emploi, solidarité, égalité
 hero: Deux femmes discutent lors d'un atelier du réseau Élan | Photo : Inès Aubry / CC BY 4.0
 ---
 

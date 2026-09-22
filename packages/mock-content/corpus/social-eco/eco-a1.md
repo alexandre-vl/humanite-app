@@ -1,6 +1,5 @@
 ---
 id: eco-a1
-kind: article
 section: social-eco
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Fonderies du Vernay : la direction présente un plan de départs, les sal
 standfirst: Le fabricant de pièces métalliques veut supprimer cent vingt postes sur son site du Val d'Arche. La direction évoque des départs volontaires ; les représentants du personnel redoutent, eux, un premier pas vers la fermeture.
 authors: marion-castel
 published: 2026-09-10 09:05
-tags: emploi, industrie, social
 hero: L'entrée du site des Fonderies du Vernay | Photo : Camille Ancel / Studio Arvor
 ---
 

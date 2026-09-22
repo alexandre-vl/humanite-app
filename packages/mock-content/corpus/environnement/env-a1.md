@@ -1,6 +1,5 @@
 ---
 id: env-a1
-kind: article
 section: environnement
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Sécheresse à Val-Mareuil : la régie des eaux impose des restrictions j
 standfirst: Le niveau de la nappe du bassin de la Sonne n'a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l'arrosage des jardins et à réduire la pression du réseau sur onze communes.
 authors: hugo-lambert
 published: 2026-09-10 08:30
-tags: eau, sécheresse, ressources
 hero: La retenue de la Sonne à son étiage | Photo : Camille Ancel
 ---
 

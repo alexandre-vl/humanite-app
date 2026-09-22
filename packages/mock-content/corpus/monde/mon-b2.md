@@ -1,6 +1,5 @@
 ---
 id: mon-b2
-kind: brief
 section: monde
 format: article
 access: free
@@ -8,7 +7,6 @@ title: L'Union des États du Levant adopte un plan commun de lutte contre les in
 standfirst: Les pays membres ont validé la création d'une flotte partagée d'avions bombardiers d'eau, mobilisable en quelques heures, après une saison marquée par des feux d'une ampleur inédite dans la région.
 authors: samir-haddad
 published: 2026-09-10 12:10
-tags: climat, coopération
 ---
 
 Les États membres de l'Union des États du Levant ont adopté jeudi un plan commun de lutte contre les incendies de forêt. Il prévoit la mise en commun d'une flotte d'avions bombardiers d'eau, mobilisable dans un délai de quelques heures.

@@ -55,7 +55,7 @@ describe('SearchPage', () => {
 
   it('laisse le lecteur finir de taper avant d’interroger le journal', async () => {
     await renderPage();
-    await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), 'climat');
+    await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), 'jeunes');
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
     await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
     expect(screen.queryByText('Cherchez dans le journal')).toBeNull();
@@ -63,15 +63,15 @@ describe('SearchPage', () => {
   });
 
   it('sert les articles qu’une question atteint, et dit combien elle en a trouvé', async () => {
-    const found = await content.search({ text: 'climat' });
+    const found = await content.search({ text: 'jeunes' });
     const [first] = found.items;
     if (first === undefined || found.total < 2) {
       throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
     }
     await renderPage();
-    await type('climat');
+    await type('jeunes');
     expect(await screen.findByText(first.title)).toBeTruthy();
-    expect(screen.getByText(`${String(found.total)} résultats pour « climat »`)).toBeTruthy();
+    expect(screen.getByText(`${String(found.total)} résultats pour « jeunes »`)).toBeTruthy();
     await settle();
   });
 
@@ -97,7 +97,7 @@ describe('SearchPage', () => {
 
   it('rend la question au lecteur quand il efface, et revient à ce qu’elle cherche', async () => {
     await renderPage();
-    await type('climat');
+    await type('jeunes');
     await fireEvent.press(screen.getByLabelText('Effacer la recherche'));
     await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
@@ -105,12 +105,12 @@ describe('SearchPage', () => {
   });
 
   it('ouvre l’article pressé sur sa propre route', async () => {
-    const [first] = (await content.search({ text: 'climat' })).items;
+    const [first] = (await content.search({ text: 'jeunes' })).items;
     if (first === undefined) {
       throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
     }
     await renderPage();
-    await type('climat');
+    await type('jeunes');
     await fireEvent.press(await screen.findByText(first.title));
     expect(jest.mocked(router.push)).toHaveBeenCalledWith({ pathname: '/article/[id]', params: { id: first.id } });
     await settle();

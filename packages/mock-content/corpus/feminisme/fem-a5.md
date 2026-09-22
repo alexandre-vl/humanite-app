@@ -1,6 +1,5 @@
 ---
 id: fem-a5
-kind: article
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Isolement des femmes en milieu rural : une ligne d'écoute itinérante si
 standfirst: Faute de transports et de services de proximité, de nombreuses femmes âgées ou isolées peinent à demander de l'aide. Un camion-permanence tente d'aller à leur rencontre, marché après marché.
 authors: claire-vasseur
 published: 2026-09-12 11:00
-tags: ruralité, solidarité, égalité
 hero: Le camion-permanence installé sur la place d'un village | Photo : Claire Aubert / CC BY 4.0
 ---
 

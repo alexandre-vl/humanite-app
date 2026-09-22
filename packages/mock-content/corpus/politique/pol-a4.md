@@ -1,6 +1,5 @@
 ---
 id: pol-a4
-kind: article
 section: politique
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Piétonnisation du centre de Villefranche-d'Arvor : la concertation vire 
 standfirst: Commerçants, riverains et associations de cyclistes se sont affrontés lors de la première réunion publique. La mairie promet une décision au printemps, après une phase d'expérimentation dès le mois d'octobre.
 authors: karim-belhadj
 published: 2026-09-11 16:20
-tags: mobilités, commerce, concertation
 hero: La rue Marchande, artère commerçante de Villefranche-d'Arvor | Photo : Sonia Belkacem / Studio Arvor
 ---
 

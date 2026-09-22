@@ -37,14 +37,15 @@ test('getArticle returns the body and rejects an unknown id', async () => {
   await expect(contentApi.getArticle(ARTICLE_ID.parse('zzz-a1'))).rejects.toBeInstanceOf(ContentApiError);
 });
 
-test('search matches titles, standfirsts and tags, and nothing of the body', async () => {
+test('search matches titles and standfirsts, and nothing of the body', async () => {
   const byTitle = await contentApi.search({ text: 'conseil municipal' });
   expect(byTitle.items.map((item) => item.id)).toContain('pol-a5');
   const byStandfirst = await contentApi.search({ text: 'cantines' });
   expect(byStandfirst.items.map((item) => item.id)).toContain('pol-a5');
-  const byTag = await contentApi.search({ text: 'budget' });
-  expect(byTag.total).toBeGreaterThan(0);
-  // A word the body of pol-a5 holds and none of its three searchable fields does: a summary carries no body at all.
+  // A subject three items once carried and no title or standfirst ever did: search stopped reading subjects the day
+  // the schema stopped carrying them, and the journal's own service names none.
+  await expect(contentApi.search({ text: 'climat' })).resolves.toMatchObject({ total: 0 });
+  // A word the body of pol-a5 holds and neither of its two searchable fields does: a summary carries no body at all.
   const body = await contentApi.getArticle(ARTICLE_ID.parse('pol-a5'));
   expect(JSON.stringify(body.blocks)).toContain('délibération');
   await expect(contentApi.search({ text: 'délibération' })).resolves.toMatchObject({ total: 0 });

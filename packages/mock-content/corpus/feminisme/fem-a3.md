@@ -1,6 +1,5 @@
 ---
 id: fem-a3
-kind: article
 section: feminisme
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Conseils municipaux : la parité progresse, mais les femmes restent tenue
 standfirst: Une analyse des exécutifs locaux de la région montre que si les assemblées sont désormais presque paritaires, les délégations stratégiques — finances, urbanisme, sécurité — demeurent très majoritairement masculines.
 authors: ines-benali
 published: 2026-09-11 09:40
-tags: parité, politique locale, égalité
 hero: Une séance du conseil municipal de Villeneuve-sur-Arche | Photo : Paul Rivière / CC BY 4.0
 ---
 

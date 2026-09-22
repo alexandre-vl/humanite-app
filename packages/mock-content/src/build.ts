@@ -173,7 +173,6 @@ export const parseItem = (text: string): Article => {
   const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
   return ARTICLE.parse({
     id,
-    kind: front['kind'],
     section: front['section'],
     format: front['format'],
     access: front['access'],
@@ -181,7 +180,6 @@ export const parseItem = (text: string): Article => {
     standfirst: front['standfirst'],
     authors: splitList(front['authors']),
     publishedAt: front['published'] === undefined ? undefined : toInstant(front['published']),
-    tags: splitList(front['tags']),
     ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
     ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
     blocks: body.map(toBlock),

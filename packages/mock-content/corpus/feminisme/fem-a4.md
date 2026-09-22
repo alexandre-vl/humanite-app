@@ -1,6 +1,5 @@
 ---
 id: fem-a4
-kind: article
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: À Courtebief, les footballeuses réclament les mêmes créneaux que les 
 standfirst: Reléguées aux horaires du matin et aux terrains annexes, les joueuses du club local ont saisi la mairie. Elles demandent un partage équitable des installations, alors que leurs effectifs ont doublé en trois ans.
 authors: ines-benali, claire-vasseur
 published: 2026-09-11 15:10
-tags: sport, égalité, vie locale
 hero: L'équipe féminine à l'entraînement sur un terrain annexe | Photo : Nadia Belkacem / CC BY 4.0
 ---
 

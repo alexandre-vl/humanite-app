@@ -1,6 +1,5 @@
 ---
 id: mon-a6
-kind: article
 section: monde
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Reconstruction en Terragne : le fonds Solidarité Sud peine à réunir le
 standfirst: Un an après la sécheresse historique qui a frappé la région de Terragne, le mécanisme d'aide créé pour financer la reconstruction n'a reçu qu'une fraction des sommes annoncées, révèle un rapport interne.
 authors: samir-haddad, elise-morvan
 published: 2026-09-13 07:40
-tags: climat, coopération, économie
 hero: Un champ asséché dans la région de Terragne | Photo : Agence Méridien / CC BY 4.0
 ---
 

@@ -4,7 +4,6 @@ import type { Article, ArticleSummary, Hero } from './index.ts';
 
 const validSummary = {
   id: 'pol-a1',
-  kind: 'article',
   section: 'politique',
   format: 'article',
   access: 'premium',
@@ -13,7 +12,6 @@ const validSummary = {
     'Un chapô assez long pour tenir dans la fourchette imposée par le schéma, décrivant en une phrase claire ce que raconte cet article fictif de démonstration destiné à la maquette.',
   authors: ['lucie-varenne'],
   publishedAt: '2026-09-10T08:30:00.000Z',
-  tags: ['budget', 'education'],
   hero: { key: 'pol-a1-hero', caption: 'Une légende', credit: 'Photo : Camille Ancel / CC BY 4.0' },
 };
 
@@ -22,12 +20,31 @@ test('ARTICLE_SUMMARY parses a valid summary', () => {
   expectTypeOf(summary).toEqualTypeOf<ArticleSummary>();
 });
 
+/**
+ * The field set itself, pinned. Two fields left this schema because nothing could fill them — `kind`, which the
+ * service draws no line for, and `tags`, which it never sends — and the way to keep a third from arriving the same
+ * way is to make adding one an edit here as well as there.
+ */
+test('a summary carries these fields and no others', () => {
+  expect([...Object.keys(ARTICLE_SUMMARY.shape)].sort((left, right) => left.localeCompare(right))).toEqual([
+    'access',
+    'authors',
+    'emphasis',
+    'format',
+    'hero',
+    'id',
+    'publishedAt',
+    'section',
+    'standfirst',
+    'title',
+  ]);
+});
+
 test('ARTICLE_SUMMARY takes the lengths the journal actually files, which no bound would have let through', () => {
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'Climat' }).success).toBe(true);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'T'.repeat(226) }).success).toBe(true);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, standfirst: '' }).success).toBe(true);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, authors: [] }).success).toBe(true);
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, tags: [] }).success).toBe(true);
 });
 
 test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, and nothing between', () => {

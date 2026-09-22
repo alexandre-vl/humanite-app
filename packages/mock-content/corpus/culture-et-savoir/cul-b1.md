@@ -1,6 +1,5 @@
 ---
 id: cul-b1
-kind: brief
 section: culture-et-savoir
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La scène nationale de Courtebief dévoile une saison placée sous le sig
 standfirst: Le théâtre a présenté mardi une programmation resserrée autour de la création contemporaine, avec quatorze spectacles et un festival de lectures ouvert aux textes d'auteurs encore inédits.
 authors: helene-marchetti
 published: 2026-09-11 07:30
-tags: théâtre, création, saison
 ---
 
 La scène nationale de Courtebief a présenté mardi sa nouvelle saison. Au total, quatorze spectacles sont programmés d'octobre à juin, dont six créations, une proportion en hausse par rapport à l'an dernier.

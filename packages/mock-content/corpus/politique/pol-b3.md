@@ -1,6 +1,5 @@
 ---
 id: pol-b3
-kind: brief
 section: politique
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Le conseil départemental vote une aide d'urgence pour les communes touch
 standfirst: Un fonds exceptionnel de deux millions d'euros doit permettre de réparer voiries et bâtiments publics endommagés cet été. Les premières enveloppes seront versées aux communes avant la fin du mois d'octobre.
 authors: lucie-varenne, karim-belhadj
 published: 2026-09-13 08:15
-tags: intempéries, collectivités, budget
 ---
 
 Le conseil départemental de la Sèvre-et-Coteaux a voté vendredi un fonds d'urgence de deux millions d'euros destiné aux communes touchées par les orages violents du mois d'août.

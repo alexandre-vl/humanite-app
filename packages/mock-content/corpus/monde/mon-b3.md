@@ -1,6 +1,5 @@
 ---
 id: mon-b3
-kind: brief
 section: monde
 format: article
 access: free
@@ -8,7 +7,6 @@ title: À Serravia, une bibliothèque itinérante dessert les quartiers privés 
 standfirst: Un ancien bus municipal transformé en médiathèque mobile sillonne depuis la rentrée les quartiers périphériques de la capitale valdave, proposant livres, jeux et accès à Internet aux habitants les plus éloignés.
 authors: elise-morvan, samir-haddad
 published: 2026-09-11 15:50
-tags: culture, villes
 ---
 
 Un ancien bus municipal repeint en bleu sillonne depuis la rentrée les quartiers périphériques de Serravia. Reconverti en médiathèque mobile, il propose des livres, des jeux et un accès à Internet aux habitants éloignés des équipements culturels du centre.

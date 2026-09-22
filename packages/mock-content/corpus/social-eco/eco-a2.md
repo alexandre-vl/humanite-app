@@ -1,6 +1,5 @@
 ---
 id: eco-a2
-kind: article
 section: social-eco
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Sur les marchés du Val d'Arche, la flambée des prix pousse les clients 
 standfirst: Fruits, légumes, fromages : en un an, les étals ont vu leurs tarifs grimper. Commerçants et clients décrivent une même spirale, entre coûts de production en hausse et pouvoir d'achat en berne, à l'approche de l'hiver.
 authors: julien-ferrand
 published: 2026-09-10 15:30
-tags: pouvoir d'achat, consommation, commerce
 hero: Un étal de primeurs sur le marché de Sainte-Coline | Photo : Nadia Rous / Studio Arvor
 ---
 

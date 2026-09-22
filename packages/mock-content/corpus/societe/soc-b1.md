@@ -1,6 +1,5 @@
 ---
 id: soc-b1
-kind: brief
 section: societe
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Villeneuve-sur-Arche ouvrira une halte de jour pour les personnes sans do
 standfirst: La municipalité a confirmé mercredi la création d'un accueil de jour, ouvert du lundi au samedi, offrant boissons chaudes, laverie et permanence sociale aux personnes à la rue durant la saison froide.
 authors: nadia-oussedik
 published: 2026-09-13 09:10
-tags: précarité, solidarité
 emphasis: true
 ---
 

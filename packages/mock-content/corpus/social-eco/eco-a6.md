@@ -1,6 +1,5 @@
 ---
 id: eco-a6
-kind: article
 section: social-eco
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Guichets fermés, tournées réduites : la fronde des maires ruraux contr
 standfirst: Dans le pays de l'Ombre, plusieurs bureaux ont vu leurs horaires rognés. Les élus dénoncent un abandon silencieux et réclament une concertation avant toute nouvelle fermeture, quand l'opérateur invoque la baisse du courrier.
 authors: marion-castel
 published: 2026-09-13 09:00
-tags: services publics, ruralité, poste
 hero: Un bureau de poste aux horaires réduits dans le pays de l'Ombre | Photo : Inès Fabre / Studio Arvor
 ---
 

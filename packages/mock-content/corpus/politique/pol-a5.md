@@ -1,6 +1,5 @@
 ---
 id: pol-a5
-kind: article
 section: politique
 format: video
 access: free
@@ -8,7 +7,6 @@ title: En immersion dans une séance de nuit du conseil municipal de Sainte-Coli
 standfirst: Jusqu'à une heure avancée, les élus ont débattu du budget, des cantines et de l'éclairage public. Notre reportage vidéo au cœur d'une assemblée où chaque euro se discute pied à pied, loin des projecteurs.
 authors: lucie-varenne
 published: 2026-09-12 09:10
-tags: démocratie locale, conseil municipal, budget
 hero: La salle du conseil de Sainte-Coline en séance de nuit | Photo : Karim Sadi / Studio Arvor
 ---
 

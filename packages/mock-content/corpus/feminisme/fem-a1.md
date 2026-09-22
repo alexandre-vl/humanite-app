@@ -1,6 +1,5 @@
 ---
 id: fem-a1
-kind: article
 section: feminisme
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Écart de salaires : dans les métiers du soin à domicile, les femmes ga
 standfirst: Une étude locale rendue publique mardi chiffre pour la première fois les écarts de rémunération dans un secteur presque entièrement féminin, où le temps partiel subi pèse lourd sur les fiches de paie.
 authors: claire-vasseur, ines-benali
 published: 2026-09-10 08:00
-tags: égalité, salaires, travail
 hero: Une aide à domicile en tournée dans un quartier pavillonnaire | Photo : Sonia Ferrer / CC BY 4.0
 ---
 

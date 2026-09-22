@@ -1,6 +1,5 @@
 ---
 id: mon-b1
-kind: brief
 section: monde
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La Valdavie rouvre sa frontière terrestre avec le Norland après six moi
 standfirst: Les deux pays ont annoncé la réouverture du poste-frontière de Vireux, fermé au printemps à la suite d'un différend douanier, une décision saluée par les commerçants transfrontaliers des deux côtés.
 authors: elise-morvan
 published: 2026-09-13 09:30
-tags: frontières, commerce
 emphasis: true
 ---
 

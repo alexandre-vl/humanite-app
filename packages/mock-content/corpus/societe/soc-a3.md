@@ -1,6 +1,5 @@
 ---
 id: soc-a3
-kind: article
 section: societe
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Déserts médicaux : la maison de santé du Val d'Arche cherche à attire
 standfirst: Ouverte il y a un an à Saint-Clair-du-Roc, la structure peine encore à recruter des généralistes, malgré des logements de fonction et une prime d'installation financée par cinq communes réunies.
 authors: nadia-oussedik, thomas-lecuyer
 published: 2026-09-12 07:50
-tags: santé, ruralité, services publics
 hero: La façade de la maison de santé du Val d'Arche | Photo : Studio Arche / CC BY 4.0
 ---
 

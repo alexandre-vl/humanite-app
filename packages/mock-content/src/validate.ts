@@ -43,7 +43,7 @@ const WORDS = {
 } as const satisfies Readonly<Record<ArticleFormat | 'brief', Words>>;
 
 /**
- * What a title, a standfirst, a byline and a tag list of this corpus measure.
+ * What a title, a standfirst and a byline of this corpus measure.
  *
  * These were written into `ARTICLE_SUMMARY` and held every item the app could ever show, because every item was
  * written here. They came down the day the schema had also to describe the journal's own service, where a title of
@@ -55,11 +55,8 @@ const SIGNS = {
   standfirst: { min: 150, max: 300 },
 } as const satisfies Readonly<Record<string, Words>>;
 
-/** How many names and how many tags an item of this corpus carries. */
-const COUNTS = {
-  authors: { min: 1, max: 2 },
-  tags: { min: 2, max: 4 },
-} as const satisfies Readonly<Record<string, Words>>;
+/** How many names an item of this corpus carries. */
+const COUNTS = { authors: { min: 1, max: 2 } } as const satisfies Readonly<Record<string, Words>>;
 
 /** The newsroom hours the corpus covers, written on its own clock and compared as instants. */
 const WINDOW = { start: toInstant('2026-09-10 07:00'), end: toInstant('2026-09-13 09:55') } as const;
@@ -89,7 +86,17 @@ const blockWords = (block: Block): number => {
 
 const wordCount = (article: Article): number => article.blocks.reduce((sum, block) => sum + blockWords(block), 0);
 
-const wordRange = (article: Article): Words => WORDS[article.kind === 'brief' ? 'brief' : article.format];
+/**
+ * Whether an item of this corpus is a brief, read off its own id.
+ *
+ * The item schema said it too, in a `kind` field, and the two had to be checked against each other here. Nothing else
+ * in the repository ever read that field — a feed calls an item short when it comes without a picture, not when it
+ * says it is — and the journal's service draws no such line at all, so the field left the schema. The naming rule of
+ * this corpus is the one place the distinction was ever really written: `pol-a1` is an article, `pol-b1` a brief.
+ */
+const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
+
+const wordRange = (article: Article): Words => WORDS[isBrief(article) ? 'brief' : article.format];
 
 /** Every picture an item names: its lead illustration, then the images of its body. */
 export const imageKeys = (article: Article): readonly ImageKey[] => [
@@ -145,9 +152,6 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (section !== undefined && !article.id.startsWith(`${section.code}-`)) {
     errors.push(`${where} : id hors de la rubrique « ${section.code} »`);
   }
-  if (/-b[1-3]$/u.test(article.id) !== (article.kind === 'brief')) {
-    errors.push(`${where} : préfixe d’id et kind incohérents`);
-  }
   if (article.title === article.title.toUpperCase()) {
     errors.push(`${where} : titre tout en capitales`);
   }
@@ -161,10 +165,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
       );
     }
   }
-  for (const [field, list, bounds] of [
-    ['auteur', article.authors, COUNTS.authors],
-    ['mot-clé', article.tags, COUNTS.tags],
-  ] as const) {
+  for (const [field, list, bounds] of [['auteur', article.authors, COUNTS.authors]] as const) {
     if (list.length < bounds.min || list.length > bounds.max) {
       errors.push(
         `${where} : ${String(list.length)} ${field}(s) (attendu ${String(bounds.min)} à ${String(bounds.max)})`,
@@ -181,23 +182,19 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   } else if (known.some((each) => each.isColumnist || each.section !== folder)) {
     errors.push(`${where} : auteurs non chroniqueurs de la rubrique attendus`);
   }
-  if (
-    (article.format === 'article' || article.format === 'video') &&
-    article.kind === 'article' &&
-    article.hero === undefined
-  ) {
+  if ((article.format === 'article' || article.format === 'video') && !isBrief(article) && article.hero === undefined) {
     errors.push(`${where} : hero obligatoire pour un article ou une vidéo`);
   }
   if (article.format === 'column' && article.hero !== undefined) {
     errors.push(`${where} : pas de hero pour une chronique`);
   }
-  if (article.emphasis !== undefined && article.kind !== 'brief') {
+  if (article.emphasis !== undefined && !isBrief(article)) {
     errors.push(`${where} : emphasis réservé à une brève`);
   }
-  if (article.kind === 'brief' && kinds.some((kind) => kind !== 'paragraph')) {
+  if (isBrief(article) && kinds.some((kind) => kind !== 'paragraph')) {
     errors.push(`${where} : une brève ne contient que des paragraphes`);
   }
-  if (article.kind === 'brief' && article.blocks.length > 3) {
+  if (isBrief(article) && article.blocks.length > 3) {
     errors.push(`${where} : une brève a au plus trois paragraphes`);
   }
   if (article.format === 'video' && kinds[0] !== 'video') {
@@ -218,7 +215,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (article.format === 'column' && kinds.includes('image')) {
     errors.push(`${where} : pas d’image dans une chronique`);
   }
-  if (article.format === 'article' && article.kind === 'article' && !kinds.includes('heading')) {
+  if (article.format === 'article' && !isBrief(article) && !kinds.includes('heading')) {
     errors.push(`${where} : au moins un intertitre dans un article`);
   }
   if (words < range.min || words > range.max) {
@@ -244,8 +241,8 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
 
 const checkSection = (folder: SectionId, articles: readonly Article[]): readonly string[] => {
   const errors: string[] = [];
-  const arts = articles.filter((article) => article.kind === 'article');
-  const briefs = articles.filter((article) => article.kind === 'brief');
+  const arts = articles.filter((article) => !isBrief(article));
+  const briefs = articles.filter(isBrief);
   const quota = EXPECTED.get(folder);
   const counts = {
     video: articles.filter((article) => article.format === 'video').length,

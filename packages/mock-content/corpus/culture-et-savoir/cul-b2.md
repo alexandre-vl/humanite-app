@@ -1,6 +1,5 @@
 ---
 id: cul-b2
-kind: brief
 section: culture-et-savoir
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Un trésor de monnaies antiques mis au jour lors de travaux d'assainissem
 standfirst: Les archéologues ont dégagé un lot de plusieurs centaines de pièces enfouies dans une jarre, une découverte qualifiée de rare pour la région et qui va retarder le chantier de plusieurs semaines.
 authors: paul-delorme
 published: 2026-09-12 07:45
-tags: archéologie, découverte
 emphasis: true
 ---
 

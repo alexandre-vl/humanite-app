@@ -1,6 +1,5 @@
 ---
 id: cul-a3
-kind: article
 section: culture-et-savoir
 format: column
 access: free
@@ -8,7 +7,6 @@ title: Chronique : la bibliothèque, dernier lieu où l'on peut entrer sans rien
 standfirst: Alors que les espaces gratuits se raréfient dans nos villes, nos bibliothèques municipales restent l'un des rares endroits où l'on est accueilli sans condition. Il serait imprudent de les tenir pour acquises.
 authors: odile-sarrazin
 published: 2026-09-11 08:00
-tags: bibliothèques, service public, lecture
 ---
 
 Je repense souvent à cette phrase d'une bibliothécaire de quartier, croisée l'hiver dernier : « Ici, personne ne me demande jamais pourquoi je suis venu. » Elle disait vrai. La bibliothèque est peut-être le dernier lieu de nos villes où l'on peut passer une après-midi entière sans rien consommer, sans se justifier, sans même parler à quiconque.

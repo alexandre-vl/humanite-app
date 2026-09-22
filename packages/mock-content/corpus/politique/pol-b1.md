@@ -1,6 +1,5 @@
 ---
 id: pol-b1
-kind: brief
 section: politique
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La préfecture reporte l'enquête publique sur le contournement routier d
 standfirst: Faute d'un dossier environnemental complet, la consultation prévue en octobre est repoussée à la fin de l'hiver, a indiqué la préfecture dans un bref communiqué diffusé mercredi en fin de journée.
 authors: karim-belhadj
 published: 2026-09-10 07:20
-tags: aménagement, transports
 emphasis: true
 ---
 

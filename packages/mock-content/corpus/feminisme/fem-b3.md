@@ -1,6 +1,5 @@
 ---
 id: fem-b3
-kind: brief
 section: feminisme
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Un forum consacré à l'entrepreneuriat des femmes se tiendra le mois pro
 standfirst: Rencontres, ateliers et micro-crédit : la manifestation entend accompagner celles qui souhaitent créer leur activité, dans un territoire où elles restent minoritaires parmi les créateurs d'entreprise.
 authors: claire-vasseur, ines-benali
 published: 2026-09-13 09:00
-tags: entrepreneuriat, égalité, économie
 ---
 
 Un forum dédié à l'entrepreneuriat des femmes se tiendra le mois prochain à Villeneuve-sur-Arche, à l'initiative d'un collectif d'associations et de la chambre consulaire locale.

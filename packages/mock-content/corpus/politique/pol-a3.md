@@ -1,6 +1,5 @@
 ---
 id: pol-a3
-kind: article
 section: politique
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Fusion des intercommunalités : le Val d'Arche et le pays de l'Ombre bute
 standfirst: Engagées depuis un an vers un rapprochement, les deux communautés de communes ne s'accordent ni sur le nombre de vice-présidents ni sur le siège de la future collectivité. Une réunion décisive est prévue la semaine prochaine.
 authors: lucie-varenne, karim-belhadj
 published: 2026-09-11 07:45
-tags: intercommunalité, gouvernance, territoires
 hero: La salle du conseil communautaire du Val d'Arche | Photo : Léo Prat / Studio Arvor
 ---
 

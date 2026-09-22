@@ -1,6 +1,5 @@
 ---
 id: mon-a3
-kind: article
 section: monde
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: À Port-Méridienne, l'automatisation du terminal portuaire inquiète les
 standfirst: L'arrivée de portiques automatisés sur le premier terminal à conteneurs de la région fait craindre des centaines de suppressions d'emplois, dans une ville où la manutention fait vivre des quartiers entiers.
 authors: elise-morvan, samir-haddad
 published: 2026-09-12 08:05
-tags: travail, économie, migration
 hero: Les portiques du terminal de Port-Méridienne | Photo : Agence Méridien / CC BY 4.0
 ---
 

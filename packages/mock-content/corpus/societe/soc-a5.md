@@ -1,6 +1,5 @@
 ---
 id: soc-a5
-kind: article
 section: societe
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Transport à la demande : les hameaux de la vallée de l'Arche testent un
 standfirst: Lancé pour six mois, un service de navette sur réservation dessert désormais les écarts privés de ligne régulière, avec l'ambition de désenclaver les personnes âgées et les jeunes sans permis.
 authors: nadia-oussedik
 published: 2026-09-11 11:05
-tags: mobilité, ruralité, services publics
 hero: Le minibus solidaire à son premier arrêt au hameau de Faverolles | Photo : Studio Arche / CC BY 4.0
 ---
 

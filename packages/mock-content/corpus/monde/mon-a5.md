@@ -1,6 +1,5 @@
 ---
 id: mon-a5
-kind: article
 section: monde
 format: column
 access: free
@@ -8,7 +7,6 @@ title: Chronique : la solidarité entre nations ne se décrète pas dans les com
 standfirst: Une trêve signée, un archipel qui attend son eau potable : la même semaine, le monde a offert le meilleur et le pire de la coopération. Il est temps d'en tirer une leçon simple mais exigeante, écrit notre chroniqueur.
 authors: yves-kerlan
 published: 2026-09-12 09:00
-tags: diplomatie, humanitaire, opinion
 ---
 
 J'ai lu, cette semaine, deux dépêches presque simultanées. L'une annonçait une trêve dans le détroit de Kessel ; l'autre décrivait des familles de l'archipel des Cargues marchant des kilomètres pour un bidon d'eau. Deux visages de la coopération internationale, et une même question que je ne parviens pas à écarter : à quoi sert une belle signature si elle ne change rien pour ceux qui attendent sur un quai ?

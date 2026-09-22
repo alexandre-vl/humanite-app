@@ -1,6 +1,5 @@
 ---
 id: spo-a3
-kind: article
 section: sport
 format: video
 access: free
@@ -8,7 +7,6 @@ title: En immersion sur la Ronde des Trois-Vallées, la course cycliste qui anim
 standfirst: Le temps d'une étape, nous avons suivi les bénévoles, les signaleurs et les coureurs de cette épreuve cycliste amateur qui traverse chaque automne une trentaine de communes du plateau, entre villages pavoisés et cols discrets.
 authors: maxime-renaud, sofia-laurenti
 published: 2026-09-11 11:10
-tags: cyclisme, course, bénévolat
 hero: Le peloton dans la traversée d'un village du plateau | Photo : Malo Renard
 ---
 

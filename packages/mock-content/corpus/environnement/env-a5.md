@@ -1,6 +1,5 @@
 ---
 id: env-a5
-kind: article
 section: environnement
 format: article
 access: free
@@ -8,7 +7,6 @@ title: La coopérative Champs d'avenir replante des haies pour se passer d'une p
 standfirst: Sur le plateau, une trentaine de maraîchers misent sur les haies et les bandes fleuries pour attirer les insectes auxiliaires, une stratégie patiente qu'ils veulent mesurer parcelle par parcelle avant de la généraliser.
 authors: hugo-lambert
 published: 2026-09-12 08:15
-tags: agriculture, pesticides, biodiversité
 hero: Une haie fraîchement plantée en bordure de parcelle | Photo : Camille Ancel
 ---
 

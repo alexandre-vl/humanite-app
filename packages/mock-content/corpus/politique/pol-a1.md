@@ -1,6 +1,5 @@
 ---
 id: pol-a1
-kind: article
 section: politique
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Transports scolaires du Val d'Arche : le département rétablit trois lig
 standfirst: Après un mois de courriers de parents et d'élus ruraux, l'assemblée départementale a voté mardi soir le maintien des trois dessertes que ses services jugeaient trop coûteuses. Le financement reste à confirmer pour la prochaine rentrée.
 authors: lucie-varenne
 published: 2026-09-10 08:30
-tags: transports, ruralité, collectivités
 hero: Un car scolaire sur le plateau de Villefranche-d'Arvor | Photo : Camille Ancel / Studio Arvor
 ---
 

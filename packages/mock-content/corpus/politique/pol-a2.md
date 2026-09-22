@@ -1,6 +1,5 @@
 ---
 id: pol-a2
-kind: article
 section: politique
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Logements vacants à Sainte-Coline : la commune lance un plan pour remett
 standfirst: La municipalité veut récupérer une centaine de logements laissés vides dans le centre ancien. Elle mise d'abord sur des aides à la rénovation, puis, en dernier recours, sur la réquisition, une piste qui divise déjà le conseil municipal.
 authors: karim-belhadj
 published: 2026-09-10 12:15
-tags: logement, urbanisme, collectivités
 hero: Une façade du centre ancien de Sainte-Coline | Photo : Nadia Rous / Studio Arvor
 ---
 

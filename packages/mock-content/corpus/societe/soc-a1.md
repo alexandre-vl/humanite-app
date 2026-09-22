@@ -1,6 +1,5 @@
 ---
 id: soc-a1
-kind: article
 section: societe
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Hébergement d'urgence à Villeneuve-sur-Arche : le collectif Toits d'abo
 standfirst: Après une nuit de veille devant la mairie, la municipalité a accepté mercredi d'ouvrir le gymnase des Charmilles pour accueillir une soixantaine de personnes sans abri avant les premières gelées.
 authors: nadia-oussedik
 published: 2026-09-11 08:15
-tags: logement, précarité, solidarité
 hero: Le gymnase des Charmilles réaménagé en dortoir | Photo : Studio Arche / CC BY 4.0
 ---
 

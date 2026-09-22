@@ -1,6 +1,5 @@
 ---
 id: spo-a5
-kind: article
 section: sport
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Pour survivre, le Racing de Fontenay-les-Prés et le club voisin scellent
 standfirst: Faute d'effectifs suffisants dans les catégories jeunes, les deux clubs de rugby du canton unissent leurs forces sous de nouvelles couleurs, un mariage de raison longtemps repoussé par les fiertés locales.
 authors: maxime-renaud
 published: 2026-09-12 18:20
-tags: rugby, clubs, jeunesse
 hero: Les deux équipes réunies avant un entraînement commun | Photo : Yann Mercier
 ---
 

@@ -1,6 +1,5 @@
 ---
 id: pol-a6
-kind: article
 section: politique
 format: article
 access: free
@@ -8,7 +7,6 @@ title: Déontologie des élus : la communauté d'agglomération adopte une chart
 standfirst: Conflits d'intérêts, cadeaux, marchés publics : la nouvelle charte encadre les pratiques des cent trente élus communautaires. Une déontologue indépendante pourra être saisie par les habitants comme par les agents.
 authors: lucie-varenne
 published: 2026-09-12 18:40
-tags: transparence, éthique, intercommunalité
 hero: Signature de la charte de déontologie en séance | Photo : Inès Fabre / Studio Arvor
 ---
 

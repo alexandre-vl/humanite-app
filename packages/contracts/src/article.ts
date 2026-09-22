@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { BLOCK } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
-import { ACCESS, ARTICLE_FORMAT, ARTICLE_KIND } from './enums.ts';
+import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
 import { ARTICLE_ID, AUTHOR_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 
 /** The illustration of an item: the key that names its picture, with the caption and the credit that go under it. */
@@ -19,10 +19,15 @@ export type Hero = z.infer<typeof HERO>;
  *
  * The bounds were not dropped, they moved to where they are true: `packages/mock-content/src/validate.ts` holds them
  * against the corpus, which is written and so can be held to them.
+ *
+ * Two fields went the other way and are gone. `kind` said whether an item was an article or a brief: no screen ever
+ * asked — a feed calls an item short when it comes without a picture — and the service draws no such line, so the one
+ * place that needs it, the corpus, reads it off the item's own id. `tags` said what an item was about: no screen ever
+ * showed one, and of the sixteen fields the service sends, none is a subject. A field a schema requires and nothing
+ * can fill is a field every reading has to invent.
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
-  kind: ARTICLE_KIND,
   section: SECTION_ID,
   format: ARTICLE_FORMAT,
   access: ACCESS,
@@ -30,7 +35,6 @@ export const ARTICLE_SUMMARY = z.object({
   standfirst: DISPLAY_TEXT,
   authors: z.array(AUTHOR_ID),
   publishedAt: z.iso.datetime(),
-  tags: z.array(DISPLAY_TEXT),
   hero: HERO.optional(),
   emphasis: z.boolean().optional(),
 });

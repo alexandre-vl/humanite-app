@@ -1,6 +1,5 @@
 ---
 id: eco-a4
-kind: article
 section: social-eco
 format: column
 access: free
@@ -8,7 +7,6 @@ title: Chronique : ce que la file d'attente d'une épicerie solidaire dit de not
 standfirst: Derrière les chiffres de la croissance, il y a des files qui s'allongent le samedi matin. Notre chroniqueur revient sur ce que révèle, très concrètement, l'essor discret de l'économie du dépannage et du partage.
 authors: bernard-quillet
 published: 2026-09-12 07:30
-tags: économie sociale, précarité, société
 ---
 
 Je passe chaque samedi devant l'épicerie solidaire de mon quartier. Depuis un an, la file d'attente s'y allonge, discrètement, sans éclat. On y croise désormais des visages que l'on n'y voyait pas : des salariés, des étudiants, des retraités qui, il y a peu encore, se seraient crus à l'abri.

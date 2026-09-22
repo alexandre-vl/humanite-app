@@ -1,6 +1,5 @@
 ---
 id: mon-a1
-kind: article
 section: monde
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Détroit de Kessel : la Savarie et le Norland signent une trêve sur la p
 standfirst: Réunis à Port-Méridienne, les représentants des deux pays voisins ont paraphé un accord encadrant les zones de pêche contestées, sous la médiation de l'Union des États du Levant, saluée par les riverains.
 authors: elise-morvan, samir-haddad
 published: 2026-09-10 07:30
-tags: diplomatie, pêche, coopération
 hero: Le port de Port-Méridienne au petit matin | Photo : Agence Méridien / CC BY 4.0
 ---
 

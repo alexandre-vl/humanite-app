@@ -1,6 +1,5 @@
 ---
 id: env-a3
-kind: article
 section: environnement
 format: article
 access: premium
@@ -8,7 +7,6 @@ title: Aux marais de Grand-Rieu, la renaturation porte ses premiers fruits deux 
 standfirst: Le conservatoire des espaces naturels des Trois-Vallées constate le retour d'oiseaux nicheurs sur la zone humide restaurée, un signe encourageant pour un chantier longtemps contesté par les riverains de la vallée.
 authors: hugo-lambert, lea-fontanel
 published: 2026-09-11 09:40
-tags: biodiversité, zones humides, rivière
 hero: Les vasières restaurées des marais de Grand-Rieu | Photo : Malo Renard
 ---
 

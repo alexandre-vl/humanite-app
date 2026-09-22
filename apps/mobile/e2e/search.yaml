@@ -1,8 +1,8 @@
 # La recherche répond quand la frappe se pose, sans bouton à presser.
 #
 # Le mot cherché n’est pas quoté : ce qu’un lecteur tape n’est pas un texte de l’interface et n’a rien à faire dans le
-# dictionnaire. « climat » traverse le corpus entier et survit au repli des accents que le moteur applique des deux
-# côtés.
+# dictionnaire. « jeunes » est écrit dans sept titres ou chapôs du corpus, et la recherche ne lit plus qu’eux depuis
+# que les sujets ont quitté le schéma.
 #
 # La question est effacée lettre par lettre plutôt qu’en touchant la croix du champ : cette croix vit en haut à
 # droite, sous le menu flottant du client de développement, et la toucher ouvrirait ce menu au lieu du champ.
@@ -12,7 +12,7 @@ appId: ${APP_ID}
 - tapOn: 'Recherche'
 - assertVisible: 'Cherchez dans le journal'
 - tapOn: 'Saisissez ici le sujet'
-- inputText: climat
+- inputText: jeunes
 - extendedWaitUntil:
     notVisible: 'Cherchez dans le journal'
     timeout: 20000

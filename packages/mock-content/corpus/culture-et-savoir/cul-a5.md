@@ -1,6 +1,5 @@
 ---
 id: cul-a5
-kind: article
 section: culture-et-savoir
 format: article
 access: free
@@ -8,7 +7,6 @@ title: À Aval-sur-Loue, des habitants numérisent la mémoire ouvrière de leur
 standfirst: Photographies, carnets d'atelier, bulletins de paie : un collectif de bénévoles rassemble et scanne les archives privées d'anciens ouvriers du textile, pour constituer un fonds accessible à tous.
 authors: helene-marchetti
 published: 2026-09-12 10:20
-tags: mémoire, archives, patrimoine industriel
 hero: Des bénévoles trient de vieilles photographies d'atelier | Photo : Marie Estève / CC BY 4.0
 ---
 

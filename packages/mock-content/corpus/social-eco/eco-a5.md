@@ -1,6 +1,5 @@
 ---
 id: eco-a5
-kind: article
 section: social-eco
 format: article
 access: free
@@ -8,7 +7,6 @@ title: À Montreuil-l'Abbé, une coopérative rachète l'usine de ses salariés 
 standfirst: Menacés par le départ à la retraite de leur patron, les employés d'une menuiserie ont repris l'entreprise en société coopérative. Un an après, l'atelier tourne, avec des débuts encourageants mais encore fragiles.
 authors: julien-ferrand
 published: 2026-09-12 14:00
-tags: économie sociale, emploi, coopératives
 hero: L'atelier de la menuiserie coopérative de Montreuil-l'Abbé | Photo : Karim Sadi / Studio Arvor
 ---
 

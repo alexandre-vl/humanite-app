@@ -1,6 +1,5 @@
 ---
 id: soc-a4
-kind: article
 section: societe
 format: article
 access: free
@@ -8,7 +7,6 @@ title: À la résidence Les Tilleuls, des ateliers intergénérationnels pour ro
 standfirst: Chaque mardi, des collégiens de Villeneuve-sur-Arche rejoignent les pensionnaires d'une maison de retraite pour cuisiner, jardiner ou simplement discuter, dans le cadre d'un projet lancé au printemps.
 authors: thomas-lecuyer
 published: 2026-09-12 10:20
-tags: grand âge, lien social, éducation
 hero: Un atelier cuisine partagé à la résidence Les Tilleuls | Photo : Marème Sow / CC BY 4.0
 ---
 
