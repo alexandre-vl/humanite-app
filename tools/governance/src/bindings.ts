@@ -977,6 +977,8 @@ export const BINDINGS = {
         'packages/contracts/src/recorded.ts',
         'packages/contracts/src/remote.ts',
         'packages/contracts/src/remote.test.ts',
+        'tools/capture/**',
+        'tools/governance/src/cli/capture-read.ts',
         'tools/guardrails/src/proofs/prose.ts',
       ],
     },
@@ -993,6 +995,7 @@ export const BINDINGS = {
         'prose/donation-kept',
         'prose/nothing-read',
       ],
+      R3: ['secret/recorded-clean', 'secret/token', 'secret/password', 'secret/address', 'secret/cookie', 'secret/key'],
     },
   },
 } as const satisfies Bindings<ProofId>;

@@ -1,0 +1,21 @@
+{
+  "name": "@huma/capture",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./answers": "./src/answers.ts",
+    "./har": "./src/har.ts",
+    "./proofs": "./src/proofs/registry.ts",
+    "./secrets": "./src/secrets.ts"
+  },
+  "dependencies": {
+    "@huma/fixtures": "workspace:*",
+    "@huma/kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@huma/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

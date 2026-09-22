@@ -79,6 +79,12 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'crée un ADR proposé au dernier format',
   },
+  'capture:read': {
+    program: cli('capture-read'),
+    arguments: [],
+    audience: 'everyone',
+    summary: 'lit une session réseau captée et en écrit les réponses du journal, sans laisser passer de secret',
+  },
   'adr:status': {
     program: cli('adr-status'),
     arguments: [],

@@ -6,6 +6,7 @@
     "@huma/adr": "workspace:*",
     "@huma/agents": "workspace:*",
     "@huma/architecture": "workspace:*",
+    "@huma/capture": "workspace:*",
     "@huma/deps": "workspace:*",
     "@huma/emulator": "workspace:*",
     "@huma/expo": "workspace:*",

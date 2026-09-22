@@ -1,5 +1,6 @@
 import { ADR_PROOFS } from '@huma/adr/proofs';
 import { AGENT_PROOFS } from '@huma/agents/proofs';
+import { CAPTURE_PROOFS } from '@huma/capture/proofs';
 import { DEPS_PROOFS } from '@huma/deps/proofs';
 import { EMULATOR_PROOFS } from '@huma/emulator/proofs';
 import { EXPO_PROOFS } from '@huma/expo/proofs';
@@ -20,6 +21,7 @@ type IdOf<Fixtures extends readonly Fixture<string, string>[]> = Fixtures[number
 export type ProofId =
   | IdOf<typeof ADR_PROOFS>
   | IdOf<typeof AGENT_PROOFS>
+  | IdOf<typeof CAPTURE_PROOFS>
   | IdOf<typeof DEPS_PROOFS>
   | IdOf<typeof EMULATOR_PROOFS>
   | IdOf<typeof EXPO_PROOFS>
@@ -40,6 +42,7 @@ export type ProofId =
 const PROOF_LISTS: readonly (readonly Fixture<ProofId, string>[])[] = [
   ADR_PROOFS,
   AGENT_PROOFS,
+  CAPTURE_PROOFS,
   DEPS_PROOFS,
   EMULATOR_PROOFS,
   EXPO_PROOFS,

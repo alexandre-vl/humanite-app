@@ -13,6 +13,7 @@ supersedes: [ADR-0020]
 - Les listes, le menu des rubriques et la recherche de ce service ne demandent aucun jeton ; seul le corps d’un article en demande un (même capture : les en-têtes d’authentification n’apparaissent que sur `wordpress/post/<id>`, `store/*` et `drm/*`).
 - Le service nomme lui-même le format de chaque article — `classic`, `opinion`, `video`, `serie` — et le droit de lecture du lecteur, article par article.
 - Le corps d’un article arrive dans un champ `content_array` en HTML WordPress de 45 à 76 ko, scripts et formulaire de don compris ; la prose utile y tient entre 0 et 37 paragraphes selon le format.
+- La forme de ce service n’est écrite nulle part ailleurs que dans une capture réseau de l’app officielle, prise pendant qu’un lecteur était connecté : elle porte donc aussi son identifiant, son mot de passe, les jetons de sa session et la clé statique du client officiel (`tools/capture/src/secrets.ts`).
 - ADR-0020 a écarté toute collecte parce qu’aucune source lisible n’existait ; le service que l’app officielle interroge en est une, et il sert ce que le journal publie.
 - ADR-0021 a posé une porte unique pour le contenu et a nommé ce remplacement comme sa propre réévaluation (`apps/mobile/src/shared/api/content.ts`).
 
@@ -37,13 +38,15 @@ Option retenue : « Un client du service derrière la porte existante », parce 
 
 - **R1** — Une réponse du service NE DOIT PAS être servie à un écran sans avoir été relue par un schéma des contrats.
 - **R2** — Le corps d’un article DOIT être rendu en blocs des contrats, sans qu’aucun balisage atteigne une primitive.
-- **R3** — Le contenu simulé PEUT rester le corpus déterministe des tests et des parcours.
+- **R3** — Un secret que porte une capture NE DOIT PAS être écrit dans un fichier suivi.
+- **R4** — Le contenu simulé PEUT rester le corpus déterministe des tests et des parcours.
 
 ### Conséquences
 
 - Bien, parce que le lecteur lit le journal du jour au lieu d’un corpus figé (C1).
 - Bien, parce que la porte unique d’ADR-0021 absorbe le changement : les requêtes, les clés de cache et les écrans restent (C2).
 - Bien, parce que les réponses captées servent de fixtures : les tests jugent un vrai payload sans réseau (C3).
+- Bien, parce qu’une capture entre par une commande qui la lit, la taille et refuse d’écrire si elle y trouve un secret, plutôt qu’à la main (C3).
 - Mauvais, parce que l’app dépend d’un service qu’elle ne tient pas, dont la forme peut changer sans préavis (C1).
 - Mauvais, parce qu’un convertisseur de balisage entre dans le paquet, et qu’il est à tenir (C4).
 

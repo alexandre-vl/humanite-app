@@ -45,10 +45,10 @@ test('REMOTE_SECTIONS renames the service key and answers the journal eleven sec
   expect(sections.sections.map((section) => section.slug)).toContain('politique');
 });
 
-test.each([
-  { label: 'an opinion piece', body: RECORDED.opinionArticle },
-  { label: 'a video', body: RECORDED.videoArticle },
-])('REMOTE_ARTICLE reads the body of $label', ({ body }) => {
+/** Every article the capture holds, by the format the journal gave it: a new format is read without a line here. */
+const ARTICLES = Object.entries(RECORDED.articles).map(([format, body]) => ({ format, body }));
+
+test.each(ARTICLES)('REMOTE_ARTICLE reads a body the service filed as $format', ({ body }) => {
   const article: RemoteArticle = REMOTE_ARTICLE.parse(body);
   expectTypeOf(article).toEqualTypeOf<RemoteArticle>();
   expect(article.content_array).toHaveLength(1);

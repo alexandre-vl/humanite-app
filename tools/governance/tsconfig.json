@@ -12,6 +12,9 @@
       "path": "../agents"
     },
     {
+      "path": "../capture"
+    },
+    {
       "path": "../deps"
     },
     {
