@@ -2,7 +2,7 @@ export { ACCESS, ARTICLE_FORMAT } from './enums.ts';
 export type { Access, ArticleFormat } from './enums.ts';
 export { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 export type { ArticleId, ImageKey, IssueId, SectionId } from './ids.ts';
-export { issueIdAt, NEWSROOM_ZONE } from './clock.ts';
+export { clockAt, instantAt, issueIdAt } from './clock.ts';
 export type { DisplayText } from './display-text.ts';
 export { BLOCK, SECTION, SPAN } from './content.ts';
 export type { Block, BlockInput, Section, Span, SpanInput } from './content.ts';

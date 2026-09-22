@@ -1,7 +1,6 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
-import { SECTION_ID } from '@huma/contracts';
+import { instantAt, SECTION_ID } from '@huma/contracts';
 import { AUTHORS, namesOf, SECTIONS } from './registries.ts';
-import { toInstant } from './time.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
 
@@ -58,8 +57,17 @@ const SIGNS = {
 /** How many names an item of this corpus carries. */
 const COUNTS = { authors: { min: 1, max: 2 } } as const satisfies Readonly<Record<string, Words>>;
 
+/** A newsroom stamp this module writes itself, and so knows to be one: an instant, or a stop if it ever is not. */
+const written = (stamp: string): string => {
+  const instant = instantAt(stamp);
+  if (instant === null) {
+    throw new RangeError(`horodatage illisible : ${stamp}`);
+  }
+  return instant;
+};
+
 /** The newsroom hours the corpus covers, written on its own clock and compared as instants. */
-const WINDOW = { start: toInstant('2026-09-10 07:00'), end: toInstant('2026-09-13 09:55') } as const;
+const WINDOW = { start: written('2026-09-10 07:00'), end: written('2026-09-13 09:55') } as const;
 
 /** What a report of the newspaper runs, in seconds: under a minute is a mistake, a quarter of an hour is a film. */
 const RUNNING_TIME = { min: 60, max: 900 } as const;

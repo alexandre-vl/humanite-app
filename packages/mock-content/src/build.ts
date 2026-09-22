@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { ARTICLE } from '@huma/contracts';
+import { ARTICLE, instantAt } from '@huma/contracts';
 import type { Article, BlockInput, SectionId, SpanInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
@@ -8,7 +8,6 @@ import type { BlockContent, DefinitionContent, PhrasingContent, RootContent } fr
 import { directive } from 'micromark-extension-directive';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import { bylineOf, SECTIONS } from './registries.ts';
-import { toInstant } from './time.ts';
 import { validateCorpus } from './validate.ts';
 
 /** Where each item file lives, relative to this module. */
@@ -177,6 +176,7 @@ export const parseItem = (text: string): Article => {
   const id = front['id'] ?? '';
   const hero = front['hero'];
   const byline = bylineOf(splitList(front['authors']));
+  const published = front['published'];
   const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
   return ARTICLE.parse({
     id,
@@ -185,7 +185,7 @@ export const parseItem = (text: string): Article => {
     access: front['access'],
     title: front['title'],
     standfirst: front['standfirst'],
-    publishedAt: front['published'] === undefined ? undefined : toInstant(front['published']),
+    publishedAt: published === undefined ? undefined : (instantAt(published) ?? published),
     ...(byline === undefined ? {} : { byline }),
     ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
     ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),

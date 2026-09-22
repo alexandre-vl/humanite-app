@@ -1,38 +1,21 @@
 import type { DisplayText } from '@huma/contracts';
-import { NEWSROOM_ZONE } from '@huma/contracts';
+import { clockAt } from '@huma/contracts';
 import { asDisplayText } from '../display-text';
 
 /**
- * The newspaper's own clock. A publication time is a Paris time, so a card shows the day the newsroom published on
- * whatever the reader's device is set to — and a test reads the same string on any machine. Hermes has neither
- * `Intl.RelativeTimeFormat` nor `Intl.PluralRules` (journal 0a, vérification 15), so the words below are written here.
+ * What an instant looks like on the newspaper's own clock. A publication time is a Paris time, so a card shows the day
+ * the newsroom published on whatever the reader's device is set to — and a test reads the same string on any machine.
  *
- * The zone comes from the contracts: this clock says what an instant looks like, not which instant it is, and which
- * one it is was settled where the paper's own day is named.
+ * The clock is the contracts' own, and not one kept here. This module kept one, built the same way as the one that
+ * names a numéro and the one the corpus stamps its items with; three copies of one clock are three places a change of
+ * locale or of hour cycle could reach one of them and not the others. Which instant a stamp names, which day it falls
+ * on and what it reads as are one reading now.
+ *
+ * What stays here is the words. Hermes has neither `Intl.RelativeTimeFormat` nor `Intl.PluralRules` (journal 0a,
+ * vérification 15), so the words below are written by hand.
  */
-const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
-  timeZone: NEWSROOM_ZONE,
-  hourCycle: 'h23',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
 const PER_MINUTE = 60;
 const PER_HOUR = 60 * PER_MINUTE;
-
-/** An instant as the newsroom's clock reads it. */
-type Clock = Readonly<{ year: number; month: number; day: number; hour: number; minute: number }>;
-
-const readClock = (instant: number): Clock => {
-  const parts = new Map<string, string>(
-    NEWSROOM_CLOCK.formatToParts(instant).map((part): readonly [string, string] => [part.type, part.value]),
-  );
-  const read = (type: string): number => Number(parts.get(type) ?? '0');
-  return { year: read('year'), month: read('month'), day: read('day'), hour: read('hour'), minute: read('minute') };
-};
 
 const parseInstant = (instant: string): number => {
   const millis = Date.parse(instant);
@@ -46,7 +29,7 @@ const pad = (value: number): string => String(value).padStart(2, '0');
 
 /**
  * The weekdays as `getUTCDay` numbers them, Sunday first, and the months as the clock numbers them, January first.
- * They are written here rather than asked of `Intl` in French: the clock above is pinned to one locale precisely so
+ * They are written here rather than asked of `Intl` in French: the newsroom's clock is read in one locale precisely so
  * the printed forms do not follow the device's own data, and a heading that did would read differently from one phone
  * to the next while the rest of the screen did not.
  */
@@ -88,7 +71,7 @@ const nameAt = (names: readonly string[], index: number): string => {
  * the room for three. The hour alone takes 34.
  */
 export const formatClockTime = (instant: string): DisplayText => {
-  const clock = readClock(parseInstant(instant));
+  const clock = clockAt(parseInstant(instant));
   return asDisplayText(`${pad(clock.hour)}:${pad(clock.minute)}`);
 };
 
@@ -102,7 +85,7 @@ export const formatClockTime = (instant: string): DisplayText => {
  * just before Paris midnight heads the day the newsroom filed it under, not the one UTC was already on.
  */
 export const formatDayLabel = (instant: string): DisplayText => {
-  const clock = readClock(parseInstant(instant));
+  const clock = clockAt(parseInstant(instant));
   const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
   return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
@@ -118,7 +101,7 @@ export const formatDayLabel = (instant: string): DisplayText => {
  * starting at different heights, side by side on the same shelf.
  */
 export const formatDayDate = (instant: string): DisplayText => {
-  const clock = readClock(parseInstant(instant));
+  const clock = clockAt(parseInstant(instant));
   return asDisplayText(`${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
 
@@ -131,7 +114,7 @@ export const formatDayDate = (instant: string): DisplayText => {
  * a reader is orienting themself in time, an article carries its own date and the year is what places it.
  */
 export const formatLongDate = (instant: string): DisplayText => {
-  const clock = readClock(parseInstant(instant));
+  const clock = clockAt(parseInstant(instant));
   return asDisplayText(`${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)} ${String(clock.year)}`);
 };
 
