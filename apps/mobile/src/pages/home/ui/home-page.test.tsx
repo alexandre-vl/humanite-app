@@ -1,11 +1,11 @@
 import type { ArticleSummary, Section } from '@huma/contracts';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { StartupProvider } from '#lib/startup';
+import { renderWithCache, settle } from '#lib/testing';
 import { HomePage } from './home-page';
 
 // The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
@@ -16,18 +16,11 @@ jest.mock('expo-router', () => ({
   useLocalSearchParams: (): Readonly<Record<string, string>> => ({}),
 }));
 
-/** One more turn, for what the screen asked on the turn before to reach it. */
-const settle = async (): Promise<void> => {
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
-};
-
 const renderPage = async (): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <StartupProvider>
-        <HomePage />
-      </StartupProvider>
-    </QueryClientProvider>,
+  await renderWithCache(
+    <StartupProvider>
+      <HomePage />
+    </StartupProvider>,
   );
   // Twice: the sections answer on the first turn and the feed of each page mounted answers on the next, so a screen
   // settled once is a screen still finishing while the test reads it.

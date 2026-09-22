@@ -16,28 +16,22 @@ export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly
  */
 export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
 
-// A section has no address of its own any more, and no screen. It is a page of the front screen, turned by swiping
-// across it or by pressing its name in the band, so there is nowhere to send a reader who chose one — there is only
-// a page to turn to. What the app had was a route nothing could reach except that band, and a screen that replaced
-// itself every time another section was chosen.
-
-// A numéro has no address in the app any more either, and for a plainer reason than a section: it is not read here.
-// The shelf still stands every numéro the paper printed, and taking one off it opens the paper on the web — which is
-// an address the newsroom owns and this module names among the others, under `NEWSROOM`.
+// Neither a section nor a numéro has an address here. A section is a page of the front screen, turned by a swipe or by
+// its name in the band, so there is only a page to turn to; a numéro is not read in the app, and taking one off the
+// shelf opens the paper on the web, at an address the newsroom owns and `NEWSROOM` names.
 
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;
 
 /**
- * Where the numéros stand. It is a screen pushed from the account and no longer a tab: everything a reader does on
- * that shelf leaves the app for humanite.fr, and a destination one comes back to is not the same thing as a door out.
+ * Where the numéros stand: a screen pushed from the account, and not a tab. Everything a reader does on that shelf
+ * leaves the app for humanite.fr, and a door out is not a destination one comes back to.
  */
 export const NEWSSTAND_HREF = '/newsstand' as const;
 
-// What the reader kept has no address written here any more. It is a tab, and a tab is not pushed: the bar at the
-// bottom stands on it directly, so nothing in the app sends a reader there — the front page's masthead did, and the
-// account did, and both were doors to a destination already under them. The route file still holds the address, and
-// a deep link still finds it; this module names what the app itself asks for.
+// What the reader kept has no address written here: it is a tab, which the bar at the bottom stands on directly, so
+// nothing in the app pushes a reader there. The route file holds the address, and a deep link finds it; this module
+// names what the app itself asks for.
 
 /**
  * Hands a page outside the app to whatever the phone opens pages with.

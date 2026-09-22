@@ -1,9 +1,9 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { describe, expect, it, jest } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { content } from '#api';
+import { renderWithCache, settle } from '#lib/testing';
 import { feedQuery } from '../api/queries';
 import { usePagedFeed } from '../model/paged-feed';
 import type { FeedRhythm } from '../model/rhythm';
@@ -17,14 +17,8 @@ function Screen({ rhythm, onOpen }: ScreenProps): ReactNode {
 }
 
 const mounted = async (rhythm: FeedRhythm, onOpen: (id: string) => void): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0 } } })}>
-      <Screen rhythm={rhythm} onOpen={onOpen} />
-    </QueryClientProvider>,
-  );
-  // A virtualised list reports its first layout in an animation frame, which jest runs as a timer: flushing one
-  // keeps that update inside act.
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await renderWithCache(<Screen rhythm={rhythm} onOpen={onOpen} />);
+  await settle();
 };
 
 const served = async (): Promise<readonly ArticleSummary[]> => (await content.getFeed({})).items;

@@ -1,4 +1,5 @@
 import { DONATION, SECTIONS_KEY } from '@huma/contracts';
+import { isRecord } from '@huma/kit/records';
 import type { Exchange } from './har.ts';
 
 /**
@@ -47,9 +48,6 @@ const ROUTES = [
 /** A body of the service, read far enough to be sorted and trimmed but not modelled: that is the contracts' work. */
 type Post = Readonly<Record<string, unknown>>;
 type Body = Readonly<Record<string, unknown>>;
-
-const isRecord = (value: unknown): value is Body =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const postsOf = (body: Body): readonly Post[] => {
   const posts: unknown = body['posts'];

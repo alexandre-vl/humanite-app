@@ -29,12 +29,12 @@ import { Surface } from '#primitives/surface';
  */
 export function LivePage(): ReactNode {
   const feed = usePagedFeed(liveFeedQuery);
-  const nameOf = useSectionNames();
+  const names = useSectionNames();
   return (
     <Surface>
       <ArticleWire
         feed={feed}
-        name={(summary) => nameOf(summary.section)}
+        names={names}
         onOpen={(id) => {
           router.push(articleHref(id));
         }}

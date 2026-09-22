@@ -1,11 +1,11 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import type { Article } from '@huma/contracts';
 import { PALETTE } from '@huma/design-tokens';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { asDisplayText } from '#lib/display-text';
 import { formatLongDate } from '#lib/format';
+import { renderWithCache, settle } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
 /** What the screen answers when the reader asks which section an article ran in, in one word the corpus never uses. */
@@ -92,12 +92,10 @@ const read = async (
   onFollow: () => void = () => undefined,
   onSupport: () => void = () => undefined,
 ): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <ArticleReader id={article.id} names={() => SECTION} onFollow={onFollow} onSupport={onSupport} />
-    </QueryClientProvider>,
+  await renderWithCache(
+    <ArticleReader id={article.id} names={() => SECTION} onFollow={onFollow} onSupport={onSupport} />,
   );
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await settle();
 };
 
 /** The first article of the corpus whose body satisfies `holds`, so a test never asserts on a shape by luck. */

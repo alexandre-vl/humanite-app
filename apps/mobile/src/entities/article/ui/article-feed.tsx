@@ -1,4 +1,4 @@
-import type { ArticleId, ArticleSummary, DisplayText } from '@huma/contracts';
+import type { ArticleId, ArticleSummary } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
@@ -10,6 +10,7 @@ import { signatureOf } from '../model/byline';
 import type { ReadFeed } from '../model/paged-feed';
 import type { FeedRhythm, FeedRow } from '../model/rhythm';
 import { feedRows, rowName, rowShape } from '../model/rhythm';
+import type { SectionNames } from '../model/section-names';
 import { ArticleCard } from './article-card';
 import type { EmptyWords } from './feed-stand-in';
 import { FeedStandIn } from './feed-stand-in';
@@ -20,11 +21,10 @@ export type ArticleFeedProps = Readonly<{
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
   /**
-   * What each article belongs to, if the screen wants its cards to say so. It is answered by the screen because the
-   * sections are another entity's, and an entity may not reach sideways for one; a screen may, and a screen already
-   * showing one section has nothing to gain from writing its name on every card.
+   * What each article belongs to, if the screen wants its cards to say so. A screen already showing one section gives
+   * none: the same word over every card would say nothing at all.
    */
-  name?: ((summary: ArticleSummary) => DisplayText | null) | undefined;
+  names?: SectionNames | undefined;
   header?: ReactNode;
   sticky?: ReactNode;
   stickyRows?: BandRows | undefined;
@@ -56,16 +56,14 @@ const useStyles = createStyles((theme) => ({
  * is the shape of a card: that is the feed's own, decided once for every item at a time when their order is known.
  *
  * A column announces its writer and nothing else does, which is why the signature is read here and not by the card:
- * a card is handed what it draws. It used to be read here for another reason as well — the names came from a roster
- * the app had to fetch, and a list that asked once per cell would have asked again at every turn of the page. An item
- * carries its signature itself now, so nothing is fetched and nothing can arrive late.
+ * a card is handed what it draws.
  */
 export function ArticleFeed({
   feed,
   rhythm,
   onOpen,
   action,
-  name,
+  names,
   header,
   sticky,
   stickyRows,
@@ -87,7 +85,7 @@ export function ArticleFeed({
           summary={row.summary}
           action={action?.(row.summary)}
           signature={row.shape === 'column' ? signatureOf(row.summary) : null}
-          name={name?.(row.summary) ?? null}
+          name={names?.(row.summary.section) ?? null}
         />
       </Pressable>
     </Box>

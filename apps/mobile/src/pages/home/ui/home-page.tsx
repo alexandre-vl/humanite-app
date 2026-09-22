@@ -33,7 +33,7 @@ type SheetProps = Readonly<{ leaf: Leaf }>;
  * section, the same word over every card says nothing at all.
  */
 function Sheet({ leaf }: SheetProps): ReactNode {
-  const nameOf = useSectionNames();
+  const names = useSectionNames();
   const section = leaf.section;
   const feed = usePagedFeed(section === null ? feedQuery : sectionFeedQuery(section));
   return (
@@ -44,7 +44,7 @@ function Sheet({ leaf }: SheetProps): ReactNode {
         router.push(articleHref(id));
       }}
       action={(summary) => <BookmarkToggle id={summary.id} />}
-      name={section === null ? (summary) => nameOf(summary.section) : undefined}
+      names={section === null ? names : undefined}
     />
   );
 }
@@ -53,17 +53,16 @@ function Sheet({ leaf }: SheetProps): ReactNode {
  * The front screen: the paper's own name, the band of its sections, and the paper itself — read by turning its
  * sections under the finger rather than by opening one and coming back out of it.
  *
- * A section used to be a screen pushed over this one, and choosing another replaced that screen. Reading two of them
- * meant a press, a read, a press back, a press; and the band, which is the one thing that says what else there is to
- * read, was the only part of the paper a reader could not reach by reading. Here the sections are pages of the front
- * screen, the band names the one in hand, and either a press or a swipe turns to another.
+ * The sections are pages of the front screen and not screens pushed over it: reading two of them that way would take a
+ * press, a read, a press back and a press, and the band — the one thing that says what else there is to read — would
+ * be the only part of the paper a reader could not reach by reading. The band names the page in hand, and either a
+ * press or a swipe turns to another.
  *
- * The masthead is a bar and not a block that slides away. A masthead shared by nine pages, each scrolled to its own
+ * The masthead is a bar and not a block that slides away. A masthead shared by every page, each scrolled to its own
  * place, would be somewhere different from the page under it the moment a reader swiped.
  *
- * It carries one control, and used to carry two. The other was the way to what the reader kept — put here because it
- * was reachable from nowhere else, which was true of the front page and of no other screen. What one keeps is a tab
- * now, so the mark on this bar was a second door to the destination standing directly under it.
+ * It carries one control. What the reader keeps is a tab, and a mark for it on this bar would be a second door to the
+ * destination standing directly under it.
  */
 export function HomePage(): ReactNode {
   const styles = useStyles();

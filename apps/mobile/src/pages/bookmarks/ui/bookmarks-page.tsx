@@ -46,7 +46,7 @@ const useStyles = createStyles(() => ({
  */
 export function BookmarksPage(): ReactNode {
   const styles = useStyles();
-  const nameOf = useSectionNames();
+  const names = useSectionNames();
   const kept = useKeptFeed(useBookmarks((state) => state.ids));
   return (
     <Surface>
@@ -57,7 +57,7 @@ export function BookmarksPage(): ReactNode {
           router.push(articleHref(id));
         }}
         action={(summary) => <BookmarkToggle id={summary.id} />}
-        name={(summary) => nameOf(summary.section)}
+        names={names}
         header={
           <Box style={styles.masthead}>
             <Text variant="display" numberOfLines={1} heading>

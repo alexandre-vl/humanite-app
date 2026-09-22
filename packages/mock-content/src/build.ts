@@ -46,9 +46,13 @@ const splitList = (value: string | undefined): readonly string[] =>
 const toHero = (
   id: string,
   value: string,
-): Readonly<{ picture: Readonly<{ kind: 'corpus'; key: string }>; caption: string; credit: string }> => {
-  const [caption, credit] = value.split('|').map((part) => part.trim());
-  return { picture: { kind: 'corpus', key: `${id}-hero` }, caption: caption ?? '', credit: credit ?? '' };
+): Readonly<{ picture: Readonly<{ kind: 'corpus'; key: string }>; caption?: string; credit?: string }> => {
+  const [caption = '', credit = ''] = value.split('|').map((part) => part.trim());
+  return {
+    picture: { kind: 'corpus', key: `${id}-hero` },
+    ...(caption === '' ? {} : { caption }),
+    ...(credit === '' ? {} : { credit }),
+  };
 };
 
 /** The plain text of inline content, line breaks becoming spaces. */

@@ -18,8 +18,8 @@ export type TextFieldProps = Readonly<{
  * the one constructor that turns a variant into type. What a reader types is a plain string and stays one: a
  * DisplayText is text the app answers for, and this is text the app was handed.
  *
- * It corrects nothing and capitalises nothing. The app's only field searches a corpus, and a word the keyboard has
- * helpfully corrected is a word the corpus does not hold; a field that wanted either would arrive with the screen that
+ * It corrects nothing and capitalises nothing. The app's only field searches the paper, and a word the keyboard has
+ * helpfully corrected is a word the paper may not hold; a field that wanted either would arrive with the screen that
  * needs it. The caret and the selection take the paper's own colour, and the placeholder the muted one, so neither is
  * a colour written here.
  */

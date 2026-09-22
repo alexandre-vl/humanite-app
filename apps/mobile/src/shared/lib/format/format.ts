@@ -57,27 +57,24 @@ const nameAt = (names: readonly string[], index: number): string => {
   return name;
 };
 
-// The bare `12/09/2026` a card used to carry is not written anywhere now. Nielsen's homepage guideline says why: as
-// long as the whole of a front is of the week — and this paper's corpus is three days of one — no card needs a date,
-// and the article needs one printed prominently. The article's is `formatLongDate`, in letters.
+// A card carries no date. Nielsen's homepage guideline says why, of a front that is all of the week: no card needs
+// one, and the article needs one printed prominently — here `formatLongDate`, in letters.
 
 /**
  * The hour an item was filed, as a row of the wire carries it: `19:52`.
  *
- * It carried the day as well — `12/09, 19:52` — under a band that stayed pinned at the top of the same screen reading
- * `samedi 12 septembre`. The same date, printed once over the run and again on each of the dozen rows inside it. What
- * that cost is a width and not a line: measured on an A065, the pair took 83 points of a 411-point screen and, with
- * the rail beside it, pushed every title to start 140 points in — so the titles wrapped to four lines where they had
- * the room for three. The hour alone takes 34.
+ * The day is the band's, pinned over the run and reading `samedi 12 septembre`: printed again on every row, as
+ * `12/09, 19:52`, it costs a width and not a line. Measured on an A065, the pair takes 83 points of a 411-point screen
+ * and, with the rail beside it, starts every title 140 points in — four lines where three had room. The hour alone
+ * takes 34.
  */
 export const formatClockTime = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
   return asDisplayText(`${pad(clock.hour)}:${pad(clock.minute)}`);
 };
 
-// The calendar day an instant falls on is not here. It was, and it was the second place the paper computed it — the
-// content door mints a numéro from the same reading, and `ISSUE_ID` already said of itself that the two were one key.
-// `issueIdAt` in the contracts is that key now, and a wire groups its runs by it.
+// The calendar day an instant falls on is the contracts' `issueIdAt`: one key, which a numéro is named by and a wire
+// groups its runs under.
 
 /**
  * That same day as a timeline heads the run it opens: `samedi 13 septembre`. The year is left out, a wire reaching

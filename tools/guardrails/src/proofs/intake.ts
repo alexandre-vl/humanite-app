@@ -1,6 +1,7 @@
 import { judgeIntake, readSummaries } from '@huma/contracts';
 import type { IntakeCode, Take } from '@huma/contracts';
 import { fixtureFactory } from '@huma/fixtures';
+import { isRecord } from '@huma/kit/records';
 
 const define = fixtureFactory<IntakeCode>();
 
@@ -15,9 +16,6 @@ const define = fixtureFactory<IntakeCode>();
  */
 const judged = (take: Take) => async (): Promise<readonly IntakeCode[]> =>
   Promise.resolve(judgeIntake(take).map((finding) => finding.code));
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 export const INTAKE_FIXTURES = [
   define(

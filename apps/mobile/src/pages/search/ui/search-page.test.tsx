@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
+import { renderWithCache, settle } from '#lib/testing';
 import { SearchPage } from './search-page';
 
 // The double is built inside the factory: jest hoists the call above everything else in the file, so anything it read
@@ -12,16 +12,7 @@ jest.mock('expo-router', () => ({ __esModule: true, router: { push: jest.fn() } 
 const PLACEHOLDER = 'Saisissez ici le sujet';
 
 const renderPage = async (): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <SearchPage />
-    </QueryClientProvider>,
-  );
-};
-
-/** One more turn, for the answer to land: a question still on its way when a test ends answers during the next one. */
-const settle = async (): Promise<void> => {
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await renderWithCache(<SearchPage />);
 };
 
 /**

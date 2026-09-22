@@ -1,10 +1,11 @@
-import type { ArticleId, ArticleSummary, DisplayText } from '@huma/contracts';
+import type { ArticleId } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
 import type { ReadFeed } from '../model/paged-feed';
+import type { SectionNames } from '../model/section-names';
 import type { WireRow as Row } from '../model/wire';
 import { rowKey, rowKind, rowPins, wireRows } from '../model/wire';
 import { FeedStandIn } from './feed-stand-in';
@@ -13,8 +14,8 @@ import { WireRow } from './wire-row';
 
 export type ArticleWireProps = Readonly<{
   feed: ReadFeed;
-  /** What the newsroom calls the section an item ran in, asked once by the screen and handed down with every row. */
-  name: (summary: ArticleSummary) => DisplayText | null;
+  /** What the newsroom calls the section each item ran in, asked once by the screen and handed down with every row. */
+  names: SectionNames;
   onOpen: (id: ArticleId) => void;
 }>;
 
@@ -26,13 +27,13 @@ const useStyles = createStyles(() => ({
  * The items of a feed as a running wire: every item under the head of its day, asking for the next page as the end
  * comes near, and reading the feed again when the reader pulls it down.
  *
- * The days are worked out over the pages already read rather than page by page: a page holds whatever twelve items the
- * cursor reached, and a day begins and ends wherever it does, never on a page boundary.
+ * The days are worked out over the pages already read rather than page by page: a page holds whatever items the cursor
+ * reached, and a day begins and ends wherever it does, never on a page boundary.
  *
  * Pulling to refresh is the one gesture a screen called En continu owes a reader, and the screen it replaces has it.
  * What it asks for is the first page again, so a wire that has been read four pages deep comes back to its newest.
  */
-export function ArticleWire({ feed, name, onOpen }: ArticleWireProps): ReactNode {
+export function ArticleWire({ feed, names, onOpen }: ArticleWireProps): ReactNode {
   const styles = useStyles();
   const rows = wireRows(feed.items);
   const open = (id: ArticleId) => () => {
@@ -45,7 +46,7 @@ export function ArticleWire({ feed, name, onOpen }: ArticleWireProps): ReactNode
       case 'item':
         return (
           <Pressable role="link" onPress={open(row.summary.id)}>
-            <WireRow summary={row.summary} name={name(row.summary)} />
+            <WireRow summary={row.summary} name={names(row.summary.section)} />
           </Pressable>
         );
     }

@@ -39,7 +39,8 @@ test.each(ROUTES)('$route: no title or standfirst reaches the domain carrying th
 });
 
 test('an item of a section’s own list is placed in that section, and an item of the front page in none', () => {
-  const section = SECTION_ID.parse('politique');
+  // The recorded list is the service's section 19573, which its menu calls `histoire`.
+  const section = SECTION_ID.parse('histoire');
   expect(readSummaries(LISTS.sectionFeed, { section }).kept.every((summary) => summary.section === section)).toBe(true);
   expect(readSummaries(LISTS.front).kept.every((summary) => summary.section === undefined)).toBe(true);
 });

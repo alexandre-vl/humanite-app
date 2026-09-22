@@ -1,10 +1,6 @@
 import { expect, test } from 'vitest';
-import { clockAt, instantAt, issueIdAt, NEWSROOM_ZONE } from './clock.ts';
+import { clockAt, instantAt, issueIdAt } from './clock.ts';
 import { ISSUE_ID } from './ids.ts';
-
-test('the newsroom keeps one zone, and everything downstream reads it from here', () => {
-  expect(NEWSROOM_ZONE).toBe('Europe/Paris');
-});
 
 test('an instant is filed under the day the newsroom made that paper', () => {
   expect(issueIdAt('2026-09-12T17:52:00.000Z')).toBe('2026-09-12');
@@ -31,10 +27,7 @@ test('an instant nothing can read is refused rather than turned into a day', () 
   expect(() => issueIdAt('hier matin')).toThrow(RangeError);
 });
 
-/**
- * A stamp of the newsroom names a Paris hour, and nothing in it says so. These four were the corpus generator's own
- * tests, when it kept a clock of its own; they moved here with the one clock left.
- */
+/** A stamp of the newsroom names a Paris hour, and nothing in it says so: summer, winter and the change between. */
 test('a summer stamp names an instant two hours before the hour the newsroom wrote', () => {
   expect(instantAt('2026-09-10 08:30')).toBe('2026-09-10T06:30:00.000Z');
 });

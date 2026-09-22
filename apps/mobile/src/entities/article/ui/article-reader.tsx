@@ -1,4 +1,4 @@
-import type { Article, ArticleId, ArticleSummary, DisplayText, SectionId } from '@huma/contracts';
+import type { Article, ArticleId, ArticleSummary, DisplayText } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -9,6 +9,7 @@ import { ThemeScope } from '#primitives/theme';
 import { articleQuery, summariesQuery } from '../api/queries';
 import { signatureOf } from '../model/byline';
 import { stateOf } from '../model/paged-feed';
+import type { SectionNames } from '../model/section-names';
 import type { LinkTarget } from '../model/spans';
 import { relatedIds } from '../model/spans';
 import { ArticleBody } from './article-body';
@@ -17,11 +18,8 @@ import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleReaderProps = Readonly<{
   id: ArticleId;
-  /**
-   * What the newsroom calls the section an article ran in. It is answered by the screen because the sections are
-   * another entity's, and an entity may not reach sideways for one.
-   */
-  names: (section: SectionId | undefined) => DisplayText | null;
+  /** What the newsroom calls the section an article ran in, answered by the screen. */
+  names: SectionNames;
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;

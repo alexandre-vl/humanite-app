@@ -50,20 +50,20 @@ const useStyles = createStyles((theme) => ({
   words: { flex: 1, paddingLeft: SPACING.md, paddingVertical: SPACING.md, gap: SPACING.xs },
   said: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   // The section gives way first: it is the one part of the line whose length the newsroom decides, and at the largest
-  // step a reader can set, the longest of the paper's eight would push the rest off the screen.
+  // step a reader can set, the longest of the paper's section names would push the rest off the screen.
   section: { flexShrink: 1 },
 }));
 
 /**
  * One item as the wire lists it: the hour it was filed, the bead it hangs from, what it is about, and its title.
  *
- * It said the hour and the title and nothing else, and the two things it did not say are the two a reader needs. The
- * first is the subject: eight sections run down one column here, in the order things happened rather than by desk, and
- * a row gave no way of telling a match report from a strike. The second is what the paper marked. Eight of the
- * seventy-two items carry the newsroom's own mark, and the screen this replaces printed those titles in bold and the
- * rest plain, with nothing anywhere saying what the bold meant — a question the reference document asks out loud and
- * leaves open. A weight cannot answer it. A word can, so the marked ones carry one, in the ink the titles are set in
- * and beside a bead filled with the paper's red: two things, neither of them a colour on its own.
+ * The hour and the title are not enough, and the two things they leave out are the two a reader needs. The first is
+ * the subject: every section runs down one column here, in the order things happened rather than by desk, and a row
+ * with no section gives no way of telling a book review from a strike. The second is what the paper marked. The
+ * newsroom marks some items, and the screen this replaces prints those titles in bold and the rest plain, with nothing
+ * anywhere saying what the bold means — a question the reference document asks out loud and leaves open. A weight
+ * cannot answer it. A word can, so the marked ones carry one, in the ink the titles are set in and beside a bead
+ * filled with the paper's red: two things, neither of them a colour on its own.
  *
  * The title is set in the type the paper reads in, at one size for every row. A wire has no desk behind it — what is
  * at the top is at the top because it is the newest — so nothing on this screen is printed larger than anything else.

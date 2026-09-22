@@ -9,10 +9,10 @@ import { ISSUE_ID } from './ids.ts';
  * somewhere different — the corpus is built by a generator, the numéros by the content door, the runs by a screen —
  * and a zone spelt out in three places is three places one could be changed without the others.
  *
- * It is no longer even exported. Every reading of the clock is made below, so nothing outside this module needs to
- * know which zone the paper keeps — only what its clock reads.
+ * Every reading of the clock is made below, so nothing outside this module needs to know which zone the paper keeps —
+ * only what its clock reads. The tests of daylight saving below are what hold it to Paris.
  */
-export const NEWSROOM_ZONE = 'Europe/Paris';
+const NEWSROOM_ZONE = 'Europe/Paris';
 
 /** What the newsroom's clock reads, field by field, each as the number it is. */
 export type Clock = Readonly<{
@@ -29,9 +29,8 @@ export type Clock = Readonly<{
  * every device and in every test. The hour runs `00` to `23`: a clock that read midnight as `24` would file it under
  * the wrong day.
  *
- * There were three of these — one here for the day, one in the corpus generator for its stamps, one in the app for
- * what a row prints — each built the same way and each free to drift from the others. This is the one left; the zone
- * above was already written once for exactly that reason, and the clock it is read on now is too.
+ * It is the one clock of the repository: the day a numéro is filed under, the stamps the corpus is written with and the
+ * hour a row prints are all read on it, for the same reason the zone above is written once.
  */
 const NEWSROOM_CLOCK = new Intl.DateTimeFormat('en-CA', {
   timeZone: NEWSROOM_ZONE,

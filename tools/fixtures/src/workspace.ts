@@ -2,6 +2,7 @@ import { chmod, mkdir, rm, rmdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { errnoCode } from '@huma/kit/errors';
 import { toRepoPath } from '@huma/kit/paths';
+import { isRecord } from '@huma/kit/records';
 
 /** Content of a fixture file; `mode` sets permission bits, `0o755` for an executable. */
 export type FileContent = string | Uint8Array | Readonly<{ content: string | Uint8Array; mode: number }>;
@@ -38,9 +39,6 @@ export async function writeTree(root: string, tree: FileTree): Promise<void> {
     }
   }
 }
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null;
 
 /**
  * A tsconfig's JSON without its `references`: they point at workspace packages a fixture tree does not hold, so a copy

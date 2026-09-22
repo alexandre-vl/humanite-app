@@ -24,11 +24,7 @@ test('ARTICLE_SUMMARY parses a valid summary', () => {
   expectTypeOf(summary).toEqualTypeOf<ArticleSummary>();
 });
 
-/**
- * The field set itself, pinned. Three fields left this schema because nothing could fill them: `kind`, a line the
- * service does not draw; `tags`, which it never sends; and `authors`, a list of identifiers into a roster it keeps
- * none of. The way to keep a fourth from arriving unnoticed is to make adding one an edit here as well as there.
- */
+/** The field set itself, pinned: a field added to the schema is an edit here as well, so none arrives unnoticed. */
 test('a summary carries these fields and no others', () => {
   expect([...Object.keys(ARTICLE_SUMMARY.shape)].sort((left, right) => left.localeCompare(right))).toEqual([
     'access',

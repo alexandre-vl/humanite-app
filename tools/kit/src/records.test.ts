@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
-import { deepFreeze, isOneOf, keysOf } from './records.ts';
+import { deepFreeze, isOneOf, isRecord, keysOf } from './records.ts';
 
 describe('keysOf', () => {
   test('lists the keys in order, typed as the keys of the record', () => {
@@ -36,5 +36,14 @@ describe('deepFreeze', () => {
   test('leaves primitives untouched', () => {
     expect(deepFreeze('text')).toBe('text');
     expect(deepFreeze(null)).toBe(null);
+  });
+});
+
+describe('isRecord', () => {
+  test('takes an object, and neither a list, nor null, nor a scalar', () => {
+    expect(isRecord({ a: 1 })).toBe(true);
+    expect(isRecord([1])).toBe(false);
+    expect(isRecord(null)).toBe(false);
+    expect(isRecord('a')).toBe(false);
   });
 });

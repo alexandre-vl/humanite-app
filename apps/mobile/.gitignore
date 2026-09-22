@@ -3,3 +3,4 @@ expo-env.d.ts
 dist/
 /android
 /ios
+.env*.local

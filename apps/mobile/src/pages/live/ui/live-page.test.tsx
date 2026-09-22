@@ -1,20 +1,14 @@
 import { describe, expect, it } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen } from '@testing-library/react-native';
+import { screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { formatClockTime, formatDayLabel } from '#lib/format';
+import { renderWithCache, settle } from '#lib/testing';
 import { LivePage } from './live-page';
 
 const renderPage = async (): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <LivePage />
-    </QueryClientProvider>,
-  );
-  // A virtualised list reports its first layout in an animation frame, which jest runs as a timer: flushing one keeps
-  // that update inside act.
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await renderWithCache(<LivePage />);
+  await settle();
 };
 
 /** The newest item of the wire, which every case below reads something of. */

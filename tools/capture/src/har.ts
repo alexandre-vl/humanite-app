@@ -1,3 +1,5 @@
+import { isRecord } from '@huma/kit/records';
+
 /**
  * Reading a recorded network session.
  *
@@ -24,9 +26,6 @@ export type Exchange = Readonly<{
   requestBody: string | null;
   responseBody: string | null;
 }>;
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /** One field of whatever a parse returned, without claiming to know what either of them is. */
 const fieldOf = (value: unknown, key: string): unknown => (isRecord(value) ? value[key] : undefined);

@@ -31,8 +31,8 @@ const EXPECTED: ReadonlyMap<SectionId, Quota> = new Map(
 type Words = Readonly<{ min: number; max: number }>;
 
 /**
- * Accepted word counts per item kind. Keyed by the union the contracts declare and not by `string`: a fourth format
- * added there used to leave every item of it exempt from any length at all, and the corpus would have validated.
+ * Accepted word counts per item kind. Keyed by the union the contracts declare and not by `string`, so a fourth format
+ * added there stops the build here rather than leaving every item of it exempt from any length.
  */
 const WORDS = {
   article: { min: 300, max: 800 },
@@ -42,20 +42,19 @@ const WORDS = {
 } as const satisfies Readonly<Record<ArticleFormat | 'brief', Words>>;
 
 /**
- * What a title, a standfirst and a byline of this corpus measure.
+ * What a title and a standfirst of this corpus measure.
  *
- * These were written into `ARTICLE_SUMMARY` and held every item the app could ever show, because every item was
- * written here. They came down the day the schema had also to describe the journal's own service, where a title of
- * fifty signs misses one item in six and a standfirst of a hundred and fifty misses one in two. A corpus is written,
- * so it can still be held to them — and it should be, or the shapes the screens were drawn against drift.
+ * The domain holds no such bound, the journal's own items breaking any it could: a title of fifty signs misses one
+ * item in six and a standfirst of a hundred and fifty one in two. A corpus is written, so it can be held to them — and
+ * it is, or the shapes the screens were drawn against drift.
  */
 const SIGNS = {
   title: { min: 50, max: 140 },
   standfirst: { min: 150, max: 300 },
 } as const satisfies Readonly<Record<string, Words>>;
 
-/** How many names an item of this corpus carries. */
-const COUNTS = { authors: { min: 1, max: 2 } } as const satisfies Readonly<Record<string, Words>>;
+/** How many names an item of this corpus is signed with. */
+const SIGNATURES = { min: 1, max: 2 } as const satisfies Words;
 
 /** A newsroom stamp this module writes itself, and so knows to be one: an instant, or a stop if it ever is not. */
 const written = (stamp: string): string => {
@@ -95,12 +94,10 @@ const blockWords = (block: Block): number => {
 const wordCount = (article: Article): number => article.blocks.reduce((sum, block) => sum + blockWords(block), 0);
 
 /**
- * Whether an item of this corpus is a brief, read off its own id.
+ * Whether an item of this corpus is a brief, read off its own id: `pol-a1` is an article, `pol-b1` a brief.
  *
- * The item schema said it too, in a `kind` field, and the two had to be checked against each other here. Nothing else
- * in the repository ever read that field — a feed calls an item short when it comes without a picture, not when it
- * says it is — and the journal's service draws no such line at all, so the field left the schema. The naming rule of
- * this corpus is the one place the distinction was ever really written: `pol-a1` is an article, `pol-b1` a brief.
+ * The domain draws no such line — a feed calls an item short when it comes without a picture, and the journal's
+ * service distinguishes nothing of the kind — so the corpus's naming rule is the one place the distinction is written.
  */
 const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
 
@@ -176,12 +173,10 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
       );
     }
   }
-  for (const [field, list, bounds] of [['auteur', namesOf(article.byline), COUNTS.authors]] as const) {
-    if (list.length < bounds.min || list.length > bounds.max) {
-      errors.push(
-        `${where} : ${String(list.length)} ${field}(s) (attendu ${String(bounds.min)} à ${String(bounds.max)})`,
-      );
-    }
+  if (authors.length < SIGNATURES.min || authors.length > SIGNATURES.max) {
+    errors.push(
+      `${where} : ${String(authors.length)} auteur(s) (attendu ${String(SIGNATURES.min)} à ${String(SIGNATURES.max)})`,
+    );
   }
   if (authors.length !== known.length) {
     errors.push(`${where} : auteur inconnu`);

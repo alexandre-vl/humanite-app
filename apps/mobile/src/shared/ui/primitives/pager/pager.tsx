@@ -16,8 +16,8 @@ export type PagerProps = Readonly<{
 /**
  * How far either side of the page being read the pager keeps a page mounted.
  *
- * One. A swipe has to find the next page already drawn or it starts on empty ground, and a pager that mounted all
- * nine would hold nine virtualised feeds and nine queries for a reader looking at one. The pages that are not mounted
+ * One. A swipe has to find the next page already drawn or it starts on empty ground, and a pager that mounted every
+ * page would hold a virtualised feed and a query per section for a reader looking at one. The pages that are not mounted
  * are still laid out, at the width of the screen: the scroll offset is what says which page is showing, so a page
  * left out of the layout would move every page after it.
  */

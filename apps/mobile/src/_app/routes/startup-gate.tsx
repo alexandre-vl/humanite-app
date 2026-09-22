@@ -7,7 +7,7 @@ import { useStartup } from '#lib/startup';
 import { FONTS } from '../model/fonts';
 
 /**
- * Holds the native splash until the cache is restored, the fonts are loaded and the feed has laid out once — and holds
+ * Holds the native splash until the cache is restored, the fonts are loaded and the first screen has laid out — and holds
  * the screen itself until the fonts are there.
  *
  * Text is measured once, when it is laid out, and never again: a line laid out before its face is registered keeps the

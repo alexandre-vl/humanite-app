@@ -1,12 +1,12 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { typographyAt } from '@huma/design-tokens';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { StartupProvider } from '#lib/startup';
+import { renderWithCache, settle } from '#lib/testing';
 import { BookmarksPage } from './bookmarks-page';
 
 // The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
@@ -17,17 +17,11 @@ jest.mock('expo-router', () => ({
   useLocalSearchParams: (): Readonly<Record<string, string>> => ({}),
 }));
 
-const settle = async (): Promise<void> => {
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
-};
-
 const renderPage = async (): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <StartupProvider>
-        <BookmarksPage />
-      </StartupProvider>
-    </QueryClientProvider>,
+  await renderWithCache(
+    <StartupProvider>
+      <BookmarksPage />
+    </StartupProvider>,
   );
   await settle();
 };

@@ -1,4 +1,5 @@
 import type { Position } from '@huma/kit/diagnostics';
+import { isRecord } from '@huma/kit/records';
 import type { Yaml } from 'mdast';
 import type { Document, ErrorCode, YAMLError } from 'yaml';
 import { isMap, isScalar, LineCounter, parseDocument } from 'yaml';
@@ -95,9 +96,6 @@ const describePath = (path: readonly PropertyKey[]): string =>
   path
     .map((key, index) => (typeof key === 'number' ? `[${String(key)}]` : `${index === 0 ? '' : '.'}${String(key)}`))
     .join('');
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
 
 const problemOf = (error: YAMLError): string => YAML_PROBLEMS[error.code];
 

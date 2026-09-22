@@ -1,7 +1,8 @@
 import { SIZES, SPACING } from '@huma/design-tokens';
 import { describe, expect, it } from '@jest/globals';
-import { act, render, screen } from '@testing-library/react-native';
+import { render, screen } from '@testing-library/react-native';
 import { View } from 'react-native';
+import { settle } from '../../../lib/testing';
 import { List } from './list';
 
 /** More items than any window holds, so what the list leaves out is visible. */
@@ -58,9 +59,7 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    // A virtualised list reports its first layout in an animation frame, which jest runs as a timer: flushing one
-    // keeps that update inside act.
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(screen.getByTestId('header')).toBeTruthy();
     expect(screen.getByTestId('sticky')).toBeTruthy();
     expect(await screen.findByTestId('un')).toBeTruthy();
@@ -78,7 +77,7 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(stickyTop()).toBe(SIZES.headerExpanded);
   });
 
@@ -92,7 +91,7 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(stickyTop()).toBe(0);
   });
 
@@ -112,7 +111,7 @@ describe('List', () => {
         stickyRows={2}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(stickyLayer('height')).toBe(SIZES.bandPair);
     expect(stickyLayer('height')).toBe(SIZES.band * 2);
   });
@@ -127,7 +126,7 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(stickyLayer('height')).toBe(SIZES.band);
   });
 
@@ -143,7 +142,7 @@ describe('List', () => {
         stickyRows={2}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(contentInset()).toBe(SIZES.headerBandPair);
     expect(contentInset()).toBe(SIZES.headerExpanded + SIZES.band * 2);
   });
@@ -159,7 +158,7 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(contentInset()).toBe(SIZES.headerBand);
   });
 
@@ -173,7 +172,7 @@ describe('List', () => {
         sticky={<View testID="sticky" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(contentInset()).toBe(SIZES.band);
   });
 
@@ -192,7 +191,7 @@ describe('List', () => {
         stickyRows={2}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(contentInset()).toBe(SIZES.headerExpanded);
   });
 
@@ -200,7 +199,7 @@ describe('List', () => {
     await render(
       <List items={['un']} keyOf={(item) => item} typeOf={() => 'row'} renderItem={(item) => <View testID={item} />} />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(contentInset()).toBe(SPACING.none);
   });
 
@@ -226,7 +225,7 @@ describe('List', () => {
         renderItem={() => <View testID="cell" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     const mounted = screen.queryAllByTestId('cell').length;
     expect(mounted).toBeGreaterThan(0);
     expect(mounted).toBeLessThan(MANY.length);
@@ -243,7 +242,7 @@ describe('List', () => {
         renderItem={(item) => <View testID={isHead(item) ? 'head' : 'row'} />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     // A pinned item is mounted twice: once where the data puts it, once laid over the top of the frame. The single
     // head of this list is the one in force at rest, so it is the copy that shows. Nothing else about pinning shows
     // in this runner — every cell measures the same height here, so how one head pushes the next off is fiction.
@@ -264,7 +263,7 @@ describe('List', () => {
         renderItem={() => <View testID="cell" />}
       />,
     );
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+    await settle();
     expect(asked).not.toHaveLength(0);
     expect(asked.every((item) => MANY.includes(item))).toBe(true);
   });

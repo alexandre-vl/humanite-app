@@ -35,7 +35,7 @@ export function SearchPage(): ReactNode {
   const styles = useStyles();
   const [typed, setTyped] = useState('');
   const asked = useDebounced(typed).trim();
-  const nameOf = useSectionNames();
+  const names = useSectionNames();
   const feed = usePagedFeed(searchQuery(asked));
   return (
     <Surface>
@@ -53,7 +53,7 @@ export function SearchPage(): ReactNode {
             router.push(articleHref(id));
           }}
           action={(summary) => <BookmarkToggle id={summary.id} />}
-          name={(summary) => nameOf(summary.section)}
+          names={names}
           empty={{ title: t('search.none.title', { query: asked }), message: t('search.none.message') }}
         />
       ) : (

@@ -1,11 +1,11 @@
 import type { Article } from '@huma/contracts';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { NEWSROOM } from '#config';
 import { openExternal } from '#lib/routing';
+import { renderWithCache, settle } from '#lib/testing';
 import { ArticlePage } from './article-page';
 
 // Both doubles are built inside their factory: jest hoists the calls above everything else in the file, so anything
@@ -40,12 +40,8 @@ const first = async (what: string, holds: (article: Article) => boolean): Promis
 
 const open = async (article: Article): Promise<void> => {
   mockRead.id = article.id;
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <ArticlePage />
-    </QueryClientProvider>,
-  );
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await renderWithCache(<ArticlePage />);
+  await settle();
 };
 
 /** Every run of every paragraph of `article`, so a link can be found by the words it is written on. */

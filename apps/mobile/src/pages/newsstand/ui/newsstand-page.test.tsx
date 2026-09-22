@@ -1,9 +1,9 @@
 import { describe, expect, it, jest } from '@jest/globals';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { NEWSROOM } from '#config';
 import { openExternal } from '#lib/routing';
+import { renderWithCache, settle } from '#lib/testing';
 import { NewsstandPage } from './newsstand-page';
 
 // The app's own door out, doubled rather than the phone's: the screen hands a page over and is told nothing back, so
@@ -11,12 +11,8 @@ import { NewsstandPage } from './newsstand-page';
 jest.mock('#lib/routing', () => ({ __esModule: true, openExternal: jest.fn() }));
 
 const renderPage = async (): Promise<void> => {
-  await render(
-    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } })}>
-      <NewsstandPage />
-    </QueryClientProvider>,
-  );
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+  await renderWithCache(<NewsstandPage />);
+  await settle();
 };
 
 describe('NewsstandPage', () => {

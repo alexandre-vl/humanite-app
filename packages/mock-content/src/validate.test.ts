@@ -72,10 +72,7 @@ test('an item of this corpus carries a byline', () => {
   ]);
 });
 
-/**
- * Brief-ness left the item schema and is read off the id here, so what used to be a check that two fields agreed is
- * now a check that one of them holds: an item named as a brief is held to a brief's shape and to nothing else.
- */
+/** An item named as a brief is held to a brief's shape, the name being the one place a brief is written. */
 test('an item named as a brief is held to what a brief may hold', () => {
   const brief = CORPUS.find((each) => /-b[1-3]$/u.test(each.id));
   if (brief === undefined) {

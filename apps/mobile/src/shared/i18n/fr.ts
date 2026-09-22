@@ -46,7 +46,7 @@ export const FR = {
   'search.placeholder': 'Saisissez ici le sujet',
   'search.clear': 'Effacer la recherche',
   'search.rest.title': 'Cherchez dans le journal',
-  'search.rest.message': 'Un mot du titre, du chapô ou d’un thème.',
+  'search.rest.message': 'Un mot, un nom ou un lieu.',
   'search.count.one': '{count} résultat pour « {query} »',
   'search.count.many': '{count} résultats pour « {query} »',
   'search.none.title': 'Aucun résultat pour « {query} »',

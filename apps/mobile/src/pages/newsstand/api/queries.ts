@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
 
-/** The root every issue key starts with: one entity, one namespace in the cache the app persists. */
+/** The root every issue key starts with: one namespace in the cache the app persists. */
 const ISSUES = 'issues';
 
 /**
@@ -16,6 +16,3 @@ export const issuesQuery = queryOptions({
   queryFn: async () => content.getIssues(),
   staleTime: Infinity,
 });
-
-// What a numéro holds is not asked for here any more. It was, for a sommaire screen this app no longer pushes: a
-// numéro is read on the paper's own site now, so the only thing the app asks the content for is the shelf.
