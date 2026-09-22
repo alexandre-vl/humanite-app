@@ -9,6 +9,7 @@
     "./secrets": "./src/secrets.ts"
   },
   "dependencies": {
+    "@huma/contracts": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*"
   },

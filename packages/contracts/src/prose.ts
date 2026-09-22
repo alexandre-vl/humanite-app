@@ -16,8 +16,14 @@ import type { Block, BlockInput, SpanInput } from './content.ts';
  * is there to keep true.
  */
 
-/** Where the journal closes every one of its articles. Everything from here on belongs to a form, not to an article. */
-const DONATION = '<div id="form_don"';
+/**
+ * Where the journal closes every one of its articles. Everything from here on belongs to a form, not to an article.
+ *
+ * Exported because a second reader depends on it: the capture tool trims a recorded body around this very mark, and a
+ * trim that cut somewhere else would hand this reading a body shaped like no body the service sends. One mark, read by
+ * both, cannot drift between them.
+ */
+export const DONATION = '<div id="form_don"';
 
 /** Elements whose text is not prose and must never reach a reader. */
 const DROPPED = /<(script|style|svg|noscript|form|iframe|figure)\b[^>]*>[\s\S]*?<\/\1>/giu;

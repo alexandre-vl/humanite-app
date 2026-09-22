@@ -2,11 +2,11 @@ import { describe, expect, it } from '@jest/globals';
 import { formatClockTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
 
 describe('formatClockTime', () => {
-  it('prints the hour a row of the wire carries, and nothing of the day over it', () => {
+  it('imprime l’heure que porte une ligne du fil, et rien du jour au-dessus', () => {
     expect(formatClockTime('2026-09-12T17:52:00.000Z')).toBe('19:52');
   });
 
-  it('pads both halves of a small hour', () => {
+  it('complète d’un zéro les deux moitiés d’une petite heure', () => {
     expect(formatClockTime('2026-09-12T22:05:00.000Z')).toBe('00:05');
   });
 
@@ -21,7 +21,7 @@ describe('formatClockTime', () => {
 // it is the key a wire groups its runs under. It was computed twice, here and in the content package, from two clocks.
 
 describe('formatDayDate', () => {
-  it('dates a front page by its day and its month, sans le jour de la semaine', () => {
+  it('date une couverture par son jour et son mois, sans le jour de la semaine', () => {
     expect(formatDayDate('2026-09-12T17:52:00.000Z')).toBe('12 septembre');
   });
 
@@ -43,17 +43,17 @@ describe('formatDayDate', () => {
 });
 
 describe('formatLongDate', () => {
-  it('dates an article with its day, its month and its year', () => {
+  it('date un article de son jour, de son mois et de son année', () => {
     expect(formatLongDate('2026-09-13T09:00:00.000Z')).toBe('13 septembre 2026');
   });
 
   /** The Paris day, like every other reading of the clock: an article filed at 00:30 in Paris is that day's. */
-  it('reads the day from the Paris date, so a late evening dates the next day', () => {
+  it('lit le jour à l’heure de Paris, donc un article du soir tard date du lendemain', () => {
     expect(formatLongDate('2026-12-31T23:30:00.000Z')).toBe('1 janvier 2027');
   });
 
   /** It is the one date the paper writes out, and the one that carries a year: nothing else here does both. */
-  it('carries the year, which no other date the paper prints does', () => {
+  it('porte l’année, que nulle autre date du journal ne porte', () => {
     expect(formatLongDate('2026-09-13T09:00:00.000Z')).toContain('2026');
     expect(formatDayLabel('2026-09-13T09:00:00.000Z')).not.toContain('2026');
     expect(formatDayDate('2026-09-13T09:00:00.000Z')).not.toContain('2026');
@@ -61,19 +61,19 @@ describe('formatLongDate', () => {
 });
 
 describe('formatDayLabel', () => {
-  it('heads a run with its weekday, its day and its month', () => {
+  it('ouvre une série par son jour de la semaine, son jour et son mois', () => {
     expect(formatDayLabel('2026-09-12T17:52:00.000Z')).toBe('samedi 12 septembre');
   });
 
-  it('reads the weekday from the Paris date, so a late evening heads the next day', () => {
+  it('lit le jour de la semaine à l’heure de Paris, donc une fin de soirée ouvre le lendemain', () => {
     expect(formatDayLabel('2026-09-12T22:30:00.000Z')).toBe('dimanche 13 septembre');
   });
 
-  it('leaves a single-figure day unpadded', () => {
+  it('laisse sans zéro un jour d’un seul chiffre', () => {
     expect(formatDayLabel('2026-01-01T09:00:00.000Z')).toBe('jeudi 1 janvier');
   });
 
-  it('names every month', () => {
+  it('nomme chaque mois', () => {
     const months = [...Array.from({ length: 12 }).keys()].map((index) =>
       formatDayLabel(`2026-${String(index + 1).padStart(2, '0')}-15T09:00:00.000Z`),
     );
@@ -95,18 +95,18 @@ describe('formatDayLabel', () => {
 });
 
 describe('formatDuration', () => {
-  it('prints a running time as a player does', () => {
+  it('imprime une durée comme un lecteur vidéo l’affiche', () => {
     expect(formatDuration(258)).toBe('4:18');
     expect(formatDuration(45)).toBe('0:45');
   });
 
-  it('carries the hour when there is one', () => {
+  it('porte l’heure quand il y en a une', () => {
     expect(formatDuration(3858)).toBe('1:04:18');
   });
 });
 
-describe('an instant nothing can read', () => {
-  it('is refused rather than printed as a stray value', () => {
+describe('un instant que rien ne sait lire', () => {
+  it('est refusé plutôt qu’imprimé comme une valeur égarée', () => {
     expect(() => formatLongDate('hier matin')).toThrow(/instant invalide/u);
   });
 });

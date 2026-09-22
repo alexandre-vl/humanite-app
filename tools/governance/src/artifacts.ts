@@ -281,6 +281,22 @@ const CACHE_BUSTER_FILE = repoPath(`${APP_DIRECTORY}/src/_app/model/cache-buster
 const CONTRACTS_SOURCES = 'packages/contracts/src';
 
 /**
+ * The answers a capture recorded, which sit among the contracts' sources and are not one.
+ *
+ * They are what the schemas and the readings are held against, written by `pnpm capture:read` and read by tests alone:
+ * nothing a reader's cache holds was ever shaped by them. Hashed with the rest, every new capture would mint a new
+ * buster and throw away every reader's cache — a day of reading, discarded because a test fixture moved.
+ */
+const RECORDED_ANSWERS = 'recorded.ts';
+
+/**
+ * Whether a file of the contracts shapes what the app caches: a source, and neither a test nor the recorded answers.
+ * Exported so the rule can be pinned by a test rather than read off the hash it feeds.
+ */
+export const shapesTheCache = (name: string): boolean =>
+  name.endsWith('.ts') && !name.endsWith('.test.ts') && name !== RECORDED_ANSWERS;
+
+/**
  * The cache buster: the sha256 of the data contracts' sources, so the persisted TanStack Query cache is discarded
  * whenever a contract changes. Kept app-local, hashed from the sources, so the app keeps its type-only dependency on the
  * contracts package and imports no runtime value from it.
@@ -289,9 +305,7 @@ const cacheBuster: Artifact = {
   path: CACHE_BUSTER_FILE,
   render: async (root) => {
     const directory = join(root, CONTRACTS_SOURCES);
-    const files = (await readdir(directory, { recursive: true }))
-      .filter((name) => name.endsWith('.ts') && !name.endsWith('.test.ts'))
-      .toSorted(compareText);
+    const files = (await readdir(directory, { recursive: true })).filter(shapesTheCache).toSorted(compareText);
     const digest = createHash('sha256');
     for (const name of files) {
       digest.update(name);

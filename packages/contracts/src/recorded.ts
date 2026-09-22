@@ -11,8 +11,7 @@
  * cover it without a line changing.
  */
 
-/** The key the service names its list of sections with; a string, so no identifier of this repo is French. */
-const SECTIONS_KEY = 'rubriques';
+import { SECTIONS_KEY } from './remote.ts';
 
 export const RECORDED = {
   front: {

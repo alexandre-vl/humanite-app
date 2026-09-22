@@ -47,7 +47,7 @@ const contentInset = (): number => {
 };
 
 describe('List', () => {
-  it('renders an item for each entry, under the header and the sticky band', async () => {
+  it('rend un élément par entrée, sous le fronton et la bande qui reste', async () => {
     await render(
       <List
         items={['un', 'deux']}
@@ -67,7 +67,7 @@ describe('List', () => {
     expect(await screen.findByTestId('deux')).toBeTruthy();
   });
 
-  it('hangs its sticky band under the header when one stands above it', async () => {
+  it('accroche sa bande qui reste sous le fronton quand il y en a un', async () => {
     await render(
       <List
         items={['un']}
@@ -82,7 +82,7 @@ describe('List', () => {
     expect(stickyTop()).toBe(SIZES.headerExpanded);
   });
 
-  it('pins its sticky band to the very top when it carries no header', async () => {
+  it('épingle sa bande qui reste tout en haut quand elle ne porte aucun fronton', async () => {
     await render(
       <List
         items={['un']}
@@ -204,7 +204,7 @@ describe('List', () => {
     expect(contentInset()).toBe(SPACING.none);
   });
 
-  it('shows what stands in when it holds nothing', async () => {
+  it('montre ce qui en tient lieu quand elle ne contient rien', async () => {
     await render(
       <List
         items={[]}
@@ -217,7 +217,7 @@ describe('List', () => {
     expect(await screen.findByTestId('empty')).toBeTruthy();
   });
 
-  it('mounts what the window asks for, not the whole list', async () => {
+  it('monte ce que la fenêtre demande, et non toute la liste', async () => {
     await render(
       <List
         items={MANY}
@@ -232,7 +232,7 @@ describe('List', () => {
     expect(mounted).toBeLessThan(MANY.length);
   });
 
-  it('holds a pinned item at the top, over the run it opens', async () => {
+  it('tient un élément épinglé en haut, au-dessus de la série qu’il ouvre', async () => {
     const isHead = (item: number): boolean => item === 0;
     await render(
       <List
@@ -251,7 +251,7 @@ describe('List', () => {
     expect(screen.queryAllByTestId('row').length).toBeGreaterThan(0);
   });
 
-  it('asks every item it mounts which tree it is', async () => {
+  it('demande à chaque élément qu’elle monte quel arbre il est', async () => {
     const asked: number[] = [];
     await render(
       <List

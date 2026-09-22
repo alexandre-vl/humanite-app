@@ -51,8 +51,6 @@ export const FR = {
   'search.count.many': '{count} résultats pour « {query} »',
   'search.none.title': 'Aucun résultat pour « {query} »',
   'search.none.message': 'Essayez un autre mot, ou un thème plus large.',
-  'section.unknown.title': 'Rubrique introuvable',
-  'section.unknown.message': 'Cette rubrique n’est pas au sommaire du journal.',
   'settings.title': 'Préférences d’affichage',
   'settings.appearance': 'Apparence',
   'settings.appearance.system': 'Système',

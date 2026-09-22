@@ -29,12 +29,12 @@ const margins = (): Margins => {
 };
 
 describe('TopBar', () => {
-  it('names the screen, and says it is a name and not a sentence', async () => {
+  it('nomme l’écran, et dit que c’est un nom et non une phrase', async () => {
     await render(<TopBar title={asDisplayText(NAME)} />);
     expect(screen.getByText(NAME).props['accessibilityRole']).toBe('header');
   });
 
-  it('lays the name over the row, the same margin at each end', async () => {
+  it('pose le nom sur la rangée, avec la même marge à chaque bout', async () => {
     await render(<TopBar title={asDisplayText(NAME)} />);
     const { left, right } = margins();
     expect(left).toBe(SIZES.barSide);
@@ -42,14 +42,14 @@ describe('TopBar', () => {
     expect(right).toBe(left);
   });
 
-  it('reports the press that leaves, under a word rather than a symbol', async () => {
+  it('signale l’appui qui fait sortir, sous un mot plutôt que sous un symbole', async () => {
     const leave = jest.fn();
     await render(<TopBar title={asDisplayText(NAME)} onBack={leave} />);
     await fireEvent.press(screen.getByLabelText(t('action.back')));
     expect(leave).toHaveBeenCalledTimes(1);
   });
 
-  it('draws no way back where nothing pushed the screen', async () => {
+  it('ne dessine aucun retour là où rien n’a poussé l’écran', async () => {
     await render(<TopBar title={asDisplayText(NAME)} />);
     expect(screen.queryByLabelText(t('action.back'))).toBeNull();
   });
@@ -59,7 +59,7 @@ describe('TopBar', () => {
    * nothing in its place either. What the platform's own bar did instead was print the route's segment, so a reader
    * arriving at a section read its address for a moment before reading its name.
    */
-  it('carries no name where the screen has none to give', async () => {
+  it('ne porte aucun nom là où l’écran n’en a pas à donner', async () => {
     await render(<TopBar onBack={jest.fn()} />);
     expect(screen.queryByRole('header')).toBeNull();
   });

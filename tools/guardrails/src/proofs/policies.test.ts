@@ -47,7 +47,7 @@ describe('policyTag reads the bracketed tag of a message, a scoped module includ
     });
   }
 
-  test('un message sans crochets n’a pas de politique', () => {
+  test('a message without brackets names no policy', () => {
     expect(policyTag('rien à lire ici')).toBeNull();
   });
 });

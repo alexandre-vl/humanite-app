@@ -142,7 +142,7 @@ const AWAITING_FOUNDATION_ADRS = [
 ];
 
 /** Whether a proof answers for something other than the ADR process: the colours the paper is read at, the visuals it draws, dependencies, Expo, git hooks, guardrails, the answers it admits, lint, performance budgets, the pictures it asks for, the prose it reads, the root guard, the secrets a capture must not carry and the structure, plus the agent proofs above. */
-const awaitsFoundationAdr = (id: string): boolean =>
+const answersForTheRest = (id: string): boolean =>
   [
     'artwork/',
     'deps/',
@@ -161,10 +161,10 @@ const awaitsFoundationAdr = (id: string): boolean =>
     'structure/',
   ].some((prefix) => id.startsWith(prefix)) || AWAITING_FOUNDATION_ADRS.includes(id);
 
-test('every proof that touches an ADR is bound to a rule of ADR-0000; the others await the ADRs of the foundations', () => {
+test('every proof that touches an ADR is bound to a rule of ADR-0000; the others answer for the rest of the repository', () => {
   const bound = new Set<string>(Object.values(BINDINGS['ADR-0000'].rules).flat());
   const ids = PROOFS.map((fixture) => fixture.id);
-  expect(ids.filter((id) => !bound.has(id))).toEqual(ids.filter(awaitsFoundationAdr));
+  expect(ids.filter((id) => !bound.has(id))).toEqual(ids.filter(answersForTheRest));
 });
 
 /**

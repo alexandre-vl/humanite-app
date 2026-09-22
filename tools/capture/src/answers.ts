@@ -1,3 +1,4 @@
+import { DONATION, SECTIONS_KEY } from '@huma/contracts';
 import type { Exchange } from './har.ts';
 
 /**
@@ -30,9 +31,6 @@ const BODY_SIGNS = 8000;
 
 /** How much of the donation block is kept. What a reading cuts, it cuts by position, so its head proves the cut. */
 const DONATION_SIGNS = 400;
-
-/** Where the journal closes every one of its articles. */
-const DONATION = '<div id="form_don"';
 
 /** How many items of a list are kept, per kind of list. A list is kept for its shapes, not for its length. */
 const ITEMS = { front: 5, wire: 4, sectionFeed: 6, search: 3 } as const;
@@ -173,9 +171,6 @@ export const chooseAnswers = (exchanges: readonly Exchange[]): Chosen => {
   return { answers, articles, missing };
 };
 
-/** The key the service names its list of sections with; a string, so no identifier of this repo is French. */
-const SECTIONS_KEY = 'rubriques';
-
 /**
  * The module a reading writes, ready to be formatted and tracked.
  *
@@ -208,8 +203,7 @@ export const moduleOf = (chosen: Chosen): string => {
  * cover it without a line changing.
  */
 
-/** The key the service names its list of sections with; a string, so no identifier of this repo is French. */
-const SECTIONS_KEY = 'rubriques';
+import { SECTIONS_KEY } from './remote.ts';
 
 export const RECORDED = ${written} as const;
 `;

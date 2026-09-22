@@ -75,12 +75,10 @@ export const artworkSvg = (key: string, code: SectionCode): string => {
 };
 
 /**
- * What a reading of the generated visuals can find wrong. One code per thing that can stop being true of the drawing,
- * so the rule is proven by a fixture that makes exactly its code appear rather than by a test nobody can point at.
- */
-/**
- * The name of one thing a reading of the drawing can find wrong. A union rather than a list, nothing ever walking
- * the codes: a reading names exactly one, and a fixture names the set it expects.
+ * The name of one thing a reading of the drawing can find wrong: one code per thing that can stop being true of it, so
+ * the rule is proven by a fixture that makes exactly its code appear rather than by a test nobody can point at. A union
+ * rather than a list, nothing ever walking the codes: a reading names exactly one, and a fixture names the set it
+ * expects.
  */
 export type ArtworkCode = 'artwork/not-deterministic' | 'artwork/key-ignored' | 'artwork/section-ignored';
 

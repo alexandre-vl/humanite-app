@@ -650,6 +650,9 @@ importers:
 
   tools/capture:
     dependencies:
+      '@huma/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@huma/fixtures':
         specifier: workspace:*
         version: link:../fixtures

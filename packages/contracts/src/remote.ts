@@ -85,8 +85,11 @@ const REMOTE_SECTION = z.object({
 /**
  * The key the service names its list of sections with. Written as a string and read through it, so the wire keeps its
  * own language and the glossary keeps ours: no identifier of this repo is ever spelled in French.
+ *
+ * Exported so the answers a capture records write the key through this same constant rather than a copy of it: the
+ * tool that writes them and the module they are written into each declared their own, and it was four spellings.
  */
-const SECTIONS_KEY = 'rubriques';
+export const SECTIONS_KEY = 'rubriques';
 
 /** The list of sections, renamed on the way in so nothing downstream reads the service's word for it. */
 export const REMOTE_SECTIONS = z

@@ -3,9 +3,10 @@ import { ContentApiError } from '@huma/contracts';
 import { contentApi } from '@huma/mock-api';
 
 /**
- * The content the app reads. A mock serves the fictional corpus from the bundle, with no network and no service; a
- * client of a real one would take its place here, behind the same contract, and no screen would change. This module is
- * the only door: a lint policy refuses the mock anywhere else.
+ * The content the app reads. Today a mock serves the fictional corpus from the bundle, with no network and no service.
+ * The journal's own service is already read by the contracts — its answers item by item, its bodies into blocks, its
+ * pictures at the width of their place — and the client that asks it for them takes this line's place, behind the
+ * same contract, without a screen changing. This module is the only door: a lint policy refuses the mock anywhere else.
  */
 export const content: ContentApi = contentApi;
 

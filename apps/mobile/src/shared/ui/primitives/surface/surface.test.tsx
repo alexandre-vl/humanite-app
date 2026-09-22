@@ -23,7 +23,7 @@ const groundOf = (): Parameters<typeof fireEvent>[0] => {
 };
 
 describe('Surface', () => {
-  it('reports its first layout to whoever holds the splash', async () => {
+  it('signale sa première mise en page à qui retient l’écran de lancement', async () => {
     await render(
       <StartupProvider>
         <Surface>
@@ -37,7 +37,7 @@ describe('Surface', () => {
     expect(await screen.findByTestId('done')).toBeTruthy();
   });
 
-  it('draws where no splash waits on it, reporting to nobody', async () => {
+  it('se dessine là où aucun écran de lancement ne l’attend, sans rien signaler', async () => {
     await render(
       <Surface>
         <View testID="content" />
