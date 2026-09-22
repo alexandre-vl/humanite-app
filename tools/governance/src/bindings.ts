@@ -971,7 +971,9 @@ export const BINDINGS = {
     scope: {
       // The wire shapes, the readings that turn the service's markup into text and blocks, the way its pictures are
       // asked for, and the answers all of them are held against. The client that will call the service is not here
-      // yet; its module joins this scope the day it is written.
+      // yet; its module joins this scope the day it is written. The simulated content is here too, with the section
+      // grounds its visuals are drawn in: this ADR supersedes the one that governed them, and a supersession that
+      // left them governed by nothing would leave their proofs bound to nothing.
       paths: [
         'packages/contracts/src/intake.ts',
         'packages/contracts/src/intake.test.ts',
@@ -982,8 +984,12 @@ export const BINDINGS = {
         'packages/contracts/src/recorded.ts',
         'packages/contracts/src/remote.ts',
         'packages/contracts/src/remote.test.ts',
+        'packages/design-tokens/src/sections.ts',
+        'packages/mock-api/**',
+        'packages/mock-content/**',
         'tools/capture/**',
         'tools/governance/src/cli/capture-read.ts',
+        'tools/guardrails/src/proofs/artwork.ts',
         'tools/guardrails/src/proofs/intake.ts',
         'tools/guardrails/src/proofs/picture.ts',
         'tools/guardrails/src/proofs/prose.ts',
@@ -1009,6 +1015,7 @@ export const BINDINGS = {
         'prose/nothing-read-plain',
       ],
       R3: ['secret/recorded-clean', 'secret/token', 'secret/password', 'secret/address', 'secret/cookie', 'secret/key'],
+      R4: ['artwork/generator', 'artwork/not-deterministic', 'artwork/key-ignored', 'artwork/section-ignored'],
       R5: ['picture/resizer', 'picture/width-ignored', 'picture/address-changed', 'picture/query-lost'],
     },
   },

@@ -9,7 +9,7 @@ supersedes: [ADR-0020]
 
 ## Contexte et problème
 
-- L’app officielle du journal est une coquille hybride qui lit un service JSON, et non une page web : chaque écran y correspond à une route de `phenix2.immanens.com/api/v1/app/300` (capture réseau du 21/09/2026).
+- L’app officielle du journal est une coquille hybride qui lit un service JSON : chaque écran y correspond à une route de `phenix2.immanens.com/api/v1/app/300` (capture réseau du 21/09/2026).
 - Les listes, le menu des rubriques et la recherche de ce service ne demandent aucun jeton ; seul le corps d’un article en demande un (même capture : `x-user-token` ne paraît que sur `wordpress/post/<id>`, `store/*` et `drm/*`).
 - Le service nomme lui-même le format de chaque article — `classic`, `opinion`, `video`, `serie` — et le droit du lecteur, article par article.
 - Le corps d’un article arrive dans un champ `content_array` en HTML WordPress de 45 à 76 ko, scripts et formulaire de don compris ; la prose utile y tient en 0 à 37 paragraphes.
@@ -41,7 +41,7 @@ Option retenue : « Un client du service derrière la porte existante », parce 
 - **R1** — Une réponse du service DOIT être relue item par item par les schémas des contrats : ce qu’ils lisent est servi dans son ordre, ce qu’ils refusent est nommé.
 - **R2** — Un texte du service DOIT être relu avant d’atteindre une primitive : un corps en blocs des contrats, un champ court en sa ligne.
 - **R3** — Un secret que porte une capture NE DOIT PAS être écrit dans un fichier suivi.
-- **R4** — Le contenu simulé PEUT rester le corpus déterministe des tests et des parcours.
+- **R4** — Le contenu simulé DOIT rester déterministe : chaque visuel découle de sa seule clé et de la couleur de sa rubrique.
 - **R5** — Une image que le service sert DOIT être demandée à la largeur de la place qu’elle remplit.
 
 ### Conséquences
@@ -79,6 +79,6 @@ Option retenue : « Un client du service derrière la porte existante », parce 
 
 - Le service rend deux fils distincts, que l’app a déjà : `wordpress/home` dans l’ordre choisi par la rédaction, et `wordpress/homepage` en ordre antéchronologique, son « En continu ».
 - Les identifiants du corpus fictif portent la grammaire de la fiction ; ceux du service sont des nombres (`packages/contracts/src/ids.ts`).
-- Le kiosque reste hors de l’app : un numéro pèse soixante-deux mégaoctets et se lit dans un moteur propriétaire protégé.
+- Le kiosque reste hors de l’app : un numéro pèse 62 Mo et se lit dans un moteur propriétaire.
 - La connexion du lecteur et le droit de lecture ne sont pas décidés ici ; ils font leur propre ADR, et rien de ce qui précède n’en dépend.
 - Réévaluation : le service change de forme sans préavis, ou le chemin public cesse de rendre un article lisible.

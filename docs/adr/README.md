@@ -334,13 +334,14 @@ Statut : accepté. Périmètre : `apps/mobile/src/shared/lib/announce/**`, `apps
 
 ### ADR-0027 · Client non officiel de l’API L’Humanité
 
-Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `packages/contracts/src/intake.test.ts`, `packages/contracts/src/picture.ts`, `packages/contracts/src/picture.test.ts`, `packages/contracts/src/prose.ts`, `packages/contracts/src/prose.test.ts`, `packages/contracts/src/recorded.ts`, `packages/contracts/src/remote.ts`, `packages/contracts/src/remote.test.ts`, `tools/capture/**`, `tools/governance/src/cli/capture-read.ts`, `tools/guardrails/src/proofs/intake.ts`, `tools/guardrails/src/proofs/picture.ts`, `tools/guardrails/src/proofs/prose.ts`.
+Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `packages/contracts/src/intake.test.ts`, `packages/contracts/src/picture.ts`, `packages/contracts/src/picture.test.ts`, `packages/contracts/src/prose.ts`, `packages/contracts/src/prose.test.ts`, `packages/contracts/src/recorded.ts`, `packages/contracts/src/remote.ts`, `packages/contracts/src/remote.test.ts`, `packages/design-tokens/src/sections.ts`, `packages/mock-api/**`, `packages/mock-content/**`, `tools/capture/**`, `tools/governance/src/cli/capture-read.ts`, `tools/guardrails/src/proofs/artwork.ts`, `tools/guardrails/src/proofs/intake.ts`, `tools/guardrails/src/proofs/picture.ts`, `tools/guardrails/src/proofs/prose.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                         |
 | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | DOIT        | `intake/reader`, `intake/unreadable-kept`, `intake/readable-dropped`, `intake/loss-unnamed`, `intake/order-lost`                                                                                |
 | R2    | DOIT        | `prose/reader`, `prose/markup-left`, `prose/entity-left`, `prose/aside-kept`, `prose/donation-kept`, `prose/break-glued`, `prose/edges-loose`, `prose/nothing-read`, `prose/nothing-read-plain` |
 | R3    | NE DOIT PAS | `secret/recorded-clean`, `secret/token`, `secret/password`, `secret/address`, `secret/cookie`, `secret/key`                                                                                     |
+| R4    | DOIT        | `artwork/generator`, `artwork/not-deterministic`, `artwork/key-ignored`, `artwork/section-ignored`                                                                                              |
 | R5    | DOIT        | `picture/resizer`, `picture/width-ignored`, `picture/address-changed`, `picture/query-lost`                                                                                                     |
 
 ## Référentiel
