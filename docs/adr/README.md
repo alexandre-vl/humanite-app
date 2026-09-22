@@ -28,7 +28,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0017](0017-typographie-et-licences-des-polices.md)                         | Typographie et licences des polices                         | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0018](0018-images-et-symboles-natifs.md)                                   | Images et symboles natifs                                   | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | proposé | `dependency`, `data-format`                                                |
-| [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | proposé | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | proposé | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | proposé | `guarded-config`, `boundary`                                               |
 | [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
@@ -268,7 +268,7 @@ Statut : proposé. Périmètre : `packages/mock-content/**`, `packages/mock-api/
 
 ### ADR-0021 · Accès au contenu par une seule porte et requêtes par entité
 
-Statut : proposé. Périmètre : `apps/mobile/src/shared/api/**`, `apps/mobile/src/entities/**`, `apps/mobile/src/pages/*/api/**`, `packages/eslint-config/src/query.ts`.
+Statut : accepté. Périmètre : `apps/mobile/src/shared/api/**`, `apps/mobile/src/entities/**`, `apps/mobile/src/pages/*/api/**`, `packages/eslint-config/src/query.ts`.
 
 | Règle | Niveau      | Preuves                                                                                            |
 | ----- | ----------- | -------------------------------------------------------------------------------------------------- |
