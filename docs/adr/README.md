@@ -27,7 +27,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)         | Tests par environnement Vitest jest-expo et Maestro         | accepté | `dependency`, `guarded-config`                                             |
 | [ADR-0017](0017-typographie-et-licences-des-polices.md)                         | Typographie et licences des polices                         | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0018](0018-images-et-symboles-natifs.md)                                   | Images et symboles natifs                                   | accepté | `dependency`, `guarded-config`, `boundary`                                 |
-| [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | proposé | `dependency`, `data-format`                                                |
+| [ADR-0020](0020-contenu-simule-en-corpus-fictif-et-visuels-generes.md)          | Contenu simulé en corpus fictif et visuels générés          | accepté | `dependency`, `data-format`                                                |
 | [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | accepté | `guarded-config`, `boundary`                                               |
@@ -258,7 +258,7 @@ Statut : accepté. Périmètre : `apps/mobile/src/shared/ui/primitives/image/**`
 
 ### ADR-0020 · Contenu simulé en corpus fictif et visuels générés
 
-Statut : proposé. Périmètre : `packages/mock-content/**`, `packages/mock-api/**`, `packages/design-tokens/src/sections.ts`.
+Statut : accepté. Périmètre : `packages/mock-content/**`, `packages/mock-api/**`, `packages/design-tokens/src/sections.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                             |
 | ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
