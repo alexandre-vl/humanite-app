@@ -31,7 +31,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0021](0021-acces-au-contenu-par-une-seule-porte-et-requetes-par-entite.md) | Accès au contenu par une seule porte et requêtes par entité | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0022](0022-liste-virtualisee-native-derriere-une-primitive.md)             | Liste virtualisée native derrière une primitive             | accepté | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0023](0023-une-porte-unique-valide-les-parametres-d-une-route.md)          | Une porte unique valide les paramètres d'une route          | accepté | `guarded-config`, `boundary`                                               |
-| [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
+| [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0025](0025-budgets-de-performance-et-outils-de-mesure.md)                  | Budgets de performance et outils de mesure                  | proposé | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0026](0026-accessibilite-annoncee-et-contraste-deduit-de-la-taille.md)     | Accessibilité annoncée et contraste déduit de la taille     | proposé | `guarded-config`, `boundary`                                               |
 
@@ -297,7 +297,7 @@ Statut : accepté. Périmètre : `apps/mobile/src/shared/lib/routing/**`.
 
 ### ADR-0024 · État du lecteur en magasin Zustand et format versionné
 
-Statut : proposé. Périmètre : `apps/mobile/src/features/**`, `apps/mobile/src/shared/lib/storage/**`.
+Statut : accepté. Périmètre : `apps/mobile/src/features/**`, `apps/mobile/src/shared/lib/storage/**`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
