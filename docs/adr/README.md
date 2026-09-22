@@ -34,6 +34,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0024](0024-etat-du-lecteur-en-magasin-zustand-et-format-versionne.md)      | État du lecteur en magasin Zustand et format versionné      | accepté | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0025](0025-budgets-de-performance-et-outils-de-mesure.md)                  | Budgets de performance et outils de mesure                  | accepté | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0026](0026-accessibilite-annoncee-et-contraste-deduit-de-la-taille.md)     | Accessibilité annoncée et contraste déduit de la taille     | accepté | `guarded-config`, `boundary`                                               |
+| [ADR-0027](0027-client-non-officiel-de-l-api-l-humanite.md)                     | Client non officiel de l’API L’Humanité                     | proposé | `dependency`, `boundary`, `data-format`                                    |
 
 ## Confirmation
 
