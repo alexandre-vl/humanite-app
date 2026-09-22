@@ -21,7 +21,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0010](0010-emulateur-android-redroid-sur-le-serveur.md)                    | Émulateur Android Redroid sur le serveur                    | accepté | `dependency`, `guarded-config`, `reversal-cost`                            |
 | [ADR-0011](0011-contrats-de-donnees-en-zod.md)                                  | Contrats de données en Zod                                  | accepté | `dependency`, `guarded-config`, `data-format`                              |
 | [ADR-0012](0012-design-tokens-et-createstyles-brande.md)                        | Design tokens et createStyles brandé                        | accepté | `guarded-config`, `boundary`                                               |
-| [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                     | Textes UI en dictionnaire français typé                     | proposé | `guarded-config`, `boundary`, `data-format`                                |
+| [ADR-0013](0013-textes-ui-en-dictionnaire-francais-type.md)                     | Textes UI en dictionnaire français typé                     | accepté | `guarded-config`, `boundary`, `data-format`                                |
 | [ADR-0014](0014-navigation-expo-router-par-onglets-natifs.md)                   | Navigation Expo Router par onglets natifs                   | proposé | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0015](0015-cache-de-donnees-tanstack-query-persiste.md)                    | Cache de données TanStack Query persisté                    | proposé | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 | [ADR-0016](0016-tests-par-environnement-vitest-jest-expo-et-maestro.md)         | Tests par environnement Vitest jest-expo et Maestro         | proposé | `dependency`, `guarded-config`                                             |
@@ -201,7 +201,7 @@ Statut : accepté. Périmètre : `packages/design-tokens/**`, `apps/mobile/src/s
 
 ### ADR-0013 · Textes UI en dictionnaire français typé
 
-Statut : proposé. Périmètre : `packages/contracts/src/display-text.ts`, `apps/mobile/src/shared/i18n/**`, `apps/mobile/src/shared/lib/display-text/**`, `apps/mobile/src/shared/lib/format/**`, `apps/mobile/src/shared/ui/primitives/text/**`.
+Statut : accepté. Périmètre : `packages/contracts/src/display-text.ts`, `apps/mobile/src/shared/i18n/**`, `apps/mobile/src/shared/lib/display-text/**`, `apps/mobile/src/shared/lib/format/**`, `apps/mobile/src/shared/ui/primitives/text/**`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                |
 | ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
