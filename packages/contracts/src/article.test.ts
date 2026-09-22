@@ -60,13 +60,19 @@ test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, 
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: 'pol-a1-hero' }).success).toBe(false);
 });
 
-test('ARTICLE extends the summary with a non-empty body', () => {
+test('ARTICLE extends the summary with a body, which a video of the journal leaves empty', () => {
   const article: Article = ARTICLE.parse({
     ...validSummary,
     blocks: [{ type: 'paragraph', spans: [{ type: 'text', value: 'x' }] }],
   });
   expectTypeOf(article).toEqualTypeOf<Article>();
-  expect(ARTICLE.safeParse({ ...validSummary, blocks: [] }).success).toBe(false);
+  expect(ARTICLE.safeParse({ ...validSummary, format: 'video', blocks: [] }).success).toBe(true);
+  expect(ARTICLE.safeParse({ ...validSummary }).success).toBe(false);
+});
+
+test('ARTICLE_SUMMARY takes an item whose section nobody named', () => {
+  const unplaced = Object.fromEntries(Object.entries(validSummary).filter(([field]) => field !== 'section'));
+  expect(ARTICLE_SUMMARY.safeParse(unplaced).success).toBe(true);
 });
 
 test('HERO names its picture, and the words under it when there are any', () => {

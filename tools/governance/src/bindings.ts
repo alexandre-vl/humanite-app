@@ -973,6 +973,8 @@ export const BINDINGS = {
       // asked for, and the answers all of them are held against. The client that will call the service is not here
       // yet; its module joins this scope the day it is written.
       paths: [
+        'packages/contracts/src/intake.ts',
+        'packages/contracts/src/intake.test.ts',
         'packages/contracts/src/picture.ts',
         'packages/contracts/src/picture.test.ts',
         'packages/contracts/src/prose.ts',
@@ -982,15 +984,19 @@ export const BINDINGS = {
         'packages/contracts/src/remote.test.ts',
         'tools/capture/**',
         'tools/governance/src/cli/capture-read.ts',
+        'tools/guardrails/src/proofs/intake.ts',
         'tools/guardrails/src/proofs/picture.ts',
         'tools/guardrails/src/proofs/prose.ts',
       ],
     },
     rules: {
-      R1: {
-        convention:
-          'Une valeur du domaine ne peut pas exister sans avoir été analysée : chaque champ de prose porte la marque DisplayText, que seul un schéma des contrats produit, et la fonction qui la produit est interdite d’import partout ailleurs. Les formes du fil vivent dans remote.ts, dont le test rejoue sur elles les réponses captées ; la lecture d’un corps se termine sur BLOCK.array().parse, sans quoi son type de retour ne tient pas.',
-      },
+      R1: [
+        'intake/reader',
+        'intake/unreadable-kept',
+        'intake/readable-dropped',
+        'intake/loss-unnamed',
+        'intake/order-lost',
+      ],
       R2: [
         'prose/reader',
         'prose/markup-left',

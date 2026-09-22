@@ -1,5 +1,5 @@
 import { ARTICLE } from '@huma/contracts';
-import type { Article } from '@huma/contracts';
+import type { Article, SectionId } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { CORPUS } from './index.ts';
 import { validateCorpus } from './validate.ts';
@@ -13,15 +13,26 @@ const illustrated = (): Article => {
   return article;
 };
 
+/**
+ * An item beside the folder it was filed in. Every item of this corpus names its section — the corpus's own check
+ * requires it — even though an item of the journal need not, so a test that finds none has lost its corpus.
+ */
+const filed = (article: Article): Readonly<{ folder: SectionId; article: Article }> => {
+  if (article.section === undefined) {
+    throw new Error(`${article.id} ne nomme pas sa rubrique`);
+  }
+  return { folder: article.section, article };
+};
+
 /** Only the errors that name one thing: a corpus of one item fails every count and presence rule besides. */
 const errorsAbout = (article: Article, word: string): readonly string[] =>
-  validateCorpus([{ folder: article.section, article }]).filter((error) => error.includes(word));
+  validateCorpus([filed(article)]).filter((error) => error.includes(word));
 
 /** Only what the picture keys are judged on. */
 const errorsFor = (article: Article): readonly string[] => errorsAbout(article, 'clé d’image');
 
 test('the corpus as built names no picture it should not', () => {
-  expect(validateCorpus(CORPUS.map((article) => ({ folder: article.section, article })))).toEqual([]);
+  expect(validateCorpus(CORPUS.map(filed))).toEqual([]);
 });
 
 test('a lead picture keyed to another item is refused', () => {

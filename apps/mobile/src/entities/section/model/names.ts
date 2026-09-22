@@ -9,9 +9,11 @@ import { sectionsQuery } from '../api/queries';
  * one entity may not reach sideways into another. So the screen in between asks here once and hands the answer down
  * with every card, which also means one query serves a whole feed rather than one per cell being recycled.
  *
- * An unanswered list gives no name rather than a guess: a slug is an address, not a word the paper prints.
+ * An unanswered list gives no name rather than a guess: a slug is an address, not a word the paper prints. Nor does an
+ * item nobody placed: the journal's service names no section on anything it lists, and a card that printed the wrong
+ * one would be worse than a card that printed none.
  */
-export const useSectionNames = (): ((section: SectionId) => DisplayText | null) => {
+export const useSectionNames = (): ((section: SectionId | undefined) => DisplayText | null) => {
   const sections = useQuery(sectionsQuery).data;
-  return (section) => sections?.find((one) => one.id === section)?.label ?? null;
+  return (section) => (section === undefined ? null : (sections?.find((one) => one.id === section)?.label ?? null));
 };

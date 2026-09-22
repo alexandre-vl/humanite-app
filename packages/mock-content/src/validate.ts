@@ -158,7 +158,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   const words = wordCount(article);
 
   if (article.section !== folder) {
-    errors.push(`${where} : section « ${article.section} » ≠ dossier « ${folder} »`);
+    errors.push(`${where} : section « ${article.section ?? 'aucune'} » ≠ dossier « ${folder} »`);
   }
   if (section !== undefined && !article.id.startsWith(`${section.code}-`)) {
     errors.push(`${where} : id hors de la rubrique « ${section.code} »`);

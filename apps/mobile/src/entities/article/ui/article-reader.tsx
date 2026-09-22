@@ -21,7 +21,7 @@ export type ArticleReaderProps = Readonly<{
    * What the newsroom calls the section an article ran in. It is answered by the screen because the sections are
    * another entity's, and an entity may not reach sideways for one.
    */
-  names: (section: SectionId) => DisplayText | null;
+  names: (section: SectionId | undefined) => DisplayText | null;
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;

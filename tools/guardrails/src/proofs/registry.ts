@@ -1,4 +1,5 @@
 import { ARTWORK_FIXTURES } from './artwork.ts';
+import { INTAKE_FIXTURES } from './intake.ts';
 import { LEGIBILITY_FIXTURES } from './legibility.ts';
 import { PICTURE_FIXTURES } from './picture.ts';
 import { POLICY_FIXTURES } from './policies.ts';
@@ -11,4 +12,5 @@ export const GUARDRAIL_PROOFS = [
   ...ARTWORK_FIXTURES,
   ...PROSE_FIXTURES,
   ...PICTURE_FIXTURES,
+  ...INTAKE_FIXTURES,
 ] as const;

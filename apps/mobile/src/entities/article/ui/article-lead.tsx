@@ -64,8 +64,10 @@ export function ArticleTitle({ title, name }: ArticleTitleProps): ReactNode {
  * ways round: a front page of one week's stories needs no date on each card, and the full article needs one printed
  * prominently. So the cards lost theirs and this one gained the month and the year.
  *
- * A video article shows no picture here. Its first block is the video, which has no still of its own and shows the
- * article's picture instead; showing it twice, once above the player and once inside it, would say nothing more.
+ * An article that plays a video shows no picture here. The player has no still of its own and shows the article's
+ * picture instead; showing it twice, once above the player and once inside it, would say nothing more. It is asked of
+ * the body and not of the format: a video of the journal comes with no player in its body — the service sends a link
+ * to the film and no prose at all — and hiding its picture on the strength of its format left the page with nothing.
  *
  * Nothing marks a reserved article. The content serves its body whole whatever the reader holds, no capture of the
  * current app shows a wall, and a mark over an article one is reading in full would only puzzle.
@@ -73,7 +75,8 @@ export function ArticleTitle({ title, name }: ArticleTitleProps): ReactNode {
 export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
   const styles = useStyles();
   const hero = article.hero;
-  const visual = article.format === 'video' ? null : pictureOf(article, 'lead');
+  const plays = article.blocks.some((block) => block.type === 'video');
+  const visual = plays ? null : pictureOf(article, 'lead');
   return (
     <>
       <Box style={styles.standfirst}>

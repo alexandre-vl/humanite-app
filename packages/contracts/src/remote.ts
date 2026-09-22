@@ -22,15 +22,20 @@ const REMOTE_ID = z.union([z.string(), z.number()]).transform((value) => String(
  * about it — so this stays closed rather than falling back to the most common one.
  */
 const REMOTE_FORMAT = z.enum(['classic', 'opinion', 'video', 'serie']);
+export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
 
 /**
  * An item as any list of the service carries it.
  *
  * Four fields are absent from the front-page route and present everywhere else, so they are optional here rather than
- * in a second shape: `article_format`, `has_audio`, and — as null — `author` and `image_caption`. The service also
- * sends `highlighted` on every item and has never filled it; a field that carries nothing is not modelled.
+ * in a second shape: `article_format`, `has_audio`, and — as null — `author` and `image_caption`.
+ *
+ * `highlighted` is sent on every item and was null on all 519 of them. It is modelled all the same, because it is the
+ * one thing the service could say about an item that the wire marks on screen — the filled bead of « En continu » —
+ * and a flag the journal starts setting tomorrow should light up, not be stripped by a schema that decided today it
+ * would always be empty. Anything but a flag there stops the item, and the reading names it.
  */
-const REMOTE_POST = z.object({
+export const REMOTE_POST = z.object({
   id: REMOTE_ID,
   type: z.string(),
   date: z.string(),
@@ -47,7 +52,9 @@ const REMOTE_POST = z.object({
   right: z.boolean(),
   video_cover: z.number().optional(),
   video_url: z.string().optional(),
+  highlighted: z.boolean().nullish(),
 });
+export type RemotePost = z.infer<typeof REMOTE_POST>;
 
 /**
  * An item with its body. The body is an array the service has only ever filled with one string: the whole article as

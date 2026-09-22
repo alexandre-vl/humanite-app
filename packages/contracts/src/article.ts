@@ -41,6 +41,11 @@ export type Hero = z.infer<typeof HERO>;
  * showed one, and of the sixteen fields the service sends, none is a subject. A field a schema requires and nothing
  * can fill is a field every reading has to invent.
  *
+ * `section` is where an item ran, when that is known. It is not always: the journal's service names no section on any
+ * item, on any route — 464 items measured, not one — and only a section's own list says, by being that section's.
+ * A reading that knows gives it; one that does not leaves it out, and a screen shows no section rather than a wrong
+ * one.
+ *
  * `byline` is who signed the piece, written out. It was a list of identifiers into a roster of the newsroom, which
  * the service has no equivalent of: it sends a name and nothing behind it — one name, never two, and `La rédaction`
  * more often than anyone — so there is nobody to look up and no page to send a reader to. A name that resolves to
@@ -48,7 +53,7 @@ export type Hero = z.infer<typeof HERO>;
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
-  section: SECTION_ID,
+  section: SECTION_ID.optional(),
   format: ARTICLE_FORMAT,
   access: ACCESS,
   title: DISPLAY_TEXT,
@@ -60,6 +65,11 @@ export const ARTICLE_SUMMARY = z.object({
 });
 export type ArticleSummary = z.infer<typeof ARTICLE_SUMMARY>;
 
-/** An item with its body, as the reader opens it. */
-export const ARTICLE = ARTICLE_SUMMARY.extend({ blocks: z.array(BLOCK).min(1) });
+/**
+ * An item with its body, as the reader opens it.
+ *
+ * The body may be empty. A video the journal publishes carries no prose at all — its whole body, read, is the donation
+ * form that closes every article — and a schema that required one block would refuse to open the video.
+ */
+export const ARTICLE = ARTICLE_SUMMARY.extend({ blocks: z.array(BLOCK) });
 export type Article = z.infer<typeof ARTICLE>;
