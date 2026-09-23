@@ -1,5 +1,5 @@
 import { DONATION, SECTIONS_KEY } from '@huma/contracts';
-import { isRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import { expect, test } from 'vitest';
 import { chooseAnswers, moduleOf } from './answers.ts';
 import type { Exchange } from './har.ts';
@@ -59,20 +59,20 @@ test('each list route keeps the first answer it was given, with the request that
 /** A list is kept for its shapes: one item per format and reservation, a free item never lost behind reserved ones. */
 test('a list keeps one item per shape, a free one among them, in the order the service sent them', () => {
   const posts = chooseAnswers(CAPTURE).answers.front?.answer['posts'];
-  const ids = Array.isArray(posts) ? posts.map((each: unknown) => (isRecord(each) ? each['id'] : null)) : null;
+  const ids = isList(posts) ? posts.map((each) => (isRecord(each) ? each['id'] : null)) : null;
   expect(ids).toEqual(['1', '3', '4']);
 });
 
 test('the menu is kept whole: its sections are its shape', () => {
   const sections = chooseAnswers(CAPTURE).answers.menu?.answer[SECTIONS_KEY];
-  expect(Array.isArray(sections) ? sections.length : 0).toBe(2);
+  expect(isList(sections) ? sections.length : 0).toBe(2);
 });
 
 /** A body is kept long enough to read a structure and never whole, and the donation block that closes it by its head. */
 test('an article is kept per format, its prose cut short and its donation block cut to its head', () => {
   const kept = chooseAnswers(CAPTURE).articles['opinion'];
   const parts: unknown = kept?.answer['content_array'];
-  const body: unknown = Array.isArray(parts) ? parts[0] : undefined;
+  const body = isList(parts) ? parts[0] : undefined;
   expect(kept?.path).toBe('/wordpress/post/3860965');
   expect(typeof body === 'string' ? body.length : 0).toBeLessThan(9000);
   expect(typeof body === 'string' ? body : '').toContain(DONATION);

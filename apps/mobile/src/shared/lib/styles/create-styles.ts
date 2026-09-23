@@ -1,4 +1,5 @@
 import type { Angle, Brand, Color, Radius, Space, Theme } from '@huma/design-tokens';
+import { isRecord } from '@huma/unknown';
 import { useMemo } from 'react';
 import { useTheme } from './theme';
 
@@ -77,8 +78,7 @@ export function createStyles<Definition extends Readonly<Record<string, Style>>>
   build: (theme: Theme) => Definition,
 ): () => { readonly [Name in keyof Definition]: StyleRef } {
   const brand = (definition: Definition): { readonly [Name in keyof Definition]: StyleRef } => {
-    const branded = (value: unknown): value is { readonly [Name in keyof Definition]: StyleRef } =>
-      typeof value === 'object' && value !== null;
+    const branded = (value: unknown): value is { readonly [Name in keyof Definition]: StyleRef } => isRecord(value);
     if (branded(definition)) {
       return definition;
     }

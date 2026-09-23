@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { parseJson } from '@huma/kit/json';
 import { runText } from '@huma/kit/process';
 import { compareText } from '@huma/kit/text';
-import { isRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import { BIN_DIRECTORY } from './commands.ts';
 
 /** Time `tsc --showConfig` may take on one project of the solution, on a loaded shared host. */
@@ -13,10 +13,10 @@ const SHOW_CONFIG_TIMEOUT_MS = 120_000;
 async function solutionProjects(root: string): Promise<readonly string[]> {
   const solution = parseJson(await readFile(join(root, 'tsconfig.json'), 'utf8'));
   const references = isRecord(solution) ? solution['references'] : undefined;
-  if (!Array.isArray(references)) {
+  if (!isList(references)) {
     throw new Error('tsconfig.json ne référence aucun projet');
   }
-  return references.map((reference: unknown) => {
+  return references.map((reference) => {
     const path = isRecord(reference) ? reference['path'] : undefined;
     if (typeof path !== 'string') {
       throw new Error('référence de projet illisible dans tsconfig.json');

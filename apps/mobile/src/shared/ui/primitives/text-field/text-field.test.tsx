@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { PALETTE, typographyAt } from '@huma/design-tokens';
-import { isList } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Keyboard } from 'react-native';
 import { asDisplayText } from '../../../lib/display-text';
@@ -15,7 +15,7 @@ const PLACEHOLDER = 'Saisissez ici le sujet';
 const letters = (): Readonly<Record<string, unknown>> => {
   const style: unknown = screen.getByPlaceholderText(PLACEHOLDER).props['style'];
   const [, typed] = isList(style) ? style : [];
-  if (typeof typed !== 'object' || typed === null) {
+  if (!isRecord(typed)) {
     throw new Error('le champ ne porte pas de type lisible');
   }
   return { ...typed };

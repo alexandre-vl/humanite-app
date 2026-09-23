@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { arrayField, objectField, parseJson, stringField } from '@huma/kit/json';
 import { capture, run } from '@huma/kit/process';
-import { isRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import type { EmulatorCode } from './checks.ts';
 import { emulatorFinding } from './checks.ts';
 import type { EmulatorConfig } from './config.ts';
@@ -72,7 +72,7 @@ export type ContainerState = Readonly<{
 /** The container of `docker container inspect` output, `null` when the list is empty. */
 export function parseContainerInspect(text: string): ContainerState | null {
   const list = parseJson(text);
-  if (!Array.isArray(list)) {
+  if (!isList(list)) {
     throw new Error('docker container inspect : sortie illisible');
   }
   const containers: readonly unknown[] = list;
@@ -100,7 +100,7 @@ const strings = (values: readonly unknown[] | null): readonly string[] =>
 /** The image of `docker image inspect` output, `null` when the list is empty. */
 export function parseImageInspect(text: string): ImageState | null {
   const list = parseJson(text);
-  if (!Array.isArray(list)) {
+  if (!isList(list)) {
     throw new Error('docker image inspect : sortie illisible');
   }
   const images: readonly unknown[] = list;

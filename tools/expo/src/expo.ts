@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { readTextIfExists, temporaryDirectory } from '@huma/kit/fs';
 import { compareText } from '@huma/kit/text';
+import { isList } from '@huma/unknown';
 
 /**
  * The parts of Expo the repository calls directly, loaded from the Expo an app installs, as its CLI loads them: what
@@ -70,10 +71,10 @@ function textResult(value: unknown, source: string): string {
 }
 
 function textsResult(value: unknown, source: string): readonly string[] {
-  if (!Array.isArray(value)) {
+  if (!isList(value)) {
     throw drift(source, 'n’a pas rendu de liste');
   }
-  return value.map((item: unknown) => textResult(item, source));
+  return value.map((item) => textResult(item, source));
 }
 
 /** The options Expo's own generator passes to `getRoutes`: validation sees the tree the generator sees. */

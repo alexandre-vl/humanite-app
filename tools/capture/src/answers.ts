@@ -1,7 +1,8 @@
 import { DONATION, SECTIONS_KEY } from '@huma/contracts';
 import { routeOf, SERVICE_ROOT } from '@huma/remote-api';
 import type { RouteName } from '@huma/remote-api';
-import { isRecord } from '@huma/unknown';
+import type { UnknownRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import type { Exchange } from './har.ts';
 
 /**
@@ -57,12 +58,12 @@ const ITEMS = { front: 5, wire: 4, menu: undefined, section: 6, search: 3 } as c
 >;
 
 /** A body of the service, read far enough to be sorted and trimmed but not modelled: that is the contracts' work. */
-type Post = Readonly<Record<string, unknown>>;
-type Body = Readonly<Record<string, unknown>>;
+type Post = UnknownRecord;
+type Body = UnknownRecord;
 
 const postsOf = (body: Body): readonly Post[] => {
   const posts: unknown = body['posts'];
-  return Array.isArray(posts) ? posts.flatMap((item: unknown): readonly Post[] => (isRecord(item) ? [item] : [])) : [];
+  return isList(posts) ? posts.flatMap((item): readonly Post[] => (isRecord(item) ? [item] : [])) : [];
 };
 
 /** A field of the wire read as the word it is, or the word that says it was not one. */
@@ -116,10 +117,10 @@ const trimBody = (html: string): string => {
 
 const trimArticle = (body: Body): Body => {
   const parts = body['content_array'];
-  if (!Array.isArray(parts)) {
+  if (!isList(parts)) {
     return body;
   }
-  const kept = parts.map((part: unknown): unknown => (typeof part === 'string' ? trimBody(part) : part));
+  const kept = parts.map((part): unknown => (typeof part === 'string' ? trimBody(part) : part));
   return { ...body, content_array: kept };
 };
 
@@ -170,7 +171,7 @@ export const chooseAnswers = (exchanges: readonly Exchange[]): Chosen => {
     if (route === 'article') {
       const format = wordOf(body['article_format'], 'unknown');
       const size = JSON.stringify(body).length;
-      if (Array.isArray(body['content_array']) && size > (sizes[format] ?? 0)) {
+      if (isList(body['content_array']) && size > (sizes[format] ?? 0)) {
         sizes[format] = size;
         articles[format] = { ...request, answer: trimArticle(body) };
       }

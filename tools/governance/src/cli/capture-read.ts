@@ -6,6 +6,7 @@ import { judgeSecrets } from '@huma/capture/secrets';
 import { findWorkspaceRoot, print, readArguments, runCommand } from '@huma/kit/cli';
 import { formatForPath } from '@huma/kit/format';
 import { repoPath } from '@huma/kit/paths';
+import { isList } from '@huma/unknown';
 
 const USAGE = 'Usage : pnpm capture:read <fichier.har>';
 
@@ -26,7 +27,7 @@ await runCommand(async () => {
   print(`· ${String(exchanges.length)} échanges lus`);
   for (const [name, kept] of Object.entries(chosen.answers)) {
     const posts = kept.answer['posts'];
-    const count = Array.isArray(posts) ? ` — ${String(posts.length)} items` : '';
+    const count = isList(posts) ? ` — ${String(posts.length)} items` : '';
     print(`  ✓ ${name}${count}`);
   }
   for (const format of Object.keys(chosen.articles).toSorted((left, right) => left.localeCompare(right))) {

@@ -4,7 +4,7 @@ import { compareDiagnostics } from '@huma/kit/diagnostics';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath, toRepoPath } from '@huma/kit/paths';
 import { compareText } from '@huma/kit/text';
-import { isRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import type { Linter } from 'eslint';
 import { ESLint } from 'eslint';
 import type { LintCode } from './checks.ts';
@@ -34,7 +34,7 @@ export type LintReport = Readonly<{
 
 /** The severity of a rule entry of a computed configuration: `0` when off. */
 function severityOf(entry: unknown): number {
-  const level: unknown = Array.isArray(entry) ? entry[0] : entry;
+  const level = isList(entry) ? entry[0] : entry;
   switch (level) {
     case 'error':
       return 2;
@@ -142,7 +142,7 @@ const SEVERITY_NAMES = ['off', 'warn', 'error'] as const;
 
 /** A rule entry of a computed configuration, its severity written as a name: `'error'`, or `['error', options…]`. */
 function normalizedEntry(entry: unknown): unknown {
-  const parts: readonly unknown[] = Array.isArray(entry) ? entry : [entry];
+  const parts = isList(entry) ? entry : [entry];
   const [level, ...options] = parts;
   const severity = typeof level === 'number' ? (SEVERITY_NAMES[level] ?? level) : level;
   return options.length === 0 ? severity : [severity, ...options];
