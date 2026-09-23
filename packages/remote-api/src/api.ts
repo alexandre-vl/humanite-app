@@ -67,6 +67,11 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
     return read.item;
   };
 
+  /**
+   * The menu, read once for as long as the app runs: a section's list is found through it, by the number it files the
+   * list under, and a page of a section would otherwise cost two requests. The app's own copy of the sections is read
+   * again once stale and is handed this one, so the bar and the lists it opens agree on what the menu holds.
+   */
   let menu: Promise<readonly ListedSection[]> | undefined;
 
   const readSections = async (): Promise<readonly ListedSection[]> => {
@@ -131,7 +136,7 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
 
     search: async ({ text, cursor }: SearchQuery): Promise<Page<ArticleSummary>> => {
       const number = pageOf(cursor);
-      const listing = await listed('search', ROUTES.search.request(text.trim(), number));
+      const listing = await listed('search', ROUTES.search.request(text, number));
       return page(listing.intake.kept, nextOf(number, listing, SERVICE_PAGES.search));
     },
   };

@@ -1,4 +1,4 @@
-import { ARTICLE_ID, ContentApiError } from '@huma/contracts';
+import { ARTICLE_ID, ContentApiError, QUESTION } from '@huma/contracts';
 import type { ContentApi, ContentErrorCode, Finding } from '@huma/contracts';
 import type { Client } from './api.ts';
 import { RECORDINGS, replayed, reply } from './bench.ts';
@@ -226,7 +226,7 @@ const addresses = async (make: Make): Promise<readonly Finding<TransportCode>[]>
     api.getFeed({}),
     ...(first === undefined ? [] : [api.getFeed({ section: first.id })]),
     api.getLiveFeed({}),
-    api.search({ text: 'climat' }),
+    api.search({ text: QUESTION.parse('climat') }),
     ...(ARTICLE_ID.safeParse(filed).success ? [api.getArticle(ARTICLE_ID.parse(filed))] : []),
   ]);
   const unknown = asked.flatMap(({ address }) => {

@@ -1,5 +1,5 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { CONTENT_ERROR_CODE, ContentApiError } from './index.ts';
+import { CONTENT_ERROR_CODE, ContentApiError, QUESTION } from './index.ts';
 import type {
   ArticleId,
   ArticleSummary,
@@ -22,6 +22,12 @@ test('ContentApiError is an Error carrying a code', () => {
 test('a failure is named by one of the causes the contract declares, and by no other word', () => {
   expect(CONTENT_ERROR_CODE.safeParse('offline').success).toBe(true);
   expect(CONTENT_ERROR_CODE.safeParse('network-error').success).toBe(false);
+});
+
+/** A question is read once, where it was typed: every source then takes it as it comes, and trims nothing again. */
+test('a question is the reader’s words without the blank around them, and never nothing', () => {
+  expect(QUESTION.parse('  école  ')).toBe('école');
+  expect(QUESTION.safeParse('   ').success).toBe(false);
 });
 
 /** The source decides how much a page holds: a size only one source could honour is not something a caller asks. */

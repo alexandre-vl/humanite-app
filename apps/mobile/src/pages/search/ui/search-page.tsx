@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { EmptyState } from '#components/empty-state';
-import { ArticleFeed, searchQuery, searchable, usePagedFeed } from '#entities/article';
+import { ArticleFeed, questionOf, searchQuery, usePagedFeed } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref } from '#lib/routing';
@@ -33,17 +33,19 @@ const useStyles = createStyles(() => ({
 export function SearchPage(): ReactNode {
   const styles = useStyles();
   const [typed, setTyped] = useState('');
-  const asked = useDebounced(typed).trim();
-  const feed = usePagedFeed(searchQuery(asked));
+  const question = questionOf(useDebounced(typed));
+  const feed = usePagedFeed(searchQuery(question));
   return (
     <Surface>
       <SearchField value={typed} onChange={setTyped} />
-      {feed.items.length === 0 ? null : (
+      {question === null || feed.items.length === 0 ? null : (
         <Box style={styles.heading}>
-          <Text variant="label">{t('search.for', { query: asked })}</Text>
+          <Text variant="label">{t('search.for', { query: question })}</Text>
         </Box>
       )}
-      {searchable(asked) ? (
+      {question === null ? (
+        <EmptyState title={t('search.rest.title')} message={t('search.rest.message')} />
+      ) : (
         <ArticleFeed
           feed={feed}
           rhythm="list"
@@ -51,10 +53,8 @@ export function SearchPage(): ReactNode {
             router.push(articleHref(id));
           }}
           action={(summary) => <BookmarkToggle summary={summary} />}
-          empty={{ title: t('search.none.title', { query: asked }), message: t('search.none.message') }}
+          empty={{ title: t('search.none.title', { query: question }), message: t('search.none.message') }}
         />
-      ) : (
-        <EmptyState title={t('search.rest.title')} message={t('search.rest.message')} />
       )}
     </Surface>
   );

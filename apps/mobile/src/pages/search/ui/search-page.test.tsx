@@ -1,3 +1,4 @@
+import { QUESTION } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
@@ -89,7 +90,7 @@ describe('SearchPage', () => {
   });
 
   it('sert les articles qu’une question atteint, sous la question qu’ils répondent', async () => {
-    const found = await content.search({ text: 'jeunes' });
+    const found = await content.search({ text: QUESTION.parse('jeunes') });
     const [first] = found.items;
     if (first === undefined) {
       throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
@@ -102,7 +103,7 @@ describe('SearchPage', () => {
   });
 
   it('trouve un article accentué à partir de ce qu’un lecteur tape sans accent', async () => {
-    const found = await content.search({ text: 'école' });
+    const found = await content.search({ text: QUESTION.parse('école') });
     const [first] = found.items;
     if (first === undefined) {
       throw new Error('le corpus ne porte aucun article sur ce sujet : le test ne vérifierait rien');
@@ -131,7 +132,7 @@ describe('SearchPage', () => {
   });
 
   it('ouvre l’article pressé sur sa propre route', async () => {
-    const [first] = (await content.search({ text: 'jeunes' })).items;
+    const [first] = (await content.search({ text: QUESTION.parse('jeunes') })).items;
     if (first === undefined) {
       throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
     }

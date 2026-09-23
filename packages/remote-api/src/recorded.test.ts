@@ -111,7 +111,7 @@ test('the menu is read whole, in the newsroom’s order, each section with the i
   }
   expect(menu.item.setAside).toEqual([]);
   expect(menu.item.kept).toHaveLength(RECORDED.menu.answer[SECTIONS_KEY].length);
-  expect(menu.item.kept[0]).toEqual({ section: { id: 'politique', label: 'Politique' }, serviceId: '19565' });
+  expect(menu.item.kept[0]).toEqual({ section: { id: 'politique', label: 'Politique' }, serviceId: 19565 });
 });
 
 test('a date of the service is read on the newsroom’s clock, not as UTC', () => {

@@ -147,7 +147,7 @@ export const contentApi: ContentApi & Required<Pick<ContentApi, 'getIssues'>> = 
   getArticle: async (id: ArticleId): Promise<Article> => Promise.resolve(asAnonymous(find(id))),
   getIssues: async (): Promise<readonly IssueSummary[]> => Promise.resolve(SHELF),
   search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
-    const needle = fold(query.text.trim());
+    const needle = fold(query.text);
     return Promise.resolve(
       pageOf(
         INDEXED.filter((indexed) => indexed.searchable.includes(needle)).map((indexed) => indexed.summary),

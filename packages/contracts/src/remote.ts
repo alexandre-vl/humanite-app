@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SECTION_NUMBER } from './ids.ts';
 
 /**
  * What the journal's own service sends, written as it arrives and not as we would have liked it.
@@ -105,7 +106,7 @@ export const REMOTE_MENU = z.object({ [SECTIONS_KEY]: z.array(z.unknown()) });
  * repeated for every section that counts nothing — is read by no one, so the reading holds nothing to it.
  */
 export const REMOTE_SECTION = z.object({
-  id: z.number().int().positive(),
+  id: SECTION_NUMBER,
   name: z.string(),
   slug: z.string(),
 });

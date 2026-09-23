@@ -3,7 +3,7 @@ import type { ArticleSummary, Page } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import type { InfiniteData, Query } from '@tanstack/react-query';
 import { QueryClient } from '@tanstack/react-query';
-import { feedQuery, searchQuery } from '#entities/article';
+import { feedQuery, questionOf, searchQuery } from '#entities/article';
 import { CACHE_BUSTER } from './cache-buster';
 import { persistOptions, queryClient } from './query-client';
 
@@ -50,7 +50,7 @@ describe('queryClient', () => {
     };
     const client = new QueryClient();
     client.setQueryData(feedQuery.queryKey, answered);
-    client.setQueryData(searchQuery('climat').queryKey, answered);
+    client.setQueryData(searchQuery(questionOf('climat')).queryKey, answered);
     const written = client
       .getQueryCache()
       .getAll()

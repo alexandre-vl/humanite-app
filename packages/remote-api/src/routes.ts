@@ -1,5 +1,5 @@
 import { SERVICE_PAGES } from '@huma/contracts';
-import type { FiledId } from '@huma/contracts';
+import type { FiledId, SectionNumber } from '@huma/contracts';
 
 /**
  * The routes of the journal's service the app reads, written once: how each request is made, and which recorded path
@@ -47,8 +47,8 @@ export const ROUTES = {
     answers: /\/wordpress\/menu$/u,
   },
   section: {
-    request: (serviceId: string, page: number): Request => ({
-      path: `/wordpress/${serviceId}/posts/`,
+    request: (serviceId: SectionNumber, page: number): Request => ({
+      path: `/wordpress/${String(serviceId)}/posts/`,
       query: [['page', String(page)], ...ANONYMOUS],
     }),
     answers: /\/wordpress\/\d+\/posts\/$/u,

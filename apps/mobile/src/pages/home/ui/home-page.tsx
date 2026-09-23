@@ -18,8 +18,11 @@ import { useSections } from '../model/sections';
 /** The identifier the band reports for the front page itself, which is no section and has none. */
 const FRONT = 'front';
 
+/** Which page of the paper a leaf is: the front, or a section by its own id. */
+type LeafId = typeof FRONT | SectionId;
+
 /** One page of the paper: the whole of it, or one section of it. */
-type Leaf = Readonly<{ id: string; label: DisplayText; section: SectionId | null }>;
+type Leaf = Readonly<{ id: LeafId; label: DisplayText }>;
 
 const useStyles = createStyles(() => ({ page: { flex: 1 } }));
 
@@ -32,8 +35,7 @@ type SheetProps = Readonly<{ leaf: Leaf }>;
  * list whose length arrives from the newsroom.
  */
 function Sheet({ leaf }: SheetProps): ReactNode {
-  const section = leaf.section;
-  const feed = usePagedFeed(section === null ? feedQuery : sectionFeedQuery(section));
+  const feed = usePagedFeed(leaf.id === FRONT ? feedQuery : sectionFeedQuery(leaf.id));
   return (
     <ArticleFeed
       feed={feed}
@@ -66,10 +68,10 @@ export function HomePage(): ReactNode {
   const sections = useSections();
   const [at, setAt] = useState(0);
   const leaves: readonly Leaf[] = [
-    { id: FRONT, label: t('nav.headline'), section: null },
-    ...sections.map((section) => ({ id: section.id, label: section.label, section: section.id })),
+    { id: FRONT, label: t('nav.headline') },
+    ...sections.map((section) => ({ id: section.id, label: section.label })),
   ];
-  const items: readonly LabelBarItem<string>[] = leaves;
+  const items: readonly LabelBarItem<LeafId>[] = leaves;
   const shown = Math.min(at, leaves.length - 1);
   return (
     <Surface>

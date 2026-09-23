@@ -5,12 +5,12 @@ import type {
   FeedQuery,
   Page,
   PageQuery,
+  Question,
   SearchQuery,
   SectionId,
 } from '@huma/contracts';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
-import { searchable } from '../model/search';
 
 /** The root every article key starts with: one entity, one namespace in the cache the app persists. */
 const ARTICLES = 'articles';
@@ -87,19 +87,21 @@ export const sectionFeedQuery = (section: SectionId): PagedFeed =>
 /** The running wire, the newest first: what the En continu screen reads. */
 export const liveFeedQuery = paged(KEYS.live(), async (query) => content.getLiveFeed(query));
 
+/** What a search that asks nothing holds: no page, and none after it. */
+const UNASKED: Page<ArticleSummary> = { items: [], nextCursor: null };
+
 /**
- * The articles a reader's question reaches, in the order the source ranks them, by pages. The question is asked of the
- * content only once it is one: an empty field or a single letter would ask for very nearly the whole paper.
+ * The articles a reader's question reaches, in the order the source ranks them, by pages. The content is asked only
+ * once there is a question: an empty field or a single letter would ask for very nearly the whole paper, and until
+ * then the reading stands idle under a key of its own.
  */
-export const searchQuery = (text: string): PagedFeed =>
-  paged(
-    KEYS.search(text),
-    async (query) => {
-      const asked: SearchQuery = { ...query, text };
-      return content.search(asked);
-    },
-    searchable(text),
-  );
+export const searchQuery = (question: Question | null): PagedFeed =>
+  question === null
+    ? paged(KEYS.search(''), async () => Promise.resolve(UNASKED), false)
+    : paged(KEYS.search(question), async (query) => {
+        const asked: SearchQuery = { ...query, text: question };
+        return content.search(asked);
+      });
 
 /** Whether a key in the cache is a reading of the reader's own making rather than a reading of the paper. */
 export const isReaderKey = (key: readonly unknown[]): boolean => key[0] === ARTICLES && key[1] === SEARCH;

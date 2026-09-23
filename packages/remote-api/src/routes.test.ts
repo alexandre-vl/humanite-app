@@ -1,4 +1,4 @@
-import { FILED_ID } from '@huma/contracts';
+import { FILED_ID, SECTION_NUMBER } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { RECORDED } from './recorded.ts';
 import { addressOf, ROUTES, routeOf } from './routes.ts';
@@ -11,7 +11,7 @@ test('a list of a reader nobody signed in asks in French, and says no one did', 
 
 /** Without its slash the service answers a redirect, served as JSON and holding HTML: the list is asked where it is. */
 test('a section’s own list is asked at its slashed path, page by page', () => {
-  expect(addressOf(ROUTES.section.request('19565', 2))).toBe(
+  expect(addressOf(ROUTES.section.request(SECTION_NUMBER.parse(19565), 2))).toBe(
     'https://phenix2.immanens.com/api/v1/app/300/wordpress/19565/posts/?page=2&language=fr&ano=1',
   );
 });

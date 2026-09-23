@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { INSTANT } from './clock.ts';
 import { SPAN } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
@@ -63,7 +64,7 @@ export const ARTICLE_SUMMARY = z.object({
   title: DISPLAY_TEXT,
   standfirst: DISPLAY_TEXT.optional(),
   byline: DISPLAY_TEXT.optional(),
-  publishedAt: z.iso.datetime(),
+  publishedAt: INSTANT,
   hero: HERO.optional(),
   film: FILM.optional(),
 });

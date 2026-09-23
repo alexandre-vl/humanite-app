@@ -1,11 +1,13 @@
 import type { z } from 'zod';
 import type { Article, ArticleSummary, HeroInput, SummaryInput } from './article.ts';
 import { ARTICLE, ARTICLE_SUMMARY, FILM } from './article.ts';
+import type { Instant } from './clock.ts';
 import { instantAt } from './clock.ts';
 import type { Section } from './content.ts';
 import { SECTION } from './content.ts';
 import type { ArticleFormat } from './enums.ts';
 import type { Finding } from './finding.ts';
+import type { SectionNumber } from './ids.ts';
 import { PICTURE } from './picture.ts';
 import { readLegend, readPlain, readProse } from './prose.ts';
 import type { RemoteFormat, RemotePost } from './remote.ts';
@@ -119,7 +121,7 @@ const filmOf = (post: RemotePost): Readonly<{ url: string }> | undefined => {
  * stands in only where the standfirst is empty — a signed column is often filed with an empty one. Of 519 items, none
  * came with both empty, and one that does is an item with no standfirst rather than one with an empty one.
  */
-const inputOf = (post: RemotePost, publishedAt: string): SummaryInput => {
+const inputOf = (post: RemotePost, publishedAt: Instant): SummaryInput => {
   const standfirst = [readPlain(post.description), readPlain(post.excerpt)].find((text) => text !== '');
   const byline = readPlain(post.author ?? '');
   const hero = heroOf(post);
@@ -216,7 +218,7 @@ export const readList = (answer: unknown): Read<Listing> => {
  * A section as the service's menu lists it: the section the app knows, and the id the service files its own list
  * under — a number the domain never holds, and which only the address of that list needs.
  */
-export type ListedSection = Readonly<{ section: Section; serviceId: string }>;
+export type ListedSection = Readonly<{ section: Section; serviceId: SectionNumber }>;
 
 /** One section of the menu, read: its slug is its id, and its name — markup and all — is read as the line it is. */
 const readSection = (raw: unknown): Read<ListedSection> => {
@@ -226,7 +228,7 @@ const readSection = (raw: unknown): Read<ListedSection> => {
   }
   const section = SECTION.safeParse({ id: wire.data.slug, label: readPlain(wire.data.name) }, REPORTED);
   return section.success
-    ? { item: { section: section.data, serviceId: String(wire.data.id) } }
+    ? { item: { section: section.data, serviceId: wire.data.id } }
     : { refused: saysOf(section.error) };
 };
 

@@ -1,5 +1,16 @@
+import { z } from 'zod';
 import type { IssueId } from './ids.ts';
 import { ISSUE_ID } from './ids.ts';
+
+/**
+ * An instant, in UTC, in the form every schema of the contracts reads: `2026-09-21T05:00:00.000Z`.
+ *
+ * It is a brand and not a string because every date a screen prints starts from one, and a string had to be read
+ * again at each of them — the formatters did, each throwing on what it could not read. An instant is minted by this
+ * schema, reading it off an item or a stamp, and nothing downstream reads one twice.
+ */
+export const INSTANT = z.iso.datetime().brand('Instant');
+export type Instant = z.infer<typeof INSTANT>;
 
 /**
  * The zone the newsroom keeps, and the one reading of an instant that everything downstream shares.
@@ -64,6 +75,12 @@ export const clockAt = (instant: number): Clock => {
   };
 };
 
+/** What the newsroom's clock reads at an instant: the reading every date a screen prints is written from. */
+export const clockOf = (instant: Instant): Clock => clockAt(Date.parse(instant));
+
+/** The instant a count of milliseconds names: the phone's own clock, or a stamp read off the newsroom's. */
+export const instantOf = (millis: number): Instant => INSTANT.parse(new Date(millis).toISOString());
+
 /** A field of a calendar written on two signs, so a day or a month of one digit still sorts as a string. */
 const twoSigns = (value: number): string => String(value).padStart(2, '0');
 
@@ -75,8 +92,8 @@ const twoSigns = (value: number): string => String(value).padStart(2, '0');
  * the one place that answers, and it answers with the brand rather than with a string, so nothing downstream can mint
  * a day the shape of an issue without being one.
  */
-export const issueIdAt = (instant: string): IssueId => {
-  const clock = clockAt(Date.parse(instant));
+export const issueIdAt = (instant: Instant): IssueId => {
+  const clock = clockOf(instant);
   return ISSUE_ID.parse(`${String(clock.year)}-${twoSigns(clock.month)}-${twoSigns(clock.day)}`);
 };
 
@@ -104,7 +121,7 @@ const offsetAt = (instant: number): number => {
  * rolled by the calendar into a day in February rather than refused, and a date that was never written is worse than
  * none. What comes back is an instant in UTC, in the form the contracts' schemas read.
  */
-export const instantAt = (stamp: string): string | null => {
+export const instantAt = (stamp: string): Instant | null => {
   const found = STAMP.exec(stamp);
   if (found === null) {
     return null;
@@ -128,5 +145,5 @@ export const instantAt = (stamp: string): string | null => {
     read.getUTCHours() !== written.hour ||
     read.getUTCMinutes() !== written.minute ||
     read.getUTCSeconds() !== written.second;
-  return rolled ? null : new Date(naive - offsetAt(naive - offsetAt(naive))).toISOString();
+  return rolled ? null : instantOf(naive - offsetAt(naive - offsetAt(naive)));
 };

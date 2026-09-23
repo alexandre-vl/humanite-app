@@ -1,5 +1,5 @@
-import type { DisplayText, IssueId } from '@huma/contracts';
-import { clockAt } from '@huma/contracts';
+import type { DisplayText, Instant, IssueId } from '@huma/contracts';
+import { clockOf } from '@huma/contracts';
 import { asDisplayText } from '../display-text';
 
 /**
@@ -12,15 +12,9 @@ import { asDisplayText } from '../display-text';
  * on and what it reads as are one reading now.
  *
  * What stays here is the words. Hermes has neither `Intl.RelativeTimeFormat` nor `Intl.PluralRules` (journal 0a,
- * vérification 15), so the words below are written by hand.
+ * vérification 15), so the words below are written by hand. What comes in is an `Instant`, read once where it was
+ * minted: each formatter here used to read its string again, and to throw on one that named no instant.
  */
-const parseInstant = (instant: string): number => {
-  const millis = Date.parse(instant);
-  if (Number.isNaN(millis)) {
-    throw new RangeError(`instant invalide : ${instant}`);
-  }
-  return millis;
-};
 
 const pad = (value: number): string => String(value).padStart(2, '0');
 
@@ -69,8 +63,8 @@ const dayOf = (day: number): string => (day === 1 ? '1er' : String(day));
  * filed at two different-looking times two taps apart. The hour sits on its own line over a row's title now, where
  * the two letters it gains cost no line.
  */
-export const formatHour = (instant: string): DisplayText => {
-  const clock = clockAt(parseInstant(instant));
+export const formatHour = (instant: Instant): DisplayText => {
+  const clock = clockOf(instant);
   return asDisplayText(`${String(clock.hour)}\u00A0h\u00A0${pad(clock.minute)}`);
 };
 
@@ -83,8 +77,8 @@ export const formatHour = (instant: string): DisplayText => {
  * date rather than from the instant, so a publication just before Paris midnight heads the day the newsroom filed it
  * under, not the one UTC was already on.
  */
-export const formatDayLabel = (instant: string): DisplayText => {
-  const clock = clockAt(parseInstant(instant));
+export const formatDayLabel = (instant: Instant): DisplayText => {
+  const clock = clockOf(instant);
   const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
   return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
@@ -99,8 +93,8 @@ export const formatDayLabel = (instant: string): DisplayText => {
  * off the edge. Letting it wrap instead would have split two covers of four onto two lines and left their pictures
  * starting at different heights, side by side on the same shelf.
  */
-export const formatDayDate = (instant: string): DisplayText => {
-  const clock = clockAt(parseInstant(instant));
+export const formatDayDate = (instant: Instant): DisplayText => {
+  const clock = clockOf(instant);
   return asDisplayText(`${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
 
@@ -111,8 +105,8 @@ export const formatDayDate = (instant: string): DisplayText => {
  * was written in, and Nielsen's homepage guideline has the full article print its date prominently, year and all. A
  * card carries it only for an item of another year than the reader's.
  */
-export const formatLongDate = (instant: string): DisplayText => {
-  const clock = clockAt(parseInstant(instant));
+export const formatLongDate = (instant: Instant): DisplayText => {
+  const clock = clockOf(instant);
   return asDisplayText(`${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)} ${String(clock.year)}`);
 };
 
@@ -121,7 +115,7 @@ export const formatLongDate = (instant: string): DisplayText => {
  * same piece at its hour, and an article of the morning and one of the evening are not the same news: the day alone
  * said less of the piece than the wire did.
  */
-export const formatPublished = (instant: string): DisplayText =>
+export const formatPublished = (instant: Instant): DisplayText =>
   asDisplayText(`${formatLongDate(instant)} à ${formatHour(instant)}`);
 
 /** Back a week, a weekday names one day only; seven days back, `Lundi` would be two. */
@@ -146,8 +140,8 @@ const dayNumber = (year: number, month: number, day: number): number => Date.UTC
  * An hour rather than an age. « Il y a 2 h » is true when it is drawn and false an hour later in a list left open,
  * where an hour of the day stays true; and it is the form the wire and the article already print.
  */
-export const formatWhen = (instant: string, today: IssueId): DisplayText => {
-  const clock = clockAt(parseInstant(instant));
+export const formatWhen = (instant: Instant, today: IssueId): DisplayText => {
+  const clock = clockOf(instant);
   const [year = 0, month = 0, day = 0] = today.split('-').map(Number);
   const before = dayNumber(year, month, day) - dayNumber(clock.year, clock.month, clock.day);
   if (before <= 0) {

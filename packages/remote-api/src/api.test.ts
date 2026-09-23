@@ -1,4 +1,4 @@
-import { ARTICLE_ID, ContentApiError, SECTION_ID } from '@huma/contracts';
+import { ARTICLE_ID, ContentApiError, QUESTION, SECTION_ID } from '@huma/contracts';
 import type { ContentErrorCode, SetAside } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { createRemoteApi } from './api.ts';
@@ -119,7 +119,7 @@ test('an article is read whole by the number it was filed under', async () => {
 
 test('a search asks its question in the path, ten at a time', async () => {
   const { api, asked } = replaying();
-  const found = await api.search({ text: '  école  ' });
+  const found = await api.search({ text: QUESTION.parse('  école  ') });
   expect(asked.at(-1)).toBe(`${SERVICE}${SERVICE_ROOT}/article/search/%C3%A9cole?page=1&per_page=10&language=fr&ano=1`);
   expect(found.items.length).toBeGreaterThan(0);
 });

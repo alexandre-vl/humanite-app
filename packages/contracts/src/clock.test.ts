@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
-import { clockAt, instantAt, issueIdAt } from './clock.ts';
+import { clockAt, INSTANT, instantAt, issueIdAt } from './clock.ts';
 import { ISSUE_ID } from './ids.ts';
 
 test('an instant is filed under the day the newsroom made that paper', () => {
-  expect(issueIdAt('2026-09-12T17:52:00.000Z')).toBe('2026-09-12');
+  expect(issueIdAt(INSTANT.parse('2026-09-12T17:52:00.000Z'))).toBe('2026-09-12');
 });
 
 /**
@@ -12,19 +12,22 @@ test('an instant is filed under the day the newsroom made that paper', () => {
  * date would fail on one of them.
  */
 test('a Paris evening belongs to the day it was filed, not to the one UTC is on', () => {
-  expect(issueIdAt('2026-09-12T22:30:00.000Z')).toBe('2026-09-13');
-  expect(issueIdAt('2026-09-12T21:30:00.000Z')).toBe('2026-09-12');
+  expect(issueIdAt(INSTANT.parse('2026-09-12T22:30:00.000Z'))).toBe('2026-09-13');
+  expect(issueIdAt(INSTANT.parse('2026-09-12T21:30:00.000Z'))).toBe('2026-09-12');
 });
 
 /** Widest first and both halves padded, so a shelf sorts as a string in the order it reads. */
 test('a day of a small month still sorts', () => {
-  expect(issueIdAt('2026-01-05T09:00:00.000Z')).toBe('2026-01-05');
-  expect(ISSUE_ID.safeParse(issueIdAt('2026-01-05T09:00:00.000Z')).success).toBe(true);
+  expect(issueIdAt(INSTANT.parse('2026-01-05T09:00:00.000Z'))).toBe('2026-01-05');
+  expect(ISSUE_ID.safeParse(issueIdAt(INSTANT.parse('2026-01-05T09:00:00.000Z'))).success).toBe(true);
 });
 
-/** A run of items would rather stop than be filed under a numéro that does not exist. */
-test('an instant nothing can read is refused rather than turned into a day', () => {
-  expect(() => issueIdAt('hier matin')).toThrow(RangeError);
+/**
+ * A run of items would rather stop than be filed under a numéro that does not exist, and it stops at the door: an
+ * instant is minted by its schema, which reads nothing that names no instant, and a day is only read off one.
+ */
+test('an instant nothing can read is refused at the door rather than turned into a day', () => {
+  expect(INSTANT.safeParse('hier matin').success).toBe(false);
 });
 
 /** A stamp of the newsroom names a Paris hour, and nothing in it says so: summer, winter and the change between. */
@@ -69,5 +72,5 @@ test('the newsroom clock reads back an instant as the stamp it was named by', ()
     minute: 45,
     second: 10,
   });
-  expect(issueIdAt(instant ?? '')).toBe('2026-09-12');
+  expect(instant === null ? null : issueIdAt(instant)).toBe('2026-09-12');
 });

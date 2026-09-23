@@ -1,4 +1,4 @@
-import { ARTICLE_ID, blocksOf, ContentApiError, issueIdAt, SECTION_ID } from '@huma/contracts';
+import { ARTICLE_ID, blocksOf, ContentApiError, issueIdAt, QUESTION, SECTION_ID } from '@huma/contracts';
 import { CORPUS } from '@huma/mock-content';
 import { expect, test } from 'vitest';
 import { contentApi } from './index.ts';
@@ -72,34 +72,34 @@ test('getArticle withholds the body of a reserved article, and nothing else of i
 });
 
 test('search matches titles and standfirsts, and nothing of the body', async () => {
-  const byTitle = await contentApi.search({ text: 'conseil municipal' });
+  const byTitle = await contentApi.search({ text: QUESTION.parse('conseil municipal') });
   expect(byTitle.items.map((item) => item.id)).toContain('pol-a5');
-  const byStandfirst = await contentApi.search({ text: 'cantines' });
+  const byStandfirst = await contentApi.search({ text: QUESTION.parse('cantines') });
   expect(byStandfirst.items.map((item) => item.id)).toContain('pol-a5');
   // A word the body of pol-a5 holds and neither of its two searchable fields does: a summary carries no body at all.
   const body = await contentApi.getArticle(ARTICLE_ID.parse('pol-a5'));
   expect(JSON.stringify(blocksOf(body))).toContain('délibération');
-  await expect(contentApi.search({ text: 'délibération' })).resolves.toMatchObject({ items: [] });
+  await expect(contentApi.search({ text: QUESTION.parse('délibération') })).resolves.toMatchObject({ items: [] });
 });
 
 test('search reads French as it is typed, not as it is written', async () => {
-  const written = await contentApi.search({ text: 'école' });
-  const typed = await contentApi.search({ text: 'ecole' });
+  const written = await contentApi.search({ text: QUESTION.parse('école') });
+  const typed = await contentApi.search({ text: QUESTION.parse('ecole') });
   expect(written.items.length).toBeGreaterThan(0);
   expect(typed.items).toEqual(written.items);
   // `œ` is one letter, which NFD leaves whole: only spelling it out makes `coeur` find the standfirst of pol-a5.
-  const ligature = await contentApi.search({ text: 'coeur' });
+  const ligature = await contentApi.search({ text: QUESTION.parse('coeur') });
   expect(ligature.items.map((item) => item.id)).toEqual(['pol-a5']);
-  const shouted = await contentApi.search({ text: '  ÉCOLE  ' });
+  const shouted = await contentApi.search({ text: QUESTION.parse('  ÉCOLE  ') });
   expect(shouted.items).toEqual(written.items);
 });
 
 /** The journal's search answers ten at a time; the mock's pages the same way, each page opening where the last ended. */
 test('search pages by ten, newest first, and its pages share nothing', async () => {
-  const first = await contentApi.search({ text: 'e' });
+  const first = await contentApi.search({ text: QUESTION.parse('e') });
   expect(first.items).toHaveLength(10);
   expect(first.nextCursor).not.toBeNull();
-  const second = await contentApi.search({ text: 'e', cursor: first.nextCursor ?? '' });
+  const second = await contentApi.search({ text: QUESTION.parse('e'), cursor: first.nextCursor ?? '' });
   expect(second.items).toHaveLength(10);
   const ids = new Set(first.items.map((item) => item.id));
   expect(second.items.filter((item) => ids.has(item.id))).toEqual([]);

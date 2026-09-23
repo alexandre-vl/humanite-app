@@ -1,10 +1,10 @@
 import type { IssueId } from '@huma/contracts';
-import { issueIdAt } from '@huma/contracts';
+import { instantOf, issueIdAt } from '@huma/contracts';
 import { useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
 
 /** The day it is on the newsroom's clock, read off the phone's own. */
-const readToday = (): IssueId => issueIdAt(new Date(Date.now()).toISOString());
+const readToday = (): IssueId => issueIdAt(instantOf(Date.now()));
 
 /** Told whenever the app comes back in front of the reader, which is when a day can have passed without a screen. */
 const followTheDay = (changed: () => void): (() => void) => {

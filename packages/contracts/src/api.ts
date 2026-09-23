@@ -17,8 +17,15 @@ export type PageQuery = Readonly<{ cursor?: string }>;
 /** A page of the front, or of one section's own list when a section is named. */
 export type FeedQuery = PageQuery & Readonly<{ section?: SectionId }>;
 
+/**
+ * What a reader asks a search: their words with the blank at either end gone, and never nothing. It is read once, where
+ * the words were typed, so a source takes the question as it comes and no two sources trim it their own way.
+ */
+export const QUESTION = z.string().trim().min(1).brand('Question');
+export type Question = z.infer<typeof QUESTION>;
+
 /** A page of the articles a question reaches. */
-export type SearchQuery = PageQuery & Readonly<{ text: string }>;
+export type SearchQuery = PageQuery & Readonly<{ text: Question }>;
 
 /**
  * The read surface of the content, which every source serves and the app reads: what both the mock and the journal's

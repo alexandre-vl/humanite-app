@@ -30,6 +30,14 @@ export const FILED_ID = z
   .brand('FiledId');
 export type FiledId = z.infer<typeof FILED_ID>;
 
+/**
+ * The number the journal's service files a section's list under — `8` for Politique — as its menu gives it. The domain
+ * never holds it: a section is its slug, and only the address of the section's list needs the number, which is why it
+ * is a brand the menu's own schema mints, and not a number any count could be passed off as.
+ */
+export const SECTION_NUMBER = z.number().int().positive().brand('SectionNumber');
+export type SectionNumber = z.infer<typeof SECTION_NUMBER>;
+
 /** An image key: the id of the item it illustrates, then what it shows — `pol-a5-hero`, `cul-a2-galerie`. */
 export const IMAGE_KEY = z
   .string()

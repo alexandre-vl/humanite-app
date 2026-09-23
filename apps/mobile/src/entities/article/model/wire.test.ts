@@ -1,5 +1,5 @@
 import type { ArticleSummary } from '@huma/contracts';
-import { issueIdAt } from '@huma/contracts';
+import { INSTANT, issueIdAt } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { content } from '#api';
 import { formatDayLabel } from '#lib/format';
@@ -37,7 +37,7 @@ describe('wireRows', () => {
     for (const row of rows) {
       if (row.kind === 'day') {
         heading = row.day;
-        expect(row.label).toBe(formatDayLabel(`${row.day}T12:00:00.000Z`));
+        expect(row.label).toBe(formatDayLabel(INSTANT.parse(`${row.day}T12:00:00.000Z`)));
       }
       if (row.kind === 'item') {
         expect(issueIdAt(row.summary.publishedAt)).toBe(heading);
