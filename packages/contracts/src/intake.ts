@@ -2,12 +2,14 @@ import type { z } from 'zod';
 import type { Article, ArticleSummary } from './article.ts';
 import { ARTICLE, ARTICLE_SUMMARY } from './article.ts';
 import { instantAt } from './clock.ts';
+import type { Section } from './content.ts';
+import { SECTION } from './content.ts';
 import type { ArticleFormat } from './enums.ts';
 import type { SectionId } from './ids.ts';
 import { PICTURE } from './picture.ts';
 import { readPlain, readProse } from './prose.ts';
 import type { RemoteFormat, RemotePost } from './remote.ts';
-import { REMOTE_ARTICLE, REMOTE_POST } from './remote.ts';
+import { REMOTE_ARTICLE, REMOTE_LIST, REMOTE_MENU, REMOTE_POST, REMOTE_SECTION, SECTIONS_KEY } from './remote.ts';
 
 /**
  * How what the journal's service answers becomes what a screen may show — item by item, and never in silence.
@@ -120,24 +122,96 @@ const readPost = (raw: unknown, context: Context): Read<ArticleSummary> => {
 };
 
 /**
- * A list of the service, read item by item: what could be read, in the order the service sent it, and what could
- * not, each where it sat.
+ * Items of the service, read one at a time: what could be read, in the order the service sent it, and what could not,
+ * each where it sat. Every list the service answers is read this way — its articles and its sections alike.
+ */
+const intakeOf = <Item>(raws: readonly unknown[], read: (raw: unknown) => Read<Item>): Intake<Item> => {
+  const kept: Item[] = [];
+  const setAside: SetAside[] = [];
+  for (const [at, raw] of raws.entries()) {
+    const one = read(raw);
+    if ('item' in one) {
+      kept.push(one.item);
+    } else {
+      setAside.push({ at, says: one.refused });
+    }
+  }
+  return { kept, setAside };
+};
+
+/**
+ * A list of the service, read item by item.
  *
  * The order is kept because it is the newsroom's. The front page of the service comes in the order its desk laid it
  * out and not by date, and a reading that sorted would print another paper than the one the journal made.
  */
-export const readSummaries = (posts: readonly unknown[], context: Context = {}): Intake<ArticleSummary> => {
-  const kept: ArticleSummary[] = [];
-  const setAside: SetAside[] = [];
-  for (const [at, raw] of posts.entries()) {
-    const read = readPost(raw, context);
-    if ('item' in read) {
-      kept.push(read.item);
-    } else {
-      setAside.push({ at, says: read.refused });
-    }
+export const readSummaries = (posts: readonly unknown[], context: Context = {}): Intake<ArticleSummary> =>
+  intakeOf(posts, (raw) => readPost(raw, context));
+
+/**
+ * Why a reading that set everything aside is no reading at all: a list where not one item could be read is an answer
+ * the reading did not understand, whatever it holds, and the first reasons say why.
+ */
+const nothingRead = (setAside: readonly SetAside[]): string =>
+  `aucun des ${String(setAside.length)} items n’a pu être lu : ${setAside
+    .slice(0, 3)
+    .map((each) => `[${String(each.at)}] ${each.says}`)
+    .join(' ; ')}`;
+
+/** A list as a client reads it: what was kept and what was set aside, and how many items the service sent. */
+export type Listing = Readonly<{ intake: Intake<ArticleSummary>; sent: number }>;
+
+/**
+ * An answer of the service that holds a list — the front, the wire, a section's own list or a search — read into one.
+ *
+ * How many items the service sent is kept beside what was read of them: a page the service filled is a page with
+ * another after it, whatever the reading made of each item, so it is the count sent and not the count kept that tells
+ * a full page from the last. A list the reading kept nothing of, having been sent something, is refused: an answer
+ * where no item could be read is not a list with nothing in it.
+ */
+export const readList = (answer: unknown, context: Context = {}): Read<Listing> => {
+  const envelope = REMOTE_LIST.safeParse(answer);
+  if (!envelope.success) {
+    return { refused: saysOf(envelope.error) };
   }
-  return { kept, setAside };
+  const { posts } = envelope.data;
+  const intake = readSummaries(posts, context);
+  return intake.kept.length === 0 && intake.setAside.length > 0
+    ? { refused: nothingRead(intake.setAside) }
+    : { item: { intake, sent: posts.length } };
+};
+
+/**
+ * A section as the service's menu lists it: the section the app knows, and the id the service files its own list
+ * under — a number the domain never holds, and which only the address of that list needs.
+ */
+export type ListedSection = Readonly<{ section: Section; serviceId: string }>;
+
+/** One section of the menu, read: its slug is its id, and its name — markup and all — is read as the line it is. */
+const readSection = (raw: unknown): Read<ListedSection> => {
+  const wire = REMOTE_SECTION.safeParse(raw);
+  if (!wire.success) {
+    return { refused: saysOf(wire.error) };
+  }
+  const section = SECTION.safeParse({ id: wire.data.slug, label: readPlain(wire.data.name) });
+  return section.success
+    ? { item: { section: section.data, serviceId: String(wire.data.id) } }
+    : { refused: saysOf(section.error) };
+};
+
+/**
+ * The menu of the service, read section by section, in its order — which is the newsroom's, and the only order a
+ * section carries. A menu the reading kept nothing of is refused, as a list is.
+ */
+export const readMenu = (answer: unknown): Read<Intake<ListedSection>> => {
+  const envelope = REMOTE_MENU.safeParse(answer);
+  if (!envelope.success) {
+    return { refused: saysOf(envelope.error) };
+  }
+  const intake = intakeOf(envelope.data[SECTIONS_KEY], readSection);
+  return intake.kept.length === 0 && intake.setAside.length > 0
+    ? { refused: nothingRead(intake.setAside) }
+    : { item: intake };
 };
 
 /**

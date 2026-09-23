@@ -61,26 +61,17 @@ export type RemotePost = z.infer<typeof REMOTE_POST>;
  * WordPress rendered it, scripts and donation form included. Splitting it is the reading's work, not the wire's.
  */
 export const REMOTE_ARTICLE = REMOTE_POST.extend({ content_array: z.array(z.string()) });
-export type RemoteArticle = z.infer<typeof REMOTE_ARTICLE>;
-
-/** What the front page, the wire and a section's own list all answer. */
-export const REMOTE_FEED = z.object({ posts: z.array(REMOTE_POST) });
-export type RemoteFeed = z.infer<typeof REMOTE_FEED>;
-
-/** What a search answers: the same items, behind a flag the service sets and we have only seen true. */
-export const REMOTE_SEARCH = z.object({ success: z.boolean(), posts: z.array(REMOTE_POST) });
 
 /**
- * A section of the paper. `count` is a ceiling the service repeats for every section, not a number of items — a
- * section's own list answers thirty on its first page — so nothing reads it.
+ * What every list of the service answers — the front, the wire, a section's own list and a search: its items, each
+ * left unread here.
+ *
+ * The envelope is read whole and the items one by one. An envelope that held its items to `REMOTE_POST` would refuse
+ * a list of thirty for one odd item, which is exactly what a reading of the service must not do: the items are read
+ * by the reading, which serves what it can and names what it cannot. A search wraps the same list beside a `success`
+ * flag the service has only ever set true; nothing reads it, so a search is read as any other list.
  */
-const REMOTE_SECTION = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string(),
-  link: z.string(),
-  description: z.string(),
-});
+export const REMOTE_LIST = z.object({ posts: z.array(z.unknown()) });
 
 /**
  * The key the service names its list of sections with. Written as a string and read through it, so the wire keeps its
@@ -91,8 +82,16 @@ const REMOTE_SECTION = z.object({
  */
 export const SECTIONS_KEY = 'rubriques';
 
-/** The list of sections, renamed on the way in so nothing downstream reads the service's word for it. */
-export const REMOTE_SECTIONS = z
-  .object({ [SECTIONS_KEY]: z.array(REMOTE_SECTION) })
-  .transform((body) => ({ sections: body[SECTIONS_KEY] }));
-export type RemoteSections = z.infer<typeof REMOTE_SECTIONS>;
+/** The menu of the service: its sections, each left unread here for the reading to take one at a time. */
+export const REMOTE_MENU = z.object({ [SECTIONS_KEY]: z.array(z.unknown()) });
+
+/**
+ * A section as the menu lists it: the number the service files its list under, the name it prints, and the slug the
+ * app knows it by. The rest of what the menu sends — a link to the site, a description always empty, and a `count`
+ * repeated for every section that counts nothing — is read by no one, so the reading holds nothing to it.
+ */
+export const REMOTE_SECTION = z.object({
+  id: z.number().int().positive(),
+  name: z.string(),
+  slug: z.string(),
+});
