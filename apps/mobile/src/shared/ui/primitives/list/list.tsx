@@ -49,6 +49,20 @@ const SCROLL_PERIOD = 16;
 /** How far the list scrolls while its masthead goes: the whole of the masthead's height, which it gives back. */
 const DISTANCE: number = SIZES.headerExpanded;
 
+/**
+ * What the list does when items arrive above the one a reader is looking at: it keeps that one where it was, unless the
+ * reader is at the very top, who is taken to the new top instead.
+ *
+ * Holding the item in view still is the default of the list under this one, and it is the rule of a conversation, where
+ * what arrives above is older. A paper is the other way round — what arrives at the top of a page is the news — and on
+ * the A065 a front pulled down to be read again kept its old first card at the top of the screen, the three that had
+ * just come in hidden above it with nothing to say they were there. A reader who has scrolled still keeps their place.
+ *
+ * The distance is zero, which is also the one length that cannot be misread: Android compares it with the offset in
+ * pixels, where every other length in this file is in points.
+ */
+const KEEP_PLACE = { autoscrollToTopThreshold: 0 } as const;
+
 const useStyles = createStyles(() => ({
   frame: { flex: 1 },
   fill: { flex: 1 },
@@ -137,6 +151,7 @@ export function List<Item>({
           scrollY.set(event.nativeEvent.contentOffset.y);
         }}
         scrollEventThrottle={SCROLL_PERIOD}
+        maintainVisibleContentPosition={KEEP_PLACE}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       />

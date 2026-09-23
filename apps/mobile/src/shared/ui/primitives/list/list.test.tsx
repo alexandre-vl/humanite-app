@@ -86,6 +86,19 @@ describe('List', () => {
     expect(scrollView().props['keyboardDismissMode']).toBe('on-drag');
   });
 
+  /**
+   * A front pulled down to be read again kept its old first card at the top of the A065, the three that had just come
+   * in hidden above it: the list under this one holds the item in view still, a reader at the top included, unless the
+   * scroll view is told otherwise.
+   */
+  it('garde sa place à qui a défilé, et mène au nouveau haut qui lit tout en haut', async () => {
+    await render(
+      <List items={['un']} keyOf={(item) => item} typeOf={() => 'row'} renderItem={(item) => <View testID={item} />} />,
+    );
+    await settle();
+    expect(scrollView().props['maintainVisibleContentPosition']).toHaveProperty('autoscrollToTopThreshold', 0);
+  });
+
   it('montre ce qui en tient lieu quand elle ne contient rien', async () => {
     await render(
       <List
