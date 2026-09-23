@@ -7,7 +7,7 @@ import { ALL_POLICIES, mutantsOf } from '../mutation.ts';
 const define = fixtureFactory<PolicyId>(IN_PROCESS);
 
 /** A Node tool of the workspace, whose `src/probe.ts` holds the code under test beside a helper module. */
-const nodeTool = (probe: string): FileTree => ({
+export const nodeTool = (probe: string): FileTree => ({
   'tools/probe/package.json': '{ "name": "@huma/probe", "private": true, "type": "module" }\n',
   'tools/probe/tsconfig.json': '{ "extends": "@huma/tsconfig/node.json", "include": ["src"] }\n',
   'tools/probe/src/helper.ts': 'export const helper = 1;\n',

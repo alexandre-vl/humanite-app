@@ -236,6 +236,9 @@ importers:
       '@huma/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
+      '@huma/unknown':
+        specifier: workspace:*
+        version: link:packages/unknown
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.4
@@ -438,6 +441,9 @@ importers:
 
   packages/contracts:
     dependencies:
+      '@huma/unknown':
+        specifier: workspace:*
+        version: link:../unknown
       zod:
         specifier: 'catalog:'
         version: 4.5.4

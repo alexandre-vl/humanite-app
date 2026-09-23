@@ -1047,4 +1047,29 @@ export const BINDINGS = {
       R2: ['structure/service-corpus', 'structure/service-corpus-beside', 'structure/service-build-clean'],
     },
   },
+  'ADR-0030': {
+    scope: {
+      // The one package that asks a value of unknown shape what it is, and the bench that shows every other file
+      // refused when it asks by hand. The two policies live in the lint configuration, which older decisions govern.
+      paths: ['packages/unknown/**', 'tools/guardrails/src/proofs/unknown.ts'],
+    },
+    rules: {
+      R1: [
+        'guardrail/unknown-record',
+        'guardrail/unknown-record-reversed',
+        'guardrail/unknown-record-switch',
+        'guardrail/unknown-record-app',
+        'guardrail/unknown-exempt',
+      ],
+      R2: [
+        'guardrail/unknown-list',
+        'guardrail/unknown-list-destructured',
+        'guardrail/unknown-list-global-this',
+        'guardrail/unknown-list-instanceof',
+        'guardrail/unknown-list-bundled',
+        'guardrail/unknown-list-package-test',
+        'guardrail/unknown-exempt',
+      ],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

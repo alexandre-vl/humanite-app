@@ -44,6 +44,7 @@
   "devDependencies": {
     "@huma/eslint-config": "workspace:*",
     "@huma/tsconfig": "workspace:*",
+    "@huma/unknown": "workspace:*",
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "knip": "catalog:",

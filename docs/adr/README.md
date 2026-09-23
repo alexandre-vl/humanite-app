@@ -37,6 +37,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0027](0027-client-non-officiel-de-l-api-l-humanite.md)                     | Client non officiel de l’API L’Humanité                     | accepté                                                                  | `dependency`, `boundary`, `data-format`                                    |
 | [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | accepté                                                                  | `guarded-config`, `boundary`, `data-format`                                |
 | [ADR-0029](0029-une-build-de-service-sans-le-corpus-par-variantes.md)           | Une build de service sans le corpus, par variantes          | accepté                                                                  | `guarded-config`, `boundary`                                               |
+| [ADR-0030](0030-une-valeur-inconnue-se-lit-par-un-seul-paquet.md)               | Une valeur inconnue se lit par un seul paquet               | proposé                                                                  | `dependency`, `guarded-config`, `boundary`                                 |
 
 ## Confirmation
 
@@ -357,6 +358,15 @@ Statut : accepté. Périmètre : `apps/mobile/metro.config.ts`, `apps/mobile/src
 | ----- | ----------- | ---------------------------------------------------------------------------------------------- |
 | R1    | NE DOIT PAS | `structure/source-variant`, `structure/service-build-clean`                                    |
 | R2    | NE DOIT PAS | `structure/service-corpus`, `structure/service-corpus-beside`, `structure/service-build-clean` |
+
+### ADR-0030 · Une valeur inconnue se lit par un seul paquet
+
+Statut : proposé. Périmètre : `packages/unknown/**`, `tools/guardrails/src/proofs/unknown.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                         |
+| ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `guardrail/unknown-record`, `guardrail/unknown-record-reversed`, `guardrail/unknown-record-switch`, `guardrail/unknown-record-app`, `guardrail/unknown-exempt`                                                                                  |
+| R2    | NE DOIT PAS | `guardrail/unknown-list`, `guardrail/unknown-list-destructured`, `guardrail/unknown-list-global-this`, `guardrail/unknown-list-instanceof`, `guardrail/unknown-list-bundled`, `guardrail/unknown-list-package-test`, `guardrail/unknown-exempt` |
 
 ## Référentiel
 

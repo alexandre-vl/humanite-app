@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { readTextIfExists, temporaryDirectory } from '@huma/kit/fs';
 import { compareText } from '@huma/kit/text';
-import { isList } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 
 /**
  * The parts of Expo the repository calls directly, loaded from the Expo an app installs, as its CLI loads them: what
@@ -41,10 +41,9 @@ const isCallable = (value: unknown): value is Callable => typeof value === 'func
 const drift = (source: string, what: string): Error =>
   new Error(`${source} ${what} : l’intégration d’Expo est à revoir pour cette version`);
 
+/** A member of a module as its loader hands it back: a namespace, or a function that carries its exports. */
 function memberOf(module: unknown, name: string): unknown {
-  return (typeof module === 'object' || typeof module === 'function') && module !== null
-    ? Reflect.get(module, name)
-    : undefined;
+  return isRecord(module) || isCallable(module) ? Reflect.get(module, name) : undefined;
 }
 
 function exportedFunction(module: unknown, name: string, source: string): Callable {

@@ -1,14 +1,14 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { isRecord } from '@huma/unknown';
 import { defineConfig } from 'vitest/config';
 
 /** The name a package declares, or `null` when a directory under a workspace root is not one. */
 function packageName(directory: string): string | null {
   try {
     const parsed: unknown = JSON.parse(readFileSync(join(directory, 'package.json'), 'utf8'));
-    return typeof parsed === 'object' && parsed !== null && 'name' in parsed && typeof parsed.name === 'string'
-      ? parsed.name
-      : null;
+    const name = isRecord(parsed) ? parsed['name'] : undefined;
+    return typeof name === 'string' ? name : null;
   } catch {
     return null;
   }

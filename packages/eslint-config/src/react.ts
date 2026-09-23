@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { APP_DIRECTORY, HERMES_FILES } from '@huma/architecture';
-import { isRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 import type { Linter } from 'eslint';
 import reactX from 'eslint-plugin-react-x';
 import { pluginOf } from './plugins.ts';
@@ -12,7 +12,7 @@ type RuleEntry = Linter.RuleEntry;
 
 /** A rule entry raised to `error`, its options kept: the workspace tolerates no warning, so none is configured. */
 function asError(entry: RuleEntry): RuleEntry {
-  if (Array.isArray(entry)) {
+  if (isList(entry)) {
     const [level, ...options]: readonly [Linter.RuleSeverity, ...unknown[]] = entry;
     return level === 'off' || level === 0 ? entry : ['error', ...options];
   }
@@ -49,7 +49,7 @@ function reactVersion(root: string): string | null {
 export function reactConfig(root: string): Linter.Config {
   const hooks = pluginOf(reactHooksModule, 'eslint-plugin-react-hooks');
   const hooksRules: Readonly<Partial<Record<string, RuleEntry>>> =
-    hooks.configs?.['recommended-latest'] !== undefined && !Array.isArray(hooks.configs['recommended-latest'])
+    hooks.configs?.['recommended-latest'] !== undefined && !isList(hooks.configs['recommended-latest'])
       ? (hooks.configs['recommended-latest'].rules ?? {})
       : {};
   const strict = reactX.configs['strict-type-checked'];

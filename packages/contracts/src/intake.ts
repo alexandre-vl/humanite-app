@@ -1,3 +1,4 @@
+import { isList } from '@huma/unknown';
 import type { z } from 'zod';
 import type { Article, ArticleSummary, HeroInput, SummaryInput } from './article.ts';
 import { ARTICLE, ARTICLE_SUMMARY, FILM } from './article.ts';
@@ -75,7 +76,7 @@ const shown = (input: unknown): string => {
   if (input === undefined) {
     return 'rien';
   }
-  return Array.isArray(input) ? 'une liste' : 'un objet';
+  return isList(input) ? 'une liste' : 'un objet';
 };
 
 /** Why a schema refused, as the one line a set-aside carries: which field, what was wrong with it, and what came. */

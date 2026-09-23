@@ -50,6 +50,14 @@ export const BUNDLED_FILES: readonly string[] = [
 ];
 
 /**
+ * Where a value of unknown shape may be asked by hand whether it is a record or a list, as globs relative to the
+ * workspace root: the source of `@huma/unknown`, the one package the app, the packages and the tools all reach. Every
+ * other file asks it, so no two places can disagree on what a record is; the package's tests are left out, and ask it
+ * like any other file.
+ */
+export const UNKNOWN_FILES: readonly string[] = ['packages/unknown/src/**/*.ts'];
+
+/**
  * The packages the simulated paper is made of — the corpus with its pictures, and the API that serves it. A build that
  * reads the journal's service imports neither, under its name or under any of its subpaths.
  */

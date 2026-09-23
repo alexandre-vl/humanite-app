@@ -13,6 +13,7 @@ import {
   ROUTING_FILES,
   ROUTE_FILES,
   THEME_FILES,
+  UNKNOWN_FILES,
 } from '@huma/architecture';
 import type { Linter } from 'eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -167,6 +168,31 @@ const NODE_PROPERTIES: readonly PropertyRestriction[] = [
   { policy: 'node/process-exit', object: 'process', property: 'exit' },
 ];
 
+/**
+ * A value of unknown shape is asked whether it is a record or a list by `@huma/unknown`, the one package the app, the
+ * packages and the tools all reach: a check written anywhere else is a second definition of what a record is, free to
+ * forget `null` or a list. `typeof` is read on either side of a comparison and in a switch; a list is refused however
+ * `Array.isArray` is reached — called, taken apart, or through `globalThis` — and when `instanceof` asks the same.
+ */
+const UNKNOWN_SYNTAX: readonly SyntaxRestriction[] = [
+  { policy: 'unknown/record', selector: "BinaryExpression[left.operator='typeof'][right.value='object']" },
+  { policy: 'unknown/record', selector: "BinaryExpression[right.operator='typeof'][left.value='object']" },
+  {
+    policy: 'unknown/record',
+    selector: "SwitchStatement[discriminant.operator='typeof'] > SwitchCase[test.value='object']",
+  },
+  {
+    policy: 'unknown/list',
+    selector:
+      "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='isArray']",
+  },
+  { policy: 'unknown/list', selector: "BinaryExpression[operator='instanceof'][right.name='Array']" },
+];
+
+const UNKNOWN_PROPERTIES: readonly PropertyRestriction[] = [
+  { policy: 'unknown/list', object: 'Array', property: 'isArray' },
+];
+
 const NAMING_BASE: readonly NamingRule[] = [
   { selector: 'default', format: ['camelCase'], leadingUnderscore: 'forbid', trailingUnderscore: 'forbid' },
   { selector: 'typeLike', format: ['PascalCase'] },
@@ -224,7 +250,12 @@ type Runtime = Readonly<{
   naming: readonly NamingRule[];
 }>;
 
-const NODE: Runtime = { syntax: NODE_SYNTAX, properties: NODE_PROPERTIES, globals: [], naming: NODE_NAMING };
+const NODE: Runtime = {
+  syntax: [...NODE_SYNTAX, ...UNKNOWN_SYNTAX],
+  properties: [...NODE_PROPERTIES, ...UNKNOWN_PROPERTIES],
+  globals: [],
+  naming: NODE_NAMING,
+};
 
 /** The restrictions that refuse a Hermes gap, however the code reaches it: directly or through `globalThis`. */
 function gapRestrictions(name: (typeof HERMES_GAP_NAMES)[number]): Pick<Runtime, 'syntax' | 'properties' | 'globals'> {
@@ -286,9 +317,10 @@ const HERMES: Runtime = {
     ...NAV_SYNTAX,
     ...QUERY_SYNTAX,
     ...ROUTE_PARAMS_SYNTAX,
+    ...UNKNOWN_SYNTAX,
     ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),
   ],
-  properties: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties),
+  properties: [...UNKNOWN_PROPERTIES, ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.properties)],
   globals: HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.globals),
   naming: HERMES_NAMING,
 };
@@ -310,10 +342,15 @@ const narrowed = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runti
   syntax: [...runtime.syntax, ...syntax],
 });
 
-/** The restrictions of `runtime` without the ones a place is exempt from, the inverse of `narrowed`: the theme's core keeps every rule but the theme lock. */
-const exempt = (runtime: Runtime, syntax: readonly SyntaxRestriction[]): Runtime => ({
+/**
+ * The restrictions of `runtime` without those of the policies a place is exempt from, the inverse of `narrowed`: the
+ * theme's core keeps every rule but the theme lock. A policy is lifted whole, whichever rule enforces it.
+ */
+const exempt = (runtime: Runtime, ...policies: readonly PolicyId[]): Runtime => ({
   ...runtime,
-  syntax: runtime.syntax.filter((restriction) => !syntax.includes(restriction)),
+  syntax: runtime.syntax.filter(({ policy }) => !policies.includes(policy)),
+  properties: runtime.properties.filter(({ policy }) => !policies.includes(policy)),
+  globals: runtime.globals.filter(({ policy }) => !policies.includes(policy)),
 });
 
 /**
@@ -413,24 +450,29 @@ export function defineWorkspaceConfig({
       rules: restrictions(BUNDLED, policies),
     },
     {
+      files: [...UNKNOWN_FILES],
+      ignores: ['**/*.test.ts'],
+      rules: restrictions(exempt(BUNDLED, 'unknown/record', 'unknown/list'), policies),
+    },
+    {
       files: [...HERMES_FILES],
       rules: restrictions(HERMES, policies),
     },
     {
       files: [...THEME_FILES],
-      rules: restrictions(exempt(HERMES, THEME_SYNTAX), policies),
+      rules: restrictions(exempt(HERMES, 'style/theme'), policies),
     },
     {
       files: [...QUERY_FILES],
-      rules: restrictions(exempt(HERMES, QUERY_SYNTAX), policies),
+      rules: restrictions(exempt(HERMES, 'query/options'), policies),
     },
     {
       files: [...ROUTING_FILES],
-      rules: restrictions(exempt(HERMES, ROUTE_PARAMS_SYNTAX), policies),
+      rules: restrictions(exempt(HERMES, 'route/params'), policies),
     },
     {
       files: [...DISPLAY_TEXT_FILES],
-      rules: restrictions(exempt(HERMES, TEXT_MINT_SYNTAX), policies),
+      rules: restrictions(exempt(HERMES, 'text/mint'), policies),
     },
     {
       files: [...ROUTE_FILES],
@@ -442,7 +484,7 @@ export function defineWorkspaceConfig({
     },
     {
       files: [...DISPLAY_TEXT_ENTRY],
-      rules: restrictions(narrowed(exempt(HERMES, TEXT_MINT_SYNTAX), ENTRY_SYNTAX), policies),
+      rules: restrictions(narrowed(exempt(HERMES, 'text/mint'), ENTRY_SYNTAX), policies),
     },
     ...namingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),
     spellingConfig([...JAVASCRIPT_FILES, ...TYPESCRIPT_FILES], policies),

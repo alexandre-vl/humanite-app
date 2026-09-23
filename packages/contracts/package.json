@@ -6,6 +6,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@huma/unknown": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {

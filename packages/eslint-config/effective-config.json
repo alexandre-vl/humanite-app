@@ -490,6 +490,11 @@
           "object": "process",
           "property": "exit",
           "message": "[node/process-exit] fixer process.exitCode : process.exit coupe les sorties en attente"
+        },
+        {
+          "object": "Array",
+          "property": "isArray",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
         }
       ],
       "no-restricted-syntax": [
@@ -517,6 +522,26 @@
         {
           "selector": "ImportExpression[source.value=/^\\.{1,2}\\/.*\\.js$/]",
           "message": "[node/dynamic-import-js] importer dynamiquement le fichier .ts : Node exécute les sources TypeScript"
+        },
+        {
+          "selector": "BinaryExpression[left.operator='typeof'][right.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "BinaryExpression[right.operator='typeof'][left.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "SwitchStatement[discriminant.operator='typeof'] > SwitchCase[test.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='isArray']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
+          "selector": "BinaryExpression[operator='instanceof'][right.name='Array']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
         }
       ],
       "no-return-await": "off",
@@ -1149,6 +1174,11 @@
           "message": "[node/process-exit] fixer process.exitCode : process.exit coupe les sorties en attente"
         },
         {
+          "object": "Array",
+          "property": "isArray",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
           "property": "toSorted",
           "message": "[hermes/array-to-sorted] .toSorted n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
         },
@@ -1247,6 +1277,26 @@
         {
           "selector": "ImportExpression[source.value=/^\\.{1,2}\\/.*\\.js$/]",
           "message": "[node/dynamic-import-js] importer dynamiquement le fichier .ts : Node exécute les sources TypeScript"
+        },
+        {
+          "selector": "BinaryExpression[left.operator='typeof'][right.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "BinaryExpression[right.operator='typeof'][left.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "SwitchStatement[discriminant.operator='typeof'] > SwitchCase[test.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='isArray']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
+          "selector": "BinaryExpression[operator='instanceof'][right.name='Array']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -5121,6 +5171,11 @@
           "message": "[test/test-only] un test focalisé cache le reste de la suite"
         },
         {
+          "object": "Array",
+          "property": "isArray",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
           "property": "toSorted",
           "message": "[hermes/array-to-sorted] .toSorted n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
         },
@@ -5319,6 +5374,26 @@
         {
           "selector": "ExportNamedDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]",
           "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
+        },
+        {
+          "selector": "BinaryExpression[left.operator='typeof'][right.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "BinaryExpression[right.operator='typeof'][left.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "SwitchStatement[discriminant.operator='typeof'] > SwitchCase[test.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='isArray']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
+          "selector": "BinaryExpression[operator='instanceof'][right.name='Array']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -8896,6 +8971,11 @@
           "message": "[test/test-only] un test focalisé cache le reste de la suite"
         },
         {
+          "object": "Array",
+          "property": "isArray",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
           "property": "toSorted",
           "message": "[hermes/array-to-sorted] .toSorted n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
         },
@@ -9094,6 +9174,26 @@
         {
           "selector": "ExportNamedDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]",
           "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
+        },
+        {
+          "selector": "BinaryExpression[left.operator='typeof'][right.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "BinaryExpression[right.operator='typeof'][left.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "SwitchStatement[discriminant.operator='typeof'] > SwitchCase[test.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='isArray']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
+          "selector": "BinaryExpression[operator='instanceof'][right.name='Array']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",
@@ -12667,6 +12767,11 @@
           "message": "[test/test-only] un test focalisé cache le reste de la suite"
         },
         {
+          "object": "Array",
+          "property": "isArray",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
           "property": "toSorted",
           "message": "[hermes/array-to-sorted] .toSorted n’existe pas dans Hermes V1 (journal 0a, vérification 15)"
         },
@@ -12865,6 +12970,26 @@
         {
           "selector": "ExportNamedDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ExportSpecifier[local.name=/^use(?:Local|Global)SearchParams$/]",
           "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
+        },
+        {
+          "selector": "BinaryExpression[left.operator='typeof'][right.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "BinaryExpression[right.operator='typeof'][left.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "SwitchStatement[discriminant.operator='typeof'] > SwitchCase[test.value='object']",
+          "message": "[unknown/record] demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie"
+        },
+        {
+          "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='isArray']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
+        },
+        {
+          "selector": "BinaryExpression[operator='instanceof'][right.name='Array']",
+          "message": "[unknown/list] demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition"
         },
         {
           "selector": "MemberExpression[object.object.name='globalThis'][object.property.name='Array'][property.name='fromAsync']",

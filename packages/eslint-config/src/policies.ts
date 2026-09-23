@@ -50,6 +50,10 @@ const WRITTEN = {
     'déclarer la requête dans le segment api de sa tranche : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit',
   'route/params':
     'lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran',
+  'unknown/record':
+    'demander à isRecord de @huma/unknown si une valeur est un objet : un typeof écrit ailleurs en est une seconde définition, qui laisse passer null ou une liste qu’elle oublie',
+  'unknown/list':
+    'demander à isList de @huma/unknown si une valeur est une liste : Array.isArray la rend liste de any, et un instanceof en est une seconde définition',
 } as const satisfies Readonly<Record<`${string}/${string}`, string>>;
 
 type WrittenPolicy = keyof typeof WRITTEN;

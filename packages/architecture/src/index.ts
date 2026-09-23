@@ -13,6 +13,7 @@ export {
   ROUTE_FILES,
   ROUTING_FILES,
   THEME_FILES,
+  UNKNOWN_FILES,
 } from './app.ts';
 export type { ConfinedModule, Place, PlaceSpec } from './places.ts';
 export { CONFINED_MODULES, IMPORTS, MODULES, PLACE_NAMES, PLACES } from './places.ts';
