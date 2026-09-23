@@ -5,11 +5,13 @@ import type { ReactNode } from 'react';
 import { StartupProvider } from '#lib/startup';
 import { chromeOptions, useTheme } from '#lib/styles';
 import { SafeAreaRoot } from '#primitives/safe-area';
+import { followTheApp } from '../model/focus';
 import { persistOptions, queryClient } from '../model/query-client';
 import { ReaderSettings } from './reader-settings';
 import { StartupGate } from './startup-gate';
 
 void preventAutoHideAsync();
+followTheApp();
 
 /**
  * The stack of pushed screens, in the colours in force.

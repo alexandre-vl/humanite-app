@@ -4292,9 +4292,9 @@
                 }
               },
               "dependency": {
-                "specifiers": "!(Platform)"
+                "specifiers": "!(AppState|Platform)"
               },
-              "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
+              "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf AppState, Platform, ouvert à toutes"
             },
             {
               "from": [
@@ -5246,7 +5246,7 @@
         },
         {
           "selector": "ImportDeclaration[source.value='react-native'] > ImportNamespaceSpecifier",
-          "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
+          "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf AppState, Platform, ouvert à toutes"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-gesture-handler'] > ImportNamespaceSpecifier",
@@ -8064,9 +8064,9 @@
                 }
               },
               "dependency": {
-                "specifiers": "!(Platform)"
+                "specifiers": "!(AppState|Platform)"
               },
-              "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
+              "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf AppState, Platform, ouvert à toutes"
             },
             {
               "from": [
@@ -9021,7 +9021,7 @@
         },
         {
           "selector": "ImportDeclaration[source.value='react-native'] > ImportNamespaceSpecifier",
-          "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
+          "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf AppState, Platform, ouvert à toutes"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-gesture-handler'] > ImportNamespaceSpecifier",
@@ -11835,9 +11835,9 @@
                 }
               },
               "dependency": {
-                "specifiers": "!(Platform)"
+                "specifiers": "!(AppState|Platform)"
               },
-              "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
+              "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf AppState, Platform, ouvert à toutes"
             },
             {
               "from": [
@@ -12792,7 +12792,7 @@
         },
         {
           "selector": "ImportDeclaration[source.value='react-native'] > ImportNamespaceSpecifier",
-          "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf Platform, ouvert à toutes"
+          "message": "[module/react-native] react-native ne s’importe que depuis : primitive, sauf AppState, Platform, ouvert à toutes"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-gesture-handler'] > ImportNamespaceSpecifier",

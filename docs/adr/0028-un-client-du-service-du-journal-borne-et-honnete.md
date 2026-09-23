@@ -41,6 +41,7 @@ Option retenue : « Un client injecté, jugé sur les réponses rejouées », pa
 - **R3** — Un échec DOIT porter le code de sa cause : réseau, délai, statut ou réponse illisible.
 - **R4** — Une requête NE DOIT PAS porter le nom du client officiel ni les identifiants d’un lecteur.
 - **R5** — Une adresse demandée au service DOIT avoir la forme d’une adresse que le client officiel a demandée.
+- **R6** — Une build qui ne nomme aucune source DOIT lire le corpus simulé.
 
 ### Conséquences
 
@@ -77,4 +78,5 @@ Option retenue : « Un client injecté, jugé sur les réponses rejouées », pa
 
 - Le délai de quinze secondes laisse deux fois et demie la plus lente des listes captées.
 - Le mock sert le même lecteur non connecté : le corps d’un article réservé y est retenu, comme le service le retient.
+- `AppState` rejoint `Platform` parmi les exceptions au confinement de React Native d’ADR-0006 : il dit si l’app est devant le lecteur, ce que la bibliothèque des requêtes ne sait pas voir sur un téléphone (`packages/architecture/src/places.ts`).
 - Réévaluation : quand la connexion d’un lecteur ajoute un jeton aux requêtes, ou quand une capture montre une route que le client ne sait pas demander.

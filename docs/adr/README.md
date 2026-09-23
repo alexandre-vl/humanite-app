@@ -347,15 +347,16 @@ Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `packages/c
 
 ### ADR-0028 · Un client du service du journal, borné et honnête
 
-Statut : proposé. Périmètre : `packages/remote-api/**`, `apps/mobile/src/shared/api/**`, `tools/guardrails/src/proofs/transport.ts`.
+Statut : proposé. Périmètre : `packages/remote-api/**`, `apps/mobile/src/_app/model/focus.ts`, `apps/mobile/src/shared/api/**`, `apps/mobile/src/shared/config/source.ts`, `tools/guardrails/src/proofs/transport.ts`.
 
-| Règle | Niveau      | Preuves                                                                                     |
-| ----- | ----------- | ------------------------------------------------------------------------------------------- |
-| R1    | DOIT        | `guardrail/module-huma-remote-api`                                                          |
-| R2    | DOIT        | `transport/client`, `transport/no-deadline`, `transport/hangs`, `transport/connection-held` |
-| R3    | DOIT        | `transport/cause-misnamed`                                                                  |
-| R4    | NE DOIT PAS | `transport/impersonates`                                                                    |
-| R5    | DOIT        | `transport/address-unknown`                                                                 |
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                    |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | DOIT        | `guardrail/module-huma-remote-api`                                                                                                                                                                                                                                                         |
+| R2    | DOIT        | `transport/client`, `transport/no-deadline`, `transport/hangs`, `transport/connection-held`                                                                                                                                                                                                |
+| R3    | DOIT        | `transport/cause-misnamed`                                                                                                                                                                                                                                                                 |
+| R4    | NE DOIT PAS | `transport/impersonates`                                                                                                                                                                                                                                                                   |
+| R5    | DOIT        | `transport/address-unknown`                                                                                                                                                                                                                                                                |
+| R6    | DOIT        | convention : La source se lit une fois, dans apps/mobile/src/shared/config/source.ts : sans EXPO_PUBLIC_CONTENT_SOURCE la build lit le mock, un mot que la liste ne tient pas arrête l’app à sa première ligne, et la mise en place des tests nomme le mock quoi que le shell ait exporté. |
 
 ## Référentiel
 

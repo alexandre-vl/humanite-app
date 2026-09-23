@@ -27,6 +27,7 @@
     "@huma/design-tokens": "workspace:*",
     "@huma/mock-api": "workspace:*",
     "@huma/mock-content": "workspace:*",
+    "@huma/remote-api": "workspace:*",
     "@shopify/flash-list": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-persist-client": "catalog:",

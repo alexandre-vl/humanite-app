@@ -2,7 +2,7 @@ import type { DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { hasShelf } from '#api';
+import { hasShelf, useSetAsideCount } from '#api';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
 import { NEWSSTAND_HREF, SETTINGS_HREF } from '#lib/routing';
@@ -13,6 +13,7 @@ import { Pressable } from '#primitives/pressable';
 import { Scroll } from '#primitives/scroll';
 import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
+import { setAsideLabel } from '../model/set-aside';
 
 const useStyles = createStyles((theme) => ({
   // The frame is given its height, not left to find one: a scrolling region inside a ground that fills the
@@ -96,6 +97,7 @@ function Group({ label, children }: Readonly<{ label: DisplayText; children: Rea
  */
 export function AccountPage(): ReactNode {
   const styles = useStyles();
+  const setAside = useSetAsideCount();
   return (
     <Surface>
       <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
@@ -111,15 +113,21 @@ export function AccountPage(): ReactNode {
           />
         </Group>
         {/* The shelf of numéros is a row and not a tab: every press on it ends in a browser, so it belongs where the
-            rest of the paper's own business is. A source that shelves no numéros has no row to show. */}
-        {hasShelf ? (
+            rest of the paper's own business is. A source that shelves no numéros has no row to show. What the
+            service sent that the app could not read is said here too, and only once there is something to say: a
+            list that lost items to a shape the app does not know loses them without failing, and this is where that
+            is seen. */}
+        {hasShelf || setAside > 0 ? (
           <Group label={t('account.paper')}>
-            <OpenRow
-              label={t('nav.newsstand')}
-              onPress={() => {
-                router.push(NEWSSTAND_HREF);
-              }}
-            />
+            {hasShelf ? (
+              <OpenRow
+                label={t('nav.newsstand')}
+                onPress={() => {
+                  router.push(NEWSSTAND_HREF);
+                }}
+              />
+            ) : null}
+            {setAside > 0 ? <InfoRow line={setAsideLabel(setAside)} hint={t('account.setAside.hint')} /> : null}
           </Group>
         ) : null}
         <Group label={t('account.contact')}>

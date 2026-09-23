@@ -2,6 +2,10 @@ import { jest } from '@jest/globals';
 import type { ReactNode } from 'react';
 import type { AccessibilityRole, StyleProp, ViewStyle } from 'react-native';
 
+// The tests read the corpus, whatever the shell that runs them has exported: a service chosen for a phone's build must
+// not turn two hundred tests into requests. Expo reads the variable when a module asks for it, which is after this.
+process.env['EXPO_PUBLIC_CONTENT_SOURCE'] = 'mock';
+
 // A frame never arrives without a screen, so the runner's requestAnimationFrame fires on a timer of its own, after the
 // test that scheduled it has ended. @shopify/flash-list schedules the end of its first layout that way, and the state
 // it then sets lands outside every act() scope — which React reports, on a file chosen by whichever test happened to be

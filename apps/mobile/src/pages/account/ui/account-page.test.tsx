@@ -1,7 +1,8 @@
 import { typographyAt } from '@huma/design-tokens';
 import { describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
+import { noteSetAside } from '#api';
 import { ICONS } from '#primitives/icon';
 import { AccountPage } from './account-page';
 
@@ -22,6 +23,19 @@ describe('AccountPage', () => {
     await render(<AccountPage />);
     await fireEvent.press(screen.getByText('Kiosque'));
     expect(jest.mocked(router.push)).toHaveBeenCalledWith('/newsstand');
+  });
+
+  /** Items a reading could not make sense of are said once there are some, and not before: an empty count says nothing. */
+  it('dit combien d’éléments illisibles le journal a servis, dès qu’il y en a', async () => {
+    await render(<AccountPage />);
+    expect(screen.queryByText(/illisible/u)).toBeNull();
+    await act(() => {
+      noteSetAside('wire', [
+        { at: 0, says: 'article_format : podcast' },
+        { at: 3, says: 'date : « hier » ne nomme aucun instant' },
+      ]);
+    });
+    expect(screen.getByText('2 éléments illisibles écartés')).toBeTruthy();
   });
 
   /** What the reader kept has a tab of its own; a row here would be a third door to the room next door. */

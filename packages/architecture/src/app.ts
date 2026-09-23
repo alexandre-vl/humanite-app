@@ -29,9 +29,10 @@ export function entryOf({ directory, layout }: PlaceSpec): string | null {
 /**
  * Package sources Metro bundles into the app, as globs relative to the workspace root. The app reaches them through its
  * workspace dependencies, so they run on Hermes exactly like `src` does, and a JavaScript API Hermes lacks fails there
- * the same way — which the tools that build these packages, running on Node, never show. `mock-content` appears by the
- * files its public entry reaches alone: the rest of it writes the corpus on Node and is never bundled. Tests are left
- * out, since Vitest runs them on Node, which is where they belong.
+ * the same way — which the tools that build these packages, running on Node, never show. `mock-content` and
+ * `remote-api` appear by the files their public entry reaches alone: the rest of the one writes the corpus on Node,
+ * and the rest of the other judges the client against a capture, neither ever bundled. Tests are left out, since Vitest
+ * runs them on Node, which is where they belong.
  */
 export const BUNDLED_FILES: readonly string[] = [
   'packages/contracts/src/**/*.ts',
@@ -41,6 +42,10 @@ export const BUNDLED_FILES: readonly string[] = [
   'packages/mock-content/src/index.ts',
   'packages/mock-content/src/registries.ts',
   'packages/mock-content/src/generated/**/*.ts',
+  'packages/remote-api/src/api.ts',
+  'packages/remote-api/src/index.ts',
+  'packages/remote-api/src/routes.ts',
+  'packages/remote-api/src/transport.ts',
 ];
 
 /** Route files, as globs relative to the workspace root. */

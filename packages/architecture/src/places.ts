@@ -192,7 +192,9 @@ type ModulePolicy = Readonly<{
 
 /**
  * Packages whose use the component levels confine: native views, animations and gestures live in L0 primitives,
- * which alone touch the native layer; `Platform` answers a question, not a view, and stays open to every place.
+ * which alone touch the native layer; `Platform` answers a question, not a view, and stays open to every place, and so
+ * does `AppState`, which says whether the app is in front of the reader — the app layer tells the query library, which
+ * cannot tell on a phone, and there is no view in it for a primitive to hold.
  * Startup modules — font loading and the splash screen — live in the app layer that drives them. The content the app
  * reads enters through the `api` place alone, the simulated one and the journal's service alike, so which of the two
  * the app reads is decided in one module.
@@ -212,7 +214,7 @@ export const MODULES = {
   'expo-splash-screen': { places: ['app'], except: [] },
   'expo-symbols': { places: ['primitive'], except: [] },
   'expo-system-ui': { places: ['primitive'], except: [] },
-  'react-native': { places: ['primitive'], except: ['Platform'] },
+  'react-native': { places: ['primitive'], except: ['AppState', 'Platform'] },
   'react-native-gesture-handler': { places: ['primitive'], except: [] },
   'react-native-mmkv': { places: ['lib'], except: [] },
   'react-native-reanimated': { places: ['primitive'], except: [] },

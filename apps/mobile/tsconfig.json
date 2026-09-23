@@ -6,6 +6,7 @@
     { "path": "../../packages/contracts" },
     { "path": "../../packages/design-tokens" },
     { "path": "../../packages/mock-api" },
-    { "path": "../../packages/mock-content" }
+    { "path": "../../packages/mock-content" },
+    { "path": "../../packages/remote-api" }
   ]
 }

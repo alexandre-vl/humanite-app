@@ -1,14 +1,37 @@
 import type { ContentApi, ContentErrorCode } from '@huma/contracts';
 import { ContentApiError } from '@huma/contracts';
 import { contentApi } from '@huma/mock-api';
+import { createRemoteApi } from '@huma/remote-api';
+import { CONTENT_SOURCE } from '../config';
+import { noteSetAside } from './set-aside';
 
 /**
- * The content the app reads. Today a mock serves the fictional corpus from the bundle, with no network and no service.
- * The journal's own service is already read by the contracts — its answers item by item, its bodies into blocks, its
- * pictures at the width of their place — and the client that asks it for them takes this line's place, behind the
- * same contract, without a screen changing. This module is the only door: a lint policy refuses the mock anywhere else.
+ * The journal's service, asked through the platform's own network: its `fetch`, its abort and its timers, which the
+ * client is handed rather than reaching for. Cookies are left out — the service sets none the app needs, and a request
+ * that sent one would speak for a session this app never opened.
  */
-export const content: ContentApi = contentApi;
+export const serviceContent = (): ContentApi =>
+  createRemoteApi<AbortSignal>({
+    fetch: async (address, init) => {
+      const reply = await fetch(address, { headers: init.headers, signal: init.signal, credentials: 'omit' });
+      return { status: reply.status, text: async () => reply.text() };
+    },
+    abortable: () => new AbortController(),
+    after: (delay, then) => {
+      const timer = setTimeout(then, delay);
+      return () => {
+        clearTimeout(timer);
+      };
+    },
+    setAside: noteSetAside,
+  });
+
+/**
+ * The content the app reads: the corpus it carries, or the journal's service, as the build chose. Both speak the same
+ * contract, so no screen knows which it reads. This module is the only door: a lint policy refuses both packages
+ * anywhere else.
+ */
+export const content: ContentApi = CONTENT_SOURCE === 'service' ? serviceContent() : contentApi;
 
 /**
  * Whether the source shelves numéros, and so whether the app has a newsstand. It is the source's to say, by having the
