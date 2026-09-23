@@ -1,4 +1,4 @@
-import type { Article, Block, LinkTarget } from '@huma/contracts';
+import type { Article, Block } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { visualOf } from '#api';
@@ -8,13 +8,12 @@ import { RichText, Text } from '#primitives/text';
 
 import { runsOf } from '../model/spans';
 import { ArticleFigure } from './article-figure';
-import { ArticleRelated } from './article-related';
 
 export type ArticleBodyProps = Readonly<{
   article: Article;
   /** The blocks of the body the reader was given, which only an open body has. */
   blocks: readonly Block[];
-  onFollow: (target: LinkTarget) => void;
+  onFollow: (url: string) => void;
 }>;
 
 type BlockProps = Omit<ArticleBodyProps, 'blocks'> & Readonly<{ block: Block }>;
@@ -25,7 +24,6 @@ const useStyles = createStyles((theme) => ({
   // crosshead floating equidistant from the paragraph it closes and the one it opens — and it opens one.
   crosshead: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm },
   quote: {
-    gap: SPACING.xs,
     marginHorizontal: SPACING.lg,
     paddingLeft: SPACING.lg,
     borderLeftWidth: SIZES.stroke,
@@ -65,7 +63,6 @@ function BlockView({ block, article, onFollow }: BlockProps): ReactNode {
       return (
         <Box style={styles.quote}>
           <RichText runs={runsOf(block.spans, onFollow)} />
-          {block.source === undefined ? null : <Text variant="legend">{block.source}</Text>}
         </Box>
       );
     case 'image': {
@@ -81,15 +78,6 @@ function BlockView({ block, article, onFollow }: BlockProps): ReactNode {
         />
       );
     }
-    case 'related':
-      return (
-        <ArticleRelated
-          summary={block.summary}
-          onOpen={() => {
-            onFollow({ kind: 'article', id: block.summary.id });
-          }}
-        />
-      );
   }
 }
 

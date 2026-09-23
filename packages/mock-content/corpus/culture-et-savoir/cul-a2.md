@@ -21,16 +21,13 @@ Fini le dédale de petites salles sombres. Les architectes ont ouvert les perspe
 Un tiers des œuvres exposées n'avait jamais été montré au public. « Nous avions des trésors qui dormaient dans les réserves faute de place », explique la conservatrice, Agnès Vaillant. Le nouvel accrochage fait aussi une place aux artistes femmes de la région, longtemps reléguées aux marges des collections.
 
 > Ce musée appartient d'abord aux habitants ; nous voulions qu'ils s'y sentent chez eux.
-> — La conservatrice du musée Berthelin
 
 ## Une place nouvelle pour les enfants
 
 Nouveauté attendue : un parcours dédié au jeune public, avec des reproductions à toucher, des jeux de piste et des ateliers le mercredi après-midi. Le service éducatif espère doubler la fréquentation scolaire, tombée très bas avant la fermeture.
 
-La direction promet aussi une politique tarifaire accessible. L'entrée restera gratuite le premier dimanche du mois, comme le rappelle [notre présentation des nouveaux tarifs](article:cul-a4). Un tarif réduit sera par ailleurs proposé aux demandeurs d'emploi et aux étudiants.
+La direction promet aussi une politique tarifaire accessible. L'entrée restera gratuite le premier dimanche du mois, comme le rappelle notre présentation des nouveaux tarifs. Un tarif réduit sera par ailleurs proposé aux demandeurs d'emploi et aux étudiants.
 
 ## Un pari sur la fréquentation
 
 Reste à faire revenir le public. Avant les travaux, le musée peinait à dépasser les vingt mille visiteurs annuels. La municipalité vise désormais le double, en misant sur des expositions temporaires plus ambitieuses et des soirées thématiques. Un premier accrochage temporaire, consacré aux paysages de la vallée, est déjà annoncé pour décembre. Les responsables comptent aussi sur les scolaires et sur un partenariat avec les offices de tourisme voisins pour drainer un public de fin de semaine.
-
-::related[cul-a5]

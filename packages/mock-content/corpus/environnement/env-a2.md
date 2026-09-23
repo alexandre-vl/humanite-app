@@ -30,6 +30,4 @@ L'enquête publique s'ouvrira en novembre. D'ici là, Énergies du Plateau organ
 
 Les élus, eux, avancent prudemment. Beaucoup soutiennent le principe d'une production locale d'électricité, mais redoutent un vote qui diviserait durablement les villages. Plusieurs réclament déjà une étude indépendante sur l'impact paysager et sur les retombées réelles pour les finances communales, avant le moindre engagement. D'autres suggèrent de réduire la surface du parc pour préserver les points de vue les plus prisés des promeneurs du dimanche.
 
-Le sujet dépasse le seul plateau. Il rejoint le débat plus large sur les usages des sols, que nous abordions dans [notre enquête sur la coopérative Champs d'avenir](article:env-a5) et ses haies.
-
-::related[env-a1]
+Le sujet dépasse le seul plateau. Il rejoint le débat plus large sur les usages des sols, que nous abordions dans notre enquête sur la coopérative Champs d'avenir et ses haies.

@@ -31,5 +31,3 @@ Comment l'expliquer ? L'étude écarte l'idée d'un manque de compétences et po
 Les règles paritaires ayant montré leurs limites, l'étude plaide pour des engagements volontaires des maires sur la répartition des délégations. Elle suggère aussi de mieux former et accompagner les élues qui souhaitent investir les fonctions budgétaires ou d'aménagement. Quelques communes ont commencé à s'y essayer. Dans deux d'entre elles, une femme a récemment pris la délégation aux finances, une première locale saluée par les autrices comme la preuve qu'une autre répartition est possible.
 
 Le sujet recoupe d'autres formes d'inégalités déjà documentées dans le monde du travail.
-
-::related[fem-a1]

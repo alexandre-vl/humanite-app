@@ -17,7 +17,6 @@ Deux ans après la fin des travaux, les marais de Grand-Rieu se laissent enfin r
 Les naturalistes du conservatoire des espaces naturels des Trois-Vallées ont recensé ce printemps plusieurs couples d'oiseaux d'eau qui avaient déserté le site depuis des décennies. _Une surprise_, même pour les plus optimistes.
 
 > On n'imaginait pas un retour aussi rapide. La nature va plus vite que nos calendriers quand on lui rend de la place.
-> — Un chargé de mission du conservatoire des Trois-Vallées
 
 Le chantier avait pourtant mauvaise presse. Reboucher des fossés, casser des drains, laisser monter l'eau : les riverains y voyaient un gâchis, voire un risque d'inondation pour les parcelles voisines.
 
@@ -34,5 +33,3 @@ Le conservatoire veut désormais ouvrir un sentier pédagogique, en s'appuyant s
 ## Un modèle à étendre ?
 
 Fort de ce résultat, le syndicat mixte du bassin de la Sonne étudie deux autres sites. Rien n'est décidé : chaque renaturation suppose des accords fonciers longs à nouer. Mais l'exemple de Grand-Rieu, longtemps cité comme un pari risqué, sert désormais d'argument aux défenseurs des zones humides.
-
-::related[env-a1]

@@ -1,4 +1,4 @@
-import type { Article, DisplayText, LinkTarget } from '@huma/contracts';
+import type { Article, DisplayText } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
@@ -16,7 +16,7 @@ export type ArticleTitleProps = Readonly<{ title: DisplayText; word: DisplayText
 export type ArticleLeadProps = Readonly<{
   article: Article;
   byline: DisplayText | null;
-  onFollow: (target: LinkTarget) => void;
+  onFollow: (url: string) => void;
 }>;
 
 const useStyles = createStyles(() => ({
@@ -90,7 +90,7 @@ export function ArticleLead({ article, byline, onFollow }: ArticleLeadProps): Re
             played === undefined
               ? null
               : () => {
-                  onFollow({ kind: 'external', url: played.url });
+                  onFollow(played.url);
                 }
           }
         />

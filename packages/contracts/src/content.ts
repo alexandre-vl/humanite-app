@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import { DISPLAY_TEXT } from './display-text.ts';
-import { ARTICLE_ID, SECTION_ID } from './ids.ts';
+import { SECTION_ID } from './ids.ts';
 
-/** Where a link points: another item of the corpus, or an external page. */
-const LINK_TARGET = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('article'), id: ARTICLE_ID }),
-  z.object({ kind: z.literal('external'), url: z.url() }),
-]);
-export type LinkTarget = z.infer<typeof LINK_TARGET>;
+/**
+ * Where a link leads: a page of the web, which the reader's browser opens. The journal's service links nowhere else
+ * — an article it names in a body, it names by a slug that none of its routes takes — so an address of any other
+ * kind is no link at all, and a reading that meets one keeps the words it wrapped.
+ */
+export const WEB_ADDRESS = z.url({ protocol: /^https?$/u });
 
 /**
  * An inline run of text inside a paragraph or a quote. Every kind keeps its words under the one name, `text`: what
@@ -18,7 +18,7 @@ export const SPAN = z.discriminatedUnion('type', [
   z.object({ type: z.literal('text'), text: DISPLAY_TEXT }),
   z.object({ type: z.literal('emphasis'), text: DISPLAY_TEXT }),
   z.object({ type: z.literal('strong'), text: DISPLAY_TEXT }),
-  z.object({ type: z.literal('link'), text: DISPLAY_TEXT, target: LINK_TARGET }),
+  z.object({ type: z.literal('link'), text: DISPLAY_TEXT, url: WEB_ADDRESS }),
 ]);
 export type Span = z.infer<typeof SPAN>;
 /** The raw shape `SPAN` accepts as input, before it validates it. */

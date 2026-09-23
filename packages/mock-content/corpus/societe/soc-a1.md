@@ -19,7 +19,6 @@ Depuis lundi, une trentaine de bénévoles du collectif Toits d'abord s'étaient
 _Le froid n'attend pas les réunions de commission_, résume l'un des porte-parole du collectif. La municipalité, qui invoquait jusque-là un manque de moyens humains, a finalement accepté d'affecter deux agents et de solliciter la fédération Solidarités Arche pour l'encadrement de nuit.
 
 > Nous ne demandions pas un miracle, seulement un toit avant que les températures ne chutent.
-> — Le collectif Toits d'abord
 
 ![Des bénévoles installent des lits de camp dans le gymnase](soc-a1-gymnase)
 
@@ -31,6 +30,4 @@ La question du relogement reste entière. La commune ne dispose que de douze log
 
 L'adjointe aux affaires sociales a promis l'ouverture d'un groupe de travail dès octobre, sans s'engager sur un calendrier. Une prudence que les bénévoles jugent _insuffisante_, mais qui n'entame pas le soulagement de voir le gymnase ouvrir dès jeudi soir.
 
-La scolarisation des enfants concernés fera l'objet d'un point spécifique, un sujet que nous suivons dans [notre enquête sur les cantines](article:soc-a2). Reste à savoir si l'expérience des Charmilles servira de modèle aux autres bourgs de l'agglomération.
-
-::related[soc-a3]
+La scolarisation des enfants concernés fera l'objet d'un point spécifique, un sujet que nous suivons dans notre enquête sur les cantines. Reste à savoir si l'expérience des Charmilles servira de modèle aux autres bourgs de l'agglomération.

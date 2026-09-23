@@ -17,7 +17,6 @@ Elles s'appellent des « marraines ». Depuis deux ans, à Saint-Maur-des-Vignes
 Le principe est simple : chaque marraine suit une « filleule » pendant six mois. Au programme, préparation d'entretiens, relecture de CV, mais aussi, souvent, un travail plus discret sur la confiance en soi.
 
 > Beaucoup de ces femmes ont tout, sauf la certitude qu'elles en sont capables.
-> — La fondatrice du réseau Élan
 
 _Ce déclic_, justement, fait la différence. Sur les cent vingt femmes accompagnées la première année, plus de la moitié ont retrouvé un emploi ou repris une formation, selon les chiffres du réseau.
 

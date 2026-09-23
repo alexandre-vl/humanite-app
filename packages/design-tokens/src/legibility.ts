@@ -21,7 +21,7 @@ import { TEXT_SCALES, TEXT_TONES, typographyAt } from './typography.ts';
  */
 
 /** The roles a screen paints behind text. */
-const GROUNDS = ['background', 'ground', 'surface', 'card', 'primary'] as const satisfies readonly (keyof Theme)[];
+const GROUNDS = ['background', 'surface', 'card', 'primary'] as const satisfies readonly (keyof Theme)[];
 
 /** A role of the theme a screen paints behind text. */
 type Ground = (typeof GROUNDS)[number];
@@ -42,20 +42,18 @@ type Printing = Readonly<{ smallest: TextVariant; grounds: readonly Ground[] }>;
  * not a number so that a change of type carries here by itself.
  */
 const PRINTINGS = {
-  // The page a feed and an article are printed on, the torn paper a linked card is dropped on, the sheet a group of
-  // rows is laid on, and the bar a row of labels sits in. Smallest in a picture's legend, and in the word that marks
-  // what an item is or that anyone may read it.
-  textPrimary: { smallest: 'legend', grounds: ['background', 'ground', 'surface', 'card'] },
+  // The page a feed and an article are printed on, the sheet a group of rows is laid on, and the bar a row of labels
+  // sits in. Smallest in a picture's legend, and in the word that marks what an item is or that anyone may read it.
+  textPrimary: { smallest: 'legend', grounds: ['background', 'surface', 'card'] },
   // What answers a title on a card.
   textSecondary: { smallest: 'summary', grounds: ['background'] },
-  // The count under a cover, the hint under a row of settings, the signature of a column, the credit under a picture,
-  // and the smallest of them all: the name set in capitals over a linked article.
-  textMuted: { smallest: 'kicker', grounds: ['background', 'card', 'surface'] },
+  // The count under a cover, the hint under a row of settings, the signature of a column, the date of a card and the
+  // hour of a row of the wire, and the smallest of them all: the credit under a picture.
+  textMuted: { smallest: 'legend', grounds: ['background', 'card', 'surface'] },
   // The day heads of the wire, the pill of a button, the chosen step of a setting, the play mark of a film, the
   // masthead of a cover: all the paper's own red.
   onPrimary: { smallest: 'caption', grounds: ['primary'] },
-  // An article's own title, on the page it is read on. It stood on a second ground as well — the torn paper of a
-  // callout, which set its own title in the same type — and a call for support is not a headline.
+  // An article's own title, on the page it is read on.
   headline: { smallest: 'headline', grounds: ['background'] },
   // The paper's own name, in the bar across the top of the front page and in no other type. Its size is the reason
   // it may be printed in this red at all: a step under twenty-four would put it under a bar it cannot clear.

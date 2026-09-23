@@ -4,32 +4,29 @@ import type { Block } from './article.ts';
 import { SECTION, SPAN } from './content.ts';
 import type { Section, Span } from './content.ts';
 
-test('SPAN parses each inline kind and validates a link target', () => {
+test('SPAN parses each inline kind, and a link only to a page of the web', () => {
   expectTypeOf(SPAN.parse({ type: 'text', text: 'x' })).toEqualTypeOf<Span>();
   expect(SPAN.safeParse({ type: 'strong', text: 'x' }).success).toBe(true);
-  expect(SPAN.safeParse({ type: 'link', text: 'x', target: { kind: 'article', id: 'pol-a1' } }).success).toBe(true);
-  expect(
-    SPAN.safeParse({ type: 'link', text: 'x', target: { kind: 'external', url: 'https://example.org/a' } }).success,
-  ).toBe(true);
-  expect(SPAN.safeParse({ type: 'link', text: 'x', target: { kind: 'external', url: 'not-a-url' } }).success).toBe(
-    false,
-  );
+  expect(SPAN.safeParse({ type: 'link', text: 'x', url: 'https://example.org/a' }).success).toBe(true);
+  expect(SPAN.safeParse({ type: 'link', text: 'x', url: 'http://example.org/a' }).success).toBe(true);
+  // The journal links nowhere but the web: an address into the corpus, a mail or no address at all is no link.
+  expect(SPAN.safeParse({ type: 'link', text: 'x', url: 'article:pol-a1' }).success).toBe(false);
+  expect(SPAN.safeParse({ type: 'link', text: 'x', url: 'mailto:redaction@example.org' }).success).toBe(false);
+  expect(SPAN.safeParse({ type: 'link', text: 'x', url: 'not-a-url' }).success).toBe(false);
 });
 
 test('BLOCK parses each block kind and rejects an unknown one', () => {
   const block: Block = BLOCK.parse({ type: 'paragraph', spans: [{ type: 'text', text: 'x' }] });
   expectTypeOf(block).toEqualTypeOf<Block>();
   expect(BLOCK.safeParse({ type: 'heading', text: 'Titre' }).success).toBe(true);
-  expect(BLOCK.safeParse({ type: 'quote', spans: [{ type: 'text', text: 'x' }], source: 'Une source' }).success).toBe(
-    true,
-  );
+  expect(BLOCK.safeParse({ type: 'quote', spans: [{ type: 'text', text: 'x' }] }).success).toBe(true);
   expect(
     BLOCK.safeParse({ type: 'image', picture: { kind: 'corpus', key: 'pol-a1-hero' }, caption: 'c' }).success,
   ).toBe(true);
   expect(BLOCK.safeParse({ type: 'image', caption: 'c', key: 'pol-a1-hero' }).success).toBe(false);
   // A film is the item's, where it plays, and not a block of a body: no body of the journal carries one.
   expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: 192 }).success).toBe(false);
-  // A related block carries the summary of what it points at, and an id alone is no longer enough to draw its card.
+  // A card pointing at another article is no block: the journal's service sends a body none.
   const pointed = {
     id: 'pol-a2',
     format: 'article',
@@ -38,8 +35,7 @@ test('BLOCK parses each block kind and rejects an unknown one', () => {
     standfirst: 'Un chapô.',
     publishedAt: '2026-09-10T08:30:00.000Z',
   };
-  expect(BLOCK.safeParse({ type: 'related', summary: pointed }).success).toBe(true);
-  expect(BLOCK.safeParse({ type: 'related', id: 'pol-a2' }).success).toBe(false);
+  expect(BLOCK.safeParse({ type: 'related', summary: pointed }).success).toBe(false);
   expect(BLOCK.safeParse({ type: 'callout', title: 'T', text: 'x', button: 'Voir' }).success).toBe(false);
   expect(BLOCK.safeParse({ type: 'sidebar' }).success).toBe(false);
 });

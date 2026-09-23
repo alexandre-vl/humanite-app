@@ -163,7 +163,6 @@ export const CORPUS_DATA = [
               text: 'Ce musée appartient d’abord aux habitants\u00A0; nous voulions qu’ils s’y sentent chez eux.',
             },
           ],
-          source: 'La conservatrice du musée Berthelin',
         },
         {
           type: 'heading',
@@ -183,19 +182,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'La direction promet aussi une politique tarifaire accessible. L’entrée restera gratuite le premier dimanche du mois, comme le rappelle ',
-            },
-            {
-              type: 'link',
-              text: 'notre présentation des nouveaux tarifs',
-              target: {
-                kind: 'article',
-                id: 'cul-a4',
-              },
-            },
-            {
-              type: 'text',
-              text: '. Un tarif réduit sera par ailleurs proposé aux demandeurs d’emploi et aux étudiants.',
+              text: 'La direction promet aussi une politique tarifaire accessible. L’entrée restera gratuite le premier dimanche du mois, comme le rappelle notre présentation des nouveaux tarifs. Un tarif réduit sera par ailleurs proposé aux demandeurs d’emploi et aux étudiants.',
             },
           ],
         },
@@ -211,28 +198,6 @@ export const CORPUS_DATA = [
               text: 'Reste à faire revenir le public. Avant les travaux, le musée peinait à dépasser les vingt mille visiteurs annuels. La municipalité vise désormais le double, en misant sur des expositions temporaires plus ambitieuses et des soirées thématiques. Un premier accrochage temporaire, consacré aux paysages de la vallée, est déjà annoncé pour décembre. Les responsables comptent aussi sur les scolaires et sur un partenariat avec les offices de tourisme voisins pour drainer un public de fin de semaine.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'cul-a5',
-            format: 'article',
-            access: 'free',
-            title:
-              'À Aval-sur-Loue, des habitants numérisent la mémoire ouvrière de leur vallée avant qu’elle ne s’efface',
-            standfirst:
-              'Photographies, carnets d’atelier, bulletins de paie\u00A0: un collectif de bénévoles rassemble et scanne les archives privées d’anciens ouvriers du textile, pour constituer un fonds accessible à tous.',
-            byline: 'Hélène Marchetti',
-            publishedAt: '2026-09-12T08:20:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'cul-a5-hero',
-              },
-              caption: 'Des bénévoles trient de vieilles photographies d’atelier',
-              credit: 'Photo\u00A0: Marie Estève / CC BY 4.0',
-            },
-          },
         },
       ],
     },
@@ -393,10 +358,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'le portail du dispositif',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/pass-culture-region',
-              },
+              url: 'https://example.org/pass-culture-region',
             },
             {
               type: 'text',
@@ -412,7 +374,6 @@ export const CORPUS_DATA = [
               text: 'Nous voulions un outil simple\u00A0: un crédit, une carte, et le moins de paperasse possible.',
             },
           ],
-          source: 'La vice-présidente chargée de la culture',
         },
         {
           type: 'heading',
@@ -445,19 +406,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Pour les libraires, l’enjeu est concret. Beaucoup espèrent voir revenir un public jeune déserté depuis des années, comme le racontait déjà ',
-            },
-            {
-              type: 'link',
-              text: 'notre reportage sur la librairie de Belleroche',
-              target: {
-                kind: 'article',
-                id: 'cul-a6',
-              },
-            },
-            {
-              type: 'text',
-              text: '. D’autres se montrent prudents, craignant une ruée sur quelques succès de librairie au détriment de la diversité éditoriale.',
+              text: 'Pour les libraires, l’enjeu est concret. Beaucoup espèrent voir revenir un public jeune déserté depuis des années, comme le racontait déjà notre reportage sur la librairie de Belleroche. D’autres se montrent prudents, craignant une ruée sur quelques succès de librairie au détriment de la diversité éditoriale.',
             },
           ],
         },
@@ -911,7 +860,6 @@ export const CORPUS_DATA = [
               text: 'On nous parle de départs volontaires, mais quand la charge de travail reste la même pour ceux qui restent, ce n’est pas un choix, c’est une pression.',
             },
           ],
-          source: 'Le syndicat Métaux-Avenir du Vernay',
         },
         {
           type: 'heading',
@@ -944,10 +892,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'collectif de soutien aux salariés',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/vernay-solidaire',
-              },
+              url: 'https://example.org/vernay-solidaire',
             },
             {
               type: 'text',
@@ -969,43 +914,9 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Une nouvelle réunion du comité est prévue la semaine prochaine. Les élus locaux, eux, s’inquiètent des effets en chaîne sur les sous-traitants du bassin, comme le détaille notre enquête sur ',
-            },
-            {
-              type: 'link',
-              text: 'le plan de reconversion du territoire',
-              target: {
-                kind: 'article',
-                id: 'eco-a3',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'Une nouvelle réunion du comité est prévue la semaine prochaine. Les élus locaux, eux, s’inquiètent des effets en chaîne sur les sous-traitants du bassin, comme le détaille notre enquête sur le plan de reconversion du territoire.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'eco-a3',
-            format: 'article',
-            access: 'premium',
-            title:
-              'Après les suppressions de postes, le Val d’Arche cherche à bâtir un plan de reconversion industrielle',
-            standfirst:
-              'Élus, chambre de commerce et organismes de formation planchent sur l’avenir d’un bassin d’emploi fragilisé. Objectif\u00A0: anticiper les reconversions plutôt que de les subir, dans un territoire longtemps tourné vers la métallurgie.',
-            byline: 'Marion Castel et Julien Ferrand',
-            publishedAt: '2026-09-11T06:10:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'eco-a3-hero',
-              },
-              caption: 'Une friche industrielle en bordure de Villefranche-d’Arvor',
-              credit: 'Photo\u00A0: Léo Prat / Studio Arvor',
-            },
-          },
         },
       ],
     },
@@ -1170,19 +1081,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Le plan esquissé repose sur trois axes\u00A0: la formation des salariés vers des métiers en tension, l’accueil de nouvelles activités sur les friches, et le soutien aux petites entreprises locales. La situation des Fonderies, détaillée dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre article sur le plan de départs',
-              target: {
-                kind: 'article',
-                id: 'eco-a1',
-              },
-            },
-            {
-              type: 'text',
-              text: ', sert de cas d’école.',
+              text: 'Le plan esquissé repose sur trois axes\u00A0: la formation des salariés vers des métiers en tension, l’accueil de nouvelles activités sur les friches, et le soutien aux petites entreprises locales. La situation des Fonderies, détaillée dans notre article sur le plan de départs, sert de cas d’école.',
             },
           ],
         },
@@ -1233,27 +1132,6 @@ export const CORPUS_DATA = [
               text: 'Les syndicats, associés aux discussions, réclament des engagements chiffrés et un calendrier précis. Ils redoutent qu’un énième plan ne reste au stade des intentions, sans moyens à la hauteur des besoins. Les élus locaux, de leur côté, veulent inscrire la démarche dans la durée, au-delà des échéances électorales, pour éviter qu’elle ne s’essouffle au premier changement de majorité.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'eco-a2',
-            format: 'article',
-            access: 'free',
-            title: 'Sur les marchés du Val d’Arche, la flambée des prix pousse les clients à rogner sur les quantités',
-            standfirst:
-              'Fruits, légumes, fromages\u00A0: en un an, les étals ont vu leurs tarifs grimper. Commerçants et clients décrivent une même spirale, entre coûts de production en hausse et pouvoir d’achat en berne, à l’approche de l’hiver.',
-            byline: 'Julien Ferrand',
-            publishedAt: '2026-09-10T13:30:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'eco-a2-hero',
-              },
-              caption: 'Un étal de primeurs sur le marché de Sainte-Coline',
-              credit: 'Photo\u00A0: Nadia Rous / Studio Arvor',
-            },
-          },
         },
       ],
     },
@@ -1358,7 +1236,6 @@ export const CORPUS_DATA = [
               text: 'Les gens ne viennent pas seulement chercher de la nourriture. Ils viennent chercher un peu de répit.',
             },
           ],
-          source: 'Une bénévole de l’épicerie solidaire',
         },
         {
           type: 'paragraph',
@@ -1785,7 +1662,6 @@ export const CORPUS_DATA = [
               text: 'Nous préférons agir maintenant, tant que la situation reste gérable, plutôt que de subir des coupures cet hiver.',
             },
           ],
-          source: 'La directrice de la régie des eaux de Val-Mareuil',
         },
         {
           type: 'paragraph',
@@ -1819,10 +1695,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'le portail public de la régie',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/val-mareuil-eau',
-              },
+              url: 'https://example.org/val-mareuil-eau',
             },
             {
               type: 'text',
@@ -1847,19 +1720,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'La sécheresse rappelle la fragilité de tout le bassin. Notre ',
-            },
-            {
-              type: 'link',
-              text: 'reportage sur la renaturation des marais de Grand-Rieu',
-              target: {
-                kind: 'article',
-                id: 'env-a3',
-              },
-            },
-            {
-              type: 'text',
-              text: ' montrait comment ces zones humides jouent un rôle d’éponge naturelle, précieux quand la nappe faiblit.',
+              text: 'La sécheresse rappelle la fragilité de tout le bassin. Notre reportage sur la renaturation des marais de Grand-Rieu montrait comment ces zones humides jouent un rôle d’éponge naturelle, précieux quand la nappe faiblit.',
             },
           ],
         },
@@ -1871,27 +1732,6 @@ export const CORPUS_DATA = [
               text: 'Le syndicat mixte du bassin de la Sonne promet un point d’étape à la mi-octobre. D’ici là, chaque geste compte, rappelle la régie, qui mise autant sur la pédagogie que sur la contrainte. Des relevés seront publiés chaque semaine, afin que chacun puisse suivre l’évolution de la nappe presque en temps réel.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'env-a3',
-            format: 'article',
-            access: 'premium',
-            title: 'Aux marais de Grand-Rieu, la renaturation porte ses premiers fruits deux ans après les travaux',
-            standfirst:
-              'Le conservatoire des espaces naturels des Trois-Vallées constate le retour d’oiseaux nicheurs sur la zone humide restaurée, un signe encourageant pour un chantier longtemps contesté par les riverains de la vallée.',
-            byline: 'Hugo Lambert et Léa Fontanel',
-            publishedAt: '2026-09-11T07:40:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'env-a3-hero',
-              },
-              caption: 'Les vasières restaurées des marais de Grand-Rieu',
-              credit: 'Photo\u00A0: Malo Renard',
-            },
-          },
         },
       ],
     },
@@ -1957,10 +1797,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'la page de concertation du projet',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/montbrel-solaire',
-              },
+              url: 'https://example.org/montbrel-solaire',
             },
             {
               type: 'text',
@@ -2017,42 +1854,9 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Le sujet dépasse le seul plateau. Il rejoint le débat plus large sur les usages des sols, que nous abordions dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre enquête sur la coopérative Champs d’avenir',
-              target: {
-                kind: 'article',
-                id: 'env-a5',
-              },
-            },
-            {
-              type: 'text',
-              text: ' et ses haies.',
+              text: 'Le sujet dépasse le seul plateau. Il rejoint le débat plus large sur les usages des sols, que nous abordions dans notre enquête sur la coopérative Champs d’avenir et ses haies.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'env-a1',
-            format: 'article',
-            access: 'premium',
-            title: 'Sécheresse à Val-Mareuil\u00A0: la régie des eaux impose des restrictions jusqu’à la fin octobre',
-            standfirst:
-              'Le niveau de la nappe du bassin de la Sonne n’a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l’arrosage des jardins et à réduire la pression du réseau sur onze communes.',
-            byline: 'Hugo Lambert',
-            publishedAt: '2026-09-10T06:30:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'env-a1-hero',
-              },
-              caption: 'La retenue de la Sonne à son étiage',
-              credit: 'Photo\u00A0: Camille Ancel',
-            },
-          },
         },
       ],
     },
@@ -2116,7 +1920,6 @@ export const CORPUS_DATA = [
               text: 'On n’imaginait pas un retour aussi rapide. La nature va plus vite que nos calendriers quand on lui rend de la place.',
             },
           ],
-          source: 'Un chargé de mission du conservatoire des Trois-Vallées',
         },
         {
           type: 'paragraph',
@@ -2178,27 +1981,6 @@ export const CORPUS_DATA = [
               text: 'Fort de ce résultat, le syndicat mixte du bassin de la Sonne étudie deux autres sites. Rien n’est décidé\u00A0: chaque renaturation suppose des accords fonciers longs à nouer. Mais l’exemple de Grand-Rieu, longtemps cité comme un pari risqué, sert désormais d’argument aux défenseurs des zones humides.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'env-a1',
-            format: 'article',
-            access: 'premium',
-            title: 'Sécheresse à Val-Mareuil\u00A0: la régie des eaux impose des restrictions jusqu’à la fin octobre',
-            standfirst:
-              'Le niveau de la nappe du bassin de la Sonne n’a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l’arrosage des jardins et à réduire la pression du réseau sur onze communes.',
-            byline: 'Hugo Lambert',
-            publishedAt: '2026-09-10T06:30:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'env-a1-hero',
-              },
-              caption: 'La retenue de la Sonne à son étiage',
-              credit: 'Photo\u00A0: Camille Ancel',
-            },
-          },
         },
       ],
     },
@@ -2427,19 +2209,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Reste la question du coût. Planter et entretenir une haie prend du temps et de la main-d’œuvre, sans revenu direct à la clé. Champs d’avenir plaide pour une aide des collectivités, à l’image de ce qui se discute autour du ',
-            },
-            {
-              type: 'link',
-              text: 'projet solaire de Montbrel',
-              target: {
-                kind: 'article',
-                id: 'env-a2',
-              },
-            },
-            {
-              type: 'text',
-              text: ', autre bras de fer sur l’usage des sols.',
+              text: 'Reste la question du coût. Planter et entretenir une haie prend du temps et de la main-d’œuvre, sans revenu direct à la clé. Champs d’avenir plaide pour une aide des collectivités, à l’image de ce qui se discute autour du projet solaire de Montbrel, autre bras de fer sur l’usage des sols.',
             },
           ],
         },
@@ -2876,7 +2646,6 @@ export const CORPUS_DATA = [
               text: 'Beaucoup de ces femmes ont tout, sauf la certitude qu’elles en sont capables.',
             },
           ],
-          source: 'La fondatrice du réseau Élan',
         },
         {
           type: 'paragraph',
@@ -3055,28 +2824,6 @@ export const CORPUS_DATA = [
             },
           ],
         },
-        {
-          type: 'related',
-          summary: {
-            id: 'fem-a1',
-            format: 'article',
-            access: 'premium',
-            title:
-              'Écart de salaires\u00A0: dans les métiers du soin à domicile, les femmes gagnent un quart de moins que prévu',
-            standfirst:
-              'Une étude locale rendue publique mardi chiffre pour la première fois les écarts de rémunération dans un secteur presque entièrement féminin, où le temps partiel subi pèse lourd sur les fiches de paie.',
-            byline: 'Claire Vasseur et Inès Benali',
-            publishedAt: '2026-09-10T06:00:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'fem-a1-hero',
-              },
-              caption: 'Une aide à domicile en tournée dans un quartier pavillonnaire',
-              credit: 'Photo\u00A0: Sonia Ferrer / CC BY 4.0',
-            },
-          },
-        },
       ],
     },
   },
@@ -3158,19 +2905,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Les dirigeantes rappellent que leur essor s’inscrit dans un mouvement plus large de féminisation des clubs, également porté par des dispositifs d’accompagnement vers l’autonomie, comme ',
-            },
-            {
-              type: 'link',
-              text: 'le réseau de marraines de Saint-Maur',
-              target: {
-                kind: 'article',
-                id: 'fem-a2',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'Les dirigeantes rappellent que leur essor s’inscrit dans un mouvement plus large de féminisation des clubs, également porté par des dispositifs d’accompagnement vers l’autonomie, comme le réseau de marraines de Saint-Maur.',
             },
           ],
         },
@@ -3279,10 +3014,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'une page d’information dédiée',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/la-halte-ecoute',
-              },
+              url: 'https://example.org/la-halte-ecoute',
             },
             {
               type: 'text',
@@ -3676,7 +3408,6 @@ export const CORPUS_DATA = [
               text: 'Nous voulons pêcher, pas patrouiller. Si la trêve tient, c’est déjà beaucoup.',
             },
           ],
-          source: 'La coopérative des marins de Port-Méridienne',
         },
         {
           type: 'paragraph',
@@ -3692,42 +3423,9 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Le sort des populations déplacées par les tensions reste, lui, en suspens, un dossier que nous détaillons dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre reportage sur l’archipel des Cargues',
-              target: {
-                kind: 'article',
-                id: 'mon-a2',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'Le sort des populations déplacées par les tensions reste, lui, en suspens, un dossier que nous détaillons dans notre reportage sur l’archipel des Cargues.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'mon-a3',
-            format: 'article',
-            access: 'premium',
-            title: 'À Port-Méridienne, l’automatisation du terminal portuaire inquiète les dockers venus de Valdavie',
-            standfirst:
-              'L’arrivée de portiques automatisés sur le premier terminal à conteneurs de la région fait craindre des centaines de suppressions d’emplois, dans une ville où la manutention fait vivre des quartiers entiers.',
-            byline: 'Élise Morvan et Samir Haddad',
-            publishedAt: '2026-09-12T06:05:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'mon-a3-hero',
-              },
-              caption: 'Les portiques du terminal de Port-Méridienne',
-              credit: 'Photo\u00A0: Agence Méridien / CC BY 4.0',
-            },
-          },
         },
       ],
     },
@@ -3792,7 +3490,6 @@ export const CORPUS_DATA = [
               text: 'On nous parle de millions débloqués, mais nous, nous comptons les jours sans eau propre.',
             },
           ],
-          source: 'Un habitant du village de Kalanne',
         },
         {
           type: 'paragraph',
@@ -3830,19 +3527,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Pour maintenir la pression, un collectif d’îliens documente chaque jour la situation et transmet ses relevés aux organisations internationales. Une démarche qui rejoint les difficultés de financement évoquées dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre article sur le fonds Solidarité Sud',
-              target: {
-                kind: 'article',
-                id: 'mon-a6',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'Pour maintenir la pression, un collectif d’îliens documente chaque jour la situation et transmet ses relevés aux organisations internationales. Une démarche qui rejoint les difficultés de financement évoquées dans notre article sur le fonds Solidarité Sud.',
             },
           ],
         },
@@ -3952,7 +3637,6 @@ export const CORPUS_DATA = [
               text: 'Nous ne sommes pas contre le progrès. Nous demandons qu’il ne se fasse pas sur notre dos.',
             },
           ],
-          source: 'L’association des dockers de Port-Méridienne',
         },
         {
           type: 'paragraph',
@@ -3964,10 +3648,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'leur portail public',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/meridien-ports',
-              },
+              url: 'https://example.org/meridien-ports',
             },
             {
               type: 'text',
@@ -4145,10 +3826,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'leur journal de bord',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/cargues-journal',
-              },
+              url: 'https://example.org/cargues-journal',
             },
             {
               type: 'text',
@@ -4273,10 +3951,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'son portail',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/meridien-terragne',
-              },
+              url: 'https://example.org/meridien-terragne',
             },
             {
               type: 'text',
@@ -4292,7 +3967,6 @@ export const CORPUS_DATA = [
               text: 'Un fonds qui ne verse pas n’est pas un fonds, c’est une déclaration d’intention.',
             },
           ],
-          source: 'Le comité paysan de Terragne',
         },
         {
           type: 'paragraph',
@@ -4320,27 +3994,6 @@ export const CORPUS_DATA = [
               text: 'Ce contournement inquiète toutefois les défenseurs du multilatéralisme, qui redoutent qu’à force de solutions parallèles, le fonds commun ne perde le peu de crédibilité qui lui reste. Sans un sursaut rapide des États membres, préviennent-ils, c’est l’idée même d’une solidarité régionale organisée qui pourrait s’effriter, au profit de logiques strictement nationales.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'mon-a2',
-            format: 'article',
-            access: 'free',
-            title: 'Après les inondations, l’archipel des Cargues attend toujours l’aide promise par ses voisins',
-            standfirst:
-              'Trois semaines après les crues qui ont ravagé plusieurs îles, les habitants dénoncent la lenteur des secours et le manque d’eau potable, tandis que l’Union des États du Levant peine à coordonner les convois.',
-            byline: 'Samir Haddad',
-            publishedAt: '2026-09-11T07:15:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'mon-a2-hero',
-              },
-              caption: 'Un quartier encore inondé sur l’île principale des Cargues',
-              credit: 'Photo\u00A0: Agence Méridien / CC BY 4.0',
-            },
-          },
         },
       ],
     },
@@ -4543,7 +4196,6 @@ export const CORPUS_DATA = [
               text: 'On nous a expliqué pendant six mois que ces lignes n’étaient pas tenables, et voilà qu’elles le redeviennent comme par miracle.',
             },
           ],
-          source: 'Le groupe Cap citoyen au conseil départemental',
         },
         {
           type: 'heading',
@@ -4559,10 +4211,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'collectif Terres communes',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/terres-communes',
-              },
+              url: 'https://example.org/terres-communes',
             },
             {
               type: 'text',
@@ -4591,43 +4240,9 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              text: ' des mobilités rurales, assorti d’une concertation avec les communes. Les élus locaux, échaudés, attendent de voir les actes suivre les promesses. Notre suivi se poursuit avec ',
-            },
-            {
-              type: 'link',
-              text: 'le dossier de l’intercommunalité',
-              target: {
-                kind: 'article',
-                id: 'pol-a3',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: ' des mobilités rurales, assorti d’une concertation avec les communes. Les élus locaux, échaudés, attendent de voir les actes suivre les promesses. Notre suivi se poursuit avec le dossier de l’intercommunalité.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'pol-a3',
-            format: 'article',
-            access: 'premium',
-            title:
-              'Fusion des intercommunalités\u00A0: le Val d’Arche et le pays de l’Ombre butent sur le partage du pouvoir',
-            standfirst:
-              'Engagées depuis un an vers un rapprochement, les deux communautés de communes ne s’accordent ni sur le nombre de vice-présidents ni sur le siège de la future collectivité. Une réunion décisive est prévue la semaine prochaine.',
-            byline: 'Lucie Varenne et Karim Belhadj',
-            publishedAt: '2026-09-11T05:45:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'pol-a3-hero',
-              },
-              caption: 'La salle du conseil communautaire du Val d’Arche',
-              credit: 'Photo\u00A0: Léo Prat / Studio Arvor',
-            },
-          },
         },
       ],
     },
@@ -4850,19 +4465,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'La question du financement des services publics, déjà tendue, plane sur les débats, comme l’a montré le récent bras de fer sur les transports scolaires détaillé dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre article sur les lignes du plateau',
-              target: {
-                kind: 'article',
-                id: 'pol-a1',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'La question du financement des services publics, déjà tendue, plane sur les débats, comme l’a montré le récent bras de fer sur les transports scolaires détaillé dans notre article sur les lignes du plateau.',
             },
           ],
         },
@@ -4874,28 +4477,6 @@ export const CORPUS_DATA = [
               text: 'Une réunion des deux exécutifs est prévue la semaine prochaine. En cas d’échec, le préfet pourrait être saisi pour arbitrer, une perspective que personne, des deux côtés, ne souhaite vraiment.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'pol-a2',
-            format: 'article',
-            access: 'free',
-            title:
-              'Logements vacants à Sainte-Coline\u00A0: la commune lance un plan pour remettre cent appartements sur le marché',
-            standfirst:
-              'La municipalité veut récupérer une centaine de logements laissés vides dans le centre ancien. Elle mise d’abord sur des aides à la rénovation, puis, en dernier recours, sur la réquisition, une piste qui divise déjà le conseil municipal.',
-            byline: 'Karim Belhadj',
-            publishedAt: '2026-09-10T10:15:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'pol-a2-hero',
-              },
-              caption: 'Une façade du centre ancien de Sainte-Coline',
-              credit: 'Photo\u00A0: Nadia Rous / Studio Arvor',
-            },
-          },
         },
       ],
     },
@@ -4960,7 +4541,6 @@ export const CORPUS_DATA = [
               text: 'Si mes clients ne peuvent plus se garer devant, ils iront à la zone commerciale. C’est aussi simple que cela.',
             },
           ],
-          source: 'L’union des commerçants de la rue Marchande',
         },
         {
           type: 'paragraph',
@@ -5210,19 +4790,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'La charte entrera en vigueur au 1er janvier. Un bilan est prévu au bout d’un an. Le débat rejoint d’autres tensions locales sur la participation des habitants, comme lors de ',
-            },
-            {
-              type: 'link',
-              text: 'la concertation sur la piétonnisation',
-              target: {
-                kind: 'article',
-                id: 'pol-a4',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'La charte entrera en vigueur au 1er janvier. Un bilan est prévu au bout d’un an. Le débat rejoint d’autres tensions locales sur la participation des habitants, comme lors de la concertation sur la piétonnisation.',
             },
           ],
         },
@@ -5405,7 +4973,6 @@ export const CORPUS_DATA = [
               text: 'Nous ne demandions pas un miracle, seulement un toit avant que les températures ne chutent.',
             },
           ],
-          source: 'Le collectif Toits d’abord',
         },
         {
           type: 'image',
@@ -5459,42 +5026,9 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'La scolarisation des enfants concernés fera l’objet d’un point spécifique, un sujet que nous suivons dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre enquête sur les cantines',
-              target: {
-                kind: 'article',
-                id: 'soc-a2',
-              },
-            },
-            {
-              type: 'text',
-              text: '. Reste à savoir si l’expérience des Charmilles servira de modèle aux autres bourgs de l’agglomération.',
+              text: 'La scolarisation des enfants concernés fera l’objet d’un point spécifique, un sujet que nous suivons dans notre enquête sur les cantines. Reste à savoir si l’expérience des Charmilles servira de modèle aux autres bourgs de l’agglomération.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'soc-a3',
-            format: 'article',
-            access: 'premium',
-            title: 'Déserts médicaux\u00A0: la maison de santé du Val d’Arche cherche à attirer de jeunes praticiens',
-            standfirst:
-              'Ouverte il y a un an à Saint-Clair-du-Roc, la structure peine encore à recruter des généralistes, malgré des logements de fonction et une prime d’installation financée par cinq communes réunies.',
-            byline: 'Nadia Oussedik et Thomas Lécuyer',
-            publishedAt: '2026-09-12T05:50:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'soc-a3-hero',
-              },
-              caption: 'La façade de la maison de santé du Val d’Arche',
-              credit: 'Photo\u00A0: Studio Arche / CC BY 4.0',
-            },
-          },
         },
       ],
     },
@@ -5559,7 +5093,6 @@ export const CORPUS_DATA = [
               text: 'On ne peut pas apprendre à un enfant à bien manger en lui laissant vingt minutes pour tout faire.',
             },
           ],
-          source: 'L’association Les Cartables du Val d’Arche',
         },
         {
           type: 'paragraph',
@@ -5682,10 +5215,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'son portail dédié',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/valdarche-sante',
-              },
+              url: 'https://example.org/valdarche-sante',
             },
             {
               type: 'text',
@@ -5731,7 +5261,6 @@ export const CORPUS_DATA = [
               text: 'Un interne qui passe six mois chez nous, c’est une chance sur deux qu’il revienne s’installer.',
             },
           ],
-          source: 'Le syndicat intercommunal du Val d’Arche',
         },
         {
           type: 'paragraph',
@@ -5830,7 +5359,6 @@ export const CORPUS_DATA = [
               text: 'Depuis que les jeunes viennent, ma mère se recoiffe le mardi matin. Ça dit tout.',
             },
           ],
-          source: 'La fille d’une pensionnaire',
         },
         {
           type: 'image',
@@ -5997,19 +5525,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Les élus espèrent démontrer que le désenclavement rural ne passe pas uniquement par la voiture individuelle. Un enjeu qui rejoint les débats sur l’accès aux soins que nous évoquions dans ',
-            },
-            {
-              type: 'link',
-              text: 'notre reportage à Saint-Clair-du-Roc',
-              target: {
-                kind: 'article',
-                id: 'soc-a3',
-              },
-            },
-            {
-              type: 'text',
-              text: '.',
+              text: 'Les élus espèrent démontrer que le désenclavement rural ne passe pas uniquement par la voiture individuelle. Un enjeu qui rejoint les débats sur l’accès aux soins que nous évoquions dans notre reportage à Saint-Clair-du-Roc.',
             },
           ],
         },
@@ -6085,7 +5601,6 @@ export const CORPUS_DATA = [
               text: 'Nous ne voulons refuser personne, mais nous ne sommes pas assez nombreux pour tout porter.',
             },
           ],
-          source: 'L’association Le Pain partagé',
         },
         {
           type: 'paragraph',
@@ -6097,10 +5612,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'sa page d’accueil',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/pain-partage',
-              },
+              url: 'https://example.org/pain-partage',
             },
             {
               type: 'text',
@@ -6155,28 +5667,6 @@ export const CORPUS_DATA = [
               text: 'La municipalité, sollicitée, étudie la mise à disposition d’un local plus grand. Rien n’est encore acté, mais l’association veut croire à une issue avant l’hiver, période où la demande grimpe encore.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'soc-a1',
-            format: 'article',
-            access: 'premium',
-            title:
-              'Hébergement d’urgence à Villeneuve-sur-Arche\u00A0: le collectif Toits d’abord obtient l’ouverture d’un gymnase',
-            standfirst:
-              'Après une nuit de veille devant la mairie, la municipalité a accepté mercredi d’ouvrir le gymnase des Charmilles pour accueillir une soixantaine de personnes sans abri avant les premières gelées.',
-            byline: 'Nadia Oussedik',
-            publishedAt: '2026-09-11T06:15:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'soc-a1-hero',
-              },
-              caption: 'Le gymnase des Charmilles réaménagé en dortoir',
-              credit: 'Photo\u00A0: Studio Arche / CC BY 4.0',
-            },
-          },
         },
       ],
     },
@@ -6369,7 +5859,6 @@ export const CORPUS_DATA = [
               text: 'On avance match après match, sans se projeter trop loin. Mais je ne vais pas mentir\u00A0: ce groupe a quelque chose.',
             },
           ],
-          source: 'L’entraîneur de l’Union sportive de Bourg-la-Rivière',
         },
         {
           type: 'paragraph',
@@ -6437,42 +5926,9 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              text: 'Sur le terrain, en attendant, l’Union avance. Le sport féminin local n’est d’ailleurs pas en reste, comme le montre ',
-            },
-            {
-              type: 'link',
-              text: 'l’essor des Aiglons de Val-Mareuil',
-              target: {
-                kind: 'article',
-                id: 'spo-a2',
-              },
-            },
-            {
-              type: 'text',
-              text: ', autre belle histoire de la rentrée.',
+              text: 'Sur le terrain, en attendant, l’Union avance. Le sport féminin local n’est d’ailleurs pas en reste, comme le montre l’essor des Aiglons de Val-Mareuil, autre belle histoire de la rentrée.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'spo-a2',
-            format: 'article',
-            access: 'free',
-            title: 'Les Aiglons de Val-Mareuil, révélation de la saison, portent l’espoir du handball féminin local',
-            standfirst:
-              'Monté de deux divisions en trois ans, le club féminin attire un public nouveau et bouscule les hiérarchies régionales, porté par une formation patiente et un noyau de joueuses fidèles au maillot.',
-            byline: 'Sofia Laurenti',
-            publishedAt: '2026-09-10T14:40:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'spo-a2-hero',
-              },
-              caption: 'Les joueuses des Aiglons à l’entraînement',
-              credit: 'Photo\u00A0: Fanny Delcourt / agence Plein-Cadre',
-            },
-          },
         },
       ],
     },
@@ -6606,27 +6062,6 @@ export const CORPUS_DATA = [
               text: 'Sur le parquet, l’ambition reste mesurée\u00A0: se maintenir d’abord, progresser ensuite. Les joueuses, elles, ne cachent pas qu’un maintien tranquille serait déjà une belle récompense pour trois saisons d’efforts et de trajets sur les routes du plateau.',
             },
           ],
-        },
-        {
-          type: 'related',
-          summary: {
-            id: 'spo-a1',
-            format: 'article',
-            access: 'premium',
-            title: 'L’Union sportive de Bourg-la-Rivière rêve de montée mais joue son avenir sur un stade vétuste',
-            standfirst:
-              'Promu au printemps, le club de football amateur enchaîne les bons résultats, mais son stade centenaire ne répond plus aux normes de la division supérieure et la municipalité tarde encore à trancher.',
-            byline: 'Maxime Renaud',
-            publishedAt: '2026-09-10T07:20:00.000Z',
-            hero: {
-              picture: {
-                kind: 'corpus',
-                key: 'spo-a1-hero',
-              },
-              caption: 'Les tribunes en bois du stade de Bourg-la-Rivière',
-              credit: 'Photo\u00A0: Théo Vasseur / agence Grand-Angle',
-            },
-          },
         },
       ],
     },
@@ -6769,10 +6204,7 @@ export const CORPUS_DATA = [
             {
               type: 'link',
               text: 'le site de la ligue régionale d’athlétisme',
-              target: {
-                kind: 'external',
-                url: 'https://example.org/ligue-athletisme',
-              },
+              url: 'https://example.org/ligue-athletisme',
             },
             {
               type: 'text',

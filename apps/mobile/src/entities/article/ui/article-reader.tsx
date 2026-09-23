@@ -1,4 +1,4 @@
-import type { Article, ArticleId, LinkTarget } from '@huma/contracts';
+import type { Article, ArticleId } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -17,10 +17,11 @@ import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleReaderProps = Readonly<{
   id: ArticleId;
-  onFollow: (target: LinkTarget) => void;
+  /** The address of a link the reader pressed, or of a film: a page of the web, for the screen to open. */
+  onFollow: (url: string) => void;
 }>;
 
-type ReadingProps = Readonly<{ article: Article; onFollow: (target: LinkTarget) => void }>;
+type ReadingProps = Readonly<{ article: Article; onFollow: (url: string) => void }>;
 
 const useStyles = createStyles((theme) => ({
   page: { backgroundColor: theme.background },

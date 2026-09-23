@@ -19,7 +19,6 @@ Depuis la rentrée, quatre écoles de la commune ont dédoublé le temps de midi
 Les parents réunis au sein de l'association Les Cartables du Val d'Arche décrivent des enfants qui rentrent le ventre creux et des personnels débordés. Ils réclament un plan pluriannuel d'agrandissement, ainsi que le recrutement d'agents supplémentaires.
 
 > On ne peut pas apprendre à un enfant à bien manger en lui laissant vingt minutes pour tout faire.
-> — L'association Les Cartables du Val d'Arche
 
 La mairie reconnaît la tension mais met en avant le coût des travaux. Selon les services techniques, l'agrandissement d'un seul réfectoire dépasserait le million d'euros, une somme jugée difficile à mobiliser sans aide du département.
 

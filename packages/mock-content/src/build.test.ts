@@ -14,6 +14,6 @@ test('the corpus holds the seventy-two items of the eight sections', () => {
 
 const ITEM = (body: string): string => `---\nid: pol-a1\n---\n\n${body}\n`;
 
-test('a directive the corpus does not write is refused, and named', () => {
-  expect(() => parseItem(ITEM('::video[Une nuit au conseil]'))).toThrow(/directive inconnue : ::video/u);
+test('a block the corpus does not write is refused, and named', () => {
+  expect(() => parseItem(ITEM('- une liste'))).toThrow(/bloc non pris en charge : list/u);
 });

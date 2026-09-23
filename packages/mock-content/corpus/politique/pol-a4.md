@@ -19,7 +19,6 @@ Le projet municipal prévoit de fermer à la circulation la rue Marchande et tro
 Dans la salle, les partisans du projet, souvent jeunes, ont mis en avant la qualité de l'air et la sécurité des piétons. Les opposants, eux, redoutent une baisse de fréquentation des commerces.
 
 > Si mes clients ne peuvent plus se garer devant, ils iront à la zone commerciale. C'est aussi simple que cela.
-> — L'union des commerçants de la rue Marchande
 
 Plusieurs habitants ont aussi soulevé la question du report de circulation vers les quartiers voisins, déjà saturés aux heures de pointe. _La crainte_ d'un simple déplacement du problème est revenue à plusieurs reprises.
 

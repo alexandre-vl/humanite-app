@@ -6,8 +6,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { formatPublished } from '#lib/format';
-import { ancestorsOf, firstArticle, layersOf, renderWithCache, settle, standfirstOf, styleOf } from '#lib/testing';
-import type { Rendered } from '#lib/testing';
+import { firstArticle, layersOf, renderWithCache, settle, standfirstOf, styleOf } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
 /**
@@ -49,12 +48,6 @@ const cornersTurned = (node: unknown): readonly string[] => {
     .flatMap((style) => layersOf(style))
     .flatMap((layer) => Object.keys(layer).filter((key) => /^borderTop(?:Left|Right)Radius$/u.test(key)));
   return [...turned, ...cornersTurned(node['children'])];
-};
-
-/** How far apart a box sets the things it holds, or nothing at all, which is the answer that was wrong. */
-const spaceInside = (node: Rendered): number => {
-  const gap = styleOf(node)['gap'];
-  return typeof gap === 'number' ? gap : 0;
 };
 
 /** How a run of text is set, read back off the style the primitive resolved for it. */
@@ -231,49 +224,6 @@ describe('ArticleReader', () => {
   });
 
   /**
-   * The linked card sets its own parts apart, and the sheet under it cannot do it for them.
-   *
-   * A torn sheet of paper spaces the things laid on it, and this card laid exactly one thing on it — the target
-   * holding the picture, the title and the sentence — so the spacing went to a single child and none of the three
-   * got any. Measured on an A065: the title's box began twenty-two pixels inside the picture's, and the sentence
-   * twenty-two inside the title's. The callout printed a few lines above lays its three parts on the sheet itself
-   * and never showed it, which is why nothing here said the sheet's own gap had stopped reaching anybody.
-   */
-  it('écarte la photo, le titre et la phrase de la carte liée', async () => {
-    const article = await holding('related');
-    const related = blocksOf(article).find((block) => block.type === 'related');
-    if (related === undefined) {
-      throw new Error('bloc lié introuvable');
-    }
-    const target = related.summary;
-    await read(article);
-    const title = await screen.findByText(target.title);
-    // The one thing on a reading screen that answers a press of its own: prose sets its links as words, without a
-    // role, so the card is the only node the page announces as one.
-    const card = screen.getByRole('link');
-    expect(spaceInside(card)).toBeGreaterThan(0);
-    // And the box between the title and that target — the pair of words — sets them apart too, more closely than
-    // the picture is set from them, which is how a card of the feed groups the very same three things.
-    const pair = ancestorsOf(title).find((node) => spaceInside(node) > 0);
-    expect(pair).not.toBe(card);
-    expect(spaceInside(pair ?? card)).toBeLessThan(spaceInside(card));
-  });
-
-  it('annonce l’article lié par son titre, et le rapporte quand on le presse', async () => {
-    const article = await holding('related');
-    const related = blocksOf(article).find((block) => block.type === 'related');
-    if (related === undefined) {
-      throw new Error('bloc lié introuvable');
-    }
-    const target = related.summary;
-    const follow = jest.fn();
-    await read(article, follow);
-    expect(await screen.findByText('Sur le même thème')).toBeTruthy();
-    await fireEvent.press(await screen.findByText(target.title));
-    expect(follow).toHaveBeenCalledWith({ kind: 'article', id: related.summary.id });
-  });
-
-  /**
    * A film opens where it lives. The journal keeps its films on YouTube with no running time, and the app plays none
    * itself: pressing the film hands its address up as a link out of the paper, which the screen opens.
    */
@@ -284,7 +234,7 @@ describe('ArticleReader', () => {
     const follow = jest.fn();
     await read(video, follow);
     await fireEvent.press(await screen.findByText(t('article.film')));
-    expect(follow).toHaveBeenCalledWith({ kind: 'external', url });
+    expect(follow).toHaveBeenCalledWith(url);
   });
 
   it('montre l’image d’une vidéo sans film, et rien à presser', async () => {

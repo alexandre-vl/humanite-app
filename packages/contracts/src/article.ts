@@ -79,22 +79,19 @@ export type SummaryInput = z.input<typeof ARTICLE_SUMMARY>;
  * A picture set inside a body is the same thing as the picture over it — a picture of either source, the words the
  * journal writes under it and the credit it writes into them — and has the same shape, so one figure draws both.
  *
- * A body that sends a reader to another article carries that article's summary, and not only its id. The card it
- * draws needs the title, the standfirst and the picture, and asking for them by id would be a second reading to make
- * after the body — of a batch the journal's service has no route for. What a body points at is written into it when
- * the body is.
+ * A quote is its words and nothing else: the journal sets a quotation apart and names no one under it, and the
+ * body it sends carries no card pointing at another of its articles — so no block does either.
  */
 export const BLOCK = z.discriminatedUnion('type', [
   z.object({ type: z.literal('paragraph'), spans: z.array(SPAN) }),
   z.object({ type: z.literal('heading'), text: DISPLAY_TEXT }),
-  z.object({ type: z.literal('quote'), spans: z.array(SPAN), source: DISPLAY_TEXT.optional() }),
+  z.object({ type: z.literal('quote'), spans: z.array(SPAN) }),
   z.object({
     type: z.literal('image'),
     picture: PICTURE,
     caption: DISPLAY_TEXT.optional(),
     credit: DISPLAY_TEXT.optional(),
   }),
-  z.object({ type: z.literal('related'), summary: ARTICLE_SUMMARY }),
 ]);
 export type Block = z.infer<typeof BLOCK>;
 /** The raw shape `BLOCK` accepts as input, before it brands and validates it. */
@@ -129,18 +126,12 @@ export type Article = z.infer<typeof ARTICLE>;
 export const textOf = (block: Block): string => {
   switch (block.type) {
     case 'paragraph':
-      return block.spans.map((span) => span.text).join('');
     case 'quote':
-      return [
-        block.spans.map((span) => span.text).join(''),
-        ...(block.source === undefined ? [] : [block.source]),
-      ].join(' ');
+      return block.spans.map((span) => span.text).join('');
     case 'heading':
       return block.text;
     case 'image':
       return [block.caption, block.credit].filter((part) => part !== undefined).join(' ');
-    case 'related':
-      return [block.summary.title, block.summary.standfirst].filter((part) => part !== undefined).join(' ');
   }
 };
 

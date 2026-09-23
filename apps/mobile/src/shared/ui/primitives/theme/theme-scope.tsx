@@ -18,8 +18,7 @@ export type ThemeScopeProps = Readonly<{
 
 /**
  * Paints a subtree in a named theme rather than the reader's. Some grounds belong to what is being read and not to a
- * setting: the current app lays a video article on the dark ground whatever the phone is set to, and lays a torn piece
- * of newsprint — a linked card — light again inside it.
+ * setting: the current app lays a video article on the dark ground whatever the phone is set to.
  *
  * A scope may name no theme, and keeps the one it is in. That is what lets a screen that learns what it holds only once
  * its content arrives — a video's page is dark, an article's is not — stand in the same tree before and after: a

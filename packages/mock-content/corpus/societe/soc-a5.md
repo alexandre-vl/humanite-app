@@ -28,6 +28,6 @@ Les chauffeurs bénévoles, eux, adaptent les tournées au fil des demandes, qui
 
 Le coût du dispositif repose pour l'instant sur une aide régionale et sur le bénévolat de deux chauffeurs à la retraite. Au-delà des six mois d'expérimentation, sa pérennité dépendra d'un cofinancement encore incertain.
 
-Les élus espèrent démontrer que le désenclavement rural ne passe pas uniquement par la voiture individuelle. Un enjeu qui rejoint les débats sur l'accès aux soins que nous évoquions dans [notre reportage à Saint-Clair-du-Roc](article:soc-a3).
+Les élus espèrent démontrer que le désenclavement rural ne passe pas uniquement par la voiture individuelle. Un enjeu qui rejoint les débats sur l'accès aux soins que nous évoquions dans notre reportage à Saint-Clair-du-Roc.
 
 Si l'essai est concluant, un second véhicule pourrait être acquis au printemps, avec des créneaux élargis aux fins de semaine. Les habitants, eux, redoutent surtout de voir le minibus disparaître une fois la subvention épuisée.

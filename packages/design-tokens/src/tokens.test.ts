@@ -1,17 +1,6 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { angle } from './brand.ts';
-import {
-  ANGLES,
-  FONT_FAMILIES,
-  FONT_SIZES,
-  LINE_HEIGHTS,
-  PALETTE,
-  RADII,
-  SIZES,
-  SPACING,
-  typographyAt,
-} from './index.ts';
-import type { Angle, Color, FontFamily, FontSize, LineHeight, Radius, Space } from './index.ts';
+import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, PALETTE, RADII, SIZES, SPACING, typographyAt } from './index.ts';
+import type { Color, FontFamily, FontSize, LineHeight, Radius, Space } from './index.ts';
 
 test('the spacing scale is a four-point grid from zero', () => {
   expect(SPACING.none).toBe(0);
@@ -33,13 +22,6 @@ test('radii, font sizes, line heights and families are branded tokens', () => {
 test('the palette exposes the measured colours', () => {
   expect(PALETTE.uiRed).toBe('#f13c47');
   expectTypeOf(PALETTE.uiRed).toEqualTypeOf<Color>();
-});
-
-test('the paper is laid at a turn to the left, written as React Native reads it', () => {
-  expectTypeOf(ANGLES.paper).toEqualTypeOf<Angle>();
-  expect(ANGLES.paper).toBe('-1.4deg');
-  expect(angle(0)).toBe('0deg');
-  expect(() => angle(Number.NaN)).toThrow(/angle invalide/u);
 });
 
 test('a list’s masthead holds its name at the largest step a reader can choose', () => {

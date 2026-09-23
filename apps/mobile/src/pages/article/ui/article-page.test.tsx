@@ -2,7 +2,6 @@ import type { Article } from '@huma/contracts';
 import { blocksOf } from '@huma/contracts';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
-import { router } from 'expo-router';
 import { PALETTE } from '@huma/design-tokens';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
@@ -13,10 +12,10 @@ import { ArticlePage } from './article-page';
 
 // Both doubles are built inside their factory: jest hoists the calls above everything else in the file, so anything
 // they read from outside would still be undefined when the screen first asks. The routing module keeps everything
-// else it holds — the screen reads its own parameter through it, and the article route is built from it.
+// else it holds — the screen reads its own parameter through it.
 jest.mock('expo-router', () => ({
   __esModule: true,
-  router: { replace: jest.fn(), back: jest.fn() },
+  router: { back: jest.fn() },
   useLocalSearchParams: (): Readonly<Record<string, string>> => ({ id: mockRead.id }),
 }));
 
@@ -35,15 +34,15 @@ const open = async (article: Article): Promise<void> => {
   await settle();
 };
 
-/** Every run of every paragraph of `article`, so a link can be found by the words it is written on. */
-const linkWords = (article: Article, kind: 'article' | 'external'): string | null => {
+/** The first link of a paragraph of `article`, so it can be pressed by the words it is written on. */
+const firstLink = (article: Article): Readonly<{ text: string; url: string }> | null => {
   for (const block of blocksOf(article)) {
     if (block.type !== 'paragraph') {
       continue;
     }
     for (const span of block.spans) {
-      if (span.type === 'link' && span.target.kind === kind) {
-        return span.text;
+      if (span.type === 'link') {
+        return span;
       }
     }
   }
@@ -51,46 +50,24 @@ const linkWords = (article: Article, kind: 'article' | 'external'): string | nul
 };
 
 beforeEach(() => {
-  jest.mocked(router.replace).mockClear();
   jest.mocked(openExternal).mockClear();
   useBookmarks.setState({ kept: [] });
 });
 
 describe('ArticlePage', () => {
-  it('remplace l’écran quand le lien mène à un autre article du journal', async () => {
-    const article = await firstArticle(
-      content,
-      'un lien vers un article',
-      (each) => linkWords(each, 'article') !== null,
-    );
-    const words = linkWords(article, 'article');
-    if (words === null) {
-      throw new Error('lien interne introuvable');
-    }
-    await open(article);
-    await fireEvent.press(await screen.findByText(words));
-    expect(jest.mocked(router.replace)).toHaveBeenCalledTimes(1);
-    expect(jest.mocked(openExternal)).not.toHaveBeenCalled();
-  });
-
   /**
-   * A link out of the paper used to do nothing at all: the screen read only the branch that names an article, and a
-   * span the reader could press led nowhere. The corpus carries twelve of them, so the silence was reachable.
+   * A link opens its page in the reader's browser, the one place the paper links to. A link out of the paper once did
+   * nothing at all — the screen read only a branch that named an article — and the corpus carries twelve of them.
    */
-  it('quitte l’app quand le lien mène hors du journal', async () => {
-    const article = await firstArticle(
-      content,
-      'un lien hors du journal',
-      (each) => linkWords(each, 'external') !== null,
-    );
-    const words = linkWords(article, 'external');
-    if (words === null) {
-      throw new Error('lien externe introuvable');
+  it('quitte l’app vers la page du lien', async () => {
+    const article = await firstArticle(content, 'un lien', (each) => firstLink(each) !== null);
+    const link = firstLink(article);
+    if (link === null) {
+      throw new Error('lien introuvable');
     }
     await open(article);
-    await fireEvent.press(await screen.findByText(words));
-    expect(jest.mocked(openExternal)).toHaveBeenCalledTimes(1);
-    expect(jest.mocked(router.replace)).not.toHaveBeenCalled();
+    await fireEvent.press(await screen.findByText(link.text));
+    expect(jest.mocked(openExternal)).toHaveBeenCalledWith(link.url);
   });
 
   /**

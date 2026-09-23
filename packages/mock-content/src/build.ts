@@ -1,11 +1,9 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { ARTICLE, ARTICLE_SUMMARY, instantAt, SECTION_ID, typeset } from '@huma/contracts';
-import type { ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput, SummaryInput } from '@huma/contracts';
-import { directiveFromMarkdown } from 'mdast-util-directive';
+import { ARTICLE, instantAt, SECTION_ID, typeset } from '@huma/contracts';
+import type { BlockInput, HeroInput, SectionId, SpanInput, SummaryInput } from '@huma/contracts';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import type { BlockContent, DefinitionContent, PhrasingContent, RootContent } from 'mdast';
-import { directive } from 'micromark-extension-directive';
 import { frontmatter } from 'micromark-extension-frontmatter';
 import type { CorpusArticle } from './item.ts';
 import { bylineOf, SECTIONS } from './registries.ts';
@@ -16,22 +14,7 @@ const CORPUS = new URL('../corpus/', import.meta.url);
 
 /** The shapes `ARTICLE` accepts as input, before it brands and validates them, derived from the contracts. */
 type RawSpan = SpanInput;
-type RawTarget = Extract<RawSpan, { type: 'link' }>['target'];
-
-/**
- * A block as a corpus file writes it. A related block names the item it points at by id: the summary the domain's
- * block carries is the other item's, so it is written into the body only once every item has been read.
- */
-type RawBlock = Exclude<BlockInput, { type: 'related' }> | Readonly<{ type: 'related'; id: string }>;
-
-/**
- * An item as its file writes it: everything a summary holds, read, the section it was written for, and a body whose
- * related blocks still name ids.
- */
-type WrittenItem = Readonly<{ summary: ArticleSummary; section: SectionId; blocks: readonly RawBlock[] }>;
-
-/** A `::name[label]{attribute="value"}` line, the node `mdast-util-directive` adds to the tree. */
-type Directive = Extract<RootContent, { type: 'leafDirective' }>;
+type RawBlock = BlockInput;
 
 /** The flat `key: value` front matter; values are kept raw so a colon inside a title survives. */
 const parseFrontmatter = (text: string): Readonly<Record<string, string>> =>
@@ -81,16 +64,9 @@ const plain = (nodes: readonly PhrasingContent[]): string =>
       if (node.type === 'break') {
         return ' ';
       }
-      if (node.type === 'textDirective') {
-        throw new Error(`« :${node.name} » est lu comme une directive : un deux-points collé à un mot en ouvre une`);
-      }
       return 'children' in node ? plain(node.children) : '';
     })
     .join('');
-
-/** Where a link points, from its url: another item, or an external page. */
-const toTarget = (url: string): RawTarget =>
-  url.startsWith('article:') ? { kind: 'article', id: url.slice('article:'.length) } : { kind: 'external', url };
 
 /** Inline content to spans; images are handled at block level, breaks and code fall back to text. */
 const toSpans = (nodes: readonly PhrasingContent[]): RawSpan[] =>
@@ -105,7 +81,7 @@ const toSpans = (nodes: readonly PhrasingContent[]): RawSpan[] =>
       return [{ type: 'strong', text: typeset(plain(node.children)) }];
     }
     if (node.type === 'link') {
-      return [{ type: 'link', text: typeset(plain(node.children)), target: toTarget(node.url) }];
+      return [{ type: 'link', text: typeset(plain(node.children)), url: node.url }];
     }
     if (node.type === 'break' || node.type === 'inlineCode') {
       return [{ type: 'text', text: node.type === 'break' ? ' ' : node.value }];
@@ -113,25 +89,10 @@ const toSpans = (nodes: readonly PhrasingContent[]): RawSpan[] =>
     return [];
   });
 
-/** A blockquote to a quote block, pulling out a trailing `— Source` line that a soft break joins in. */
+/** A blockquote to a quote block: its words, as the journal sets a quotation apart, with no one named under it. */
 const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBlock => {
   const paragraph = children.find((child) => child.type === 'paragraph');
-  if (paragraph === undefined) {
-    return { type: 'quote', spans: [] };
-  }
-  const spans = toSpans(paragraph.children);
-  const last = spans.at(-1);
-  if (last?.type === 'text' && last.text.includes('\n')) {
-    const lines = last.text.split('\n');
-    const tail = lines.at(-1) ?? '';
-    if (/^\s*—/u.test(tail)) {
-      const head = lines.slice(0, -1).join(' ').trimEnd();
-      const body: RawSpan[] =
-        head.length > 0 ? [...spans.slice(0, -1), { type: 'text', text: head }] : spans.slice(0, -1);
-      return { type: 'quote', spans: body, source: typeset(tail.replace(/^\s*—\s*/u, '')) };
-    }
-  }
-  return { type: 'quote', spans };
+  return { type: 'quote', spans: paragraph === undefined ? [] : toSpans(paragraph.children) };
 };
 
 /** A paragraph that holds only an image becomes an image block; otherwise a paragraph of spans. */
@@ -148,14 +109,6 @@ const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
   return { type: 'paragraph', spans: toSpans(children) };
 };
 
-/** A leaf directive to its block: the one the corpus writes names the item it points to in its `[label]`. */
-const toDirective = (node: Directive): RawBlock => {
-  if (node.name === 'related') {
-    return { type: 'related', id: plain(node.children).trim() };
-  }
-  throw new Error(`directive inconnue : ::${node.name}`);
-};
-
 const toBlock = (node: RootContent): RawBlock => {
   if (node.type === 'heading') {
     return { type: 'heading', text: typeset(plain(node.children)) };
@@ -166,20 +119,17 @@ const toBlock = (node: RootContent): RawBlock => {
   if (node.type === 'blockquote') {
     return toQuote(node.children);
   }
-  if (node.type === 'leafDirective') {
-    return toDirective(node);
-  }
   throw new Error(`bloc non pris en charge : ${node.type}`);
 };
 
 /**
- * Parse one item file: its summary, read, and its body as written. Exported so its refusals can be pinned by a test.
- * The body is read first, so a block the file gets wrong is what the refusal names, whatever the front matter holds.
+ * Parse one item file into the item it writes. Exported so its refusals can be pinned by a test. The body is read
+ * first, so a block the file gets wrong is what the refusal names, whatever the front matter holds.
  */
-export const parseItem = (text: string): WrittenItem => {
+export const parseItem = (text: string): CorpusArticle => {
   const tree = fromMarkdown(text, {
-    extensions: [frontmatter(['yaml']), directive()],
-    mdastExtensions: [frontmatterFromMarkdown(['yaml']), directiveFromMarkdown()],
+    extensions: [frontmatter(['yaml'])],
+    mdastExtensions: [frontmatterFromMarkdown(['yaml'])],
   });
   const head = tree.children[0];
   const front = parseFrontmatter(head?.type === 'yaml' ? head.value : '');
@@ -189,7 +139,7 @@ export const parseItem = (text: string): WrittenItem => {
   const published = front['published'];
   const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
   const blocks = body.map(toBlock);
-  const summary = ARTICLE_SUMMARY.parse({
+  const article = ARTICLE.parse({
     id,
     format: front['format'],
     access: front['access'],
@@ -198,35 +148,15 @@ export const parseItem = (text: string): WrittenItem => {
     publishedAt: published === undefined ? undefined : (instantAt(published) ?? published),
     ...(byline === undefined ? {} : ({ byline } satisfies Partial<SummaryInput>)),
     ...(hero === undefined ? {} : ({ hero: toHero(id, hero) } satisfies Partial<SummaryInput>)),
+    body: { kind: 'open', blocks },
   });
-  return { summary, section: SECTION_ID.parse(front['section']), blocks };
+  return { section: SECTION_ID.parse(front['section']), ...article };
 };
-
-/** An item whole: its related blocks given the summary of the item each names, which must be one of the corpus. */
-const resolved = (item: WrittenItem, summaries: ReadonlyMap<string, ArticleSummary>): CorpusArticle => ({
-  section: item.section,
-  ...ARTICLE.parse({
-    ...item.summary,
-    body: {
-      kind: 'open',
-      blocks: item.blocks.map((block) => {
-        if (block.type !== 'related') {
-          return block;
-        }
-        const summary = summaries.get(block.id);
-        if (summary === undefined) {
-          throw new Error(`::related vers un item absent du corpus : ${block.id}`);
-        }
-        return { type: 'related', summary };
-      }),
-    },
-  }),
-});
 
 /** Reads and validates every item, throwing an aggregate error when the corpus breaks any rule. */
 export function buildCorpus(): readonly CorpusArticle[] {
   const errors: string[] = [];
-  const written: { readonly folder: SectionId; readonly file: string; readonly item: WrittenItem }[] = [];
+  const items: { readonly folder: SectionId; readonly article: CorpusArticle }[] = [];
   for (const section of SECTIONS) {
     const directory = new URL(`${section.id}/`, CORPUS);
     const files = readdirSync(directory)
@@ -234,21 +164,12 @@ export function buildCorpus(): readonly CorpusArticle[] {
       .toSorted((left, right) => left.localeCompare(right));
     for (const file of files) {
       try {
-        written.push({ folder: section.id, file, item: parseItem(readFileSync(new URL(file, directory), 'utf8')) });
+        items.push({ folder: section.id, article: parseItem(readFileSync(new URL(file, directory), 'utf8')) });
       } catch (error) {
         errors.push(`${section.id}/${file} : ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   }
-  const summaries = new Map(written.map(({ item }) => [item.summary.id, item.summary]));
-  const items = written.flatMap(({ folder, file, item }) => {
-    try {
-      return [{ folder, article: resolved(item, summaries) }];
-    } catch (error) {
-      errors.push(`${folder}/${file} : ${error instanceof Error ? error.message : String(error)}`);
-      return [];
-    }
-  });
   errors.push(...validateCorpus(items));
   if (errors.length > 0) {
     throw new Error(`corpus invalide :\n${errors.join('\n')}`);

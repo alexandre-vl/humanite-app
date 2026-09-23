@@ -19,7 +19,6 @@ L'Union des États du Levant avait promis un pont maritime d'urgence. Dans les f
 Le principal besoin reste l'eau potable. Les puits ont été contaminés par les remontées salines, et les familles doivent parfois marcher plusieurs kilomètres pour un bidon. L'ONG Ponts citoyens a installé trois unités de filtration, très insuffisantes selon ses propres équipes.
 
 > On nous parle de millions débloqués, mais nous, nous comptons les jours sans eau propre.
-> — Un habitant du village de Kalanne
 
 Les autorités locales, débordées, reconnaissent leurs limites. Elles réclament surtout des moyens logistiques : des barges à faible tirant d'eau, des groupes électrogènes, et des équipes capables de réparer le réseau d'assainissement avant l'arrivée des pluies suivantes.
 
@@ -29,6 +28,6 @@ Le bilan humain, encore provisoire, fait état de plusieurs dizaines de disparus
 
 Passé le pic médiatique, les habitants redoutent désormais l'oubli. Les reconstructions promises après une précédente tempête n'avaient jamais été achevées, rappellent les plus âgés, encore marqués par des chantiers abandonnés.
 
-Pour maintenir la pression, un collectif d'îliens documente chaque jour la situation et transmet ses relevés aux organisations internationales. Une démarche qui rejoint les difficultés de financement évoquées dans [notre article sur le fonds Solidarité Sud](article:mon-a6).
+Pour maintenir la pression, un collectif d'îliens documente chaque jour la situation et transmet ses relevés aux organisations internationales. Une démarche qui rejoint les difficultés de financement évoquées dans notre article sur le fonds Solidarité Sud.
 
 Le prochain conseil de l'Union des États du Levant doit se tenir la semaine prochaine. Les Cargues y seront à l'ordre du jour, sans garantie, cette fois, que les annonces se traduisent en actes.

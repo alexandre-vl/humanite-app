@@ -49,9 +49,22 @@ test('a run carries its words bare, and the blank at its edges goes to the plain
   const [block] = readProse('<p>voir <a href="https://www.humanite.fr/"> ici </a>et là</p>');
   expect(block?.type === 'paragraph' && block.spans).toEqual([
     { type: 'text', text: 'voir ' },
-    { type: 'link', text: 'ici', target: { kind: 'external', url: 'https://www.humanite.fr/' } },
+    { type: 'link', text: 'ici', url: 'https://www.humanite.fr/' },
     { type: 'text', text: ' et là' },
   ]);
+});
+
+/** A reader's press opens a page of the web and nothing else, so an anchor to anything else is read as its words. */
+test.each([
+  { shape: 'a mail', href: 'mailto:redaction@example.org' },
+  { shape: 'a note of the same page', href: '#note' },
+  { shape: 'a path with no host', href: '/politique/un-article' },
+  { shape: 'a script', href: 'javascript:void(0)' },
+])('an anchor to $shape keeps its words and makes no link', ({ href }) => {
+  const [block] = readProse(`<p>voir <a href="${href}">ici</a> et là</p>`);
+  const spans = block?.type === 'paragraph' ? block.spans : [];
+  expect(spans.map((span) => span.type)).not.toContain('link');
+  expect(drawn(`voir <a href="${href}">ici</a> et là`)).toBe('voir ici et là');
 });
 
 /** The journal writes a picture's credit into its caption; a reading sets it apart and keeps the « © » with its name. */

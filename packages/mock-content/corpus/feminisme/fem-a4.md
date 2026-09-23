@@ -22,7 +22,7 @@ Aujourd'hui, les matchs des équipes masculines occupent l'essentiel des crénea
 
 Un collectif de parents s'est joint à la démarche. Il souligne que plusieurs adolescentes hésitent à s'inscrire, découragées par des horaires incompatibles avec leurs devoirs et les transports du soir. « À ce compte-là, on décourage une génération de joueuses », s'inquiète l'un d'eux.
 
-Les dirigeantes rappellent que leur essor s'inscrit dans un mouvement plus large de féminisation des clubs, également porté par des dispositifs d'accompagnement vers l'autonomie, comme [le réseau de marraines de Saint-Maur](article:fem-a2).
+Les dirigeantes rappellent que leur essor s'inscrit dans un mouvement plus large de féminisation des clubs, également porté par des dispositifs d'accompagnement vers l'autonomie, comme le réseau de marraines de Saint-Maur.
 
 ## La mairie temporise
 

@@ -25,12 +25,9 @@ Sur le terrain, les conséquences sont concrètes : des canaux à moitié répar
 Plusieurs voix réclament une refonte du dispositif. L'observatoire Méridien propose de conditionner l'adhésion au versement effectif des contributions, et de publier chaque année un bilan transparent. Ses recommandations sont détaillées sur [son portail](https://example.org/meridien-terragne).
 
 > Un fonds qui ne verse pas n'est pas un fonds, c'est une déclaration d'intention.
-> — Le comité paysan de Terragne
 
 Les pays membres se réuniront le mois prochain pour tenter de débloquer la situation. L'enjeu dépasse la seule Terragne : d'autres régions, exposées aux mêmes aléas, observent de près la crédibilité de ce mécanisme, appelé à servir de modèle.
 
 Les organisations de terrain, elles, n'attendent plus. Elles nouent des partenariats directs avec des coopératives locales, contournant un fonds jugé trop lent, une débrouille qui rappelle les difficultés déjà vues ailleurs dans la région.
 
 Ce contournement inquiète toutefois les défenseurs du multilatéralisme, qui redoutent qu'à force de solutions parallèles, le fonds commun ne perde le peu de crédibilité qui lui reste. Sans un sursaut rapide des États membres, préviennent-ils, c'est l'idée même d'une solidarité régionale organisée qui pourrait s'effriter, au profit de logiques strictement nationales.
-
-::related[mon-a2]

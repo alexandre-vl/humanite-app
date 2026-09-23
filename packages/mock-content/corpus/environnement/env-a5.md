@@ -28,6 +28,6 @@ Les premiers retours restent prudents. Sur certaines parcelles, les traitements 
 
 ## Un modèle économique à trouver
 
-Reste la question du coût. Planter et entretenir une haie prend du temps et de la main-d'œuvre, sans revenu direct à la clé. Champs d'avenir plaide pour une aide des collectivités, à l'image de ce qui se discute autour du [projet solaire de Montbrel](article:env-a2), autre bras de fer sur l'usage des sols.
+Reste la question du coût. Planter et entretenir une haie prend du temps et de la main-d'œuvre, sans revenu direct à la clé. Champs d'avenir plaide pour une aide des collectivités, à l'image de ce qui se discute autour du projet solaire de Montbrel, autre bras de fer sur l'usage des sols.
 
 À terme, la coopérative espère faire école. Elle organisera cet hiver des visites de parcelles pour les exploitants voisins, curieux mais encore hésitants.

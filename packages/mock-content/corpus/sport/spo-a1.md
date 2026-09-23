@@ -17,7 +17,6 @@ Trois victoires en trois journées : l'Union sportive de Bourg-la-Rivière n'ava
 Promu au printemps, le club évolue pour la première fois depuis vingt ans à ce niveau. L'effectif, largement composé de joueurs formés au club, déjoue les pronostics. _Personne_ ne les attendait si haut.
 
 > On avance match après match, sans se projeter trop loin. Mais je ne vais pas mentir : ce groupe a quelque chose.
-> — L'entraîneur de l'Union sportive de Bourg-la-Rivière
 
 L'engouement suit. Les affluences ont doublé, la buvette est prise d'assaut et le parking déborde. Le club, longtemps discret, redevient un sujet de conversation sur les marchés du dimanche.
 
@@ -35,6 +34,4 @@ Une pétition circule déjà pour préserver les tribunes historiques, tandis qu
 
 La municipalité, elle, temporise. Rénover coûte cher, et la facture des travaux dépasse largement le budget annuel du club. Une réunion est prévue en fin de mois pour arbitrer.
 
-Sur le terrain, en attendant, l'Union avance. Le sport féminin local n'est d'ailleurs pas en reste, comme le montre [l'essor des Aiglons de Val-Mareuil](article:spo-a2), autre belle histoire de la rentrée.
-
-::related[spo-a2]
+Sur le terrain, en attendant, l'Union avance. Le sport féminin local n'est d'ailleurs pas en reste, comme le montre l'essor des Aiglons de Val-Mareuil, autre belle histoire de la rentrée.

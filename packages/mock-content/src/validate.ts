@@ -1,4 +1,4 @@
-import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId } from '@huma/contracts';
+import type { Article, ArticleFormat, Block, ImageKey, SectionId } from '@huma/contracts';
 import type { CorpusArticle } from './item.ts';
 import { blocksOf, instantAt, textOf, typeset } from '@huma/contracts';
 import { AUTHORS, codeOf, namesOf, quotaOf, SECTIONS } from './registries.ts';
@@ -70,8 +70,12 @@ const wordCount = (article: Article): number => blocksOf(article).reduce((sum, b
  *
  * The domain draws no such line — a feed calls an item short when it comes without a picture, and the journal's
  * service distinguishes nothing of the kind — so the corpus's naming rule is the one place the distinction is written.
+ * How many a section holds is `SLOTS`'s to say, and not this grammar's.
  */
-export const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
+export const isBrief = (article: Article): boolean => /-b\d+$/u.test(article.id);
+
+/** What every section of the corpus holds: six articles, then three briefs. */
+const SLOTS = { articles: 6, briefs: 3 } as const;
 
 /** The length an item is held to, or none for an item of a format this corpus does not write. */
 const wordRange = (article: Article): Words | undefined => {
@@ -92,39 +96,20 @@ export const imageKeys = (article: Article): readonly ImageKey[] => [
   ),
 ];
 
-/** The ids an item points to, through internal links and related blocks. */
-const linkedIds = (article: Article): readonly ArticleId[] =>
-  blocksOf(article).flatMap((block): readonly ArticleId[] => {
-    if (block.type === 'related') {
-      return [block.summary.id];
-    }
-    if (block.type === 'paragraph' || block.type === 'quote') {
-      return block.spans.flatMap((span) =>
-        span.type === 'link' && span.target.kind === 'article' ? [span.target.id] : [],
-      );
-    }
-    return [];
-  });
-
-/** Whether each element the section bar needs appears somewhere in a section. */
-const presence = (articles: readonly Article[]): readonly Readonly<{ label: string; ok: boolean }>[] => {
+/** Whether each element the section bar needs appears somewhere in a section, and what to say when it does not. */
+const presence = (articles: readonly Article[]): readonly Readonly<{ missing: string; ok: boolean }>[] => {
   const blocks = articles.flatMap((article) => blocksOf(article));
   const spans = blocks.flatMap((block) => (block.type === 'paragraph' || block.type === 'quote' ? block.spans : []));
   return [
-    { label: 'un intertitre', ok: blocks.some((block) => block.type === 'heading') },
-    {
-      label: 'une citation avec source',
-      ok: blocks.some((block) => block.type === 'quote' && block.source !== undefined),
-    },
-    { label: 'une image', ok: blocks.some((block) => block.type === 'image') },
-    { label: 'un ::related', ok: blocks.some((block) => block.type === 'related') },
-    { label: 'un lien interne', ok: spans.some((span) => span.type === 'link' && span.target.kind === 'article') },
-    { label: 'un lien externe', ok: spans.some((span) => span.type === 'link' && span.target.kind === 'external') },
-    { label: 'une mise en italique', ok: spans.some((span) => span.type === 'emphasis') },
+    { missing: 'aucun intertitre', ok: blocks.some((block) => block.type === 'heading') },
+    { missing: 'aucune citation', ok: blocks.some((block) => block.type === 'quote') },
+    { missing: 'aucune image', ok: blocks.some((block) => block.type === 'image') },
+    { missing: 'aucun lien', ok: spans.some((span) => span.type === 'link') },
+    { missing: 'aucune mise en italique', ok: spans.some((span) => span.type === 'emphasis') },
   ];
 };
 
-const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): readonly string[] => {
+const checkItem = ({ folder, article }: Item): readonly string[] => {
   const errors: string[] = [];
   const where = article.id;
   const code = codeOf(folder);
@@ -212,13 +197,6 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
       errors.push(`${where} : clé d’image « ${key} » hors de l’item`);
     }
   }
-  for (const target of linkedIds(article)) {
-    if (target === article.id) {
-      errors.push(`${where} : lien vers lui-même`);
-    } else if (!ids.has(target)) {
-      errors.push(`${where} : lien vers un id inexistant « ${target} »`);
-    }
-  }
   return errors;
 };
 
@@ -231,8 +209,11 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
     video: articles.filter((article) => article.format === 'video').length,
     column: articles.filter((article) => article.format === 'column').length,
   };
-  if (arts.length !== 6 || briefs.length !== 3) {
-    errors.push(`${folder} : ${String(arts.length)} articles / ${String(briefs.length)} brèves (6 / 3 attendus)`);
+  if (arts.length !== SLOTS.articles || briefs.length !== SLOTS.briefs) {
+    errors.push(
+      `${folder} : ${String(arts.length)} articles / ${String(briefs.length)} brèves ` +
+        `(${String(SLOTS.articles)} / ${String(SLOTS.briefs)} attendus)`,
+    );
   }
   if (arts.filter((article) => article.access === 'premium').length !== 2) {
     errors.push(`${folder} : deux articles premium attendus`);
@@ -246,9 +227,9 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
       }
     }
   }
-  for (const { label, ok } of presence(articles)) {
+  for (const { missing, ok } of presence(articles)) {
     if (!ok) {
-      errors.push(`${folder} : aucun ${label}`);
+      errors.push(`${folder} : ${missing}`);
     }
   }
   return errors;
@@ -256,7 +237,6 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
 
 /** Every rule the corpus must meet, beyond the field shapes `ARTICLE` already checks. */
 export function validateCorpus(items: readonly Item[]): readonly string[] {
-  const ids = new Set(items.map((item) => item.article.id));
   const seen = new Set<ImageKey>();
   const twice = new Set<ImageKey>();
   for (const key of items.flatMap((item) => imageKeys(item.article))) {
@@ -267,7 +247,7 @@ export function validateCorpus(items: readonly Item[]): readonly string[] {
   }
   return [
     ...[...twice].map((key) => `clé d’image « ${key} » employée par deux items`),
-    ...items.flatMap((item) => checkItem(item, ids)),
+    ...items.flatMap(checkItem),
     ...SECTIONS.flatMap((section) =>
       checkSection(
         section.id,

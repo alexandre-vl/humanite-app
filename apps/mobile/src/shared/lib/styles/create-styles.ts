@@ -1,4 +1,4 @@
-import type { Angle, Brand, Color, Radius, Space, Theme } from '@huma/design-tokens';
+import type { Brand, Color, Radius, Space, Theme } from '@huma/design-tokens';
 import { isRecord } from '@huma/unknown';
 import { useMemo } from 'react';
 import { useTheme } from './theme';
@@ -8,9 +8,8 @@ import { useTheme } from './theme';
  * reach a native view. Layout keywords stay plain, the way React Native types them, and so do the six fields that carry
  * a ratio rather than a dimension — `flex`, `flexGrow`, `flexShrink`, `aspectRatio`, `opacity`, `zIndex` — which no
  * token scale would measure. Typography is absent: a run of text names a Text variant, and `textStyle` alone turns that
- * into a face, a size, a colour and the line height it derives. The one transform a style may carry is a rotation by a
- * named angle, because the one the app has is the tilt the journal lays its paper at; anything that moves belongs to a
- * worklet inside a primitive, not to a table built once per theme.
+ * into a face, a size, a colour and the line height it derives. A style carries no transform: anything that moves
+ * belongs to a worklet inside a primitive, not to a table built once per theme.
  */
 type Style = Readonly<{
   flex?: number;
@@ -63,7 +62,6 @@ type Style = Readonly<{
   opacity?: number;
   overflow?: 'visible' | 'hidden';
   zIndex?: number;
-  transform?: readonly [Readonly<{ rotate: Angle }>];
 }>;
 
 /** An opaque handle to a token-built style; a primitive's `style` prop accepts nothing else. */

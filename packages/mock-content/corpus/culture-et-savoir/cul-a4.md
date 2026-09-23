@@ -19,7 +19,6 @@ Le dispositif couvre trois grands postes : les billets de spectacle et de ciném
 Selon le conseil régional, près de 90 000 jeunes seraient éligibles. Le barème complet et la liste des partenaires sont consultables sur [le portail du dispositif](https://example.org/pass-culture-region).
 
 > Nous voulions un outil simple : un crédit, une carte, et le moins de paperasse possible.
-> — La vice-présidente chargée de la culture
 
 ## Un financement encore discuté
 
@@ -29,7 +28,7 @@ Reste la question de l'argent. L'enveloppe, estimée à onze millions d'euros pa
 
 ## Les libraires attendent de voir
 
-Pour les libraires, l'enjeu est concret. Beaucoup espèrent voir revenir un public jeune déserté depuis des années, comme le racontait déjà [notre reportage sur la librairie de Belleroche](article:cul-a6). D'autres se montrent prudents, craignant une ruée sur quelques succès de librairie au détriment de la diversité éditoriale.
+Pour les libraires, l'enjeu est concret. Beaucoup espèrent voir revenir un public jeune déserté depuis des années, comme le racontait déjà notre reportage sur la librairie de Belleroche. D'autres se montrent prudents, craignant une ruée sur quelques succès de librairie au détriment de la diversité éditoriale.
 
 Les premiers chiffres d'activation seront scrutés de près. En trois jours, la région annonce déjà plus de dix mille comptes ouverts, un démarrage jugé « encourageant » sans être décisif.
 

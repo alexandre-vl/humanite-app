@@ -179,7 +179,6 @@ test('an interview becomes the questions and the answers it is made of, and keep
     block.type === 'paragraph' ? block.spans.filter((span) => span.type === 'link') : [],
   );
   expect(linked.length).toBeGreaterThan(0);
-  expect(linked.every((span) => span.target.kind === 'external')).toBe(true);
 });
 
 test('a video of the journal is read as a video, with its film and its body open', () => {

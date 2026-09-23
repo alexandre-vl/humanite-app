@@ -125,9 +125,9 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * also the size of a heading inside a screen: a crosshead of a body, the head of the wall, the title of an empty
  * shelf. The measurements are beside the sizes.
  *
- * `kicker` is a label rather than a line: the word that marks what an item is or who may read it, and the name over a
- * block an article sets apart, in small capitals. It is the one role whose letters are set apart — the only way twelve
- * points of type reads as a label and not as the first line of the title under it.
+ * `kicker` is a label rather than a line: the word that marks what an item is or who may read it, in small capitals and
+ * in the ink of the text. It is the one role whose letters are set apart — the only way twelve points of type reads as
+ * a label and not as the first line of the title under it.
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xxxl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
@@ -161,7 +161,7 @@ const TYPOGRAPHY = {
     face: 'bold',
     size: FONT_SIZES.xs,
     leading: LINE_HEIGHTS.normal,
-    tone: 'textMuted',
+    tone: 'textPrimary',
     caps: true,
     tracking: TRACKING.wide,
   },

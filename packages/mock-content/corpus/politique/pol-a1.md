@@ -21,7 +21,6 @@ La majorité départementale, longtemps silencieuse, a cédé sous la pression c
 L'opposition, elle, dénonce une volte-face opportuniste à quelques mois des élections.
 
 > On nous a expliqué pendant six mois que ces lignes n'étaient pas tenables, et voilà qu'elles le redeviennent comme par miracle.
-> — Le groupe Cap citoyen au conseil départemental
 
 ## Un financement encore incertain
 
@@ -29,6 +28,4 @@ Reste la question de l'argent. Le maintien des trois dessertes sera financé cet
 
 ![Un car scolaire à l'arrêt devant le collège de Villefranche-d'Arvor](pol-a1-car-scolaire)
 
-Pour la rentrée 2027, la collectivité promet un _schéma pérenne_ des mobilités rurales, assorti d'une concertation avec les communes. Les élus locaux, échaudés, attendent de voir les actes suivre les promesses. Notre suivi se poursuit avec [le dossier de l'intercommunalité](article:pol-a3).
-
-::related[pol-a3]
+Pour la rentrée 2027, la collectivité promet un _schéma pérenne_ des mobilités rurales, assorti d'une concertation avec les communes. Les élus locaux, échaudés, attendent de voir les actes suivre les promesses. Notre suivi se poursuit avec le dossier de l'intercommunalité.

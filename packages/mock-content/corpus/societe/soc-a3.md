@@ -27,7 +27,6 @@ Malgré ces efforts, les jeunes praticiens hésitent. Beaucoup redoutent l'isole
 Pour renverser la tendance, la maison de santé accueille désormais des internes en stage, dans l'espoir de créer un attachement au territoire. Deux cabines de télémédecine ont aussi été installées, permettant des consultations à distance avec un centre hospitalier situé à quarante kilomètres.
 
 > Un interne qui passe six mois chez nous, c'est une chance sur deux qu'il revienne s'installer.
-> — Le syndicat intercommunal du Val d'Arche
 
 Les élus veulent croire à cette stratégie de long terme. Ils réclament aussi une meilleure coordination régionale, estimant que la concurrence entre territoires pour attirer les mêmes praticiens finit par _épuiser_ les finances locales sans résoudre le fond du problème.
 

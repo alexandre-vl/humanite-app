@@ -19,7 +19,6 @@ En un an, le nombre de foyers inscrits a augmenté de près de moitié. Étudian
 Pour tenir, l'épicerie s'appuie sur une quinzaine de bénévoles réguliers. Mais plusieurs d'entre eux, âgés, souhaitent lever le pied. Sans renfort, l'association craint de devoir fermer un après-midi par semaine, au risque de laisser des familles sans solution.
 
 > Nous ne voulons refuser personne, mais nous ne sommes pas assez nombreux pour tout porter.
-> — L'association Le Pain partagé
 
 L'organisation a mis en ligne un formulaire d'inscription pour les volontaires, accessible depuis [sa page d'accueil](https://example.org/pain-partage). Une matinée par mois suffit, insiste-t-elle, pour faire tourner les distributions.
 
@@ -32,5 +31,3 @@ L'épicerie fonctionne selon un principe de participation : les bénéficiaires 
 Au-delà des bras, l'épicerie cherche à sécuriser ses approvisionnements. Elle négocie des partenariats avec des maraîchers de la vallée pour récupérer les invendus, une piste qui permettrait aussi de proposer des produits _frais_ plutôt que des seules conserves.
 
 La municipalité, sollicitée, étudie la mise à disposition d'un local plus grand. Rien n'est encore acté, mais l'association veut croire à une issue avant l'hiver, période où la demande grimpe encore.
-
-::related[soc-a1]

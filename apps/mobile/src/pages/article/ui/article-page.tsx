@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
 import { ArticleReader, articleQuery, readsDark } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
-import { articleHref, openExternal, useRouteParams } from '#lib/routing';
+import { openExternal, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 import { ThemeScope } from '#primitives/theme';
 
@@ -49,16 +49,7 @@ export function ArticlePage(): ReactNode {
           }}
           action={article === undefined ? null : <BookmarkToggle summary={article} />}
         />
-        <ArticleReader
-          id={id}
-          onFollow={(target) => {
-            if (target.kind === 'article') {
-              router.replace(articleHref(target.id));
-              return;
-            }
-            openExternal(target.url);
-          }}
-        />
+        <ArticleReader id={id} onFollow={openExternal} />
       </Surface>
     </ThemeScope>
   );

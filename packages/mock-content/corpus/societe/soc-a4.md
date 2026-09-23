@@ -19,7 +19,6 @@ L'initiative est née d'un constat partagé par le personnel : trop de résident
 Les activités varient au fil des semaines : jardinage dans les bacs surélevés, lecture à voix haute, initiation aux jeux de société d'autrefois. L'idée n'est pas de meubler le temps, mais de créer de véritables _complicités_ entre les générations.
 
 > Depuis que les jeunes viennent, ma mère se recoiffe le mardi matin. Ça dit tout.
-> — La fille d'une pensionnaire
 
 ![Un collégien et une résidente préparent une tarte ensemble](soc-a4-atelier)
 

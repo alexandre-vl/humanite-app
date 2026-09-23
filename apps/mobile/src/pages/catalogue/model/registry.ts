@@ -11,7 +11,6 @@ import { catalog as themeCatalog } from '#primitives/theme';
 import { catalog as buttonCatalog } from '#components/button';
 import { catalog as emptyStateCatalog } from '#components/empty-state';
 import { catalog as labelBarCatalog } from '#components/label-bar';
-import { catalog as paperCatalog } from '#components/paper';
 import { catalog as segmentedControlCatalog } from '#components/segmented-control';
 import { catalog as skeletonCatalog } from '#components/skeleton';
 import { catalog as topBarCatalog } from '#components/top-bar';
@@ -32,7 +31,6 @@ export const REGISTRY = [
   { level: 'L1', entry: buttonCatalog },
   { level: 'L1', entry: emptyStateCatalog },
   { level: 'L1', entry: labelBarCatalog },
-  { level: 'L1', entry: paperCatalog },
   { level: 'L1', entry: segmentedControlCatalog },
   { level: 'L1', entry: skeletonCatalog },
   { level: 'L1', entry: topBarCatalog },

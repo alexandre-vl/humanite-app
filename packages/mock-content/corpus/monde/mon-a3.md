@@ -27,7 +27,6 @@ _On ne remplace pas une vie de métier par une formation de trois semaines_, sou
 Les représentants du personnel réclament un accord garantissant le reclassement de chaque salarié concerné. La direction, elle, propose des départs volontaires et une prime, jugés très insuffisants par l'association des dockers.
 
 > Nous ne sommes pas contre le progrès. Nous demandons qu'il ne se fasse pas sur notre dos.
-> — L'association des dockers de Port-Méridienne
 
 Des économistes de l'observatoire Méridien appellent à anticiper la transition plutôt qu'à la subir. Leurs travaux, publiés cette semaine, sont consultables sur [leur portail public](https://example.org/meridien-ports) et plaident pour un fonds régional de reconversion.
 

@@ -1,5 +1,6 @@
 import { BLOCK, textOf } from './article.ts';
 import type { Block, BlockInput, HeroInput } from './article.ts';
+import { WEB_ADDRESS } from './content.ts';
 import type { SpanInput } from './content.ts';
 import type { Finding } from './finding.ts';
 import { PICTURE } from './picture.ts';
@@ -182,8 +183,8 @@ const asText = (text: string): SpanInput => ({ type: 'text', text });
 const runOf = (tag: string, attributes: string): ((bare: string) => SpanInput) => {
   if (tag === 'a') {
     const url = attribute(attributes, 'href');
-    // Only an address a browser can open becomes a link; anything else is read as the words it wraps.
-    return url.startsWith('http') ? (text) => ({ type: 'link', text, target: { kind: 'external', url } }) : asText;
+    // Only an address the contract takes for a link becomes one; anything else is read as the words it wraps.
+    return WEB_ADDRESS.safeParse(url).success ? (text) => ({ type: 'link', text, url }) : asText;
   }
   if (tag === 'em' || tag === 'i') {
     return (text) => ({ type: 'emphasis', text });

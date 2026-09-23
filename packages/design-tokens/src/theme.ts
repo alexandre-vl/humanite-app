@@ -8,9 +8,8 @@ import { PALETTE } from './palette.ts';
  * button its pill. Both themes give it the same value, because `primary` itself is the same red in both — a surface
  * that does not change between themes cannot ask for two different texts on it.
  *
- * `ground` is the torn paper a linked card is dropped on, which is light on either page — paper is paper wherever it
- * lands — and `headline` the colour an article's own title takes on its page: red on the light one and white on the
- * dark one, as the current app prints them (captures 11, 13).
+ * `headline` is the colour an article's own title takes on its page: red on the light one and white on the dark one,
+ * as the current app prints them (captures 11, 13).
  *
  * There was a `block` as well: a second ground a feed printed on, taken in turn with the page's own every three cards
  * so that a run of them read as one block and the next as another (captures 18, 19). No front worth copying does
@@ -54,7 +53,6 @@ import { PALETTE } from './palette.ts';
  */
 export type Theme = Readonly<{
   background: Color;
-  ground: Color;
   surface: Color;
   card: Color;
   textPrimary: Color;
@@ -73,7 +71,6 @@ export type Theme = Readonly<{
 /** The light theme, built from the measured palette. */
 export const LIGHT_THEME = {
   background: PALETTE.white,
-  ground: PALETTE.blueGrey,
   surface: PALETTE.white,
   card: PALETTE.paleGrey,
   textPrimary: PALETTE.aubergine,
@@ -92,7 +89,6 @@ export const LIGHT_THEME = {
 /** The dark theme, derived from the measured dark background #141414. */
 const DARK_THEME = {
   background: PALETTE.darkBackground,
-  ground: PALETTE.darkBackground,
   surface: PALETTE.darkSurface,
   card: PALETTE.darkCard,
   textPrimary: PALETTE.paleGrey,

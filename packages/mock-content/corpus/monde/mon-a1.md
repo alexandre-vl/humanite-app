@@ -29,10 +29,7 @@ Les incidents avaient culminé cet été, quand deux chalutiers s'étaient retro
 L'accord entrera en vigueur dans un mois, le temps de former les patrouilles conjointes. Des observateurs de l'Union des États du Levant seront déployés à bord pour vérifier le respect des quotas, un point sur lequel les deux capitales s'étaient longtemps opposées.
 
 > Nous voulons pêcher, pas patrouiller. Si la trêve tient, c'est déjà beaucoup.
-> — La coopérative des marins de Port-Méridienne
 
 Les analystes de l'observatoire Méridien restent mesurés. Ils rappellent que deux précédentes tentatives avaient échoué en moins d'un an, faute de contrôle indépendant. Cette fois, la présence d'observateurs pourrait changer la donne, estiment-ils, à condition que les financements suivent.
 
-Le sort des populations déplacées par les tensions reste, lui, en suspens, un dossier que nous détaillons dans [notre reportage sur l'archipel des Cargues](article:mon-a2).
-
-::related[mon-a3]
+Le sort des populations déplacées par les tensions reste, lui, en suspens, un dossier que nous détaillons dans notre reportage sur l'archipel des Cargues.

@@ -30,8 +30,6 @@ Plusieurs maires plaident pour une solution intermédiaire : un siège partagé 
 
 À ces désaccords s'ajoutent des craintes plus discrètes. Les agents des deux collectivités s'interrogent sur le devenir de leurs postes, tandis que plusieurs petites communes redoutent de voir s'éloigner des services de proximité déjà rares. Les syndicats du personnel réclament, eux, des garanties écrites sur le maintien de l'emploi avant tout vote de rapprochement.
 
-La question du financement des services publics, déjà tendue, plane sur les débats, comme l'a montré le récent bras de fer sur les transports scolaires détaillé dans [notre article sur les lignes du plateau](article:pol-a1).
+La question du financement des services publics, déjà tendue, plane sur les débats, comme l'a montré le récent bras de fer sur les transports scolaires détaillé dans notre article sur les lignes du plateau.
 
 Une réunion des deux exécutifs est prévue la semaine prochaine. En cas d'échec, le préfet pourrait être saisi pour arbitrer, une perspective que personne, des deux côtés, ne souhaite vraiment.
-
-::related[pol-a2]

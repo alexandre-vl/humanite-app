@@ -1,4 +1,4 @@
-import type { LinkTarget, Span } from '@huma/contracts';
+import type { Span } from '@huma/contracts';
 import type { TextRun } from '#primitives/text';
 
 /**
@@ -6,7 +6,7 @@ import type { TextRun } from '#primitives/text';
  * run may differ, so a kind added to the contract stops the build here rather than rendering as plain words: `text`
  * differs by nothing, `emphasis` and `strong` by their face, and a link by answering a press.
  */
-export const runsOf = (spans: readonly Span[], open: (target: LinkTarget) => void): readonly TextRun[] =>
+export const runsOf = (spans: readonly Span[], open: (url: string) => void): readonly TextRun[] =>
   spans.map((span): TextRun => {
     switch (span.type) {
       case 'text':
@@ -19,7 +19,7 @@ export const runsOf = (spans: readonly Span[], open: (target: LinkTarget) => voi
         return {
           text: span.text,
           onPress: () => {
-            open(span.target);
+            open(span.url);
           },
         };
     }

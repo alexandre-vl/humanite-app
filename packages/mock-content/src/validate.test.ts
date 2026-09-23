@@ -33,7 +33,7 @@ const errorsAbout = (article: CorpusArticle, word: string): readonly string[] =>
 /** Only what the picture keys are judged on. */
 const errorsFor = (article: CorpusArticle): readonly string[] => errorsAbout(article, 'clé d’image');
 
-test('the corpus as built names no picture it should not', () => {
+test('the corpus as built meets every rule it is held to', () => {
   expect(validateCorpus(CORPUS.map(filed))).toEqual([]);
 });
 

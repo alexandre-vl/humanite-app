@@ -6,7 +6,7 @@ export type { Instant } from './clock.ts';
 export type { DisplayText } from './display-text.ts';
 export type { Finding } from './finding.ts';
 export { SECTION } from './content.ts';
-export type { LinkTarget, Section, Span, SpanInput } from './content.ts';
+export type { Section, Span, SpanInput } from './content.ts';
 export { ARTICLE, ARTICLE_SUMMARY, BLOCK, blocksOf, textOf } from './article.ts';
 export { atSquare, atWidth, judgePicture, PICTURE } from './picture.ts';
 export type { Picture, PictureCode, Resize } from './picture.ts';

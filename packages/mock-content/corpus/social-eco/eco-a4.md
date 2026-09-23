@@ -28,7 +28,6 @@ La file du samedi matin dit autre chose. Elle dit qu'un travail ne protège plus
 Une bénévole me confiait récemment une phrase que je n'oublie pas.
 
 > Les gens ne viennent pas seulement chercher de la nourriture. Ils viennent chercher un peu de répit.
-> — Une bénévole de l'épicerie solidaire
 
 Le répit, voilà peut-être le vrai bien rare de notre époque. Le temps de souffler, la marge pour voir venir, la possibilité de refuser un mauvais emploi ou un logement insalubre.
 

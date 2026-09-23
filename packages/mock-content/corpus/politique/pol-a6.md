@@ -30,4 +30,4 @@ La déontologue, dont le nom sera connu en décembre, disposera d'un budget prop
 
 Plusieurs communes membres ont annoncé vouloir adopter une charte similaire à l'échelon municipal, afin d'harmoniser les pratiques sur l'ensemble du territoire.
 
-La charte entrera en vigueur au 1er janvier. Un bilan est prévu au bout d'un an. Le débat rejoint d'autres tensions locales sur la participation des habitants, comme lors de [la concertation sur la piétonnisation](article:pol-a4).
+La charte entrera en vigueur au 1er janvier. Un bilan est prévu au bout d'un an. Le débat rejoint d'autres tensions locales sur la participation des habitants, comme lors de la concertation sur la piétonnisation.

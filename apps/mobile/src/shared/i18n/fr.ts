@@ -19,7 +19,6 @@ export const FR = {
   'action.retry': 'Réessayer',
   'app.name': 'L’Humanité',
   'article.free': 'Accès libre',
-  'article.related': 'Sur le même thème',
   'article.withheld.title': 'Réservé aux abonnés',
   'article.withheld.message': 'Le journal réserve la suite de cet article à ses abonnés numériques.',
   'article.withheld.where': 'L’abonnement se souscrit sur humanite.fr.',

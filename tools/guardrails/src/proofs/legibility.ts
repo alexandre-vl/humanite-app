@@ -70,14 +70,19 @@ export const LEGIBILITY_FIXTURES = [
     'legibility/ground-unprinted',
     'un fond que la règle nomme et sur lequel plus rien n’est posé',
     ['legibility/ground-unprinted'],
-    // The ink printed on the torn paper a linked card is dropped on stops being printed there, and the ground is left
-    // named by the rule with nothing on it.
+    // The two inks laid on the sheet a group of rows sits on stop being laid there, and the sheet is left named by the
+    // rule with nothing printed on it. It is the one ground no departure and no part of the switch names, so this
+    // breaks nothing else.
     broken({
       printings: {
         ...THE_PAPER.printings,
         textPrimary: {
           ...THE_PAPER.printings.textPrimary,
-          grounds: THE_PAPER.printings.textPrimary.grounds.filter((ground) => ground !== 'ground'),
+          grounds: THE_PAPER.printings.textPrimary.grounds.filter((ground) => ground !== 'card'),
+        },
+        textMuted: {
+          ...THE_PAPER.printings.textMuted,
+          grounds: THE_PAPER.printings.textMuted.grounds.filter((ground) => ground !== 'card'),
         },
       },
     }),

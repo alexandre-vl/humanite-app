@@ -1,5 +1,5 @@
-import type { Angle, FontFamily, FontSize, LineHeight, Radius, Space, Tracking } from './brand.ts';
-import { angle, fontFamily, fontSize, lineHeight, radius, space, tracking } from './brand.ts';
+import type { FontFamily, FontSize, LineHeight, Radius, Space, Tracking } from './brand.ts';
+import { fontFamily, fontSize, lineHeight, radius, space, tracking } from './brand.ts';
 
 /** Spacing scale in points, on a four-point grid. */
 export const SPACING = {
@@ -167,12 +167,3 @@ export const SIZES = {
   thumbnail: space(96),
   cover: space(140),
 } as const satisfies Readonly<Record<string, Space>>;
-
-/**
- * The angles the journal lays its paper at. A linked card and a callout are printed as torn pieces of newsprint
- * dropped on the page, each turned very slightly to the left: measured at 1,24° to 1,51° across the three the captures
- * hold (12, 15, 16), which is one angle read three times rather than three angles.
- */
-export const ANGLES = {
-  paper: angle(-1.4),
-} as const satisfies Readonly<Record<string, Angle>>;

@@ -21,7 +21,6 @@ La direction met en avant un plan reposant d'abord sur des départs volontaires 
 Du côté des salariés, le discours ne passe pas.
 
 > On nous parle de départs volontaires, mais quand la charge de travail reste la même pour ceux qui restent, ce n'est pas un choix, c'est une pression.
-> — Le syndicat Métaux-Avenir du Vernay
 
 ## La crainte d'un désengagement progressif
 
@@ -33,6 +32,4 @@ Le maire de Villefranche-d'Arvor a demandé une réunion en urgence avec la dire
 
 Dans le bassin, l'inquiétude gagne au-delà des grilles de l'usine. Plusieurs sous-traitants, qui dépendent des commandes du Vernay pour une large part de leur activité, redoutent un effet domino sur leurs propres effectifs. Les commerçants de Villefranche-d'Arvor, eux, se souviennent du coup porté au centre-ville lors du dernier plan social, il y a une dizaine d'années.
 
-Une nouvelle réunion du comité est prévue la semaine prochaine. Les élus locaux, eux, s'inquiètent des effets en chaîne sur les sous-traitants du bassin, comme le détaille notre enquête sur [le plan de reconversion du territoire](article:eco-a3).
-
-::related[eco-a3]
+Une nouvelle réunion du comité est prévue la semaine prochaine. Les élus locaux, eux, s'inquiètent des effets en chaîne sur les sous-traitants du bassin, comme le détaille notre enquête sur le plan de reconversion du territoire.

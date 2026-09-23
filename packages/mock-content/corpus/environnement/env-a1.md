@@ -17,7 +17,6 @@ Le constat est tombé lundi matin, à la lecture des relevés hebdomadaires : la
 Les hydrogéologues de la régie des eaux parlent d'un étiage « historique pour la saison ». La retenue de la Sonne, qui sert d'appoint pendant l'été, affiche un niveau que l'on n'observe d'ordinaire qu'en fin d'automne. _Rien_, dans les relevés des vingt dernières années, ne ressemble à cet automne précoce.
 
 > Nous préférons agir maintenant, tant que la situation reste gérable, plutôt que de subir des coupures cet hiver.
-> — La directrice de la régie des eaux de Val-Mareuil
 
 La régie a donc pris un arrêté de restriction. L'arrosage des jardins, le lavage des voitures et le remplissage des piscines privées sont interdits jusqu'au 31 octobre. La pression sera abaissée la nuit sur l'ensemble du réseau, ce qui pourrait provoquer de légères baisses de débit dans les étages élevés.
 
@@ -31,8 +30,6 @@ Selon les projections publiées sur [le portail public de la régie](https://exa
 
 ## Un bassin sous tension
 
-La sécheresse rappelle la fragilité de tout le bassin. Notre [reportage sur la renaturation des marais de Grand-Rieu](article:env-a3) montrait comment ces zones humides jouent un rôle d'éponge naturelle, précieux quand la nappe faiblit.
+La sécheresse rappelle la fragilité de tout le bassin. Notre reportage sur la renaturation des marais de Grand-Rieu montrait comment ces zones humides jouent un rôle d'éponge naturelle, précieux quand la nappe faiblit.
 
 Le syndicat mixte du bassin de la Sonne promet un point d'étape à la mi-octobre. D'ici là, chaque geste compte, rappelle la régie, qui mise autant sur la pédagogie que sur la contrainte. Des relevés seront publiés chaque semaine, afin que chacun puisse suivre l'évolution de la nappe presque en temps réel.
-
-::related[env-a3]

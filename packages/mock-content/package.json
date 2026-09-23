@@ -13,10 +13,8 @@
   "dependencies": {
     "@huma/contracts": "workspace:*",
     "@huma/design-tokens": "workspace:*",
-    "mdast-util-directive": "catalog:",
     "mdast-util-from-markdown": "catalog:",
     "mdast-util-frontmatter": "catalog:",
-    "micromark-extension-directive": "catalog:",
     "micromark-extension-frontmatter": "catalog:",
     "sharp": "catalog:",
     "thumbhash": "catalog:"

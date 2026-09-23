@@ -35,5 +35,3 @@ La saison qui s'ouvre s'annonce plus rude. Les adversaires connaissent désormai
 Le club rêve pourtant grand, à l'image de tout un bassin sportif en mouvement. Comme l'Union sportive de Bourg-la-Rivière côté football, Val-Mareuil savoure une saison à part.
 
 Sur le parquet, l'ambition reste mesurée : se maintenir d'abord, progresser ensuite. Les joueuses, elles, ne cachent pas qu'un maintien tranquille serait déjà une belle récompense pour trois saisons d'efforts et de trajets sur les routes du plateau.
-
-::related[spo-a1]

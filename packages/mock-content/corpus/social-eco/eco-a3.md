@@ -16,7 +16,7 @@ L'annonce des suppressions de postes aux Fonderies du Vernay a agi comme un éle
 
 L'idée n'est pas neuve, mais elle prend un tour d'urgence. Le Val d'Arche, longtemps porté par la métallurgie, voit ses grands employeurs vieillir. « Nous ne voulons pas revivre ce qu'ont connu d'autres bassins, où l'on a réagi dix ans trop tard », résume la présidente de la chambre de commerce, Sabine Ledoux.
 
-Le plan esquissé repose sur trois axes : la formation des salariés vers des métiers en tension, l'accueil de nouvelles activités sur les friches, et le soutien aux petites entreprises locales. La situation des Fonderies, détaillée dans [notre article sur le plan de départs](article:eco-a1), sert de cas d'école.
+Le plan esquissé repose sur trois axes : la formation des salariés vers des métiers en tension, l'accueil de nouvelles activités sur les friches, et le soutien aux petites entreprises locales. La situation des Fonderies, détaillée dans notre article sur le plan de départs, sert de cas d'école.
 
 ## Le nerf de la guerre : la formation
 
@@ -29,5 +29,3 @@ La région a été sollicitée pour cofinancer un « campus des métiers » qui 
 Les premières formations pourraient toutefois démarrer dès le printemps, à titre expérimental, pour les salariés les plus proches d'un départ. La maison de l'emploi de Villefranche-d'Arvor a été chargée de recenser les compétences disponibles et les besoins des entreprises qui recrutent encore, du bâtiment aux services à la personne.
 
 Les syndicats, associés aux discussions, réclament des engagements chiffrés et un calendrier précis. Ils redoutent qu'un énième plan ne reste au stade des intentions, sans moyens à la hauteur des besoins. Les élus locaux, de leur côté, veulent inscrire la démarche dans la durée, au-delà des échéances électorales, pour éviter qu'elle ne s'essouffle au premier changement de majorité.
-
-::related[eco-a2]
