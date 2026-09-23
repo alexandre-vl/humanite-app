@@ -1,5 +1,6 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { ARTICLE_SUMMARY } from '@huma/contracts';
+import { isList, isRecord } from '@huma/unknown';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { STORAGE_KEYS, field, stateStorage } from '#lib/storage';
@@ -27,11 +28,9 @@ type Kept = Readonly<{
   toggle: (summary: ArticleSummary) => void;
 }>;
 
-const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
-
 /** A summary as the second version wrote it, with the empty standfirst it wrote for none left out. */
 const withoutEmptyStandfirst = (entry: unknown): unknown =>
-  typeof entry === 'object' && entry !== null && field(entry, 'standfirst') === ''
+  isRecord(entry) && entry['standfirst'] === ''
     ? Object.fromEntries(Object.entries(entry).filter(([name]) => name !== 'standfirst'))
     : entry;
 

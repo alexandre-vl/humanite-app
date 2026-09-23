@@ -4,9 +4,10 @@ import { print } from '@huma/kit/cli';
 import { readTextIfExists } from '@huma/kit/fs';
 import { compileGlob } from '@huma/adr/globs';
 import { ownRepository, worktreeTreeId } from '@huma/kit/git';
-import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
+import { parseJson, stringField } from '@huma/kit/json';
 import type { Environment } from '@huma/kit/process';
 import { capture, describeExit, runAttached } from '@huma/kit/process';
+import { isRecord } from '@huma/unknown';
 import type { VerifyEntry, VerifyStep } from './commands.ts';
 import { BIN_DIRECTORY, COMMANDS, VERIFY_PLAN } from './commands.ts';
 
@@ -71,7 +72,7 @@ const stepCommand = (root: string, entry: VerifyEntry, staged: boolean): readonl
 export async function readVerifiedTree(root: string): Promise<string | null> {
   const text = await readTextIfExists(join(root, STAMP_PATH));
   const stamp = text === null ? null : parseJson(text);
-  return isJsonObject(stamp) ? stringField(stamp, 'tree') : null;
+  return isRecord(stamp) ? stringField(stamp, 'tree') : null;
 }
 
 /** Runs every step of `VERIFY_PLAN` in order, stopping at the first failure; a success records the verified tree. */

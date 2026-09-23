@@ -10,6 +10,7 @@ import {
   SECTIONS_KEY,
   textOf,
 } from '@huma/contracts';
+import { isList, isRecord } from '@huma/unknown';
 import { expect, test } from 'vitest';
 import { RECORDED } from './recorded.ts';
 
@@ -34,14 +35,10 @@ const LISTS = [
 /** Every body the capture holds, by the format the journal gave it. */
 const ARTICLES = Object.entries(RECORDED.articles).map(([format, kept]) => ({ format, answer: kept.answer }));
 
-/** Written here and not taken from `@huma/kit`, which is a tool: a package depends on packages alone. */
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
 /** Every value held under one of `keys`, at whatever depth of whatever answer holds it. */
 const fieldsOf = (value: unknown, keys: readonly string[]): readonly string[] => {
-  if (Array.isArray(value)) {
-    return value.flatMap((item: unknown) => fieldsOf(item, keys));
+  if (isList(value)) {
+    return value.flatMap((item) => fieldsOf(item, keys));
   }
   if (!isRecord(value)) {
     return [];

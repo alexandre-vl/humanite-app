@@ -21,6 +21,9 @@
       "path": "../../packages/remote-api"
     },
     {
+      "path": "../../packages/unknown"
+    },
+    {
       "path": "../fixtures"
     },
     {

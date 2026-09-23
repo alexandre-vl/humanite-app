@@ -3,6 +3,9 @@
   "include": ["src"],
   "references": [
     {
+      "path": "../../packages/unknown"
+    },
+    {
       "path": "../fixtures"
     },
     {

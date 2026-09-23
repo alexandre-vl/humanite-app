@@ -2,15 +2,13 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { readWorkspace } from '@huma/deps/workspace';
 import { findWorkspaceRoot } from '@huma/kit/cli';
+import { isRecord } from '@huma/unknown';
 import { expect, test } from 'vitest';
 import { expoRouterApps } from './apps.ts';
 
 /** A nested field of a config object, read without trusting its shape: `undefined` as soon as a step is not an object. */
 const field = (value: unknown, ...keys: readonly string[]): unknown =>
-  keys.reduce<unknown>(
-    (current, key) => (typeof current === 'object' && current !== null ? Reflect.get(current, key) : undefined),
-    value,
-  );
+  keys.reduce<unknown>((current, key) => (isRecord(current) ? current[key] : undefined), value);
 
 /**
  * app.config.ts is typed as ExpoConfig, but that type leaves every load-bearing choice optional: the invariants below

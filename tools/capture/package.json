@@ -12,7 +12,8 @@
     "@huma/contracts": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
-    "@huma/remote-api": "workspace:*"
+    "@huma/remote-api": "workspace:*",
+    "@huma/unknown": "workspace:*"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",

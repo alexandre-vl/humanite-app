@@ -1,5 +1,5 @@
 {
   "extends": "@huma/tsconfig/library.json",
   "include": ["src"],
-  "references": [{ "path": "../contracts" }]
+  "references": [{ "path": "../contracts" }, { "path": "../unknown" }]
 }

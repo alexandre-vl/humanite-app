@@ -1,12 +1,10 @@
 /**
- * Narrowing of untyped JSON without a schema library: the agent hooks read their input with these helpers because
- * importing a validator would add its load time to every tool call.
+ * Reading untyped JSON without a schema library: the agent hooks read their input with these helpers because
+ * importing a validator would add its load time to every tool call. Whether a value is a record or a list is asked
+ * of `@huma/unknown`, like everywhere else in the workspace.
  */
-
-export type JsonObject = Readonly<Record<string, unknown>>;
-
-export const isJsonObject = (value: unknown): value is JsonObject =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+import type { UnknownRecord } from '@huma/unknown';
+import { isList, isRecord } from '@huma/unknown';
 
 /** `JSON.parse` that returns `undefined` instead of throwing on malformed text. */
 export function parseJson(text: string): unknown {
@@ -18,17 +16,17 @@ export function parseJson(text: string): unknown {
   }
 }
 
-export function stringField(object: JsonObject, key: string): string | null {
+export function stringField(object: UnknownRecord, key: string): string | null {
   const value = object[key];
   return typeof value === 'string' ? value : null;
 }
 
-export function objectField(object: JsonObject, key: string): JsonObject | null {
+export function objectField(object: UnknownRecord, key: string): UnknownRecord | null {
   const value = object[key];
-  return isJsonObject(value) ? value : null;
+  return isRecord(value) ? value : null;
 }
 
-export function arrayField(object: JsonObject, key: string): readonly unknown[] | null {
+export function arrayField(object: UnknownRecord, key: string): readonly unknown[] | null {
   const value = object[key];
-  return Array.isArray(value) ? value : null;
+  return isList(value) ? value : null;
 }

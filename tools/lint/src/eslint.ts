@@ -4,6 +4,7 @@ import { compareDiagnostics } from '@huma/kit/diagnostics';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath, toRepoPath } from '@huma/kit/paths';
 import { compareText } from '@huma/kit/text';
+import { isRecord } from '@huma/unknown';
 import type { Linter } from 'eslint';
 import { ESLint } from 'eslint';
 import type { LintCode } from './checks.ts';
@@ -46,8 +47,8 @@ function severityOf(entry: unknown): number {
 
 /** How many rules a computed configuration turns on: ESLint lints the files its defaults match, rules or not. */
 function activeRuleCount(config: unknown): number {
-  const rules: unknown = typeof config === 'object' && config !== null ? Reflect.get(config, 'rules') : undefined;
-  if (typeof rules !== 'object' || rules === null) {
+  const rules = isRecord(config) ? config['rules'] : undefined;
+  if (!isRecord(rules)) {
     return 0;
   }
   return Reflect.ownKeys(rules).filter((key) => severityOf(Reflect.get(rules, key)) !== 0).length;
@@ -149,12 +150,12 @@ function normalizedEntry(entry: unknown): unknown {
 
 /** The keys and values of an object of a computed configuration, sorted by key; `{}` for anything else. */
 const sortedRecord = (value: unknown, map: (entry: unknown) => unknown = (entry) => entry): Record<string, unknown> =>
-  typeof value === 'object' && value !== null
+  isRecord(value)
     ? Object.fromEntries(
         Reflect.ownKeys(value)
           .filter((key): key is string => typeof key === 'string')
           .toSorted(compareText)
-          .map((key) => [key, map(Reflect.get(value, key))]),
+          .map((key) => [key, map(value[key])]),
       )
     : {};
 
@@ -176,16 +177,11 @@ export async function renderEffectiveConfigs(
   const configs: Record<string, unknown> = {};
   for (const path of paths) {
     const config: unknown = await eslint.calculateConfigForFile(join(root, path));
-    const field = (name: string): unknown =>
-      typeof config === 'object' && config !== null ? Reflect.get(config, name) : undefined;
+    const field = (name: string): unknown => (isRecord(config) ? config[name] : undefined);
     const languageOptions = field('languageOptions');
     configs[path] = {
       plugins: Object.keys(sortedRecord(field('plugins'))),
-      parserOptions: sortedRecord(
-        typeof languageOptions === 'object' && languageOptions !== null
-          ? Reflect.get(languageOptions, 'parserOptions')
-          : undefined,
-      ),
+      parserOptions: sortedRecord(isRecord(languageOptions) ? languageOptions['parserOptions'] : undefined),
       settings: sortedRecord(field('settings')),
       rules: sortedRecord(field('rules'), normalizedEntry),
     };

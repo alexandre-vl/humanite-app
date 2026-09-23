@@ -17,6 +17,7 @@
     "@huma/lint": "workspace:*",
     "@huma/perf": "workspace:*",
     "@huma/structure": "workspace:*",
+    "@huma/unknown": "workspace:*",
     "typescript": "catalog:"
   },
   "devDependencies": {

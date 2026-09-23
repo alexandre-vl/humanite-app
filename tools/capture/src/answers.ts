@@ -1,7 +1,7 @@
 import { DONATION, SECTIONS_KEY } from '@huma/contracts';
-import { isRecord } from '@huma/kit/records';
 import { routeOf, SERVICE_ROOT } from '@huma/remote-api';
 import type { RouteName } from '@huma/remote-api';
+import { isRecord } from '@huma/unknown';
 import type { Exchange } from './har.ts';
 
 /**

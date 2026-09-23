@@ -1,4 +1,5 @@
 import { SPACING } from '@huma/design-tokens';
+import { isList, isRecord } from '@huma/unknown';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { Dimensions } from 'react-native';
@@ -13,12 +14,8 @@ const MARK = `symbol:${ICONS.play.android}`;
 
 const WORD = asDisplayText('Vidéo');
 
-/** The style layers a view carries: the stand-in lays out one for the size it was handed, then the one it was given. */
-const isLayers = (value: unknown): value is readonly unknown[] => Array.isArray(value);
-
 /** The width a style entry carries, whatever else it holds: the stand-in lays one out per number it was handed. */
-const sizeOf = (value: unknown): unknown =>
-  typeof value === 'object' && value !== null && 'width' in value ? value.width : undefined;
+const sizeOf = (value: unknown): unknown => (isRecord(value) ? value['width'] : undefined);
 
 describe('Icon', () => {
   /**
@@ -56,8 +53,9 @@ describe('Icon', () => {
     const { fontScale } = Dimensions.get('window');
     expect(fontScale).toBeGreaterThan(1);
     await render(<Icon name="play" announces={DECORATIVE} size={asked} />);
+    // The stand-in lays out a layer for the size it was handed, then the one it was given.
     const drawn: unknown = screen.getByTestId(MARK, { includeHiddenElements: true }).props['style'];
-    if (!isLayers(drawn)) {
+    if (!isList(drawn)) {
       throw new Error('la marque ne porte pas la paire de styles que la bibliothèque pose');
     }
     expect(sizeOf(drawn[0])).toBe(symbolSize(asked, fontScale, DRAWN_AS_TEXT));

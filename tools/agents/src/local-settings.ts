@@ -1,8 +1,9 @@
 import type { CheckCodeOf } from '@huma/kit/checks';
 import { defineChecks } from '@huma/kit/checks';
 import type { Diagnostic } from '@huma/kit/diagnostics';
-import { isJsonObject, parseJson } from '@huma/kit/json';
+import { parseJson } from '@huma/kit/json';
 import { repoPath } from '@huma/kit/paths';
+import { isRecord } from '@huma/unknown';
 import { CLAUDE_LOCAL_SETTINGS_PATH } from './policy.ts';
 
 /**
@@ -31,7 +32,7 @@ export function checkLocalSettings(text: string | null): readonly Diagnostic<Loc
   }
   const path = repoPath(CLAUDE_LOCAL_SETTINGS_PATH);
   const settings = parseJson(text);
-  if (!isJsonObject(settings)) {
+  if (!isRecord(settings)) {
     return [LOCAL_SETTINGS_CHECKS.finding('agent/local-settings-unreadable', path, {})];
   }
   return settings['disableAllHooks'] === undefined || settings['disableAllHooks'] === false

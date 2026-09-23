@@ -21,6 +21,7 @@
     "./text": "./src/text.ts"
   },
   "dependencies": {
+    "@huma/unknown": "workspace:*",
     "prettier": "catalog:"
   },
   "devDependencies": {

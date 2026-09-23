@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import type { Diagnostic } from '@huma/kit/diagnostics';
-import { arrayField, isJsonObject, objectField, parseJson, stringField } from '@huma/kit/json';
+import { arrayField, objectField, parseJson, stringField } from '@huma/kit/json';
 import { capture, run } from '@huma/kit/process';
+import { isRecord } from '@huma/unknown';
 import type { EmulatorCode } from './checks.ts';
 import { emulatorFinding } from './checks.ts';
 import type { EmulatorConfig } from './config.ts';
@@ -79,8 +80,8 @@ export function parseContainerInspect(text: string): ContainerState | null {
   if (container === undefined) {
     return null;
   }
-  const state = isJsonObject(container) ? objectField(container, 'State') : null;
-  const labels = isJsonObject(container) ? objectField(container, 'Config') : null;
+  const state = isRecord(container) ? objectField(container, 'State') : null;
+  const labels = isRecord(container) ? objectField(container, 'Config') : null;
   const status = state === null ? null : stringField(state, 'Status');
   const startedAt = state === null ? null : stringField(state, 'StartedAt');
   if (status === null || startedAt === null) {
@@ -107,8 +108,8 @@ export function parseImageInspect(text: string): ImageState | null {
   if (image === undefined) {
     return null;
   }
-  const id = isJsonObject(image) ? stringField(image, 'Id') : null;
-  if (!isJsonObject(image) || id === null) {
+  const id = isRecord(image) ? stringField(image, 'Id') : null;
+  if (!isRecord(image) || id === null) {
     throw new Error('docker image inspect : identifiant illisible');
   }
   return { id, tags: strings(arrayField(image, 'RepoTags')), digests: strings(arrayField(image, 'RepoDigests')) };

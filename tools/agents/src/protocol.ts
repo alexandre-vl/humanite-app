@@ -1,5 +1,6 @@
-import type { JsonObject } from '@huma/kit/json';
-import { isJsonObject, objectField, parseJson, stringField } from '@huma/kit/json';
+import { objectField, parseJson, stringField } from '@huma/kit/json';
+import type { UnknownRecord } from '@huma/unknown';
+import { isRecord } from '@huma/unknown';
 
 /**
  * The Claude Code hook protocol (https://code.claude.com/docs/en/hooks): what a hook reads on stdin and the outputs
@@ -8,7 +9,7 @@ import { isJsonObject, objectField, parseJson, stringField } from '@huma/kit/jso
 
 export type HookInput = Readonly<{
   toolName: string | null;
-  toolInput: JsonObject | null;
+  toolInput: UnknownRecord | null;
   /** Directory of the session or subagent the event comes from; worktree sessions report their worktree here. */
   cwd: string | null;
   /** The `Stop` hook already kept the agent working once in this turn. */
@@ -18,7 +19,7 @@ export type HookInput = Readonly<{
 /** The fields of a raw hook input, `null` when it is not a JSON object. */
 export function readHookInput(raw: string): HookInput | null {
   const value = parseJson(raw);
-  if (!isJsonObject(value)) {
+  if (!isRecord(value)) {
     return null;
   }
   return {

@@ -1,5 +1,6 @@
 import type { Position } from '@huma/kit/diagnostics';
 import { START } from '@huma/kit/diagnostics';
+import { isRecord } from '@huma/unknown';
 import type { Nodes, Parent, Root } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -185,8 +186,7 @@ export function countWords(root: Root): number {
   return words;
 }
 
-const isTextNode = (value: unknown): boolean =>
-  typeof value === 'object' && value !== null && Reflect.get(value, 'type') === 'text';
+const isTextNode = (value: unknown): boolean => isRecord(value) && value['type'] === 'text';
 
 /**
  * Serialisation of nodes that two sources differing only by formatting share: positions and list tightness are left

@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@huma/kit": "workspace:*",
+    "@huma/unknown": "workspace:*",
     "vitest": "catalog:"
   },
   "devDependencies": {

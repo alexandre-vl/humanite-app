@@ -1,7 +1,7 @@
 import { judgeIntake, readSummaries } from '@huma/contracts';
 import type { IntakeCode, Take } from '@huma/contracts';
 import { fixtureFactory } from '@huma/fixtures';
-import { isRecord } from '@huma/kit/records';
+import { isRecord } from '@huma/unknown';
 
 const define = fixtureFactory<IntakeCode>();
 

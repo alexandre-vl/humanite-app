@@ -15,7 +15,8 @@
   "dependencies": {
     "@huma/adr": "workspace:*",
     "@huma/fixtures": "workspace:*",
-    "@huma/kit": "workspace:*"
+    "@huma/kit": "workspace:*",
+    "@huma/unknown": "workspace:*"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",

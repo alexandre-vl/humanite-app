@@ -1,8 +1,8 @@
 import { readFile, stat } from 'node:fs/promises';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { errnoCode } from '@huma/kit/errors';
-import { isJsonObject } from '@huma/kit/json';
 import { compareText } from '@huma/kit/text';
+import { isRecord } from '@huma/unknown';
 import type { AndroidWrite } from '../android-writes.ts';
 import { ABSENT, ANDROID_WRITES, VOLATILE_SYSCTLS } from '../android-writes.ts';
 import type { EmulatorCode } from '../checks.ts';
@@ -140,7 +140,7 @@ export const serializeSample = (sample: HostSample): string =>
 
 export function deserializeSample(text: string): HostSample {
   const parsed: unknown = JSON.parse(text);
-  if (!isJsonObject(parsed)) {
+  if (!isRecord(parsed)) {
     throw new Error('échantillon de l’hôte illisible');
   }
   return new Map(

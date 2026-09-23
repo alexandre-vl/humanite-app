@@ -1,5 +1,4 @@
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null;
+import { isRecord } from '@huma/unknown';
 
 /**
  * What a disk holds under one name, whatever it holds.

@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import type { ExitCode } from '@huma/kit/cli';
 import { errnoCode } from '@huma/kit/errors';
 import { readTextIfExists } from '@huma/kit/fs';
-import { isJsonObject, parseJson, stringField } from '@huma/kit/json';
+import { parseJson, stringField } from '@huma/kit/json';
+import { isRecord } from '@huma/unknown';
 import type { EmulatorConfig } from './config.ts';
 import type { Session } from './session.ts';
 import { runtimeDirectory } from './session.ts';
@@ -25,7 +26,7 @@ const lockFile = (config: EmulatorConfig): string => join(runtimeDirectory(confi
 /** The holder a lock file names, or `null` when it is missing, garbled or half-written: such a file frees the lock. */
 function readHolder(text: string | null): LockHolder | null {
   const value = text === null ? undefined : parseJson(text);
-  if (!isJsonObject(value)) {
+  if (!isRecord(value)) {
     return null;
   }
   const command = stringField(value, 'command');

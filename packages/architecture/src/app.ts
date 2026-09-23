@@ -46,6 +46,7 @@ export const BUNDLED_FILES: readonly string[] = [
   'packages/remote-api/src/index.ts',
   'packages/remote-api/src/routes.ts',
   'packages/remote-api/src/transport.ts',
+  'packages/unknown/src/**/*.ts',
 ];
 
 /**

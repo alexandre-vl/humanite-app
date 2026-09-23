@@ -6,8 +6,9 @@ import { renderClaudeSettings } from '@huma/agents/settings';
 import type { FileTree } from '@huma/fixtures';
 import { createRepository, fixtureFactory } from '@huma/fixtures';
 import { temporaryDirectory } from '@huma/kit/fs';
-import { arrayField, isJsonObject, objectField, parseJson, stringField } from '@huma/kit/json';
+import { arrayField, objectField, parseJson, stringField } from '@huma/kit/json';
 import { runText } from '@huma/kit/process';
+import { isRecord } from '@huma/unknown';
 import { ADR_INDEX_ARTIFACT, checkArtifacts } from '../artifacts.ts';
 import type { GovernanceCode } from '../checks.ts';
 import { guardFailureOutput } from '../hooks/fallback.ts';
@@ -35,10 +36,10 @@ type HookEvent = 'PreToolUse' | 'Stop';
 /** The command line the rendered settings give to the first hook of `event`. */
 function settingsCommand(event: HookEvent): string {
   const settings = parseJson(renderClaudeSettings(POLICY, HOOK_COMMANDS));
-  const entries = isJsonObject(settings) ? arrayField(objectField(settings, 'hooks') ?? {}, event) : null;
+  const entries = isRecord(settings) ? arrayField(objectField(settings, 'hooks') ?? {}, event) : null;
   const [entry] = entries ?? [];
-  const [hook] = isJsonObject(entry) ? (arrayField(entry, 'hooks') ?? []) : [];
-  const command = isJsonObject(hook) ? stringField(hook, 'command') : null;
+  const [hook] = isRecord(entry) ? (arrayField(entry, 'hooks') ?? []) : [];
+  const command = isRecord(hook) ? stringField(hook, 'command') : null;
   if (command === null) {
     throw new Error(`Commande ${event} absente des réglages rendus`);
   }
@@ -61,11 +62,11 @@ async function hookCommand(
     return [];
   }
   const answer = parseJson(output);
-  const specific = isJsonObject(answer) ? objectField(answer, 'hookSpecificOutput') : null;
+  const specific = isRecord(answer) ? objectField(answer, 'hookSpecificOutput') : null;
   if (specific !== null && stringField(specific, 'permissionDecision') === 'deny') {
     return ['claude-hook/denied'];
   }
-  if (isJsonObject(answer) && stringField(answer, 'decision') === 'block') {
+  if (isRecord(answer) && stringField(answer, 'decision') === 'block') {
     return ['claude-hook/blocked'];
   }
   throw new Error(`Réponse inattendue du hook : ${output}`);

@@ -6,6 +6,9 @@
       "path": "../../packages/architecture"
     },
     {
+      "path": "../../packages/unknown"
+    },
+    {
       "path": "../adr"
     },
     {

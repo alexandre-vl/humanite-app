@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import type { Article, Block } from '@huma/contracts';
 import { ARTICLE, blocksOf, ContentApiError } from '@huma/contracts';
+import { isList, isRecord } from '@huma/unknown';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
@@ -8,15 +9,19 @@ import { formatPublished } from '#lib/format';
 import { firstArticle, renderWithCache, settle, standfirstOf, styleOf } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
-const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
-
-/** Every run of text the page prints, in the order it prints them — which is the order they are read in. */
+/**
+ * Every run of text the page prints, in the order it prints them — which is the order they are read in. The
+ * renderer hands back one node, a list of them or a run of text, and each is opened: a list left unread would
+ * pass a page that printed nothing.
+ */
 const inOrder = (node: unknown): readonly string[] => {
   if (typeof node === 'string') {
     return [node];
   }
-  const children: unknown = typeof node === 'object' && node !== null ? Reflect.get(node, 'children') : null;
-  return isList(children) ? children.flatMap(inOrder) : [];
+  if (isList(node)) {
+    return node.flatMap(inOrder);
+  }
+  return isRecord(node) ? inOrder(node['children']) : [];
 };
 
 /**
@@ -27,25 +32,24 @@ const inOrder = (node: unknown): readonly string[] => {
  * been given back the turned corner, which is exactly the regression it exists to catch.
  */
 const cornersTurned = (node: unknown): readonly string[] => {
-  if (typeof node !== 'object' || node === null) {
+  if (isList(node)) {
+    return node.flatMap(cornersTurned);
+  }
+  if (!isRecord(node)) {
     return [];
   }
-  const props: unknown = Reflect.get(node, 'props');
-  const styles: readonly unknown[] =
-    typeof props === 'object' && props !== null
-      ? Object.entries(props)
-          .filter(([name]) => name === 'style' || name.endsWith('Style'))
-          .map(([, value]: readonly [string, unknown]) => value)
-      : [];
+  const props = node['props'];
+  const styles: readonly unknown[] = isRecord(props)
+    ? Object.entries(props)
+        .filter(([name]) => name === 'style' || name.endsWith('Style'))
+        .map(([, value]) => value)
+    : [];
   const turned = styles
     .flatMap((style) => (isList(style) ? style : [style]))
     .flatMap((layer) =>
-      typeof layer === 'object' && layer !== null
-        ? Object.keys(layer).filter((key) => /^borderTop(?:Left|Right)Radius$/u.test(key))
-        : [],
+      isRecord(layer) ? Object.keys(layer).filter((key) => /^borderTop(?:Left|Right)Radius$/u.test(key)) : [],
     );
-  const children: unknown = Reflect.get(node, 'children');
-  return [...turned, ...(isList(children) ? children.flatMap(cornersTurned) : [])];
+  return [...turned, ...cornersTurned(node['children'])];
 };
 
 /** One node of the rendered page, named off what the screen hands back rather than off the renderer's own types. */
@@ -70,10 +74,7 @@ const spaceInside = (node: Node): number => {
 type Typeset = Readonly<{ fontSize: number; color: string }>;
 
 const isTypeset = (value: unknown): value is Typeset =>
-  typeof value === 'object' &&
-  value !== null &&
-  typeof Reflect.get(value, 'fontSize') === 'number' &&
-  typeof Reflect.get(value, 'color') === 'string';
+  isRecord(value) && typeof value['fontSize'] === 'number' && typeof value['color'] === 'string';
 
 const typesetOf = (text: string): Typeset => {
   const style = styleOf(screen.getByText(text));

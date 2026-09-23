@@ -10,6 +10,7 @@
   "dependencies": {
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
+    "@huma/unknown": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:"
   },

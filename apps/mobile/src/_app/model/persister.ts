@@ -1,3 +1,4 @@
+import { isList, isRecord } from '@huma/unknown';
 import type { DehydratedState } from '@tanstack/react-query';
 import type { PersistedClient, Persister } from '@tanstack/react-query-persist-client';
 import { STORAGE_KEYS, storage } from '#lib/storage';
@@ -6,14 +7,12 @@ import { STORAGE_KEYS, storage } from '#lib/storage';
 type Holds = (value: unknown) => boolean;
 
 const holdsEvery = (value: unknown, fields: Readonly<Record<string, Holds>>): boolean =>
-  typeof value === 'object' &&
-  value !== null &&
-  Object.entries(fields).every(([name, holds]) => holds(Reflect.get(value, name)));
+  isRecord(value) && Object.entries(fields).every(([name, holds]) => holds(value[name]));
 
 /** What a dehydrated cache holds, keyed exhaustively: a field the library adds stops compiling here until it is checked. */
 const STATE_FIELDS = {
-  mutations: (value) => Array.isArray(value),
-  queries: (value) => Array.isArray(value),
+  mutations: isList,
+  queries: isList,
 } satisfies Readonly<Record<keyof DehydratedState, Holds>>;
 
 /** What a persisted client holds, keyed exhaustively for the same reason. */

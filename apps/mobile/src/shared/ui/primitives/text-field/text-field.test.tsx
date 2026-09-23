@@ -1,5 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { PALETTE, typographyAt } from '@huma/design-tokens';
+import { isList } from '@huma/unknown';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Keyboard } from 'react-native';
 import { asDisplayText } from '../../../lib/display-text';
@@ -7,15 +8,13 @@ import { dismissKeyboard, TextField } from './text-field';
 
 const PLACEHOLDER = 'Saisissez ici le sujet';
 
-const isLayers = (value: unknown): value is readonly unknown[] => Array.isArray(value);
-
 /**
  * The letters the field is set in, read back from the pair React Native takes: the box first, the type second. The
  * palette is read rather than the theme, which no file outside the theme's own core may import.
  */
 const letters = (): Readonly<Record<string, unknown>> => {
   const style: unknown = screen.getByPlaceholderText(PLACEHOLDER).props['style'];
-  const [, typed] = isLayers(style) ? style : [];
+  const [, typed] = isList(style) ? style : [];
   if (typeof typed !== 'object' || typed === null) {
     throw new Error('le champ ne porte pas de type lisible');
   }

@@ -2,7 +2,7 @@ import { chmod, mkdir, rm, rmdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { errnoCode } from '@huma/kit/errors';
 import { toRepoPath } from '@huma/kit/paths';
-import { isRecord } from '@huma/kit/records';
+import { isRecord } from '@huma/unknown';
 
 /** Content of a fixture file; `mode` sets permission bits, `0o755` for an executable. */
 export type FileContent = string | Uint8Array | Readonly<{ content: string | Uint8Array; mode: number }>;

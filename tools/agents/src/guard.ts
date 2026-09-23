@@ -4,9 +4,10 @@ import { adrWriteProblem, isAdrFilePath, looksDecided } from '@huma/adr/guard';
 import { ADR_DIRECTORY } from '@huma/adr/layout';
 import { DECIDED_STATUSES, INITIAL_STATUS } from '@huma/adr/statuses';
 import type { Refusal } from '@huma/kit/checks';
-import type { JsonObject } from '@huma/kit/json';
-import { arrayField, isJsonObject, objectField, stringField } from '@huma/kit/json';
+import { arrayField, objectField, stringField } from '@huma/kit/json';
 import { toRepoPath } from '@huma/kit/paths';
+import type { UnknownRecord } from '@huma/unknown';
+import { isRecord } from '@huma/unknown';
 import type { AgentCode } from './checks.ts';
 import { agentRefusal } from './checks.ts';
 import type { FileEdit } from './edit.ts';
@@ -232,7 +233,7 @@ async function judgeCommandLine(line: string, cwd: string, context: GuardContext
   return refusals;
 }
 
-function editOf(input: JsonObject): FileEdit | null {
+function editOf(input: UnknownRecord): FileEdit | null {
   const oldString = stringField(input, 'old_string');
   const newString = stringField(input, 'new_string');
   return oldString === null || newString === null
@@ -241,7 +242,7 @@ function editOf(input: JsonObject): FileEdit | null {
 }
 
 /** The content a file tool leaves, `null` when it cannot be computed or the call fails. */
-function contentAfter(tool: string, input: JsonObject, before: string | null): string | null {
+function contentAfter(tool: string, input: UnknownRecord, before: string | null): string | null {
   switch (tool) {
     case 'Write':
       return stringField(input, 'content');
@@ -250,7 +251,7 @@ function contentAfter(tool: string, input: JsonObject, before: string | null): s
       return edit === null ? null : contentAfterEdit(before, edit);
     }
     case 'MultiEdit': {
-      const edits = (arrayField(input, 'edits') ?? []).map((edit) => (isJsonObject(edit) ? editOf(edit) : null));
+      const edits = (arrayField(input, 'edits') ?? []).map((edit) => (isRecord(edit) ? editOf(edit) : null));
       return edits.includes(null)
         ? null
         : contentAfterMultiEdit(
@@ -263,7 +264,12 @@ function contentAfter(tool: string, input: JsonObject, before: string | null): s
   }
 }
 
-async function judgeFileTool(tool: string, input: JsonObject, cwd: string, context: GuardContext): Promise<Refusals> {
+async function judgeFileTool(
+  tool: string,
+  input: UnknownRecord,
+  cwd: string,
+  context: GuardContext,
+): Promise<Refusals> {
   const filePath = stringField(input, 'file_path') ?? stringField(input, 'notebook_path');
   if (filePath === null) {
     return [agentRefusal('agent/call-without-path', { tool })];
@@ -286,7 +292,7 @@ async function judgeFileTool(tool: string, input: JsonObject, cwd: string, conte
 }
 
 async function judgeCall(call: unknown, context: GuardContext): Promise<Refusals> {
-  if (!isJsonObject(call)) {
+  if (!isRecord(call)) {
     return [agentRefusal('agent/unreadable-call', {})];
   }
   const tool = stringField(call, 'tool_name');

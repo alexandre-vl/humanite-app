@@ -1,5 +1,6 @@
 import { QUESTION } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
+import { isRecord } from '@huma/unknown';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { router } from 'expo-router';
@@ -50,11 +51,13 @@ const type = async (text: string): Promise<void> => {
 // update inside act, where React can account for it.
 afterEach(settle);
 
+/**
+ * Whether a style is one record with a width. A list of layers is passed over on purpose: the icon's stand-in lays
+ * out a layer for the size it was handed, and that width is the glyph's own, not the side of the box a finger lands
+ * on.
+ */
 const hasSide = (value: unknown): value is Readonly<{ width: number }> =>
-  typeof value === 'object' &&
-  value !== null &&
-  !Array.isArray(value) &&
-  typeof Reflect.get(value, 'width') === 'number';
+  isRecord(value) && typeof value['width'] === 'number';
 
 /** The side a mark is drawn at, read from the nearest box around its glyph that is given one. */
 const sideOf = (glyph: ReturnType<typeof screen.getByText>): number => {

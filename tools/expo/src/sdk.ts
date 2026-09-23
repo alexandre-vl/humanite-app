@@ -2,7 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import type { TestedRanges } from '@huma/deps/check';
-import { isJsonObject, stringField } from '@huma/kit/json';
+import { stringField } from '@huma/kit/json';
+import { isRecord } from '@huma/unknown';
 
 /** The table of the native modules an Expo SDK tested together, as `expo install` reads it. */
 const BUNDLED_NATIVE_MODULES = 'expo/bundledNativeModules.json';
@@ -12,8 +13,8 @@ export async function expoTestedRanges(appRoot: string, importer: string): Promi
   const fromApp = createRequire(join(appRoot, 'package.json'));
   const manifest: unknown = JSON.parse(await readFile(fromApp.resolve('expo/package.json'), 'utf8'));
   const table: unknown = JSON.parse(await readFile(fromApp.resolve(BUNDLED_NATIVE_MODULES), 'utf8'));
-  const version = isJsonObject(manifest) ? stringField(manifest, 'version') : null;
-  if (version === null || !isJsonObject(table)) {
+  const version = isRecord(manifest) ? stringField(manifest, 'version') : null;
+  if (version === null || !isRecord(table)) {
     throw new Error(`${BUNDLED_NATIVE_MODULES} illisible : l’intégration d’Expo est à revoir pour cette version`);
   }
   const ranges = new Map(

@@ -13,6 +13,7 @@
     "@huma/architecture": "workspace:*",
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
+    "@huma/unknown": "workspace:*",
     "dependency-cruiser": "catalog:",
     "steiger": "catalog:"
   },

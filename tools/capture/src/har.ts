@@ -1,4 +1,4 @@
-import { isRecord } from '@huma/kit/records';
+import { isRecord } from '@huma/unknown';
 
 /**
  * Reading a recorded network session.

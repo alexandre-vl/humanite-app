@@ -32,6 +32,9 @@
       "path": "./packages/remote-api"
     },
     {
+      "path": "./packages/unknown"
+    },
+    {
       "path": "./tools/adr"
     },
     {

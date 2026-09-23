@@ -1,4 +1,5 @@
 import { SIZES, SPACING } from '@huma/design-tokens';
+import { isRecord } from '@huma/unknown';
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { t } from '../../../i18n';
@@ -12,10 +13,7 @@ const NAME = 'Rubrique';
 type Margins = Readonly<{ left: number; right: number }>;
 
 const isCentred = (value: unknown): value is Margins =>
-  typeof value === 'object' &&
-  value !== null &&
-  typeof Reflect.get(value, 'left') === 'number' &&
-  typeof Reflect.get(value, 'right') === 'number';
+  isRecord(value) && typeof value['left'] === 'number' && typeof value['right'] === 'number';
 
 /** Where the bar laid the name, read back from the layer that carries it. */
 const margins = (): Margins => {
@@ -33,10 +31,7 @@ const margins = (): Margins => {
 type Square = Readonly<{ width: number; height: number }>;
 
 const isSquare = (value: unknown): value is Square =>
-  typeof value === 'object' &&
-  value !== null &&
-  typeof Reflect.get(value, 'width') === 'number' &&
-  Reflect.get(value, 'width') === Reflect.get(value, 'height');
+  isRecord(value) && typeof value['width'] === 'number' && value['width'] === value['height'];
 
 /** The side of the square a control of the bar hangs in, read from the nearest box around it held at a fixed size. */
 const squareAround = (control: ReturnType<typeof screen.getByText>): number => {

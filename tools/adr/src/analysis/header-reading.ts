@@ -1,5 +1,5 @@
 import type { Position } from '@huma/kit/diagnostics';
-import { isRecord } from '@huma/kit/records';
+import { isRecord } from '@huma/unknown';
 import type { Yaml } from 'mdast';
 import type { Document, ErrorCode, YAMLError } from 'yaml';
 import { isMap, isScalar, LineCounter, parseDocument } from 'yaml';

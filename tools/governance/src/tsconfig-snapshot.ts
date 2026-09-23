@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { isJsonObject, parseJson } from '@huma/kit/json';
+import { parseJson } from '@huma/kit/json';
 import { runText } from '@huma/kit/process';
 import { compareText } from '@huma/kit/text';
+import { isRecord } from '@huma/unknown';
 import { BIN_DIRECTORY } from './commands.ts';
 
 /** Time `tsc --showConfig` may take on one project of the solution, on a loaded shared host. */
@@ -11,12 +12,12 @@ const SHOW_CONFIG_TIMEOUT_MS = 120_000;
 /** The projects the solution `tsconfig.json` at `root` references, as configuration files relative to the root. */
 async function solutionProjects(root: string): Promise<readonly string[]> {
   const solution = parseJson(await readFile(join(root, 'tsconfig.json'), 'utf8'));
-  const references = isJsonObject(solution) ? solution['references'] : undefined;
+  const references = isRecord(solution) ? solution['references'] : undefined;
   if (!Array.isArray(references)) {
     throw new Error('tsconfig.json ne référence aucun projet');
   }
   return references.map((reference: unknown) => {
-    const path = isJsonObject(reference) ? reference['path'] : undefined;
+    const path = isRecord(reference) ? reference['path'] : undefined;
     if (typeof path !== 'string') {
       throw new Error('référence de projet illisible dans tsconfig.json');
     }
@@ -26,7 +27,7 @@ async function solutionProjects(root: string): Promise<readonly string[]> {
 }
 
 const sortedObject = (value: unknown): unknown =>
-  isJsonObject(value)
+  isRecord(value)
     ? Object.fromEntries(Object.entries(value).toSorted(([left], [right]) => compareText(left, right)))
     : value;
 
@@ -44,7 +45,7 @@ export async function renderEffectiveTsconfigs(root: string): Promise<string> {
         timeoutMs: SHOW_CONFIG_TIMEOUT_MS,
       }),
     );
-    if (!isJsonObject(shown)) {
+    if (!isRecord(shown)) {
       throw new Error(`tsc --showConfig ${project} : sortie illisible`);
     }
     const directory = dirname(join(root, project));

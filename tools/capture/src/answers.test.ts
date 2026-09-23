@@ -1,5 +1,5 @@
 import { DONATION, SECTIONS_KEY } from '@huma/contracts';
-import { isRecord } from '@huma/kit/records';
+import { isRecord } from '@huma/unknown';
 import { expect, test } from 'vitest';
 import { chooseAnswers, moduleOf } from './answers.ts';
 import type { Exchange } from './har.ts';

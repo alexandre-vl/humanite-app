@@ -3,6 +3,7 @@ import fsd from '@feature-sliced/steiger-plugin';
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import { repoPath, toRepoPath } from '@huma/kit/paths';
 import { isOneOf } from '@huma/kit/records';
+import { isList, isRecord } from '@huma/unknown';
 import { linter, processConfiguration } from 'steiger';
 import type { StructureCode } from './checks.ts';
 import { STRUCTURE_CHECKS, structureFinding } from './checks.ts';
@@ -44,10 +45,7 @@ type SteigerPlugin = Extract<
 >;
 
 const isSteigerPlugin = (value: unknown): value is SteigerPlugin =>
-  typeof value === 'object' &&
-  value !== null &&
-  Array.isArray(Reflect.get(value, 'ruleDefinitions')) &&
-  typeof Reflect.get(value, 'meta') === 'object';
+  isRecord(value) && isList(value['ruleDefinitions']) && isRecord(value['meta']);
 
 /**
  * The Feature-Sliced plugin, checked on loading: its declarations import a toolkit it bundles instead of depending on,
@@ -64,8 +62,7 @@ function featureSlicedPlugin(): SteigerPlugin {
 /** The names of the rules the plugin defines, read from the plugin itself. */
 function pluginRuleNames(): readonly string[] {
   return featureSlicedPlugin().ruleDefinitions.map((definition: unknown) => {
-    const name: unknown =
-      typeof definition === 'object' && definition !== null ? Reflect.get(definition, 'name') : null;
+    const name = isRecord(definition) ? definition['name'] : null;
     if (typeof name !== 'string') {
       throw new Error('règle Steiger sans nom');
     }

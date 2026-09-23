@@ -1,5 +1,5 @@
 {
   "extends": "@huma/tsconfig/node.json",
   "include": ["src"],
-  "references": [{ "path": "../architecture" }]
+  "references": [{ "path": "../architecture" }, { "path": "../unknown" }]
 }

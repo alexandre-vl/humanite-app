@@ -17,11 +17,12 @@ import type { Diagnostic } from '@huma/kit/diagnostics';
 import { formatForPath } from '@huma/kit/format';
 import { directoryNames, readTextIfExists } from '@huma/kit/fs';
 import { ownRepository } from '@huma/kit/git';
-import { isJsonObject, parseJson } from '@huma/kit/json';
+import { parseJson } from '@huma/kit/json';
 import type { RepoPath } from '@huma/kit/paths';
 import { repoPath } from '@huma/kit/paths';
 import { compareText, firstDifferentLine } from '@huma/kit/text';
 import { renderEffectiveConfigs } from '@huma/lint/eslint';
+import { isRecord } from '@huma/unknown';
 import { renderAgentsGuide } from './agents-guide.ts';
 import { BINDINGS, BINDINGS_PATH } from './bindings.ts';
 import type { GovernanceCode } from './checks.ts';
@@ -68,7 +69,7 @@ const manifestField = (path: RepoPath, field: string, value: () => unknown): Art
   path,
   render: async (root) => {
     const current = parseJson(await readFile(join(root, path), 'utf8'));
-    if (!isJsonObject(current)) {
+    if (!isRecord(current)) {
       throw new Error(`${path} illisible`);
     }
     return formatForPath(root, path, `${JSON.stringify({ ...current, [field]: value() }, null, 2)}\n`);

@@ -9,6 +9,7 @@
   "dependencies": {
     "@cspell/eslint-plugin": "catalog:",
     "@huma/architecture": "workspace:*",
+    "@huma/unknown": "workspace:*",
     "@tanstack/eslint-plugin-query": "catalog:",
     "eslint-import-resolver-typescript": "catalog:",
     "eslint-plugin-boundaries": "catalog:",

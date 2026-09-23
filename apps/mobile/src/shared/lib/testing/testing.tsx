@@ -1,4 +1,5 @@
 import type { Article, ArticleSummary, ContentApi, DisplayText, Page, PageQuery } from '@huma/contracts';
+import { isList, isRecord } from '@huma/unknown';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
@@ -73,16 +74,15 @@ export const firstArticle = async (
   throw new Error(`aucun article ne porte ${what} : le test ne vérifierait rien`);
 };
 
-/** One layer of a style: an object of properties, as opposed to a list of layers or a layer left out. */
-const isLayer = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-/** The layers of a style in the order React Native applies them, nested lists opened and empty slots left out. */
+/**
+ * The layers of a style in the order React Native applies them, nested lists opened and empty slots left out: a
+ * layer is a record of properties, as opposed to a list of layers or a layer left out.
+ */
 const layersOf = (style: unknown): readonly Readonly<Record<string, unknown>>[] => {
-  if (Array.isArray(style)) {
-    return style.flatMap((layer: unknown) => layersOf(layer));
+  if (isList(style)) {
+    return style.flatMap((layer) => layersOf(layer));
   }
-  return isLayer(style) ? [style] : [];
+  return isRecord(style) ? [style] : [];
 };
 
 /**

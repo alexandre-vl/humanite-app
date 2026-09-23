@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { APP_DIRECTORY, HERMES_FILES } from '@huma/architecture';
+import { isRecord } from '@huma/unknown';
 import type { Linter } from 'eslint';
 import reactX from 'eslint-plugin-react-x';
 import { pluginOf } from './plugins.ts';
@@ -34,8 +35,7 @@ function reactVersion(root: string): string | null {
     return null;
   }
   const manifest: unknown = JSON.parse(readFileSync(createRequire(app).resolve('react/package.json'), 'utf8'));
-  const version: unknown =
-    typeof manifest === 'object' && manifest !== null ? Reflect.get(manifest, 'version') : undefined;
+  const version = isRecord(manifest) ? manifest['version'] : undefined;
   if (typeof version !== 'string') {
     throw new Error('version de react illisible');
   }
@@ -64,7 +64,7 @@ export function reactConfig(root: string): Linter.Config {
     plugins: { 'react-hooks': hooks, ...strict.plugins },
     settings: {
       'react-x': {
-        ...(typeof presetSettings === 'object' && presetSettings !== null ? presetSettings : {}),
+        ...(isRecord(presetSettings) ? presetSettings : {}),
         ...(version === null ? {} : { version }),
       },
     },
