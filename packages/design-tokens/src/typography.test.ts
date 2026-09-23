@@ -42,7 +42,7 @@ test('a line height derives from a size times its multiple', () => {
  * The headline was held here too, at the 47.6 the captures gave it, and it is no longer: the current app's headline is
  * not the measurement this one wants. Three papers set a mobile headline at twenty-eight — none of them in a condensed
  * face — and this one is set in Anton, whose x-height is 0.732 em against Overpass's 0.511. What the old step held was
- * a headline standing as tall as forty-nine points of the text it opens. What holds it now is the note beside `xl`,
+ * a headline standing as tall as forty-nine points of the text it opens. What holds it now is the note beside `xxxl`,
  * and the rule that derives a contrast bar from a size: at twenty-eight it may be printed in the paper's red, and at
  * the step under it may not.
  */

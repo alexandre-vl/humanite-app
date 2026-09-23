@@ -66,9 +66,6 @@ export function ArticleTitle({ title, word }: ArticleTitleProps): ReactNode {
  * time. Under the picture it was answering the caption rather than the headline, so an article opened on a photograph
  * credited to one person and signed, four lines later and past a second credit, by another.
  *
- * The date is written out in full here, with the hour: Nielsen's homepage guideline has the full article print one
- * prominently, and the wire already lists the same piece at its hour.
- *
  * A video opens on its film, right under its headline, and shows no picture further down: the film's still is the
  * article's picture, and showing it twice would say nothing more. What reads as a video is its format — the service
  * sends a link to the film and a body of prose, when any, that says nothing of it.

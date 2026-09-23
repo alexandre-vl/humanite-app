@@ -226,10 +226,6 @@ describe('ArticleReader', () => {
     expect(cornersTurned(screen.toJSON())).toEqual([]);
   });
 
-  /**
-   * Nielsen's homepage guideline: the full article prints its date prominently — here with its hour, which the wire
-   * already lists the same piece at.
-   */
   it('date l’article en toutes lettres, avec l’heure où il a paru', async () => {
     const article = await holding('paragraph');
     await read(article);

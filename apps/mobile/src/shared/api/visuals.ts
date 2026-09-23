@@ -39,29 +39,28 @@ const SQUARE = { thumbnail: true, card: false, lead: false } as const satisfies 
 export type Visual = Readonly<{ source: number | Readonly<{ uri: string }>; thumbhash?: string }>;
 
 /**
- * A picture at the size asked for. A key of the corpus is drawn by the source the build bundled, which gives `null`
+ * A picture for the place it fills. A key of the corpus is drawn by the source the build bundled, which gives `null`
  * for a key that names nothing — and for every key, in a build that reads the service and carries no corpus — rather
  * than a broken view. A picture of the journal is always an address, which its schema has already held to the
  * journal's own server; it is asked for at the width of the place it fills and not at the one the service listed.
  */
-export const visualOf = (picture: Picture, size: PicturePlace): Visual | null => {
+export const visualOf = (picture: Picture, place: PicturePlace): Visual | null => {
   if (picture.kind === 'journal') {
-    const width = PLACE_WIDTHS[size];
-    return { source: { uri: SQUARE[size] ? atSquare(picture.url, width) : atWidth(picture.url, width) } };
+    const width = PLACE_WIDTHS[place];
+    return { source: { uri: SQUARE[place] ? atSquare(picture.url, width) : atWidth(picture.url, width) } };
   }
-  const drawn = SOURCE.corpusPicture(picture.key, PLACE_WIDTHS[size]);
+  const drawn = SOURCE.corpusPicture(picture.key, PLACE_WIDTHS[place]);
   return drawn === null ? null : { source: drawn.module, thumbhash: drawn.thumbhash };
 };
 
 /**
- * The illustration an item carries at the size asked for, or nothing: a brief and a column are written without one.
- * The corpus holds no brief with a picture today, but nothing in the contracts forbids one — the schema makes `hero`
- * optional on every item, and the corpus rule only stops requiring it of a brief — so the question is asked of the
- * item, never of its kind.
+ * The illustration an item carries, at the width of the place it fills, or nothing when it carries none. Whether it
+ * carries one is asked of the item and never of its kind: the schema makes `hero` optional on every item, whatever it
+ * is.
  *
  * It is asked here, beside the key resolver, because more than one entity asks it and no entity may ask another: a
  * card of the feed and the cover of a numéro both need the picture of an item, and the item is the content's shape,
  * which is what this door answers for.
  */
-export const pictureOf = (summary: ArticleSummary, size: PicturePlace): Visual | null =>
-  summary.hero === undefined ? null : visualOf(summary.hero.picture, size);
+export const pictureOf = (summary: ArticleSummary, place: PicturePlace): Visual | null =>
+  summary.hero === undefined ? null : visualOf(summary.hero.picture, place);

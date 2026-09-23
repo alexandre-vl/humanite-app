@@ -124,6 +124,9 @@ export function SettingsPage(): ReactNode {
           <Text variant="caption">{t('settings.preview')}</Text>
           <Text variant="prose">{t('settings.preview.text')}</Text>
         </Box>
+        {/* Offered even when nothing is set, where pressing it sets what is already set. Hidden then, it would vanish
+            from under the finger that pressed it and take a screen reader's place with it; greyed, it would need a
+            state no other control of the app has. */}
         <Box style={styles.reset}>
           <Button label={t('settings.reset')} onPress={reset} />
         </Box>

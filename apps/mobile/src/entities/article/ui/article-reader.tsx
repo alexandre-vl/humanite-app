@@ -63,7 +63,7 @@ function Wall(): ReactNode {
 }
 
 /**
- * The article as it is read: one page, one ground, from the section over the headline down to the last paragraph.
+ * The article as it is read: one page, one ground, from the head of the piece down to its last paragraph.
  *
  * It was two — a coloured band carrying the headline, and under it a white sheet with its top-left corner turned by
  * forty-eight points. Neither half survives inspection. Of the six papers worth copying, none prints an article body

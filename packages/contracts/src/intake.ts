@@ -60,7 +60,7 @@ const FORMATS = {
 
 /**
  * What every parse of a reading asks of the schema: to keep, on each issue, the value it refused. A reason that says a
- * format was not one of four, and not which format it was, is a reason nobody can act on.
+ * format was not one the service is known to send, and not which format it was, is a reason nobody can act on.
  */
 const REPORTED = { reportInput: true } as const;
 

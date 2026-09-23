@@ -98,10 +98,10 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * (README:97). It is the weight that carries over and not the family: the site declares Overpass and this app is set in
  * it throughout, while the current app shows its copy in Roboto (README:103).
  *
- * `standfirst` and `summary` were one role and had to become two. A card and an article both carry a sentence under
- * their title, and the two are not the same sentence: on an article it is the opening of the piece, read straight
- * after the headline and before the body; on a card it is what answers the title in a list of
- * twenty others. Set as one, it was bold and in the ink of the title — so on a card it read as a second title, and
+ * `standfirst` and `summary` were one role and had to become two. An article and the card a page opens on both carry
+ * a sentence under their title, and the two are not the same sentence: on an article it is the opening of the piece,
+ * read straight after the headline and before the body; on the card it is what answers the title at the head of a
+ * page of others. Set as one, it was bold and in the ink of the title — so on a card it read as a second title, and
  * on an article it read as no larger than the body it introduced. The article's is now regular at twenty points and
  * keeps the ink; the card's is regular at sixteen in the middle ink.
  *

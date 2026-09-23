@@ -14,9 +14,10 @@ import { TEXT_SCALES, TEXT_TONES, typographyAt } from './typography.ts';
  * set and the table that holds what contrast it owes did not know about each other.
  *
  * So the threshold is derived instead, from the smallest type each colour is ever set in, at the smallest step a
- * reader can choose. Of the thirteen variants exactly two are large text by WCAG's measure — an article's own headline
- * and the paper's masthead, the two roles set at twenty-eight points. Every other role owes four and a half to one,
- * and six of them were being held to three.
+ * reader can choose. Of the thirteen variants exactly two are large text by their size alone — an article's own
+ * headline and the paper's masthead, the two roles set at twenty-eight points; the bold half of WCAG's measure is
+ * left out, for the reason given beside `LARGE_TEXT`. Every other role owes four and a half to one, and six of them
+ * were being held to three.
  */
 
 /** The roles a screen paints behind text. */
@@ -69,8 +70,9 @@ const PRINTINGS = {
  * The size, in points, at and above which WCAG 2 reads text as large. The guideline says eighteen points, or fourteen
  * bold, and notes that eighteen points is about twenty-four CSS pixels; React Native sets type in density-independent
  * points, which are those pixels. The bold half is left out deliberately: reading every face as if it were light is
- * the stricter reading, it asks for no second table saying what a face weighs, and it changes no verdict here — the
- * one variant that clears twenty-four clears it at any weight.
+ * the stricter reading, it asks for no second table saying what a face weighs, and it changes no verdict here. A
+ * colour owes the bar of the smallest type it is set in, and the one role the bold half would promote — `lead`, bold
+ * and at twenty-one points at the smallest step — is never the smallest type of its colour.
  */
 const LARGE_TEXT = 24;
 

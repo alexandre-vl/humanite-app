@@ -138,7 +138,7 @@ export const TRACKING = {
  * at neither — which is what a bar the platform lays out does, and what the app had to take over when it stopped
  * drawing one. It was eighty-eight, room for two controls at one end, which no screen hangs any more.
  *
- * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst, and `cover` the
+ * `thumbnail` is the side of the small square picture a card in a line carries beside its title, and `cover` the
  * width of a numéro standing on the newsstand's shelf. Both are widths, not heights, and the only two the paper names:
  * everything else a card lays out is a share of the screen it is given, while these have to be read against the width
  * the picture was written at — 320 points over 96 is the three-to-one a dense screen asks for, and a cover at 140 is

@@ -18,7 +18,10 @@ const VERSION = 3;
 /** The version whose summaries are brought forward, and not dropped. */
 const BROUGHT_FORWARD = 2;
 
-/** What the reader has kept, the last kept first, and the one thing they do to it. */
+/**
+ * What the reader has kept, the last kept first, and the one thing they do to it. `kept` is also the name it is written
+ * under on the phone, and keeps it: another name would be a new version and a migration, for nothing a reader sees.
+ */
 type Kept = Readonly<{
   kept: readonly ArticleSummary[];
   toggle: (summary: ArticleSummary) => void;

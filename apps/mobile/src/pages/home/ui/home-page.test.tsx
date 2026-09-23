@@ -30,16 +30,15 @@ const renderPage = async (): Promise<void> => {
 
 /**
  * The article the front page opens on, worked out beside the code under test rather than by it: the first the feed
- * serves that carries a picture. The feed arrives newest first and a morning's newest items are briefs filed before
- * the desk has pictures, so this is not the first item — and a test that pressed the first mark on the screen while
- * naming the first item of the feed would be naming two different articles.
+ * serves, a feed laying its items out in the order its source gives them — so the first mark on the screen is this
+ * article's, with or without a picture.
  */
 const frontArticle = async (): Promise<ArticleSummary> => {
-  const found = (await content.getFeed({})).items.find((item) => item.hero !== undefined);
-  if (found === undefined) {
-    throw new Error('le journal ne sert aucun article illustré : le test ne vérifierait rien');
+  const [first] = (await content.getFeed({})).items;
+  if (first === undefined) {
+    throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
   }
-  return found;
+  return first;
 };
 
 const firstSection = async (): Promise<Section> => {

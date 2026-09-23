@@ -34,6 +34,7 @@ const LISTS = [
 /** Every body the capture holds, by the format the journal gave it. */
 const ARTICLES = Object.entries(RECORDED.articles).map(([format, kept]) => ({ format, answer: kept.answer }));
 
+/** Written here and not taken from `@huma/kit`, which is a tool: a package depends on packages alone. */
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 

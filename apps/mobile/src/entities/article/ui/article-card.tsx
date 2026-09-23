@@ -19,8 +19,8 @@ import { ItemWord } from './item-word';
 export type ArticleCardProps = Readonly<{
   shape: CardShape;
   summary: ArticleSummary;
-  action?: ReactNode | undefined;
-  signature?: DisplayText | null | undefined;
+  action?: ReactNode;
+  signature?: DisplayText | null;
 }>;
 
 /** The square the small picture of a card in a line is cut to. */
@@ -134,8 +134,8 @@ function Foot({ summary, action }: Pick<PartProps, 'summary' | 'action'>): React
 }
 
 /**
- * The size a card sets its title in, which is its place in the page: `lead` across a card the page raises, `title`
- * beside a picture in a line and on every card without one.
+ * The size a card sets its title in, which is its place in the page: `lead` on the card a page opens on and on every
+ * card it raises, `title` on a card in a line, a column and a brief.
  */
 type TitleSize = 'lead' | 'title';
 
@@ -321,7 +321,8 @@ function Brief({ summary, action, signature }: PartProps): ReactNode {
  * on carries its standfirst.
  *
  * `action` is whatever the screen lets a reader do to the article from the feed, and `signature` who signed it. The
- * card takes both already made: an entity may not name a route, nor hold an action of its own.
+ * card takes both already made: an entity may not name a route, nor hold an action of its own. Either may be left out,
+ * for a card that offers nothing or names nobody — which is every card but a column's, and every card drawn alone.
  */
 export function ArticleCard({ shape, summary, action = null, signature = null }: ArticleCardProps): ReactNode {
   const parts = { summary, action, signature };

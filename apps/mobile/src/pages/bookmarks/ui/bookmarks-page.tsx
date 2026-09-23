@@ -39,9 +39,6 @@ const useStyles = createStyles(() => ({
  * The name is handed to the list rather than laid above it, so it slides away as the reader goes down their shelf and
  * comes back as they return — the account's own name does that by being the first thing in a scrolling page, and a
  * name that stayed while the account's left would be the same word behaving two ways.
- *
- * The cards name the section they ran in, as they do everywhere articles from the whole paper are mixed: a shelf is
- * the one place where what was kept comes from anywhere at all.
  */
 export function BookmarksPage(): ReactNode {
   const styles = useStyles();

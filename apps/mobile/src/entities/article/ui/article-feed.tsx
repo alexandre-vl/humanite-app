@@ -39,7 +39,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 /**
- * A paged feed of articles, laid out in the rhythm its screen reads in, under the bands its screen supplies, asking
+ * A paged feed of articles, laid out in the rhythm its screen reads in, under the band its screen supplies, asking
  * for the next page as the end comes near.
  *
  * It reports which article was pressed and goes nowhere itself: an entity may not name a route, and the screen that
@@ -53,8 +53,8 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, empty }: Art
   const styles = useStyles();
   const render = (row: FeedRow): ReactNode => (
     <Box style={styles.card}>
-      {/* No label: a card's own words are its name, and they are better than any summary of them — what it is, the
-          title and the sentence under it are read in one breath, and the next swipe is the next article. */}
+      {/* No label: a card's own words are its name, and they are better than any summary of them — what it is, its
+          title and whatever it prints under it are read in one breath, and the next swipe is the next article. */}
       <Pressable
         role="link"
         onPress={() => {
