@@ -3,6 +3,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { noteSetAside } from '#api';
+import { styleOf } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { AccountPage } from './account-page';
 
@@ -51,9 +52,7 @@ describe('AccountPage', () => {
    */
   it('se nomme dans le type dont l’étagère voisine se nomme', async () => {
     await render(<AccountPage />);
-    const style: unknown = screen.getByText('Mon compte').props['style'];
-    const size: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'fontSize') : undefined;
-    expect(size).toBe(typographyAt('display', 'normal', 'paper').size);
+    expect(styleOf(screen.getByText('Mon compte'))['fontSize']).toBe(typographyAt('display', 'normal', 'paper').size);
   });
 
   /**

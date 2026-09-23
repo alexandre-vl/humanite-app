@@ -5,7 +5,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { formatPublished } from '#lib/format';
-import { everyArticle, renderWithCache, settle, standfirstOf } from '#lib/testing';
+import { firstArticle, renderWithCache, settle, standfirstOf, styleOf } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
 const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
@@ -62,8 +62,7 @@ const ancestorsOf = (node: Node): readonly Node[] => {
 
 /** How far apart a box sets the things it holds, or nothing at all, which is the answer that was wrong. */
 const spaceInside = (node: Node): number => {
-  const style: unknown = node.props['style'];
-  const gap: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'gap') : null;
+  const gap = styleOf(node)['gap'];
   return typeof gap === 'number' ? gap : 0;
 };
 
@@ -77,7 +76,7 @@ const isTypeset = (value: unknown): value is Typeset =>
   typeof Reflect.get(value, 'color') === 'string';
 
 const typesetOf = (text: string): Typeset => {
-  const style: unknown = screen.getByText(text).props['style'];
+  const style = styleOf(screen.getByText(text));
   if (!isTypeset(style)) {
     throw new Error(`« ${text} » n’est posé dans aucune taille ni aucune encre : le test ne comparerait rien`);
   }
@@ -89,26 +88,15 @@ const read = async (article: Article, onFollow: () => void = () => undefined): P
   await settle();
 };
 
-/** The first article of the corpus whose body satisfies `holds`, so a test never asserts on a shape by luck. */
-const first = async (what: string, holds: (article: Article) => boolean): Promise<Article> => {
-  for (const summary of await everyArticle(content)) {
-    const article = await content.getArticle(summary.id);
-    if (holds(article)) {
-      return article;
-    }
-  }
-  throw new Error(`aucun article du corpus ne porte ${what} : le test ne vérifierait rien`);
-};
-
 const holding = async (kind: Block['type']): Promise<Article> =>
-  first(`un bloc ${kind}`, (article) => blocksOf(article).some((block) => block.type === kind));
+  firstArticle(content, `un bloc ${kind}`, (article) => blocksOf(article).some((block) => block.type === kind));
 
 /**
  * Most paragraphs of the corpus are one run long, so an article picked for holding a paragraph would pass a renderer
  * that dropped every run but the first. This one is picked for holding a sentence made of several.
  */
 const holdingSeveralRuns = async (): Promise<Article> =>
-  first('un paragraphe de plusieurs fragments', (article) =>
+  firstArticle(content, 'un paragraphe de plusieurs fragments', (article) =>
     blocksOf(article).some((block) => block.type === 'paragraph' && block.spans.length > 1),
   );
 
@@ -117,15 +105,8 @@ afterEach(() => {
 });
 
 /** An article the reader the app is may not read whole: one the source serves with its body kept back. */
-const reserved = async (): Promise<Article> => {
-  for (const summary of await everyArticle(content)) {
-    const article = await content.getArticle(summary.id);
-    if (article.body.kind === 'withheld') {
-      return article;
-    }
-  }
-  throw new Error('le journal ne retient aucun corps : le test ne vérifierait rien');
-};
+const reserved = async (): Promise<Article> =>
+  firstArticle(content, 'un corps retenu', (article) => article.body.kind === 'withheld');
 
 describe('ArticleReader, face à un corps retenu', () => {
   /**
@@ -157,14 +138,14 @@ describe('ArticleReader', () => {
    * same title — and a plain article, which most are, says nothing there.
    */
   it('dit au-dessus du titre ce qu’est une opinion, et rien d’un article', async () => {
-    const column = await first('une opinion', (article) => article.format === 'column');
+    const column = await firstArticle(content, 'une opinion', (article) => article.format === 'column');
     await read(column);
     expect(await screen.findByText(column.title)).toBeTruthy();
     expect(screen.getByText(t('format.column'))).toBeTruthy();
   });
 
   it('ne met aucun mot au-dessus du titre d’un article', async () => {
-    const written = await first('un article', (article) => article.format === 'article');
+    const written = await firstArticle(content, 'un article', (article) => article.format === 'article');
     await read(written);
     expect(await screen.findByText(written.title)).toBeTruthy();
     for (const word of [t('format.video'), t('format.column'), t('format.series'), t('format.live')]) {
@@ -212,7 +193,8 @@ describe('ArticleReader', () => {
    * credit, by another.
    */
   it('signe l’article avant la photo, et non sous la légende de la photo', async () => {
-    const article = await first(
+    const article = await firstArticle(
+      content,
       'une photo légendée et une signature',
       (candidate) => candidate.hero?.caption !== undefined && candidate.format !== 'video',
     );
@@ -312,7 +294,7 @@ describe('ArticleReader', () => {
    * itself: pressing the film hands its address up as a link out of the paper, which the screen opens.
    */
   it('ouvre le film d’une vidéo là où il vit, sans le jouer', async () => {
-    const video = await first('une vidéo', (article) => article.format === 'video');
+    const video = await firstArticle(content, 'une vidéo', (article) => article.format === 'video');
     const url = 'https://youtu.be/dfZt_ZVhtus';
     jest.spyOn(content, 'getArticle').mockResolvedValue(ARTICLE.parse({ ...video, film: { url } }));
     const follow = jest.fn();
@@ -322,7 +304,11 @@ describe('ArticleReader', () => {
   });
 
   it('montre l’image d’une vidéo sans film, et rien à presser', async () => {
-    const video = await first('une vidéo', (article) => article.format === 'video' && article.film === undefined);
+    const video = await firstArticle(
+      content,
+      'une vidéo',
+      (article) => article.format === 'video' && article.film === undefined,
+    );
     await read(video);
     expect(await screen.findByText(video.title)).toBeTruthy();
     expect(screen.queryByText(t('article.film'))).toBeNull();

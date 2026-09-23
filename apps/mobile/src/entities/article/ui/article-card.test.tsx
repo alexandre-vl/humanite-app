@@ -5,7 +5,7 @@ import { content } from '#api';
 import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
 import { formatHour, formatLongDate } from '#lib/format';
-import { everyArticle, standfirstOf } from '#lib/testing';
+import { everyArticle, standfirstOf, styleOf } from '#lib/testing';
 import { Text } from '#primitives/text';
 import type { CardShape } from '../model/rhythm';
 import { ArticleCard } from './article-card';
@@ -31,13 +31,7 @@ const illustrated = (items: readonly ArticleSummary[]): ArticleSummary => {
 const pictures = (): number => screen.queryAllByTestId('picture', { includeHiddenElements: true }).length;
 
 /** The colour a run of text was actually painted in, read back off the style the primitive gave it. */
-const inkOf = (text: DisplayText): unknown => {
-  const style: unknown = screen.getByText(text).props['style'];
-  if (typeof style !== 'object' || style === null) {
-    throw new Error('ce texte ne porte aucun style : le test ne lirait aucune encre');
-  }
-  return Reflect.get(style, 'color');
-};
+const inkOf = (text: DisplayText): unknown => styleOf(screen.getByText(text))['color'];
 
 /** One node of the rendered tree, named off what the screen hands back rather than off the renderer's own types. */
 type Node = ReturnType<typeof screen.getByText>;
@@ -130,8 +124,7 @@ describe('ArticleCard', () => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape="line" summary={summary} />);
     const picture = screen.getByTestId('picture', { includeHiddenElements: true });
-    const together: unknown = holdingBoth(screen.getByText(summary.title), picture).props['style'];
-    expect(together).toMatchObject({ flexDirection: 'row' });
+    expect(styleOf(holdingBoth(screen.getByText(summary.title), picture))).toMatchObject({ flexDirection: 'row' });
   });
 
   /**
@@ -146,10 +139,8 @@ describe('ArticleCard', () => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape="lead" summary={summary} />);
     const picture = screen.getByTestId('picture', { includeHiddenElements: true });
-    const keysOf = (style: unknown): readonly string[] =>
-      typeof style === 'object' && style !== null ? Object.keys(style) : [];
-    const own = keysOf(picture.props['style']);
-    const frame = keysOf(picture.parent?.props['style']);
+    const own = Object.keys(styleOf(picture));
+    const frame = picture.parent === null ? [] : Object.keys(styleOf(picture.parent));
     expect([...own, ...frame].filter((key) => key.startsWith('margin'))).toEqual([]);
     expect(frame).toContain('aspectRatio');
   });

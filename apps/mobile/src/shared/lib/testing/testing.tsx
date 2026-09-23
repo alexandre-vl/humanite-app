@@ -1,4 +1,4 @@
-import type { ArticleSummary, ContentApi, DisplayText, Page, PageQuery } from '@huma/contracts';
+import type { Article, ArticleSummary, ContentApi, DisplayText, Page, PageQuery } from '@huma/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
@@ -54,3 +54,44 @@ export const standfirstOf = (summary: ArticleSummary): DisplayText => {
   }
   return summary.standfirst;
 };
+
+/**
+ * The first article a content serves whose whole reading satisfies `holds`, so a test never asserts on a shape by luck.
+ * `what` names the shape for the failure that says no article has it: a test that found none would verify nothing.
+ */
+export const firstArticle = async (
+  content: ContentApi,
+  what: string,
+  holds: (article: Article) => boolean,
+): Promise<Article> => {
+  for (const summary of await everyArticle(content)) {
+    const article = await content.getArticle(summary.id);
+    if (holds(article)) {
+      return article;
+    }
+  }
+  throw new Error(`aucun article ne porte ${what} : le test ne vérifierait rien`);
+};
+
+/** One layer of a style: an object of properties, as opposed to a list of layers or a layer left out. */
+const isLayer = (value: unknown): value is Readonly<Record<string, unknown>> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/** The layers of a style in the order React Native applies them, nested lists opened and empty slots left out. */
+const layersOf = (style: unknown): readonly Readonly<Record<string, unknown>>[] => {
+  if (Array.isArray(style)) {
+    return style.flatMap((layer: unknown) => layersOf(layer));
+  }
+  return isLayer(style) ? [style] : [];
+};
+
+/**
+ * A style of a rendered node as the one object it paints with: React Native takes a list of layers, a later one over
+ * an earlier, and so does this. `prop` names which style, the node's own by default. Written once for every test that
+ * asks what a node was painted with, which each used to answer by hand.
+ */
+export const styleOf = (
+  node: Readonly<{ props: Readonly<Record<string, unknown>> }>,
+  prop = 'style',
+): Readonly<Record<string, unknown>> =>
+  layersOf(node.props[prop]).reduce<Readonly<Record<string, unknown>>>((flat, layer) => ({ ...flat, ...layer }), {});

@@ -5,12 +5,10 @@ import { render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
 import type { Typesetting } from '../../../lib/styles';
 import { TypesettingProvider } from '../../../lib/styles';
+import { styleOf } from '../../../lib/testing';
 import { Text } from './text';
 
 const WORDS = 'le journal';
-
-const isStyle = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null;
 
 /** How a run of body text was set, read back from the style it gave the native text. */
 const setAs = async (typesetting: Typesetting): Promise<Readonly<Record<string, unknown>>> => {
@@ -19,11 +17,7 @@ const setAs = async (typesetting: Typesetting): Promise<Readonly<Record<string, 
       <Text variant="body">{asDisplayText(WORDS)}</Text>
     </TypesettingProvider>,
   );
-  const style: unknown = screen.getByText(WORDS).props['style'];
-  if (!isStyle(style)) {
-    throw new Error('le texte ne porte pas de style lisible');
-  }
-  return style;
+  return styleOf(screen.getByText(WORDS));
 };
 
 const paperAt = async (scale: TextScale): Promise<Readonly<Record<string, unknown>>> =>

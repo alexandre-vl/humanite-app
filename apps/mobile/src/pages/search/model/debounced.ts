@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
  * is not a token: nothing else in the app waits on a reader, and a design that changed it would not be changing a
  * duration the rest of the journal shares.
  */
-const SETTLE = 300;
+export const SETTLE = 300;
 
 /**
  * A value as it stands once the reader has stopped changing it.

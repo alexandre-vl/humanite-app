@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { FONT_FAMILIES, typographyAt } from '@huma/design-tokens';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
+import { styleOf } from '../../../lib/testing';
 import type { TextRun } from './rich-text';
 import { RichText } from './rich-text';
 
@@ -10,11 +11,8 @@ const plain = (text: string): TextRun => ({ text: asDisplayText(text) });
 /** A role as the paper sets it, at the step nobody has moved. */
 const prose = typographyAt('prose', 'normal', 'paper');
 
-/** What a rendered run paints with, flattened: React Native accepts an array of styles, and a run gets one object. */
-const styleOf = (text: string): Readonly<Record<string, unknown>> => {
-  const style: unknown = screen.getByText(text).props['style'];
-  return typeof style === 'object' && style !== null ? { ...style } : {};
-};
+/** What a rendered run paints with. */
+const paintOf = (text: string): Readonly<Record<string, unknown>> => styleOf(screen.getByText(text));
 
 describe('RichText', () => {
   it('rend chaque fragment de la phrase, dans l’ordre', async () => {
@@ -25,7 +23,7 @@ describe('RichText', () => {
 
   it('ne donne au fragment penché que sa fonte, pour qu’il hérite du reste de la phrase', async () => {
     await render(<RichText runs={[plain('avant '), { text: asDisplayText('penché'), face: 'italic' }]} />);
-    expect(styleOf('penché')).toEqual({ fontFamily: FONT_FAMILIES.paper.lightItalic });
+    expect(paintOf('penché')).toEqual({ fontFamily: FONT_FAMILIES.paper.lightItalic });
   });
 
   it('donne à la phrase la taille et l’interligne de son variant', async () => {

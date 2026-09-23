@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { asDisplayText } from '../../../lib/display-text';
 import { createStyles } from '../../../lib/styles';
+import { styleOf } from '../../../lib/testing';
 import { Switch } from './switch';
 
 const LABEL = 'Lisibilité renforcée';
@@ -33,11 +34,7 @@ function Roles(): ReactNode {
   );
 }
 
-/** A rendered view's style, flattened: React Native accepts an array of styles, and these probes each carry one. */
-const flatten = (value: unknown): Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null ? { ...value } : {};
-
-const roleColor = (testID: string): unknown => flatten(screen.getByTestId(testID).props['style'])['backgroundColor'];
+const roleColor = (testID: string): unknown => styleOf(screen.getByTestId(testID))['backgroundColor'];
 
 describe('Switch', () => {
   it('se laisse trouver et annoncer par son étiquette, le texte de la ligne n’étant pas le sien', async () => {

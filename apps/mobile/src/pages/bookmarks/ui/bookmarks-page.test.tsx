@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { StartupProvider } from '#lib/startup';
-import { renderWithCache, settle } from '#lib/testing';
+import { renderWithCache, settle, styleOf } from '#lib/testing';
 import { BookmarksPage } from './bookmarks-page';
 
 // The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
@@ -85,8 +85,7 @@ describe('BookmarksPage', () => {
    */
   it('se nomme dans le type dont le compte se nomme, et pas dans celui d’une barre', async () => {
     await renderPage();
-    const style: unknown = screen.getByText('Mes lectures').props['style'];
-    const size: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'fontSize') : undefined;
+    const size = styleOf(screen.getByText('Mes lectures'))['fontSize'];
     expect(size).toBe(typographyAt('display', 'normal', 'paper').size);
     expect(size).not.toBe(typographyAt('label', 'normal', 'paper').size);
   });

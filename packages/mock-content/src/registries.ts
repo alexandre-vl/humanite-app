@@ -2,24 +2,28 @@ import { SECTION, SECTION_ID } from '@huma/contracts';
 import type { Section, SectionId } from '@huma/contracts';
 import type { SectionCode } from '@huma/design-tokens';
 
+/** How many of a section's six articles are of each of the two formats the corpus spreads by quota. */
+export type Quota = Readonly<{ video: number; column: number }>;
+
 /**
  * The sections of the corpus, in the order of the category bar, each with the three letters its items, its pictures and
- * its ground are named by.
+ * its ground are named by, and how many videos and columns it files.
  *
  * The first seven are the journal's own — slug, name and place in its menu alike (`/wordpress/menu`); `sport` is the
  * corpus's alone. The letters are the corpus's too: the journal numbers its sections and names no code, so the letters
- * stay here, with the fiction that is written in them, and not in the domain.
+ * stay here, with the fiction that is written in them, and not in the domain. The quota was a table of its own, keyed
+ * by slugs spelt a second time and read back through the brand; on the row, a section cannot be written without one.
  */
 const REGISTRY = [
-  { id: 'politique', code: 'pol', label: 'Politique' },
-  { id: 'social-eco', code: 'eco', label: 'Social Éco' },
-  { id: 'societe', code: 'soc', label: 'Société' },
-  { id: 'monde', code: 'mon', label: 'Monde' },
-  { id: 'culture-et-savoir', code: 'cul', label: 'Culture et savoir' },
-  { id: 'feminisme', code: 'fem', label: 'Féminisme' },
-  { id: 'environnement', code: 'env', label: 'Environnement' },
-  { id: 'sport', code: 'spo', label: 'Sport' },
-] as const satisfies readonly Readonly<{ id: string; code: SectionCode; label: string }>[];
+  { id: 'politique', code: 'pol', label: 'Politique', quota: { video: 1, column: 0 } },
+  { id: 'social-eco', code: 'eco', label: 'Social Éco', quota: { video: 0, column: 1 } },
+  { id: 'societe', code: 'soc', label: 'Société', quota: { video: 0, column: 0 } },
+  { id: 'monde', code: 'mon', label: 'Monde', quota: { video: 1, column: 1 } },
+  { id: 'culture-et-savoir', code: 'cul', label: 'Culture et savoir', quota: { video: 1, column: 1 } },
+  { id: 'feminisme', code: 'fem', label: 'Féminisme', quota: { video: 0, column: 0 } },
+  { id: 'environnement', code: 'env', label: 'Environnement', quota: { video: 0, column: 0 } },
+  { id: 'sport', code: 'spo', label: 'Sport', quota: { video: 1, column: 0 } },
+] as const satisfies readonly Readonly<{ id: string; code: SectionCode; label: string; quota: Quota }>[];
 
 /** The sections as the domain knows them, in the order of the bar: the letters stay behind. */
 export const SECTIONS: readonly Section[] = REGISTRY.map(({ id, label }) => SECTION.parse({ id, label }));
@@ -27,6 +31,9 @@ export const SECTIONS: readonly Section[] = REGISTRY.map(({ id, label }) => SECT
 /** The three letters of the section `id` names, or `undefined` for an id that names no section of this corpus. */
 export const codeOf = (id: SectionId | undefined): SectionCode | undefined =>
   REGISTRY.find((each) => each.id === id)?.code;
+
+/** The formats the section `id` files by quota, or `undefined` for an id that names no section of this corpus. */
+export const quotaOf = (id: SectionId): Quota | undefined => REGISTRY.find((each) => each.id === id)?.quota;
 
 /**
  * Someone who signs a piece of this corpus. Not a value of the domain and never one again: an item carries the name

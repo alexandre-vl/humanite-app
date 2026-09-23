@@ -5,13 +5,11 @@ import type { ReactNode } from 'react';
 import { usePreferences } from '#features/preferences';
 import { asDisplayText } from '#lib/display-text';
 import { useTheme } from '#lib/styles';
+import { styleOf } from '#lib/testing';
 import { Text } from '#primitives/text';
 import { ReaderSettings } from './reader-settings';
 
 const WORDS = 'le journal';
-
-const isStyle = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null;
 
 /** A subtree set the way the reader asked: a run of body text, and the ground it was given to paint on. */
 function Probe(): ReactNode {
@@ -32,13 +30,7 @@ const print = async (): Promise<void> => {
 };
 
 /** How the run of body text was set, read back from the style it gave the native text. */
-const letters = (): Readonly<Record<string, unknown>> => {
-  const style: unknown = screen.getByText(WORDS).props['style'];
-  if (!isStyle(style)) {
-    throw new Error('le texte ne porte pas de style lisible');
-  }
-  return style;
-};
+const letters = (): Readonly<Record<string, unknown>> => styleOf(screen.getByText(WORDS));
 
 beforeEach(() => {
   usePreferences.getState().reset();

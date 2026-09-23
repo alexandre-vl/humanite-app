@@ -7,13 +7,19 @@ import { content } from '#api';
 import { t } from '#i18n';
 import { renderWithCache, settle } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
+import { SETTLE } from '../model/debounced';
 import { SearchPage } from './search-page';
 
 // The double is built inside the factory: jest hoists the call above everything else in the file, so anything it read
 // from outside would still be undefined when the screen first asks for the router.
 jest.mock('expo-router', () => ({ __esModule: true, router: { push: jest.fn() } }));
 
-const PLACEHOLDER = 'Saisissez ici le sujet';
+const PLACEHOLDER = t('search.placeholder');
+
+/** Just past the screen's own wait for the typing to settle, which is when what was typed becomes a question. */
+const afterTyping = async (): Promise<void> => {
+  await act(async () => new Promise((resolve) => setTimeout(resolve, SETTLE + 1)));
+};
 
 const renderPage = async (): Promise<void> => {
   await renderWithCache(<SearchPage />);
@@ -27,7 +33,7 @@ const renderPage = async (): Promise<void> => {
  */
 const type = async (text: string): Promise<void> => {
   await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), text);
-  await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
+  await afterTyping();
   await settle();
 };
 
@@ -84,7 +90,7 @@ describe('SearchPage', () => {
     await renderPage();
     await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), 'jeunes');
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
+    await afterTyping();
     expect(screen.queryByText('Cherchez dans le journal')).toBeNull();
     await settle();
   });
@@ -126,7 +132,7 @@ describe('SearchPage', () => {
     await renderPage();
     await type('jeunes');
     await fireEvent.press(screen.getByLabelText('Effacer la recherche'));
-    await act(async () => new Promise((resolve) => setTimeout(resolve, 400)));
+    await afterTyping();
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
     await settle();
   });

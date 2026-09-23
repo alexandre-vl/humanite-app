@@ -2,16 +2,11 @@ import { SIZES, SPACING } from '@huma/design-tokens';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { View } from 'react-native';
-import { settle } from '../../../lib/testing';
+import { settle, styleOf } from '../../../lib/testing';
 import { List } from './list';
 
 /** More items than any window holds, so what the list leaves out is visible. */
 const MANY = [...Array.from({ length: 60 }).keys()];
-
-const isLayers = (value: unknown): value is readonly unknown[] => Array.isArray(value);
-
-const isInset = (value: unknown): value is Readonly<{ paddingTop: number }> =>
-  typeof value === 'object' && value !== null && typeof Reflect.get(value, 'paddingTop') === 'number';
 
 /**
  * How far down the list pushed its own content, read off the scroll view it renders.
@@ -24,12 +19,11 @@ const contentInset = (): number => {
   while (node !== null && node.type !== 'RCTScrollView') {
     node = node.parent;
   }
-  const style: unknown = node?.props['contentContainerStyle'];
-  const [inset] = isLayers(style) ? style : [];
-  if (!isInset(inset)) {
+  const inset = node === null ? undefined : styleOf(node, 'contentContainerStyle')['paddingTop'];
+  if (typeof inset !== 'number') {
     throw new Error('la liste ne dit pas de combien elle décale son contenu');
   }
-  return inset.paddingTop;
+  return inset;
 };
 
 describe('List', () => {

@@ -1,32 +1,7 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId } from '@huma/contracts';
 import type { CorpusArticle } from './item.ts';
-import { blocksOf, instantAt, SECTION_ID, textOf, typeset } from '@huma/contracts';
-import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
-
-type Quota = Readonly<{ video: number; column: number }>;
-
-/**
- * Per-section counts of the special formats, by section slug.
- *
- * A section id is a brand and not a closed union, so no type can say this table answers for every section the registry
- * names. Two things are done instead: each key is read through the brand, so a slug of the wrong shape stops the
- * module, and a section the table has no line for is reported below rather than quietly exempted from every quota it
- * should have had.
- */
-const QUOTAS: readonly (readonly [string, Quota])[] = [
-  ['politique', { video: 1, column: 0 }],
-  ['social-eco', { video: 0, column: 1 }],
-  ['societe', { video: 0, column: 0 }],
-  ['monde', { video: 1, column: 1 }],
-  ['culture-et-savoir', { video: 1, column: 1 }],
-  ['feminisme', { video: 0, column: 0 }],
-  ['environnement', { video: 0, column: 0 }],
-  ['sport', { video: 1, column: 0 }],
-];
-
-const EXPECTED: ReadonlyMap<SectionId, Quota> = new Map(
-  QUOTAS.map(([id, quota]): readonly [SectionId, Quota] => [SECTION_ID.parse(id), quota]),
-);
+import { blocksOf, instantAt, textOf, typeset } from '@huma/contracts';
+import { AUTHORS, codeOf, namesOf, quotaOf, SECTIONS } from './registries.ts';
 
 /** What a length is measured against. */
 type Words = Readonly<{ min: number; max: number }>;
@@ -96,7 +71,7 @@ const wordCount = (article: Article): number => blocksOf(article).reduce((sum, b
  * The domain draws no such line — a feed calls an item short when it comes without a picture, and the journal's
  * service distinguishes nothing of the kind — so the corpus's naming rule is the one place the distinction is written.
  */
-const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
+export const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
 
 /** The length an item is held to, or none for an item of a format this corpus does not write. */
 const wordRange = (article: Article): Words | undefined => {
@@ -251,7 +226,7 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
   const errors: string[] = [];
   const arts = articles.filter((article) => !isBrief(article));
   const briefs = articles.filter(isBrief);
-  const quota = EXPECTED.get(folder);
+  const quota = quotaOf(folder);
   const counts = {
     video: articles.filter((article) => article.format === 'video').length,
     column: articles.filter((article) => article.format === 'column').length,

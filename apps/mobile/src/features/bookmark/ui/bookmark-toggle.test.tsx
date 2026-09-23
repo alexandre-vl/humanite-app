@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
+import { styleOf } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { useBookmarks } from '../model/store';
 import { BookmarkToggle } from './bookmark-toggle';
@@ -13,13 +14,6 @@ const anArticle = async (): Promise<ArticleSummary> => {
     throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
   }
   return first;
-};
-
-/** What a node was given to paint its own box with, read one flattened style at a time. */
-const groundOf = (node: unknown): unknown => {
-  const style: unknown = typeof node === 'object' && node !== null ? Reflect.get(node, 'props') : null;
-  const flat: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'style') : null;
-  return typeof flat === 'object' && flat !== null ? Reflect.get(flat, 'backgroundColor') : undefined;
 };
 
 beforeEach(async () => {
@@ -39,10 +33,10 @@ describe('BookmarkToggle', () => {
     const summary = await anArticle();
     await render(<BookmarkToggle summary={summary} />);
     const free = screen.getByLabelText(t('bookmark.add'));
-    expect(groundOf(free)).toBeUndefined();
+    expect(styleOf(free)['backgroundColor']).toBeUndefined();
     await fireEvent.press(free);
     const kept = screen.getByLabelText(t('bookmark.remove'));
-    expect(groundOf(kept)).toBeDefined();
+    expect(styleOf(kept)['backgroundColor']).toBeDefined();
   });
 
   /**

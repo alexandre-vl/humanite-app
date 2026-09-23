@@ -8,7 +8,7 @@ import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
 import { openExternal } from '#lib/routing';
-import { everyArticle, renderWithCache, settle } from '#lib/testing';
+import { everyArticle, firstArticle, renderWithCache, settle, styleOf } from '#lib/testing';
 import { ArticlePage } from './article-page';
 
 // Both doubles are built inside their factory: jest hoists the calls above everything else in the file, so anything
@@ -28,17 +28,6 @@ jest.mock('#lib/routing', () => ({
 
 /** The article the screen is asked for, set before each render and read back by the mocked route parameters. */
 const mockRead: { id: string } = { id: '' };
-
-/** The first article of the corpus whose body satisfies `holds`, so a test never asserts on a shape by luck. */
-const first = async (what: string, holds: (article: Article) => boolean): Promise<Article> => {
-  for (const summary of await everyArticle(content)) {
-    const article = await content.getArticle(summary.id);
-    if (holds(article)) {
-      return article;
-    }
-  }
-  throw new Error(`aucun article du corpus ne porte ${what} : le test ne vérifierait rien`);
-};
 
 const open = async (article: Article): Promise<void> => {
   mockRead.id = article.id;
@@ -69,7 +58,11 @@ beforeEach(() => {
 
 describe('ArticlePage', () => {
   it('remplace l’écran quand le lien mène à un autre article du journal', async () => {
-    const article = await first('un lien vers un article', (each) => linkWords(each, 'article') !== null);
+    const article = await firstArticle(
+      content,
+      'un lien vers un article',
+      (each) => linkWords(each, 'article') !== null,
+    );
     const words = linkWords(article, 'article');
     if (words === null) {
       throw new Error('lien interne introuvable');
@@ -85,7 +78,11 @@ describe('ArticlePage', () => {
    * span the reader could press led nowhere. The corpus carries twelve of them, so the silence was reachable.
    */
   it('quitte l’app quand le lien mène hors du journal', async () => {
-    const article = await first('un lien hors du journal', (each) => linkWords(each, 'external') !== null);
+    const article = await firstArticle(
+      content,
+      'un lien hors du journal',
+      (each) => linkWords(each, 'external') !== null,
+    );
     const words = linkWords(article, 'external');
     if (words === null) {
       throw new Error('lien externe introuvable');
@@ -103,13 +100,13 @@ describe('ArticlePage', () => {
    * file outside the theme's core may not import.
    */
   it('pose la page d’une vidéo sur le thème sombre, et les autres sur celui du lecteur', async () => {
-    const video = await first('une vidéo', (each) => each.format === 'video');
+    const video = await firstArticle(content, 'une vidéo', (each) => each.format === 'video');
     await open(video);
-    expect((await screen.findByText(video.title)).props['style']).toMatchObject({ color: PALETTE.white });
+    expect(styleOf(await screen.findByText(video.title))).toMatchObject({ color: PALETTE.white });
     await screen.unmount();
-    const written = await first('un article', (each) => each.format === 'article');
+    const written = await firstArticle(content, 'un article', (each) => each.format === 'article');
     await open(written);
-    expect((await screen.findByText(written.title)).props['style']).toMatchObject({ color: PALETTE.uiRed });
+    expect(styleOf(await screen.findByText(written.title))).toMatchObject({ color: PALETTE.uiRed });
   });
 
   /** The mark keeps what the shelf will show — the article's card, read off the article the screen opened. */

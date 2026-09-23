@@ -3,7 +3,7 @@ import type { SectionId } from '@huma/contracts';
 import type { CorpusArticle } from './index.ts';
 import { expect, test } from 'vitest';
 import { CORPUS } from './index.ts';
-import { validateCorpus } from './validate.ts';
+import { isBrief, validateCorpus } from './validate.ts';
 
 /** The first item that carries a lead picture, to bend one rule at a time against a body that breaks none. */
 const illustrated = (): CorpusArticle => {
@@ -75,7 +75,7 @@ test('an item of this corpus carries a byline', () => {
 
 /** An item named as a brief is held to a brief's shape, the name being the one place a brief is written. */
 test('an item named as a brief is held to what a brief may hold', () => {
-  const brief = CORPUS.find((each) => /-b[1-3]$/u.test(each.id));
+  const brief = CORPUS.find(isBrief);
   if (brief === undefined) {
     throw new Error('aucune brève dans le corpus');
   }

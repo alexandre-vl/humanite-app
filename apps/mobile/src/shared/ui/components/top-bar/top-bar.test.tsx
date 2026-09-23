@@ -3,6 +3,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { t } from '../../../i18n';
 import { asDisplayText } from '../../../lib/display-text';
+import { styleOf } from '../../../lib/testing';
 import { Text } from '../../primitives/text';
 import { TopBar } from './top-bar';
 
@@ -19,10 +20,10 @@ const isCentred = (value: unknown): value is Margins =>
 /** Where the bar laid the name, read back from the layer that carries it. */
 const margins = (): Margins => {
   let node = screen.getByText(NAME).parent;
-  while (node !== null && !isCentred(node.props['style'])) {
+  while (node !== null && !isCentred(styleOf(node))) {
     node = node.parent;
   }
-  const style: unknown = node?.props['style'];
+  const style = node === null ? {} : styleOf(node);
   if (!isCentred(style)) {
     throw new Error('le nom n’est posé sur rien qui dise où il est : le test ne vérifierait pas qu’il est centré');
   }
@@ -40,10 +41,10 @@ const isSquare = (value: unknown): value is Square =>
 /** The side of the square a control of the bar hangs in, read from the nearest box around it held at a fixed size. */
 const squareAround = (control: ReturnType<typeof screen.getByText>): number => {
   let node = control.parent;
-  while (node !== null && !isSquare(node.props['style'])) {
+  while (node !== null && !isSquare(styleOf(node))) {
     node = node.parent;
   }
-  const style: unknown = node?.props['style'];
+  const style = node === null ? {} : styleOf(node);
   if (!isSquare(style)) {
     throw new Error('rien autour du contrôle ne le tient à une taille : le test ne vérifierait pas où il pend');
   }
