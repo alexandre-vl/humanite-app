@@ -35,7 +35,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0025](0025-budgets-de-performance-et-outils-de-mesure.md)                  | Budgets de performance et outils de mesure                  | accepté                                                                  | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0026](0026-accessibilite-annoncee-et-contraste-deduit-de-la-taille.md)     | Accessibilité annoncée et contraste déduit de la taille     | accepté                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0027](0027-client-non-officiel-de-l-api-l-humanite.md)                     | Client non officiel de l’API L’Humanité                     | accepté                                                                  | `dependency`, `boundary`, `data-format`                                    |
-| [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | proposé                                                                  | `guarded-config`, `boundary`, `data-format`                                |
+| [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | accepté                                                                  | `guarded-config`, `boundary`, `data-format`                                |
 
 ## Confirmation
 
@@ -337,7 +337,7 @@ Statut : accepté. Périmètre : `packages/contracts/src/intake.ts`, `packages/c
 
 ### ADR-0028 · Un client du service du journal, borné et honnête
 
-Statut : proposé. Périmètre : `packages/remote-api/**`, `apps/mobile/src/_app/model/focus.ts`, `apps/mobile/src/shared/api/**`, `apps/mobile/src/shared/config/source.ts`, `tools/guardrails/src/proofs/transport.ts`.
+Statut : accepté. Périmètre : `packages/remote-api/**`, `apps/mobile/src/_app/model/focus.ts`, `apps/mobile/src/shared/api/**`, `apps/mobile/src/shared/config/source.ts`, `tools/guardrails/src/proofs/transport.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                    |
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
