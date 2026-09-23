@@ -1,5 +1,7 @@
 import { DONATION, SECTIONS_KEY } from '@huma/contracts';
 import { isRecord } from '@huma/kit/records';
+import { routeOf, SERVICE_ROOT } from '@huma/remote-api';
+import type { RouteName } from '@huma/remote-api';
 import type { Exchange } from './har.ts';
 
 /**
@@ -18,7 +20,14 @@ import type { Exchange } from './har.ts';
  * What a future capture adds, it adds by itself: articles are keyed by the format the service gave them, so a
  * session that opens a kind of article no capture has shown yet lands under a new key, and the tests that walk that
  * table cover it without a line changing.
+ *
+ * Each answer is kept with the request that asked it — its path under the service's root and its query — so a test can
+ * replay it at the address a client asks, and a rule can hold the client's addresses to the ones the official client
+ * actually used.
  */
+
+/** Where the answers a capture keeps are written down: beside the client of the service they are the answers of. */
+export const RECORDED_PATH = 'packages/remote-api/src/recorded.ts';
 
 /**
  * How much of an article's body is kept: enough to read a structure, never enough to read the article.
@@ -33,17 +42,19 @@ const BODY_SIGNS = 8000;
 /** How much of the donation block is kept. What a reading cuts, it cuts by position, so its head proves the cut. */
 const DONATION_SIGNS = 400;
 
-/** How many items of a list are kept, per kind of list. A list is kept for its shapes, not for its length. */
-const ITEMS = { front: 5, wire: 4, sectionFeed: 6, search: 3 } as const;
+/** The routes whose answer is a list, kept one answer each; an article is kept per format instead. */
+type ListRoute = Exclude<RouteName, 'article'>;
 
-/** The routes of the service this repository reads, and the name each answer is written down under. */
-const ROUTES = [
-  { name: 'front', matches: (path: string): boolean => path.endsWith('/wordpress/home') },
-  { name: 'wire', matches: (path: string): boolean => path.endsWith('/wordpress/homepage') },
-  { name: 'sections', matches: (path: string): boolean => path.endsWith('/wordpress/menu') },
-  { name: 'sectionFeed', matches: (path: string): boolean => /\/wordpress\/\d+\/posts\/$/u.test(path) },
-  { name: 'search', matches: (path: string): boolean => path.includes('/article/search/') },
-] as const;
+/** The list routes, in the order this repository reads them and writes them down. */
+const LISTS: readonly ListRoute[] = ['front', 'wire', 'menu', 'section', 'search'];
+
+/**
+ * How many items of a list are kept, per list route — a list is kept for its shapes, not for its length — and none
+ * for the menu, which is kept whole: its eleven sections are its shape.
+ */
+const ITEMS = { front: 5, wire: 4, menu: undefined, section: 6, search: 3 } as const satisfies Readonly<
+  Record<ListRoute, number | undefined>
+>;
 
 /** A body of the service, read far enough to be sorted and trimmed but not modelled: that is the contracts' work. */
 type Post = Readonly<Record<string, unknown>>;
@@ -58,12 +69,14 @@ const postsOf = (body: Body): readonly Post[] => {
 const wordOf = (value: unknown, absent: string): string => (typeof value === 'string' ? value : absent);
 
 /**
- * What makes one item of a list tell a reader something another does not: the format the journal gave it, and which
- * of the fields it may leave out it actually carries. Two items of the same shape hold a schema to the same thing.
+ * What makes one item of a list tell a reader something another does not: the format the journal gave it, whether it
+ * is reserved, and which of the fields it may leave out it actually carries. Two items of the same shape hold a schema
+ * to the same thing; a free item and a reserved one do not, the reserved one being where a body can be kept back.
  */
 const shapeOf = (post: Post): string =>
   [
     wordOf(post['article_format'], 'none'),
+    post['premium'] === true ? 'premium' : 'free',
     post['image_caption'] === undefined ? 'no-caption' : post['image_caption'] === null ? 'null-caption' : 'caption',
     post['video_url'] === undefined ? 'no-video' : 'video',
     post['author'] === null ? 'no-author' : 'author',
@@ -110,12 +123,18 @@ const trimArticle = (body: Body): Body => {
   return { ...body, content_array: kept };
 };
 
+/** An answer kept, with the request that asked it: the path under the service's root, and the query as it was sent. */
+type Kept = Readonly<{ path: string; query: string; answer: Body }>;
+
 /** What a reading of a capture chose, and what it could not find. */
 export type Chosen = Readonly<{
-  answers: Readonly<Record<string, Body>>;
-  articles: Readonly<Record<string, Body>>;
+  answers: Readonly<Partial<Record<ListRoute, Kept>>>;
+  articles: Readonly<Record<string, Kept>>;
   missing: readonly string[];
 }>;
+
+/** The path of an exchange under the service's root, which is how a route names it. */
+const underRoot = (path: string): string => (path.startsWith(SERVICE_ROOT) ? path.slice(SERVICE_ROOT.length) : path);
 
 /** Whether an exchange is an answer of the journal's service, in JSON, that went through. */
 const served = (exchange: Exchange): boolean =>
@@ -138,34 +157,37 @@ const bodyOf = (exchange: Exchange): Body | null => {
  * hold the same article twice, once truncated by a cache.
  */
 export const chooseAnswers = (exchanges: readonly Exchange[]): Chosen => {
-  const answers: Record<string, Body> = {};
-  const articles: Record<string, Body> = {};
+  const answers: Partial<Record<ListRoute, Kept>> = {};
+  const articles: Record<string, Kept> = {};
+  const sizes: Record<string, number> = {};
   for (const exchange of exchanges) {
-    if (!served(exchange)) {
+    const body = served(exchange) ? bodyOf(exchange) : null;
+    const route = routeOf(exchange.path);
+    if (body === null || route === undefined) {
       continue;
     }
-    const body = bodyOf(exchange);
-    if (body === null) {
-      continue;
-    }
-    const route = ROUTES.find((each) => each.matches(exchange.path));
-    if (route !== undefined && answers[route.name] === undefined) {
-      const most: number | undefined = route.name === 'sections' ? undefined : ITEMS[route.name];
-      answers[route.name] = most === undefined ? body : { ...body, posts: varied(postsOf(body), most) };
-      continue;
-    }
-    if (/\/wordpress\/post\/\d+$/u.test(exchange.path) && Array.isArray(body['content_array'])) {
+    const request = { path: underRoot(exchange.path), query: exchange.query };
+    if (route === 'article') {
       const format = wordOf(body['article_format'], 'unknown');
-      const kept = articles[format];
       const size = JSON.stringify(body).length;
-      if (kept === undefined || JSON.stringify(kept).length < size) {
-        articles[format] = trimArticle(body);
+      if (Array.isArray(body['content_array']) && size > (sizes[format] ?? 0)) {
+        sizes[format] = size;
+        articles[format] = { ...request, answer: trimArticle(body) };
       }
+      continue;
+    }
+    if (answers[route] === undefined) {
+      const most = ITEMS[route];
+      answers[route] = {
+        ...request,
+        answer: most === undefined ? body : { ...body, posts: varied(postsOf(body), most) },
+      };
     }
   }
-  const missing = [...ROUTES.map((route) => route.name), 'articles'].filter((name: string) =>
-    name === 'articles' ? Object.keys(articles).length === 0 : answers[name] === undefined,
-  );
+  const missing = [
+    ...LISTS.filter((route) => answers[route] === undefined),
+    ...(Object.keys(articles).length === 0 ? ['article'] : []),
+  ];
   return { answers, articles, missing };
 };
 
@@ -180,17 +202,18 @@ export const moduleOf = (chosen: Chosen): string => {
   const formats = Object.keys(chosen.articles).toSorted((left, right) => left.localeCompare(right));
   const table = {
     ...Object.fromEntries(
-      ROUTES.flatMap((route) => {
-        const body = chosen.answers[route.name];
-        return body === undefined ? [] : [[route.name, body] as const];
+      LISTS.flatMap((route) => {
+        const kept = chosen.answers[route];
+        return kept === undefined ? [] : [[route, kept] as const];
       }),
     ),
     articles: Object.fromEntries(formats.map((format) => [format, chosen.articles[format]] as const)),
   };
   const written = JSON.stringify(table, null, 2).replace(`"${SECTIONS_KEY}":`, '[SECTIONS_KEY]:');
   return `/**
- * Real answers of the journal's service, so a schema is held against what it sends and not against what we remember
- * of it. Written by \`pnpm capture:read\`; never edited by hand.
+ * Real answers of the journal's service, each with the request that asked it, so a reading is held against what the
+ * service sends and a client against the addresses the official client used. Written by \`pnpm capture:read\`; never
+ * edited by hand.
  *
  * Bodies are trimmed: the opening of the prose and the head of the donation block the service closes every article
  * with. The block is what a reading has to recognise and cut, so its head is kept; the prose is the journal's to
@@ -201,7 +224,7 @@ export const moduleOf = (chosen: Chosen): string => {
  * cover it without a line changing.
  */
 
-import { SECTIONS_KEY } from './remote.ts';
+import { SECTIONS_KEY } from '@huma/contracts';
 
 export const RECORDED = ${written} as const;
 `;

@@ -1,40 +1,14 @@
 import { expect, test } from 'vitest';
 import { atWidth, judgePicture, PICTURE } from './index.ts';
-import { RECORDED } from './recorded.ts';
 
 /**
- * The judging answers whether a way of asking for a picture holds the rule; these answer whether the pictures the
- * journal actually serves are ones this contract reads, and how the one way this module offers treats each shape of
- * address it can meet. One holds a rule, the others hold a measurement and a branch.
+ * The judging answers whether a way of asking for a picture holds the rule; these answer how the one way this module
+ * offers treats each shape of address it can meet. Whether the pictures the journal actually serves are ones this
+ * contract reads is measured beside the client, in the package that keeps its answers.
  */
-
-const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-/** Every picture address the capture kept, at whatever depth of whatever answer holds it. */
-const imagesOf = (value: unknown): readonly string[] => {
-  if (Array.isArray(value)) {
-    return value.flatMap((item: unknown) => imagesOf(item));
-  }
-  if (!isRecord(value)) {
-    return [];
-  }
-  const own = typeof value['image'] === 'string' && value['image'] !== '' ? [value['image']] : [];
-  return [...own, ...Object.values(value).flatMap((child: unknown) => imagesOf(child))];
-};
-
-const IMAGES = imagesOf(RECORDED);
 
 test('the way this module asks for a picture holds the rule', () => {
   expect(judgePicture(atWidth)).toEqual([]);
-});
-
-test('the capture in the repository holds pictures to read', () => {
-  expect(IMAGES.length).toBeGreaterThan(10);
-});
-
-test('every picture the journal served is one this contract reads as the journal’s', () => {
-  expect(IMAGES.filter((url) => !PICTURE.safeParse({ kind: 'journal', url }).success)).toEqual([]);
 });
 
 test('a picture of the journal is refused when it points anywhere but the journal’s own pictures', () => {

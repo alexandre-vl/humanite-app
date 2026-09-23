@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { chooseAnswers, moduleOf } from '@huma/capture/answers';
+import { chooseAnswers, moduleOf, RECORDED_PATH } from '@huma/capture/answers';
 import { readHar } from '@huma/capture/har';
 import { judgeSecrets } from '@huma/capture/secrets';
 import { findWorkspaceRoot, print, readArguments, runCommand } from '@huma/kit/cli';
@@ -10,7 +10,7 @@ import { repoPath } from '@huma/kit/paths';
 const USAGE = 'Usage : pnpm capture:read <fichier.har>';
 
 /** Where the answers a capture keeps are written down, and the only file this command writes. */
-const RECORDED = repoPath('packages/contracts/src/recorded.ts');
+const RECORDED = repoPath(RECORDED_PATH);
 
 await runCommand(async () => {
   const { positionals } = readArguments(USAGE, { options: {}, allowPositionals: true });
@@ -24,8 +24,8 @@ await runCommand(async () => {
   const exchanges = readHar(await readFile(file, 'utf8'));
   const chosen = chooseAnswers(exchanges);
   print(`· ${String(exchanges.length)} échanges lus`);
-  for (const [name, body] of Object.entries(chosen.answers)) {
-    const posts = body['posts'];
+  for (const [name, kept] of Object.entries(chosen.answers)) {
+    const posts = kept.answer['posts'];
     const count = Array.isArray(posts) ? ` — ${String(posts.length)} items` : '';
     print(`  ✓ ${name}${count}`);
   }

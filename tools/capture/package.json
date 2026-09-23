@@ -11,7 +11,8 @@
   "dependencies": {
     "@huma/contracts": "workspace:*",
     "@huma/fixtures": "workspace:*",
-    "@huma/kit": "workspace:*"
+    "@huma/kit": "workspace:*",
+    "@huma/remote-api": "workspace:*"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",

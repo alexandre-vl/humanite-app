@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fixtureFactory } from '@huma/fixtures';
 import { findWorkspaceRoot } from '@huma/kit/cli';
+import { RECORDED_PATH } from '../answers.ts';
 import { judgeSecrets } from '../secrets.ts';
 import type { SecretCode } from '../secrets.ts';
 
@@ -21,9 +22,6 @@ const define = fixtureFactory<SecretCode>();
 const judged = (text: string) => async (): Promise<readonly SecretCode[]> =>
   Promise.resolve(judgeSecrets(text).map((finding) => finding.code));
 
-/** Where the answers a capture kept are written down. */
-const RECORDED = 'packages/contracts/src/recorded.ts';
-
 /** A JWT of the right shape and of no value: three parts, the first a base64 of an object. */
 const TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJpbnZlbnRlIiwiaWF0IjowfQ.c2lnbmF0dXJlLWludmVudGVl';
 
@@ -34,7 +32,7 @@ export const SECRET_FIXTURES = [
     [],
     async (): Promise<readonly SecretCode[]> => {
       const root = await findWorkspaceRoot(import.meta.dirname);
-      const text = await readFile(join(root, RECORDED), 'utf8');
+      const text = await readFile(join(root, RECORDED_PATH), 'utf8');
       return judgeSecrets(text).map((finding) => finding.code);
     },
   ),

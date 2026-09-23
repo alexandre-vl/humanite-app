@@ -281,20 +281,10 @@ const CACHE_BUSTER_FILE = repoPath(`${APP_DIRECTORY}/src/_app/model/cache-buster
 const CONTRACTS_SOURCES = 'packages/contracts/src';
 
 /**
- * The answers a capture recorded, which sit among the contracts' sources and are not one.
- *
- * They are what the schemas and the readings are held against, written by `pnpm capture:read` and read by tests alone:
- * nothing a reader's cache holds was ever shaped by them. Hashed with the rest, every new capture would mint a new
- * buster and throw away every reader's cache — a day of reading, discarded because a test fixture moved.
+ * Whether a file of the contracts shapes what the app caches: a source, and not a test. Exported so the rule can be
+ * pinned by a test rather than read off the hash it feeds.
  */
-const RECORDED_ANSWERS = 'recorded.ts';
-
-/**
- * Whether a file of the contracts shapes what the app caches: a source, and neither a test nor the recorded answers.
- * Exported so the rule can be pinned by a test rather than read off the hash it feeds.
- */
-export const shapesTheCache = (name: string): boolean =>
-  name.endsWith('.ts') && !name.endsWith('.test.ts') && name !== RECORDED_ANSWERS;
+export const shapesTheCache = (name: string): boolean => name.endsWith('.ts') && !name.endsWith('.test.ts');
 
 /**
  * The cache buster: the sha256 of the data contracts' sources, so the persisted TanStack Query cache is discarded

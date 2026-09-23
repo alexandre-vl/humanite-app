@@ -970,10 +970,10 @@ export const BINDINGS = {
   'ADR-0027': {
     scope: {
       // The wire shapes, the readings that turn the service's markup into text and blocks, the way its pictures are
-      // asked for, and the answers all of them are held against. The client that will call the service is not here
-      // yet; its module joins this scope the day it is written. The simulated content is here too, with the section
-      // grounds its visuals are drawn in: this ADR supersedes the one that governed them, and a supersession that
-      // left them governed by nothing would leave their proofs bound to nothing.
+      // asked for, and the package that asks the service — with the answers all of them are held against. The
+      // simulated content is here too, with the section grounds its visuals are drawn in: this ADR supersedes the one
+      // that governed them, and a supersession that left them governed by nothing would leave their proofs bound to
+      // nothing.
       paths: [
         'packages/contracts/src/intake.ts',
         'packages/contracts/src/intake.test.ts',
@@ -981,12 +981,11 @@ export const BINDINGS = {
         'packages/contracts/src/picture.test.ts',
         'packages/contracts/src/prose.ts',
         'packages/contracts/src/prose.test.ts',
-        'packages/contracts/src/recorded.ts',
         'packages/contracts/src/remote.ts',
-        'packages/contracts/src/remote.test.ts',
         'packages/design-tokens/src/sections.ts',
         'packages/mock-api/**',
         'packages/mock-content/**',
+        'packages/remote-api/**',
         'tools/capture/**',
         'tools/governance/src/cli/capture-read.ts',
         'tools/guardrails/src/proofs/artwork.ts',
