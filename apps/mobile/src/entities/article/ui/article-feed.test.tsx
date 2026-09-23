@@ -13,7 +13,7 @@ type ScreenProps = Readonly<{ rhythm: FeedRhythm; onOpen: (id: string) => void }
 
 /** What a screen does with a feed, in miniature: it reads it, then hands it to the view that shows it. */
 function Screen({ rhythm, onOpen }: ScreenProps): ReactNode {
-  return <ArticleFeed feed={usePagedFeed(feedQuery)} rhythm={rhythm} dated={false} onOpen={onOpen} />;
+  return <ArticleFeed feed={usePagedFeed(feedQuery)} rhythm={rhythm} onOpen={onOpen} />;
 }
 
 const mounted = async (rhythm: FeedRhythm, onOpen: (id: string) => void): Promise<void> => {

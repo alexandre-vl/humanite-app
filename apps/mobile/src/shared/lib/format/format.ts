@@ -1,4 +1,4 @@
-import type { DisplayText } from '@huma/contracts';
+import type { DisplayText, IssueId } from '@huma/contracts';
 import { clockAt } from '@huma/contracts';
 import { asDisplayText } from '../display-text';
 
@@ -29,8 +29,12 @@ const pad = (value: number): string => String(value).padStart(2, '0');
  * They are written here rather than asked of `Intl` in French: the newsroom's clock is read in one locale precisely so
  * the printed forms do not follow the device's own data, and a heading that did would read differently from one phone
  * to the next while the rest of the screen did not.
+ *
+ * A weekday is only ever printed at the head of what it dates — a band over a run of the wire, the date that closes a
+ * card — so it is written with the capital a French line opens on. The band read `samedi 12 septembre` in the lower
+ * case, the one heading on its screen that began without one.
  */
-const WEEKDAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'] as const;
+const WEEKDAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'] as const;
 const MONTHS = [
   'janvier',
   'février',
@@ -57,29 +61,27 @@ const nameAt = (names: readonly string[], index: number): string => {
 /** A day of the month as French prints it: `1er` for the first, the number for every other. */
 const dayOf = (day: number): string => (day === 1 ? '1er' : String(day));
 
-// A card carries a date only where its list reaches back further than a day, and the article prints one prominently —
-// both `formatLongDate`, in letters. Nielsen's homepage guideline is why a front of one day's paper carries none.
-
 /**
- * The hour an item was filed, as a row of the wire carries it: `19:52`.
+ * The hour an item was filed, as the paper prints it wherever it prints one: `19\u00A0h\u00A052`, the letter held to
+ * its numbers, and the hour without a zero in front of it.
  *
- * The day is the band's, pinned over the run and reading `samedi 12 septembre`: printed again on every row, as
- * `12/09, 19:52`, it costs a width and not a line. Measured on an A065, the pair takes 83 points of a 411-point screen
- * and, with the rail beside it, starts every title 140 points in — four lines where three had room. The hour alone
- * takes 34.
+ * One form for every screen. The wire printed `19:52` while the article printed `à 19 h 52`, so the same piece was
+ * filed at two different-looking times two taps apart. The hour sits on its own line over a row's title now, where
+ * the two letters it gains cost no line.
  */
-export const formatClockTime = (instant: string): DisplayText => {
+export const formatHour = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
-  return asDisplayText(`${pad(clock.hour)}:${pad(clock.minute)}`);
+  return asDisplayText(`${String(clock.hour)}\u00A0h\u00A0${pad(clock.minute)}`);
 };
 
-// The calendar day an instant falls on is the contracts' `issueIdAt`: one key, which a numéro is named by and a wire
-// groups its runs under.
+// The calendar day an instant falls on is the contracts' `issueIdAt`: one key, which a numéro is named by, a wire
+// groups its runs under and a card is dated against.
 
 /**
- * That same day as a timeline heads the run it opens: `samedi 13 septembre`. The year is left out, a wire reaching
- * back weeks at most; the weekday is read from the Paris calendar date rather than from the instant, so a publication
- * just before Paris midnight heads the day the newsroom filed it under, not the one UTC was already on.
+ * That same day as a timeline heads the run it opens, and as a card names a day of the week before: `Samedi 13
+ * septembre`. The year is left out, a wire reaching back weeks at most; the weekday is read from the Paris calendar
+ * date rather than from the instant, so a publication just before Paris midnight heads the day the newsroom filed it
+ * under, not the one UTC was already on.
  */
 export const formatDayLabel = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
@@ -88,7 +90,7 @@ export const formatDayLabel = (instant: string): DisplayText => {
 };
 
 /**
- * That same day as a front page carries it: `13 septembre`.
+ * That same day as a cover carries it, and as a card does once it is older than a week: `13 septembre`.
  *
  * The weekday is left off, and not to save room for its own sake. A wire needs it because a wire spans days and a
  * reader arriving in the middle of one is orienting themself in time; a cover is dated, and on a shelf of consecutive
@@ -103,12 +105,11 @@ export const formatDayDate = (instant: string): DisplayText => {
 };
 
 /**
- * The day an article was published, written out where an article prints it: `13 septembre 2026`.
+ * The day an article was published, written out in full: `13 septembre 2026`.
  *
- * It is the one place in the paper that carries a year, and the one that carries a month in letters. Nielsen's
- * homepage guideline says both halves of that: a front page of one week's stories needs no date on each card, and the
- * full article needs one printed prominently. The weekday is left off — a wire needs it because a wire spans days and
- * a reader is orienting themself in time, an article carries its own date and the year is what places it.
+ * It is the one date that carries a year: an article reached from a search two years on is read out of the day it
+ * was written in, and Nielsen's homepage guideline has the full article print its date prominently, year and all. A
+ * card carries it only for an item of another year than the reader's.
  */
 export const formatLongDate = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
@@ -118,11 +119,47 @@ export const formatLongDate = (instant: string): DisplayText => {
 /**
  * When an article was published, as its head prints it: `23 septembre 2026 à 6\u00A0h\u00A057`. The wire lists the
  * same piece at its hour, and an article of the morning and one of the evening are not the same news: the day alone
- * said less of the piece than the wire did. The hour is written the French way, the letter held to its numbers.
+ * said less of the piece than the wire did.
  */
-export const formatPublished = (instant: string): DisplayText => {
+export const formatPublished = (instant: string): DisplayText =>
+  asDisplayText(`${formatLongDate(instant)} à ${formatHour(instant)}`);
+
+/** Back a week, a weekday names one day only; seven days back, `Lundi` would be two. */
+const WEEK = 7;
+
+const DAY_MILLIS = 86_400_000;
+
+/** A calendar day as a count of days, so two of them are told apart by a subtraction and no clock change counts. */
+const dayNumber = (year: number, month: number, day: number): number => Date.UTC(year, month - 1, day) / DAY_MILLIS;
+
+/**
+ * When an item was published, as a card says it, against the day the reader is reading on: `12\u00A0h\u00A001` for an
+ * item of that day, `Hier à 18\u00A0h\u00A030` for one of the day before, `Lundi 21 septembre` within the week,
+ * `4 juillet` earlier in the year and `4 juillet 2025` before it.
+ *
+ * Every card carries it, the front's included. The front went without, on Nielsen's guideline that a homepage whose
+ * stories are all of one week needs no date on each — a guideline that asks for a date at the top of the page instead,
+ * which this one never printed, and a front the journal's service fills over seventeen hours: a piece of last night
+ * read as one of this morning. The Guardian's fronts print an hour on every card less than twelve hours old, and
+ * Google News an age on every card.
+ *
+ * An hour rather than an age. « Il y a 2 h » is true when it is drawn and false an hour later in a list left open,
+ * where an hour of the day stays true; and it is the form the wire and the article already print.
+ */
+export const formatWhen = (instant: string, today: IssueId): DisplayText => {
   const clock = clockAt(parseInstant(instant));
-  return asDisplayText(`${formatLongDate(instant)} à ${String(clock.hour)}\u00A0h\u00A0${pad(clock.minute)}`);
+  const [year = 0, month = 0, day = 0] = today.split('-').map(Number);
+  const before = dayNumber(year, month, day) - dayNumber(clock.year, clock.month, clock.day);
+  if (before <= 0) {
+    return formatHour(instant);
+  }
+  if (before === 1) {
+    return asDisplayText(`Hier à ${formatHour(instant)}`);
+  }
+  if (before < WEEK) {
+    return formatDayLabel(instant);
+  }
+  return clock.year === year ? formatDayDate(instant) : formatLongDate(instant);
 };
 
 /**

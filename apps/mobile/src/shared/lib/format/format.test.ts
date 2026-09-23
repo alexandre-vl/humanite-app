@@ -1,20 +1,29 @@
+import type { IssueId } from '@huma/contracts';
+import { issueIdAt } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { asDisplayText } from '../display-text';
-import { formatByline, formatClockTime, formatDayDate, formatDayLabel, formatLongDate, formatPublished } from './index';
+import {
+  formatByline,
+  formatDayDate,
+  formatDayLabel,
+  formatHour,
+  formatLongDate,
+  formatPublished,
+  formatWhen,
+} from './index';
 
-describe('formatClockTime', () => {
-  it('imprime l’heure que porte une ligne du fil, et rien du jour au-dessus', () => {
-    expect(formatClockTime('2026-09-12T17:52:00.000Z')).toBe('19:52');
-  });
-
-  it('complète d’un zéro les deux moitiés d’une petite heure', () => {
-    expect(formatClockTime('2026-09-12T22:05:00.000Z')).toBe('00:05');
+describe('formatHour', () => {
+  /** The French form, its letter held to its numbers, and no zero in front of an hour of one figure. */
+  it('imprime l’heure à la française, la lettre tenue à ses chiffres', () => {
+    expect(formatHour('2026-09-12T17:52:00.000Z')).toBe('19\u00A0h\u00A052');
+    expect(formatHour('2026-09-12T07:05:00.000Z')).toBe('9\u00A0h\u00A005');
   });
 
   // The hour is the newsroom's, like every other reading here: an instant filed just before Paris midnight shows the
   // hour Paris was on, under the head of the day Paris was on.
   it('lit l’heure de Paris, donc une fin de soirée passe minuit avec elle', () => {
-    expect(formatClockTime('2026-09-12T23:30:00.000Z')).toBe('01:30');
+    expect(formatHour('2026-09-12T22:05:00.000Z')).toBe('0\u00A0h\u00A005');
+    expect(formatHour('2026-09-12T23:30:00.000Z')).toBe('1\u00A0h\u00A030');
   });
 });
 
@@ -63,15 +72,15 @@ describe('formatLongDate', () => {
 
 describe('formatDayLabel', () => {
   it('ouvre une série par son jour de la semaine, son jour et son mois', () => {
-    expect(formatDayLabel('2026-09-12T17:52:00.000Z')).toBe('samedi 12 septembre');
+    expect(formatDayLabel('2026-09-12T17:52:00.000Z')).toBe('Samedi 12 septembre');
   });
 
   it('lit le jour de la semaine à l’heure de Paris, donc une fin de soirée ouvre le lendemain', () => {
-    expect(formatDayLabel('2026-09-12T22:30:00.000Z')).toBe('dimanche 13 septembre');
+    expect(formatDayLabel('2026-09-12T22:30:00.000Z')).toBe('Dimanche 13 septembre');
   });
 
   it('laisse sans zéro un jour d’un seul chiffre', () => {
-    expect(formatDayLabel('2026-01-01T09:00:00.000Z')).toBe('jeudi 1er janvier');
+    expect(formatDayLabel('2026-01-01T09:00:00.000Z')).toBe('Jeudi 1er janvier');
   });
 
   it('nomme chaque mois', () => {
@@ -79,18 +88,18 @@ describe('formatDayLabel', () => {
       formatDayLabel(`2026-${String(index + 1).padStart(2, '0')}-15T09:00:00.000Z`),
     );
     expect(months).toEqual([
-      'jeudi 15 janvier',
-      'dimanche 15 février',
-      'dimanche 15 mars',
-      'mercredi 15 avril',
-      'vendredi 15 mai',
-      'lundi 15 juin',
-      'mercredi 15 juillet',
-      'samedi 15 août',
-      'mardi 15 septembre',
-      'jeudi 15 octobre',
-      'dimanche 15 novembre',
-      'mardi 15 décembre',
+      'Jeudi 15 janvier',
+      'Dimanche 15 février',
+      'Dimanche 15 mars',
+      'Mercredi 15 avril',
+      'Vendredi 15 mai',
+      'Lundi 15 juin',
+      'Mercredi 15 juillet',
+      'Samedi 15 août',
+      'Mardi 15 septembre',
+      'Jeudi 15 octobre',
+      'Dimanche 15 novembre',
+      'Mardi 15 décembre',
     ]);
   });
 });
@@ -100,6 +109,48 @@ describe('formatPublished', () => {
   it('écrit le jour et l’heure où l’article a paru, à l’heure de Paris', () => {
     expect(formatPublished('2026-09-23T04:57:00.000Z')).toBe('23 septembre 2026 à 6\u00A0h\u00A057');
     expect(formatPublished('2026-09-01T10:05:00.000Z')).toBe('1er septembre 2026 à 12\u00A0h\u00A005');
+  });
+});
+
+describe('formatWhen', () => {
+  /** The day the reader reads on, as the phone's clock gives it: a Paris calendar date. */
+  const on = (day: string): IssueId => issueIdAt(`${day}T12:00:00.000Z`);
+
+  it('donne son heure à un article du jour, et rien d’autre', () => {
+    expect(formatWhen('2026-09-23T10:01:00.000Z', on('2026-09-23'))).toBe('12\u00A0h\u00A001');
+  });
+
+  /** The front runs over seventeen hours: last night's pieces sit among this morning's, and say so. */
+  it('dit « Hier » à un article de la veille, avec son heure', () => {
+    expect(formatWhen('2026-09-22T16:30:00.000Z', on('2026-09-23'))).toBe('Hier à 18\u00A0h\u00A030');
+  });
+
+  it('compte les jours à l’heure de Paris, donc minuit passé à Paris est déjà le jour du lecteur', () => {
+    expect(formatWhen('2026-09-22T22:30:00.000Z', on('2026-09-23'))).toBe('0\u00A0h\u00A030');
+    expect(formatWhen('2026-09-22T21:30:00.000Z', on('2026-09-23'))).toBe('Hier à 23\u00A0h\u00A030');
+  });
+
+  it('nomme le jour de la semaine tant qu’il n’en désigne qu’un', () => {
+    expect(formatWhen('2026-09-21T09:00:00.000Z', on('2026-09-23'))).toBe('Lundi 21 septembre');
+    expect(formatWhen('2026-09-17T09:00:00.000Z', on('2026-09-23'))).toBe('Jeudi 17 septembre');
+    expect(formatWhen('2026-09-16T09:00:00.000Z', on('2026-09-23'))).toBe('16 septembre');
+  });
+
+  /** Only another year than the reader's is printed: a section reaches back weeks, a search two years. */
+  it('ne porte l’année que pour une autre année que celle du lecteur', () => {
+    expect(formatWhen('2026-07-04T09:00:00.000Z', on('2026-09-23'))).toBe('4 juillet');
+    expect(formatWhen('2025-07-04T09:00:00.000Z', on('2026-09-23'))).toBe('4 juillet 2025');
+  });
+
+  it('compte en jours du calendrier, par-dessus la fin d’une année comme par-dessus un changement d’heure', () => {
+    expect(formatWhen('2026-12-31T09:00:00.000Z', on('2027-01-02'))).toBe('Jeudi 31 décembre');
+    expect(formatWhen('2026-12-20T09:00:00.000Z', on('2027-01-02'))).toBe('20 décembre 2026');
+    expect(formatWhen('2026-10-24T22:30:00.000Z', on('2026-10-26'))).toBe('Hier à 0\u00A0h\u00A030');
+  });
+
+  /** A phone whose clock runs behind the newsroom's is handed an item from its future: it reads as the day's. */
+  it('donne son heure à un article daté d’après le jour du lecteur', () => {
+    expect(formatWhen('2026-09-24T07:00:00.000Z', on('2026-09-23'))).toBe('9\u00A0h\u00A000');
   });
 });
 

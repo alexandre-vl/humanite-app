@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { formatLongDate } from '#lib/format';
+import { formatWhen, useToday } from '#lib/format';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -20,8 +20,6 @@ export type ArticleCardProps = Readonly<{
   summary: ArticleSummary;
   action?: ReactNode | undefined;
   signature?: DisplayText | null | undefined;
-  /** Whether the card says when the item was published: wherever a list reaches back further than one day's paper. */
-  dated?: boolean | undefined;
 }>;
 
 /**
@@ -99,7 +97,6 @@ type PartProps = Readonly<{
   summary: ArticleSummary;
   action: ReactNode;
   signature: DisplayText | null;
-  dated: boolean;
 }>;
 
 /**
@@ -127,26 +124,23 @@ function Head({ summary, signature }: Pick<PartProps, 'summary' | 'signature'>):
 }
 
 /**
- * What closes a card: when it was published, where the list reaches back further than a day; whether anyone may read
- * it; and the one thing a reader may do to it from the feed.
+ * What closes a card: when it was published, whether anyone may read it, and the one thing a reader may do to it from
+ * the feed.
  *
- * The date was taken off every card for a front page of one day, which needs none — Nielsen's guideline 84. A section's
- * own list reaches back six weeks and a search two years, and a card there without a date says a piece of August is
- * this morning's; so the screen that lists further back than a day asks for one. The control keeps one place on every
- * shape, the end of the card, where a thumb leaving it passes: NN/g's finding on saving is that a save nobody can find
- * is a save nobody uses, and it is the one thing on a card that answers a press of its own.
+ * The date is written against the reader's day, on every list alike — the hour for an item of that day, `Hier` for one
+ * of the day before, the weekday within the week, the date beyond — so a front of seventeen hours tells last night
+ * from this morning and a search reaching back two years says which year. The control keeps one place on every shape,
+ * the end of the card, where a thumb leaving it passes: NN/g's finding on saving is that a save nobody can find is a
+ * save nobody uses, and it is the one thing on a card that answers a press of its own.
  */
-function Foot({ summary, action, dated }: Pick<PartProps, 'summary' | 'action' | 'dated'>): ReactNode {
+function Foot({ summary, action }: Pick<PartProps, 'summary' | 'action'>): ReactNode {
   const styles = useStyles();
-  const open = OPEN[summary.access];
-  if (!dated && !open && action === null) {
-    return null;
-  }
+  const today = useToday();
   return (
     <Box style={styles.foot}>
       <Box style={styles.said}>
-        {dated ? <Text variant="caption">{formatLongDate(summary.publishedAt)}</Text> : null}
-        {open ? (
+        <Text variant="caption">{formatWhen(summary.publishedAt, today)}</Text>
+        {OPEN[summary.access] ? (
           <Text variant="kicker" tone="textPrimary">
             {t('article.free')}
           </Text>
@@ -205,14 +199,14 @@ function Picture({ summary }: Readonly<{ summary: ArticleSummary }>): ReactNode 
 }
 
 /** The front of a page: the picture first, at the width of the block, then the words under it. */
-function Lead({ summary, action, signature, dated }: PartProps): ReactNode {
+function Lead({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
       <Picture summary={summary} />
       <Head summary={summary} signature={signature} />
       <Words summary={summary} standfirst />
-      <Foot summary={summary} action={action} dated={dated} />
+      <Foot summary={summary} action={action} />
     </Box>
   );
 }
@@ -231,7 +225,7 @@ function Lead({ summary, action, signature, dated }: PartProps): ReactNode {
  * Monde shows one on fifteen of a hundred and seven. A sentence under every title is what turned this front into a
  * wall of grey where nothing was subordinate to anything.
  */
-function Line({ summary, action, signature, dated }: PartProps): ReactNode {
+function Line({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'thumbnail');
   return (
@@ -251,7 +245,7 @@ function Line({ summary, action, signature, dated }: PartProps): ReactNode {
           />
         )}
       </Box>
-      <Foot summary={summary} action={action} dated={dated} />
+      <Foot summary={summary} action={action} />
     </Box>
   );
 }
@@ -267,7 +261,7 @@ function Line({ summary, action, signature, dated }: PartProps): ReactNode {
  * It carries no standfirst either. Two columns in three are filed with none, and the service stands in the opening of
  * the body for it, cut at a « … »: a sentence begun, not a sentence about the piece.
  */
-function Column({ summary, action, signature, dated }: PartProps): ReactNode {
+function Column({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.column}>
@@ -276,7 +270,7 @@ function Column({ summary, action, signature, dated }: PartProps): ReactNode {
         <Box style={styles.card}>
           <Head summary={summary} signature={signature} />
           <Words summary={summary} standfirst={false} />
-          <Foot summary={summary} action={action} dated={dated} />
+          <Foot summary={summary} action={action} />
         </Box>
       </Box>
     </Box>
@@ -284,13 +278,13 @@ function Column({ summary, action, signature, dated }: PartProps): ReactNode {
 }
 
 /** An item written without a picture: its words are the whole card (capture 02). */
-function Brief({ summary, action, signature, dated }: PartProps): ReactNode {
+function Brief({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
       <Head summary={summary} signature={signature} />
       <Words summary={summary} standfirst />
-      <Foot summary={summary} action={action} dated={dated} />
+      <Foot summary={summary} action={action} />
     </Box>
   );
 }
@@ -309,18 +303,11 @@ function Brief({ summary, action, signature, dated }: PartProps): ReactNode {
  * `stacked` put the title above the picture and the standfirst below it, so two cards a scroll apart taught two
  * different templates for the same four things.
  *
- * `action` is whatever the screen lets a reader do to the article from the feed, `signature` who signed it, and
- * `dated` whether the screen lists further back than a day. The card takes all three already made: an entity may not
- * name a route, nor hold an action of its own.
+ * `action` is whatever the screen lets a reader do to the article from the feed, and `signature` who signed it. The
+ * card takes both already made: an entity may not name a route, nor hold an action of its own.
  */
-export function ArticleCard({
-  shape,
-  summary,
-  action = null,
-  signature = null,
-  dated = false,
-}: ArticleCardProps): ReactNode {
-  const parts = { summary, action, signature, dated };
+export function ArticleCard({ shape, summary, action = null, signature = null }: ArticleCardProps): ReactNode {
+  const parts = { summary, action, signature };
   switch (shape) {
     case 'lead': {
       return <Lead {...parts} />;

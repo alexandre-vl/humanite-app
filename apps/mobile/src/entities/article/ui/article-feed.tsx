@@ -19,8 +19,6 @@ export type ArticleFeedProps = Readonly<{
   rhythm: FeedRhythm;
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
-  /** Whether each card says when its item was published: wherever the list reaches back further than a day. */
-  dated: boolean;
   header?: ReactNode;
   sticky?: ReactNode;
   stickyRows?: BandRows | undefined;
@@ -59,7 +57,6 @@ export function ArticleFeed({
   rhythm,
   onOpen,
   action,
-  dated,
   header,
   sticky,
   stickyRows,
@@ -81,7 +78,6 @@ export function ArticleFeed({
           summary={row.summary}
           action={action?.(row.summary)}
           signature={row.shape === 'column' ? signatureOf(row.summary) : null}
-          dated={dated}
         />
       </Pressable>
     </Box>

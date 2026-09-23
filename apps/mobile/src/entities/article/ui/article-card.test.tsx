@@ -1,10 +1,10 @@
 import type { ArticleSummary, DisplayText } from '@huma/contracts';
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
-import { formatLongDate } from '#lib/format';
+import { formatHour, formatLongDate } from '#lib/format';
 import { everyArticle } from '#lib/testing';
 import { Text } from '#primitives/text';
 import type { CardShape } from '../model/rhythm';
@@ -69,6 +69,8 @@ const holdingBoth = (one: Node, other: Node): Node => {
 const PICTURES = { lead: 1, line: 1, column: 0, brief: 0 } satisfies Readonly<Record<CardShape, number>>;
 
 const SHAPES: readonly CardShape[] = ['lead', 'line', 'column', 'brief'];
+
+const DAY = 86_400_000;
 
 /**
  * The shapes with room for the sentence under a title. A line has none, and that is the point of a line; a column has
@@ -153,31 +155,26 @@ describe('ArticleCard', () => {
   });
 
   /**
-   * Nielsen's homepage guideline 84: as long as every story on the front is of the week, no card needs the date, and
-   * the full article needs one printed prominently. Of the eight fronts measured, Le Monde and NPR print nothing at
-   * all, the Guardian prints an age only under twelve hours, and not one prints a calendar date on every card. This
-   * one printed `13/09/2026` five times a screen, under a corpus filed across three days of one week.
+   * Every card says when its item was published, written against the day the reader reads on: the journal's front
+   * runs over seventeen hours, and a card that printed nothing told a piece of last night from one of this morning by
+   * nothing at all. The clock is pinned, so the case reads the same on any day it is run.
    */
-  it.each(SHAPES)('ne date pas %s : une une d’une journée n’a pas de date par carte', async (shape) => {
+  it.each(SHAPES)('date %s de son heure le jour même, et de son année une autre année', async (shape) => {
     const summary = illustrated(await everything());
-    await render(<ArticleCard shape={shape} summary={summary} />);
-    expect(screen.queryByText(/\d{2}\/\d{2}\/\d{4}/u)).toBeNull();
-    expect(screen.queryByText(formatLongDate(summary.publishedAt))).toBeNull();
+    const published = Date.parse(summary.publishedAt);
+    const clock = jest.spyOn(Date, 'now').mockReturnValue(published);
+    try {
+      await render(<ArticleCard shape={shape} summary={summary} />);
+      expect(screen.getByText(formatHour(summary.publishedAt))).toBeTruthy();
+      await screen.unmount();
+      clock.mockReturnValue(published + 400 * DAY);
+      await render(<ArticleCard shape={shape} summary={summary} />);
+      expect(screen.getByText(formatLongDate(summary.publishedAt))).toBeTruthy();
+    } finally {
+      clock.mockRestore();
+    }
   });
 
-  /** A section's own list reaches back weeks and a search years: there, a card without a date says August is today. */
-  it.each(SHAPES)('date %s quand l’écran liste plus loin qu’une journée', async (shape) => {
-    const summary = illustrated(await everything());
-    await render(<ArticleCard shape={shape} summary={summary} dated />);
-    expect(screen.getByText(formatLongDate(summary.publishedAt))).toBeTruthy();
-  });
-
-  /**
-   * A card says two things and has to say them in that order. Both were printed in the ink of a title and in the
-   * weight of one, four points apart — so the sentence that answers the headline read as a second, smaller headline,
-   * and which to read first was left to the sizes alone. The ink is the claim: not which colour, only that the two
-   * are not one.
-   */
   it.each(WITH_SUMMARY)('sépare sur %s l’encre du titre de celle du chapô', async (shape) => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape={shape} summary={summary} />);

@@ -1,7 +1,7 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { formatClockTime } from '#lib/format';
+import { formatHour } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
@@ -60,7 +60,7 @@ export function WireRow({ summary }: WireRowProps): ReactNode {
       </Box>
       <Box style={styles.words}>
         <Box style={styles.said}>
-          <Text variant="caption">{formatClockTime(summary.publishedAt)}</Text>
+          <Text variant="caption">{formatHour(summary.publishedAt)}</Text>
           {word === null ? null : (
             <Text variant="kicker" tone="textPrimary">
               {word}

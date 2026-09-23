@@ -29,8 +29,7 @@ type SheetProps = Readonly<{ leaf: Leaf }>;
  * One page's feed: the whole paper, or one section of it.
  *
  * A page is a component of its own because each asks for its own feed, and a hook cannot be called in a loop over a
- * list whose length arrives from the newsroom. A section's cards say when each piece was published and the front's do
- * not: the front is one day's paper, and a section's own list reaches back weeks — six, for some.
+ * list whose length arrives from the newsroom.
  */
 function Sheet({ leaf }: SheetProps): ReactNode {
   const section = leaf.section;
@@ -39,7 +38,6 @@ function Sheet({ leaf }: SheetProps): ReactNode {
     <ArticleFeed
       feed={feed}
       rhythm="paper"
-      dated={section !== null}
       onOpen={(id) => {
         router.push(articleHref(id));
       }}

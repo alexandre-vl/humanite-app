@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
-import { formatClockTime, formatDayLabel } from '#lib/format';
+import { formatDayLabel, formatHour } from '#lib/format';
 import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { LivePage } from './live-page';
 
@@ -47,7 +47,7 @@ describe('LivePage', () => {
     const item = await newest();
     await renderPage();
     expect(await screen.findByText(item.title)).toBeTruthy();
-    expect(await screen.findAllByText(formatClockTime(item.publishedAt))).not.toHaveLength(0);
+    expect(await screen.findAllByText(formatHour(item.publishedAt))).not.toHaveLength(0);
   });
 
   /**

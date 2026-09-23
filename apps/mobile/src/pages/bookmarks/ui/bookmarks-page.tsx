@@ -51,7 +51,6 @@ export function BookmarksPage(): ReactNode {
       <ArticleFeed
         feed={kept}
         rhythm="list"
-        dated
         onOpen={(id) => {
           router.push(articleHref(id));
         }}

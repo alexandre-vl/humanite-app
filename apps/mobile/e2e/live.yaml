@@ -10,7 +10,7 @@ appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn: 'En continu'
-- assertVisible: dimanche 13 septembre
+- assertVisible: Dimanche 13 septembre
 - takeScreenshot: live-top
 - scroll
 - scroll
