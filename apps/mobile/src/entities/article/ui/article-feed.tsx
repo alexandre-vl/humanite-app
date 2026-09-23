@@ -3,7 +3,6 @@ import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
-import type { BandRows } from '#primitives/list';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
 import { signatureOf } from '../model/byline';
@@ -20,8 +19,6 @@ export type ArticleFeedProps = Readonly<{
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
   header?: ReactNode;
-  sticky?: ReactNode;
-  stickyRows?: BandRows | undefined;
   empty?: EmptyWords | undefined;
 }>;
 
@@ -52,16 +49,7 @@ const useStyles = createStyles((theme) => ({
  * A column announces its writer and nothing else does, which is why the signature is read here and not by the card:
  * a card is handed what it draws.
  */
-export function ArticleFeed({
-  feed,
-  rhythm,
-  onOpen,
-  action,
-  header,
-  sticky,
-  stickyRows,
-  empty,
-}: ArticleFeedProps): ReactNode {
+export function ArticleFeed({ feed, rhythm, onOpen, action, header, empty }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
   const render = (row: FeedRow): ReactNode => (
     <Box style={styles.card}>
@@ -90,8 +78,6 @@ export function ArticleFeed({
       renderItem={render}
       contentStyle={styles.feed}
       header={header}
-      sticky={sticky}
-      stickyRows={stickyRows}
       empty={<FeedStandIn state={feed.state} onRetry={feed.retry} empty={empty} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}

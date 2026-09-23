@@ -4,13 +4,13 @@ import { PALETTE } from './palette.ts';
 /**
  * The semantic colour roles a screen paints with, one value per theme.
  *
- * `onPrimary` is the text a screen lays on `primary`: the wire of En continu paints its whole ground in it, and a
+ * `onPrimary` is the text a screen lays on `primary`: the head of each day of En continu paints its band in it, and a
  * button its pill. Both themes give it the same value, because `primary` itself is the same red in both — a surface
  * that does not change between themes cannot ask for two different texts on it.
  *
- * `ground` is what a reading screen lays its sheet of `background` on, and `headline` the colour a headline takes
- * there. The dark article of the current app needs no rule of its own for either: its ground and its sheet are the
- * same value, so the sheet stops showing, and its headline turns white where the light one is red (captures 11, 13).
+ * `ground` is the torn paper a linked card is dropped on, which is light on either page — paper is paper wherever it
+ * lands — and `headline` the colour an article's own title takes on its page: red on the light one and white on the
+ * dark one, as the current app prints them (captures 11, 13).
  *
  * There was a `block` as well: a second ground a feed printed on, taken in turn with the page's own every three cards
  * so that a run of them read as one block and the next as another (captures 18, 19). No front worth copying does
@@ -38,11 +38,12 @@ import { PALETTE } from './palette.ts';
  * last of those, and not everywhere: 4.81 to 1 on the dark page, 4.35 on the dark bar, 3.83 on the light page. So the
  * light theme writes its links in the deeper `inkRed`, and the dark theme in `darkInkRed`, lifted just enough.
  *
- * `rule` is the line the paper actually draws, and `border` is not it. The one rule in the app — under what an
- * article says about itself, before the article itself — was painted in `border`, which is the light theme's ground
- * for a block: 1.13 to one against the page, a separator nobody has ever seen. A rule is not a ground and owes
- * nothing to WCAG, which asks nothing of a line carrying no meaning of its own; it owes only to be there, and at
- * 1.43 on the light page and 1.52 on the dark one it is.
+ * `rule` is the line the paper actually draws — between two cards, under what an article says about itself, between the
+ * rows of a group — and `border` is not it: that is the grey an empty picture shows until it lands, and the flash of a
+ * press. The first rule in the app was painted in `border`, 1.13 to one against the page, a separator nobody has ever
+ * seen; the rows of the account were ruled in it until later still, 1.04 to one against their card. A rule is not a
+ * ground and owes nothing to WCAG, which asks nothing of a line carrying no meaning of its own; it owes only to be
+ * there, and at 1.43 on the light page and 1.56 on the dark one it is.
  *
  * `control` is the track of a switch when it is off, and it is one value in both themes although the light theme
  * paints muted text the same. A muted word owes one thing: to be read on the page. A track owes three — to be found

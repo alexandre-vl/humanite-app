@@ -42,18 +42,14 @@ test('the paper is laid at a turn to the left, written as React Native reads it'
   expect(() => angle(Number.NaN)).toThrow(/angle invalide/u);
 });
 
-test('sizes give a list its bands and the scroll inset each arrangement adds up to', () => {
+test('a list’s masthead holds its name at the largest step a reader can choose', () => {
   // Sixteen points of air, one line of display type at the largest step a reader can choose, and what is left over
   // is the air the same name has on a screen that lays it in a plain scrolling page. Held against the table it is
   // derived from, so a change to the type or to the steps fails here rather than clipping a name on a phone.
   expect(SIZES.headerExpanded).toBe(48);
   const largest = typographyAt('display', 'huge', 'paper');
   expect(SPACING.lg + largest.size * largest.leading).toBeLessThan(SIZES.headerExpanded);
-  expect(SIZES.band).toBe(40);
-  expect(SIZES.bandPair).toBe(SIZES.band * 2);
-  expect(SIZES.headerBand).toBe(SIZES.headerExpanded + SIZES.band);
-  expect(SIZES.headerBandPair).toBe(SIZES.headerExpanded + SIZES.bandPair);
-  expectTypeOf(SIZES.headerBandPair).toEqualTypeOf<Space>();
+  expectTypeOf(SIZES.headerExpanded).toEqualTypeOf<Space>();
 });
 
 test('a bar keeps both its ends free for the square each of them holds', () => {

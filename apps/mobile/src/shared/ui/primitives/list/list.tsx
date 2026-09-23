@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { createStyles } from '../../../lib/styles';
 import type { StyleRef } from '../../../lib/styles';
-import { collapseDistance, collapseProgress, lerp } from './geometry';
+import { collapseProgress, lerp } from './geometry';
 
 /** What every list needs, whichever way it holds something still at the top. */
 type ListCore<Item> = Readonly<{
@@ -27,38 +27,18 @@ type ListCore<Item> = Readonly<{
   contentStyle?: StyleRef;
 }>;
 
-/**
- * How many rows the strip that stays takes, each one `SIZES.band` tall. The list draws the strip and insets its own
- * content by exactly its height, so it has to be told: a band is composed by the screen, and what a screen puts in one
- * is not something a list can see.
- */
-export type BandRows = 1 | 2;
-
-/**
- * Bands the list draws over its own content: a masthead that slides away, a strip that stays under it, and how many
- * rows that strip takes — one unless it says otherwise, which is what a strip of one kind of thing takes.
- */
-type WithBands = Readonly<{
-  header?: ReactNode;
-  sticky?: ReactNode;
-  stickyRows?: BandRows | undefined;
-  pinned?: undefined;
-}>;
+/** A masthead the list draws over its own content, which slides away as the list scrolls. */
+type WithHeader = Readonly<{ header?: ReactNode; pinned?: undefined }>;
 
 /** Items of the data that stay at the top while the run they open scrolls past. */
-type WithPinned<Item> = Readonly<{
-  header?: undefined;
-  sticky?: undefined;
-  stickyRows?: undefined;
-  pinned: (item: Item) => boolean;
-}>;
+type WithPinned<Item> = Readonly<{ header?: undefined; pinned: (item: Item) => boolean }>;
 
 /**
- * A list either draws bands of its own or pins items of its data, never both: the pinned item is laid at the very top
- * of the list's frame, which is where the bands already are, so the two would stack on the same pixels. The union says
- * so in the type, since nothing at runtime would notice one hiding the other.
+ * A list either draws a masthead of its own or pins items of its data, never both: the pinned item is laid at the very
+ * top of the list's frame, which is where the masthead already is, so the two would stack on the same pixels. The union
+ * says so in the type, since nothing at runtime would notice one hiding the other.
  */
-export type ListProps<Item> = ListCore<Item> & (WithBands | WithPinned<Item>);
+export type ListProps<Item> = ListCore<Item> & (WithHeader | WithPinned<Item>);
 
 /** How near the end the scroll gets, as a share of the visible height, before the list asks for the next page. */
 const END_THRESHOLD = 0.5;
@@ -66,17 +46,14 @@ const END_THRESHOLD = 0.5;
 /** How often the native scroll reports its offset, in milliseconds: one report per frame at 60 Hz. */
 const SCROLL_PERIOD = 16;
 
-const DISTANCE = collapseDistance(SIZES.headerExpanded, SIZES.headerCollapsed);
+/** How far the list scrolls while its masthead goes: the whole of the masthead's height, which it gives back. */
+const DISTANCE: number = SIZES.headerExpanded;
 
 const useStyles = createStyles(() => ({
   frame: { flex: 1 },
   fill: { flex: 1 },
   flush: { paddingTop: SPACING.none },
   underHeader: { paddingTop: SIZES.headerExpanded },
-  underBand: { paddingTop: SIZES.band },
-  underBandPair: { paddingTop: SIZES.bandPair },
-  underHeaderBand: { paddingTop: SIZES.headerBand },
-  underHeaderBandPair: { paddingTop: SIZES.headerBandPair },
   masthead: {
     position: 'absolute',
     top: SPACING.none,
@@ -85,59 +62,17 @@ const useStyles = createStyles(() => ({
     height: SIZES.headerExpanded,
     overflow: 'hidden',
   },
-  bandUnderHeader: {
-    position: 'absolute',
-    top: SIZES.headerExpanded,
-    left: SPACING.none,
-    right: SPACING.none,
-    height: SIZES.band,
-  },
-  bandPairUnderHeader: {
-    position: 'absolute',
-    top: SIZES.headerExpanded,
-    left: SPACING.none,
-    right: SPACING.none,
-    height: SIZES.bandPair,
-  },
-  bandAtTop: {
-    position: 'absolute',
-    top: SPACING.none,
-    left: SPACING.none,
-    right: SPACING.none,
-    height: SIZES.band,
-  },
-  bandPairAtTop: {
-    position: 'absolute',
-    top: SPACING.none,
-    left: SPACING.none,
-    right: SPACING.none,
-    height: SIZES.bandPair,
-  },
 }));
 
 /**
- * The inset the scrolled content needs, and where the strip that stays is laid, for each arrangement of bands: each
- * band hides its own height at the top. Two tables rather than a chain of conditions, because a style table is built
- * once per theme and cannot add two heights together at the moment it is read.
- */
-const INSETS = {
-  bare: { none: 'flush', 1: 'underBand', 2: 'underBandPair' },
-  header: { none: 'underHeader', 1: 'underHeaderBand', 2: 'underHeaderBandPair' },
-} as const;
-
-const BANDS = {
-  bare: { 1: 'bandAtTop', 2: 'bandPairAtTop' },
-  header: { 1: 'bandUnderHeader', 2: 'bandPairUnderHeader' },
-} as const;
-
-/**
- * A virtualised list, under an optional `header` band that fades and slides away as it scrolls and an optional `sticky`
- * band that stays pinned, of `stickyRows` rows. The bands live here rather than in a header primitive of their own
- * because a screen may hold only one scrolling region — two would fight for the gesture and neither would recycle —
- * and because a primitive may not import another primitive, so whoever owns the scroll must also own what reacts to it.
+ * A virtualised list, under an optional `header` band that fades and slides away as it scrolls. The band lives here
+ * rather than in a header primitive of its own because a screen may hold only one scrolling region — two would fight
+ * for the gesture and neither would recycle — and because a primitive may not import another primitive, so whoever
+ * owns the scroll must also own what reacts to it.
  *
- * What goes in a band is the screen's, its height is not: the list insets its own content by exactly what the bands
- * hide, and a band it measured for itself would be a band it had to render before it could lay anything out.
+ * What goes in the band is the screen's, its height is not: the list insets its own content by exactly what the band
+ * hides, and a band it measured for itself would be a band it had to render before it could lay anything out. There was
+ * a second band as well, a strip that stayed under the first, of one row or two; no screen laid one, and it went.
  *
  * The scroll offset arrives on the JavaScript thread: the list replaces the scroll handler of the view it renders with
  * its own (`@shopify/flash-list/dist/recyclerview/RecyclerView.js`, the `CompatScrollView` element), and calls ours back
@@ -163,8 +98,6 @@ export function List<Item>({
   pinned,
   empty,
   header,
-  sticky,
-  stickyRows = 1,
   onEndReached,
   onRefresh,
   refreshing,
@@ -176,21 +109,10 @@ export function List<Item>({
     [items, pinned],
   );
   const scrollY = useSharedValue(0);
-  const hasHeader = header !== undefined;
-  const above = hasHeader ? 'header' : 'bare';
-  // The inset is read off the band actually handed over, never off the row count alone: a count given without a band
-  // would otherwise push the content down under nothing at all.
-  const rows = sticky === undefined ? 'none' : stickyRows;
-  // What the header gives back as it collapses, and therefore how far the band under it follows: nothing at all when
-  // the list carries no header, since a band that follows nothing has nowhere to go.
-  const slide = hasHeader ? DISTANCE : 0;
   const mastheadStyle = useAnimatedStyle(() => {
     const progress = collapseProgress(scrollY.get(), DISTANCE);
     return { opacity: lerp(1, 0, progress), transform: [{ translateY: lerp(0, -DISTANCE, progress) }] };
   });
-  const stickyStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: lerp(0, -slide, collapseProgress(scrollY.get(), DISTANCE)) }],
-  }));
   return (
     <Animated.View style={styles.frame}>
       <FlashList
@@ -201,7 +123,7 @@ export function List<Item>({
         renderItem={(info) => <>{renderItem(info.item)}</>}
         stickyHeaderIndices={pinnedPlaces}
         ListEmptyComponent={<>{empty}</>}
-        contentContainerStyle={[styles[INSETS[above][rows]], contentStyle]}
+        contentContainerStyle={[header === undefined ? styles.flush : styles.underHeader, contentStyle]}
         onEndReached={onEndReached}
         onEndReachedThreshold={END_THRESHOLD}
         onRefresh={onRefresh}
@@ -212,9 +134,6 @@ export function List<Item>({
         scrollEventThrottle={SCROLL_PERIOD}
       />
       {header === undefined ? null : <Animated.View style={[styles.masthead, mastheadStyle]}>{header}</Animated.View>}
-      {sticky === undefined ? null : (
-        <Animated.View style={[styles[BANDS[above][stickyRows]], stickyStyle]}>{sticky}</Animated.View>
-      )}
     </Animated.View>
   );
 }

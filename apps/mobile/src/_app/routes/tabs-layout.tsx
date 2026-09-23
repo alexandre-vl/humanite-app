@@ -21,8 +21,8 @@ import { ICONS } from '#primitives/icon';
  *
  * Every tab is named, and that is not the default. Material's navigation bar labels only the selected item once it
  * carries more than three, which this one does: measured on an A065, the bar held one `TextView` — `En continu`, at
- * `[245,2265][403,2307]` — and four destinations drawn as a symbol and nothing else. A house, a magnifying glass and
- * a person are guessable; a folded newspaper standing for the newsstand is not, and the reference document already
+ * `[245,2265][403,2307]` — and four destinations drawn as a symbol and nothing else. A house, a magnifying glass, a
+ * bookmark and a person are guessable; a bolt standing for the running wire is not, and the reference document already
  * lists an unlabelled control among the frictions of the app this one replaces. Material's own accessibility note on
  * the component says to set the labels on, which is what this does.
  *

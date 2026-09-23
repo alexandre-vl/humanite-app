@@ -22,8 +22,7 @@ export type SwitchProps = Readonly<{
  * would otherwise be a nameless target under a finger that cannot see.
  *
  * The colours are the ones a control needs, not the ones a card needs, and it took two readings on an A065 to find
- * them. Drawn in the border and the surface — the roles a rule and a sheet take — it measured 1.13 to 1 against the
- * page: a control nobody could find. Given the knob the page's own colour, it measured 1.00 against the page: the
+ * them. Drawn in `border` and `surface`, it measured 1.13 to 1 against the page: a control nobody could find. Given the knob the page's own colour, it measured 1.00 against the page: the
  * platform draws the knob wider than the track and paints it over the middle of the pill, so a knob the colour of the
  * page leaves a hole where it sits and a crescent where it does not. Both themes showed it; three of the four states
  * were a shape nobody would name a switch.

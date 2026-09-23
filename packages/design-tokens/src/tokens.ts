@@ -114,9 +114,9 @@ export const TRACKING = {
 /**
  * Component sizes in points — heights the four-point SPACING grid does not reach.
  *
- * A list lays its own bands: a masthead that slides away as it scrolls, from `headerExpanded` down to
- * `headerCollapsed`, and under it a strip that stays, of one `band` or of two stacked. The scroll inset each
- * arrangement adds up to is named too, because a style table is built once and cannot add.
+ * A list lays one band of its own: a masthead `headerExpanded` tall, which slides away as the list scrolls and which
+ * the list's content starts under. There was a strip under it as well, of one `band` or of two stacked, with the scroll
+ * inset of each arrangement named beside it; no screen laid one, and the four sizes went with it.
  *
  * `stroke` is the rule the paper draws where it draws one — the line a timeline hangs its items from, the line a field
  * is typed on. It is here rather than on the spacing grid because it is finer than the grid's smallest step.
@@ -134,10 +134,9 @@ export const TRACKING = {
  * the picture was written at — 320 points over 96 is the three-to-one a dense screen asks for, and a cover at 140 is
  * served by the 1080 the corpus writes. The shelf's own measurement is 138,3 points, read on capture 04 as a slot of
  * 363 pixels at 2,625 pixels per point; 140 is the step the grid holds nearest it.
- */
-/**
- * What the sliding band holds, worked out rather than picked: one line of `display` type on the page's own margin,
- * which is what a screen with nothing better to print at its top prints there.
+ *
+ * `headerExpanded` is what the sliding band holds, worked out rather than picked: one line of `display` type on the
+ * page's own margin, which is what a screen with nothing better to print at its top prints there.
  *
  * Sixteen points of air above it, the type itself, and eight under — eight because the first row of a feed carries
  * sixteen of its own, and the twenty-four those add up to is the air the account screen leaves under its own name, a
@@ -150,15 +149,8 @@ export const TRACKING = {
  * looks like. It was sixty-four, which no reading justified and which left the name floating seventeen points further
  * from the page than the same name on the account screen.
  */
-const HEADER_EXPANDED = 48;
-const BAND = 40;
 export const SIZES = {
-  headerExpanded: space(HEADER_EXPANDED),
-  headerCollapsed: space(0),
-  band: space(BAND),
-  bandPair: space(BAND * 2),
-  headerBand: space(HEADER_EXPANDED + BAND),
-  headerBandPair: space(HEADER_EXPANDED + BAND * 2),
+  headerExpanded: space(48),
   bar: space(56),
   barSide: space(56),
   stroke: space(2),

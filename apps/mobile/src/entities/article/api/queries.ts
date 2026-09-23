@@ -66,7 +66,7 @@ const paged = (
 
 /**
  * The options of a paged feed of articles: a screen composes them, it never writes them. The type is read off the
- * factory rather than off one of the three feeds, so naming it never ties every reader to what that one feed happens
+ * factory rather than off one of the four feeds, so naming it never ties every reader to what that one feed happens
  * to do today.
  */
 export type PagedFeed = ReturnType<typeof paged>;

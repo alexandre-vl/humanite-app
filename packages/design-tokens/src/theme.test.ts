@@ -5,6 +5,9 @@ import type { Color, Theme } from './index.ts';
 /** Every theme the tokens publish, read from the table instead of listed again beside it. */
 const themes: readonly (readonly [string, Theme])[] = Object.entries(THEMES);
 
+/** The grounds a rule is drawn across: the page between two cards, a card between two rows, a sheet between choices. */
+const RULED = ['background', 'card', 'surface'] as const satisfies readonly (keyof Theme)[];
+
 test('the tokens publish a light and a dark theme', () => {
   expect(THEME_NAMES).toEqual(['light', 'dark']);
 });
@@ -50,11 +53,12 @@ describe.each(themes)('%s theme', (name, theme) => {
 
   /**
    * A line drawn where nobody sees one is not a line. WCAG asks nothing of a rule that carries no meaning of its own,
-   * so the bar here is only that it is there at all — and the value the paper was drawing it in, the light theme's
-   * ground for a block, measured 1.13 to one against the page it was cutting.
+   * so the bar here is only that it is there at all, on every ground it cuts. The paper drew its first rule in the grey
+   * of an empty picture, 1.13 to one against the page it was cutting, and the rows of the account were ruled in it
+   * later still, 1.04 to one against their card; the dark theme's rule stood at 1.28 on its card until it was asked.
    */
-  test(`${name}: the rule can be told from the page it cuts`, () => {
-    expect(contrastRatio(theme.rule, theme.background)).toBeGreaterThan(1.3);
+  test.each(RULED)(`${name}: the rule can be told from the %s it cuts`, (ground) => {
+    expect(contrastRatio(theme.rule, theme[ground])).toBeGreaterThan(1.3);
   });
 
   test(`${name}: every colour it paints with is named in the palette`, () => {

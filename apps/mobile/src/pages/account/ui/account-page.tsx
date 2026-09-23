@@ -25,7 +25,7 @@ const useStyles = createStyles((theme) => ({
   // the colour a rule is drawn in, needs no rule of its own.
   card: {
     gap: SIZES.stroke,
-    backgroundColor: theme.border,
+    backgroundColor: theme.rule,
     borderRadius: RADII.md,
     overflow: 'hidden',
   },

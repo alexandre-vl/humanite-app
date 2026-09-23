@@ -66,7 +66,7 @@ export const FR = {
   'search.rest.message': 'Un mot, un nom ou un lieu.',
   'search.for': 'Résultats pour «\u00A0{query}\u00A0»',
   'search.none.title': 'Aucun résultat pour «\u00A0{query}\u00A0»',
-  'search.none.message': 'Essayez un autre mot, ou un thème plus large.',
+  'search.none.message': 'Essayez un autre mot, ou un sujet plus large.',
   'settings.title': 'Préférences d’affichage',
   'settings.appearance': 'Apparence',
   'settings.appearance.system': 'Système',

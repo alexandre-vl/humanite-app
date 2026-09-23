@@ -14,7 +14,7 @@ import { ThemeScope } from '#primitives/theme';
  *
  * The parameter is parsed rather than read: an `ArticleId` is a branded string only the contract's parser mints, so a
  * link whose value is not shaped like one never reaches the content, and one that is shaped like one but names no
- * article comes back as the failure the reader is offered another try at.
+ * article comes back as the failure that says so, with nothing to try again: asking twice would not make it one.
  *
  * The route is pushed at the root of the stack rather than inside the tabs, so reading covers the tab bar — which is
  * what the current app does, and what the reference calls for: `Article — plein écran, retour ‹, sans barre du bas`.

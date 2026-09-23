@@ -303,7 +303,7 @@ const POST = {
 /** The two items of the sample a reading must serve, in the order the service sent them. */
 const READABLE = ['3900001', '3900003'] as const;
 
-/** The item of the sample no reading may serve: it carries a fifth format, which the wire does not know. */
+/** The item of the sample no reading may serve: it carries a format the wire does not know. */
 const UNREADABLE = '3900002';
 
 /**

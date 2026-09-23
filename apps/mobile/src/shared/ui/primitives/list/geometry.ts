@@ -1,10 +1,7 @@
 /**
- * The pure geometry of the collapsing bands, in points. Reanimated worklets call `collapseProgress` and `lerp` on the UI
+ * The pure geometry of the collapsing band, in points. Reanimated worklets call `collapseProgress` and `lerp` on the UI
  * thread — hence the `'worklet'` directive — while a jest test exercises them as plain functions on the JS thread.
  */
-
-/** The scroll distance over which the header collapses: its expanded height less its collapsed height, never negative. */
-export const collapseDistance = (expanded: number, collapsed: number): number => Math.max(expanded - collapsed, 0);
 
 /** How far the header has collapsed at a scroll offset, from 0 (expanded) to 1 (collapsed), clamped both ends. */
 export const collapseProgress = (scrollY: number, distance: number): number => {

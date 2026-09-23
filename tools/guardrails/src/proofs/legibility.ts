@@ -70,14 +70,14 @@ export const LEGIBILITY_FIXTURES = [
     'legibility/ground-unprinted',
     'un fond que la règle nomme et sur lequel plus rien n’est posé',
     ['legibility/ground-unprinted'],
-    // The ink that was printed on the paper's block ground stops being printed there, and the ground is left named
-    // by the rule with nothing on it.
+    // The ink printed on the torn paper a linked card is dropped on stops being printed there, and the ground is left
+    // named by the rule with nothing on it.
     broken({
       printings: {
         ...THE_PAPER.printings,
         textPrimary: {
           ...THE_PAPER.printings.textPrimary,
-          grounds: THE_PAPER.printings.textPrimary.grounds.filter((ground) => ground !== 'border'),
+          grounds: THE_PAPER.printings.textPrimary.grounds.filter((ground) => ground !== 'ground'),
         },
       },
     }),

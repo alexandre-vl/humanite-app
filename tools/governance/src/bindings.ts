@@ -867,7 +867,7 @@ export const BINDINGS = {
       R1: ['guardrail/module-shopify-flash-list'],
       R2: {
         convention:
-          'La primitive List rend la seule région défilante verticale de son écran et porte elle-même les bandes qui suivent le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. L’autre région défilante de l’app, la primitive Scroll, exige son axe : aucun appel ne peut prendre l’axe vertical sans l’écrire, et une bande qui défile en travers ne dispute aucun geste à la liste.',
+          'La primitive List rend la seule région défilante verticale de son écran et porte elle-même le fronton qui suit le défilement : elle crée la valeur partagée du décalage, qu’aucune autre place ne peut nommer puisque react-native-reanimated est confinée aux primitives. L’autre région défilante de l’app, la primitive Scroll, exige son axe : aucun appel ne peut prendre l’axe vertical sans l’écrire, et une bande qui défile en travers ne dispute aucun geste à la liste.',
       },
     },
   },

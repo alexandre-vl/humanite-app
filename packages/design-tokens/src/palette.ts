@@ -26,6 +26,10 @@ import { color } from './brand.ts';
  * theme's bar. The tab a reader is on is named there in it, and the red itself measured 4.35 on that bar; lifted, it
  * measures 4.53 there, and 5.01 on the dark page where the red measured 4.81.
  *
+ * `darkRule` is the dark theme's rule, lifted two steps on each channel from where it was derived: at `#3a3340` it
+ * measured 1.28 to one against the card whose rows it divides, under what the themes' test asks of a rule on every
+ * ground it cuts. It now measures 1.32 there, 1.41 on the sheet and 1.56 on the page.
+ *
  * `inkGrey` and `darkSecondary` are the middle step of an ink that had only two. A card sets a title and the summary
  * under it, and both were printed in the same colour at the same weight — so the summary read as a second title
  * rather than as what answers one. The two new values sit between the ink and the muted grey at roughly half the
@@ -48,7 +52,7 @@ export const PALETTE = {
   darkMuted: color('#b0a8b6'),
   darkSecondary: color('#cfc7d5'),
   darkBorder: color('#333333'),
-  darkRule: color('#3a3340'),
+  darkRule: color('#3c3542'),
   dateGrey: color('#74677a'),
   white: color('#ffffff'),
   black: color('#000000'),

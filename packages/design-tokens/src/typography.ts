@@ -88,17 +88,18 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * The app's text styles, one per role (docs/app-actuelle). A component names a role and the Text primitive derives the
  * absolute line height from the size and the multiple, so a raw size, face or text colour never enters a style.
  *
- * The three reading roles are set from the article captures, read at 2.625 px per point (the 24-point gesture bar
- * measures 63 px): a headline steps 47.0 points and the table gives 34 × 1.4 = 47.6; a legend steps 16.0 and the table
- * gives 12 × 1.4 = 16.8; prose steps 23.8 against the table's 16 × 1.6 = 25.6, the one role the scale reaches least
- * closely. Prose differs from body by its face alone, and that is what was measured: the current app sets its article
- * copy in a light weight, matched word for word at 1.000 against Roboto Light, the next candidate — Overpass Light —
- * scoring 0.943 (README:97). It is the weight that carries over and not the family: the site declares Overpass and
- * this app is set in it throughout, while the current app shows its copy in Roboto (README:103).
+ * Two reading roles are set from the article captures, read at 2.625 px per point (the 24-point gesture bar measures
+ * 63 px): a legend steps 16.0 points and the table gives 12 × 1.4 = 16.8; prose steps 23.8 against the table's
+ * 16 × 1.6 = 25.6, the one role the scale reaches least closely. The headline was the third — it steps 47.0, and the
+ * table gave 34 × 1.4 = 47.6 — and it left the capture on purpose: see the note on `xl` beside the sizes. Prose differs
+ * from body by its face alone, and that is what was measured: the current app sets its article copy in a light weight,
+ * matched word for word at 1.000 against Roboto Light, the next candidate — Overpass Light — scoring 0.943 (README:97).
+ * It is the weight that carries over and not the family: the site declares Overpass and this app is set in it
+ * throughout, while the current app shows its copy in Roboto (README:103).
  *
  * `standfirst` and `summary` were one role and had to become two. A card and an article both carry a sentence under
  * their title, and the two are not the same sentence: on an article it is the opening of the piece, read straight
- * after a headline of thirty-four points and before the body; on a card it is what answers the title in a list of
+ * after the headline and before the body; on a card it is what answers the title in a list of
  * twenty others. Set as one, it was bold and in the ink of the title — so on a card it read as a second title, and
  * on an article it read as no larger than the body it introduced. The article's is now regular at twenty points and
  * keeps the ink; the card's is regular at sixteen in the middle ink.
@@ -112,14 +113,14 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  *
  * `headline` sets an article's own title and nothing else. It used to set three more things — the crossheads inside a
  * body, the label over a linked article, the title of a call for support — so an article printed its own title four
- * times over in the same twenty-four-point red, each shouting as loud as the piece it belonged to. A headline is the
+ * times over in the same red at the same size, each shouting as loud as the piece it belonged to. A headline is the
  * one line of a screen that must be read first; a table that hands the same type to whatever else wants to be large
  * has no way of saying so. Its leading is `tight` because that is what a headline set over four lines wants, and what
  * the Guardian's own `headlineMedium28` and the BBC's mobile rule both set: 1.15 and 1.21.
  *
- * `kicker` is the word that names what a card belongs to, set above its title in small capitals. It is the one role
- * whose letters are set apart — the only way twelve points of type reads as a label and not as the first line of the
- * title under it.
+ * `kicker` is a label rather than a line: the word that marks what an item is or who may read it, and the name over a
+ * block an article sets apart, in small capitals. It is the one role whose letters are set apart — the only way twelve
+ * points of type reads as a label and not as the first line of the title under it.
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'headline' },

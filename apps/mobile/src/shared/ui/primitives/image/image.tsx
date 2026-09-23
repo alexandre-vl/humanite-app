@@ -27,8 +27,9 @@ export type ImageProps = Readonly<{
  * the journal comes with no thumbhash, which is why a caller may hand one over as absent.
  *
  * Every picture the paper lays out fills its box and is cropped to it, so the fit is written here rather than asked
- * for: the boxes are the paper's, the pictures are all written at one shape, and a caller choosing between five fits
- * would be a caller deciding what the paper looks like from inside a card.
+ * for: the boxes are the paper's, one shape for each kind of picture, and a caller choosing between five fits would be
+ * a caller deciding what the paper looks like from inside a card. The journal serves its pictures in more shapes than
+ * the paper has boxes, and the crop is what lets two cards of one kind stand the same height.
  *
  * `announces` is what the picture says to a reader listening to the paper, and it is required for the same reason
  * `recyclingKey` is: no type can tell whether a picture repeats the words beside it or carries something they do not,

@@ -21,9 +21,9 @@ const useStyles = createStyles((theme) => ({
   row: {
     flexDirection: 'row',
     gap: SIZES.stroke,
-    backgroundColor: theme.border,
+    backgroundColor: theme.rule,
     borderWidth: SIZES.stroke,
-    borderColor: theme.border,
+    borderColor: theme.rule,
     borderRadius: RADII.md,
     overflow: 'hidden',
   },

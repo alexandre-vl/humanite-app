@@ -1,16 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { collapseDistance, collapseProgress, lerp } from './geometry';
-
-describe('collapseDistance', () => {
-  it('vaut la hauteur dépliée moins la hauteur repliée', () => {
-    expect(collapseDistance(64, 0)).toBe(64);
-    expect(collapseDistance(64, 40)).toBe(24);
-  });
-
-  it('n’est jamais négative', () => {
-    expect(collapseDistance(40, 64)).toBe(0);
-  });
-});
+import { collapseProgress, lerp } from './geometry';
 
 describe('collapseProgress', () => {
   it('va de 0 dépliée à 1 repliée', () => {

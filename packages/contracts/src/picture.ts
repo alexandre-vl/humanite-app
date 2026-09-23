@@ -34,10 +34,11 @@ const WIDTH = /([?&])w=\d+/u;
  * The same picture of the journal, asked for at a width.
  *
  * The service lists every picture at a width of its own choosing — twelve hundred pixels, four hundred and thirty-three
- * times out of five hundred and nineteen — and its server resizes to whatever width it is asked. A thumbnail three
- * hundred and twenty pixels wide that took the address as listed would download a picture nearly four times as wide
- * as its box, on every row of every list. So the width is replaced, and nothing else is touched: a picture set inside
- * a body carries a height and a crop beside its width, and losing them would hand back a different picture.
+ * times out of five hundred and nineteen — and its server scales it down to any width it is asked, never up. A
+ * thumbnail three hundred and twenty pixels wide that took the address as listed would download a picture nearly four
+ * times as wide as its box, on every row of every list. So the width is replaced, and nothing else is touched: a
+ * picture set inside a body carries a height and a crop beside its width, and losing them would hand back a different
+ * picture.
  */
 export const atWidth = (address: string, width: number): string =>
   WIDTH.test(address)

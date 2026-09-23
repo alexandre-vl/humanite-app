@@ -25,10 +25,13 @@ const useStyles = createStyles(() => ({
  * comes near, and reading the feed again when the reader pulls it down.
  *
  * The days are worked out over the pages already read rather than page by page: a page holds whatever items the cursor
- * reached, and a day begins and ends wherever it does, never on a page boundary.
+ * reached, and a day begins and ends wherever it does, never on a page boundary. Both sources answer the wire in a
+ * single page today — no capture has shown the service's second — and the contract keeps it paged, so a source that
+ * pages it is read on to its end rather than cut at its first page.
  *
  * Pulling to refresh is the one gesture a screen called En continu owes a reader, and the screen it replaces has it.
- * What it asks for is the first page again, so a wire that has been read four pages deep comes back to its newest.
+ * It reads every page the wire holds again, from the first, so the newest item is back at the top wherever the reader
+ * had scrolled to.
  */
 export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
   const styles = useStyles();

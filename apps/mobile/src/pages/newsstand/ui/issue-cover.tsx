@@ -47,8 +47,9 @@ const useStyles = createStyles((theme) => ({
  * of: the paper's name, the day it carries, the picture it opened on and the headline over it. Everything comes from
  * the numéro itself; nothing here is a second description of an article.
  *
- * The headline is legible over the picture for the same reason the wire's is: the grounds the corpus paints are dark
- * enough to carry white, which its own table of section grounds holds.
+ * The headline is set in white over the picture, and every picture a shelf can show is one the corpus painted: its
+ * grounds are each dark enough to carry white, which their own table is tested for, and a build reading the journal
+ * stands no shelf at all.
  *
  * The day is read off the opening item rather than off the numéro's own name. The two are the same day — the content
  * gathers a numéro by the day its items were filed on, and the opener is one of them — and the reader of an instant
