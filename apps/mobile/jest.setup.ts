@@ -88,9 +88,11 @@ jest.mock('@shopify/flash-list/dist/recyclerview/utils/measureLayout', () => {
 // the tree each promises to mount. The symbol carries the platform name it was given rather than the key it was named
 // by, because that is all it receives; a test reads the key through the registry, which stays the single source.
 //
-// Both also carry through what they were told to announce. A stand-in that dropped those props would let a picture
-// claim to be passed over by a screen reader and a test agree with it, which is the one thing these two primitives
-// now promise; so the stand-in repeats them and a test can read what the real view would have carried.
+// Each carries through what it was told to announce exactly as far as the library it stands for does. expo-image takes
+// the props and hands them to the native view, so its stand-in repeats them and a test can read what the real view
+// carries. expo-symbols takes none: on Android its view is a box around a letter, and everything but the box's style
+// is dropped on the way — so its stand-in drops them too. It repeated them once, and the bench agreed with an icon
+// whose announcement never reached a phone: the play mark of every video card was read out as its glyph, U+E037.
 type Announced = Readonly<{
   accessible?: boolean | undefined;
   accessibilityRole?: AccessibilityRole | undefined;
@@ -121,17 +123,15 @@ jest.mock('expo-image', () => {
 
 // The symbol's stand-in also lays itself out the way the library does — a box of the size it was handed, then the
 // style it was given — because on Android that size is a font size and the box is not, and the primitive undoes the
-// reader's step on one of the two. A stand-in that dropped the size would let that come apart unseen.
+// reader's step on one of the two. A stand-in that dropped the size would let that come apart unseen. It reads the
+// name, the size and the style, and nothing else, which is all the library's Android view reads.
 jest.mock('expo-symbols', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const symbolView = (
-    props: Announced & { name?: { android?: string }; size?: number; style?: StyleProp<ViewStyle> },
-  ): unknown =>
+  const symbolView = (props: { name?: { android?: string }; size?: number; style?: StyleProp<ViewStyle> }): unknown =>
     react.createElement(reactNative.View, {
       testID: `symbol:${props.name?.android ?? ''}`,
       style: [{ width: props.size, height: props.size }, props.style],
-      ...mockAnnounced(props),
     });
   return { __esModule: true, SymbolView: symbolView };
 });

@@ -87,8 +87,12 @@ const useStyles = createStyles((theme) => ({
   column: { flexDirection: 'row', gap: SPACING.md },
   mark: { width: SIZES.stroke, alignSelf: 'stretch', backgroundColor: theme.primary },
   head: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: SPACING.sm },
-  foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.sm },
-  said: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: SPACING.sm, flexShrink: 1 },
+  foot: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  // What the foot says takes all the width the control leaves it, rather than the width of its words. Sized to its
+  // words, it broke « Accès libre » under the date on two cards of three far down a section on the phone — 563 pixels
+  // of words set on two lines with 891 to spare — while the first card of the same list kept them on one: a cell the
+  // list recycles came back holding the width of the item it last showed.
+  said: { flex: 1, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: SPACING.sm },
 }));
 
 type PartProps = Readonly<{

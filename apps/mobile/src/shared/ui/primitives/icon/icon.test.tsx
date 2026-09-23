@@ -28,10 +28,9 @@ describe('Icon', () => {
    */
   it('est passée sans un mot quand la cible autour d’elle se nomme déjà', async () => {
     await render(<Icon name="play" announces={DECORATIVE} />);
-    const mark = screen.getByTestId(MARK, { includeHiddenElements: true });
-    expect(mark.props['accessible']).toBe(false);
-    expect(mark.props['accessibilityElementsHidden']).toBe(true);
-    expect(mark.props['importantForAccessibility']).toBe('no-hide-descendants');
+    // The mark is drawn, and a reader walking the screen never reaches it. What hides it can only be a view of the
+    // app's own: the library's takes no word about it, which is how its glyph reached a card's name on the phone.
+    expect(screen.getByTestId(MARK, { includeHiddenElements: true })).toBeTruthy();
     expect(screen.queryByTestId(MARK)).toBeNull();
   });
 

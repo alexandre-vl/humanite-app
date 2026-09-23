@@ -1,5 +1,5 @@
 import type { Article, DisplayText, LinkTarget } from '@huma/contracts';
-import { SIZES, SPACING } from '@huma/design-tokens';
+import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
 import { formatPublished } from '#lib/format';
@@ -18,13 +18,12 @@ export type ArticleLeadProps = Readonly<{
   onFollow: (target: LinkTarget) => void;
 }>;
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(() => ({
   // One measure for everything that is read, the body's own. The head used to keep a wider one, so the first line of
   // an article started further in than every line after it.
   title: { paddingHorizontal: SPACING.lg, gap: SPACING.xs },
   standfirst: { paddingHorizontal: SPACING.lg },
   meta: { gap: SPACING.xs, paddingHorizontal: SPACING.lg },
-  rule: { height: SIZES.stroke, marginHorizontal: SPACING.lg, backgroundColor: theme.rule },
 }));
 
 /**
@@ -62,8 +61,8 @@ export function ArticleTitle({ title, word }: ArticleTitleProps): ReactNode {
 }
 
 /**
- * What comes before the body: the standfirst, who signed and when, then the picture and what is written under it,
- * closed by a rule. Only the words keep the column's margins; the picture runs to both edges of the page.
+ * What comes before the body: the standfirst, who signed and when, then the picture and what is written under it.
+ * Only the words keep the column's margins; the picture runs to both edges of the page.
  *
  * The signature moved above the picture, which is where the Guardian's own mobile template for an opinion piece puts
  * it — title, headline, standfirst, meta, media, body — and where the BBC puts it, wrapped into one unit with the
@@ -123,7 +122,6 @@ export function ArticleLead({ article, byline, onFollow }: ArticleLeadProps): Re
           credit={hero.credit}
         />
       )}
-      <Box style={styles.rule} />
     </>
   );
 }

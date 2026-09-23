@@ -28,6 +28,7 @@ const useStyles = createStyles((theme) => ({
   // every crosshead are all things read in a row, and a gap that changed between them would be saying they are not.
   column: { gap: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.xxxl },
   away: { paddingTop: SPACING.lg },
+  rule: { height: SIZES.stroke, marginHorizontal: SPACING.lg, backgroundColor: theme.rule },
   // Flat, level and as wide as the column: the words under a headline, not a slip of paper laid over the page. It was
   // the tilted sheet of a support callout, drawn for one rare appeal inside a body; on a paper that keeps four bodies
   // in five back, it ended nearly every article, and a sheet turned by a degree and a half read as a fault of the page.
@@ -73,6 +74,10 @@ function Wall(): ReactNode {
  *
  * The dark theme had already said as much by accident: there its ground and its sheet take the same value, the sheet
  * stops showing, and the page runs edge to edge — which is what every article does now.
+ *
+ * The head is closed by what follows it: a body by a hairline, a wall by its own rule in the paper's red. The hairline
+ * used to close the head whatever came next, and on the four articles in five whose body is kept back the phone drew
+ * two rules one gap apart — grey, then red — where one says the same.
  */
 function Reading({ article, onFollow }: ReadingProps): ReactNode {
   const styles = useStyles();
@@ -81,7 +86,10 @@ function Reading({ article, onFollow }: ReadingProps): ReactNode {
       <ArticleTitle title={article.title} word={formatWord(article.format)} />
       <ArticleLead article={article} byline={signatureOf(article)} onFollow={onFollow} />
       {article.body.kind === 'open' ? (
-        <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} />
+        <>
+          <Box style={styles.rule} />
+          <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} />
+        </>
       ) : (
         <Wall />
       )}
