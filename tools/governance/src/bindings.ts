@@ -993,6 +993,7 @@ export const BINDINGS = {
         'prose/aside-kept',
         'prose/donation-kept',
         'prose/break-glued',
+        'prose/break-glued-body',
         'prose/edges-loose',
         'prose/nothing-read',
         'prose/nothing-read-plain',

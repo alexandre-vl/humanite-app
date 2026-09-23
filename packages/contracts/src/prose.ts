@@ -51,6 +51,12 @@ const QUESTION = 'wp-block-huma-question';
 const ASIDES = ['seealso-component'] as const;
 
 /**
+ * The space the journal sets where a line must not break. Written as an escape, wherever this file writes it, so the
+ * source carries no byte a reader of it cannot see.
+ */
+const UNBREAKABLE = '\u00A0';
+
+/**
  * The named entities this renderer emits, and what each one stands for. Numeric entities are read by their code
  * point, so only the names need a table.
  *
@@ -65,7 +71,7 @@ const NAMED: Readonly<Record<string, string>> = Object.fromEntries([
   ['hellip', '…'],
   ['laquo', '«'],
   ['lt', '<'],
-  ['nbsp', '\u00A0'],
+  ['nbsp', UNBREAKABLE],
   ['quot', '"'],
   ['raquo', '»'],
   ['rsquo', '’'],
@@ -90,7 +96,7 @@ const BREAKS = /<br\b[^>]*>|<\/(?:p|div|li|h[1-6]|blockquote)>/giu;
  *
  * It is the only blank spared, because it is the only one the journal sets on purpose: every other blank that is
  * not an ordinary space appears once or twice in a whole capture, inside a script or a bundle, never a sentence.
- * Written as an escape, here and in the table above, so the source carries no byte a reader of it cannot see.
+ * Written as an escape for the reason `UNBREAKABLE` is: a pattern cannot name a constant.
  */
 const BLANKS = /[^\S\u00A0]+/gu;
 
@@ -99,7 +105,7 @@ const BLANKS = /[^\S\u00A0]+/gu;
  *
  * The edges are deliberately left alone. A sentence is read in runs — words, then a bold name, then words again —
  * and the space that separates two runs sits at the edge of one of them: « <strong>Ouizille : </strong>C'est » reads
- * as « Ouizille :C'est » the moment each run is trimmed on its own. Trimming happens once the runs are joined.
+ * as « Ouizille :C'est » the moment that edge is cut off with the run. What happens to it is `piecesOf`'s to decide.
  */
 const plain = (markup: string): string =>
   markup
@@ -145,67 +151,102 @@ const withoutClass = (markup: string, className: string): string => {
 const attribute = (attributes: string, name: string): string =>
   new RegExp(`${name}="([^"]*)"`, 'iu').exec(attributes)?.[1] ?? '';
 
-/** A run of a sentence, as the markup around it says it should be read. */
-const spanOf = (tag: string, attributes: string, inner: string): SpanInput | null => {
-  const value = plain(inner);
-  if (value.trim() === '') {
-    return null;
-  }
+/** Plain words, the run a sentence is made of wherever the markup marks out nothing else. */
+const asText = (value: string): SpanInput => ({ type: 'text', value });
+
+/** The kind of run the markup around some words makes of them, once those words are bare. */
+const runOf = (tag: string, attributes: string): ((bare: string) => SpanInput) => {
   if (tag === 'a') {
     const url = attribute(attributes, 'href');
     // Only an address a browser can open becomes a link; anything else is read as the words it wraps.
-    return url.startsWith('http')
-      ? { type: 'link', text: value.trim(), target: { kind: 'external', url } }
-      : { type: 'text', value };
+    return url.startsWith('http') ? (text) => ({ type: 'link', text, target: { kind: 'external', url } }) : asText;
   }
   if (tag === 'em' || tag === 'i') {
-    return { type: 'emphasis', value: value.trim() };
+    return (value) => ({ type: 'emphasis', value });
   }
   if (tag === 'strong' || tag === 'b') {
-    return { type: 'strong', value };
+    return (value) => ({ type: 'strong', value });
   }
-  return { type: 'text', value };
+  return asText;
+};
+
+/**
+ * What keeps two runs of a sentence apart, as a screen draws it: the journal's unbreakable space where it set one,
+ * and one ordinary space wherever else, however much blank the markup held there.
+ */
+type Gap = Readonly<{ type: 'gap'; blank: typeof UNBREAKABLE | ' ' }>;
+
+/** A run of a sentence with its words bare, or the gap between two runs. */
+type Piece = SpanInput | Gap;
+
+const gapOf = (blank: string): Gap => ({ type: 'gap', blank: blank.includes(UNBREAKABLE) ? UNBREAKABLE : ' ' });
+
+/** Some words as a run of their kind, bare, with the blank at either edge of them set down as the gap it is. */
+const piecesOf = (words: string, run: (bare: string) => SpanInput): readonly Piece[] => {
+  const bare = words.trim();
+  if (bare === '') {
+    return words === '' ? [] : [gapOf(words)];
+  }
+  const lead = words.slice(0, words.length - words.trimStart().length);
+  const trail = words.slice(words.trimEnd().length);
+  return [...(lead === '' ? [] : [gapOf(lead)]), run(bare), ...(trail === '' ? [] : [gapOf(trail)])];
+};
+
+/**
+ * The pieces of a sentence as the spans a screen draws, one straight after the other.
+ *
+ * Gaps that meet close into one, the unbreakable space winning since the journal set it on purpose, and the gaps at
+ * either end of the sentence go. Each gap left is added to the plain words beside it or, between two marked runs,
+ * becomes plain words of its own: a screen draws each run's words and nothing between them, so a gap no span carries
+ * is two words soldered into one: « <em>la suite.</em><br><em>Et la fin</em> » drawn « la suite.Et la fin », as a
+ * body the phone read on 23/09/2026 was.
+ */
+const spansFrom = (pieces: readonly Piece[]): SpanInput[] => {
+  const spans: SpanInput[] = [];
+  let gap: Gap | null = null;
+  for (const piece of pieces) {
+    if (piece.type === 'gap') {
+      if (gap === null || piece.blank === UNBREAKABLE) {
+        gap = piece;
+      }
+      continue;
+    }
+    const last = spans.at(-1);
+    if (gap === null || last === undefined) {
+      spans.push(piece);
+    } else if (last.type === 'text') {
+      spans[spans.length - 1] = { ...last, value: `${last.value}${gap.blank}` };
+      spans.push(piece);
+    } else if (piece.type === 'text') {
+      spans.push({ ...piece, value: `${gap.blank}${piece.value}` });
+    } else {
+      spans.push(asText(gap.blank), piece);
+    }
+    gap = null;
+  }
+  return spans;
 };
 
 /** The text a run carries, whatever kind of run it is. */
 const wordsOf = (span: SpanInput): string => ('value' in span ? span.value : span.text);
 
-/** The same run, its words replaced. */
-const reworded = (span: SpanInput, words: string): SpanInput =>
-  'value' in span ? { ...span, value: words } : { ...span, text: words };
-
-/** A sentence, cut into the runs the markup marks out and the plain words between them, trimmed once at each end. */
+/** A sentence, cut into the runs the markup marks out and the plain words between them. */
 const spansOf = (markup: string): SpanInput[] => {
-  const spans: SpanInput[] = [];
+  const pieces: Piece[] = [];
   let read = 0;
   INLINE.lastIndex = 0;
   let found = INLINE.exec(markup);
   while (found !== null) {
     const [whole, tag = '', attributes = '', inner = ''] = found;
-    const before = plain(markup.slice(read, found.index));
-    if (before.trim() !== '') {
-      spans.push({ type: 'text', value: before });
-    }
-    const span = spanOf(tag.toLowerCase(), attributes, inner);
-    if (span !== null) {
-      spans.push(span);
-    }
+    pieces.push(
+      ...piecesOf(plain(markup.slice(read, found.index)), asText),
+      ...piecesOf(plain(inner), runOf(tag.toLowerCase(), attributes)),
+    );
     read = found.index + whole.length;
     found = INLINE.exec(markup);
   }
-  const rest = plain(markup.slice(read));
-  if (rest.trim() !== '') {
-    spans.push({ type: 'text', value: rest });
-  }
-  const first = spans[0];
-  const last = spans[spans.length - 1];
-  if (first !== undefined) {
-    spans[0] = reworded(first, wordsOf(first).replace(/^\s+/u, ''));
-  }
-  if (last !== undefined) {
-    spans[spans.length - 1] = reworded(last, wordsOf(last).replace(/\s+$/u, ''));
-  }
-  return spans.filter((span) => wordsOf(span) !== '');
+  pieces.push(...piecesOf(plain(markup.slice(read)), asText));
+  return spansFrom(pieces);
 };
 
 const blockOf = (tag: string, attributes: string, inner: string): BlockInput | null => {
@@ -294,13 +335,21 @@ const ELSEWHERE = 'Le titre d’un autre article';
 const APPEAL = 'Soutenez-nous';
 
 /**
+ * The runs the second sentence of the body sample is set in, kept apart by nothing a screen draws — a line break
+ * between two runs of emphasis, a blank between one of them and a link, the blank the link's words end on — which must
+ * reach a screen as the stretches of one sentence and not as words soldered together.
+ */
+const APART = ['Une seconde phrase.', 'Puis une autre', 'et un lien', 'pour finir.'] as const;
+
+/**
  * A body shaped the way this journal shapes one, small enough to read at a glance: a sentence with a run of bold and
- * an entity, an aside holding another article's headline, a second sentence, and the donation block that closes it.
+ * an entity, an aside holding another article's headline, a second sentence in runs, and the donation block that
+ * closes it.
  */
 const SAMPLE = [
   '<p>Un <strong>mot</strong> et une entit&eacute;.</p>',
   `<div class="seealso-component"><div><p>${ELSEWHERE}</p></div></div>`,
-  '<p>Une seconde phrase.</p>',
+  `<p><em>${APART[0]}</em><br><em>${APART[1]}</em> <a href="https://www.humanite.fr/">${APART[2]} </a>${APART[3]}</p>`,
   `<div id="form_don"><p>${APPEAL}</p></div>`,
 ].join('');
 
@@ -329,13 +378,16 @@ export const THE_BODY = {
   after: AFTER,
 } as const;
 
-/** The words a block carries, whatever kind of block it is. */
+/**
+ * The words a block carries, whatever kind of block it is — a sentence's runs joined as a screen draws them, with
+ * nothing between, since a judging that put a space there would see two words where a reader sees one.
+ */
 const textOf = (block: Block): string => {
   if (block.type === 'heading') {
     return block.text;
   }
   if (block.type === 'paragraph' || block.type === 'quote') {
-    return block.spans.map(wordsOf).join(' ');
+    return block.spans.map(wordsOf).join('');
   }
   if (block.type === 'image') {
     return block.caption;
@@ -355,13 +407,13 @@ const textOf = (block: Block): string => {
  * The readings are handed in rather than reached for, and that is what makes the rule provable: a judging that called
  * `readProse` itself could only ever answer about `readProse`, so nothing could show that it answers at all. Given
  * them, a fixture hands in one that forgets to strip a tag, or to resolve an entity, or to drop what belongs to the
- * page rather than to the article, or to keep two words apart across a line break — and reads the code that comes
- * back.
+ * page rather than to the article, or to keep two words apart across a line break or a blank — and reads the code
+ * that comes back.
  *
  * Both doors are judged together because the fault is the same fault on either side: a title with a tag in it is as
  * unreadable as a paragraph with one, and the reader of one calls the reader of the other. What only a short field
- * can get wrong — a break swallowed, an edge left loose — has a code of its own; what either can get wrong has one
- * code between them, so a defect is named once however it arrives.
+ * can get wrong — an edge left loose — has a code of its own; what either can get wrong has one code between them —
+ * two words soldered where the journal set them apart among others — so a defect is named once however it arrives.
  *
  * A reading that rendered nothing is reported alone: everything below reads what came back, and a judging of nothing
  * would name every fault at once and tell the reader which to fix last.
@@ -382,6 +434,10 @@ export const judgeProse = (read: ProseReaders): readonly ProseFinding[] => {
   }
   const words = [...blocks.map(textOf), line];
   const has = (test: (text: string) => boolean): boolean => words.some(test);
+  const glued = [
+    ...(line.includes(`${BEFORE} ${AFTER}`) ? [] : [`« ${BEFORE} » et « ${AFTER} »`]),
+    ...(has((text) => text.includes(APART.join(' '))) ? [] : [`les passages de « ${APART.join(' ')} »`]),
+  ];
   return [
     ...(has((text) => /<[^>]*>/u.test(text))
       ? [{ code: 'prose/markup-left' as const, says: 'du balisage est resté dans le texte rendu' }]
@@ -395,9 +451,9 @@ export const judgeProse = (read: ProseReaders): readonly ProseFinding[] => {
     ...(has((text) => text.includes(APPEAL))
       ? [{ code: 'prose/donation-kept' as const, says: `« ${APPEAL} » appartient au formulaire de don` }]
       : []),
-    ...(line.includes(`${BEFORE} ${AFTER}`)
+    ...(glued.length === 0
       ? []
-      : [{ code: 'prose/break-glued' as const, says: `« ${BEFORE} » et « ${AFTER} » se sont soudés en un mot` }]),
+      : [{ code: 'prose/break-glued' as const, says: `${glued.join(' ; ')} : des mots se sont soudés` }]),
     ...(line === line.trim()
       ? []
       : [{ code: 'prose/edges-loose' as const, says: 'le blanc du gabarit est resté au bord de la phrase' }]),

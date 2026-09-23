@@ -28,6 +28,17 @@ const saying =
     ...BLOCK.array().parse([{ type: 'paragraph', spans: [{ type: 'text', value: words }] }]),
   ];
 
+/**
+ * A reading of a body that keeps, of a sentence, only the stretches holding a word — as this one did until a phone
+ * showed two words soldered — and so drops what kept two runs apart when nothing but a break or a blank did.
+ */
+const soldering: ProseReader = (html) =>
+  readProse(html).map((block) =>
+    block.type === 'paragraph' || block.type === 'quote'
+      ? { ...block, spans: block.spans.filter((span) => ('value' in span ? span.value : span.text).trim() !== '') }
+      : block,
+  );
+
 export const PROSE_FIXTURES = [
   define(
     'prose/reader',
@@ -64,6 +75,12 @@ export const PROSE_FIXTURES = [
     'une lecture qui laisse tomber le retour à la ligne et soude les deux mots qu’il sépare',
     ['prose/break-glued'],
     judged(readProse, (html) => readPlain(html.replaceAll('<br>', ''))),
+  ),
+  define(
+    'prose/break-glued-body',
+    'une lecture qui ne garde d’une phrase que les passages porteurs d’un mot, et soude ceux qu’un blanc séparait',
+    ['prose/break-glued'],
+    judged(soldering, readPlain),
   ),
   define(
     'prose/edges-loose',
