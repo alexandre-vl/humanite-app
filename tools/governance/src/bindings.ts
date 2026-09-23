@@ -842,22 +842,6 @@ export const BINDINGS = {
       R2: ['guardrail/icon-symbol'],
     },
   },
-  'ADR-0020': {
-    scope: {
-      paths: ['packages/mock-content/**', 'packages/mock-api/**', 'packages/design-tokens/src/sections.ts'],
-    },
-    rules: {
-      R1: {
-        convention:
-          'Aucun média n’entre dans packages/mock-content : le dépôt ne suit que les visuels que son propre générateur écrit, et le manifeste des images est produit par pnpm --filter @huma/mock-content generate, jamais par un téléchargement.',
-      },
-      R2: {
-        convention:
-          'IMAGE_KEY impose la forme « identifiant d’item, puis sujet » ; validateCorpus refuse une clé qui nomme un autre item ou qui sert deux images, et le test des visuels exige un fichier par clé et par largeur, sans orphelin.',
-      },
-      R3: ['artwork/generator', 'artwork/not-deterministic', 'artwork/key-ignored', 'artwork/section-ignored'],
-    },
-  },
   'ADR-0021': {
     scope: {
       // A page declares queries as an entity does, so its `api` segment is in scope as well: R2 is about the segment

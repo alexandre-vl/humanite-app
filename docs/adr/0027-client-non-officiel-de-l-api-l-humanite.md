@@ -1,6 +1,6 @@
 ---
 format: 1
-status: proposed
+status: accepted
 significance: [dependency, boundary, data-format]
 supersedes: [ADR-0020]
 ---
