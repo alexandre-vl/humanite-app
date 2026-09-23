@@ -18,23 +18,7 @@ test('every theme is named, every name has a theme, and every name can be chosen
   expect(THEME_CHOICES).toEqual(['system', ...THEME_NAMES]);
 });
 
-/**
- * The premium yellow is one value in both themes, so — like the paper's red, which is why `onPrimary` exists — it
- * cannot ask for two different texts on it. What has to hold is the light theme's, because the mark is named light
- * wherever it is printed: read in the reader's theme it took the dark theme's own pale text and measured 1.30 to 1
- * against the yellow, a word painted in a colour nobody can read it in, on the one card that tells a reader they
- * must pay to read further. Nothing reported it — no rule here asked what a theme's text does on its own premium.
- */
-test('the premium yellow is one value, and carries the light theme’s text', () => {
-  expect(THEMES.dark.premium).toBe(THEMES.light.premium);
-  expect(contrastRatio(THEMES.light.textPrimary, THEMES.light.premium)).toBeGreaterThanOrEqual(4.5);
-});
-
-/**
- * The paper's name is the one thing that does not change with the page it is printed on. It is held beside the
- * premium yellow because it is the same kind of fact: one value, both themes, and a reason — there the mark builds
- * itself in a forced light scope, here the mark is the paper.
- */
+/** The paper's name is the one thing that does not change with the page it is printed on: the mark is the paper. */
 test('the paper’s name is one red, whichever page it is printed on', () => {
   expect(THEMES.dark.mark).toBe(THEMES.light.mark);
   expect(THEMES.light.mark).toBe(PALETTE.uiRed);

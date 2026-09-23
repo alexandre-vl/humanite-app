@@ -1,12 +1,13 @@
-import type { Access, ArticleFormat, ArticleSummary, DisplayText } from '@huma/contracts';
+import type { Access, ArticleSummary, DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { Badge } from '#components/badge';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { createStyles } from '#lib/styles';
+import { formatLongDate } from '#lib/format';
+import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
+import { Icon } from '#primitives/icon';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
 
@@ -19,16 +20,22 @@ export type ArticleCardProps = Readonly<{
   summary: ArticleSummary;
   action?: ReactNode | undefined;
   signature?: DisplayText | null | undefined;
+  /** Whether the card says when the item was published: wherever a list reaches back further than one day's paper. */
+  dated?: boolean | undefined;
 }>;
 
 /**
- * Whether a card tells the reader the item is reserved, access by access. The table answers for every access the
- * contract declares, so an access added there stops the build here rather than travelling the feed unmarked — a
- * silence nothing would report.
+ * Whether a card says the item is open to any reader, access by access.
+ *
+ * Four items in five are reserved to subscribers — twelve of the thirteen on a front page — so a mark on each of those
+ * was a mark on four cards in five, and told a reader nothing a card without it did not. The mark goes on the
+ * exception: the item anyone can read, which is what Mediapart marks on a paper as closed as this one. The table
+ * answers for every access the contract declares, so an access added there stops the build here rather than
+ * travelling the feed unmarked.
  */
-const MARKED = { free: false, premium: true } satisfies Readonly<Record<Access, boolean>>;
+const OPEN = { free: true, premium: false } satisfies Readonly<Record<Access, boolean>>;
 
-/** The square the small picture of a card in a line is cropped to. */
+/** The square the small picture of a card in a line is cut to. */
 const THUMBNAIL_RATIO = 1;
 
 const useStyles = createStyles((theme) => ({
@@ -36,13 +43,35 @@ const useStyles = createStyles((theme) => ({
   // nearer than what follows. A single gap between all four — which is what the card had — says they are four
   // unrelated things, and leaves the order they are read in resting on size alone.
   card: { gap: SPACING.sm },
-  title: { gap: SPACING.xs },
+  words: { gap: SPACING.xs },
   // The gap between the picture and what follows is the card's, and never the picture's own margin. Given one, the
   // picture lost thirty-seven pixels of width on an A065: a cell of a virtualised list is laid out at a height it
   // already knows, so a margin added under the picture comes off the picture's height — and a box held to a ratio
   // that loses height loses width with it. Measured [42,399][1001,938] against [42,399][1038,958] beside it.
-  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, borderRadius: RADII.sm, backgroundColor: theme.border },
-  film: { alignSelf: 'stretch', aspectRatio: FRAMES.film, borderRadius: RADII.sm, backgroundColor: theme.border },
+  photo: {
+    alignSelf: 'stretch',
+    aspectRatio: FRAMES.photo,
+    borderRadius: RADII.sm,
+    overflow: 'hidden',
+    backgroundColor: theme.border,
+  },
+  film: {
+    alignSelf: 'stretch',
+    aspectRatio: FRAMES.film,
+    borderRadius: RADII.sm,
+    overflow: 'hidden',
+    backgroundColor: theme.border,
+  },
+  fill: { position: 'absolute', top: SPACING.none, bottom: SPACING.none, left: SPACING.none, right: SPACING.none },
+  // The mark a film is played from sits on its still, in the corner a thumb reaches, on the paper's red.
+  play: {
+    position: 'absolute',
+    left: SPACING.sm,
+    bottom: SPACING.sm,
+    padding: SPACING.sm,
+    borderRadius: RADII.pill,
+    backgroundColor: theme.primary,
+  },
   line: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md },
   thumbnail: {
     width: SIZES.thumbnail,
@@ -57,77 +86,129 @@ const useStyles = createStyles((theme) => ({
   // and drops the picture. A block of brand colour in a scrolling feed is a thing to look at, not a thing to read.
   column: { flexDirection: 'row', gap: SPACING.md },
   mark: { width: SIZES.stroke, alignSelf: 'stretch', backgroundColor: theme.primary },
-  // What the card says about itself, and the one thing a reader may do to it from the feed. It used to close the
-  // card, under the standfirst, carrying the date of publication; the date is gone — the front page of a week's
-  // paper needs none, which is Nielsen's guideline 84 — and what is left belongs over the title, where a paper prints
-  // a surtitre, rather than in a row of its own at the bottom.
-  meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.sm },
-  said: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+  head: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: SPACING.sm },
+  foot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: SPACING.sm },
+  said: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', columnGap: SPACING.sm, flexShrink: 1 },
 }));
 
-type MetaProps = Readonly<{ summary: ArticleSummary; action: ReactNode; said: ReactNode }>;
+type PartProps = Readonly<{
+  summary: ArticleSummary;
+  action: ReactNode;
+  signature: DisplayText | null;
+  dated: boolean;
+}>;
 
 /**
- * The line over a card's title: what it belongs to, whether it is reserved, and what the screen lets a reader do.
- *
- * It is drawn on every shape and always in the same place, so the control a reader reaches for is where they left it
- * whatever the card under it looks like. NN/g's finding on saving is what keeps it visible rather than behind a
- * press-and-hold: a save nobody can find is a save nobody uses. It stays the one thing on the card that answers a
- * press of its own, which is the other half of the same finding.
+ * What the item is, over its title, when it is anything but an article — a video, a piece of opinion, a chapter of a
+ * series, a running coverage — and who signed it, when it is a column. Nothing at all otherwise: the line over a title
+ * used to be drawn on every card, and on a paper whose items name no section and are mostly reserved it held nothing
+ * on four cards in five but the space it took, 148 pixels of it on the phone above a title.
  */
-function Meta({ summary, action, said }: MetaProps): ReactNode {
+function Head({ summary, signature }: Pick<PartProps, 'summary' | 'signature'>): ReactNode {
   const styles = useStyles();
+  const word = formatWord(summary.format);
+  if (word === null && signature === null) {
+    return null;
+  }
   return (
-    <Box style={styles.meta}>
+    <Box style={styles.head}>
+      {word === null ? null : (
+        <Text variant="kicker" tone="textPrimary">
+          {word}
+        </Text>
+      )}
+      {signature === null ? null : <Text variant="caption">{signature}</Text>}
+    </Box>
+  );
+}
+
+/**
+ * What closes a card: when it was published, where the list reaches back further than a day; whether anyone may read
+ * it; and the one thing a reader may do to it from the feed.
+ *
+ * The date was taken off every card for a front page of one day, which needs none — Nielsen's guideline 84. A section's
+ * own list reaches back six weeks and a search two years, and a card there without a date says a piece of August is
+ * this morning's; so the screen that lists further back than a day asks for one. The control keeps one place on every
+ * shape, the end of the card, where a thumb leaving it passes: NN/g's finding on saving is that a save nobody can find
+ * is a save nobody uses, and it is the one thing on a card that answers a press of its own.
+ */
+function Foot({ summary, action, dated }: Pick<PartProps, 'summary' | 'action' | 'dated'>): ReactNode {
+  const styles = useStyles();
+  const open = OPEN[summary.access];
+  if (!dated && !open && action === null) {
+    return null;
+  }
+  return (
+    <Box style={styles.foot}>
       <Box style={styles.said}>
-        {said}
-        {MARKED[summary.access] ? <Badge label={t('article.premium')} /> : null}
+        {dated ? <Text variant="caption">{formatLongDate(summary.publishedAt)}</Text> : null}
+        {open ? (
+          <Text variant="kicker" tone="textPrimary">
+            {t('article.free')}
+          </Text>
+        ) : null}
       </Box>
       {action}
     </Box>
   );
 }
 
-/**
- * What an item is, set over its title in small capitals when it is anything but an article: a video, a piece of
- * opinion, a chapter of a series, the running coverage of an event. It is the word a paper prints there that the
- * service knows of every item — the section it ran in being known of none outside that section's own list.
- */
-function Kicker({ format }: Readonly<{ format: ArticleFormat }>): ReactNode {
-  const word = formatWord(format);
-  return word === null ? null : (
-    <Text variant="kicker" tone="textPrimary">
-      {word}
-    </Text>
+/** The words of a card: its title, whole, and the sentence under it when the shape has room for one. */
+function Words({ summary, standfirst }: Readonly<{ summary: ArticleSummary; standfirst: boolean }>): ReactNode {
+  const styles = useStyles();
+  return (
+    <Box style={styles.words}>
+      {/* A headline is never cut. At the clamps the cards were drawn with, the journal's own titles lost their end on
+          two cards in five — median 101 signs, 117 on a front page — and what a French headline says after its colon
+          is the news; the Guardian, Le Monde and Mediapart cut none of theirs in a feed. */}
+      <Text variant="title">{summary.title}</Text>
+      {standfirst ? (
+        <Text variant="summary" numberOfLines={3}>
+          {summary.standfirst}
+        </Text>
+      ) : null}
+    </Box>
   );
 }
 
-type BodyProps = Readonly<{ summary: ArticleSummary; action: ReactNode; signature: DisplayText | null }>;
+/** The picture of a card at the width of the block, in its own frame, with the mark a film is played from. */
+function Picture({ summary }: Readonly<{ summary: ArticleSummary }>): ReactNode {
+  const styles = useStyles();
+  const theme = useTheme();
+  const visual = pictureOf(summary, 'card');
+  const frame = frameOf(summary.format);
+  if (visual === null) {
+    return null;
+  }
+  return (
+    <Box style={styles[frame]}>
+      <Image
+        source={visual.source}
+        recyclingKey={summary.id}
+        announces={DECORATIVE}
+        thumbhash={visual.thumbhash}
+        style={styles.fill}
+      />
+      {/* Decorative: the word over the title already says the item is a video, and a reader listening would hear it
+          twice. */}
+      {frame === 'film' ? (
+        <Box style={styles.play}>
+          <Icon name="play" announces={DECORATIVE} size={SPACING.md} tintColor={theme.onPrimary} />
+        </Box>
+      ) : null}
+    </Box>
+  );
+}
 
 /** The front of a page: the picture first, at the width of the block, then the words under it. */
-function Lead({ summary, action }: BodyProps): ReactNode {
+function Lead({ summary, action, signature, dated }: PartProps): ReactNode {
   const styles = useStyles();
-  const visual = pictureOf(summary, 'card');
   return (
     <Box style={styles.card}>
-      {visual === null ? null : (
-        <Image
-          source={visual.source}
-          recyclingKey={summary.id}
-          announces={DECORATIVE}
-          thumbhash={visual.thumbhash}
-          style={styles[frameOf(summary.format)]}
-        />
-      )}
-      <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />
-      <Box style={styles.title}>
-        <Text variant="title" numberOfLines={3}>
-          {summary.title}
-        </Text>
-        <Text variant="summary" numberOfLines={2}>
-          {summary.standfirst}
-        </Text>
-      </Box>
+      <Picture summary={summary} />
+      <Head summary={summary} signature={signature} />
+      <Words summary={summary} standfirst />
+      <Foot summary={summary} action={action} dated={dated} />
     </Box>
   );
 }
@@ -138,29 +219,23 @@ function Lead({ summary, action }: BodyProps): ReactNode {
  * The title used to run the full width of the card and the picture sat under it, beside the standfirst — so the title
  * was cut at two lines while the room next to the picture went to a sentence, and the card had two left margins, one
  * for the title and one for everything under it. NN/g's rule for a list row is the one this broke: a reader scans a
- * single left edge, so the text keeps one column and the picture takes the other. It takes the right-hand one because
- * not every item in this feed has a picture — a brief and a column have none — and a picture on the right leaves every
- * title in the feed flush against the same edge whether or not one is there.
+ * single left edge, so the text keeps one column and the picture takes the other, on the right, where it leaves every
+ * title flush against the same edge whether or not a picture is there. It hangs from the top of the title, however
+ * long the title runs.
  *
  * It carries no standfirst. On a phone the Guardian shows none on any card and the BBC shows none on any card; Le
  * Monde shows one on fifteen of a hundred and seven. A sentence under every title is what turned this front into a
  * wall of grey where nothing was subordinate to anything.
  */
-function Line({ summary, action }: BodyProps): ReactNode {
+function Line({ summary, action, signature, dated }: PartProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'thumbnail');
   return (
     <Box style={styles.card}>
-      <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />
+      <Head summary={summary} signature={signature} />
       <Box style={styles.line}>
         <Box style={styles.rest}>
-          {/* Four lines and not three. The column left beside a picture of ninety-six points measures twenty-nine
-              letters of this face at this size, and the paper's own headlines run to ninety-five: at three lines a
-              title of the corpus is cut while the fourth line it needed sits empty under the picture. Four lines of
-              twenty points measure ninety-two, which is what the picture beside them measures. */}
-          <Text variant="title" numberOfLines={4}>
-            {summary.title}
-          </Text>
+          <Words summary={summary} standfirst={false} />
         </Box>
         {visual === null ? null : (
           <Image
@@ -172,6 +247,7 @@ function Line({ summary, action }: BodyProps): ReactNode {
           />
         )}
       </Box>
+      <Foot summary={summary} action={action} dated={dated} />
     </Box>
   );
 }
@@ -179,37 +255,24 @@ function Line({ summary, action }: BodyProps): ReactNode {
 /**
  * A column, marked as one and signed.
  *
- * The current app prints the word on a red block beside the writer's portrait, and leaves the other half of the card
- * empty — no standfirst, no date (capture 18). The portrait is not the paper's to print here: the corpus files no
- * likeness of anyone, and inventing one for a writer who does not exist would be a picture of a person. So the mark
- * is the rule the app draws down the side of a quoted voice, the word and the name are set where every other card
- * sets what it belongs to, and the card keeps the standfirst every other shape with room for one keeps.
+ * The current app prints the word on a red block beside the writer's portrait. The journal's own picture for a column
+ * is a vignette — the genre's word and the writer's face printed on a red ground, the same one on every column of the
+ * same writer — so it is not the picture of the piece, and the card draws none. The mark is the rule the app draws down
+ * the side of a quoted voice, and the word and the name are set where every other card says what it is.
+ *
+ * It carries no standfirst either. Two columns in three are filed with none, and the service stands in the opening of
+ * the body for it, cut at a « … »: a sentence begun, not a sentence about the piece.
  */
-function Column({ summary, action, signature }: BodyProps): ReactNode {
+function Column({ summary, action, signature, dated }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.column}>
       <Box style={styles.mark} />
       <Box style={styles.rest}>
         <Box style={styles.card}>
-          <Meta
-            summary={summary}
-            action={action}
-            said={
-              <>
-                <Kicker format={summary.format} />
-                {signature === null ? null : <Text variant="caption">{signature}</Text>}
-              </>
-            }
-          />
-          <Box style={styles.title}>
-            <Text variant="title" numberOfLines={3}>
-              {summary.title}
-            </Text>
-            <Text variant="summary" numberOfLines={2}>
-              {summary.standfirst}
-            </Text>
-          </Box>
+          <Head summary={summary} signature={signature} />
+          <Words summary={summary} standfirst={false} />
+          <Foot summary={summary} action={action} dated={dated} />
         </Box>
       </Box>
     </Box>
@@ -217,19 +280,13 @@ function Column({ summary, action, signature }: BodyProps): ReactNode {
 }
 
 /** An item written without a picture: its words are the whole card (capture 02). */
-function Brief({ summary, action }: BodyProps): ReactNode {
+function Brief({ summary, action, signature, dated }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
-      <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />
-      <Box style={styles.title}>
-        <Text variant="title" numberOfLines={3}>
-          {summary.title}
-        </Text>
-        <Text variant="summary" numberOfLines={3}>
-          {summary.standfirst}
-        </Text>
-      </Box>
+      <Head summary={summary} signature={signature} />
+      <Words summary={summary} standfirst />
+      <Foot summary={summary} action={action} dated={dated} />
     </Box>
   );
 }
@@ -239,32 +296,39 @@ function Brief({ summary, action }: BodyProps): ReactNode {
  *
  * The shape arrives decided: a card does not read the item to choose one, because the list recycles a cell only
  * between items that answered the same shape, and the only place that can answer for a whole feed at once is the one
- * that laid it out. The four shapes are kept in this one file so that what separates them — how much room the picture
- * takes, and whether there is one — can be read at a glance rather than diffed across four.
+ * that laid it out. The four shapes are kept in this one file, built of the same four parts, so that what separates
+ * them — how much room the picture takes, and whether there is one — can be read at a glance.
  *
- * They are four orderings of one order. Every card says what it is first, then its title, then the sentence under
- * it if it has room for one; what changes is the picture. That is Le Monde's card, which runs a whole front off one
+ * They are four orderings of one order: what the item is, its title, the sentence under it if the shape has room for
+ * one, and what closes it; what changes is the picture. That is Le Monde's card, which runs a whole front off one
  * component and varies which parts are present rather than where they sit, and it is what the fifth shape broke:
  * `stacked` put the title above the picture and the standfirst below it, so two cards a scroll apart taught two
  * different templates for the same four things.
  *
- * `action` is whatever the screen lets a reader do to the article from the feed, and `signature` who signed it. The
- * card takes both already made: an entity may not name a route, nor hold an action of its own.
+ * `action` is whatever the screen lets a reader do to the article from the feed, `signature` who signed it, and
+ * `dated` whether the screen lists further back than a day. The card takes all three already made: an entity may not
+ * name a route, nor hold an action of its own.
  */
-export function ArticleCard({ shape, summary, action, signature = null }: ArticleCardProps): ReactNode {
-  const body = { summary, action, signature };
+export function ArticleCard({
+  shape,
+  summary,
+  action = null,
+  signature = null,
+  dated = false,
+}: ArticleCardProps): ReactNode {
+  const parts = { summary, action, signature, dated };
   switch (shape) {
     case 'lead': {
-      return <Lead {...body} />;
+      return <Lead {...parts} />;
     }
     case 'line': {
-      return <Line {...body} />;
+      return <Line {...parts} />;
     }
     case 'column': {
-      return <Column {...body} />;
+      return <Column {...parts} />;
     }
     case 'brief': {
-      return <Brief {...body} />;
+      return <Brief {...parts} />;
     }
   }
 }

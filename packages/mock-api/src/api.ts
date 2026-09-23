@@ -33,8 +33,25 @@ const notFound = (id: ArticleId): never => {
   throw new ContentApiError('not-found', `article introuvable : ${id}`);
 };
 
-/** A day's paper while it is being gathered: what it holds, and what it will open on. */
-type Gathering = Readonly<{ items: ArticleSummary[] }> & { opener: ArticleSummary };
+/**
+ * What a run of the corpus's items opens on: the first of them with a picture, or the first of them when none has one.
+ *
+ * A paper opens on a picture, and the corpus has no desk to choose one: laid out newest first, its newest items of a
+ * morning are the briefs filed before there is a picture — four of them on its front. So the corpus lays its own front
+ * and its numéros' covers by this one rule, and the screens show what they are served in the order they are served
+ * it, as they show the journal's.
+ */
+const openerOf = (items: readonly ArticleSummary[]): ArticleSummary | undefined =>
+  items.find((item) => item.hero !== undefined) ?? items[0];
+
+/** A run of items with the one it opens on laid first, and everything else as it came. */
+const openedOn = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
+  const opener = openerOf(items);
+  return opener === undefined ? items : [opener, ...items.filter((item) => item.id !== opener.id)];
+};
+
+/** The front of the corpus: its newest items, as many as the journal's front holds, opened on a picture. */
+const FRONT: readonly ArticleSummary[] = openedOn(CHRONOLOGICAL.slice(0, SERVICE_PAGES.front));
 
 /**
  * The corpus gathered into numéros, one per day on the newsroom's clock.
@@ -43,31 +60,19 @@ type Gathering = Readonly<{ items: ArticleSummary[] }> & { opener: ArticleSummar
  * so the day an item was filed on already says it. Inventing a field would be inventing an editorial decision the
  * fiction never made, and would let the two disagree.
  *
- * The opener is the freshest illustrated item of the day, which is the same rule the front page follows — a paper opens
- * on a picture, and the newest items of a morning are briefs filed before the desk has one. A day holding no picture
- * at all opens on its freshest item, so every numéro has a cover.
- *
  * Only the cover of a numéro is gathered now. What a numéro holds was served too, laid out desk by desk as a printed
  * edition runs them, and no screen ever asked: a numéro weighs sixty-two megabytes and is read in its publisher's own
  * reader, so the newsstand shows the covers and sends a reader to the paper's own site.
  */
-const gathered = new Map<IssueId, Gathering>();
+const days = new Map<IssueId, ArticleSummary[]>();
 for (const summary of CHRONOLOGICAL) {
   const day = issueIdAt(summary.publishedAt);
-  const held = gathered.get(day);
-  if (held === undefined) {
-    gathered.set(day, { items: [summary], opener: summary });
-  } else {
-    held.items.push(summary);
-    if (held.opener.hero === undefined && summary.hero !== undefined) {
-      held.opener = summary;
-    }
-  }
+  days.set(day, [...(days.get(day) ?? []), summary]);
 }
 
 /** The shelf: every numéro, the most recent first, as the newsstand stands them. */
-const SHELF: readonly IssueSummary[] = [...gathered]
-  .map(([day, held]) => ISSUE_SUMMARY.parse({ id: day, opener: held.opener, count: held.items.length }))
+const SHELF: readonly IssueSummary[] = [...days]
+  .map(([day, items]) => ISSUE_SUMMARY.parse({ id: day, opener: openerOf(items), count: items.length }))
   .sort((left, right) => right.id.localeCompare(left.id));
 
 /**
@@ -130,7 +135,7 @@ export const contentApi: ContentApi & Required<Pick<ContentApi, 'getIssues'>> = 
     const { section } = query;
     return Promise.resolve(
       section === undefined
-        ? whole(CHRONOLOGICAL, SERVICE_PAGES.front)
+        ? whole(FRONT, SERVICE_PAGES.front)
         : pageOf(
             NEWEST_FIRST.filter((entry) => entry.section === section).map(summarize),
             query,

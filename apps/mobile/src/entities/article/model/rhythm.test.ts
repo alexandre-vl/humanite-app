@@ -3,6 +3,7 @@ import type { ArticleSummary } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { content, pictureOf } from '#api';
 import { everyArticle } from '#lib/testing';
+import { frameOf } from './format';
 import { feedRows, rowName, rowShape } from './rhythm';
 
 /** The whole paper, which is what a rhythm has to hold over. */
@@ -11,25 +12,14 @@ const everything = async (): Promise<readonly ArticleSummary[]> => everyArticle(
 /** The front, as its source lays it out. */
 const theFront = async (): Promise<readonly ArticleSummary[]> => (await content.getFeed({})).items;
 
-/** The article a page should open on, worked out beside the code under test rather than by it. */
-const frontOf = (items: readonly ArticleSummary[]): ArticleSummary | undefined =>
-  items.find((item) => item.hero !== undefined);
-
 describe('feedRows, rythme du journal', () => {
-  it('montre chaque article une fois, la une montée en tête', async () => {
+  /** The order is the desk's: a feed does not rearrange a front the newsroom laid out. */
+  it('montre chaque article une fois, dans l’ordre où la source les sert', async () => {
     const items = await everything();
-    const front = frontOf(items);
-    if (front === undefined) {
-      throw new Error('aucun article illustré : le test ne vérifierait rien');
-    }
-    const shown = feedRows(items, 'paper').map((row) => row.summary.id);
-    expect(shown).toEqual([front.id, ...items.filter((item) => item.id !== front.id).map((item) => item.id)]);
+    expect(feedRows(items, 'paper').map((row) => row.summary.id)).toEqual(items.map((item) => item.id));
   });
 
-  /**
-   * The front of the corpus opens on four briefs ahead of the first picture, so a page that took its rank alone would
-   * open on a brief and the front page would never once be printed. This is the test that would have caught that.
-   */
+  /** A front is laid to open on a picture — by the journal's desk, and by the corpus for its own — and it opens large. */
   it('ouvre sur un article en grand, et c’est un article illustré', async () => {
     const rows = feedRows(await theFront(), 'paper');
     const [lead] = rows;
@@ -48,7 +38,10 @@ describe('feedRows, rythme du journal', () => {
    */
   it('relève un article en grand de loin en loin, et jamais deux de suite', async () => {
     const rows = feedRows(await everything(), 'paper');
-    const raised = rows.flatMap((row, rank) => (row.shape === 'lead' ? [rank] : []));
+    // A film is shown at its own width wherever it falls; the rhythm is what the rank raises.
+    const raised = rows.flatMap((row, rank) =>
+      row.shape === 'lead' && frameOf(row.summary.format) !== 'film' ? [rank] : [],
+    );
     expect(raised.length).toBeGreaterThan(2);
     for (const [index, rank] of raised.entries()) {
       expect(rank - (raised[index - 1] ?? rank - 2)).toBeGreaterThan(1);
@@ -85,19 +78,27 @@ describe('feedRows, rythme du journal', () => {
 describe('feedRows, rythme d’une liste', () => {
   /**
    * A list answers in the order it was asked in: a reader who searched sees the best answer first, and nothing the
-   * newsroom did to a page may reorder that. Nor does a list raise anything — it is not a page (capture 09).
+   * newsroom did to a page may reorder that. Nor does a list raise anything by its rank — it is not a page (capture
+   * 09); a film is shown at its own width there as anywhere, its still being cut by a square.
    */
-  it('répond dans l’ordre reçu, sans une', async () => {
+  it('répond dans l’ordre reçu, sans rien relever qu’un film', async () => {
     const items = await everything();
     const rows = feedRows(items, 'list');
     expect(rows.map(rowName)).toEqual(items.map((item) => item.id));
-    expect(rows.some((row) => rowShape(row) === 'lead')).toBe(false);
+    expect(rows.filter((row) => rowShape(row) === 'lead').every((row) => row.summary.format === 'video')).toBe(true);
   });
 
-  it('met en ligne tout ce qui porte une image, et garde le reste tel quel', async () => {
+  it('met en ligne tout ce qui porte une photo, un film en grand, et garde le reste tel quel', async () => {
     for (const row of feedRows(await everything(), 'list')) {
+      const pictured = pictureOf(row.summary, 'card') !== null;
       const expected =
-        row.summary.format === 'column' ? 'column' : pictureOf(row.summary, 'card') === null ? 'brief' : 'line';
+        row.summary.format === 'column'
+          ? 'column'
+          : !pictured
+            ? 'brief'
+            : frameOf(row.summary.format) === 'film'
+              ? 'lead'
+              : 'line';
       expect(row.shape).toBe(expected);
     }
   });

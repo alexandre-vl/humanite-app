@@ -63,7 +63,6 @@ export type Theme = Readonly<{
   mark: Color;
   link: Color;
   primary: Color;
-  premium: Color;
   border: Color;
   rule: Color;
   control: Color;
@@ -83,7 +82,6 @@ export const LIGHT_THEME = {
   mark: PALETTE.uiRed,
   link: PALETTE.inkRed,
   primary: PALETTE.uiRed,
-  premium: PALETTE.premiumYellow,
   border: PALETTE.blueGrey,
   rule: PALETTE.ruleGrey,
   control: PALETTE.dateGrey,
@@ -103,7 +101,6 @@ export const DARK_THEME = {
   mark: PALETTE.uiRed,
   link: PALETTE.uiRed,
   primary: PALETTE.uiRed,
-  premium: PALETTE.premiumYellow,
   border: PALETTE.darkBorder,
   rule: PALETTE.darkRule,
   control: PALETTE.dateGrey,

@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
+import { formatLongDate } from '#lib/format';
 import { everyArticle } from '#lib/testing';
 import { Text } from '#primitives/text';
 import type { CardShape } from '../model/rhythm';
@@ -69,8 +70,11 @@ const PICTURES = { lead: 1, line: 1, column: 0, brief: 0 } satisfies Readonly<Re
 
 const SHAPES: readonly CardShape[] = ['lead', 'line', 'column', 'brief'];
 
-/** The shapes with room for the sentence under a title. A line has none, and that is the point of a line. */
-const WITH_SUMMARY: readonly CardShape[] = ['lead', 'column', 'brief'];
+/**
+ * The shapes with room for the sentence under a title. A line has none, and that is the point of a line; a column has
+ * none either, two in three of the journal's being filed without one and served with the opening of the body cut off.
+ */
+const WITH_SUMMARY: readonly CardShape[] = ['lead', 'brief'];
 
 const CASES: readonly (readonly [CardShape, number])[] = SHAPES.map((shape) => [shape, PICTURES[shape]]);
 
@@ -101,10 +105,17 @@ describe('ArticleCard', () => {
    * any card and the BBC shows none on any card; Le Monde shows one on fifteen of a hundred and seven. A sentence
    * under every title is what made this front a wall of grey in which nothing was subordinate to anything.
    */
-  it('ne met pas de chapô sur une ligne, la forme que trois cartes sur quatre prennent', async () => {
+  it.each(['line', 'column'] as const)('ne met pas de chapô sur %s', async (shape) => {
     const summary = illustrated(await everything());
-    await render(<ArticleCard shape="line" summary={summary} />);
+    await render(<ArticleCard shape={shape} summary={summary} />);
     expect(screen.queryByText(summary.standfirst)).toBeNull();
+  });
+
+  /** A headline cut is a headline lost: the journal's lost their end on two cards in five at the old clamps. */
+  it.each(SHAPES)('ne coupe jamais le titre de %s', async (shape) => {
+    const summary = illustrated(await everything());
+    await render(<ArticleCard shape={shape} summary={summary} />);
+    expect(screen.getByText(summary.title).props['numberOfLines']).toBeUndefined();
   });
 
   /**
@@ -129,13 +140,16 @@ describe('ArticleCard', () => {
    * `[42,399][1001,938]`, thirty-seven pixels short of the block it is supposed to fill, and no bench could see it.
    * The room between a picture and what follows belongs to the card.
    */
-  it('ne donne aucune marge propre à une photo tenue par son rapport', async () => {
+  it('ne donne aucune marge propre à une photo tenue par son cadre', async () => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape="lead" summary={summary} />);
-    const style: unknown = screen.getByTestId('picture', { includeHiddenElements: true }).props['style'];
-    const laid = typeof style === 'object' && style !== null ? Object.keys(style) : [];
-    expect(laid.filter((key) => key.startsWith('margin'))).toEqual([]);
-    expect(laid).toContain('aspectRatio');
+    const picture = screen.getByTestId('picture', { includeHiddenElements: true });
+    const keysOf = (style: unknown): readonly string[] =>
+      typeof style === 'object' && style !== null ? Object.keys(style) : [];
+    const own = keysOf(picture.props['style']);
+    const frame = keysOf(picture.parent?.props['style']);
+    expect([...own, ...frame].filter((key) => key.startsWith('margin'))).toEqual([]);
+    expect(frame).toContain('aspectRatio');
   });
 
   /**
@@ -144,10 +158,18 @@ describe('ArticleCard', () => {
    * all, the Guardian prints an age only under twelve hours, and not one prints a calendar date on every card. This
    * one printed `13/09/2026` five times a screen, under a corpus filed across three days of one week.
    */
-  it.each(SHAPES)('ne date pas %s : une une d’une semaine n’a pas de date par carte', async (shape) => {
+  it.each(SHAPES)('ne date pas %s : une une d’une journée n’a pas de date par carte', async (shape) => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape={shape} summary={summary} />);
     expect(screen.queryByText(/\d{2}\/\d{2}\/\d{4}/u)).toBeNull();
+    expect(screen.queryByText(formatLongDate(summary.publishedAt))).toBeNull();
+  });
+
+  /** A section's own list reaches back weeks and a search years: there, a card without a date says August is today. */
+  it.each(SHAPES)('date %s quand l’écran liste plus loin qu’une journée', async (shape) => {
+    const summary = illustrated(await everything());
+    await render(<ArticleCard shape={shape} summary={summary} dated />);
+    expect(screen.getByText(formatLongDate(summary.publishedAt))).toBeTruthy();
   });
 
   /**
@@ -169,21 +191,20 @@ describe('ArticleCard', () => {
   });
 
   /**
-   * The premium mark shares the line over the title with the section, on every shape. It had a line of its own, where
-   * it left one shape a row taller than another mounting the very same components — the split the recycling then had
-   * to carry.
+   * Four items in five are reserved to subscribers, so a mark on each of those told a reader nothing; the mark is on
+   * the exception, the item anyone can read, and on nothing else.
    */
-  it.each(SHAPES)('ne marque sur %s que les articles réservés aux abonnés', async (shape) => {
+  it.each(SHAPES)('ne marque sur %s que les articles en accès libre', async (shape) => {
     const items = await everything();
     const reserved = items.find((item) => item.access === 'premium');
     const open = items.find((item) => item.access === 'free');
     if (reserved === undefined || open === undefined) {
       throw new Error('le contenu ne sert pas les deux accès : le test ne vérifierait rien');
     }
-    const view = await render(<ArticleCard shape={shape} summary={reserved} />);
-    expect(screen.getByText('Abonnés')).toBeTruthy();
-    await view.rerender(<ArticleCard shape={shape} summary={open} />);
-    expect(screen.queryByText('Abonnés')).toBeNull();
+    const view = await render(<ArticleCard shape={shape} summary={open} />);
+    expect(screen.getByText(t('article.free'))).toBeTruthy();
+    await view.rerender(<ArticleCard shape={shape} summary={reserved} />);
+    expect(screen.queryByText(t('article.free'))).toBeNull();
   });
 
   it('annonce une opinion comme telle, et la signe quand la rédaction est arrivée', async () => {

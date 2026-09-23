@@ -7,7 +7,6 @@ import { catalog as switchCatalog } from '#primitives/switch';
 import { catalog as textCatalog } from '#primitives/text';
 import { catalog as textFieldCatalog } from '#primitives/text-field';
 import { catalog as themeCatalog } from '#primitives/theme';
-import { catalog as badgeCatalog } from '#components/badge';
 import { catalog as buttonCatalog } from '#components/button';
 import { catalog as emptyStateCatalog } from '#components/empty-state';
 import { catalog as labelBarCatalog } from '#components/label-bar';
@@ -28,7 +27,6 @@ export const REGISTRY: readonly CatalogItem[] = [
   { level: 'L0', entry: textCatalog },
   { level: 'L0', entry: textFieldCatalog },
   { level: 'L0', entry: themeCatalog },
-  { level: 'L1', entry: badgeCatalog },
   { level: 'L1', entry: buttonCatalog },
   { level: 'L1', entry: emptyStateCatalog },
   { level: 'L1', entry: labelBarCatalog },

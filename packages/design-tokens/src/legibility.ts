@@ -19,10 +19,7 @@ import { TEXT_SCALES, TEXT_TONES, typographyAt } from './typography.ts';
  * and six of them were being held to three.
  */
 
-/**
- * The roles a screen paints behind text. `premium` is not among them: the one mark printed on it builds itself inside
- * a light scope, so that pairing is a single fixed one rather than one per theme, and the theme test pins it there.
- */
+/** The roles a screen paints behind text. */
 const GROUNDS = [
   'background',
   'ground',

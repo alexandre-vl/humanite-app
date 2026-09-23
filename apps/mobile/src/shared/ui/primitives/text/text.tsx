@@ -20,6 +20,10 @@ export type TextProps = Readonly<{
  * truncates to numberOfLines when given, and reads a DisplayText, never a raw string. A sentence whose parts differ —
  * a slanted word, a link — is not this: it is RichText, which takes the parts rather than one string.
  *
+ * A text cut to a number of lines is broken simply, each line filled before the next begins. Android's default evens out
+ * the lines of the whole paragraph, the lines cut away included, and starts a line early to do it: a standfirst cut at
+ * three lines showed fewer words than three lines hold, with room left at the end of its first.
+ *
  * `heading` says the line opens what follows it, which is how a reader listening to the paper skips through it: a
  * screen reader offers to jump from one heading to the next, and a page with none is a page that can only be walked
  * word by word. It is not read off the variant, because the same type serves a headline and the title of a card in a
@@ -31,6 +35,7 @@ export function Text({ children, variant = 'body', tone, align, numberOfLines, h
   return (
     <NativeText
       numberOfLines={numberOfLines}
+      textBreakStrategy={numberOfLines === undefined ? 'highQuality' : 'simple'}
       accessibilityRole={heading === true ? 'header' : undefined}
       style={textStyle(variant, theme, typesetting, tone, align)}
     >

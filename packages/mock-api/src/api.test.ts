@@ -21,12 +21,17 @@ test('getSections answers the registry, in the order of the bar', async () => {
   ]);
 });
 
-/** The front of the journal's service is one answer of thirteen: the mock's is too, the corpus having no desk. */
-test('getFeed without a section is the front: the thirteen newest, in one answer', async () => {
+/**
+ * The front of the journal's service is one answer of thirteen, in its desk's order. The corpus has no desk, so it
+ * lays its own: its thirteen newest, opened on the first of them with a picture, the rest as they came.
+ */
+test('getFeed without a section is the front: the thirteen newest, opened on a picture, in one answer', async () => {
   const front = await contentApi.getFeed({});
   expect(front.items).toHaveLength(13);
   expect(front.nextCursor).toBeNull();
-  expect(newestFirst(front.items.map((item) => item.publishedAt))).toBe(true);
+  const [opener, ...rest] = front.items;
+  expect(opener?.hero).toBeDefined();
+  expect(newestFirst(rest.map((item) => item.publishedAt))).toBe(true);
 });
 
 test('getFeed with a section is that section’s own list, newest first', async () => {

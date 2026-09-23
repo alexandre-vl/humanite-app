@@ -1,7 +1,6 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { pictureOf } from '#api';
-import { isColumn } from './format';
-import { openerOf } from './picture';
+import { frameOf, isColumn } from './format';
 
 /**
  * The trees a feed card mounts, one name per shape the cards take.
@@ -42,14 +41,17 @@ export type FeedRow = Readonly<{ shape: CardShape; summary: ArticleSummary }>;
  * marked, never for every third card. What the band actually said is what NN/g calls the illusion of completeness: a
  * contrasting full-width edge reads as the end of the page, and a reader stops there.
  */
-const BLOCK = 4;
+const LEAD_EVERY = 4;
 
 /**
  * The shape an item takes at its rank.
  *
- * What the item is comes first: a column is a column wherever it falls, and an item written without a picture cannot
- * be given one by its place in the page. Only then does the rank speak, and only on a page of the paper — which
- * raises one article in full at the top and again every fourth item, and runs everything between them on one line.
+ * What the item is comes first: a column is a column wherever it falls, an item written without a picture cannot be
+ * given one by its place in the page, and a film is shown at its own width. The still of a film is sixteen by nine,
+ * and the journal's carry their titles printed on them: cut to the square beside a line, they lost half a face and
+ * half a word on every row (« ENTION / CAINE », on the phone). Only then does the rank speak, and only on a page of
+ * the paper — which raises one article in full at the top and again every fourth item, and runs everything between
+ * them on one line.
  */
 const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): CardShape => {
   if (isColumn(summary.format)) {
@@ -58,31 +60,18 @@ const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): Car
   if (pictureOf(summary, 'card') === null) {
     return 'brief';
   }
+  if (frameOf(summary.format) === 'film') {
+    return 'lead';
+  }
   if (rhythm === 'list') {
     return 'line';
   }
-  return rank % BLOCK === 0 ? 'lead' : 'line';
+  return rank % LEAD_EVERY === 0 ? 'lead' : 'line';
 };
 
 /**
- * The order a page of the paper reads in: the article it opens on first, then everything else as it came.
- *
- * A page opens on a picture, and a feed need not start with one: the corpus lays its front out newest first, and the
- * newest items of a morning are the briefs filed before the desk has pictures — four of them there. A page that took
- * its rank alone would open on a brief and never once print the front it is named after, so the opener is chosen
- * rather than found in place; on a front whose desk already opens on a picture, it is the first item and nothing
- * moves. Nothing else moves either way.
- */
-const paperOrder = (summaries: readonly ArticleSummary[]): readonly ArticleSummary[] => {
-  const opener = openerOf(summaries);
-  if (opener === undefined) {
-    return summaries;
-  }
-  return [opener, ...summaries.filter((summary) => summary.id !== opener.id)];
-};
-
-/**
- * The rows a feed shows, in order: every item as a card, in the shape its rank and its own nature give it.
+ * The rows a feed shows, in the order the source gave them: every item as a card, in the shape its rank and its own
+ * nature give it. The order is the desk's, and a feed does not rearrange a front the newsroom laid out.
  *
  * The shape is decided once, here, and never by a screen: a screen that chose a card would have to know the rhythm of
  * every other screen to keep one, and the list would be handed two items answering the same name that mount different
@@ -92,10 +81,8 @@ const paperOrder = (summaries: readonly ArticleSummary[]): readonly ArticleSumma
  * read. Removing one does move every item under it, and a cell whose shape changed is thrown away and mounted again;
  * that is the price of a rhythm the page can be read by, and only the bookmarks a reader empties ever pay it.
  */
-export const feedRows = (summaries: readonly ArticleSummary[], rhythm: FeedRhythm): readonly FeedRow[] => {
-  const ordered = rhythm === 'paper' ? paperOrder(summaries) : summaries;
-  return ordered.map((summary, rank) => ({ shape: shapeAt(summary, rank, rhythm), summary }));
-};
+export const feedRows = (summaries: readonly ArticleSummary[], rhythm: FeedRhythm): readonly FeedRow[] =>
+  summaries.map((summary, rank) => ({ shape: shapeAt(summary, rank, rhythm), summary }));
 
 /** What tells one row of a feed from another for the list: each shape mounts its own tree, and only its own. */
 export const rowShape = (row: FeedRow): string => row.shape;

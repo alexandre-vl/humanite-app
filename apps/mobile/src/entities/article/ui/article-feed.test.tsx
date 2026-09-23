@@ -13,7 +13,7 @@ type ScreenProps = Readonly<{ rhythm: FeedRhythm; onOpen: (id: string) => void }
 
 /** What a screen does with a feed, in miniature: it reads it, then hands it to the view that shows it. */
 function Screen({ rhythm, onOpen }: ScreenProps): ReactNode {
-  return <ArticleFeed feed={usePagedFeed(feedQuery)} rhythm={rhythm} onOpen={onOpen} />;
+  return <ArticleFeed feed={usePagedFeed(feedQuery)} rhythm={rhythm} dated={false} onOpen={onOpen} />;
 }
 
 const mounted = async (rhythm: FeedRhythm, onOpen: (id: string) => void): Promise<void> => {
@@ -23,26 +23,25 @@ const mounted = async (rhythm: FeedRhythm, onOpen: (id: string) => void): Promis
 
 const served = async (): Promise<readonly ArticleSummary[]> => (await content.getFeed({})).items;
 
-/** The first article served, and the first that carries a picture: on this corpus they are never the same one. */
-const both = (items: readonly ArticleSummary[]): readonly [ArticleSummary, ArticleSummary] => {
+/** The first article the content serves, which both rhythms show first. */
+const firstOf = (items: readonly ArticleSummary[]): ArticleSummary => {
   const [first] = items;
-  const front = items.find((item) => item.hero !== undefined);
-  if (first === undefined || front === undefined) {
-    throw new Error('le contenu ne sert pas ce qu’il faut : le test ne vérifierait rien');
+  if (first === undefined) {
+    throw new Error('le contenu ne sert aucun article : le test ne vérifierait rien');
   }
-  return [first, front];
+  return first;
 };
 
 describe('ArticleFeed', () => {
   it('affiche les articles que le contenu sert', async () => {
-    const [first] = both(await served());
+    const first = firstOf(await served());
     await mounted('paper', () => undefined);
     expect(await screen.findByText(first.title)).toBeTruthy();
     expect(await screen.findByText(first.standfirst)).toBeTruthy();
   });
 
   it('rapporte l’article pressé, sans naviguer lui-même', async () => {
-    const [first] = both(await served());
+    const first = firstOf(await served());
     const open = jest.fn();
     await mounted('paper', open);
     await fireEvent.press(await screen.findByText(first.title));
@@ -50,14 +49,13 @@ describe('ArticleFeed', () => {
   });
 
   /**
-   * The two rhythms differ on the screen, not only in the model: a page of the paper puts its front first, and a
-   * list answers in the order it was asked in. This is the only test that reads that off a mounted list.
+   * A page of the paper and a list differ in the shapes they give their items, never in their order: the order is the
+   * source's — a desk's front, a search's answers — and a feed shows it as it came, under either rhythm.
    */
-  it('monte la une en tête d’une page, et laisse une liste dans son ordre', async () => {
-    const [first, front] = both(await served());
-    expect(first.id).not.toBe(front.id);
+  it('montre en tête d’une page comme d’une liste le premier article servi', async () => {
+    const first = firstOf(await served());
     await mounted('paper', () => undefined);
-    expect(await screen.findByText(front.title)).toBeTruthy();
+    expect(await screen.findByText(first.title)).toBeTruthy();
     await screen.unmount();
     await mounted('list', () => undefined);
     expect(await screen.findByText(first.title)).toBeTruthy();

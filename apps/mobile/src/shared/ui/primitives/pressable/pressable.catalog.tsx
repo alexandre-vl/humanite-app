@@ -6,7 +6,7 @@ import { createStyles } from '../../../lib/styles';
 import { Pressable } from './pressable';
 
 const useStyles = createStyles((theme) => ({
-  demo: { width: SPACING.xxxl, height: SPACING.xxxl, borderRadius: RADII.md, backgroundColor: theme.premium },
+  demo: { width: SPACING.xxxl, height: SPACING.xxxl, borderRadius: RADII.md, backgroundColor: theme.border },
 }));
 
 function PressableDemo(): ReactNode {

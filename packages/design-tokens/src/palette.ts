@@ -33,7 +33,6 @@ export const PALETTE = {
   inkRed: color('#ca323c'),
   aubergine: color('#230434'),
   inkGrey: color('#4c3f57'),
-  premiumYellow: color('#ffd603'),
   blueGrey: color('#ecf2f2'),
   paleGrey: color('#f5f5f5'),
   ruleGrey: color('#dcd5e0'),
