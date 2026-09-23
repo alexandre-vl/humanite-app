@@ -4,6 +4,7 @@ import { expoRouterApps } from '@huma/expo/apps';
 import { findWorkspaceRoot, print, readArguments, runCommand } from '@huma/kit/cli';
 import { renderDiagnostics } from '@huma/kit/diagnostics';
 import { cycleFindings } from '@huma/structure/cycles';
+import { serviceBuildFindings } from '@huma/structure/service-build';
 import { steigerFindings } from '@huma/structure/steiger';
 
 const USAGE = 'Usage : pnpm structure:check';
@@ -13,14 +14,20 @@ await runCommand(async () => {
   const root = await findWorkspaceRoot();
   let failed = false;
   for (const app of expoRouterApps(await readWorkspace(root))) {
-    const findings = [...(await steigerFindings(root, app)), ...(await cycleFindings(root, app, HERMES_DIRECTORIES))];
+    const findings = [
+      ...(await steigerFindings(root, app)),
+      ...(await cycleFindings(root, app, HERMES_DIRECTORIES)),
+      ...(await serviceBuildFindings(root, app, HERMES_DIRECTORIES)),
+    ];
     if (findings.length > 0) {
       failed = true;
       print(renderDiagnostics(findings, 'text'));
       print(`✗ ${app} : ${String(findings.length)} problème(s) de structure`);
       continue;
     }
-    print(`✓ ${app} : structure Feature-Sliced conforme, aucun cycle d’imports`);
+    print(
+      `✓ ${app} : structure Feature-Sliced conforme, aucun cycle d’imports, rien du corpus dans la build de service`,
+    );
   }
   return failed ? 1 : 0;
 });

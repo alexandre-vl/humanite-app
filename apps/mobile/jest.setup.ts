@@ -2,8 +2,10 @@ import { jest } from '@jest/globals';
 import type { ReactNode } from 'react';
 import type { AccessibilityRole, StyleProp, ViewStyle } from 'react-native';
 
-// The tests read the corpus, whatever the shell that runs them has exported: a service chosen for a phone's build must
-// not turn two hundred tests into requests. Expo reads the variable when a module asks for it, which is after this.
+// The tests read the corpus: Jest resolves the content door's default module, never its service variant, whatever the
+// shell that runs them has exported. The variable is made to say the same, since the door refuses a build whose source
+// and variable disagree — a service chosen for a phone's build would otherwise stop every test at its first import.
+// Expo reads the variable when a module asks for it, which is after this.
 process.env['EXPO_PUBLIC_CONTENT_SOURCE'] = 'mock';
 
 // A frame never arrives without a screen, so the runner's requestAnimationFrame fires on a timer of its own, after the

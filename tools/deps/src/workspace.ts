@@ -25,7 +25,11 @@ export type WorkspacePackage = Readonly<{
   name: string | null;
   /** Specifiers by kind, as written in `package.json`. */
   specifiers: Readonly<Record<DependencyKind, ReadonlyMap<string, string>>>;
-  /** Directories the `tsconfig.json` references, relative to the root; `null` without a `tsconfig.json`. */
+  /**
+   * Directories the package's TypeScript projects reference, relative to the root: its `tsconfig.json`, and any
+   * `tsconfig.<name>.json` beside it for files that run elsewhere — an app's Node configuration. `null` without a
+   * `tsconfig.json`.
+   */
   references: readonly string[] | null;
 }>;
 
@@ -175,19 +179,32 @@ export async function packageDirectories(root: string, globs: readonly string[])
   return directories.toSorted(compareText);
 }
 
+/** A TypeScript project at the root of a package: `tsconfig.json`, or `tsconfig.<name>.json` beside it. */
+const PROJECT = /^tsconfig(?:\.[a-z]+)?\.json$/u;
+
+/** The directories every project of the package at `directory` references, once each, in the order first written. */
+export async function readReferences(root: string, directory: string): Promise<readonly string[] | null> {
+  if ((await readTextIfExists(join(root, directory, 'tsconfig.json'))) === null) {
+    return null;
+  }
+  const projects = (await readdir(join(root, directory))).filter((name) => PROJECT.test(name)).toSorted(compareText);
+  const references = new Set<string>();
+  for (const project of projects) {
+    const parsed = TSCONFIG.parse(JSON.parse(await readFile(join(root, directory, project), 'utf8')));
+    for (const reference of parsed.references ?? []) {
+      const target = resolve(root, directory, reference.path);
+      const inside = relative(root, target.endsWith('.json') ? dirname(target) : target)
+        .split('\\')
+        .join('/');
+      references.add(inside === '' ? '.' : inside);
+    }
+  }
+  return [...references];
+}
+
 async function readPackage(root: string, directory: string): Promise<WorkspacePackage> {
   const manifest = MANIFEST.parse(JSON.parse(await readFile(join(root, directory, 'package.json'), 'utf8')));
-  const tsconfigText = await readTextIfExists(join(root, directory, 'tsconfig.json'));
-  const references =
-    tsconfigText === null
-      ? null
-      : (TSCONFIG.parse(JSON.parse(tsconfigText)).references ?? []).map((reference) => {
-          const target = resolve(root, directory, reference.path);
-          const inside = relative(root, target.endsWith('.json') ? dirname(target) : target)
-            .split('\\')
-            .join('/');
-          return inside === '' ? '.' : inside;
-        });
+  const references = await readReferences(root, directory);
   return {
     directory,
     name: manifest.name ?? null,

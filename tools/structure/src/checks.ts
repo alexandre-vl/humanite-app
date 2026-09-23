@@ -3,7 +3,7 @@ import { defineChecks } from '@huma/kit/checks';
 
 /**
  * Findings of `pnpm structure:check`: the Feature-Sliced heuristics Steiger owns, which boundaries cannot express,
- * and the import cycles dependency-cruiser finds.
+ * the import cycles dependency-cruiser finds, and what a build reading the service would bundle.
  */
 const TABLE = {
   'structure/ambiguous-slice-names': {
@@ -41,6 +41,15 @@ const TABLE = {
   'structure/cycle': {
     summary: 'aucun cycle d’imports dans le code de l’app',
     message: 'cycle d’imports : {cycle}',
+  },
+  'structure/source-variant': {
+    summary: 'une variante de service ne vit que dans une place qui les permet, la place api',
+    message:
+      'variante de service hors de la place api : une build de service la prendrait pour le module qu’elle double',
+  },
+  'structure/service-corpus': {
+    summary: 'une build qui lit le service n’embarque rien du corpus simulé',
+    message: 'la build de service embarque {module}',
   },
 } as const;
 

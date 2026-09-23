@@ -1,37 +1,33 @@
 import type { ContentApi, ContentErrorCode } from '@huma/contracts';
 import { ContentApiError } from '@huma/contracts';
-import { contentApi } from '@huma/mock-api';
-import { createRemoteApi } from '@huma/remote-api';
+import type { ContentSource } from '../config';
 import { CONTENT_SOURCE } from '../config';
-import { noteSetAside } from './set-aside';
+import type { Source } from './source';
+import { SOURCE } from './source';
 
 /**
- * The journal's service, asked through the platform's own network: its `fetch`, its abort and its timers, which the
- * client is handed rather than reaching for. Cookies are left out — the service sets none the app needs, and a request
- * that sent one would speak for a session this app never opened.
+ * The source a build bundled, once the build's own variable has named the same one.
+ *
+ * Which source a build reads is settled when Metro resolves `./source`: the corpus by default, the journal's service
+ * in a build that asked for it. The variable says it a second time, for what keeps its data under the source's name —
+ * the cache and the reader's shelf. The two are read from one environment when the bundle is made, so they disagree
+ * only when the variable changed under a Metro still resolving for the other source; such a build stops here, rather
+ * than keep one source's answers under the other's name.
  */
-export const serviceContent = (): ContentApi =>
-  createRemoteApi<AbortSignal>({
-    fetch: async (address, init) => {
-      const reply = await fetch(address, { headers: init.headers, signal: init.signal, credentials: 'omit' });
-      return { status: reply.status, text: async () => reply.text() };
-    },
-    abortable: () => new AbortController(),
-    after: (delay, then) => {
-      const timer = setTimeout(then, delay);
-      return () => {
-        clearTimeout(timer);
-      };
-    },
-    setAside: noteSetAside,
-  });
+export const agreed = (bundled: Source, named: ContentSource): Source => {
+  if (bundled.name !== named) {
+    throw new RangeError(
+      `EXPO_PUBLIC_CONTENT_SOURCE nomme « ${named} », et la build lit « ${bundled.name} » : relancer Metro pour la source nommée`,
+    );
+  }
+  return bundled;
+};
 
 /**
- * The content the app reads: the corpus it carries, or the journal's service, as the build chose. Both speak the same
- * contract, so no screen knows which it reads. This module is the only door: a lint policy refuses both packages
- * anywhere else.
+ * The content the app reads, from the source the build bundled. Both speak the same contract, so no screen knows which
+ * it reads. This module is the only door: a lint policy refuses both packages anywhere but this place.
  */
-export const content: ContentApi = CONTENT_SOURCE === 'service' ? serviceContent() : contentApi;
+export const content: ContentApi = agreed(SOURCE, CONTENT_SOURCE).content;
 
 /**
  * Whether the source shelves numéros, and so whether the app has a newsstand. It is the source's to say, by having the

@@ -1,8 +1,7 @@
 import { atSquare, atWidth } from '@huma/contracts';
 import type { ArticleSummary, Picture } from '@huma/contracts';
-import { VISUALS } from '@huma/mock-content';
-import { ASSETS } from '@huma/mock-content/assets';
 import type { AssetWidth } from '@huma/mock-content/assets';
+import { SOURCE } from './source';
 
 /**
  * How wide a picture is wanted, named by the place it fills rather than by a count of pixels. A screen knows the box it
@@ -40,22 +39,18 @@ const SQUARE = { thumbnail: true, card: false, lead: false } as const satisfies 
 export type Visual = Readonly<{ source: number | Readonly<{ uri: string }>; thumbhash?: string }>;
 
 /**
- * A picture at the size asked for. A key of the corpus that names nothing gives `null` rather than a broken view: the
- * corpus generator guarantees a file per key, and a screen that outlives that guarantee should show its text alone. A
- * picture of the journal is always an address, which its schema has already held to the journal's own server; it is
- * asked for at the width of the place it fills and not at the one the service listed.
+ * A picture at the size asked for. A key of the corpus is drawn by the source the build bundled, which gives `null`
+ * for a key that names nothing — and for every key, in a build that reads the service and carries no corpus — rather
+ * than a broken view. A picture of the journal is always an address, which its schema has already held to the
+ * journal's own server; it is asked for at the width of the place it fills and not at the one the service listed.
  */
 export const visualOf = (picture: Picture, size: VisualSize): Visual | null => {
   if (picture.kind === 'journal') {
     const width = PLACE_WIDTHS[size];
     return { source: { uri: SQUARE[size] ? atSquare(picture.url, width) : atWidth(picture.url, width) } };
   }
-  const widths = ASSETS[picture.key];
-  const thumbhash = VISUALS[picture.key];
-  if (widths === undefined || thumbhash === undefined) {
-    return null;
-  }
-  return { source: widths[PLACE_WIDTHS[size]], thumbhash };
+  const drawn = SOURCE.corpusPicture(picture.key, PLACE_WIDTHS[size]);
+  return drawn === null ? null : { source: drawn.module, thumbhash: drawn.thumbhash };
 };
 
 /**

@@ -227,7 +227,8 @@ export const COMMANDS = {
     program: cli('structure-check'),
     arguments: [],
     audience: 'everyone',
-    summary: 'vérifie la structure Feature-Sliced de chaque app avec Steiger et y cherche les cycles d’imports',
+    summary:
+      'vérifie la structure Feature-Sliced de chaque app avec Steiger, y cherche les cycles d’imports, et le corpus dans sa build de service',
   },
   test: {
     program: binary('vitest'),

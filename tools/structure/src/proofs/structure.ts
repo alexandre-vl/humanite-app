@@ -6,6 +6,7 @@ import { fixtureFactory, IN_PROCESS, withoutReferences, workspaceCopy } from '@h
 import { findWorkspaceRoot } from '@huma/kit/cli';
 import type { StructureCode } from '../checks.ts';
 import { cycleFindings } from '../cycles.ts';
+import { serviceBuildFindings } from '../service-build.ts';
 import { steigerFindings } from '../steiger.ts';
 
 const define = fixtureFactory<StructureCode>(IN_PROCESS);
@@ -53,6 +54,7 @@ const checked = (files: FileTree) => async (): Promise<readonly StructureCode[]>
   const findings = [
     ...(await steigerFindings(copy.root, APP)),
     ...(await cycleFindings(copy.root, APP, HERMES_DIRECTORIES)),
+    ...(await serviceBuildFindings(copy.root, APP, HERMES_DIRECTORIES)),
   ];
   return findings.map((finding) => finding.code);
 };
@@ -84,6 +86,22 @@ const MANY_ENTITIES = [
 
 /** Modules enough to pass the threshold Steiger sets for shared/lib, fifteen. */
 const MANY_MODULES = Array.from({ length: 16 }, (unused: unknown, index) => `helper${String(index)}`);
+
+/**
+ * The content door with its two sources: the corpus, which the default module reads, and a service variant, whose
+ * content is `service` — reaching the corpus or not — and a route that reads the door, as every screen does.
+ */
+const door = (service: string): FileTree => ({
+  'app/reader.tsx':
+    "import { content } from '#api';\n\nexport default function Reader() {\n  return content === null ? null : null;\n}\n",
+  'src/shared/api/index.ts': entry('content', 'content'),
+  'src/shared/api/content.ts': "import { SOURCE } from './source';\n\nexport const content = SOURCE;\n",
+  'src/shared/api/source.ts': "import { contentApi } from '@huma/mock-api';\n\nexport const SOURCE = contentApi;\n",
+  'src/shared/api/source.service.ts': service,
+});
+
+/** A service variant that serves without the corpus. */
+const APART = 'export const SOURCE = null;\n';
 
 const ARTICLE_PAGES = {
   ...page('home', [['article', '#entities/article']]),
@@ -204,6 +222,38 @@ export const STRUCTURE_FIXTURES = [
       'src/entities/article/model/summary.ts':
         "import { article } from './article';\n\nexport const summary = () => article;\n",
       ...ARTICLE_PAGES,
+    }),
+  ),
+  define(
+    'structure/service-build-clean',
+    'une porte dont la variante de service n’importe rien du corpus',
+    [],
+    checked(door(APART)),
+  ),
+  define(
+    'structure/service-corpus',
+    'une variante de service qui importe l’API du corpus',
+    ['structure/service-corpus'],
+    checked(door("import { contentApi } from '@huma/mock-api';\n\nexport const SOURCE = contentApi;\n")),
+  ),
+  define(
+    'structure/service-corpus-beside',
+    'une porte bien doublée, et un module voisin qui importe les images du corpus',
+    ['structure/service-corpus'],
+    checked({
+      ...door(APART),
+      'src/shared/api/index.ts': "export { content } from './content';\nexport { VISUALS } from './visuals';\n",
+      'src/shared/api/visuals.ts': "export { VISUALS } from '@huma/mock-content';\n",
+    }),
+  ),
+  define(
+    'structure/source-variant',
+    'une variante de service dans une page',
+    ['structure/source-variant'],
+    checked({
+      ...entity('article', 'article'),
+      ...ARTICLE_PAGES,
+      'src/pages/home/model/notice.service.ts': constant('notice'),
     }),
   ),
   define(

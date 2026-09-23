@@ -5,6 +5,7 @@
   "exports": {
     "./cycles": "./src/cycles.ts",
     "./proofs": "./src/proofs/registry.ts",
+    "./service-build": "./src/service-build.ts",
     "./steiger": "./src/steiger.ts"
   },
   "dependencies": {

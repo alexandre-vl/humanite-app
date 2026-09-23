@@ -83,11 +83,18 @@ export function unclassifiedSteigerRules(): Readonly<{ missing: readonly string[
   };
 }
 
+/** The codes this package reports itself, from the imports and the files of the app, rather than through Steiger. */
+const OWN_CODES = [
+  'structure/cycle',
+  'structure/source-variant',
+  'structure/service-corpus',
+] as const satisfies readonly StructureCode[];
+
 /** The codes of the Steiger rules, which carry Steiger's own text. */
-type SteigerCode = Exclude<StructureCode, 'structure/cycle'>;
+type SteigerCode = Exclude<StructureCode, (typeof OWN_CODES)[number]>;
 
 const STEIGER_CODES: readonly SteigerCode[] = STRUCTURE_CHECKS.codes.filter(
-  (code): code is SteigerCode => code !== 'structure/cycle',
+  (code): code is SteigerCode => !isOneOf(OWN_CODES, code),
 );
 
 const codeOf = (rule: string): SteigerCode | null => {

@@ -381,6 +381,9 @@ importers:
       '@expo/metro-config':
         specifier: 'catalog:'
         version: 57.0.12(expo@57.0.22)(supports-color@8.1.1)(typescript@6.0.3)
+      '@huma/architecture':
+        specifier: workspace:*
+        version: link:../../packages/architecture
       '@huma/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig

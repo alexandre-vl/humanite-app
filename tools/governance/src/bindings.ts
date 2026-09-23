@@ -1026,8 +1026,25 @@ export const BINDINGS = {
       R5: ['transport/address-unknown'],
       R6: {
         convention:
-          'La source se lit une fois, dans apps/mobile/src/shared/config/source.ts : sans EXPO_PUBLIC_CONTENT_SOURCE la build lit le mock, un mot que la liste ne tient pas arrête l’app à sa première ligne, et la mise en place des tests nomme le mock quoi que le shell ait exporté.',
+          'La source se nomme dans apps/mobile/src/shared/config/source.ts : sans EXPO_PUBLIC_CONTENT_SOURCE la build lit le mock, un mot que la liste ne tient pas arrête l’app à sa première ligne, et la mise en place des tests nomme le mock quoi que le shell ait exporté. Metro lit la même variable pour résoudre les variantes de service (ADR-0029), et la porte du contenu arrête une build dont le module lié nomme une autre source que la variable.',
       },
+    },
+  },
+  'ADR-0029': {
+    scope: {
+      // What a build reading the service resolves: the one definition of the variant, the bundler that applies it,
+      // the two sources it chooses between, and the check that follows that build's imports.
+      paths: [
+        'apps/mobile/metro.config.ts',
+        'apps/mobile/src/shared/api/source.ts',
+        'apps/mobile/src/shared/api/source.service.ts',
+        'packages/architecture/src/resolution.ts',
+        'tools/structure/src/service-build.ts',
+      ],
+    },
+    rules: {
+      R1: ['structure/source-variant', 'structure/service-build-clean'],
+      R2: ['structure/service-corpus', 'structure/service-corpus-beside', 'structure/service-build-clean'],
     },
   },
 } as const satisfies Bindings<ProofId>;

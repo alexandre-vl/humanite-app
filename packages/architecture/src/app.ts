@@ -48,6 +48,12 @@ export const BUNDLED_FILES: readonly string[] = [
   'packages/remote-api/src/transport.ts',
 ];
 
+/**
+ * The packages the simulated paper is made of — the corpus with its pictures, and the API that serves it. A build that
+ * reads the journal's service imports neither, under its name or under any of its subpaths.
+ */
+export const CORPUS_PACKAGES: readonly string[] = ['@huma/mock-api', '@huma/mock-content'];
+
 /** Route files, as globs relative to the workspace root. */
 export const ROUTE_FILES: readonly string[] = [`${APP_DIRECTORY}/${PLACES.route.directory}/**/*.{ts,tsx}`];
 

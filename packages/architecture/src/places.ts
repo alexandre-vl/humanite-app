@@ -78,10 +78,20 @@ export type PlaceSpec = Readonly<{
   level: ComponentLevel | null;
   /** Whether a file may have `.ios.tsx` and `.android.tsx` variants beside its default. */
   platformVariants: boolean;
+  /** Whether a file may have a `.service` variant, which a build reading the journal's service bundles in its place. */
+  sourceVariants: boolean;
 }>;
 
 export const PLACES = {
-  route: { directory: 'app', layout: 'routes', segments: [], alias: null, level: null, platformVariants: false },
+  route: {
+    directory: 'app',
+    layout: 'routes',
+    segments: [],
+    alias: null,
+    level: null,
+    platformVariants: false,
+    sourceVariants: false,
+  },
   app: {
     directory: 'src/_app',
     layout: 'segments',
@@ -89,6 +99,7 @@ export const PLACES = {
     alias: '#app',
     level: null,
     platformVariants: false,
+    sourceVariants: false,
   },
   page: {
     directory: 'src/pages',
@@ -97,6 +108,7 @@ export const PLACES = {
     alias: '#pages/*',
     level: 'L4',
     platformVariants: false,
+    sourceVariants: false,
   },
   feature: {
     directory: 'src/features',
@@ -105,6 +117,7 @@ export const PLACES = {
     alias: '#features/*',
     level: 'L3',
     platformVariants: false,
+    sourceVariants: false,
   },
   entity: {
     directory: 'src/entities',
@@ -113,6 +126,7 @@ export const PLACES = {
     alias: '#entities/*',
     level: 'L2',
     platformVariants: false,
+    sourceVariants: false,
   },
   component: {
     directory: 'src/shared/ui/components',
@@ -121,6 +135,7 @@ export const PLACES = {
     alias: '#components/*',
     level: 'L1',
     platformVariants: false,
+    sourceVariants: false,
   },
   primitive: {
     directory: 'src/shared/ui/primitives',
@@ -129,6 +144,7 @@ export const PLACES = {
     alias: '#primitives/*',
     level: 'L0',
     platformVariants: true,
+    sourceVariants: false,
   },
   lib: {
     directory: 'src/shared/lib',
@@ -137,6 +153,7 @@ export const PLACES = {
     alias: '#lib/*',
     level: null,
     platformVariants: false,
+    sourceVariants: false,
   },
   i18n: {
     directory: 'src/shared/i18n',
@@ -145,6 +162,7 @@ export const PLACES = {
     alias: '#i18n',
     level: null,
     platformVariants: false,
+    sourceVariants: false,
   },
   config: {
     directory: 'src/shared/config',
@@ -153,6 +171,7 @@ export const PLACES = {
     alias: '#config',
     level: null,
     platformVariants: false,
+    sourceVariants: false,
   },
   api: {
     directory: 'src/shared/api',
@@ -161,6 +180,7 @@ export const PLACES = {
     alias: '#api',
     level: null,
     platformVariants: false,
+    sourceVariants: true,
   },
 } as const satisfies Readonly<Record<Place, PlaceSpec>>;
 

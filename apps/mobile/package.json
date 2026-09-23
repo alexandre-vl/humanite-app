@@ -55,6 +55,7 @@
   "devDependencies": {
     "@babel/core": "catalog:",
     "@expo/metro-config": "catalog:",
+    "@huma/architecture": "workspace:*",
     "@huma/tsconfig": "workspace:*",
     "@jest/globals": "catalog:",
     "@react-native/jest-preset": "catalog:",
