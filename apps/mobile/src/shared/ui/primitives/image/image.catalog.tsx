@@ -13,7 +13,7 @@ import { Image } from './image';
  */
 const DEMO = '0lYGDIJ4mXZ/h3h2d4VXgIf7hw==';
 
-const useStyles = createStyles(() => ({ demo: { width: SIZES.headerExpanded, height: SIZES.headerExpanded } }));
+const useStyles = createStyles(() => ({ demo: { width: SIZES.thumbnail, height: SIZES.thumbnail } }));
 
 function ImageDemo(): ReactNode {
   const styles = useStyles();

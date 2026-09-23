@@ -59,10 +59,10 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
       pinned={rowPins}
       renderItem={render}
       contentStyle={styles.wire}
-      empty={<FeedStandIn state={feed.state} onRetry={feed.retry} />}
+      empty={<FeedStandIn state={feed.state} onRetry={feed.readAgain} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
-      onRefresh={feed.refresh}
+      onRefresh={feed.readAgain}
     />
   );
 }

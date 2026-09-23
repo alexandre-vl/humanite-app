@@ -2,7 +2,6 @@ import { SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
-import type { CatalogLevel } from '#lib/catalogue';
 import { asDisplayText } from '#lib/display-text';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -11,12 +10,15 @@ import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
 import { REGISTRY } from '../model/registry';
 
+/** A level the catalogue lists, as the generated registry spells it. */
+type Level = (typeof REGISTRY)[number]['level'];
+
 /**
  * The levels the catalogue lists, top down: those the registry holds, and no other. Listing them by hand would be a
  * second source beside the levels the architecture assigns each place, which the generated registry already carries —
  * and a level nothing lives in would print an empty heading.
  */
-const LEVELS: readonly CatalogLevel[] = [...new Set(REGISTRY.map((item) => item.level))].sort((left, right) =>
+const LEVELS: readonly Level[] = [...new Set(REGISTRY.map((item) => item.level))].sort((left, right) =>
   left.localeCompare(right),
 );
 

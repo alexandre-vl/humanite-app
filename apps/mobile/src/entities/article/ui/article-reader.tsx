@@ -23,7 +23,7 @@ export type ArticleReaderProps = Readonly<{
 type ReadingProps = Readonly<{ article: Article; onFollow: (target: LinkTarget) => void }>;
 
 const useStyles = createStyles((theme) => ({
-  page: { flex: 1, backgroundColor: theme.background },
+  page: { backgroundColor: theme.background },
   // One measure down the page, and one gap between everything on it: the head, the picture, every paragraph and
   // every crosshead are all things read in a row, and a gap that changed between them would be saying they are not.
   column: { gap: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.xxxl },

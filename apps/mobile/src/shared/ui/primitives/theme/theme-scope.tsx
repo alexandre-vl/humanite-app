@@ -3,6 +3,7 @@ import type { ThemeName } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { StatusBar } from 'react-native';
 import { ThemeProvider, useTheme } from '../../../lib/styles';
+import { BAR_STYLES } from './bar-style';
 
 export type ThemeScopeProps = Readonly<{
   /** The theme the subtree is painted in, or none to keep the one it is already in. */
@@ -31,7 +32,7 @@ export function ThemeScope({ name, screen = false, children }: ThemeScopeProps):
   const enclosing = useTheme();
   return (
     <ThemeProvider theme={name === null ? enclosing : THEMES[name]}>
-      {screen && name !== null ? <StatusBar barStyle={name === 'dark' ? 'light-content' : 'dark-content'} /> : null}
+      {screen && name !== null ? <StatusBar barStyle={BAR_STYLES[name]} /> : null}
       {children}
     </ThemeProvider>
   );

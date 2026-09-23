@@ -8,8 +8,8 @@ import { PLACE_WIDTHS, visualOf } from './visuals';
  * other: the generator runs on Node and knows no screen, and a screen knows no count of pixels. This is the only place
  * both are in scope, so it is the only place the pair can be held.
  *
- * It is held in both directions on purpose. A width written for no place ships files nobody can request — 63 of them,
- * 78 ko, weighed against a cold-start budget — and a place asking for a width nothing writes returns a broken picture.
+ * It is held in both directions on purpose. A width written for no place ships files nobody can request, weighed
+ * against a cold-start budget, and a place asking for a width nothing writes returns a broken picture.
  */
 describe('les largeurs écrites et les places qui les demandent', () => {
   const rising = (left: number, right: number): number => left - right;

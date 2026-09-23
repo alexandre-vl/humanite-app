@@ -13,8 +13,8 @@ import { SOURCE } from './source';
  * sources: a thumbnail is a thumbnail whichever of them drew it.
  *
  * It is published because it is one half of a pair: the corpus writes a file per width, this names the places, and
- * nothing but a test can hold the two against each other. A width written for no place is 63 files of bundle a cold
- * start pays for and no screen can ever spend.
+ * nothing but a test can hold the two against each other. A width written for no place is bundle a cold start pays
+ * for and no screen can ever spend — what the last one weighed is written beside the corpus's widths.
  */
 export const PLACE_WIDTHS = {
   thumbnail: 320,
@@ -23,13 +23,13 @@ export const PLACE_WIDTHS = {
 } as const satisfies Readonly<Record<string, AssetWidth>>;
 
 /** The place a picture fills, from a row's thumbnail to the lead picture of an article. */
-export type VisualSize = keyof typeof PLACE_WIDTHS;
+type PicturePlace = keyof typeof PLACE_WIDTHS;
 
 /**
  * Which places are square, and so have a picture of the journal cut square by its server rather than scaled up to fill
  * them. A picture of the corpus is a file of the bundle, drawn at its width and cut by the view.
  */
-const SQUARE = { thumbnail: true, card: false, lead: false } as const satisfies Readonly<Record<VisualSize, boolean>>;
+const SQUARE = { thumbnail: true, card: false, lead: false } as const satisfies Readonly<Record<PicturePlace, boolean>>;
 
 /**
  * A picture ready for a native view: the module the bundler resolved or the address the phone asks for, and — for a
@@ -44,7 +44,7 @@ export type Visual = Readonly<{ source: number | Readonly<{ uri: string }>; thum
  * than a broken view. A picture of the journal is always an address, which its schema has already held to the
  * journal's own server; it is asked for at the width of the place it fills and not at the one the service listed.
  */
-export const visualOf = (picture: Picture, size: VisualSize): Visual | null => {
+export const visualOf = (picture: Picture, size: PicturePlace): Visual | null => {
   if (picture.kind === 'journal') {
     const width = PLACE_WIDTHS[size];
     return { source: { uri: SQUARE[size] ? atSquare(picture.url, width) : atWidth(picture.url, width) } };
@@ -63,5 +63,5 @@ export const visualOf = (picture: Picture, size: VisualSize): Visual | null => {
  * card of the feed and the cover of a numéro both need the picture of an item, and the item is the content's shape,
  * which is what this door answers for.
  */
-export const pictureOf = (summary: ArticleSummary, size: VisualSize): Visual | null =>
+export const pictureOf = (summary: ArticleSummary, size: PicturePlace): Visual | null =>
   summary.hero === undefined ? null : visualOf(summary.hero.picture, size);

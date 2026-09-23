@@ -442,22 +442,15 @@ const AFTER = 'et la fin';
  * A short field shaped the way this journal shapes one: the paragraph its stylesheet wraps a standfirst in, a run of
  * emphasis, the space it does not want broken, a line break, and the blank the wrapper leaves at either end.
  */
-const HEADLINE = `\n\n<p class="chapo">Un <em>mot</em>&nbsp;: ${BEFORE}<br>${AFTER}.</p>\n`;
+const STANDFIRST = `\n\n<p class="chapo">Un <em>mot</em>&nbsp;: ${BEFORE}<br>${AFTER}.</p>\n`;
 
 /**
- * What the judging reads, and the things in it that must not survive a reading.
+ * The things in what the judging reads that must not survive a reading.
  *
  * Exported because a fixture has to be able to hand back a reading that kept one of them — word for word, or the
  * judging would not recognise it — and that is the only way to show the judging would have spoken.
  */
-export const THE_BODY = {
-  html: SAMPLE,
-  headline: HEADLINE,
-  elsewhere: ELSEWHERE,
-  appeal: APPEAL,
-  before: BEFORE,
-  after: AFTER,
-} as const;
+export const THE_BODY = { elsewhere: ELSEWHERE, appeal: APPEAL } as const;
 
 /**
  * Whether a reading of the journal's markup leaves a screen nothing but text a reader should see.
@@ -478,7 +471,7 @@ export const THE_BODY = {
  */
 export const judgeProse = (read: ProseReaders): readonly Finding<ProseCode>[] => {
   const blocks = read.prose(SAMPLE);
-  const line = read.plain(HEADLINE);
+  const line = read.plain(STANDFIRST);
   if (blocks.length === 0 || line === '') {
     return [
       {

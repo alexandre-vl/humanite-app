@@ -5281,7 +5281,7 @@
           "message": "[style/inline] construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés"
         },
         {
-          "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]",
+          "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|THEMES)$/]",
           "message": "[style/theme] recevoir le thème du paramètre de createStyles : un thème figé importé en dur ignore le schéma de couleurs en vigueur"
         },
         {
@@ -9056,7 +9056,7 @@
           "message": "[style/inline] construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés"
         },
         {
-          "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]",
+          "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|THEMES)$/]",
           "message": "[style/theme] recevoir le thème du paramètre de createStyles : un thème figé importé en dur ignore le schéma de couleurs en vigueur"
         },
         {
@@ -12827,7 +12827,7 @@
           "message": "[style/inline] construire les styles avec createStyles, ou lineStyle pour des lettres : un objet de style en ligne échappe aux tokens brandés"
         },
         {
-          "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]",
+          "selector": "ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|THEMES)$/]",
           "message": "[style/theme] recevoir le thème du paramètre de createStyles : un thème figé importé en dur ignore le schéma de couleurs en vigueur"
         },
         {

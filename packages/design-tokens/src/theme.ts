@@ -90,7 +90,7 @@ export const LIGHT_THEME = {
 } as const satisfies Theme;
 
 /** The dark theme, derived from the measured dark background #141414. */
-export const DARK_THEME = {
+const DARK_THEME = {
   background: PALETTE.darkBackground,
   ground: PALETTE.darkBackground,
   surface: PALETTE.darkSurface,

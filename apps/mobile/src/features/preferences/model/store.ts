@@ -3,6 +3,7 @@ import { FACE_SETS, TEXT_SCALES, THEME_CHOICES } from '@huma/design-tokens';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { STORAGE_KEYS, field, stateStorage } from '#lib/storage';
+import { PAPER_TYPESETTING } from '#lib/styles';
 
 /**
  * The version of what this writes to disk. It names the first shape rather than describing a change, and is read back
@@ -17,8 +18,8 @@ const VERSION = 1;
 /** What the reader has set about how the paper is printed for them. */
 type Settings = Readonly<{ theme: ThemeChoice; scale: TextScale; faces: FaceSet }>;
 
-/** What the paper does when nothing has been set: the phone's colours, and the size the paper is written at. */
-const DEFAULTS = { theme: 'system', scale: 'normal', faces: 'paper' } as const satisfies Settings;
+/** What the paper does when nothing has been set: the phone's colours, and the type as the paper sets it. */
+const DEFAULTS = { theme: 'system', ...PAPER_TYPESETTING } as const satisfies Settings;
 
 type Reading = Settings &
   Readonly<{

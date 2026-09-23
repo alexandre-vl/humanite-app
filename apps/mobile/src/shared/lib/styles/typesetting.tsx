@@ -5,10 +5,13 @@ import type { ReactNode } from 'react';
 /** How the type is set for a reader: at which step, and in which set of faces. */
 export type Typesetting = Readonly<{ scale: TextScale; faces: FaceSet }>;
 
-/** The paper's own: what a tree without a provider is set in, so it still renders. */
-const PAPER: Typesetting = { scale: 'normal', faces: 'paper' };
+/**
+ * The paper's own: the step it is written at and the faces it is printed in. It is what a reader who has set nothing
+ * reads, what the switch between the two sets of faces turns back to, and what a tree without a provider is set in.
+ */
+export const PAPER_TYPESETTING: Typesetting = { scale: 'normal', faces: 'paper' };
 
-const TypesettingContext = createContext<Typesetting>(PAPER);
+const TypesettingContext = createContext<Typesetting>(PAPER_TYPESETTING);
 
 /** Reads how the type is set here: every text style the app builds resolves its face and its size through it. */
 export function useTypesetting(): Typesetting {

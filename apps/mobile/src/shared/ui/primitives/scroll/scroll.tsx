@@ -2,6 +2,13 @@ import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { ScrollView } from 'react-native';
 import type { StyleRef } from '../../../lib/styles';
+import { createStyles } from '../../../lib/styles';
+
+const useStyles = createStyles(() => ({
+  // A region that scrolls down is given the height of the ground it is in, not left to find one: sized to its content,
+  // a short page would leave the rest of the ground unreachable. Across, it is as tall as what it holds.
+  fill: { flex: 1 },
+}));
 
 export type ScrollProps = Readonly<{
   children?: ReactNode;
@@ -29,6 +36,7 @@ export type ScrollProps = Readonly<{
  * screen mounts.
  */
 export function Scroll({ children, axis, style, contentStyle, at }: ScrollProps): ReactNode {
+  const styles = useStyles();
   const scroll = useRef<ScrollView>(null);
   const across = axis === 'horizontal';
   useEffect(() => {
@@ -42,7 +50,7 @@ export function Scroll({ children, axis, style, contentStyle, at }: ScrollProps)
       ref={scroll}
       horizontal={across}
       showsHorizontalScrollIndicator={false}
-      style={style}
+      style={across ? style : [styles.fill, style]}
       contentContainerStyle={contentStyle}
     >
       {children}

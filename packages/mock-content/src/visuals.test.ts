@@ -41,12 +41,6 @@ test('the registry offers every picture the corpus names, at every width it is w
   }
 });
 
-test('the same key draws the same picture, and two keys draw two', () => {
-  expect(artworkSvg('pol-a1-hero', 'pol')).toBe(artworkSvg('pol-a1-hero', 'pol'));
-  expect(artworkSvg('pol-a1-hero', 'pol')).not.toBe(artworkSvg('pol-a3-hero', 'pol'));
-  expect(artworkSvg('pol-a1-hero', 'pol')).not.toBe(artworkSvg('pol-a1-hero', 'mon'));
-});
-
 /**
  * The generator follows from the key of the item it illustrates and from the colour of its section, and from nothing
  * else — the same reading a fixture hands broken drawings to, run here on the real one.

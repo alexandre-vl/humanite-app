@@ -136,7 +136,7 @@ const NAV_SYNTAX: readonly SyntaxRestriction[] = [
 const THEME_SYNTAX: readonly SyntaxRestriction[] = [
   {
     policy: 'style/theme',
-    selector: String.raw`ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|DARK_THEME|THEMES)$/]`,
+    selector: String.raw`ImportDeclaration[source.value='@huma/design-tokens'] > ImportSpecifier[imported.name=/^(?:LIGHT_THEME|THEMES)$/]`,
   },
 ];
 

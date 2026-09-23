@@ -9,7 +9,7 @@ import type { SegmentedItem } from '#components/segmented-control';
 import { SegmentedControl } from '#components/segmented-control';
 import { usePreferences } from '#features/preferences';
 import { t } from '#i18n';
-import { createStyles } from '#lib/styles';
+import { createStyles, PAPER_TYPESETTING } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Scroll } from '#primitives/scroll';
 import { Surface } from '#primitives/surface';
@@ -43,14 +43,10 @@ const STEP_WORDS = {
 
 const STEPS: readonly SegmentedItem<TextScale>[] = TEXT_SCALES.map((id) => ({ id, label: STEP_WORDS[id] }));
 
-/** Which set of faces the switch stands for, read and written as an on-off. */
+/** Which set of faces the switch stands for, read and written as an on-off: off is the paper's own. */
 const LEGIBLE: FaceSet = 'legible';
-const PAPER: FaceSet = 'paper';
 
 const useStyles = createStyles((theme) => ({
-  // The frame is given its height, not left to find one: a scrolling region inside a ground that fills the
-  // screen sizes to its content otherwise, and a short page would leave the rest of the ground unreachable.
-  frame: { flex: 1 },
   page: { padding: SPACING.lg, gap: SPACING.xl },
   setting: { gap: SPACING.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: SPACING.lg },
@@ -104,7 +100,7 @@ export function SettingsPage(): ReactNode {
           router.back();
         }}
       />
-      <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
+      <Scroll axis="vertical" contentStyle={styles.page}>
         <Setting label={t('settings.appearance')}>
           <SegmentedControl items={APPEARANCES} active={theme} onSelect={chooseTheme} />
         </Setting>
@@ -120,7 +116,7 @@ export function SettingsPage(): ReactNode {
             value={faces === LEGIBLE}
             label={t('settings.faces')}
             onChange={(wanted) => {
-              chooseFaces(wanted ? LEGIBLE : PAPER);
+              chooseFaces(wanted ? LEGIBLE : PAPER_TYPESETTING.faces);
             }}
           />
         </Box>

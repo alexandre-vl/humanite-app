@@ -5,7 +5,7 @@ import { LabelBar } from './label-bar';
 
 const ITEMS = [
   { id: 'front', label: asDisplayText('À la une') },
-  { id: 'kept', label: asDisplayText('Favoris') },
+  { id: 'politique', label: asDisplayText('Politique') },
 ] as const;
 
 describe('LabelBar', () => {
@@ -15,8 +15,8 @@ describe('LabelBar', () => {
    * carried the same fault until it said which choice was in force.
    */
   it('dit laquelle des bandes est en vigueur, et pas seulement en couleur', async () => {
-    await render(<LabelBar items={ITEMS} active="kept" onSelect={jest.fn()} />);
-    expect(screen.getByRole('radio', { name: 'Favoris', selected: true })).toBeTruthy();
+    await render(<LabelBar items={ITEMS} active="politique" onSelect={jest.fn()} />);
+    expect(screen.getByRole('radio', { name: 'Politique', selected: true })).toBeTruthy();
     expect(screen.getByRole('radio', { name: 'À la une', selected: false })).toBeTruthy();
   });
 
@@ -24,14 +24,14 @@ describe('LabelBar', () => {
   it('ne se donne pas pour un choix quand aucune n’est en vigueur', async () => {
     await render(<LabelBar items={ITEMS} onSelect={jest.fn()} />);
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
-    expect(screen.getByLabelText('Favoris')).toBeTruthy();
+    expect(screen.getByLabelText('Politique')).toBeTruthy();
   });
 
   it('rapporte le choix qu’on touche, par son identifiant', async () => {
     const chosen = jest.fn();
     await render(<LabelBar items={ITEMS} active="front" onSelect={chosen} />);
-    await fireEvent.press(screen.getByLabelText('Favoris'));
-    expect(chosen).toHaveBeenCalledWith('kept');
+    await fireEvent.press(screen.getByLabelText('Politique'));
+    expect(chosen).toHaveBeenCalledWith('politique');
   });
 
   /**
@@ -43,7 +43,7 @@ describe('LabelBar', () => {
    */
   it('ne prend aucune part de la hauteur qu’on lui offre', async () => {
     await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} />);
-    let node = screen.getByLabelText('Favoris').parent;
+    let node = screen.getByLabelText('Politique').parent;
     while (node !== null && node.type !== 'RCTScrollView') {
       node = node.parent;
     }

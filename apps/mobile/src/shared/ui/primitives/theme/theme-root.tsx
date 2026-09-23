@@ -1,12 +1,25 @@
-import { DARK_THEME, LIGHT_THEME } from '@huma/design-tokens';
-import type { ThemeChoice } from '@huma/design-tokens';
+import { THEMES } from '@huma/design-tokens';
+import type { ThemeChoice, ThemeName } from '@huma/design-tokens';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
+import type { ColorSchemeName } from 'react-native';
 import { StatusBar, useColorScheme } from 'react-native';
 import { ThemeProvider } from '../../../lib/styles';
+import { BAR_STYLES } from './bar-style';
 
 export type ThemeRootProps = Readonly<{ choice: ThemeChoice; children: ReactNode }>;
+
+/**
+ * The theme a choice names: itself when it names one, and otherwise the phone's — dark when the phone says dark, and
+ * the light page when it says light or nothing at all, which is the paper as it is printed.
+ */
+const themeFor = (choice: ThemeChoice, scheme: ColorSchemeName): ThemeName => {
+  if (choice !== 'system') {
+    return choice;
+  }
+  return scheme === 'dark' ? 'dark' : 'light';
+};
 
 /**
  * Resolves a choice to a theme and provides it to the app: the only reader of the system scheme. It also contrasts the
@@ -25,15 +38,14 @@ export type ThemeRootProps = Readonly<{ choice: ThemeChoice; children: ReactNode
  * and a phone that turns dark under them must be seen to.
  */
 export function ThemeRoot({ choice, children }: ThemeRootProps): ReactNode {
-  const scheme = useColorScheme();
-  const dark = choice === 'system' ? scheme === 'dark' : choice === 'dark';
-  const theme = dark ? DARK_THEME : LIGHT_THEME;
+  const name = themeFor(choice, useColorScheme());
+  const theme = THEMES[name];
   useEffect(() => {
     void setBackgroundColorAsync(theme.background);
   }, [theme.background]);
   return (
     <ThemeProvider theme={theme}>
-      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={BAR_STYLES[name]} />
       {children}
     </ThemeProvider>
   );

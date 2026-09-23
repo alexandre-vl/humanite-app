@@ -31,7 +31,6 @@ export const ICONS = {
   live: { ios: 'bolt', android: 'bolt' },
   // The mark a row carries when touching it opens another screen.
   next: { ios: 'chevron.right', android: 'chevron_right' },
-  newsstand: { ios: 'newspaper', android: 'newspaper' },
   play: { ios: 'play.fill', android: 'play_arrow' },
   // How the reader sets the paper's own type. The letters are the signifier on both platforms, not a cogwheel: what
   // lies behind it is the size, the faces and the light or the dark, and none of those is a setting of the machine.

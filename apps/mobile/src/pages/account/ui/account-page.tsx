@@ -16,9 +16,6 @@ import { Text } from '#primitives/text';
 import { setAsideLabel } from '../model/set-aside';
 
 const useStyles = createStyles((theme) => ({
-  // The frame is given its height, not left to find one: a scrolling region inside a ground that fills the
-  // screen sizes to its content otherwise, and a short page would leave the rest of the ground unreachable.
-  frame: { flex: 1 },
   page: { padding: SPACING.lg, gap: SPACING.xl },
   group: { gap: SPACING.sm },
   // The rules between rows are the ground showing through: a card whose rows are spaced by the width of a rule, over
@@ -100,7 +97,7 @@ export function AccountPage(): ReactNode {
   const setAside = useSetAsideCount();
   return (
     <Surface>
-      <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
+      <Scroll axis="vertical" contentStyle={styles.page}>
         <Text variant="display" heading>
           {t('nav.account')}
         </Text>

@@ -1,1 +1,1 @@
-export type { CatalogEntry, CatalogItem, CatalogLevel } from './catalogue';
+export type { CatalogEntry, CatalogItem } from './catalogue';

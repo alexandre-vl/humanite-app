@@ -78,10 +78,10 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, empty }: Art
       renderItem={render}
       contentStyle={styles.feed}
       header={header}
-      empty={<FeedStandIn state={feed.state} onRetry={feed.retry} empty={empty} />}
+      empty={<FeedStandIn state={feed.state} onRetry={feed.readAgain} empty={empty} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
-      onRefresh={feed.refresh}
+      onRefresh={feed.readAgain}
     />
   );
 }

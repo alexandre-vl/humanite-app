@@ -33,9 +33,11 @@ export const stateOf = (status: QueryStatus, error: Error | null): FeedState => 
 export type ReadFeed = Readonly<{
   items: readonly ArticleSummary[];
   state: FeedState;
-  retry: () => void;
-  /** Reading the feed again from its first page, which is what a pull down the screen asks for. */
-  refresh: () => void;
+  /**
+   * Reading the feed again, every page it holds from the first: what a pull down the screen asks for, and what a
+   * failure offers to try again. The two are one reading, and a feed that named them apart could make them differ.
+   */
+  readAgain: () => void;
   /** Whether that reading is under way, and only that one: asking for the next page is not a refresh. */
   refreshing: boolean;
   onEndReached?: (() => void) | undefined;
@@ -71,14 +73,12 @@ const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
 export function usePagedFeed(query: PagedFeed): ReadFeed {
   const { data, status, error, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(query);
-  const again = (): void => {
-    void refetch();
-  };
   return {
     items: once(data?.pages.flatMap((page) => page.items) ?? []),
     state: stateOf(status, error),
-    retry: again,
-    refresh: again,
+    readAgain: () => {
+      void refetch();
+    },
     // An infinite query calls itself refetching while it reaches for the next page too, and a spinner at the top of a
     // list the reader has scrolled to the bottom of says nothing true. The page being asked for is what tells the two
     // apart.
@@ -101,7 +101,6 @@ const nothing = (): void => undefined;
 export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
   items,
   state: { kind: 'empty' },
-  retry: nothing,
-  refresh: nothing,
+  readAgain: nothing,
   refreshing: false,
 });

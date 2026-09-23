@@ -17,9 +17,6 @@ import { coverLabel } from '../model/count';
 import { IssueCover } from './issue-cover';
 
 const useStyles = createStyles(() => ({
-  // The frame is given its height, not left to find one: a scrolling region inside a ground that fills the screen
-  // sizes to its content otherwise, and a short page would leave the rest of the ground unreachable.
-  frame: { flex: 1 },
   page: { padding: SPACING.lg, gap: SPACING.lg },
   shelf: { gap: SPACING.lg, paddingBottom: SPACING.sm },
 }));
@@ -59,7 +56,7 @@ export function NewsstandPage(): ReactNode {
           router.back();
         }}
       />
-      <Scroll axis="vertical" style={styles.frame} contentStyle={styles.page}>
+      <Scroll axis="vertical" contentStyle={styles.page}>
         {/* Said once, above the shelf, and not on every cover: a reader leaving the app should read it coming, and
             four covers repeating the same sentence would be the shelf telling them four times. */}
         <Text variant="caption">{t('newsstand.web')}</Text>

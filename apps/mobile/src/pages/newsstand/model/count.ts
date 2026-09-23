@@ -1,19 +1,12 @@
 import type { DisplayText, IssueSummary } from '@huma/contracts';
-import { plural, t } from '#i18n';
+import { counted, t } from '#i18n';
 import { formatDayDate } from '#lib/format';
 
 /**
  * How much a numéro holds, in words. The number is written into the sentence by the dictionary rather than glued to it
  * here, so the French and the place the number sits in it stay where the rest of the app's French is.
  */
-export const countLabel = (count: number): DisplayText => {
-  switch (plural(count)) {
-    case 'one':
-      return t('issue.count.one', { count });
-    case 'many':
-      return t('issue.count.many', { count });
-  }
-};
+export const countLabel = (count: number): DisplayText => counted('issue.count', count);
 
 /**
  * What a cover says to a reader listening to the shelf, in one sentence rather than four things in a row.
