@@ -10,7 +10,8 @@ import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
 import { Text } from '#primitives/text';
-import { HERO_RATIO } from '../model/picture';
+import { frameOf } from '../model/format';
+import { FRAMES } from '../model/picture';
 
 export type ArticleRelatedProps = Readonly<{ summary: ArticleSummary; onOpen: () => void }>;
 
@@ -28,7 +29,8 @@ const useStyles = createStyles((theme) => ({
   // The title and the sentence answering it are a pair, and are set nearer to each other than to the picture — the
   // same three distances a card of the feed is set at, because this is a card of the feed laid on a torn sheet.
   words: { gap: SPACING.xs },
-  picture: { alignSelf: 'stretch', aspectRatio: HERO_RATIO, borderRadius: RADII.sm, backgroundColor: theme.border },
+  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, borderRadius: RADII.sm, backgroundColor: theme.border },
+  film: { alignSelf: 'stretch', aspectRatio: FRAMES.film, borderRadius: RADII.sm, backgroundColor: theme.border },
 }));
 
 /**
@@ -59,7 +61,7 @@ export function ArticleRelated({ summary, onOpen }: ArticleRelatedProps): ReactN
               recyclingKey={summary.id}
               announces={DECORATIVE}
               thumbhash={visual.thumbhash}
-              style={styles.picture}
+              style={styles[frameOf(summary.format)]}
             />
           )}
           <Box style={styles.words}>

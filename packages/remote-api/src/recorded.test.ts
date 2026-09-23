@@ -286,3 +286,14 @@ test('an open article carries no standfirst its body already opens on, and a wit
   expect(withheld.item.standfirst).toBe(readPlain(RECORDED.articles.opinion.answer.excerpt));
   expect(withheld.item.standfirst).not.toBe('');
 });
+
+/** A speaker of a debate is introduced in one line — the name in bold, then what she does — as the journal writes it. */
+test('the box introducing a speaker of a debate is read as one line, and not as a name and a job apart', () => {
+  const read = readArticle(RECORDED.articles.opinion.answer);
+  if (!('item' in read)) {
+    throw new Error(read.refused);
+  }
+  const lines = blocksOf(read.item).map(textOf);
+  expect(lines).toContain('Cécile Duflot, directrice générale d’Oxfam France');
+  expect(lines).not.toContain('Cécile Duflot');
+});

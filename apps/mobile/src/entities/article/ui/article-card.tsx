@@ -10,8 +10,8 @@ import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
 
-import { formatWord } from '../model/format';
-import { HERO_RATIO } from '../model/picture';
+import { formatWord, frameOf } from '../model/format';
+import { FRAMES } from '../model/picture';
 import type { CardShape } from '../model/rhythm';
 
 export type ArticleCardProps = Readonly<{
@@ -41,7 +41,8 @@ const useStyles = createStyles((theme) => ({
   // picture lost thirty-seven pixels of width on an A065: a cell of a virtualised list is laid out at a height it
   // already knows, so a margin added under the picture comes off the picture's height — and a box held to a ratio
   // that loses height loses width with it. Measured [42,399][1001,938] against [42,399][1038,958] beside it.
-  picture: { alignSelf: 'stretch', aspectRatio: HERO_RATIO, borderRadius: RADII.sm, backgroundColor: theme.border },
+  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, borderRadius: RADII.sm, backgroundColor: theme.border },
+  film: { alignSelf: 'stretch', aspectRatio: FRAMES.film, borderRadius: RADII.sm, backgroundColor: theme.border },
   line: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md },
   thumbnail: {
     width: SIZES.thumbnail,
@@ -115,7 +116,7 @@ function Lead({ summary, action }: BodyProps): ReactNode {
           recyclingKey={summary.id}
           announces={DECORATIVE}
           thumbhash={visual.thumbhash}
-          style={styles.picture}
+          style={styles[frameOf(summary.format)]}
         />
       )}
       <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />

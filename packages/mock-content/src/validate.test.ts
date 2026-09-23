@@ -87,7 +87,10 @@ test('one picture key cannot serve two pictures', () => {
   const twice = bent(article, {
     body: {
       kind: 'open',
-      blocks: [{ type: 'image', caption: 'La même image, deux fois', key: `${article.id}-hero` }, ...blocksOf(article)],
+      blocks: [
+        { type: 'image', picture: { kind: 'corpus', key: `${article.id}-hero` }, caption: 'La même image, deux fois' },
+        ...blocksOf(article),
+      ],
     },
   });
   expect(errorsFor(twice)).toEqual([expect.stringContaining('employée par deux items')]);

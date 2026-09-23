@@ -995,6 +995,8 @@ export const BINDINGS = {
         'prose/break-glued',
         'prose/break-glued-body',
         'prose/edges-loose',
+        'prose/speaker-split',
+        'prose/figure-lost',
         'prose/nothing-read',
         'prose/nothing-read-plain',
       ],

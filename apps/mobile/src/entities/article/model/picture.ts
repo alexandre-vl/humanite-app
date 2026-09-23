@@ -1,15 +1,19 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { pictureOf } from '#api';
 
-/** The frame a picture is cropped to, which is the shape the corpus draws them in. */
-export const HERO_RATIO = 16 / 9;
-
 /**
- * The wider frame a picture fills on a reading screen, measured on capture 13 at 1058 × 493 points. A card crops its
- * picture to the shape the corpus draws it in; an article crops it to the band the sheet gives it, which is not the
- * same shape and is not meant to be.
+ * The frames a picture is cropped to, named by what the picture is.
+ *
+ * A photograph of the journal is three by two: the median of 319 pictures of a capture, and 58 % of them within a
+ * hair of it. The frame they were cut to was sixteen by nine on a card — the shape the corpus draws its pictures in,
+ * which cut a sixth of every photograph — and two and a sixth on an article, measured off the current app, which cut
+ * nearly a third. A video's picture is the still of its film, and its film is sixteen by nine: 29 of the 29 of the
+ * capture measure it exactly, so that frame costs a still nothing.
  */
-export const LEAD_RATIO = 1058 / 493;
+export const FRAMES = { photo: 3 / 2, film: 16 / 9 } as const;
+
+/** The frame a picture is cropped to. */
+export type Frame = keyof typeof FRAMES;
 
 /**
  * The item a run of articles opens on: the first of them that carries a picture, or nothing at all.

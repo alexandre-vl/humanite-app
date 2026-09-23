@@ -1,11 +1,15 @@
 import type { ArticleFormat, DisplayText } from '@huma/contracts';
 import { t } from '#i18n';
+import type { Frame } from './picture';
 
 /** The words a format is announced by, as the dictionary keys them. */
 type FormatWord = 'format.column' | 'format.live' | 'format.series' | 'format.video';
 
-/** What a format changes on a screen: the word over a title, the signed card of a column, the dark page of a video. */
-type Treatment = Readonly<{ word: FormatWord | null; column: boolean; dark: boolean }>;
+/**
+ * What a format changes on a screen: the word over a title, the signed card of a column, the dark page of a video, and
+ * the frame its picture is cut to.
+ */
+type Treatment = Readonly<{ word: FormatWord | null; column: boolean; dark: boolean; frame: Frame }>;
 
 /**
  * What each format of the paper changes on a screen, format by format, and nowhere else.
@@ -19,11 +23,11 @@ type Treatment = Readonly<{ word: FormatWord | null; column: boolean; dark: bool
  * being drawn, silently, as a plain article.
  */
 const TREATMENTS = {
-  article: { word: null, column: false, dark: false },
-  column: { word: 'format.column', column: true, dark: false },
-  video: { word: 'format.video', column: false, dark: true },
-  series: { word: 'format.series', column: false, dark: false },
-  live: { word: 'format.live', column: false, dark: false },
+  article: { word: null, column: false, dark: false, frame: 'photo' },
+  column: { word: 'format.column', column: true, dark: false, frame: 'photo' },
+  video: { word: 'format.video', column: false, dark: true, frame: 'film' },
+  series: { word: 'format.series', column: false, dark: false, frame: 'photo' },
+  live: { word: 'format.live', column: false, dark: false, frame: 'photo' },
 } as const satisfies Readonly<Record<ArticleFormat, Treatment>>;
 
 /** The word an item's format is announced by over its title, or none for a plain article. */
@@ -37,3 +41,6 @@ export const isColumn = (format: ArticleFormat): boolean => TREATMENTS[format].c
 
 /** Whether an item is read on the dark page whatever the reader's theme, as the paper prints its videos. */
 export const readsDark = (format: ArticleFormat): boolean => TREATMENTS[format].dark;
+
+/** The frame an item's picture is cut to: the still of a film in the film's shape, and a photograph in its own. */
+export const frameOf = (format: ArticleFormat): Frame => TREATMENTS[format].frame;

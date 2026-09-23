@@ -145,8 +145,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'cul-a2-galerie',
+          },
           caption: 'La grande galerie et sa verrière restaurée',
-          key: 'cul-a2-galerie',
         },
         {
           type: 'paragraph',
@@ -535,8 +538,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'cul-a5-archives',
+          },
           caption: "Des mains gantées manipulent d'anciens tirages",
-          key: 'cul-a5-archives',
         },
         {
           type: 'paragraph',
@@ -933,8 +939,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'eco-a1-rassemblement',
+          },
           caption: "Des salariés rassemblés devant l'usine du Vernay",
-          key: 'eco-a1-rassemblement',
         },
         {
           type: 'paragraph',
@@ -1203,8 +1212,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'eco-a3-formation',
+          },
           caption: 'Un atelier de formation aux métiers de la maintenance',
-          key: 'eco-a3-formation',
         },
         {
           type: 'paragraph',
@@ -1443,8 +1455,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'eco-a5-atelier',
+          },
           caption: "L'atelier de la menuiserie coopérative en activité",
-          key: 'eco-a5-atelier',
         },
         {
           type: 'heading',
@@ -1828,8 +1843,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'env-a1-retenue',
+          },
           caption: 'La retenue de la Sonne vue depuis le barrage',
-          key: 'env-a1-retenue',
         },
         {
           type: 'heading',
@@ -2144,8 +2162,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'env-a3-observatoire',
+          },
           caption: 'Un observatoire en bois surplombe les vasières',
-          key: 'env-a3-observatoire',
         },
         {
           type: 'paragraph',
@@ -2268,8 +2289,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'env-a4-cour',
+          },
           caption: "Une cour d'école transformée en jardin ombragé",
-          key: 'env-a4-cour',
         },
         {
           type: 'paragraph',
@@ -2749,8 +2773,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'fem-a1-tournee',
+          },
           caption: 'Une aide à domicile prépare sa tournée du matin',
-          key: 'fem-a1-tournee',
         },
         {
           type: 'paragraph',
@@ -3613,8 +3640,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'mon-a1-negociations',
+          },
           caption: 'Les délégations à la table des négociations',
-          key: 'mon-a1-negociations',
         },
         {
           type: 'paragraph',
@@ -3904,8 +3934,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'mon-a3-dockers',
+          },
           caption: "Des dockers rassemblés à l'entrée du terminal",
-          key: 'mon-a3-dockers',
         },
         {
           type: 'heading',
@@ -4552,8 +4585,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'pol-a1-car-scolaire',
+          },
           caption: "Un car scolaire à l'arrêt devant le collège de Villefranche-d'Arvor",
-          key: 'pol-a1-car-scolaire',
         },
         {
           type: 'paragraph',
@@ -4797,8 +4833,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'pol-a3-carte-fusion',
+          },
           caption: 'Carte des deux intercommunalités appelées à fusionner',
-          key: 'pol-a3-carte-fusion',
         },
         {
           type: 'paragraph',
@@ -5386,8 +5425,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'soc-a1-gymnase',
+          },
           caption: 'Des bénévoles installent des lits de camp dans le gymnase',
-          key: 'soc-a1-gymnase',
         },
         {
           type: 'paragraph',
@@ -5669,8 +5711,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'soc-a3-attente',
+          },
           caption: "La salle d'attente de la maison de santé, encore peu fréquentée",
-          key: 'soc-a3-attente',
         },
         {
           type: 'paragraph',
@@ -5805,8 +5850,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'soc-a4-atelier',
+          },
           caption: 'Un collégien et une résidente préparent une tarte ensemble',
-          key: 'soc-a4-atelier',
         },
         {
           type: 'paragraph',
@@ -6363,8 +6411,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'spo-a1-tribunes',
+          },
           caption: 'Les vieilles tribunes en bois du stade municipal',
-          key: 'spo-a1-tribunes',
         },
         {
           type: 'paragraph',
@@ -6517,8 +6568,11 @@ export const CORPUS_DATA = [
         },
         {
           type: 'image',
+          picture: {
+            kind: 'corpus',
+            key: 'spo-a2-tribunes',
+          },
           caption: 'Les tribunes garnies un soir de match',
-          key: 'spo-a2-tribunes',
         },
         {
           type: 'paragraph',

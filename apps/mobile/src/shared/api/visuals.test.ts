@@ -35,9 +35,20 @@ describe('une image du journal', () => {
   const picture = PICTURE.parse({ kind: 'journal', url });
 
   it('se demande à la largeur de chaque place, sans perdre ce que son adresse demande d’autre', () => {
-    expect(visualOf(picture, 'thumbnail')).toEqual({ source: { uri: url.replace('w=150', 'w=320') } });
     expect(visualOf(picture, 'card')).toEqual({ source: { uri: url.replace('w=150', 'w=1080') } });
     expect(visualOf(picture, 'lead')).toEqual({ source: { uri: url.replace('w=150', 'w=1600') } });
+  });
+
+  /**
+   * A thumbnail is a square, and a picture asked only by its width is wider than it is tall: scaled up to fill the
+   * square, it was drawn soft on every row of a list. The server cuts it square at the thumbnail's own size.
+   */
+  it('se fait couper au carré par le serveur, à la taille de la vignette', () => {
+    const listed = PICTURE.parse({ kind: 'journal', url: url.replace('?w=150&h=150&crop=1', '?w=1200') });
+    expect(visualOf(listed, 'thumbnail')).toEqual({
+      source: { uri: url.replace('?w=150&h=150&crop=1', '?w=320&h=320&crop=1') },
+    });
+    expect(visualOf(picture, 'thumbnail')).toEqual({ source: { uri: url.replace('w=150&h=150', 'w=320&h=320') } });
   });
 
   it('ne porte aucun hachage à peindre, que le service n’envoie pas', () => {

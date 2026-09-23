@@ -8,6 +8,7 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
 
+import { frameOf } from '../model/format';
 import { ArticleFigure } from './article-figure';
 
 export type ArticleTitleProps = Readonly<{ title: DisplayText; word: DisplayText | null }>;
@@ -98,7 +99,13 @@ export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
         <Text variant="caption">{formatLongDate(article.publishedAt)}</Text>
       </Box>
       {visual === null || hero === undefined ? null : (
-        <ArticleFigure visual={visual} recyclingKey={article.id} caption={hero.caption} credit={hero.credit} />
+        <ArticleFigure
+          visual={visual}
+          frame={frameOf(article.format)}
+          recyclingKey={article.id}
+          caption={hero.caption}
+          credit={hero.credit}
+        />
       )}
       <Box style={styles.rule} />
     </>

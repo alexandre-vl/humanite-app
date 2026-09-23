@@ -83,6 +83,18 @@ export const PROSE_FIXTURES = [
     judged(soldering, readPlain),
   ),
   define(
+    'prose/speaker-split',
+    'une lecture qui ne reconnaît pas la boîte d’un intervenant et en fait deux paragraphes épars',
+    ['prose/speaker-split'],
+    judged((html) => readProse(html.replaceAll('debater-component', 'debater-gone')), readPlain),
+  ),
+  define(
+    'prose/figure-lost',
+    'une lecture qui laisse tomber l’image d’un corps et les mots écrits sous elle',
+    ['prose/figure-lost'],
+    judged((html) => readProse(html).filter((block) => block.type !== 'image'), readPlain),
+  ),
+  define(
     'prose/edges-loose',
     'une lecture qui garde le blanc que le gabarit laisse au bord d’un champ court',
     ['prose/edges-loose'],

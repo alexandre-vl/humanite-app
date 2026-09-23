@@ -1,4 +1,4 @@
-import { atWidth } from '@huma/contracts';
+import { atSquare, atWidth } from '@huma/contracts';
 import type { ArticleSummary, Picture } from '@huma/contracts';
 import { VISUALS } from '@huma/mock-content';
 import { ASSETS } from '@huma/mock-content/assets';
@@ -9,8 +9,9 @@ import type { AssetWidth } from '@huma/mock-content/assets';
  * lays out, not the widths the corpus was written at, so it asks by role and this table answers — and the day the
  * pictures are written at other widths, only this table moves.
  *
- * The journal's pictures are asked for at these same widths. Its server resizes to whatever it is asked, so the one
- * table serves both sources: a thumbnail is a thumbnail whichever of them drew it.
+ * The journal's pictures are asked for at these same widths. Its server scales down to whatever width it is asked and
+ * never up — a picture listed at 1200 pixels comes back at 1200 when asked for 1600 — so the one table serves both
+ * sources: a thumbnail is a thumbnail whichever of them drew it.
  *
  * It is published because it is one half of a pair: the corpus writes a file per width, this names the places, and
  * nothing but a test can hold the two against each other. A width written for no place is 63 files of bundle a cold
@@ -24,6 +25,12 @@ export const PLACE_WIDTHS = {
 
 /** The place a picture fills, from a row's thumbnail to the lead picture of an article. */
 export type VisualSize = keyof typeof PLACE_WIDTHS;
+
+/**
+ * Which places are square, and so have a picture of the journal cut square by its server rather than scaled up to fill
+ * them. A picture of the corpus is a file of the bundle, drawn at its width and cut by the view.
+ */
+const SQUARE = { thumbnail: true, card: false, lead: false } as const satisfies Readonly<Record<VisualSize, boolean>>;
 
 /**
  * A picture ready for a native view: the module the bundler resolved or the address the phone asks for, and — for a
@@ -40,7 +47,8 @@ export type Visual = Readonly<{ source: number | Readonly<{ uri: string }>; thum
  */
 export const visualOf = (picture: Picture, size: VisualSize): Visual | null => {
   if (picture.kind === 'journal') {
-    return { source: { uri: atWidth(picture.url, PLACE_WIDTHS[size]) } };
+    const width = PLACE_WIDTHS[size];
+    return { source: { uri: SQUARE[size] ? atSquare(picture.url, width) : atWidth(picture.url, width) } };
   }
   const widths = ASSETS[picture.key];
   const thumbhash = VISUALS[picture.key];

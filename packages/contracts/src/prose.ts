@@ -2,6 +2,7 @@ import { BLOCK, textOf } from './article.ts';
 import type { Block, BlockInput } from './article.ts';
 import type { SpanInput } from './content.ts';
 import type { Finding } from './finding.ts';
+import { PICTURE } from './picture.ts';
 
 /**
  * How a body the journal publishes becomes the blocks a screen knows.
@@ -14,8 +15,9 @@ import type { Finding } from './finding.ts';
  *
  * Nothing here is a general HTML parser and nothing here should become one. It reads the shapes this journal's own
  * renderer emits, measured on the bodies of a capture: paragraphs with links, emphasis and bold, its own question
- * block, headings, and quotes. A shape it does not know leaves no trace — which is the point, and which `judgeProse`
- * is there to keep true.
+ * block, the box that introduces a speaker of a debate, headings, quotes, and a picture of the journal with the words
+ * under it. A shape it does not know leaves no trace — which is the point, and which `judgeProse` is there to keep
+ * true.
  */
 
 /**
@@ -27,11 +29,14 @@ import type { Finding } from './finding.ts';
  */
 export const DONATION = '<div id="form_don"';
 
-/** Elements whose text is not prose and must never reach a reader. */
-const DROPPED = /<(script|style|svg|noscript|form|iframe|figure)\b[^>]*>[\s\S]*?<\/\1>/giu;
+/**
+ * Elements whose text is not prose and must never reach a reader. An embedded player goes with them, frame and all:
+ * the figure that held one is left with no picture, and a figure with no picture of the journal is no block.
+ */
+const DROPPED = /<(script|style|svg|noscript|form|iframe)\b[^>]*>[\s\S]*?<\/\1>/giu;
 
 /** The block-level elements a body of this journal is made of. */
-const BLOCKS = /<(p|h2|h3|h4|h5|h6|blockquote)\b([^>]*)>([\s\S]*?)<\/\1>/giu;
+const BLOCKS = /<(p|h2|h3|h4|h5|h6|blockquote|figure)\b([^>]*)>([\s\S]*?)<\/\1>/giu;
 
 /** The inline elements a paragraph of this journal is made of. */
 const INLINE = /<(strong|b|em|i|a)\b([^>]*)>([\s\S]*?)<\/\1>/giu;
@@ -118,13 +123,14 @@ const plain = (markup: string): string =>
     .replace(BLANKS, ' ');
 
 /**
- * The same markup with every element of a given class removed, the elements it nests included.
+ * The same markup with every element of a given class written anew by `rewrite`, from the whole element as it was —
+ * the elements it nests included.
  *
- * A pattern cannot do this: these containers hold other containers of the same tag, and a non-greedy match closes on
- * the first inner end tag. So the end is found by counting opens against closes, which is the only way to take a
- * whole element out and not its first half.
+ * A pattern cannot find where such an element ends: these containers hold other containers of the same tag, and a
+ * non-greedy match closes on the first inner end tag. So the end is found by counting opens against closes, which is
+ * the only way to take a whole element and not its first half.
  */
-const withoutClass = (markup: string, className: string): string => {
+const rewritten = (markup: string, className: string, rewrite: (element: string) => string): string => {
   const opening = new RegExp(`<(\\w+)\\b[^>]*class="[^"]*\\b${className}\\b[^"]*"[^>]*>`, 'iu');
   let text = markup;
   let found = opening.exec(text);
@@ -143,10 +149,29 @@ const withoutClass = (markup: string, className: string): string => {
       }
       edge = edges.exec(text);
     }
-    text = `${text.slice(0, found.index)} ${text.slice(end)}`;
+    text = `${text.slice(0, found.index)} ${rewrite(text.slice(found.index, end))} ${text.slice(end)}`;
     found = opening.exec(text);
   }
   return text;
+};
+
+/** The markup inside the first element of a given class within `element`, as written, or nothing. */
+const innerOf = (element: string, className: string): string =>
+  new RegExp(`<(\\w+)\\b[^>]*class="[^"]*\\b${className}\\b[^"]*"[^>]*>([\\s\\S]*?)</\\1>`, 'iu').exec(element)?.[2] ??
+  '';
+
+/**
+ * The box a debate opens each speaker's first answer with — a portrait, a name, and what the speaker does — as the one
+ * line the journal itself writes for every later answer: the name in bold, then the rest. Read as it stood, it was two
+ * paragraphs of their own, a name and a job title set as prose between two answers; the portrait goes, a face the app
+ * would lay beside no one else's.
+ */
+const SPEAKER = 'debater-component';
+
+const speakerLine = (element: string): string => {
+  const name = innerOf(element, 'debater__name').trim();
+  const role = innerOf(element, 'debater__function').trim();
+  return name === '' ? '' : `<p><strong>${name}</strong>${role === '' ? '' : `, ${role}`}</p>`;
 };
 
 const attribute = (attributes: string, name: string): string =>
@@ -247,7 +272,30 @@ const spansOf = (markup: string): SpanInput[] => {
   return spansFrom(pieces);
 };
 
+/**
+ * A picture of the journal set inside a body, with the words under it: the address of its image, and its caption read
+ * apart from the credit written into it. A figure holding anything else — a player whose frame was dropped, a picture
+ * served from elsewhere — is no picture of the journal, and no block.
+ */
+const figureOf = (inner: string): BlockInput | null => {
+  const address = /<img\b[^>]*\bsrc="([^"]*)"/iu.exec(inner)?.[1];
+  const picture = PICTURE.safeParse({ kind: 'journal', url: (address ?? '').replaceAll('&amp;', '&') });
+  if (!picture.success) {
+    return null;
+  }
+  const { caption, credit } = readLegend(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/iu.exec(inner)?.[1] ?? '');
+  return {
+    type: 'image',
+    picture: picture.data,
+    ...(caption === '' ? {} : { caption }),
+    ...(credit === '' ? {} : { credit }),
+  };
+};
+
 const blockOf = (tag: string, attributes: string, inner: string): BlockInput | null => {
+  if (tag === 'figure') {
+    return figureOf(inner);
+  }
   const heading = tag !== 'p' && tag !== 'blockquote';
   const question = tag === 'p' && attribute(attributes, 'class').split(/\s+/u).includes(QUESTION);
   if (heading || question) {
@@ -271,7 +319,8 @@ const blockOf = (tag: string, attributes: string, inner: string): BlockInput | n
 export const readProse = (html: string): readonly Block[] => {
   const end = html.indexOf(DONATION);
   const cut = (end < 0 ? html : html.slice(0, end)).replace(DROPPED, ' ');
-  const body = ASIDES.reduce((text, className) => withoutClass(text, className), cut);
+  const kept = ASIDES.reduce((text, className) => rewritten(text, className, () => ''), cut);
+  const body = rewritten(kept, SPEAKER, speakerLine);
   const blocks: BlockInput[] = [];
   BLOCKS.lastIndex = 0;
   let found = BLOCKS.exec(body);
@@ -338,6 +387,8 @@ export type ProseCode =
   | 'prose/donation-kept'
   | 'prose/break-glued'
   | 'prose/edges-loose'
+  | 'prose/speaker-split'
+  | 'prose/figure-lost'
   | 'prose/nothing-read';
 
 /** A way of reading a body, which is what the judging below is handed rather than reaching for one. */
@@ -362,15 +413,26 @@ const APPEAL = 'Soutenez-nous';
  */
 const APART = ['Une seconde phrase.', 'Puis une autre', 'et un lien', 'pour finir.'] as const;
 
+/** Who the body sample's speaker box introduces, and what she does: one line of a debate, not two of prose. */
+const SPEAKER_NAME = 'Une intervenante';
+const SPEAKER_ROLE = 'directrice d’une association';
+
+/** The picture the body sample sets, as the journal addresses its pictures, and the words written under it. */
+const FIGURE_PICTURE = 'https://www.humanite.fr/wp-content/uploads/2026/09/une-image.jpg?w=1024';
+const FIGURE_CAPTION = 'Une légende.';
+const FIGURE_CREDIT = 'Une agence';
+
 /**
  * A body shaped the way this journal shapes one, small enough to read at a glance: a sentence with a run of bold and
- * an entity, an aside holding another article's headline, a second sentence in runs, and the donation block that
- * closes it.
+ * an entity, an aside holding another article's headline, a speaker box of a debate, a second sentence in runs, a
+ * picture with its credit written into its caption, and the donation block that closes it.
  */
 const SAMPLE = [
   '<p>Un <strong>mot</strong> et une entit&eacute;.</p>',
   `<div class="seealso-component"><div><p>${ELSEWHERE}</p></div></div>`,
+  `<div class="debater-component"><img class="avatar" src="https://www.humanite.fr/wp-content/uploads/2026/09/une-voix.jpg?w=150&amp;h=150&amp;crop=1" alt=""><div class="debater"><p class="debater__name">${SPEAKER_NAME}</p><p class="debater__function">${SPEAKER_ROLE}</p></div></div>`,
   `<p><em>${APART[0]}</em><br><em>${APART[1]}</em> <a href="https://www.humanite.fr/">${APART[2]} </a>${APART[3]}</p>`,
+  `<figure class="wp-block-image"><img src="${FIGURE_PICTURE}" alt=""><figcaption>${FIGURE_CAPTION} ©${FIGURE_CREDIT}</figcaption></figure>`,
   `<div id="form_don"><p>${APPEAL}</p></div>`,
 ].join('');
 
@@ -436,6 +498,13 @@ export const judgeProse = (read: ProseReaders): readonly Finding<ProseCode>[] =>
     ...(line.includes(`${BEFORE} ${AFTER}`) ? [] : [`« ${BEFORE} » et « ${AFTER} »`]),
     ...(has((text) => text.includes(APART.join(' '))) ? [] : [`les passages de « ${APART.join(' ')} »`]),
   ];
+  const figured = blocks.some(
+    (block) =>
+      block.type === 'image' &&
+      block.picture.kind === 'journal' &&
+      block.caption === FIGURE_CAPTION &&
+      block.credit === `©${UNBREAKABLE}${FIGURE_CREDIT}`,
+  );
   return [
     ...(has((text) => /<[^>]*>/u.test(text))
       ? [{ code: 'prose/markup-left' as const, says: 'du balisage est resté dans le texte rendu' }]
@@ -455,5 +524,16 @@ export const judgeProse = (read: ProseReaders): readonly Finding<ProseCode>[] =>
     ...(line === line.trim()
       ? []
       : [{ code: 'prose/edges-loose' as const, says: 'le blanc du gabarit est resté au bord de la phrase' }]),
+    ...(has((text) => text.includes(SPEAKER_NAME) && text.includes(SPEAKER_ROLE))
+      ? []
+      : [{ code: 'prose/speaker-split' as const, says: `« ${SPEAKER_NAME} » n’est pas présentée en une ligne` }]),
+    ...(figured
+      ? []
+      : [
+          {
+            code: 'prose/figure-lost' as const,
+            says: 'une image du journal n’a pas été rendue avec sa légende et son crédit',
+          },
+        ]),
   ];
 };

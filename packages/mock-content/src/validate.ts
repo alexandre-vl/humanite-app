@@ -115,7 +115,9 @@ const wordRange = (article: Article): Words | undefined => {
  */
 export const imageKeys = (article: Article): readonly ImageKey[] => [
   ...(article.hero?.picture.kind === 'corpus' ? [article.hero.picture.key] : []),
-  ...blocksOf(article).flatMap((block) => (block.type === 'image' ? [block.key] : [])),
+  ...blocksOf(article).flatMap((block) =>
+    block.type === 'image' && block.picture.kind === 'corpus' ? [block.picture.key] : [],
+  ),
 ];
 
 /** The ids an item points to, through internal links and related blocks. */

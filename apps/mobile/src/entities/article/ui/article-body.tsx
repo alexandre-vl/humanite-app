@@ -40,8 +40,8 @@ const useStyles = createStyles((theme) => ({
  * One block of a body, rendered as the one thing it is. The switch answers for the seven kinds the contract declares,
  * so a kind added there stops the build rather than rendering as nothing at all.
  *
- * A body picture carries a caption and no credit: the contract gives a credit only to the article's own picture, so a
- * figure inside the body has none to show, and says so by not showing one.
+ * A picture inside a body is drawn as the one over it is — a photograph, with its caption and its credit when the
+ * journal wrote them — and named by the picture itself, which a body never sets twice.
  */
 function BlockView({ block, article, onFollow, onSupport }: BlockProps): ReactNode {
   const styles = useStyles();
@@ -72,9 +72,16 @@ function BlockView({ block, article, onFollow, onSupport }: BlockProps): ReactNo
         </Box>
       );
     case 'image': {
-      const visual = visualOf({ kind: 'corpus', key: block.key }, 'lead');
+      const visual = visualOf(block.picture, 'lead');
+      const named = block.picture.kind === 'corpus' ? block.picture.key : block.picture.url;
       return visual === null ? null : (
-        <ArticleFigure visual={visual} recyclingKey={`${article.id}-${block.key}`} caption={block.caption} />
+        <ArticleFigure
+          visual={visual}
+          frame="photo"
+          recyclingKey={`${article.id}-${named}`}
+          caption={block.caption}
+          credit={block.credit}
+        />
       );
     }
     case 'video':

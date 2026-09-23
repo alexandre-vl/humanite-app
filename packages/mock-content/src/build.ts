@@ -131,7 +131,8 @@ const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBl
 const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
   const [only] = children;
   if (children.length === 1 && only?.type === 'image') {
-    return { type: 'image', caption: only.alt ?? '', key: only.url };
+    const caption = only.alt ?? '';
+    return { type: 'image', picture: { kind: 'corpus', key: only.url }, ...(caption === '' ? {} : { caption }) };
   }
   return { type: 'paragraph', spans: toSpans(children) };
 };
