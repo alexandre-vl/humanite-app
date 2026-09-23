@@ -36,7 +36,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0026](0026-accessibilite-annoncee-et-contraste-deduit-de-la-taille.md)     | Accessibilité annoncée et contraste déduit de la taille     | accepté                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0027](0027-client-non-officiel-de-l-api-l-humanite.md)                     | Client non officiel de l’API L’Humanité                     | accepté                                                                  | `dependency`, `boundary`, `data-format`                                    |
 | [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | accepté                                                                  | `guarded-config`, `boundary`, `data-format`                                |
-| [ADR-0029](0029-une-build-de-service-sans-le-corpus-par-variantes.md)           | Une build de service sans le corpus, par variantes          | proposé                                                                  | `guarded-config`, `boundary`                                               |
+| [ADR-0029](0029-une-build-de-service-sans-le-corpus-par-variantes.md)           | Une build de service sans le corpus, par variantes          | accepté                                                                  | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -351,7 +351,7 @@ Statut : accepté. Périmètre : `packages/remote-api/**`, `apps/mobile/src/_app
 
 ### ADR-0029 · Une build de service sans le corpus, par variantes
 
-Statut : proposé. Périmètre : `apps/mobile/metro.config.ts`, `apps/mobile/src/shared/api/source.ts`, `apps/mobile/src/shared/api/source.service.ts`, `packages/architecture/src/resolution.ts`, `tools/structure/src/service-build.ts`.
+Statut : accepté. Périmètre : `apps/mobile/metro.config.ts`, `apps/mobile/src/shared/api/source.ts`, `apps/mobile/src/shared/api/source.service.ts`, `packages/architecture/src/resolution.ts`, `tools/structure/src/service-build.ts`.
 
 | Règle | Niveau      | Preuves                                                                                        |
 | ----- | ----------- | ---------------------------------------------------------------------------------------------- |
