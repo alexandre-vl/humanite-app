@@ -33,6 +33,4 @@ La direction promet aussi une politique tarifaire accessible. L'entrée restera 
 
 Reste à faire revenir le public. Avant les travaux, le musée peinait à dépasser les vingt mille visiteurs annuels. La municipalité vise désormais le double, en misant sur des expositions temporaires plus ambitieuses et des soirées thématiques. Un premier accrochage temporaire, consacré aux paysages de la vallée, est déjà annoncé pour décembre. Les responsables comptent aussi sur les scolaires et sur un partenariat avec les offices de tourisme voisins pour drainer un public de fin de semaine.
 
-::callout[Devenez adhérent | Pour un accès illimité aux collections et aux avant-premières des expositions, la carte annuelle du musée est en vente à l'accueil et en ligne. | Réserver ma carte]
-
 ::related[cul-a5]

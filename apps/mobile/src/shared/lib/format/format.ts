@@ -14,9 +14,6 @@ import { asDisplayText } from '../display-text';
  * What stays here is the words. Hermes has neither `Intl.RelativeTimeFormat` nor `Intl.PluralRules` (journal 0a,
  * vérification 15), so the words below are written by hand.
  */
-const PER_MINUTE = 60;
-const PER_HOUR = 60 * PER_MINUTE;
-
 const parseInstant = (instant: string): number => {
   const millis = Date.parse(instant);
   if (Number.isNaN(millis)) {
@@ -57,8 +54,11 @@ const nameAt = (names: readonly string[], index: number): string => {
   return name;
 };
 
-// A card carries no date. Nielsen's homepage guideline says why, of a front that is all of the week: no card needs
-// one, and the article needs one printed prominently — here `formatLongDate`, in letters.
+/** A day of the month as French prints it: `1er` for the first, the number for every other. */
+const dayOf = (day: number): string => (day === 1 ? '1er' : String(day));
+
+// A card carries a date only where its list reaches back further than a day, and the article prints one prominently —
+// both `formatLongDate`, in letters. Nielsen's homepage guideline is why a front of one day's paper carries none.
 
 /**
  * The hour an item was filed, as a row of the wire carries it: `19:52`.
@@ -84,7 +84,7 @@ export const formatClockTime = (instant: string): DisplayText => {
 export const formatDayLabel = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
   const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
-  return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
+  return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
 
 /**
@@ -99,7 +99,7 @@ export const formatDayLabel = (instant: string): DisplayText => {
  */
 export const formatDayDate = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
-  return asDisplayText(`${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
+  return asDisplayText(`${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
 };
 
 /**
@@ -112,7 +112,17 @@ export const formatDayDate = (instant: string): DisplayText => {
  */
 export const formatLongDate = (instant: string): DisplayText => {
   const clock = clockAt(parseInstant(instant));
-  return asDisplayText(`${String(clock.day)} ${nameAt(MONTHS, clock.month - 1)} ${String(clock.year)}`);
+  return asDisplayText(`${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)} ${String(clock.year)}`);
+};
+
+/**
+ * When an article was published, as its head prints it: `23 septembre 2026 à 6\u00A0h\u00A057`. The wire lists the
+ * same piece at its hour, and an article of the morning and one of the evening are not the same news: the day alone
+ * said less of the piece than the wire did. The hour is written the French way, the letter held to its numbers.
+ */
+export const formatPublished = (instant: string): DisplayText => {
+  const clock = clockAt(parseInstant(instant));
+  return asDisplayText(`${formatLongDate(instant)} à ${String(clock.hour)}\u00A0h\u00A0${pad(clock.minute)}`);
 };
 
 /**
@@ -128,13 +138,7 @@ export const formatByline = (byline: DisplayText): DisplayText => {
   if (byline.trim() === '') {
     throw new RangeError('un article est signé');
   }
-  return asDisplayText(`Par ${byline}`);
-};
-
-/** A running time, as a player prints it: `4:18`, and `1:04:18` once past the hour. */
-export const formatDuration = (seconds: number): DisplayText => {
-  const hours = Math.floor(seconds / PER_HOUR);
-  const minutes = Math.floor((seconds % PER_HOUR) / PER_MINUTE);
-  const rest = seconds % PER_MINUTE;
-  return asDisplayText(hours > 0 ? `${String(hours)}:${pad(minutes)}:${pad(rest)}` : `${String(minutes)}:${pad(rest)}`);
+  // The newsroom as a whole signs one piece in nine as `La rédaction`, capital and all, which reads as a name after
+  // the word in front of it: « Par La rédaction ». A newsroom is not a name, and French writes it in the lower case.
+  return asDisplayText(`Par ${byline.replace(/^La rédaction$/u, 'la rédaction')}`);
 };

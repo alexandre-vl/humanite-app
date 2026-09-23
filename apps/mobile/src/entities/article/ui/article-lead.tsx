@@ -1,18 +1,22 @@
-import type { Article, DisplayText } from '@huma/contracts';
-import { blocksOf } from '@huma/contracts';
+import type { Article, DisplayText, LinkTarget } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { formatLongDate } from '#lib/format';
+import { formatPublished } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
 
 import { frameOf } from '../model/format';
 import { ArticleFigure } from './article-figure';
+import { ArticleFilm } from './article-film';
 
 export type ArticleTitleProps = Readonly<{ title: DisplayText; word: DisplayText | null }>;
-export type ArticleLeadProps = Readonly<{ article: Article; byline: DisplayText | null }>;
+export type ArticleLeadProps = Readonly<{
+  article: Article;
+  byline: DisplayText | null;
+  onFollow: (target: LinkTarget) => void;
+}>;
 
 const useStyles = createStyles((theme) => ({
   // One measure for everything that is read, the body's own. The head used to keep a wider one, so the first line of
@@ -66,26 +70,38 @@ export function ArticleTitle({ title, word }: ArticleTitleProps): ReactNode {
  * time. Under the picture it was answering the caption rather than the headline, so an article opened on a photograph
  * credited to one person and signed, four lines later and past a second credit, by another.
  *
- * The date is written out in full here and nowhere else in the paper. Nielsen's homepage guideline is the reason both
- * ways round: a front page of one week's stories needs no date on each card, and the full article needs one printed
- * prominently. So the cards lost theirs and this one gained the month and the year.
+ * The date is written out in full here, with the hour: Nielsen's homepage guideline has the full article print one
+ * prominently, and the wire already lists the same piece at its hour.
  *
- * An article that plays a video shows no picture here. The player has no still of its own and shows the article's
- * picture instead; showing it twice, once above the player and once inside it, would say nothing more. It is asked of
- * the body and not of the format: a video of the journal comes with no player in its body — the service sends a link
- * to the film and no prose at all — and hiding its picture on the strength of its format left the page with nothing.
+ * A video opens on its film, right under its headline, and shows no picture further down: the film's still is the
+ * article's picture, and showing it twice would say nothing more. What reads as a video is its format — the service
+ * sends a link to the film and a body of prose, when any, that says nothing of it.
  *
  * The head is the same whether the body follows or not. An article whose body the source keeps back from this reader
  * still carries its title, its standfirst and its picture, and the wall that says why the rest is not there is laid
  * where the body would run — under this, not in place of it.
  */
-export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
+export function ArticleLead({ article, byline, onFollow }: ArticleLeadProps): ReactNode {
   const styles = useStyles();
   const hero = article.hero;
-  const plays = blocksOf(article).some((block) => block.type === 'video');
-  const visual = plays ? null : pictureOf(article, 'lead');
+  const film = frameOf(article.format) === 'film';
+  const visual = film ? null : pictureOf(article, 'lead');
+  const played = article.film;
   return (
     <>
+      {film ? (
+        <ArticleFilm
+          poster={pictureOf(article, 'lead')}
+          recyclingKey={article.id}
+          onPlay={
+            played === undefined
+              ? null
+              : () => {
+                  onFollow({ kind: 'external', url: played.url });
+                }
+          }
+        />
+      ) : null}
       {/* An article whose body opens on the words a list stood in for its missing standfirst has none of its own. */}
       {article.standfirst === '' ? null : (
         <Box style={styles.standfirst}>
@@ -96,7 +112,7 @@ export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
         {/* Named a label rather than left to the default: the signature fell to the body's own type, so who wrote a
             piece was set in the same letters, at the same size and in the same ink as the piece itself. */}
         {byline === null ? null : <Text variant="label">{byline}</Text>}
-        <Text variant="caption">{formatLongDate(article.publishedAt)}</Text>
+        <Text variant="caption">{formatPublished(article.publishedAt)}</Text>
       </Box>
       {visual === null || hero === undefined ? null : (
         <ArticleFigure

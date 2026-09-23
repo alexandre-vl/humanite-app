@@ -10,8 +10,6 @@ published: 2026-09-11 18:30
 hero: Le marché éphémère installé sur la friche de Serravia | Photo : Agence Méridien / CC BY 4.0
 ---
 
-::video[À Serravia, un marché naît sur une friche]{duration="4:05"}
-
 La scène se joue chaque samedi à l'aube, sur un terrain vague du centre de Serravia. Là où s'élevaient les anciennes halles, fermées l'an dernier pour vétusté, une trentaine de jeunes commerçants dressent désormais leurs étals sous des bâches colorées.
 
 Maraîchers, fromagers, artisans : tous ont moins de trente-cinq ans et n'avaient pas les moyens de louer un emplacement dans les galeries marchandes de la périphérie. En occupant la friche, avec l'accord tacite de la municipalité, ils ont créé un marché qui attire aujourd'hui des familles de toute la ville.

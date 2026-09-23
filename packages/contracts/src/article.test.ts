@@ -1,5 +1,5 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { ARTICLE, ARTICLE_SUMMARY, blocksOf, HERO } from './article.ts';
+import { ARTICLE, ARTICLE_SUMMARY, blocksOf, FILM, HERO } from './article.ts';
 import type { Article, ArticleSummary, Hero } from './article.ts';
 
 const validSummary = {
@@ -29,6 +29,7 @@ test('a summary carries these fields and no others', () => {
   expect([...Object.keys(ARTICLE_SUMMARY.shape)].sort((left, right) => left.localeCompare(right))).toEqual([
     'access',
     'byline',
+    'film',
     'format',
     'hero',
     'id',
@@ -101,4 +102,18 @@ test('HERO takes a picture of the journal, with nothing written under it', () =>
   expect(
     ARTICLE_SUMMARY.safeParse({ ...validSummary, id: '3861029', hero: { picture: { kind: 'journal', url } } }).success,
   ).toBe(true);
+});
+
+/** A film of the journal is on YouTube, in one of the three shapes the service links them in, and nowhere else. */
+test('FILM takes a film of the journal where it lives, and nothing else', () => {
+  for (const url of [
+    'https://youtu.be/KCUigtb6V6E',
+    'https://www.youtube.com/watch?v=dfZt_ZVhtus',
+    'https://youtube.com/shorts/dfZt_ZVhtus',
+  ]) {
+    expect(FILM.safeParse({ url }).success).toBe(true);
+  }
+  for (const url of ['https://vimeo.com/123', 'https://youtu.be/', 'http://youtu.be/KCUigtb6V6E']) {
+    expect(FILM.safeParse({ url }).success).toBe(false);
+  }
 });

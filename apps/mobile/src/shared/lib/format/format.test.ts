@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
-import { formatClockTime, formatDayDate, formatDayLabel, formatDuration, formatLongDate } from './index';
+import { asDisplayText } from '../display-text';
+import { formatByline, formatClockTime, formatDayDate, formatDayLabel, formatLongDate, formatPublished } from './index';
 
 describe('formatClockTime', () => {
   it('imprime l’heure que porte une ligne du fil, et rien du jour au-dessus', () => {
@@ -49,7 +50,7 @@ describe('formatLongDate', () => {
 
   /** The Paris day, like every other reading of the clock: an article filed at 00:30 in Paris is that day's. */
   it('lit le jour à l’heure de Paris, donc un article du soir tard date du lendemain', () => {
-    expect(formatLongDate('2026-12-31T23:30:00.000Z')).toBe('1 janvier 2027');
+    expect(formatLongDate('2026-12-31T23:30:00.000Z')).toBe('1er janvier 2027');
   });
 
   /** It is the one date the paper writes out, and the one that carries a year: nothing else here does both. */
@@ -70,7 +71,7 @@ describe('formatDayLabel', () => {
   });
 
   it('laisse sans zéro un jour d’un seul chiffre', () => {
-    expect(formatDayLabel('2026-01-01T09:00:00.000Z')).toBe('jeudi 1 janvier');
+    expect(formatDayLabel('2026-01-01T09:00:00.000Z')).toBe('jeudi 1er janvier');
   });
 
   it('nomme chaque mois', () => {
@@ -94,14 +95,19 @@ describe('formatDayLabel', () => {
   });
 });
 
-describe('formatDuration', () => {
-  it('imprime une durée comme un lecteur vidéo l’affiche', () => {
-    expect(formatDuration(258)).toBe('4:18');
-    expect(formatDuration(45)).toBe('0:45');
+describe('formatPublished', () => {
+  /** The hour on the newsroom's clock, written the French way, its letter held to its numbers. */
+  it('écrit le jour et l’heure où l’article a paru, à l’heure de Paris', () => {
+    expect(formatPublished('2026-09-23T04:57:00.000Z')).toBe('23 septembre 2026 à 6\u00A0h\u00A057');
+    expect(formatPublished('2026-09-01T10:05:00.000Z')).toBe('1er septembre 2026 à 12\u00A0h\u00A005');
   });
+});
 
-  it('porte l’heure quand il y en a une', () => {
-    expect(formatDuration(3858)).toBe('1:04:18');
+describe('formatByline', () => {
+  /** The newsroom signing as a whole is not a name, and French writes it in the lower case after the word before it. */
+  it('signe au nom d’une personne, et au nom de la rédaction en minuscule', () => {
+    expect(formatByline(asDisplayText('Lisa Guillemin'))).toBe('Par Lisa Guillemin');
+    expect(formatByline(asDisplayText('La rédaction'))).toBe('Par la rédaction');
   });
 });
 

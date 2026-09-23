@@ -51,6 +51,7 @@ export const REMOTE_POST = z.object({
   article_format: REMOTE_FORMAT.optional(),
   premium: z.boolean(),
   right: z.boolean(),
+  video_url: z.string().optional(),
 });
 export type RemotePost = z.infer<typeof REMOTE_POST>;
 

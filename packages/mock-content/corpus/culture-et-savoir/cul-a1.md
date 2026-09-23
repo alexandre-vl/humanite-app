@@ -10,8 +10,6 @@ published: 2026-09-10 09:15
 hero: Une restauratrice au travail sur la fresque de l'église Saint-Genou | Photo : atelier Vermeil / CC BY 4.0
 ---
 
-::video[Sous les enduits, la fresque retrouvée de Belleroche]{duration="4:07"}
-
 Reportage — la scène se découvre au ralenti, centimètre carré après centimètre carré. Dans la nef fraîche de l'église Saint-Genou, à Belleroche, une équipe de restaurateurs dégage depuis le printemps une peinture murale que personne n'attendait.
 
 Tout a commencé par un sondage de routine. En grattant un badigeon jauni, un ouvrier a fait apparaître un fragment de bleu profond. Les travaux ont aussitôt été suspendus, le temps d'alerter le service régional de l'archéologie.

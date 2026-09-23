@@ -137,28 +137,10 @@ const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
   return { type: 'paragraph', spans: toSpans(children) };
 };
 
-/** A `m:ss` running time to whole seconds. It reaches here as an attribute: inside a label, `:ss` opens a directive. */
-const toSeconds = (value: string | null | undefined): number => {
-  const [, minutes, seconds] = /^(\d{1,2}):([0-5]\d)$/u.exec(value ?? '') ?? [];
-  if (minutes === undefined || seconds === undefined) {
-    throw new Error(`durée invalide : « ${value ?? ''} », attendu m:ss`);
-  }
-  return Number(minutes) * 60 + Number(seconds);
-};
-
-/** A leaf directive to its block: prose from its `[label]` split on ` | `, data from its `{name="value"}` attributes. */
+/** A leaf directive to its block: the one the corpus writes names the item it points to in its `[label]`. */
 const toDirective = (node: Directive): RawBlock => {
-  const [first = '', second = '', third = ''] = plain(node.children)
-    .split('|')
-    .map((part) => part.trim());
-  if (node.name === 'video') {
-    return { type: 'video', title: first, durationSeconds: toSeconds(node.attributes?.['duration']) };
-  }
   if (node.name === 'related') {
-    return { type: 'related', id: first };
-  }
-  if (node.name === 'callout') {
-    return { type: 'callout', title: first, text: second, button: third };
+    return { type: 'related', id: plain(node.children).trim() };
   }
   throw new Error(`directive inconnue : ::${node.name}`);
 };

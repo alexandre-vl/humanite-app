@@ -1,11 +1,10 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import type { Article, Block } from '@huma/contracts';
-import { blocksOf, ContentApiError } from '@huma/contracts';
-import { PALETTE } from '@huma/design-tokens';
+import { ARTICLE, blocksOf, ContentApiError } from '@huma/contracts';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
-import { formatLongDate } from '#lib/format';
+import { formatPublished } from '#lib/format';
 import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
@@ -85,12 +84,8 @@ const typesetOf = (text: string): Typeset => {
   return style;
 };
 
-const read = async (
-  article: Article,
-  onFollow: () => void = () => undefined,
-  onSupport: () => void = () => undefined,
-): Promise<void> => {
-  await renderWithCache(<ArticleReader id={article.id} onFollow={onFollow} onSupport={onSupport} />);
+const read = async (article: Article, onFollow: () => void = () => undefined): Promise<void> => {
+  await renderWithCache(<ArticleReader id={article.id} onFollow={onFollow} />);
   await settle();
 };
 
@@ -133,24 +128,26 @@ const reserved = async (): Promise<Article> => {
 };
 
 describe('ArticleReader, face à un corps retenu', () => {
-  /** The head is the article's and the wall says why the rest is not there; nothing of the body is shown. */
-  it('montre la tête de l’article et l’appel à s’abonner là où le corps aurait couru', async () => {
+  /**
+   * The head is the article's and the wall says why the rest is not there, and where a subscription is taken — in
+   * words, with nothing to press: a reader's app may not send its reader to a purchase.
+   */
+  it('montre la tête de l’article, et le mur là où le corps aurait couru, sans rien à presser', async () => {
     const article = await reserved();
-    const onSupport = jest.fn();
-    await read(article, () => undefined, onSupport);
+    await read(article);
     expect(await screen.findByText(article.title)).toBeTruthy();
-    expect(screen.getByText('Réservé aux abonnés')).toBeTruthy();
-    await fireEvent.press(screen.getByText('S’abonner'));
-    expect(onSupport).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(t('article.withheld.title'))).toBeTruthy();
+    expect(screen.getByText(t('article.withheld.where'))).toBeTruthy();
+    expect(screen.queryByRole('button')).toBeNull();
   });
 
   /** A source that refuses the whole article puts up the same wall, rather than a try that cannot pass. */
-  it('dresse le même appel quand la source refuse l’article entier, sans offrir d’essai', async () => {
+  it('dresse le même mur quand la source refuse l’article entier, sans offrir d’essai', async () => {
     const article = await reserved();
     jest.spyOn(content, 'getArticle').mockRejectedValue(new ContentApiError('refused', 'réservé'));
     await read(article);
-    expect(await screen.findByText('S’abonner')).toBeTruthy();
-    expect(screen.queryByText('Réessayer')).toBeNull();
+    expect(await screen.findByText(t('article.withheld.where'))).toBeTruthy();
+    expect(screen.queryByText(t('action.retry'))).toBeNull();
   });
 });
 
@@ -248,13 +245,13 @@ describe('ArticleReader', () => {
   });
 
   /**
-   * Nielsen's homepage guideline both ways round: a front page of one week's stories needs no date on each card, and
-   * the full article needs one printed prominently. The cards lost theirs; this is where the paper says the day.
+   * Nielsen's homepage guideline: the full article prints its date prominently — here with its hour, which the wire
+   * already lists the same piece at.
    */
-  it('date l’article en toutes lettres, la seule date que le journal écrive ainsi', async () => {
+  it('date l’article en toutes lettres, avec l’heure où il a paru', async () => {
     const article = await holding('paragraph');
     await read(article);
-    expect(await screen.findByText(formatLongDate(article.publishedAt))).toBeTruthy();
+    expect(await screen.findByText(formatPublished(article.publishedAt))).toBeTruthy();
   });
 
   it('signe l’article du nom que le journal écrit, précédé du mot qui l’annonce', async () => {
@@ -310,51 +307,24 @@ describe('ArticleReader', () => {
     expect(follow).toHaveBeenCalledWith({ kind: 'article', id: related.summary.id });
   });
 
-  it('porte la durée de la vidéo, la seule chose que le contrat en dise avec son titre', async () => {
-    const article = await holding('video');
-    const video = blocksOf(article).find((block) => block.type === 'video');
-    if (video === undefined) {
-      throw new Error('bloc vidéo introuvable');
-    }
-    await read(article);
-    expect(await screen.findByText(video.title)).toBeTruthy();
-    const minutes = Math.floor(video.durationSeconds / 60);
-    expect(screen.getByText(new RegExp(`^${String(minutes)}:`, 'u'))).toBeTruthy();
+  /**
+   * A film opens where it lives. The journal keeps its films on YouTube with no running time, and the app plays none
+   * itself: pressing the film hands its address up as a link out of the paper, which the screen opens.
+   */
+  it('ouvre le film d’une vidéo là où il vit, sans le jouer', async () => {
+    const video = await first('une vidéo', (article) => article.format === 'video');
+    const url = 'https://youtu.be/dfZt_ZVhtus';
+    jest.spyOn(content, 'getArticle').mockResolvedValue(ARTICLE.parse({ ...video, film: { url } }));
+    const follow = jest.fn();
+    await read(video, follow);
+    await fireEvent.press(await screen.findByText(t('article.film')));
+    expect(follow).toHaveBeenCalledWith({ kind: 'external', url });
   });
 
-  /**
-   * Le gabarit sombre de l’article vidéo n’est pas une règle à part : c’est le thème sombre posé sur le sous-arbre.
-   * La couleur du titre le dit, et c’est la seule chose qu’un rendu hors écran puisse en observer. Les deux valeurs
-   * sont celles des captures : blanc sur la 11, le rouge de l’interface sur la 13. Le nuancier est lu plutôt que les
-   * thèmes, qu’un fichier hors du noyau du thème n’a pas le droit d’importer.
-   */
-  it('pose l’article vidéo sur le thème sombre, et les autres sur celui du lecteur', async () => {
-    const video = await holding('video');
+  it('montre l’image d’une vidéo sans film, et rien à presser', async () => {
+    const video = await first('une vidéo', (article) => article.format === 'video' && article.film === undefined);
     await read(video);
-    const dark: unknown = (await screen.findByText(video.title)).props['style'];
-    expect(dark).toMatchObject({ color: PALETTE.white });
-
-    const written = await holding('image');
-    await read(written);
-    const light: unknown = (await screen.findByText(written.title)).props['style'];
-    expect(light).toMatchObject({ color: PALETTE.uiRed });
-  });
-
-  /**
-   * The capture shows an appeal with nothing to press, which the reference document counts as a fault. Showing a
-   * button is not enough to have fixed it: a button that is drawn and answers nothing is the same fault, wearing the
-   * shape of its repair. So the press is what the test makes, and the word carried up is what it reads.
-   */
-  it('donne à l’encart de soutien un bouton qui répond, que la capture n’en montre pas', async () => {
-    const article = await holding('callout');
-    const callout = blocksOf(article).find((block) => block.type === 'callout');
-    if (callout === undefined) {
-      throw new Error('encart introuvable');
-    }
-    const support = jest.fn();
-    await read(article, () => undefined, support);
-    expect(await screen.findByText(callout.title)).toBeTruthy();
-    await fireEvent.press(screen.getByText(callout.button));
-    expect(support).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText(video.title)).toBeTruthy();
+    expect(screen.queryByText(t('article.film'))).toBeNull();
   });
 });

@@ -5,8 +5,6 @@
  * that sends a reader to one. What the app reads comes through its content door, whichever source the build chose.
  */
 export const NEWSROOM = {
-  /** Where a reader who answers the call for support goes. */
-  subscription: 'https://www.humanite.fr/abonnement',
   /**
    * The paper itself, on the open web, where a numéro taken off the shelf is read.
    *

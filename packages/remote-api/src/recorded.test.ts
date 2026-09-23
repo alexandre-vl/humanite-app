@@ -297,3 +297,12 @@ test('the box introducing a speaker of a debate is read as one line, and not as 
   expect(lines).toContain('Cécile Duflot, directrice générale d’Oxfam France');
   expect(lines).not.toContain('Cécile Duflot');
 });
+
+/** Every video item the capture kept links to its film, and the reading keeps the link; nothing else carries one. */
+test('a video of the journal keeps the film it links to, and no other item has one', () => {
+  const read = LISTS.flatMap(({ answer }) => readSummaries(answer.posts).kept);
+  const videos = read.filter((summary) => summary.format === 'video');
+  expect(videos.length).toBeGreaterThan(0);
+  expect(videos.filter((summary) => summary.film === undefined)).toEqual([]);
+  expect(read.filter((summary) => summary.format !== 'video' && summary.film !== undefined)).toEqual([]);
+});

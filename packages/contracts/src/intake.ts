@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 import type { Article, ArticleSummary, HeroInput, SummaryInput } from './article.ts';
-import { ARTICLE, ARTICLE_SUMMARY } from './article.ts';
+import { ARTICLE, ARTICLE_SUMMARY, FILM } from './article.ts';
 import { instantAt } from './clock.ts';
 import type { Section } from './content.ts';
 import { SECTION } from './content.ts';
@@ -103,6 +103,15 @@ const heroOf = (post: RemotePost): HeroInput | undefined => {
 };
 
 /**
+ * The film a video item links to, or nothing. An address that is not a film of the journal costs the item its film and
+ * not the item, as a picture from elsewhere costs it its picture.
+ */
+const filmOf = (post: RemotePost): Readonly<{ url: string }> | undefined => {
+  const film = FILM.safeParse({ url: post.video_url ?? '' });
+  return film.success ? film.data : undefined;
+};
+
+/**
  * An item of the service as the contracts' schema is handed it. Every field of text is read as the line it is, the
  * date as the instant it names, and the flags as the words the domain uses for them.
  *
@@ -114,6 +123,7 @@ const inputOf = (post: RemotePost, publishedAt: string): SummaryInput => {
   const standfirst = readPlain(post.description);
   const byline = readPlain(post.author ?? '');
   const hero = heroOf(post);
+  const film = filmOf(post);
   return {
     id: post.id,
     format: FORMATS[post.article_format ?? 'classic'],
@@ -123,6 +133,7 @@ const inputOf = (post: RemotePost, publishedAt: string): SummaryInput => {
     publishedAt,
     ...(byline === '' ? {} : { byline }),
     ...(hero === undefined ? {} : { hero }),
+    ...(film === undefined ? {} : { film }),
   };
 };
 

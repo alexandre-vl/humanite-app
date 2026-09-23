@@ -3,7 +3,7 @@ import type { CorpusArticle } from './item.ts';
 import { blocksOf, instantAt, SECTION_ID, textOf } from '@huma/contracts';
 import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
 
-type Quota = Readonly<{ video: number; column: number; callout: number }>;
+type Quota = Readonly<{ video: number; column: number }>;
 
 /**
  * Per-section counts of the special formats, by section slug.
@@ -14,14 +14,14 @@ type Quota = Readonly<{ video: number; column: number; callout: number }>;
  * should have had.
  */
 const QUOTAS: readonly (readonly [string, Quota])[] = [
-  ['politique', { video: 1, column: 0, callout: 0 }],
-  ['social-eco', { video: 0, column: 1, callout: 0 }],
-  ['societe', { video: 0, column: 0, callout: 0 }],
-  ['monde', { video: 1, column: 1, callout: 0 }],
-  ['culture-et-savoir', { video: 1, column: 1, callout: 1 }],
-  ['feminisme', { video: 0, column: 0, callout: 0 }],
-  ['environnement', { video: 0, column: 0, callout: 0 }],
-  ['sport', { video: 1, column: 0, callout: 0 }],
+  ['politique', { video: 1, column: 0 }],
+  ['social-eco', { video: 0, column: 1 }],
+  ['societe', { video: 0, column: 0 }],
+  ['monde', { video: 1, column: 1 }],
+  ['culture-et-savoir', { video: 1, column: 1 }],
+  ['feminisme', { video: 0, column: 0 }],
+  ['environnement', { video: 0, column: 0 }],
+  ['sport', { video: 1, column: 0 }],
 ];
 
 const EXPECTED: ReadonlyMap<SectionId, Quota> = new Map(
@@ -77,9 +77,6 @@ const written = (stamp: string): string => {
 
 /** The newsroom hours the corpus covers, written on its own clock and compared as instants. */
 const WINDOW = { start: written('2026-09-10 07:00'), end: written('2026-09-13 09:55') } as const;
-
-/** What a report of the newspaper runs, in seconds: under a minute is a mistake, a quarter of an hour is a film. */
-const RUNNING_TIME = { min: 60, max: 900 } as const;
 
 /** An item with the section folder it was read from. */
 type Item = Readonly<{ folder: SectionId; article: CorpusArticle }>;
@@ -208,21 +205,6 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (isBrief(article) && blocksOf(article).length > 3) {
     errors.push(`${where} : une brève a au plus trois paragraphes`);
   }
-  if (article.format === 'video' && kinds[0] !== 'video') {
-    errors.push(`${where} : une vidéo commence par ::video`);
-  }
-  if (kinds.filter((kind) => kind === 'video').length !== (article.format === 'video' ? 1 : 0)) {
-    errors.push(`${where} : une ::video ne paraît que dans un item vidéo`);
-  }
-  if (
-    blocksOf(article).some(
-      (block) =>
-        block.type === 'video' &&
-        (block.durationSeconds < RUNNING_TIME.min || block.durationSeconds > RUNNING_TIME.max),
-    )
-  ) {
-    errors.push(`${where} : durée de vidéo hors de ${String(RUNNING_TIME.min)}–${String(RUNNING_TIME.max)} s`);
-  }
   if (article.format === 'column' && kinds.includes('image')) {
     errors.push(`${where} : pas d’image dans une chronique`);
   }
@@ -260,7 +242,6 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
   const counts = {
     video: articles.filter((article) => article.format === 'video').length,
     column: articles.filter((article) => article.format === 'column').length,
-    callout: articles.reduce((sum, article) => sum + blocksOf(article).filter((b) => b.type === 'callout').length, 0),
   };
   if (arts.length !== 6 || briefs.length !== 3) {
     errors.push(`${folder} : ${String(arts.length)} articles / ${String(briefs.length)} brèves (6 / 3 attendus)`);
@@ -271,7 +252,7 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
   if (quota === undefined) {
     errors.push(`${folder} : aucun quota de formats déclaré pour cette rubrique`);
   } else {
-    for (const key of ['video', 'column', 'callout'] as const) {
+    for (const key of ['video', 'column'] as const) {
       if (counts[key] !== quota[key]) {
         errors.push(`${folder} : ${String(counts[key])} ${key} (attendu ${String(quota[key])})`);
       }

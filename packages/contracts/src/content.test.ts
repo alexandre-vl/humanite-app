@@ -27,8 +27,8 @@ test('BLOCK parses each block kind and rejects an unknown one', () => {
     BLOCK.safeParse({ type: 'image', picture: { kind: 'corpus', key: 'pol-a1-hero' }, caption: 'c' }).success,
   ).toBe(true);
   expect(BLOCK.safeParse({ type: 'image', caption: 'c', key: 'pol-a1-hero' }).success).toBe(false);
-  expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: 192 }).success).toBe(true);
-  expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: '3:12' }).success).toBe(false);
+  // A film is the item's, where it plays, and not a block of a body: no body of the journal carries one.
+  expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: 192 }).success).toBe(false);
   // A related block carries the summary of what it points at, and an id alone is no longer enough to draw its card.
   const pointed = {
     id: 'pol-a2',
@@ -40,7 +40,7 @@ test('BLOCK parses each block kind and rejects an unknown one', () => {
   };
   expect(BLOCK.safeParse({ type: 'related', summary: pointed }).success).toBe(true);
   expect(BLOCK.safeParse({ type: 'related', id: 'pol-a2' }).success).toBe(false);
-  expect(BLOCK.safeParse({ type: 'callout', title: 'T', text: 'x', button: 'Voir' }).success).toBe(true);
+  expect(BLOCK.safeParse({ type: 'callout', title: 'T', text: 'x', button: 'Voir' }).success).toBe(false);
   expect(BLOCK.safeParse({ type: 'sidebar' }).success).toBe(false);
 });
 

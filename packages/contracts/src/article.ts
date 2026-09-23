@@ -27,6 +27,18 @@ export type Hero = z.infer<typeof HERO>;
 export type HeroInput = z.input<typeof HERO>;
 
 /**
+ * A film of the journal: where it plays.
+ *
+ * The journal puts its films on YouTube and links each video item to its own — 31 of 31 in a capture, in three
+ * shapes: `youtu.be/<id>` on 28, `youtube.com/watch?v=<id>` and `youtube.com/shorts/<id>` — with no running time
+ * anywhere. The app plays nothing itself: a film opens where it lives, which is what the official app does with it. An
+ * address of any other shape is not a film of the journal, and names none.
+ */
+export const FILM = z.object({
+  url: z.url().regex(/^https:\/\/(?:youtu\.be\/|(?:www\.)?youtube\.com\/(?:watch\?v=|shorts\/))[\w-]{11}(?:[?&].*)?$/u),
+});
+
+/**
  * An item as a feed shows it: everything but the body.
  *
  * No field carries a length or a count. Measured on 375 items the journal's service answered, a title of fifty to a
@@ -52,6 +64,7 @@ export const ARTICLE_SUMMARY = z.object({
   byline: DISPLAY_TEXT.optional(),
   publishedAt: z.iso.datetime(),
   hero: HERO.optional(),
+  film: FILM.optional(),
 });
 export type ArticleSummary = z.infer<typeof ARTICLE_SUMMARY>;
 /** The raw shape `ARTICLE_SUMMARY` accepts, typed for the reason `HeroInput` is. */
@@ -78,9 +91,7 @@ export const BLOCK = z.discriminatedUnion('type', [
     caption: DISPLAY_TEXT.optional(),
     credit: DISPLAY_TEXT.optional(),
   }),
-  z.object({ type: z.literal('video'), title: DISPLAY_TEXT, durationSeconds: z.number().int().positive() }),
   z.object({ type: z.literal('related'), summary: ARTICLE_SUMMARY }),
-  z.object({ type: z.literal('callout'), title: DISPLAY_TEXT, text: DISPLAY_TEXT, button: DISPLAY_TEXT }),
 ]);
 export type Block = z.infer<typeof BLOCK>;
 /** The raw shape `BLOCK` accepts as input, before it brands and validates it. */
@@ -125,12 +136,8 @@ export const textOf = (block: Block): string => {
       return block.text;
     case 'image':
       return [block.caption, block.credit].filter((part) => part !== undefined).join(' ');
-    case 'video':
-      return block.title;
     case 'related':
       return [block.summary.title, block.summary.standfirst].join(' ');
-    case 'callout':
-      return [block.title, block.text, block.button].join(' ');
   }
 };
 

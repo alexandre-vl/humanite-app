@@ -1,23 +1,20 @@
 import type { Article, Block, LinkTarget } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { pictureOf, visualOf } from '#api';
+import { visualOf } from '#api';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { RichText, Text } from '#primitives/text';
 
 import { runsOf } from '../model/spans';
-import { ArticleCallout } from './article-callout';
 import { ArticleFigure } from './article-figure';
 import { ArticleRelated } from './article-related';
-import { ArticleVideo } from './article-video';
 
 export type ArticleBodyProps = Readonly<{
   article: Article;
   /** The blocks of the body the reader was given, which only an open body has. */
   blocks: readonly Block[];
   onFollow: (target: LinkTarget) => void;
-  onSupport: () => void;
 }>;
 
 type BlockProps = Omit<ArticleBodyProps, 'blocks'> & Readonly<{ block: Block }>;
@@ -37,13 +34,13 @@ const useStyles = createStyles((theme) => ({
 }));
 
 /**
- * One block of a body, rendered as the one thing it is. The switch answers for the seven kinds the contract declares,
+ * One block of a body, rendered as the one thing it is. The switch answers for every kind the contract declares,
  * so a kind added there stops the build rather than rendering as nothing at all.
  *
  * A picture inside a body is drawn as the one over it is — a photograph, with its caption and its credit when the
  * journal wrote them — and named by the picture itself, which a body never sets twice.
  */
-function BlockView({ block, article, onFollow, onSupport }: BlockProps): ReactNode {
+function BlockView({ block, article, onFollow }: BlockProps): ReactNode {
   const styles = useStyles();
   switch (block.type) {
     case 'paragraph':
@@ -84,15 +81,6 @@ function BlockView({ block, article, onFollow, onSupport }: BlockProps): ReactNo
         />
       );
     }
-    case 'video':
-      return (
-        <ArticleVideo
-          title={block.title}
-          durationSeconds={block.durationSeconds}
-          poster={pictureOf(article, 'lead')}
-          recyclingKey={`${article.id}-video`}
-        />
-      );
     case 'related':
       return (
         <ArticleRelated
@@ -102,8 +90,6 @@ function BlockView({ block, article, onFollow, onSupport }: BlockProps): ReactNo
           }}
         />
       );
-    case 'callout':
-      return <ArticleCallout title={block.title} text={block.text} button={block.button} onPress={onSupport} />;
   }
 }
 
@@ -120,11 +106,11 @@ const place = (blocks: readonly Block[]): readonly PlacedBlock[] => {
 };
 
 /** The body of an article, block by block, in the order it was written. */
-export function ArticleBody({ article, blocks, onFollow, onSupport }: ArticleBodyProps): ReactNode {
+export function ArticleBody({ article, blocks, onFollow }: ArticleBodyProps): ReactNode {
   return (
     <>
       {place(blocks).map(({ key, block }) => (
-        <BlockView key={key} block={block} article={article} onFollow={onFollow} onSupport={onSupport} />
+        <BlockView key={key} block={block} article={article} onFollow={onFollow} />
       ))}
     </>
   );

@@ -3,11 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
-import { ArticleReader, articleQuery } from '#entities/article';
+import { ArticleReader, articleQuery, readsDark } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
-import { NEWSROOM } from '#config';
 import { articleHref, openExternal, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
+import { ThemeScope } from '#primitives/theme';
 
 /**
  * One article, read whole, full screen.
@@ -29,33 +29,37 @@ import { Surface } from '#primitives/surface';
  * Following a link inside the body leads to another article by replacing this screen rather than stacking one more,
  * the way one section replaces another: a reader who followed four links back to back should step back to the feed,
  * not walk every article already read. A link that points outside the paper leaves the app entirely, and so does the
- * call for support an article carries: both are pages the newsroom keeps on the open web, and the screen is where
- * that is decided — the article knows it is sending a reader somewhere, never where.
+ * film of a video: both are pages kept on the open web, and the screen is where that is decided — the article knows
+ * it is sending a reader somewhere, never where.
+ *
+ * A video is read on the dark page, from the status bar down, whatever the reader's theme: the ground belongs to what
+ * is read, as the current app prints its videos. The whole screen is scoped — its bar and the inset over it included —
+ * where only the reading was, which left a white bar over a black page. The scope stands whether or not it names a
+ * theme, so the screen is not built again when the article arrives and turns out to be a film.
  */
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
   const article = useQuery(articleQuery(id)).data;
   return (
-    <Surface>
-      <TopBar
-        onBack={() => {
-          router.back();
-        }}
-        actions={article === undefined ? null : <BookmarkToggle summary={article} />}
-      />
-      <ArticleReader
-        id={id}
-        onFollow={(target) => {
-          if (target.kind === 'article') {
-            router.replace(articleHref(target.id));
-            return;
-          }
-          openExternal(target.url);
-        }}
-        onSupport={() => {
-          openExternal(NEWSROOM.subscription);
-        }}
-      />
-    </Surface>
+    <ThemeScope name={article !== undefined && readsDark(article.format) ? 'dark' : null} screen>
+      <Surface>
+        <TopBar
+          onBack={() => {
+            router.back();
+          }}
+          actions={article === undefined ? null : <BookmarkToggle summary={article} />}
+        />
+        <ArticleReader
+          id={id}
+          onFollow={(target) => {
+            if (target.kind === 'article') {
+              router.replace(articleHref(target.id));
+              return;
+            }
+            openExternal(target.url);
+          }}
+        />
+      </Surface>
+    </ThemeScope>
   );
 }

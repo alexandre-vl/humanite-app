@@ -72,16 +72,18 @@ export const inputStyle = (variant: TextVariant, theme: Theme, typesetting: Type
   faceOf(typographyAt(variant, typesetting.scale, typesetting.faces), theme, undefined);
 
 /**
- * The style one run inside a paragraph departs by: a face when it is set apart, the link colour when it answers a
- * press. Everything it leaves out — the size, the line height, the colour of the paragraph — React Native inherits
- * from the text that encloses it, which is what keeps a slanted word on its neighbours' baseline.
+ * The style one run inside a paragraph departs by: a face when it is set apart, the link colour and a line under it
+ * when it answers a press. Everything it leaves out — the size, the line height, the colour of the paragraph — React
+ * Native inherits from the text that encloses it, which is what keeps a slanted word on its neighbours' baseline.
  *
  * The colour is `link` and not `primary` because this red is a letter and not a ground, and the two want the red from
- * opposite ends; the theme holds which is which.
+ * opposite ends; the theme holds which is which. The line is there because a colour alone does not say it: the
+ * link's red measures 3.54 to 1 against the paragraph's ink on the phone, and a reader who does not see red sees a
+ * word like the others.
  */
 export function runStyle(face: RunFace | undefined, pressable: boolean, theme: Theme, faces: FaceSet): TextStyle {
   return {
     ...(face === undefined ? {} : { fontFamily: FONT_FAMILIES[faces][RUN_FACES[face]] }),
-    ...(pressable ? { color: theme.link } : {}),
+    ...(pressable ? { color: theme.link, textDecorationLine: 'underline' } : {}),
   };
 }

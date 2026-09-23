@@ -3,8 +3,8 @@ import { blocksOf } from '@huma/contracts';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
+import { PALETTE } from '@huma/design-tokens';
 import { content } from '#api';
-import { NEWSROOM } from '#config';
 import { useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
 import { openExternal } from '#lib/routing';
@@ -96,15 +96,20 @@ describe('ArticlePage', () => {
     expect(jest.mocked(router.replace)).not.toHaveBeenCalled();
   });
 
-  it('ouvre la page d’abonnement du journal quand le lecteur répond à l’appel au soutien', async () => {
-    const article = await first('un encart', (each) => blocksOf(each).some((block) => block.type === 'callout'));
-    const callout = blocksOf(article).find((block) => block.type === 'callout');
-    if (callout === undefined) {
-      throw new Error('encart introuvable');
-    }
-    await open(article);
-    await fireEvent.press(await screen.findByText(callout.button));
-    expect(jest.mocked(openExternal)).toHaveBeenCalledWith(NEWSROOM.subscription);
+  /**
+   * A video is read on the dark page and every other piece on the reader's own, the bar over it included: the dark was
+   * laid on the reading alone, and left a white bar over a black page. The headline's ink says which ground it is on —
+   * white on the dark one, the paper's red on the light one — and the swatches are read rather than the themes, which a
+   * file outside the theme's core may not import.
+   */
+  it('pose la page d’une vidéo sur le thème sombre, et les autres sur celui du lecteur', async () => {
+    const video = await first('une vidéo', (each) => each.format === 'video');
+    await open(video);
+    expect((await screen.findByText(video.title)).props['style']).toMatchObject({ color: PALETTE.white });
+    await screen.unmount();
+    const written = await first('un article', (each) => each.format === 'article');
+    await open(written);
+    expect((await screen.findByText(written.title)).props['style']).toMatchObject({ color: PALETTE.uiRed });
   });
 
   /** The mark keeps what the shelf will show — the article's card, read off the article the screen opened. */
