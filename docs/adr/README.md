@@ -35,6 +35,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0025](0025-budgets-de-performance-et-outils-de-mesure.md)                  | Budgets de performance et outils de mesure                  | accepté | `guarded-config`, `reversal-cost`                                          |
 | [ADR-0026](0026-accessibilite-annoncee-et-contraste-deduit-de-la-taille.md)     | Accessibilité annoncée et contraste déduit de la taille     | accepté | `guarded-config`, `boundary`                                               |
 | [ADR-0027](0027-client-non-officiel-de-l-api-l-humanite.md)                     | Client non officiel de l’API L’Humanité                     | proposé | `dependency`, `boundary`, `data-format`                                    |
+| [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | proposé | `guarded-config`, `boundary`, `data-format`                                |
 
 ## Confirmation
 
@@ -343,6 +344,18 @@ Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `packages/c
 | R3    | NE DOIT PAS | `secret/recorded-clean`, `secret/token`, `secret/password`, `secret/address`, `secret/cookie`, `secret/key`                                                                                     |
 | R4    | DOIT        | `artwork/generator`, `artwork/not-deterministic`, `artwork/key-ignored`, `artwork/section-ignored`                                                                                              |
 | R5    | DOIT        | `picture/resizer`, `picture/width-ignored`, `picture/address-changed`, `picture/query-lost`                                                                                                     |
+
+### ADR-0028 · Un client du service du journal, borné et honnête
+
+Statut : proposé. Périmètre : `packages/remote-api/**`, `apps/mobile/src/shared/api/**`, `tools/guardrails/src/proofs/transport.ts`.
+
+| Règle | Niveau      | Preuves                                                                                     |
+| ----- | ----------- | ------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | `guardrail/module-huma-remote-api`                                                          |
+| R2    | DOIT        | `transport/client`, `transport/no-deadline`, `transport/hangs`, `transport/connection-held` |
+| R3    | DOIT        | `transport/cause-misnamed`                                                                  |
+| R4    | NE DOIT PAS | `transport/impersonates`                                                                    |
+| R5    | DOIT        | `transport/address-unknown`                                                                 |
 
 ## Référentiel
 

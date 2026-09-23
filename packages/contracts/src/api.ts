@@ -32,14 +32,15 @@ export type SearchQuery = PageQuery & Readonly<{ text: string }>;
  *
  * `getIssues` answers with every numéro at once: a day's paper is a closed thing of a few dozen pieces, and the
  * newsstand stands them in a row. It takes no cursor, because it has no next page — that is what tells a numéro from
- * a feed.
+ * a feed. A source may have no shelf at all — the journal's numéros are PDF files of a publisher's own reader, which
+ * no JSON route of its service lists — and then it has no such method, and the app no newsstand.
  */
 export type ContentApi = Readonly<{
   getSections: () => Promise<readonly Section[]>;
   getFeed: (query: FeedQuery) => Promise<Page<ArticleSummary>>;
   getLiveFeed: (query: PageQuery) => Promise<Page<ArticleSummary>>;
   getArticle: (id: ArticleId) => Promise<Article>;
-  getIssues: () => Promise<readonly IssueSummary[]>;
+  getIssues?: () => Promise<readonly IssueSummary[]>;
   search: (query: SearchQuery) => Promise<Page<ArticleSummary>>;
 }>;
 

@@ -11,6 +11,14 @@ import { NewsstandPage } from './newsstand-page';
 // what a test can read is which page it handed over — and that is what this module is for.
 jest.mock('#lib/routing', () => ({ __esModule: true, openExternal: jest.fn() }));
 
+/** The shelf the source stands, which the mock has: a test of the newsstand reads nothing without one. */
+const theShelf = async () => {
+  if (content.getIssues === undefined) {
+    throw new Error('la source ne tient aucun kiosque : le test ne vérifierait rien');
+  }
+  return content.getIssues();
+};
+
 const renderPage = async (): Promise<void> => {
   await renderWithCache(<NewsstandPage />);
   await settle();
@@ -30,7 +38,7 @@ describe('NewsstandPage', () => {
   });
 
   it('range tous les numéros du journal, chacun avec ce qu’il contient', async () => {
-    const shelf = await content.getIssues();
+    const shelf = await theShelf();
     expect(shelf.length).toBeGreaterThan(1);
     await renderPage();
     for (const issue of shelf) {
@@ -45,7 +53,7 @@ describe('NewsstandPage', () => {
    * this is, what it opens on, and how much is in it, which is what a reader takes a paper off a shelf for.
    */
   it('dit chaque numéro en une phrase, et non le nom du journal quatre fois', async () => {
-    const shelf = await content.getIssues();
+    const shelf = await theShelf();
     const first = shelf[0];
     if (first === undefined) {
       throw new Error('l’étagère est vide : le test ne vérifierait rien');
@@ -66,7 +74,7 @@ describe('NewsstandPage', () => {
    * it is the count of them that tells.
    */
   it('donne à chaque couverture la photo d’ouverture de son numéro', async () => {
-    const shelf = await content.getIssues();
+    const shelf = await theShelf();
     await renderPage();
     await screen.findByText(shelf[0]?.opener.title ?? '');
     // Hidden ones count: a cover's picture is passed over by a screen reader, the title over it having already said
@@ -80,7 +88,7 @@ describe('NewsstandPage', () => {
    * that a change rather than a removal is here: the cover still answers a press, and answers it with the paper.
    */
   it('ouvre le journal sur le web quand on prend un numéro sur l’étagère', async () => {
-    const shelf = await content.getIssues();
+    const shelf = await theShelf();
     const first = shelf[0];
     if (first === undefined) {
       throw new Error('le kiosque ne range aucun numéro : le test ne vérifierait rien');

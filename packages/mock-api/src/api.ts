@@ -125,9 +125,9 @@ const asAnonymous = (article: Article): Article =>
 /**
  * The content the corpus serves, as the app's door reads it. It answers at once and never fails: a test that wants a
  * screen to see a failure hands the screen a failing read of its own, and what a screen does while it waits is shown
- * by holding a promise open, not by sleeping.
+ * by holding a promise open, not by sleeping. It shelves numéros, gathered from its own days, which a source need not.
  */
-export const contentApi: ContentApi = {
+export const contentApi: ContentApi & Required<Pick<ContentApi, 'getIssues'>> = {
   getSections: async (): Promise<readonly Section[]> => Promise.resolve(SECTIONS),
   getFeed: async (query: FeedQuery): Promise<Page<ArticleSummary>> => {
     const { section } = query;

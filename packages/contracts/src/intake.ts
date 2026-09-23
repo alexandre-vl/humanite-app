@@ -26,7 +26,7 @@ import { REMOTE_ARTICLE, REMOTE_LIST, REMOTE_MENU, REMOTE_POST, REMOTE_SECTION, 
  */
 
 /** One answer a reading could not make into an item: where it sat in the answer, and what stopped it. */
-type SetAside = Readonly<{ at: number; says: string }>;
+export type SetAside = Readonly<{ at: number; says: string }>;
 
 /** What a reading of a list kept, in the order the service sent it, and what it set aside, each with its reason. */
 export type Intake<Item> = Readonly<{ kept: readonly Item[]; setAside: readonly SetAside[] }>;

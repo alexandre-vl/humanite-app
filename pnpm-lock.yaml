@@ -904,6 +904,9 @@ importers:
       '@huma/mock-content':
         specifier: workspace:*
         version: link:../../packages/mock-content
+      '@huma/remote-api':
+        specifier: workspace:*
+        version: link:../../packages/remote-api
       eslint:
         specifier: 'catalog:'
         version: 10.10.0(jiti@2.7.0)(supports-color@8.1.1)

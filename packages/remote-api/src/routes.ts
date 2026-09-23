@@ -7,7 +7,7 @@ import type { ArticleId } from '@huma/contracts';
  */
 
 /** Where the service answers: its host, and the application the official client is filed under. */
-const SERVICE = 'https://phenix2.immanens.com';
+export const SERVICE = 'https://phenix2.immanens.com';
 
 /** The path every route of the service lives under: the version of its interface, and the application's number. */
 export const SERVICE_ROOT = '/api/v1/app/300';
@@ -25,8 +25,11 @@ const ANONYMOUS = [
   ['ano', '1'],
 ] as const;
 
+/** How many items a section's own list answers per page, whatever it is asked: thirty on every page captured. */
+export const SECTION_PAGE = 30;
+
 /** How many items a search answers per page: the ten the official client asks for, and the ten it is given. */
-const SEARCH_PAGE = 10;
+export const SEARCH_PAGE = 10;
 
 /**
  * The routes, each as the request that asks it and the pattern of the paths that answer it.

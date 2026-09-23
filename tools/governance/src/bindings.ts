@@ -1018,4 +1018,18 @@ export const BINDINGS = {
       R5: ['picture/resizer', 'picture/width-ignored', 'picture/address-changed', 'picture/query-lost'],
     },
   },
+  'ADR-0028': {
+    scope: {
+      // The client of the service with its judging, the door that hands it the platform's ports, and the bench that
+      // bends it one port at a time.
+      paths: ['packages/remote-api/**', 'apps/mobile/src/shared/api/**', 'tools/guardrails/src/proofs/transport.ts'],
+    },
+    rules: {
+      R1: ['guardrail/module-huma-remote-api'],
+      R2: ['transport/client', 'transport/no-deadline', 'transport/hangs', 'transport/connection-held'],
+      R3: ['transport/cause-misnamed'],
+      R4: ['transport/impersonates'],
+      R5: ['transport/address-unknown'],
+    },
+  },
 } as const satisfies Bindings<ProofId>;

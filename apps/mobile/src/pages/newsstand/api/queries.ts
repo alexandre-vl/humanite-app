@@ -1,3 +1,4 @@
+import { ContentApiError } from '@huma/contracts';
 import { queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
 
@@ -13,6 +14,12 @@ const ISSUES = 'issues';
  */
 export const issuesQuery = queryOptions({
   queryKey: [ISSUES],
-  queryFn: async () => content.getIssues(),
+  // A source with no shelf has no newsstand to reach; asked all the same — by an address typed in — it has no page.
+  queryFn: async () => {
+    if (content.getIssues === undefined) {
+      throw new ContentApiError('not-found', 'cette source ne tient aucun kiosque');
+    }
+    return content.getIssues();
+  },
   staleTime: Infinity,
 });

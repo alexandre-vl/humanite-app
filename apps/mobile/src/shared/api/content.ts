@@ -11,6 +11,12 @@ import { contentApi } from '@huma/mock-api';
 export const content: ContentApi = contentApi;
 
 /**
+ * Whether the source shelves numéros, and so whether the app has a newsstand. It is the source's to say, by having the
+ * method or not, and it is read once: the source is chosen when the app is built.
+ */
+export const hasShelf = content.getIssues !== undefined;
+
+/**
  * Whether asking again could answer differently, cause by cause. What the source does not have stays missing however
  * often it is asked for, what it refuses this reader it refuses again, and an answer no reading could make sense of is
  * the same answer next time; a request that never reached the source, one it did not answer in time, and one it could

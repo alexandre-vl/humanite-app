@@ -210,6 +210,12 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/corpus.ts': "export { CORPUS } from '@huma/mock-content';\n" }),
     ),
     define(
+      'guardrail/module-huma-remote-api',
+      'une page qui interroge le service du journal sans passer par la place api',
+      ['module/@huma/remote-api'],
+      linted({ 'src/pages/home/model/service.ts': "export { createRemoteApi } from '@huma/remote-api';\n" }),
+    ),
+    define(
       'guardrail/module-expo-splash-screen',
       'une page qui pilote le splash',
       ['module/expo-splash-screen'],

@@ -13,6 +13,7 @@
     "@huma/fixtures": "workspace:*",
     "@huma/kit": "workspace:*",
     "@huma/mock-content": "workspace:*",
+    "@huma/remote-api": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:"
   },

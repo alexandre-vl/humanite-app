@@ -2,12 +2,29 @@
   "extends": "@huma/tsconfig/node.json",
   "include": ["src"],
   "references": [
-    { "path": "../../packages/architecture" },
-    { "path": "../../packages/contracts" },
-    { "path": "../../packages/design-tokens" },
-    { "path": "../../packages/eslint-config" },
-    { "path": "../../packages/mock-content" },
-    { "path": "../fixtures" },
-    { "path": "../kit" }
+    {
+      "path": "../../packages/architecture"
+    },
+    {
+      "path": "../../packages/contracts"
+    },
+    {
+      "path": "../../packages/design-tokens"
+    },
+    {
+      "path": "../../packages/eslint-config"
+    },
+    {
+      "path": "../../packages/mock-content"
+    },
+    {
+      "path": "../../packages/remote-api"
+    },
+    {
+      "path": "../fixtures"
+    },
+    {
+      "path": "../kit"
+    }
   ]
 }

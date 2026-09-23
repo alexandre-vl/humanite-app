@@ -13,7 +13,7 @@ supersedes: [ADR-0020]
 - Les listes, le menu des rubriques et la recherche de ce service ne demandent aucun jeton ; seul le corps d’un article en demande un (même capture : `x-user-token` ne paraît que sur `wordpress/post/<id>`, `store/*` et `drm/*`).
 - Le service nomme lui-même le format de chaque article — `classic`, `opinion`, `video`, `serie` — et le droit du lecteur, article par article.
 - Le corps d’un article arrive dans un champ `content_array` en HTML WordPress de 45 à 76 ko, scripts et formulaire de don compris ; la prose utile y tient en 0 à 37 paragraphes.
-- Le balisage n’est pas réservé au corps : chaque chapô arrive enveloppé d’un paragraphe, et titres et légendes portent entités, italiques et exposants (`packages/contracts/src/recorded.ts`).
+- Le balisage n’est pas réservé au corps : chaque chapô arrive enveloppé d’un paragraphe, et titres et légendes portent entités, italiques et exposants (`packages/remote-api/src/recorded.ts`).
 - Chaque image du service est une adresse du journal portant sa largeur en `?w=`, que son serveur redimensionne à la demande (`packages/contracts/src/picture.ts`).
 - La forme de ce service n’est écrite que dans une capture prise pendant qu’un lecteur était connecté : elle porte donc son identifiant, son mot de passe, ses jetons de session et la clé du client officiel (`tools/capture/src/secrets.ts`).
 - ADR-0020 a écarté toute collecte parce qu’aucune source lisible n’existait ; le service que l’app officielle interroge en est une.

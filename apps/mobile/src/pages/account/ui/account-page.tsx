@@ -2,6 +2,7 @@ import type { DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
+import { hasShelf } from '#api';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
 import { NEWSSTAND_HREF, SETTINGS_HREF } from '#lib/routing';
@@ -109,16 +110,18 @@ export function AccountPage(): ReactNode {
             }}
           />
         </Group>
-        {/* The shelf of numéros, which was a tab and is a row. Every press on it ends in a browser, so it belongs
-            where the rest of the paper's own business is rather than in the bar a reader navigates the app by. */}
-        <Group label={t('account.paper')}>
-          <OpenRow
-            label={t('nav.newsstand')}
-            onPress={() => {
-              router.push(NEWSSTAND_HREF);
-            }}
-          />
-        </Group>
+        {/* The shelf of numéros is a row and not a tab: every press on it ends in a browser, so it belongs where the
+            rest of the paper's own business is. A source that shelves no numéros has no row to show. */}
+        {hasShelf ? (
+          <Group label={t('account.paper')}>
+            <OpenRow
+              label={t('nav.newsstand')}
+              onPress={() => {
+                router.push(NEWSSTAND_HREF);
+              }}
+            />
+          </Group>
+        ) : null}
         <Group label={t('account.contact')}>
           <InfoRow line={t('account.contact.mail')} hint={t('account.contact.mail.hint')} />
           <InfoRow line={t('account.contact.phone')} hint={t('account.contact.phone.hint')} />
