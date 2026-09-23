@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { ARTICLE, ARTICLE_SUMMARY, instantAt, SECTION_ID } from '@huma/contracts';
+import { ARTICLE, ARTICLE_SUMMARY, instantAt, SECTION_ID, typeset } from '@huma/contracts';
 import type { ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
@@ -42,6 +42,13 @@ const parseFrontmatter = (text: string): Readonly<Record<string, string>> =>
     }),
   );
 
+/**
+ * A written field set the French way, and a missing one left missing for the schema to refuse by name. The corpus is
+ * written the way anyone types — a space before a colon, a straight apostrophe — and reaches a screen set the way the
+ * journal's own text is read: one rule, the contracts' own, for both.
+ */
+const typesetOr = (value: string | undefined): string | undefined => (value === undefined ? undefined : typeset(value));
+
 /** A `key: a, b` scalar split into trimmed, non-empty parts. */
 const splitList = (value: string | undefined): readonly string[] =>
   value === undefined
@@ -56,7 +63,7 @@ const splitList = (value: string | undefined): readonly string[] =>
  * it is a picture of the corpus: the only kind whose file the bundler holds.
  */
 const toHero = (id: string, value: string): HeroInput => {
-  const [caption = '', credit = ''] = value.split('|').map((part) => part.trim());
+  const [caption = '', credit = ''] = value.split('|').map((part) => typeset(part.trim()));
   return {
     picture: { kind: 'corpus', key: `${id}-hero` },
     ...(caption === '' ? {} : { caption }),
@@ -89,16 +96,16 @@ const toTarget = (url: string): RawTarget =>
 const toSpans = (nodes: readonly PhrasingContent[]): RawSpan[] =>
   nodes.flatMap((node): RawSpan[] => {
     if (node.type === 'text') {
-      return [{ type: 'text', text: node.value }];
+      return [{ type: 'text', text: typeset(node.value) }];
     }
     if (node.type === 'emphasis') {
-      return [{ type: 'emphasis', text: plain(node.children) }];
+      return [{ type: 'emphasis', text: typeset(plain(node.children)) }];
     }
     if (node.type === 'strong') {
-      return [{ type: 'strong', text: plain(node.children) }];
+      return [{ type: 'strong', text: typeset(plain(node.children)) }];
     }
     if (node.type === 'link') {
-      return [{ type: 'link', text: plain(node.children), target: toTarget(node.url) }];
+      return [{ type: 'link', text: typeset(plain(node.children)), target: toTarget(node.url) }];
     }
     if (node.type === 'break' || node.type === 'inlineCode') {
       return [{ type: 'text', text: node.type === 'break' ? ' ' : node.value }];
@@ -121,7 +128,7 @@ const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBl
       const head = lines.slice(0, -1).join(' ').trimEnd();
       const body: RawSpan[] =
         head.length > 0 ? [...spans.slice(0, -1), { type: 'text', text: head }] : spans.slice(0, -1);
-      return { type: 'quote', spans: body, source: tail.replace(/^\s*—\s*/u, '') };
+      return { type: 'quote', spans: body, source: typeset(tail.replace(/^\s*—\s*/u, '')) };
     }
   }
   return { type: 'quote', spans };
@@ -131,7 +138,7 @@ const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBl
 const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
   const [only] = children;
   if (children.length === 1 && only?.type === 'image') {
-    const caption = only.alt ?? '';
+    const caption = typeset(only.alt ?? '');
     return { type: 'image', picture: { kind: 'corpus', key: only.url }, ...(caption === '' ? {} : { caption }) };
   }
   return { type: 'paragraph', spans: toSpans(children) };
@@ -147,7 +154,7 @@ const toDirective = (node: Directive): RawBlock => {
 
 const toBlock = (node: RootContent): RawBlock => {
   if (node.type === 'heading') {
-    return { type: 'heading', text: plain(node.children) };
+    return { type: 'heading', text: typeset(plain(node.children)) };
   }
   if (node.type === 'paragraph') {
     return toParagraph(node.children);
@@ -182,8 +189,8 @@ export const parseItem = (text: string): WrittenItem => {
     id,
     format: front['format'],
     access: front['access'],
-    title: front['title'],
-    standfirst: front['standfirst'],
+    title: typesetOr(front['title']),
+    standfirst: typesetOr(front['standfirst']),
     publishedAt: published === undefined ? undefined : (instantAt(published) ?? published),
     ...(byline === undefined ? {} : { byline }),
     ...(hero === undefined ? {} : { hero: toHero(id, hero) }),

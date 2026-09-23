@@ -8,7 +8,7 @@ describe('t', () => {
 
   it('remplit chaque trou d’une clé par la valeur qu’on lui donne', () => {
     expect(t('issue.cover', { date: '13 septembre', opener: 'Grève', count: '11 articles' })).toBe(
-      'Numéro du 13 septembre : Grève. 11 articles.',
+      'Numéro du 13 septembre\u00A0: Grève. 11 articles.',
     );
   });
 

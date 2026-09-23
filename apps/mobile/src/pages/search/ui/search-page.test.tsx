@@ -62,7 +62,7 @@ describe('SearchPage', () => {
     await renderPage();
     await type('jeunes');
     expect(await screen.findByText(first.title)).toBeTruthy();
-    expect(screen.getByText('Résultats pour « jeunes »')).toBeTruthy();
+    expect(screen.getByText('Résultats pour «\u00A0jeunes\u00A0»')).toBeTruthy();
     await settle();
   });
 
@@ -81,7 +81,7 @@ describe('SearchPage', () => {
   it('nomme la question à laquelle rien ne répond, plutôt que d’annoncer un journal vide', async () => {
     await renderPage();
     await type('zzzz');
-    expect(await screen.findByText('Aucun résultat pour « zzzz »')).toBeTruthy();
+    expect(await screen.findByText('Aucun résultat pour «\u00A0zzzz\u00A0»')).toBeTruthy();
     expect(screen.queryByText('Rien à lire pour l’instant')).toBeNull();
     await settle();
   });

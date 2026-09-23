@@ -1,6 +1,6 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId } from '@huma/contracts';
 import type { CorpusArticle } from './item.ts';
-import { blocksOf, instantAt, SECTION_ID, textOf } from '@huma/contracts';
+import { blocksOf, instantAt, SECTION_ID, textOf, typeset } from '@huma/contracts';
 import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
 
 type Quota = Readonly<{ video: number; column: number }>;
@@ -167,6 +167,19 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   }
   if (article.title === article.title.toUpperCase()) {
     errors.push(`${where} : titre tout en capitales`);
+  }
+  // Every text a screen draws is set the French way, the journal's read from its service as the corpus's read from its
+  // files: a text still set some other way reached a screen by some path that skipped the one rule.
+  const texts = [
+    article.title,
+    article.standfirst,
+    article.hero?.caption ?? '',
+    article.hero?.credit ?? '',
+    ...blocksOf(article).map(textOf),
+  ];
+  const loose = texts.filter((text) => typeset(text) !== text);
+  if (loose.length > 0) {
+    errors.push(`${where} : ${String(loose.length)} texte(s) à composer à la française, dont « ${loose[0] ?? ''} »`);
   }
   for (const [field, text, bounds] of [
     ['titre', article.title, SIGNS.title],

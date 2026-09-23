@@ -29,7 +29,11 @@ test.each([
     html: 'voir <a href="https://www.humanite.fr/">ici</a> <strong>et</strong> là',
     reads: 'voir ici et là',
   },
-  { shape: 'the blank a run ends on', html: '<em>« assez », </em>a-t-il dit', reads: '« assez », a-t-il dit' },
+  {
+    shape: 'the blank a run ends on',
+    html: '<em>« assez », </em>a-t-il dit',
+    reads: '«\u00A0assez\u00A0», a-t-il dit',
+  },
   { shape: 'the blank a run opens with', html: 'un mot<em> souligné</em>', reads: 'un mot souligné' },
   {
     shape: 'an unbreakable space beside an ordinary one',
@@ -74,7 +78,7 @@ test.each([
     shape: 'a body picture’s source',
     html: 'Une photo. | Source : iStock',
     caption: 'Une photo.',
-    credit: 'Source : iStock',
+    credit: 'Source\u00A0: iStock',
   },
   { shape: 'a caption with no credit', html: 'Une photo sans crédit.', caption: 'Une photo sans crédit.', credit: '' },
   { shape: 'a mark that credits no one', html: 'Un tableau ©', caption: 'Un tableau', credit: '' },

@@ -62,7 +62,7 @@ describe('NewsstandPage', () => {
     const covers = await screen.findAllByRole('link', { name: /^Numéro du/u });
     expect(covers).toHaveLength(shelf.length);
     expect(covers[0]?.props['accessibilityLabel']).toBe(
-      `Numéro du 13 septembre : ${first.opener.title}. ${String(first.count)} articles.`,
+      `Numéro du 13 septembre\u00A0: ${first.opener.title}. ${String(first.count)} articles.`,
     );
     // The paper's name is painted on every cover and read out on none: the shelf is one paper, said once at the top.
     expect(screen.queryAllByLabelText('Humanité')).toHaveLength(0);

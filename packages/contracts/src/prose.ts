@@ -3,6 +3,7 @@ import type { Block, BlockInput } from './article.ts';
 import type { SpanInput } from './content.ts';
 import type { Finding } from './finding.ts';
 import { PICTURE } from './picture.ts';
+import { typeset, UNBREAKABLE } from './typography.ts';
 
 /**
  * How a body the journal publishes becomes the blocks a screen knows.
@@ -57,12 +58,6 @@ const QUESTION = 'wp-block-huma-question';
 const ASIDES = ['seealso-component'] as const;
 
 /**
- * The space the journal sets where a line must not break. Written as an escape, wherever this file writes it, so the
- * source carries no byte a reader of it cannot see.
- */
-const UNBREAKABLE = '\u00A0';
-
-/**
  * The named entities this renderer emits, and what each one stands for. Numeric entities are read by their code
  * point, so only the names need a table.
  *
@@ -107,20 +102,23 @@ const BREAKS = /<br\b[^>]*>|<\/(?:p|div|li|h[1-6]|blockquote)>/giu;
 const BLANKS = /[^\S\u00A0]+/gu;
 
 /**
- * Text as a reader should see it: entities resolved, tags gone, runs of space closed up.
+ * Text as a reader should see it: entities resolved, tags gone, runs of space closed up, and set the way French sets
+ * it — the journal's own typography, where its service sent some other.
  *
  * The edges are deliberately left alone. A sentence is read in runs — words, then a bold name, then words again —
  * and the space that separates two runs sits at the edge of one of them: « <strong>Ouizille : </strong>C'est » reads
  * as « Ouizille :C'est » the moment that edge is cut off with the run. What happens to it is `piecesOf`'s to decide.
  */
 const plain = (markup: string): string =>
-  markup
-    .replace(BREAKS, ' ')
-    .replace(/<[^>]*>/gu, '')
-    .replace(/&#(\d+);/gu, (whole, code: string) => String.fromCodePoint(Number(code)))
-    .replace(/&#x([0-9a-f]+);/giu, (whole, code: string) => String.fromCodePoint(Number.parseInt(code, 16)))
-    .replace(/&([a-z]+);/giu, (whole, name: string) => NAMED[name.toLowerCase()] ?? whole)
-    .replace(BLANKS, ' ');
+  typeset(
+    markup
+      .replace(BREAKS, ' ')
+      .replace(/<[^>]*>/gu, '')
+      .replace(/&#(\d+);/gu, (whole, code: string) => String.fromCodePoint(Number(code)))
+      .replace(/&#x([0-9a-f]+);/giu, (whole, code: string) => String.fromCodePoint(Number.parseInt(code, 16)))
+      .replace(/&([a-z]+);/giu, (whole, name: string) => NAMED[name.toLowerCase()] ?? whole)
+      .replace(BLANKS, ' '),
+  );
 
 /**
  * The same markup with every element of a given class written anew by `rewrite`, from the whole element as it was —

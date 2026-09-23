@@ -15,6 +15,7 @@ export type { IntakeCode, ListedSection, Listing, SetAside, Take } from './intak
 export { DONATION, judgeProse, readPlain, readProse, THE_BODY } from './prose.ts';
 export { SECTIONS_KEY, SERVICE_PAGES } from './remote.ts';
 export type { PlainReader, ProseCode, ProseReader } from './prose.ts';
+export { typeset } from './typography.ts';
 export { ISSUE_SUMMARY } from './issue.ts';
 export type { IssueSummary } from './issue.ts';
 export type { Page } from './page.ts';

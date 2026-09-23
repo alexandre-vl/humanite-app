@@ -1,3 +1,4 @@
+import { typeset } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { FR } from './fr';
 
@@ -11,5 +12,14 @@ describe('FR', () => {
 
   it('ne laisse aucun texte vide, qu’aucune marque ne vaudrait', () => {
     expect(Object.values(FR).filter((text) => text.trim() === '')).toEqual([]);
+  });
+
+  /**
+   * The app's own words are set the way the journal's are read: the rule is the contracts' one, so a colon of the app
+   * cannot open a line where a colon of the journal could not. « Résultats pour « {query} » » left a guillemet alone
+   * at the end of a line whenever a long query wrapped.
+   */
+  it('compose chaque texte à la française, comme le journal est lu', () => {
+    expect(Object.entries(FR).filter(([, text]) => typeset(text) !== text)).toEqual([]);
   });
 });
