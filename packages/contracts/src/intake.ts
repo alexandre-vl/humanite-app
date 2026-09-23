@@ -140,9 +140,15 @@ export const readSummaries = (posts: readonly unknown[], context: Context = {}):
   return { kept, setAside };
 };
 
-/** An article of the service, read whole: its summary as a list reads it, and its body as blocks. */
-export const readArticle = (body: unknown): Read<Article> => {
-  const wire = REMOTE_ARTICLE.safeParse(body);
+/**
+ * An article of the service, read whole: its summary as a list reads it, and its body as blocks — or as withheld, when
+ * the service says this reader has no right to it.
+ *
+ * A withheld body is not read at all. What the service sends beside `right: false` is not the article's body for this
+ * reader, whatever it holds, and a reading that turned it into blocks would unlock what the service kept back.
+ */
+export const readArticle = (answer: unknown): Read<Article> => {
+  const wire = REMOTE_ARTICLE.safeParse(answer);
   if (!wire.success) {
     return { refused: saysOf(wire.error) };
   }
@@ -150,7 +156,10 @@ export const readArticle = (body: unknown): Read<Article> => {
   if ('refused' in summary) {
     return summary;
   }
-  const article = ARTICLE.safeParse({ ...summary.item, blocks: readProse(wire.data.content_array.join('')) });
+  const body = wire.data.right
+    ? { kind: 'open', blocks: readProse(wire.data.content_array.join('')) }
+    : { kind: 'withheld' };
+  const article = ARTICLE.safeParse({ ...summary.item, body });
   return article.success ? { item: article.data } : { refused: saysOf(article.error) };
 };
 

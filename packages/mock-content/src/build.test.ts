@@ -1,3 +1,4 @@
+import { blocksOf } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { buildCorpus, parseItem } from './build.ts';
 import { CORPUS } from './index.ts';
@@ -23,7 +24,7 @@ test('a video without a running time is refused', () => {
 });
 
 test('a running time written m:ss reaches the corpus in seconds', () => {
-  const videos = buildCorpus().flatMap((article) => article.blocks.filter((block) => block.type === 'video'));
+  const videos = buildCorpus().flatMap((article) => blocksOf(article).filter((block) => block.type === 'video'));
   expect(videos.map((video) => video.durationSeconds).toSorted((left, right) => left - right)).toEqual([
     245, 247, 258, 278,
   ]);

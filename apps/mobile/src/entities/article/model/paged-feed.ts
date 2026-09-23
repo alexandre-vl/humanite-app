@@ -1,10 +1,15 @@
-import type { ArticleId, ArticleSummary } from '@huma/contracts';
+import type { ArticleId, ArticleSummary, ContentErrorCode } from '@huma/contracts';
 import type { QueryStatus } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { failureOf } from '#api';
 import type { PagedFeed } from '../api/queries';
 
-/** Why a feed is showing no article: it has not answered yet, it failed, or it truly holds none. */
-export type FeedState = 'pending' | 'error' | 'empty';
+/**
+ * Why a feed is showing no article: it has not answered yet, it failed — and then for which cause, which decides what
+ * the reader is told and whether asking again can help — or it truly holds none.
+ */
+export type FeedState =
+  Readonly<{ kind: 'pending' }> | Readonly<{ kind: 'failed'; failure: ContentErrorCode }> | Readonly<{ kind: 'empty' }>;
 
 /**
  * What stands in a feed's place, for each answer a query can have given. A reading that succeeded and still shows
@@ -12,12 +17,13 @@ export type FeedState = 'pending' | 'error' | 'empty';
  * there stops the build here rather than falling through to the wrong stand-in.
  */
 const STAND_IN = {
-  pending: 'pending',
-  error: 'error',
-  success: 'empty',
-} as const satisfies Readonly<Record<QueryStatus, FeedState>>;
+  pending: () => ({ kind: 'pending' }),
+  error: (error) => ({ kind: 'failed', failure: failureOf(error) }),
+  success: () => ({ kind: 'empty' }),
+} as const satisfies Readonly<Record<QueryStatus, (error: Error | null) => FeedState>>;
 
-export const stateOf = (status: QueryStatus): FeedState => STAND_IN[status];
+/** What stands in a feed's place, read off a query's status and the error it failed with, when it did. */
+export const stateOf = (status: QueryStatus, error: Error | null): FeedState => STAND_IN[status](error);
 
 /**
  * A feed as the view that draws it reads it: what has arrived, what stands in while nothing has, and — when there is
@@ -63,14 +69,14 @@ const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
  * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
 export function usePagedFeed(query: PagedFeed): ReadFeed {
-  const { data, status, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { data, status, error, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(query);
   const again = (): void => {
     void refetch();
   };
   return {
     items: once(data?.pages.flatMap((page) => page.items) ?? []),
-    state: stateOf(status),
+    state: stateOf(status, error),
     retry: again,
     refresh: again,
     // An infinite query calls itself refetching while it reaches for the next page too, and a spinner at the top of a
@@ -94,7 +100,7 @@ const nothing = (): void => undefined;
  */
 export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
   items,
-  state: 'empty',
+  state: { kind: 'empty' },
   retry: nothing,
   refresh: nothing,
   refreshing: false,

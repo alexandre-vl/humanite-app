@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { Article, ArticleSummary } from './article.ts';
 import type { Section } from './content.ts';
 import type { ArticleId, SectionId } from './ids.ts';
@@ -42,9 +43,20 @@ export type ContentApi = Readonly<{
   search: (query: SearchQuery) => Promise<Page<ArticleSummary>>;
 }>;
 
-/** Why a content request failed. */
-export const CONTENT_ERROR_CODES = ['not-found', 'unavailable', 'timeout'] as const;
-export type ContentErrorCode = (typeof CONTENT_ERROR_CODES)[number];
+/**
+ * Why a content read failed, as the one word a screen branches on. Each names a cause, not a symptom, because what a
+ * reader is told and whether asking again can help both follow from the cause:
+ *
+ * - `not-found` — the source has no such piece, and asking again will not give it one;
+ * - `refused` — the source will not serve this reader what was asked, and asking again as the same reader changes
+ *   nothing;
+ * - `offline` — the request never reached the source;
+ * - `timeout` — the source did not answer within the time a read is given;
+ * - `unavailable` — the source answered that it cannot serve now, or its answer was cut off on the way;
+ * - `malformed` — the source answered something no reading can make an answer of.
+ */
+export const CONTENT_ERROR_CODE = z.enum(['not-found', 'refused', 'offline', 'timeout', 'unavailable', 'malformed']);
+export type ContentErrorCode = z.infer<typeof CONTENT_ERROR_CODE>;
 
 /** An error the content api raises, tagged with a code the caller can branch on. */
 export class ContentApiError extends Error {

@@ -15,11 +15,13 @@ import { ArticleVideo } from './article-video';
 
 export type ArticleBodyProps = Readonly<{
   article: Article;
+  /** The blocks of the body the reader was given, which only an open body has. */
+  blocks: readonly Block[];
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;
 
-type BlockProps = ArticleBodyProps & Readonly<{ block: Block }>;
+type BlockProps = Omit<ArticleBodyProps, 'blocks'> & Readonly<{ block: Block }>;
 
 const useStyles = createStyles((theme) => ({
   words: { paddingHorizontal: SPACING.lg },
@@ -112,10 +114,10 @@ const place = (blocks: readonly Block[]): readonly PlacedBlock[] => {
 };
 
 /** The body of an article, block by block, in the order it was written. */
-export function ArticleBody({ article, onFollow, onSupport }: ArticleBodyProps): ReactNode {
+export function ArticleBody({ article, blocks, onFollow, onSupport }: ArticleBodyProps): ReactNode {
   return (
     <>
-      {place(article.blocks).map(({ key, block }) => (
+      {place(blocks).map(({ key, block }) => (
         <BlockView key={key} block={block} article={article} onFollow={onFollow} onSupport={onSupport} />
       ))}
     </>

@@ -1,4 +1,5 @@
-import { describe, expect, it } from '@jest/globals';
+import { ContentApiError } from '@huma/contracts';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
@@ -20,7 +21,19 @@ const newest = async () => {
   return item;
 };
 
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
 describe('LivePage', () => {
+  /** What the reader is told of a wire that did not come is its cause, read off the failure the door raised. */
+  it('dit pourquoi le fil n’est pas venu, et offre un nouvel essai qui peut aboutir', async () => {
+    jest.spyOn(content, 'getLiveFeed').mockRejectedValue(new ContentApiError('offline', 'hors ligne'));
+    await renderPage();
+    expect(await screen.findByText('Pas de connexion')).toBeTruthy();
+    expect(screen.getByText(t('action.retry'))).toBeTruthy();
+  });
+
   // Twice over: the list mounts the head of a run where the run begins, and again pinned at the top of its frame.
   it('coiffe le fil de la journée que ses items portent, et l’y retient', async () => {
     const item = await newest();

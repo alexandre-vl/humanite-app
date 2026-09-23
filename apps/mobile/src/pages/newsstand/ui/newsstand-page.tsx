@@ -2,9 +2,9 @@ import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { EmptyState } from '#components/empty-state';
 import { TopBar } from '#components/top-bar';
 import { NEWSROOM } from '#config';
+import { FeedStandIn, stateOf } from '#entities/article';
 import { t } from '#i18n';
 import { openExternal } from '#lib/routing';
 import { createStyles } from '#lib/styles';
@@ -49,7 +49,8 @@ const useStyles = createStyles(() => ({
  */
 export function NewsstandPage(): ReactNode {
   const styles = useStyles();
-  const issues = useQuery(issuesQuery).data ?? [];
+  const { data, status, error, refetch } = useQuery(issuesQuery);
+  const issues = data ?? [];
   return (
     <Surface>
       <TopBar
@@ -63,7 +64,15 @@ export function NewsstandPage(): ReactNode {
             four covers repeating the same sentence would be the shelf telling them four times. */}
         <Text variant="caption">{t('newsstand.web')}</Text>
         {issues.length === 0 ? (
-          <EmptyState title={t('newsstand.empty.title')} message={t('newsstand.empty.message')} />
+          // While the shelf is on its way, and when it failed, the stand-in says so: an empty shelf is the one thing
+          // it would be wrong to say before the answer is in.
+          <FeedStandIn
+            state={stateOf(status, error)}
+            onRetry={() => {
+              void refetch();
+            }}
+            empty={{ title: t('newsstand.empty.title'), message: t('newsstand.empty.message') }}
+          />
         ) : (
           <Scroll axis="horizontal" contentStyle={styles.shelf}>
             {issues.map((issue) => (

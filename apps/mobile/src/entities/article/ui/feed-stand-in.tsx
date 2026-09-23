@@ -1,5 +1,7 @@
+import type { ContentErrorCode } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
+import { canRetry } from '#api';
 import { Button } from '#components/button';
 import type { EmptyStateProps } from '#components/empty-state';
 import { EmptyState } from '#components/empty-state';
@@ -22,7 +24,6 @@ export type FeedStandInProps = Readonly<{
   state: FeedState;
   onRetry: () => void;
   empty?: EmptyWords | undefined;
-  error?: EmptyWords | undefined;
 }>;
 
 const useStyles = createStyles(() => ({
@@ -31,16 +32,27 @@ const useStyles = createStyles(() => ({
 }));
 
 /**
- * What stands in a feed's place: shapes while it loads, a failure worth another try, or an empty shelf. Both the card
- * feed and the wire show it, so what a reader is told when nothing arrives does not depend on which screen asked.
- *
- * Both the empty shelf and the failure can be said in the screen's own words, because only there does the screen know
- * something the stand-in does not: an unpublished paper and a question that matched nothing are both a feed holding
- * nothing, and one article that did not arrive is not the articles, plural, that a feed would be missing.
+ * What a reader is told of a failure, in the words the dictionary gives its cause. The key is built from the code, so
+ * a cause the contract adds is a key missing from the dictionary, and that stops the build here.
  */
-export function FeedStandIn({ state, onRetry, empty, error }: FeedStandInProps): ReactNode {
+export const failureWords = (failure: ContentErrorCode): EmptyWords => ({
+  title: t(`failure.${failure}.title`),
+  message: t(`failure.${failure}.message`),
+});
+
+/**
+ * What stands in a feed's place: shapes while it loads, a failure said by its cause, or an empty shelf. Every feed and
+ * every screen that reads one shows it, so what a reader is told when nothing arrives does not depend on which screen
+ * asked.
+ *
+ * A failure is offered another try only when one could answer differently: a page the paper does not have, a page it
+ * refuses this reader, and an answer no reading could make sense of all come back the same, and a button that can only
+ * fail again is a button that lies. The empty shelf can be said in the screen's own words: an unpublished paper and a
+ * question that matched nothing are both a feed holding nothing, and only the screen knows which.
+ */
+export function FeedStandIn({ state, onRetry, empty }: FeedStandInProps): ReactNode {
   const styles = useStyles();
-  switch (state) {
+  switch (state.kind) {
     case 'pending':
       return (
         <Box style={styles.standIn}>
@@ -49,14 +61,16 @@ export function FeedStandIn({ state, onRetry, empty, error }: FeedStandInProps):
           <Skeleton />
         </Box>
       );
-    case 'error': {
-      const words = error ?? { title: t('feed.error.title'), message: t('feed.error.message') };
+    case 'failed': {
+      const words = failureWords(state.failure);
       return (
         <Box style={styles.standIn}>
           <EmptyState title={words.title} message={words.message} />
-          <Box style={styles.retry}>
-            <Button label={t('action.retry')} onPress={onRetry} />
-          </Box>
+          {canRetry(state.failure) ? (
+            <Box style={styles.retry}>
+              <Button label={t('action.retry')} onPress={onRetry} />
+            </Box>
+          ) : null}
         </Box>
       );
     }

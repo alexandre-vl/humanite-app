@@ -1,4 +1,5 @@
 import type { Article, DisplayText } from '@huma/contracts';
+import { blocksOf } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
@@ -69,13 +70,14 @@ export function ArticleTitle({ title, name }: ArticleTitleProps): ReactNode {
  * the body and not of the format: a video of the journal comes with no player in its body — the service sends a link
  * to the film and no prose at all — and hiding its picture on the strength of its format left the page with nothing.
  *
- * Nothing marks a reserved article. The content serves its body whole whatever the reader holds, no capture of the
- * current app shows a wall, and a mark over an article one is reading in full would only puzzle.
+ * The head is the same whether the body follows or not. An article whose body the source keeps back from this reader
+ * still carries its title, its standfirst and its picture, and the wall that says why the rest is not there is laid
+ * where the body would run — under this, not in place of it.
  */
 export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
   const styles = useStyles();
   const hero = article.hero;
-  const plays = article.blocks.some((block) => block.type === 'video');
+  const plays = blocksOf(article).some((block) => block.type === 'video');
   const visual = plays ? null : pictureOf(article, 'lead');
   return (
     <>

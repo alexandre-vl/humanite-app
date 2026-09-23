@@ -1,4 +1,4 @@
-import { ARTICLE_ID, ContentApiError, issueIdAt, SECTION_ID } from '@huma/contracts';
+import { ARTICLE_ID, blocksOf, ContentApiError, issueIdAt, SECTION_ID } from '@huma/contracts';
 import { CORPUS } from '@huma/mock-content';
 import { expect, test } from 'vitest';
 import { contentApi } from './index.ts';
@@ -46,10 +46,22 @@ test('getLiveFeed is the ten newest, in one answer', async () => {
   expect(newestFirst(wire.items.map((item) => item.publishedAt))).toBe(true);
 });
 
-test('getArticle returns the body and rejects an unknown id', async () => {
-  const article = await contentApi.getArticle(ARTICLE_ID.parse('pol-a1'));
-  expect(article.blocks.length).toBeGreaterThan(0);
+test('getArticle serves a free article whole, and rejects an unknown id', async () => {
+  const article = await contentApi.getArticle(ARTICLE_ID.parse('pol-a5'));
+  expect(article.access).toBe('free');
+  expect(blocksOf(article).length).toBeGreaterThan(0);
   await expect(contentApi.getArticle(ARTICLE_ID.parse('zzz-a1'))).rejects.toBeInstanceOf(ContentApiError);
+});
+
+/** The reader the app is has no subscription: a reserved article comes with its head, and its body kept back. */
+test('getArticle withholds the body of a reserved article, and nothing else of it', async () => {
+  const reserved = CORPUS.filter((article) => article.access === 'premium');
+  expect(reserved.length).toBeGreaterThan(0);
+  for (const article of reserved) {
+    const served = await contentApi.getArticle(article.id);
+    expect(served.body).toEqual({ kind: 'withheld' });
+    expect(served.title).toBe(article.title);
+  }
 });
 
 test('search matches titles and standfirsts, and nothing of the body', async () => {
@@ -59,7 +71,7 @@ test('search matches titles and standfirsts, and nothing of the body', async () 
   expect(byStandfirst.items.map((item) => item.id)).toContain('pol-a5');
   // A word the body of pol-a5 holds and neither of its two searchable fields does: a summary carries no body at all.
   const body = await contentApi.getArticle(ARTICLE_ID.parse('pol-a5'));
-  expect(JSON.stringify(body.blocks)).toContain('délibération');
+  expect(JSON.stringify(blocksOf(body))).toContain('délibération');
   await expect(contentApi.search({ text: 'délibération' })).resolves.toMatchObject({ items: [] });
 });
 

@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { judgeIntake, readArticle, readSummaries, SECTION_ID } from './index.ts';
+import { blocksOf, judgeIntake, readArticle, readPlain, readSummaries, SECTION_ID } from './index.ts';
 import { RECORDED } from './recorded.ts';
 
 /**
@@ -88,9 +88,23 @@ test('every article the capture kept is read whole, as its format says', () => {
     throw new Error('un article de la capture n’a pas été lu');
   }
   expect(opinion.item.format).toBe('column');
-  expect(opinion.item.blocks.filter((block) => block.type === 'paragraph').length).toBeGreaterThanOrEqual(8);
+  expect(blocksOf(opinion.item).filter((block) => block.type === 'paragraph').length).toBeGreaterThanOrEqual(8);
   expect(video.item.format).toBe('video');
-  expect(video.item.blocks).toEqual([]);
+  expect(video.item.body).toEqual({ kind: 'open', blocks: [] });
+});
+
+/**
+ * The service answers every list without a token, and there `right` only repeats `premium`; on an article it is the
+ * reader's own. What it sends beside `right: false` is not this reader's body, and reading it would unlock it.
+ */
+test('an article the service withholds from this reader is read as withheld, and nothing of its body is read', () => {
+  const read = readArticle({ ...RECORDED.articles.opinion, right: false });
+  if (!('item' in read)) {
+    throw new Error('l’article retenu n’a pas été lu');
+  }
+  expect(read.item.body).toEqual({ kind: 'withheld' });
+  expect(read.item.title).toBe(readPlain(RECORDED.articles.opinion.title));
+  expect(JSON.stringify(read.item)).not.toContain('paragraph');
 });
 
 test('an article whose body is not the service’s is refused with its reason, not read as an empty one', () => {

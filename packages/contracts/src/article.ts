@@ -72,10 +72,25 @@ export type Block = z.infer<typeof BLOCK>;
 export type BlockInput = z.input<typeof BLOCK>;
 
 /**
- * An item with its body, as the reader opens it.
+ * What the reader is given of a body: all of it, or none of it, because the source keeps it back.
  *
- * The body may be empty. A video the journal publishes carries no prose at all — its whole body, read, is the donation
- * form that closes every article — and a schema that required one block would refuse to open the video.
+ * A body kept back is not a failure. The article is there — its title, its standfirst, its picture — and what the
+ * source withholds is the body, which it gives only to readers holding a right this one does not. The app honours
+ * that: it shows what it was given and says why the rest is not there, and it never reads what came with a body the
+ * source said this reader may not have.
+ *
+ * An open body may be empty. A video the journal publishes carries no prose at all — its whole body, read, is the
+ * donation form that closes every article — and a body that required one block would refuse to open the video.
  */
-export const ARTICLE = ARTICLE_SUMMARY.extend({ blocks: z.array(BLOCK) });
+const BODY = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('open'), blocks: z.array(BLOCK) }),
+  z.object({ kind: z.literal('withheld') }),
+]);
+
+/** An item with what the reader is given of its body, as the reader opens it. */
+export const ARTICLE = ARTICLE_SUMMARY.extend({ body: BODY });
 export type Article = z.infer<typeof ARTICLE>;
+
+/** The blocks of a body the reader was given, and none of one withheld. */
+export const blocksOf = (article: Article): readonly Block[] =>
+  article.body.kind === 'open' ? article.body.blocks : [];

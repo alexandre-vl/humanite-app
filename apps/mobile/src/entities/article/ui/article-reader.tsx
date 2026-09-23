@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
+import { Box } from '#primitives/box';
 import { Scroll } from '#primitives/scroll';
 import { ThemeScope } from '#primitives/theme';
 import { articleQuery } from '../api/queries';
@@ -12,6 +13,7 @@ import { stateOf } from '../model/paged-feed';
 import type { SectionNames } from '../model/section-names';
 import type { LinkTarget } from '../model/spans';
 import { ArticleBody } from './article-body';
+import { ArticleCallout } from './article-callout';
 import { ArticleLead, ArticleTitle } from './article-lead';
 import { FeedStandIn } from './feed-stand-in';
 
@@ -35,7 +37,24 @@ const useStyles = createStyles((theme) => ({
   // One measure down the page, and one gap between everything on it: the head, the picture, every paragraph and
   // every crosshead are all things read in a row, and a gap that changed between them would be saying they are not.
   column: { gap: SPACING.lg, paddingTop: SPACING.md, paddingBottom: SPACING.xxxl },
+  wall: { paddingTop: SPACING.lg },
 }));
+
+/**
+ * The call to subscribe, where a body the source keeps back would run: the paper's own words for why the rest is not
+ * there, and the one thing a reader can do about it. It is laid as the call for support a body can carry, because it
+ * is one — and nothing of the body is shown, the source having said this reader may not have it.
+ */
+function Wall({ onSupport }: Readonly<{ onSupport: () => void }>): ReactNode {
+  return (
+    <ArticleCallout
+      title={t('article.withheld.title')}
+      text={t('article.withheld.message')}
+      button={t('article.subscribe')}
+      onPress={onSupport}
+    />
+  );
+}
 
 /**
  * The article as it is read: one page, one ground, from the section over the headline down to the last paragraph.
@@ -56,7 +75,11 @@ function Reading({ article, name, onFollow, onSupport }: ReadingProps): ReactNod
     <Scroll axis="vertical" style={styles.page} contentStyle={styles.column}>
       <ArticleTitle title={article.title} name={name} />
       <ArticleLead article={article} byline={signatureOf(article)} />
-      <ArticleBody article={article} onFollow={onFollow} onSupport={onSupport} />
+      {article.body.kind === 'open' ? (
+        <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} onSupport={onSupport} />
+      ) : (
+        <Wall onSupport={onSupport} />
+      )}
     </Scroll>
   );
 }
@@ -69,15 +92,25 @@ function Reading({ article, name, onFollow, onSupport }: ReadingProps): ReactNod
  * reader who has chosen dark keeps it for every other article.
  */
 export function ArticleReader({ id, names, onFollow, onSupport }: ArticleReaderProps): ReactNode {
-  const { data: article, status, refetch } = useQuery(articleQuery(id));
+  const styles = useStyles();
+  const { data: article, status, error, refetch } = useQuery(articleQuery(id));
   if (article === undefined) {
+    const state = stateOf(status, error);
+    // A source that will not serve this reader the article at all puts up the same wall as one that keeps its body
+    // back: the call to subscribe stands in its place, rather than a failure offered a try that cannot pass.
+    if (state.kind === 'failed' && state.failure === 'refused') {
+      return (
+        <Box style={styles.wall}>
+          <Wall onSupport={onSupport} />
+        </Box>
+      );
+    }
     return (
       <FeedStandIn
-        state={stateOf(status)}
+        state={state}
         onRetry={() => {
           void refetch();
         }}
-        error={{ title: t('article.error.title'), message: t('article.error.message') }}
       />
     );
   }

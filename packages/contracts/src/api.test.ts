@@ -1,5 +1,5 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { CONTENT_ERROR_CODES, ContentApiError } from './index.ts';
+import { CONTENT_ERROR_CODE, ContentApiError } from './index.ts';
 import type {
   ArticleId,
   ArticleSummary,
@@ -18,9 +18,10 @@ test('ContentApiError is an Error carrying a code', () => {
   expectTypeOf(error.code).toEqualTypeOf<ContentErrorCode>();
 });
 
-test('CONTENT_ERROR_CODES lists the error codes', () => {
-  expect(CONTENT_ERROR_CODES).toContain('timeout');
-  expectTypeOf<(typeof CONTENT_ERROR_CODES)[number]>().toEqualTypeOf<ContentErrorCode>();
+/** A code is a cause, and a word the contracts' parser reads: a code nobody declared is refused, not branched on. */
+test('a failure is named by one of the causes the contract declares, and by no other word', () => {
+  expect(CONTENT_ERROR_CODE.safeParse('offline').success).toBe(true);
+  expect(CONTENT_ERROR_CODE.safeParse('network-error').success).toBe(false);
 });
 
 /** The source decides how much a page holds: a size only one source could honour is not something a caller asks. */

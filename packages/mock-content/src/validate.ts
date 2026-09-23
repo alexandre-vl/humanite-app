@@ -1,5 +1,5 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
-import { instantAt, SECTION_ID } from '@huma/contracts';
+import { blocksOf, instantAt, SECTION_ID } from '@huma/contracts';
 import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
@@ -91,7 +91,7 @@ const blockWords = (block: Block): number => {
   return 0;
 };
 
-const wordCount = (article: Article): number => article.blocks.reduce((sum, block) => sum + blockWords(block), 0);
+const wordCount = (article: Article): number => blocksOf(article).reduce((sum, block) => sum + blockWords(block), 0);
 
 /**
  * Whether an item of this corpus is a brief, read off its own id: `pol-a1` is an article, `pol-b1` a brief.
@@ -109,12 +109,12 @@ const wordRange = (article: Article): Words => WORDS[isBrief(article) ? 'brief' 
  */
 export const imageKeys = (article: Article): readonly ImageKey[] => [
   ...(article.hero?.picture.kind === 'corpus' ? [article.hero.picture.key] : []),
-  ...article.blocks.flatMap((block) => (block.type === 'image' ? [block.key] : [])),
+  ...blocksOf(article).flatMap((block) => (block.type === 'image' ? [block.key] : [])),
 ];
 
 /** The ids an item points to, through internal links and related blocks. */
 const linkedIds = (article: Article): readonly ArticleId[] =>
-  article.blocks.flatMap((block): readonly ArticleId[] => {
+  blocksOf(article).flatMap((block): readonly ArticleId[] => {
     if (block.type === 'related') {
       return [block.summary.id];
     }
@@ -128,7 +128,7 @@ const linkedIds = (article: Article): readonly ArticleId[] =>
 
 /** Whether each element the section bar needs appears somewhere in a section. */
 const presence = (articles: readonly Article[]): readonly Readonly<{ label: string; ok: boolean }>[] => {
-  const blocks = articles.flatMap((article) => article.blocks);
+  const blocks = articles.flatMap((article) => blocksOf(article));
   const spans = blocks.flatMap((block) => (block.type === 'paragraph' || block.type === 'quote' ? block.spans : []));
   return [
     { label: 'un intertitre', ok: blocks.some((block) => block.type === 'heading') },
@@ -150,7 +150,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   const code = codeOf(folder);
   const authors = namesOf(article.byline).map((name) => AUTHORS.find((each) => each.name === name));
   const known = authors.filter((each) => each !== undefined);
-  const kinds = article.blocks.map((block) => block.type);
+  const kinds = blocksOf(article).map((block) => block.type);
   const range = wordRange(article);
   const words = wordCount(article);
 
@@ -200,7 +200,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (isBrief(article) && kinds.some((kind) => kind !== 'paragraph')) {
     errors.push(`${where} : une brève ne contient que des paragraphes`);
   }
-  if (isBrief(article) && article.blocks.length > 3) {
+  if (isBrief(article) && blocksOf(article).length > 3) {
     errors.push(`${where} : une brève a au plus trois paragraphes`);
   }
   if (article.format === 'video' && kinds[0] !== 'video') {
@@ -210,7 +210,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
     errors.push(`${where} : une ::video ne paraît que dans un item vidéo`);
   }
   if (
-    article.blocks.some(
+    blocksOf(article).some(
       (block) =>
         block.type === 'video' &&
         (block.durationSeconds < RUNNING_TIME.min || block.durationSeconds > RUNNING_TIME.max),
@@ -253,7 +253,7 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
   const counts = {
     video: articles.filter((article) => article.format === 'video').length,
     column: articles.filter((article) => article.format === 'column').length,
-    callout: articles.reduce((sum, article) => sum + article.blocks.filter((b) => b.type === 'callout').length, 0),
+    callout: articles.reduce((sum, article) => sum + blocksOf(article).filter((b) => b.type === 'callout').length, 0),
   };
   if (arts.length !== 6 || briefs.length !== 3) {
     errors.push(`${folder} : ${String(arts.length)} articles / ${String(briefs.length)} brèves (6 / 3 attendus)`);

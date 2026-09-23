@@ -1,4 +1,4 @@
-import { ARTICLE } from '@huma/contracts';
+import { ARTICLE, blocksOf } from '@huma/contracts';
 import type { Article, SectionId } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { CORPUS } from './index.ts';
@@ -78,7 +78,8 @@ test('an item named as a brief is held to what a brief may hold', () => {
   if (brief === undefined) {
     throw new Error('aucune brève dans le corpus');
   }
-  const swollen = ARTICLE.parse({ ...brief, blocks: [...brief.blocks, ...brief.blocks, ...brief.blocks] });
+  const blocks = blocksOf(brief);
+  const swollen = ARTICLE.parse({ ...brief, body: { kind: 'open', blocks: [...blocks, ...blocks, ...blocks] } });
   expect(errorsAbout(swollen, 'trois paragraphes')).toEqual([expect.stringContaining('au plus trois paragraphes')]);
 });
 
@@ -86,7 +87,10 @@ test('one picture key cannot serve two pictures', () => {
   const article = illustrated();
   const twice = ARTICLE.parse({
     ...article,
-    blocks: [{ type: 'image', caption: 'La même image, deux fois', key: `${article.id}-hero` }, ...article.blocks],
+    body: {
+      kind: 'open',
+      blocks: [{ type: 'image', caption: 'La même image, deux fois', key: `${article.id}-hero` }, ...blocksOf(article)],
+    },
   });
   expect(errorsFor(twice)).toEqual([expect.stringContaining('employée par deux items')]);
 });

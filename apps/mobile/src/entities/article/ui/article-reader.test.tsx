@@ -1,5 +1,6 @@
-import { describe, expect, it, jest } from '@jest/globals';
-import type { Article } from '@huma/contracts';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import type { Article, Block } from '@huma/contracts';
+import { blocksOf, ContentApiError } from '@huma/contracts';
 import { PALETTE } from '@huma/design-tokens';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
@@ -109,8 +110,8 @@ const first = async (what: string, holds: (article: Article) => boolean): Promis
   throw new Error(`aucun article du corpus ne porte ${what} : le test ne vérifierait rien`);
 };
 
-const holding = async (kind: Article['blocks'][number]['type']): Promise<Article> =>
-  first(`un bloc ${kind}`, (article) => article.blocks.some((block) => block.type === kind));
+const holding = async (kind: Block['type']): Promise<Article> =>
+  first(`un bloc ${kind}`, (article) => blocksOf(article).some((block) => block.type === kind));
 
 /**
  * Most paragraphs of the corpus are one run long, so an article picked for holding a paragraph would pass a renderer
@@ -118,8 +119,45 @@ const holding = async (kind: Article['blocks'][number]['type']): Promise<Article
  */
 const holdingSeveralRuns = async (): Promise<Article> =>
   first('un paragraphe de plusieurs fragments', (article) =>
-    article.blocks.some((block) => block.type === 'paragraph' && block.spans.length > 1),
+    blocksOf(article).some((block) => block.type === 'paragraph' && block.spans.length > 1),
   );
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+/** An article the reader the app is may not read whole: one the source serves with its body kept back. */
+const reserved = async (): Promise<Article> => {
+  for (const summary of await everyArticle(content)) {
+    const article = await content.getArticle(summary.id);
+    if (article.body.kind === 'withheld') {
+      return article;
+    }
+  }
+  throw new Error('le journal ne retient aucun corps : le test ne vérifierait rien');
+};
+
+describe('ArticleReader, face à un corps retenu', () => {
+  /** The head is the article's and the wall says why the rest is not there; nothing of the body is shown. */
+  it('montre la tête de l’article et l’appel à s’abonner là où le corps aurait couru', async () => {
+    const article = await reserved();
+    const onSupport = jest.fn();
+    await read(article, () => undefined, onSupport);
+    expect(await screen.findByText(article.title)).toBeTruthy();
+    expect(screen.getByText('Réservé aux abonnés')).toBeTruthy();
+    await fireEvent.press(screen.getByText('S’abonner'));
+    expect(onSupport).toHaveBeenCalledTimes(1);
+  });
+
+  /** A source that refuses the whole article puts up the same wall, rather than a try that cannot pass. */
+  it('dresse le même appel quand la source refuse l’article entier, sans offrir d’essai', async () => {
+    const article = await reserved();
+    jest.spyOn(content, 'getArticle').mockRejectedValue(new ContentApiError('refused', 'réservé'));
+    await read(article);
+    expect(await screen.findByText('S’abonner')).toBeTruthy();
+    expect(screen.queryByText('Réessayer')).toBeNull();
+  });
+});
 
 describe('ArticleReader', () => {
   /**
@@ -139,7 +177,7 @@ describe('ArticleReader', () => {
     await read(article);
     expect(await screen.findByText(article.title)).toBeTruthy();
     expect(screen.getByText(article.standfirst)).toBeTruthy();
-    const words = article.blocks.flatMap((block) =>
+    const words = blocksOf(article).flatMap((block) =>
       block.type === 'paragraph' ? block.spans.map((span) => ('value' in span ? span.value : span.text)) : [],
     );
     for (const run of words) {
@@ -155,7 +193,7 @@ describe('ArticleReader', () => {
    */
   it('donne aux intertitres une taille et une encre sous celles du titre de l’article', async () => {
     const article = await holding('heading');
-    const crosshead = article.blocks.find((block) => block.type === 'heading');
+    const crosshead = blocksOf(article).find((block) => block.type === 'heading');
     if (crosshead === undefined) {
       throw new Error('intertitre introuvable');
     }
@@ -237,7 +275,7 @@ describe('ArticleReader', () => {
    */
   it('écarte la photo, le titre et la phrase de la carte liée', async () => {
     const article = await holding('related');
-    const related = article.blocks.find((block) => block.type === 'related');
+    const related = blocksOf(article).find((block) => block.type === 'related');
     if (related === undefined) {
       throw new Error('bloc lié introuvable');
     }
@@ -257,7 +295,7 @@ describe('ArticleReader', () => {
 
   it('annonce l’article lié par son titre, et le rapporte quand on le presse', async () => {
     const article = await holding('related');
-    const related = article.blocks.find((block) => block.type === 'related');
+    const related = blocksOf(article).find((block) => block.type === 'related');
     if (related === undefined) {
       throw new Error('bloc lié introuvable');
     }
@@ -271,7 +309,7 @@ describe('ArticleReader', () => {
 
   it('porte la durée de la vidéo, la seule chose que le contrat en dise avec son titre', async () => {
     const article = await holding('video');
-    const video = article.blocks.find((block) => block.type === 'video');
+    const video = blocksOf(article).find((block) => block.type === 'video');
     if (video === undefined) {
       throw new Error('bloc vidéo introuvable');
     }
@@ -306,7 +344,7 @@ describe('ArticleReader', () => {
    */
   it('donne à l’encart de soutien un bouton qui répond, que la capture n’en montre pas', async () => {
     const article = await holding('callout');
-    const callout = article.blocks.find((block) => block.type === 'callout');
+    const callout = blocksOf(article).find((block) => block.type === 'callout');
     if (callout === undefined) {
       throw new Error('encart introuvable');
     }

@@ -113,6 +113,16 @@ const whole = (items: readonly ArticleSummary[], size: number): Page<ArticleSumm
 const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
 
 /**
+ * An article as a reader who holds no subscription is given it: whole when it is free, its body withheld when it is not.
+ *
+ * That is the reader the app is today: nobody signs in, and the journal's service, which answers `right: false` on
+ * every reserved item it lists to such a reader, serves the body to subscribers alone. The mock is that reader too, so
+ * what a reserved article shows is what the app will show of one — its head, and the call to subscribe.
+ */
+const asAnonymous = (article: Article): Article =>
+  article.access === 'premium' ? { ...article, body: { kind: 'withheld' } } : article;
+
+/**
  * The content the corpus serves, as the app's door reads it. It answers at once and never fails: a test that wants a
  * screen to see a failure hands the screen a failing read of its own, and what a screen does while it waits is shown
  * by holding a promise open, not by sleeping.
@@ -132,7 +142,7 @@ export const contentApi: ContentApi = {
     );
   },
   getLiveFeed: async (): Promise<Page<ArticleSummary>> => Promise.resolve(whole(CHRONOLOGICAL, PAGE_SIZES.wire)),
-  getArticle: async (id: ArticleId): Promise<Article> => Promise.resolve(find(id)),
+  getArticle: async (id: ArticleId): Promise<Article> => Promise.resolve(asAnonymous(find(id))),
   getIssues: async (): Promise<readonly IssueSummary[]> => Promise.resolve(SHELF),
   search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
     const needle = fold(query.text.trim());

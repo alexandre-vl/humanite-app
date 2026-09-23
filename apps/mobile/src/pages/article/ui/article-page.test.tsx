@@ -1,4 +1,5 @@
 import type { Article } from '@huma/contracts';
+import { blocksOf } from '@huma/contracts';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
@@ -47,7 +48,7 @@ const open = async (article: Article): Promise<void> => {
 
 /** Every run of every paragraph of `article`, so a link can be found by the words it is written on. */
 const linkWords = (article: Article, kind: 'article' | 'external'): string | null => {
-  for (const block of article.blocks) {
+  for (const block of blocksOf(article)) {
     if (block.type !== 'paragraph') {
       continue;
     }
@@ -96,8 +97,8 @@ describe('ArticlePage', () => {
   });
 
   it('ouvre la page d’abonnement du journal quand le lecteur répond à l’appel au soutien', async () => {
-    const article = await first('un encart', (each) => each.blocks.some((block) => block.type === 'callout'));
-    const callout = article.blocks.find((block) => block.type === 'callout');
+    const article = await first('un encart', (each) => blocksOf(each).some((block) => block.type === 'callout'));
+    const callout = blocksOf(article).find((block) => block.type === 'callout');
     if (callout === undefined) {
       throw new Error('encart introuvable');
     }

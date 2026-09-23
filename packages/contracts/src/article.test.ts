@@ -1,5 +1,5 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { ARTICLE, ARTICLE_SUMMARY, HERO } from './index.ts';
+import { ARTICLE, ARTICLE_SUMMARY, blocksOf, HERO } from './index.ts';
 import type { Article, ArticleSummary, Hero } from './index.ts';
 
 const validSummary = {
@@ -59,11 +59,25 @@ test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, 
 test('ARTICLE extends the summary with a body, which a video of the journal leaves empty', () => {
   const article: Article = ARTICLE.parse({
     ...validSummary,
-    blocks: [{ type: 'paragraph', spans: [{ type: 'text', value: 'x' }] }],
+    body: { kind: 'open', blocks: [{ type: 'paragraph', spans: [{ type: 'text', value: 'x' }] }] },
   });
   expectTypeOf(article).toEqualTypeOf<Article>();
-  expect(ARTICLE.safeParse({ ...validSummary, format: 'video', blocks: [] }).success).toBe(true);
+  expect(blocksOf(article)).toHaveLength(1);
+  expect(ARTICLE.safeParse({ ...validSummary, format: 'video', body: { kind: 'open', blocks: [] } }).success).toBe(
+    true,
+  );
   expect(ARTICLE.safeParse({ ...validSummary }).success).toBe(false);
+});
+
+/** A body kept back is nothing at all, and a withheld body that carried blocks would be a body unlocked. */
+test('a withheld body carries no blocks, and gives none', () => {
+  const withheld = ARTICLE.parse({ ...validSummary, body: { kind: 'withheld' } });
+  expect(blocksOf(withheld)).toEqual([]);
+  const smuggled = ARTICLE.parse({
+    ...validSummary,
+    body: { kind: 'withheld', blocks: [{ type: 'heading', text: 'x' }] },
+  });
+  expect(smuggled.body).toEqual({ kind: 'withheld' });
 });
 
 test('ARTICLE_SUMMARY takes an item whose section nobody named', () => {

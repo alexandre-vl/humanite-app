@@ -213,16 +213,19 @@ export const parseItem = (text: string): WrittenItem => {
 const resolved = (item: WrittenItem, summaries: ReadonlyMap<string, ArticleSummary>): Article =>
   ARTICLE.parse({
     ...item.summary,
-    blocks: item.blocks.map((block) => {
-      if (block.type !== 'related') {
-        return block;
-      }
-      const summary = summaries.get(block.id);
-      if (summary === undefined) {
-        throw new Error(`::related vers un item absent du corpus : ${block.id}`);
-      }
-      return { type: 'related', summary };
-    }),
+    body: {
+      kind: 'open',
+      blocks: item.blocks.map((block) => {
+        if (block.type !== 'related') {
+          return block;
+        }
+        const summary = summaries.get(block.id);
+        if (summary === undefined) {
+          throw new Error(`::related vers un item absent du corpus : ${block.id}`);
+        }
+        return { type: 'related', summary };
+      }),
+    },
   });
 
 /** Reads and validates every item, throwing an aggregate error when the corpus breaks any rule. */

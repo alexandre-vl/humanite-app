@@ -2,7 +2,7 @@
 id: cul-a2
 section: culture-et-savoir
 format: article
-access: premium
+access: free
 title: Le musée Berthelin rouvre ses portes après deux ans de travaux et un accrochage entièrement repensé
 standfirst: Fermé depuis l'automne 2024, le musée municipal de Villeneuve-sur-Arche accueille de nouveau le public samedi, avec des salles réaménagées, un parcours pour les enfants et une collection enfin sortie des réserves.
 authors: helene-marchetti, paul-delorme

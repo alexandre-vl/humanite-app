@@ -1,4 +1,5 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { ContentApiError } from '@huma/contracts';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { NEWSROOM } from '#config';
@@ -15,7 +16,19 @@ const renderPage = async (): Promise<void> => {
   await settle();
 };
 
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
 describe('NewsstandPage', () => {
+  /** An empty shelf is a thing the paper says; before its answer, or when there was none, the shelf says so instead. */
+  it('ne dit pas le kiosque vide tant qu’il n’a pas répondu, ni quand il n’a pas pu répondre', async () => {
+    jest.spyOn(content, 'getIssues').mockRejectedValue(new ContentApiError('offline', 'hors ligne'));
+    await renderPage();
+    expect(await screen.findByText('Pas de connexion')).toBeTruthy();
+    expect(screen.queryByText('Le kiosque est vide')).toBeNull();
+  });
+
   it('range tous les numéros du journal, chacun avec ce qu’il contient', async () => {
     const shelf = await content.getIssues();
     expect(shelf.length).toBeGreaterThan(1);
