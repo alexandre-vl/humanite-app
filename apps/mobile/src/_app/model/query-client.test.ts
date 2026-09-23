@@ -45,7 +45,7 @@ describe('queryClient', () => {
     }
     // The real keys, not two written by hand: what is kept must be judged on what the app actually files things under.
     const answered: InfiniteData<Page<ArticleSummary>> = {
-      pages: [{ items: [], nextCursor: null, total: 0 }],
+      pages: [{ items: [], nextCursor: null }],
       pageParams: [''],
     };
     const client = new QueryClient();

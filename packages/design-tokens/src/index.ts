@@ -10,7 +10,7 @@ export type { LegibilityCode, LegibilityTables } from './legibility.ts';
 // bench can hand the reading a broken table and read the code that comes back.
 export { judgeLegibility, THE_PAPER } from './legibility.ts';
 export type { SectionCode } from './sections.ts';
-export { SECTION_COLORS, sectionCode, sectionColor } from './sections.ts';
+export { SECTION_COLORS, sectionColor } from './sections.ts';
 export type { Theme, ThemeChoice, ThemeName } from './theme.ts';
 export { DARK_THEME, LIGHT_THEME, THEME_CHOICES, THEME_NAMES, THEMES } from './theme.ts';
 export type { RunFace, TextScale, TextTone, TextVariant, Typography } from './typography.ts';

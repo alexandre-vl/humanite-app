@@ -6,8 +6,8 @@ import type {
   ContentApi,
   ContentErrorCode,
   FeedQuery,
-  LiveQuery,
   Page,
+  PageQuery,
   SearchQuery,
 } from './index.ts';
 
@@ -23,13 +23,18 @@ test('CONTENT_ERROR_CODES lists the error codes', () => {
   expectTypeOf<(typeof CONTENT_ERROR_CODES)[number]>().toEqualTypeOf<ContentErrorCode>();
 });
 
-test('the query types describe what a caller may select', () => {
-  const feed: FeedQuery = { limit: 10 };
-  const live: LiveQuery = { limit: 10 };
-  const search: SearchQuery = { text: 'greve' };
-  expect(feed.limit).toBe(10);
-  expect(live.limit).toBe(10);
-  expect(search.text).toBe('greve');
+/** The source decides how much a page holds: a size only one source could honour is not something a caller asks. */
+test('a query asks for a page by its cursor, and never for a size', () => {
+  expectTypeOf<PageQuery>().not.toHaveProperty('limit');
+  expectTypeOf<FeedQuery>().not.toHaveProperty('limit');
+  expectTypeOf<SearchQuery>().not.toHaveProperty('limit');
+  expectTypeOf<FeedQuery>().toExtend<PageQuery>();
+  expectTypeOf<SearchQuery>().toExtend<PageQuery>();
+});
+
+test('a page tells where the next one starts, and counts nothing', () => {
+  expectTypeOf<Page<ArticleSummary>>().not.toHaveProperty('total');
+  expectTypeOf<Page<ArticleSummary>['nextCursor']>().toEqualTypeOf<string | null>();
 });
 
 test('the content api returns pages and takes branded ids', () => {

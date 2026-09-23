@@ -19,4 +19,4 @@ export { ISSUE_SUMMARY } from './issue.ts';
 export type { IssueSummary } from './issue.ts';
 export type { Page } from './page.ts';
 export { CONTENT_ERROR_CODES, ContentApiError } from './api.ts';
-export type { ContentApi, ContentErrorCode, FeedQuery, LiveQuery, SearchQuery } from './api.ts';
+export type { ContentApi, ContentErrorCode, FeedQuery, PageQuery, SearchQuery } from './api.ts';

@@ -41,7 +41,7 @@ describe('SearchPage', () => {
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
     await type('c');
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
-    expect(screen.queryByText(/résultats?/u)).toBeNull();
+    expect(screen.queryByText(/Résultats pour/u)).toBeNull();
   });
 
   it('laisse le lecteur finir de taper avant d’interroger le journal', async () => {
@@ -53,16 +53,16 @@ describe('SearchPage', () => {
     await settle();
   });
 
-  it('sert les articles qu’une question atteint, et dit combien elle en a trouvé', async () => {
+  it('sert les articles qu’une question atteint, sous la question qu’ils répondent', async () => {
     const found = await content.search({ text: 'jeunes' });
     const [first] = found.items;
-    if (first === undefined || found.total < 2) {
+    if (first === undefined) {
       throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
     }
     await renderPage();
     await type('jeunes');
     expect(await screen.findByText(first.title)).toBeTruthy();
-    expect(screen.getByText(`${String(found.total)} résultats pour « jeunes »`)).toBeTruthy();
+    expect(screen.getByText('Résultats pour « jeunes »')).toBeTruthy();
     await settle();
   });
 

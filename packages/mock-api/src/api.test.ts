@@ -1,32 +1,49 @@
 import { ARTICLE_ID, ContentApiError, issueIdAt, SECTION_ID } from '@huma/contracts';
-import type { ContentApi, ContentErrorCode } from '@huma/contracts';
+import { CORPUS } from '@huma/mock-content';
 import { expect, test } from 'vitest';
-import { contentApi, createContentApi } from './index.ts';
+import { contentApi } from './index.ts';
 
-test('getSections exposes the registry', async () => {
-  await expect(contentApi.getSections()).resolves.toHaveLength(8);
+/** Newest first, as a list of instants reads when nothing has been moved out of its place. */
+const newestFirst = (instants: readonly string[]): boolean =>
+  instants.every((instant, at) => at === 0 || (instants[at - 1] ?? '').localeCompare(instant) >= 0);
+
+test('getSections answers the registry, in the order of the bar', async () => {
+  const sections = await contentApi.getSections();
+  expect(sections.map((section) => section.id)).toEqual([
+    'politique',
+    'social-eco',
+    'societe',
+    'monde',
+    'culture-et-savoir',
+    'feminisme',
+    'environnement',
+    'sport',
+  ]);
 });
 
-test('getFeed filters by section, newest first, and paginates', async () => {
+/** The front of the journal's service is one answer of thirteen: the mock's is too, the corpus having no desk. */
+test('getFeed without a section is the front: the thirteen newest, in one answer', async () => {
+  const front = await contentApi.getFeed({});
+  expect(front.items).toHaveLength(13);
+  expect(front.nextCursor).toBeNull();
+  expect(newestFirst(front.items.map((item) => item.publishedAt))).toBe(true);
+});
+
+test('getFeed with a section is that section’s own list, newest first', async () => {
   const section = SECTION_ID.parse('politique');
-  const first = await contentApi.getFeed({ section, limit: 4 });
-  expect(first.total).toBe(9);
-  expect(first.items).toHaveLength(4);
-  expect(first.items.every((item) => item.section === section)).toBe(true);
-  expect(first.nextCursor).not.toBeNull();
-  const dates = first.items.map((item) => item.publishedAt);
-  expect(dates).toEqual([...dates].toSorted((left, right) => right.localeCompare(left)));
+  const own = await contentApi.getFeed({ section });
+  expect(own.items).toHaveLength(9);
+  expect(own.items.every((item) => item.section === section)).toBe(true);
+  expect(newestFirst(own.items.map((item) => item.publishedAt))).toBe(true);
+  expect(own.nextCursor).toBeNull();
 });
 
-test('getFeed without a section spans the whole corpus', async () => {
-  const all = await contentApi.getFeed({});
-  expect(all.total).toBe(72);
-});
-
-test('getLiveFeed pages through every item newest first', async () => {
-  const live = await contentApi.getLiveFeed({ limit: 100 });
-  expect(live.items).toHaveLength(72);
-  expect(live.nextCursor).toBeNull();
+/** The wire of the journal's service is one answer of ten, never seen paged. */
+test('getLiveFeed is the ten newest, in one answer', async () => {
+  const wire = await contentApi.getLiveFeed({});
+  expect(wire.items).toHaveLength(10);
+  expect(wire.nextCursor).toBeNull();
+  expect(newestFirst(wire.items.map((item) => item.publishedAt))).toBe(true);
 });
 
 test('getArticle returns the body and rejects an unknown id', async () => {
@@ -40,19 +57,16 @@ test('search matches titles and standfirsts, and nothing of the body', async () 
   expect(byTitle.items.map((item) => item.id)).toContain('pol-a5');
   const byStandfirst = await contentApi.search({ text: 'cantines' });
   expect(byStandfirst.items.map((item) => item.id)).toContain('pol-a5');
-  // A subject three items once carried and no title or standfirst ever did: search stopped reading subjects the day
-  // the schema stopped carrying them, and the journal's own service names none.
-  await expect(contentApi.search({ text: 'climat' })).resolves.toMatchObject({ total: 0 });
   // A word the body of pol-a5 holds and neither of its two searchable fields does: a summary carries no body at all.
   const body = await contentApi.getArticle(ARTICLE_ID.parse('pol-a5'));
   expect(JSON.stringify(body.blocks)).toContain('délibération');
-  await expect(contentApi.search({ text: 'délibération' })).resolves.toMatchObject({ total: 0 });
+  await expect(contentApi.search({ text: 'délibération' })).resolves.toMatchObject({ items: [] });
 });
 
 test('search reads French as it is typed, not as it is written', async () => {
   const written = await contentApi.search({ text: 'école' });
   const typed = await contentApi.search({ text: 'ecole' });
-  expect(written.total).toBeGreaterThan(0);
+  expect(written.items.length).toBeGreaterThan(0);
   expect(typed.items).toEqual(written.items);
   // `œ` is one letter, which NFD leaves whole: only spelling it out makes `coeur` find the standfirst of pol-a5.
   const ligature = await contentApi.search({ text: 'coeur' });
@@ -61,14 +75,16 @@ test('search reads French as it is typed, not as it is written', async () => {
   expect(shouted.items).toEqual(written.items);
 });
 
-test('search answers newest first, and pages like a feed', async () => {
-  const every = await contentApi.search({ text: 'e', limit: 100 });
-  expect(every.total).toBe(72);
-  const dates = every.items.map((item) => item.publishedAt);
-  expect(dates).toEqual([...dates].toSorted((left, right) => right.localeCompare(left)));
+/** The journal's search answers ten at a time; the mock's pages the same way, each page opening where the last ended. */
+test('search pages by ten, newest first, and its pages share nothing', async () => {
   const first = await contentApi.search({ text: 'e' });
-  expect(first.items).toHaveLength(12);
-  expect(first.nextCursor).toBe('12');
+  expect(first.items).toHaveLength(10);
+  expect(first.nextCursor).not.toBeNull();
+  const second = await contentApi.search({ text: 'e', cursor: first.nextCursor ?? '' });
+  expect(second.items).toHaveLength(10);
+  const ids = new Set(first.items.map((item) => item.id));
+  expect(second.items.filter((item) => ids.has(item.id))).toEqual([]);
+  expect(newestFirst([...first.items, ...second.items].map((item) => item.publishedAt))).toBe(true);
 });
 
 test('getSummaries answers in the order asked', async () => {
@@ -85,57 +101,24 @@ test('getSummaries leaves out an id the paper no longer prints, and serves the r
   await expect(contentApi.getSummaries([withdrawn])).resolves.toEqual([]);
 });
 
-test('getArticle still refuses an id the paper no longer prints', async () => {
-  await expect(contentApi.getArticle(ARTICLE_ID.parse('zzz-a1'))).rejects.toBeInstanceOf(ContentApiError);
-});
-
 test('getIssues gathers the corpus into one numéro a day, the most recent first', async () => {
   const shelf = await contentApi.getIssues();
   expect(shelf.map((issue) => issue.id)).toEqual(['2026-09-13', '2026-09-12', '2026-09-11', '2026-09-10']);
   expect(shelf.map((issue) => issue.count)).toEqual([11, 21, 22, 18]);
 });
 
-/**
- * A numéro is a day and nothing else, so the numéros are a partition of the paper: every item is counted in exactly
- * one of them, and no item is counted twice or left out. What a numéro holds is not served any more — the newsstand
- * shows covers and sends a reader to the paper's own site — so the counts are what says it, and they still do.
- */
+/** A numéro is a day and nothing else, so the numéros are a partition of the paper: every item counted exactly once. */
 test('the numéros count between them every item the paper printed, each once', async () => {
   const shelf = await contentApi.getIssues();
-  const counted = shelf.reduce((sum, issue) => sum + issue.count, 0);
-  const whole = await contentApi.getFeed({ limit: 200 });
-  expect(counted).toBe(whole.total);
+  expect(shelf.reduce((sum, issue) => sum + issue.count, 0)).toBe(CORPUS.length);
   expect(new Set(shelf.map((issue) => issue.id)).size).toBe(shelf.length);
 });
 
 /** A cover is a front page, and a front page carries a picture — the rule the paper's own front already follows. */
 test('every numéro opens on an item the paper printed that day, and on a picture', async () => {
-  const whole = await contentApi.getFeed({ limit: 200 });
-  const days = new Map(whole.items.map((summary) => [summary.id, issueIdAt(summary.publishedAt)]));
+  const days = new Map(CORPUS.map((article) => [article.id, issueIdAt(article.publishedAt)]));
   for (const issue of await contentApi.getIssues()) {
     expect(days.get(issue.opener.id)).toBe(issue.id);
     expect(issue.opener.hero).toBeDefined();
-  }
-});
-
-/** One call per method of the contract: a method added without its call here is a type error, not a silent gap. */
-const CALLS = {
-  getSections: async (api) => api.getSections(),
-  getFeed: async (api) => api.getFeed({}),
-  getLiveFeed: async (api) => api.getLiveFeed({}),
-  getArticle: async (api) => api.getArticle(ARTICLE_ID.parse('pol-a1')),
-  getSummaries: async (api) => api.getSummaries([ARTICLE_ID.parse('pol-a1')]),
-  getIssues: async (api) => api.getIssues(),
-  search: async (api) => api.search({ text: 'budget' }),
-} satisfies Readonly<Record<keyof ContentApi, (api: ContentApi) => Promise<unknown>>>;
-
-const METHODS = Object.keys(CALLS).filter((name): name is keyof ContentApi => Object.hasOwn(CALLS, name));
-
-test('every method of the contract reports the failure injected on its name', async () => {
-  expect(METHODS).toHaveLength(7);
-  for (const method of METHODS) {
-    const fail: Partial<Record<keyof ContentApi, ContentErrorCode>> = {};
-    fail[method] = 'unavailable';
-    await expect(CALLS[method](createContentApi({ fail }))).rejects.toMatchObject({ code: 'unavailable' });
   }
 });

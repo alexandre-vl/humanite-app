@@ -1,6 +1,6 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
 import { instantAt, SECTION_ID } from '@huma/contracts';
-import { AUTHORS, namesOf, SECTIONS } from './registries.ts';
+import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
 
@@ -147,7 +147,7 @@ const presence = (articles: readonly Article[]): readonly Readonly<{ label: stri
 const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): readonly string[] => {
   const errors: string[] = [];
   const where = article.id;
-  const section = SECTIONS.find((each) => each.id === folder);
+  const code = codeOf(folder);
   const authors = namesOf(article.byline).map((name) => AUTHORS.find((each) => each.name === name));
   const known = authors.filter((each) => each !== undefined);
   const kinds = article.blocks.map((block) => block.type);
@@ -157,8 +157,8 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (article.section !== folder) {
     errors.push(`${where} : section « ${article.section ?? 'aucune'} » ≠ dossier « ${folder} »`);
   }
-  if (section !== undefined && !article.id.startsWith(`${section.code}-`)) {
-    errors.push(`${where} : id hors de la rubrique « ${section.code} »`);
+  if (code !== undefined && !article.id.startsWith(`${code}-`)) {
+    errors.push(`${where} : id hors de la rubrique « ${code} »`);
   }
   if (article.title === article.title.toUpperCase()) {
     errors.push(`${where} : titre tout en capitales`);

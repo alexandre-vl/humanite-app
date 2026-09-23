@@ -2,10 +2,11 @@ import type { Color } from './brand.ts';
 import { color } from './brand.ts';
 
 /**
- * A ground colour per section, held against the three-letter code the section registry gives it. The current app names
- * a section by a red rule under its label rather than by a colour; these grounds exist for the generated visuals that
- * stand in for photographs the mock has none of, and each is dark enough to carry a white headline. Codes are strings,
- * not keys: the spelling check reads identifiers, and none of these eight is an English word.
+ * A ground colour per section of the corpus, held against the three letters the corpus registry names it by. The app
+ * paints no section in a colour; these grounds exist for the generated visuals that stand in for the photographs the
+ * corpus has none of, and each is dark enough to carry a white headline. They are tokens because every colour is one,
+ * and a contrast is only measured on a token. Codes are strings, not keys: the spelling check reads identifiers, and
+ * none of these eight is an English word.
  */
 export const SECTION_COLORS = [
   ['pol', color('#7b1e3a')],
@@ -28,9 +29,6 @@ const entryOf = (value: string): (typeof SECTION_COLORS)[number] => {
   }
   return found;
 };
-
-/** A code read from the section registry, as a section this module draws for; an unknown one is refused. */
-export const sectionCode = (value: string): SectionCode => entryOf(value)[0];
 
 /** The ground a section's visuals are drawn on. */
 export const sectionColor = (code: SectionCode): Color => entryOf(code)[1];

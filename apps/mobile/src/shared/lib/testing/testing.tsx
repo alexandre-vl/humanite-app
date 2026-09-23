@@ -1,3 +1,4 @@
+import type { ArticleSummary, ContentApi, Page, PageQuery } from '@huma/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
@@ -20,4 +21,25 @@ export const renderWithCache = async (ui: ReactElement): Promise<void> => {
  */
 export const settle = async (): Promise<void> => {
   await act(async () => new Promise((resolve) => setTimeout(resolve, 0)));
+};
+
+/** Every page of a list, read from its first to its last, and flattened. */
+const everyPage = async (
+  read: (query: PageQuery) => Promise<Page<ArticleSummary>>,
+  cursor?: string,
+): Promise<readonly ArticleSummary[]> => {
+  const page = await read(cursor === undefined ? {} : { cursor });
+  return page.nextCursor === null ? page.items : [...page.items, ...(await everyPage(read, page.nextCursor))];
+};
+
+/**
+ * Every article a content serves, section by section and each section to its last page: the whole paper, as a test
+ * looking for an article of some shape needs it. The front and the wire are not the paper — each holds only the newest.
+ */
+export const everyArticle = async (content: ContentApi): Promise<readonly ArticleSummary[]> => {
+  const sections = await content.getSections();
+  const lists = await Promise.all(
+    sections.map(async (section) => everyPage(async (query) => content.getFeed({ ...query, section: section.id }))),
+  );
+  return lists.flat();
 };

@@ -1,8 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { sectionCode } from '@huma/design-tokens';
 import { VISUAL_WIDTHS } from './artwork.ts';
 import { buildCorpus } from './build.ts';
-import { SECTIONS } from './registries.ts';
+import { codeOf } from './registries.ts';
 import { imageName, renderVisual } from './render.ts';
 import type { Visual } from './render.ts';
 import { imageKeys } from './validate.ts';
@@ -21,8 +20,10 @@ process.stdout.write(`corpus : ${String(corpus.length)} items générés\n`);
 /** Then the picture that stands in for each illustration the mock has no photograph for. */
 const visuals: Visual[] = [];
 for (const article of corpus) {
-  const section = SECTIONS.find((each) => each.id === article.section);
-  const code = sectionCode(section?.code ?? '');
+  const code = codeOf(article.section);
+  if (code === undefined) {
+    throw new RangeError(`${article.id} : rubrique inconnue du corpus`);
+  }
   for (const key of imageKeys(article)) {
     visuals.push(await renderVisual(key, code));
   }

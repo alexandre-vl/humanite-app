@@ -4,25 +4,29 @@ import type {
   ArticleId,
   ArticleSummary,
   ContentApi,
-  ContentErrorCode,
   FeedQuery,
   IssueId,
   IssueSummary,
-  LiveQuery,
   Page,
+  PageQuery,
   SearchQuery,
   Section,
-  SectionId,
 } from '@huma/contracts';
 import { CORPUS, SECTIONS } from '@huma/mock-content';
 
-const DEFAULT_LIMIT = 12;
+/**
+ * How much each list answers at once: what the journal's service answered in the capture of 21/09/2026, so every
+ * screen runs on the mock at the geometry of the paper it will read. The front and the wire come in one answer each,
+ * the service having never been seen to page either; a section's own list and a search come thirty and ten at a time.
+ */
+const PAGE_SIZES = { front: 13, wire: 10, section: 30, search: 10 } as const;
 
 const summarize = (article: Article): ArticleSummary => ARTICLE_SUMMARY.parse(article);
 
 /**
- * Every summary, newest first — the order feeds and search present. The app bundles this module, so it runs on Hermes,
- * which has no `Array.prototype.toSorted`: a copy sorted in place says the same thing to both engines.
+ * Every summary, newest first — the order a section's list, the wire and a search present, and the order the corpus
+ * lays its front in, having no desk to lay it otherwise. The app bundles this module, so it runs on Hermes, which has
+ * no `Array.prototype.toSorted`: a copy sorted in place says the same thing to both engines.
  */
 const CHRONOLOGICAL: readonly ArticleSummary[] = [...CORPUS.map(summarize)].sort((left, right) =>
   right.publishedAt.localeCompare(left.publishedAt),
@@ -74,8 +78,9 @@ const SHELF: readonly IssueSummary[] = [...gathered]
 
 /**
  * A text as search compares it: no case, no accents, no ligature. French is written with them and searched without —
- * a reader who types `ecole` means `école`, and on this corpus 45 of the 117 subjects carry an accent. Hermes has both
- * `normalize('NFD')` and the `\p{…}` escapes this needs, measured in the app itself (journal 0a, vérification 15).
+ * a reader who types `ecole` means `école`, and on this corpus 643 of the 3 346 words of the titles and standfirsts
+ * carry an accent. Hermes has both `normalize('NFD')` and the `\p{…}` escapes this needs, measured in the app itself
+ * (journal 0a, vérification 15).
  *
  * `œ` is spelt out first because NFD leaves it whole: it is one letter, not an `o` wearing a mark. The corpus writes
  * it eight times — cœur, œil, œuvre, vœux — and nothing at all with `æ`, which is why only one ligature is named.
@@ -88,107 +93,75 @@ type Indexed = Readonly<{ summary: ArticleSummary; searchable: string }>;
 /**
  * What search looks through: the title and the standfirst of every article, and nothing of the body. The body is not
  * in a summary at all, so searching it would mean holding the whole corpus a second time.
- *
- * It read the subjects of an item too, until the schema stopped carrying any: nothing ever showed a subject to a
- * reader, and the journal's own service names none. A word that was only ever a subject — « climat » was three of
- * them — is now reachable only where the newsroom wrote it, which is what the journal's own search answers on.
  */
 const INDEXED: readonly Indexed[] = CHRONOLOGICAL.map((summary) => ({
   summary,
   searchable: fold([summary.title, summary.standfirst].join(' ')),
 }));
 
-const page = (
-  items: readonly ArticleSummary[],
-  cursor: string | undefined,
-  limit: number | undefined,
-): Page<ArticleSummary> => {
-  const parsed = cursor === undefined ? 0 : Number.parseInt(cursor, 10);
+/** The page of `items` a cursor opens — an offset, minted here and nowhere else — `size` items long. */
+const pageOf = (items: readonly ArticleSummary[], query: PageQuery, size: number): Page<ArticleSummary> => {
+  const parsed = query.cursor === undefined ? 0 : Number.parseInt(query.cursor, 10);
   const offset = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
-  const size = limit !== undefined && limit > 0 ? limit : DEFAULT_LIMIT;
   const next = offset + size;
-  return {
-    items: items.slice(offset, next),
-    nextCursor: next < items.length ? String(next) : null,
-    total: items.length,
-  };
+  return { items: items.slice(offset, next), nextCursor: next < items.length ? String(next) : null };
 };
 
+/** A list that comes in one answer, whatever cursor is handed: it has no next page to open. */
+const whole = (items: readonly ArticleSummary[], size: number): Page<ArticleSummary> => ({
+  items: items.slice(0, size),
+  nextCursor: null,
+});
+
+const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
+
 /**
- * What makes the mock testable: a failure per method, named by the method it answers to.
+ * The summaries of the ids that name an article, in the order they were asked for and no other — the caller's order is
+ * the only one it can be, a batch being asked by whoever already knows how its answers are to be read.
  *
- * It carried a latency and a delay to await as well, and nothing in the repository ever passed either — a mock that
- * answers instantly is what makes a test deterministic, and what a screen does while it waits is shown by holding a
- * promise open, not by sleeping.
+ * An id that names nothing is left out rather than raised. A batch is not a lookup: the ids come from somewhere that
+ * outlives the paper — a body pointing at a piece since withdrawn, a reader's own list kept on the phone across a
+ * corpus that has changed under it — and a whole screen that fails because one line of it no longer exists tells the
+ * reader nothing true. What is still printed is served; what is not, is not there.
  */
-export type MockApiOptions = Readonly<{ fail?: Partial<Record<keyof ContentApi, ContentErrorCode>> }>;
+const summariesOf = (ids: readonly ArticleId[]): readonly ArticleSummary[] =>
+  ids.flatMap((id) => {
+    const summary = SUMMARIES.get(id);
+    return summary === undefined ? [] : [summary];
+  });
 
-/** A content api backed by the fictional corpus, with injectable errors. */
-export const createContentApi = (options: MockApiOptions = {}): ContentApi => {
-  const { fail } = options;
-
-  const guard = async (method: keyof ContentApi): Promise<void> => {
-    const code = fail?.[method];
-    if (code !== undefined) {
-      throw new ContentApiError(code, `échec simulé de ${method}`);
-    }
-    return Promise.resolve();
-  };
-
-  const inSection = (section: SectionId | undefined): readonly ArticleSummary[] =>
-    section === undefined ? CHRONOLOGICAL : CHRONOLOGICAL.filter((summary) => summary.section === section);
-
-  const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
-
-  /**
-   * The summaries of the ids that name an article, in the order they were asked for and no other — the caller's order
-   * is the only one it can be, a batch being asked by whoever already knows how its answers are to be read.
-   *
-   * An id that names nothing is left out rather than raised. A batch is not a lookup: the ids come from somewhere that
-   * outlives the paper — a body pointing at a piece since withdrawn, a reader's own list kept on the phone across a
-   * corpus that has changed under it — and a whole screen that fails because one line of it no longer exists tells the
-   * reader nothing true. What is still printed is served; what is not, is not there. The caller can always see which,
-   * having handed over the ids.
-   */
-  const summariesOf = (ids: readonly ArticleId[]): readonly ArticleSummary[] =>
-    ids.flatMap((id) => {
-      const summary = SUMMARIES.get(id);
-      return summary === undefined ? [] : [summary];
-    });
-
-  return {
-    getSections: async (): Promise<readonly Section[]> => {
-      await guard('getSections');
-      return SECTIONS;
-    },
-    getFeed: async (query: FeedQuery): Promise<Page<ArticleSummary>> => {
-      await guard('getFeed');
-      return page(inSection(query.section), query.cursor, query.limit);
-    },
-    getLiveFeed: async (query: LiveQuery): Promise<Page<ArticleSummary>> => {
-      await guard('getLiveFeed');
-      return page(CHRONOLOGICAL, query.cursor, query.limit);
-    },
-    getArticle: async (id: ArticleId): Promise<Article> => {
-      await guard('getArticle');
-      return find(id);
-    },
-    getSummaries: async (ids: readonly ArticleId[]): Promise<readonly ArticleSummary[]> => {
-      await guard('getSummaries');
-      return summariesOf(ids);
-    },
-    getIssues: async (): Promise<readonly IssueSummary[]> => {
-      await guard('getIssues');
-      return SHELF;
-    },
-    search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
-      await guard('search');
-      const needle = fold(query.text.trim());
-      return page(
+/**
+ * The content the corpus serves, as the app's door reads it. It answers at once and never fails: a test that wants a
+ * screen to see a failure hands the screen a failing read of its own, and what a screen does while it waits is shown
+ * by holding a promise open, not by sleeping.
+ */
+export const contentApi: ContentApi = {
+  getSections: async (): Promise<readonly Section[]> => Promise.resolve(SECTIONS),
+  getFeed: async (query: FeedQuery): Promise<Page<ArticleSummary>> => {
+    const { section } = query;
+    return Promise.resolve(
+      section === undefined
+        ? whole(CHRONOLOGICAL, PAGE_SIZES.front)
+        : pageOf(
+            CHRONOLOGICAL.filter((summary) => summary.section === section),
+            query,
+            PAGE_SIZES.section,
+          ),
+    );
+  },
+  getLiveFeed: async (): Promise<Page<ArticleSummary>> => Promise.resolve(whole(CHRONOLOGICAL, PAGE_SIZES.wire)),
+  getArticle: async (id: ArticleId): Promise<Article> => Promise.resolve(find(id)),
+  getSummaries: async (ids: readonly ArticleId[]): Promise<readonly ArticleSummary[]> =>
+    Promise.resolve(summariesOf(ids)),
+  getIssues: async (): Promise<readonly IssueSummary[]> => Promise.resolve(SHELF),
+  search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
+    const needle = fold(query.text.trim());
+    return Promise.resolve(
+      pageOf(
         INDEXED.filter((indexed) => indexed.searchable.includes(needle)).map((indexed) => indexed.summary),
-        query.cursor,
-        query.limit,
-      );
-    },
-  };
+        query,
+        PAGE_SIZES.search,
+      ),
+    );
+  },
 };

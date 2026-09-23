@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { content } from '#api';
 import { NEWSROOM } from '#config';
 import { openExternal } from '#lib/routing';
-import { renderWithCache, settle } from '#lib/testing';
+import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { ArticlePage } from './article-page';
 
 // Both doubles are built inside their factory: jest hoists the calls above everything else in the file, so anything
@@ -28,8 +28,7 @@ const mockRead: { id: string } = { id: '' };
 
 /** The first article of the corpus whose body satisfies `holds`, so a test never asserts on a shape by luck. */
 const first = async (what: string, holds: (article: Article) => boolean): Promise<Article> => {
-  const { items } = await content.getFeed({ limit: 100 });
-  for (const summary of items) {
+  for (const summary of await everyArticle(content)) {
     const article = await content.getArticle(summary.id);
     if (holds(article)) {
       return article;

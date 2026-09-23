@@ -29,8 +29,9 @@ test('BLOCK parses each block kind and rejects an unknown one', () => {
   expect(BLOCK.safeParse({ type: 'sidebar' }).success).toBe(false);
 });
 
-test('SECTION requires a three-letter code', () => {
-  const section: Section = SECTION.parse({ id: 'monde', code: 'mon', label: 'Monde', order: 4 });
+test('SECTION reads a slug and the name the newsroom prints, and nothing else', () => {
+  const section: Section = SECTION.parse({ id: 'culture-et-savoir', label: 'Culture et savoir', order: 5 });
   expectTypeOf(section).toEqualTypeOf<Section>();
-  expect(SECTION.safeParse({ id: 'monde', code: 'monde', label: 'Monde', order: 4 }).success).toBe(false);
+  expect(section).toEqual({ id: 'culture-et-savoir', label: 'Culture et savoir' });
+  expect(SECTION.safeParse({ id: '19569', label: 'Culture et savoir' }).success).toBe(false);
 });

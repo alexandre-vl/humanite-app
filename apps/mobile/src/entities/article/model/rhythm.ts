@@ -66,9 +66,11 @@ const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): Car
 /**
  * The order a page of the paper reads in: the article it opens on first, then everything else as it came.
  *
- * The feed arrives newest first, and the newest items of a morning are the briefs filed before the desk has pictures
- * — four of them, the day this was written. A page that took its rank alone would open on a brief and never once
- * print the front it is named after, so the front is chosen rather than found in place. Nothing else moves.
+ * A page opens on a picture, and a feed need not start with one: the corpus lays its front out newest first, and the
+ * newest items of a morning are the briefs filed before the desk has pictures — four of them there. A page that took
+ * its rank alone would open on a brief and never once print the front it is named after, so the opener is chosen
+ * rather than found in place; on a front whose desk already opens on a picture, it is the first item and nothing
+ * moves. Nothing else moves either way.
  */
 const paperOrder = (summaries: readonly ArticleSummary[]): readonly ArticleSummary[] => {
   const opener = openerOf(summaries);

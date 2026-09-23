@@ -3,7 +3,7 @@ import { contrastRatio } from './contrast.ts';
 import { PALETTE } from './palette.ts';
 import { SECTION_COLORS, sectionColor } from './sections.ts';
 
-test('every section of the newspaper has one ground, and no two share a code', () => {
+test('every section of the corpus has one ground, and no two share a code', () => {
   const codes = SECTION_COLORS.map(([code]) => code);
   expect(codes).toHaveLength(8);
   expect(new Set(codes).size).toBe(codes.length);

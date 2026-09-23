@@ -4,35 +4,38 @@ import type { ArticleId, SectionId } from './ids.ts';
 import type { IssueSummary } from './issue.ts';
 import type { Page } from './page.ts';
 
-/** What a feed query selects: a section, a page cursor and a page size. */
-export type FeedQuery = Readonly<{ section?: SectionId; cursor?: string; limit?: number }>;
+/**
+ * Which page of a list a query asks for: the cursor an earlier page handed back, or none for the first.
+ *
+ * It names no size. The source decides how much a page holds — the journal's service answers thirty items for a
+ * section and ten for a search, whatever it is asked — and a size only one source could honour is a size the other
+ * would silently ignore.
+ */
+export type PageQuery = Readonly<{ cursor?: string }>;
 
-/** What the live feed query selects: a page cursor and a page size. */
-export type LiveQuery = Readonly<{ cursor?: string; limit?: number }>;
+/** A page of the front, or of one section's own list when a section is named. */
+export type FeedQuery = PageQuery & Readonly<{ section?: SectionId }>;
 
-/** What a search query selects: the text, a page cursor and a page size. */
-export type SearchQuery = Readonly<{ text: string; cursor?: string; limit?: number }>;
+/** A page of the articles a question reaches. */
+export type SearchQuery = PageQuery & Readonly<{ text: string }>;
 
 /**
- * The read surface of the content, which the mock and the app both speak.
+ * The read surface of the content, which every source serves and the app reads: what both the mock and the journal's
+ * service can answer, and nothing only one of them could.
  *
- * `getArticle` names one piece and fails when it is not there — asking for it is opening it. `getSummaries` names
- * several and answers with those that exist, in the order asked: its ids come from lists that outlive the paper, and
- * one withdrawn piece must not cost the reader the rest of them.
+ * `getFeed` with no section is the front, in the order its desk laid it out; with one, that section's own list, the
+ * newest first. `getArticle` names one piece and fails when it is not there — asking for it is opening it.
+ * `getSummaries` names several and answers with those that exist, in the order asked: its ids come from lists that
+ * outlive the paper, and one withdrawn piece must not cost the reader the rest of them.
  *
  * `getIssues` answers with every numéro at once: a day's paper is a closed thing of a few dozen pieces, and the
  * newsstand stands them in a row. It takes no cursor, because it has no next page — that is what tells a numéro from
  * a feed.
- *
- * Three methods left this surface, each for the same reason: no screen called it, and the journal's service answers
- * nothing of the kind. `getAuthors` served a roster the service has no equivalent of; `getIssue` opened a numéro
- * inside the app, which the numéro's own weight and its reader put out of reach; `getSession` said whether the
- * reader subscribed, which the service says article by article instead, in the right it grants each one.
  */
 export type ContentApi = Readonly<{
   getSections: () => Promise<readonly Section[]>;
   getFeed: (query: FeedQuery) => Promise<Page<ArticleSummary>>;
-  getLiveFeed: (query: LiveQuery) => Promise<Page<ArticleSummary>>;
+  getLiveFeed: (query: PageQuery) => Promise<Page<ArticleSummary>>;
   getArticle: (id: ArticleId) => Promise<Article>;
   getSummaries: (ids: readonly ArticleId[]) => Promise<readonly ArticleSummary[]>;
   getIssues: () => Promise<readonly IssueSummary[]>;

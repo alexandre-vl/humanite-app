@@ -33,11 +33,15 @@ export type Block = z.infer<typeof BLOCK>;
 /** The raw shape `BLOCK` accepts as input, before it brands and validates it. */
 export type BlockInput = z.input<typeof BLOCK>;
 
-/** A section of the newspaper: its id, three-letter code, label and order in the bar. */
+/**
+ * A section of the newspaper: its id and the name the newsroom prints for it.
+ *
+ * Its place in the bar is its place in the list the source answers, and nothing else: the journal's menu comes in the
+ * newsroom's order and says so by that order alone, and a number beside it would be a second order that could
+ * disagree with the first.
+ */
 export const SECTION = z.object({
   id: SECTION_ID,
-  code: z.string().regex(/^[a-z]{3}$/u),
   label: DISPLAY_TEXT,
-  order: z.number().int().positive(),
 });
 export type Section = z.infer<typeof SECTION>;

@@ -3,12 +3,13 @@ import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { asDisplayText } from '#lib/display-text';
+import { everyArticle } from '#lib/testing';
 import { Text } from '#primitives/text';
 import type { CardShape } from '../model/rhythm';
 import { ArticleCard } from './article-card';
 
-/** The whole corpus, which is what a card has to hold over. */
-const everything = async (): Promise<readonly ArticleSummary[]> => (await content.getFeed({ limit: 100 })).items;
+/** The whole paper, which is what a card has to hold over. */
+const everything = async (): Promise<readonly ArticleSummary[]> => everyArticle(content);
 
 /** An article that carries a picture: the shapes are told apart by what they do with one. */
 const illustrated = (items: readonly ArticleSummary[]): ArticleSummary => {

@@ -12,12 +12,11 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
-import { countLabel } from '../model/count';
 import { useDebounced } from '../model/debounced';
 import { SearchField } from './search-field';
 
 const useStyles = createStyles(() => ({
-  count: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md },
+  heading: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.md },
 }));
 
 /**
@@ -27,9 +26,10 @@ const useStyles = createStyles(() => ({
  * a reader is typing in must do neither — so the screen holds it itself, above the one scrolling region it has.
  *
  * Nothing is asked until the typing settles and the field holds a question; until then the screen says what it
- * searches, which is the one thing a reader cannot guess and the paper's own screen leaves blank. The count is shown
- * only once there is something to count: while an answer is on its way the previous one is still on screen, and a
- * number that flickered to zero and back would be read as a wrong answer rather than as an unfinished one.
+ * searches, which is the one thing a reader cannot guess and the paper's own screen leaves blank. The line over the
+ * answers names the question they answer, and counts nothing: the journal's search says how many it found nowhere, so
+ * no source can be counted on to. It is shown only once there is an answer, the previous one staying on screen while
+ * the next is on its way.
  */
 export function SearchPage(): ReactNode {
   const styles = useStyles();
@@ -41,8 +41,8 @@ export function SearchPage(): ReactNode {
     <Surface>
       <SearchField value={typed} onChange={setTyped} />
       {feed.items.length === 0 ? null : (
-        <Box style={styles.count}>
-          <Text variant="label">{countLabel(feed.total, asked)}</Text>
+        <Box style={styles.heading}>
+          <Text variant="label">{t('search.for', { query: asked })}</Text>
         </Box>
       )}
       {searchable(asked) ? (

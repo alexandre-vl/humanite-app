@@ -5,7 +5,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { asDisplayText } from '#lib/display-text';
 import { formatLongDate } from '#lib/format';
-import { renderWithCache, settle } from '#lib/testing';
+import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
 /** What the screen answers when the reader asks which section an article ran in, in one word the corpus never uses. */
@@ -100,8 +100,7 @@ const read = async (
 
 /** The first article of the corpus whose body satisfies `holds`, so a test never asserts on a shape by luck. */
 const first = async (what: string, holds: (article: Article) => boolean): Promise<Article> => {
-  const { items } = await content.getFeed({ limit: 100 });
-  for (const summary of items) {
+  for (const summary of await everyArticle(content)) {
     const article = await content.getArticle(summary.id);
     if (holds(article)) {
       return article;

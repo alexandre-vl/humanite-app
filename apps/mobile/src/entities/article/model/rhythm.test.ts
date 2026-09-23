@@ -2,10 +2,14 @@ import { ARTICLE_SUMMARY } from '@huma/contracts';
 import type { ArticleSummary } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { content, pictureOf } from '#api';
+import { everyArticle } from '#lib/testing';
 import { feedRows, rowName, rowShape } from './rhythm';
 
-/** The whole corpus, which is what a rhythm has to hold over. */
-const everything = async (): Promise<readonly ArticleSummary[]> => (await content.getFeed({ limit: 100 })).items;
+/** The whole paper, which is what a rhythm has to hold over. */
+const everything = async (): Promise<readonly ArticleSummary[]> => everyArticle(content);
+
+/** The front, as its source lays it out. */
+const theFront = async (): Promise<readonly ArticleSummary[]> => (await content.getFeed({})).items;
 
 /** The article a page should open on, worked out beside the code under test rather than by it. */
 const frontOf = (items: readonly ArticleSummary[]): ArticleSummary | undefined =>
@@ -23,11 +27,11 @@ describe('feedRows, rythme du journal', () => {
   });
 
   /**
-   * The corpus files four briefs ahead of the first picture, so a page that took its rank alone would open on a
-   * brief and the front page would never once be printed. This is the test that would have caught that.
+   * The front of the corpus opens on four briefs ahead of the first picture, so a page that took its rank alone would
+   * open on a brief and the front page would never once be printed. This is the test that would have caught that.
    */
   it('ouvre sur un article en grand, et c’est un article illustré', async () => {
-    const rows = feedRows(await everything(), 'paper');
+    const rows = feedRows(await theFront(), 'paper');
     const [lead] = rows;
     if (lead === undefined) {
       throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');

@@ -1,17 +1,32 @@
 import { SECTION, SECTION_ID } from '@huma/contracts';
 import type { Section, SectionId } from '@huma/contracts';
+import type { SectionCode } from '@huma/design-tokens';
 
-/** The sections in the order of the category bar (docs/app-actuelle; environnement and sport assumed). */
-export const SECTIONS: readonly Section[] = [
-  { id: 'politique', code: 'pol', label: 'Politique', order: 1 },
-  { id: 'social-eco', code: 'eco', label: 'Social Éco', order: 2 },
-  { id: 'societe', code: 'soc', label: 'Société', order: 3 },
-  { id: 'monde', code: 'mon', label: 'Monde', order: 4 },
-  { id: 'culture-et-savoir', code: 'cul', label: 'Culture et savoir', order: 5 },
-  { id: 'feminisme', code: 'fem', label: 'Féminisme', order: 6 },
-  { id: 'environnement', code: 'env', label: 'Environnement', order: 7 },
-  { id: 'sport', code: 'spo', label: 'Sport', order: 8 },
-].map((raw) => SECTION.parse(raw));
+/**
+ * The sections of the corpus, in the order of the category bar, each with the three letters its items, its pictures and
+ * its ground are named by.
+ *
+ * The first seven are the journal's own — slug, name and place in its menu alike (`/wordpress/menu`); `sport` is the
+ * corpus's alone. The letters are the corpus's too: the journal numbers its sections and names no code, so the letters
+ * stay here, with the fiction that is written in them, and not in the domain.
+ */
+const REGISTRY = [
+  { id: 'politique', code: 'pol', label: 'Politique' },
+  { id: 'social-eco', code: 'eco', label: 'Social Éco' },
+  { id: 'societe', code: 'soc', label: 'Société' },
+  { id: 'monde', code: 'mon', label: 'Monde' },
+  { id: 'culture-et-savoir', code: 'cul', label: 'Culture et savoir' },
+  { id: 'feminisme', code: 'fem', label: 'Féminisme' },
+  { id: 'environnement', code: 'env', label: 'Environnement' },
+  { id: 'sport', code: 'spo', label: 'Sport' },
+] as const satisfies readonly Readonly<{ id: string; code: SectionCode; label: string }>[];
+
+/** The sections as the domain knows them, in the order of the bar: the letters stay behind. */
+export const SECTIONS: readonly Section[] = REGISTRY.map(({ id, label }) => SECTION.parse({ id, label }));
+
+/** The three letters of the section `id` names, or `undefined` for an id that names no section of this corpus. */
+export const codeOf = (id: SectionId | undefined): SectionCode | undefined =>
+  REGISTRY.find((each) => each.id === id)?.code;
 
 /**
  * Someone who signs a piece of this corpus. Not a value of the domain and never one again: an item carries the name

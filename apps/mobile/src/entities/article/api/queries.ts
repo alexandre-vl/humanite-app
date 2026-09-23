@@ -3,8 +3,8 @@ import type {
   ArticleId,
   ArticleSummary,
   FeedQuery,
-  LiveQuery,
   Page,
+  PageQuery,
   SearchQuery,
   SectionId,
 } from '@huma/contracts';
@@ -33,7 +33,7 @@ const KEPT = 'kept';
 const FIRST = '';
 
 /** The query that reads the page `cursor` opens, a cursor staying an opaque string the content alone mints. */
-const at = (cursor: string): LiveQuery => (cursor === FIRST ? {} : { cursor });
+const at = (cursor: string): PageQuery => (cursor === FIRST ? {} : { cursor });
 
 /**
  * The key of every reading of articles, minted here and nowhere else. Two screens asking for the same pages under two
@@ -56,7 +56,7 @@ const KEYS = {
  */
 const paged = (
   queryKey: readonly string[],
-  read: (query: LiveQuery) => Promise<Page<ArticleSummary>>,
+  read: (query: PageQuery) => Promise<Page<ArticleSummary>>,
   enabled = true,
 ) =>
   infiniteQueryOptions({
@@ -74,7 +74,7 @@ const paged = (
  */
 export type PagedFeed = ReturnType<typeof paged>;
 
-/** Every article, newest first, by pages: what the À la une screen reads. */
+/** The front, in the order its source lays it out: what the À la une screen reads. */
 export const feedQuery = paged(KEYS.feed(), async (query) => content.getFeed(query));
 
 /**
@@ -87,13 +87,12 @@ export const sectionFeedQuery = (section: SectionId): PagedFeed =>
     return content.getFeed(filtered);
   });
 
-/** The same articles as a running wire: what the En continu screen reads. */
+/** The running wire, the newest first: what the En continu screen reads. */
 export const liveFeedQuery = paged(KEYS.live(), async (query) => content.getLiveFeed(query));
 
 /**
- * The articles a reader's question reaches, newest first, by pages. The question is asked of the content only once it
- * is one: an empty field would otherwise fetch the whole paper — the content matches every article against nothing —
- * and a single letter very nearly all of it.
+ * The articles a reader's question reaches, in the order the source ranks them, by pages. The question is asked of the
+ * content only once it is one: an empty field or a single letter would ask for very nearly the whole paper.
  */
 export const searchQuery = (text: string): PagedFeed =>
   paged(

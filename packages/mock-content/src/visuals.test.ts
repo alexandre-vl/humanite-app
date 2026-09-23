@@ -6,13 +6,13 @@ import { VISUAL_WIDTHS, artworkSvg, judgeArtwork } from './artwork.ts';
 import { VISUALS } from './generated/visuals.ts';
 import { CORPUS } from './index.ts';
 import { IMAGES, imageName } from './render.ts';
-import { SECTIONS } from './registries.ts';
+import { codeOf, SECTIONS } from './registries.ts';
 import { imageKeys } from './validate.ts';
 
 const keys = CORPUS.flatMap((article) => imageKeys(article));
 
 test('every section of the registry has a ground, and every ground a section', () => {
-  expect(SECTIONS.map((section) => section.code).toSorted()).toEqual(SECTION_COLORS.map(([code]) => code).toSorted());
+  expect(new Set(SECTIONS.map((section) => codeOf(section.id)))).toEqual(new Set(SECTION_COLORS.map(([code]) => code)));
 });
 
 test('every picture the corpus names has its placeholder', () => {

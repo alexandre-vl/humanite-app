@@ -7,11 +7,13 @@ describe('t', () => {
   });
 
   it('remplit chaque trou d’une clé par la valeur qu’on lui donne', () => {
-    expect(t('search.count.many', { count: 12, query: 'climat' })).toBe('12 résultats pour « climat »');
+    expect(t('issue.cover', { date: '13 septembre', opener: 'Grève', count: '11 articles' })).toBe(
+      'Numéro du 13 septembre : Grève. 11 articles.',
+    );
   });
 
   it('écrit un nombre comme un nombre s’écrit, sans que l’appelant ait à le faire', () => {
-    expect(t('search.count.one', { count: 1, query: 'gaza' })).toBe('1 résultat pour « gaza »');
+    expect(t('issue.count.one', { count: 1 })).toBe('1 article');
   });
 
   /**
@@ -20,12 +22,12 @@ describe('t', () => {
    */
   it('refuse à la compilation un trou vide, un trou en trop, et un nom mal écrit', () => {
     // @ts-expect-error une clé à trous n’est pas appelable sans ses valeurs
-    expect(t('search.count.many')).toBeTruthy();
+    expect(t('search.for')).toBeTruthy();
     // @ts-expect-error une clé sans trou n’accepte aucune valeur
     expect(t('nav.search', { count: 1 })).toBeTruthy();
     // @ts-expect-error le nom d’un trou est celui que le français écrit, et « subject » n’y est pas
     expect(t('search.none.title', { subject: 'climat' })).toBeTruthy();
-    // @ts-expect-error il manque « query », que le texte laisse en blanc
-    expect(t('search.count.many', { count: 3 })).toBeTruthy();
+    // @ts-expect-error il manque « opener », que le texte laisse en blanc
+    expect(t('issue.cover', { date: '13 septembre', count: '11 articles' })).toBeTruthy();
   });
 });
