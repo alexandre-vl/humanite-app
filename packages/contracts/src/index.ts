@@ -10,7 +10,7 @@ export type { LinkTarget, Section, Span, SpanInput } from './content.ts';
 export { ARTICLE, ARTICLE_SUMMARY, BLOCK, blocksOf, textOf } from './article.ts';
 export { atSquare, atWidth, judgePicture, PICTURE } from './picture.ts';
 export type { Picture, PictureCode, Resize } from './picture.ts';
-export type { Article, ArticleSummary, Block, BlockInput, HeroInput } from './article.ts';
+export type { Article, ArticleSummary, Block, BlockInput, HeroInput, SummaryInput } from './article.ts';
 export { judgeIntake, readArticle, readList, readMenu, readSummaries } from './intake.ts';
 export type { IntakeCode, ListedSection, Listing, SetAside, Take } from './intake.ts';
 export { DONATION, judgeProse, readPlain, readProse, THE_BODY } from './prose.ts';

@@ -23,7 +23,8 @@ export type Hero = z.infer<typeof HERO>;
 /**
  * The raw shape `HERO` accepts, before it brands and validates it: what a reading builds and hands the schema. Typed,
  * so a key spelt wrong is refused by the compiler rather than dropped by the parse — an object schema strips the keys
- * it does not name, and an optional one missing would read as a picture with nothing under it.
+ * it does not name, and an optional one missing would read as a picture with nothing under it. A key a reading spreads
+ * in only when it holds something is checked against nothing on its way, so a reading says `satisfies` of it.
  */
 export type HeroInput = z.input<typeof HERO>;
 

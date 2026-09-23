@@ -185,13 +185,30 @@ test('an interview becomes the questions and the answers it is made of, and keep
   expect(linked.every((span) => span.target.kind === 'external')).toBe(true);
 });
 
-test('a video of the journal is read as a video, with its body open', () => {
+test('a video of the journal is read as a video, with its film and its body open', () => {
   const read = readArticle(RECORDED.articles.video.answer);
   if (!('item' in read)) {
     throw new Error(read.refused);
   }
   expect(read.item.format).toBe('video');
+  expect(read.item.film).toBeDefined();
   expect(read.item.body.kind).toBe('open');
+});
+
+/**
+ * A film is what a video item links to, and a link that is no film of the journal costs the item that link and nothing
+ * else, as a picture from elsewhere costs it its picture. Sent as `null`, it used to cost the whole item.
+ */
+test.each([
+  { sent: 'as null', film: null },
+  { sent: 'as an address that is no film of the journal', film: 'https://example.org/video' },
+])('a video whose film is sent $sent is kept, without a film', ({ film }) => {
+  const read = readArticle({ ...RECORDED.articles.video.answer, video_url: film });
+  if (!('item' in read)) {
+    throw new Error(read.refused);
+  }
+  expect(read.item.format).toBe('video');
+  expect(read.item.film).toBeUndefined();
 });
 
 /** The recorded column as an answer that holds every field of the item and no body. */

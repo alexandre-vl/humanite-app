@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { ARTICLE, ARTICLE_SUMMARY, instantAt, SECTION_ID, typeset } from '@huma/contracts';
-import type { ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput } from '@huma/contracts';
+import type { ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput, SummaryInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -66,8 +66,8 @@ const toHero = (id: string, value: string): HeroInput => {
   const [caption = '', credit = ''] = value.split('|').map((part) => typeset(part.trim()));
   return {
     picture: { kind: 'corpus', key: `${id}-hero` },
-    ...(caption === '' ? {} : { caption }),
-    ...(credit === '' ? {} : { credit }),
+    ...(caption === '' ? {} : ({ caption } satisfies Partial<HeroInput>)),
+    ...(credit === '' ? {} : ({ credit } satisfies Partial<HeroInput>)),
   };
 };
 
@@ -139,7 +139,11 @@ const toParagraph = (children: readonly PhrasingContent[]): RawBlock => {
   const [only] = children;
   if (children.length === 1 && only?.type === 'image') {
     const caption = typeset(only.alt ?? '');
-    return { type: 'image', picture: { kind: 'corpus', key: only.url }, ...(caption === '' ? {} : { caption }) };
+    return {
+      type: 'image',
+      picture: { kind: 'corpus', key: only.url },
+      ...(caption === '' ? {} : ({ caption } satisfies Partial<HeroInput>)),
+    };
   }
   return { type: 'paragraph', spans: toSpans(children) };
 };
@@ -192,8 +196,8 @@ export const parseItem = (text: string): WrittenItem => {
     title: typesetOr(front['title']),
     standfirst: typesetOr(front['standfirst']),
     publishedAt: published === undefined ? undefined : (instantAt(published) ?? published),
-    ...(byline === undefined ? {} : { byline }),
-    ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
+    ...(byline === undefined ? {} : ({ byline } satisfies Partial<SummaryInput>)),
+    ...(hero === undefined ? {} : ({ hero: toHero(id, hero) } satisfies Partial<SummaryInput>)),
   });
   return { summary, section: SECTION_ID.parse(front['section']), blocks };
 };

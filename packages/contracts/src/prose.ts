@@ -1,5 +1,5 @@
 import { BLOCK, textOf } from './article.ts';
-import type { Block, BlockInput } from './article.ts';
+import type { Block, BlockInput, HeroInput } from './article.ts';
 import type { SpanInput } from './content.ts';
 import type { Finding } from './finding.ts';
 import { PICTURE } from './picture.ts';
@@ -285,8 +285,8 @@ const figureOf = (inner: string): BlockInput | null => {
   return {
     type: 'image',
     picture: picture.data,
-    ...(caption === '' ? {} : { caption }),
-    ...(credit === '' ? {} : { credit }),
+    ...(caption === '' ? {} : ({ caption } satisfies Partial<HeroInput>)),
+    ...(credit === '' ? {} : ({ credit } satisfies Partial<HeroInput>)),
   };
 };
 

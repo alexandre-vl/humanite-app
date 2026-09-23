@@ -101,7 +101,11 @@ const heroOf = (post: RemotePost): HeroInput | undefined => {
     return undefined;
   }
   const { caption, credit } = readLegend(post.image_caption ?? '');
-  return { picture: picture.data, ...(caption === '' ? {} : { caption }), ...(credit === '' ? {} : { credit }) };
+  return {
+    picture: picture.data,
+    ...(caption === '' ? {} : ({ caption } satisfies Partial<HeroInput>)),
+    ...(credit === '' ? {} : ({ credit } satisfies Partial<HeroInput>)),
+  };
 };
 
 /**
@@ -131,11 +135,11 @@ const inputOf = (post: RemotePost, publishedAt: Instant): SummaryInput => {
     format: FORMATS[post.article_format ?? 'classic'],
     access: post.premium ? 'premium' : 'free',
     title: readPlain(post.title),
-    ...(standfirst === undefined ? {} : { standfirst }),
+    ...(standfirst === undefined ? {} : ({ standfirst } satisfies Partial<SummaryInput>)),
     publishedAt,
-    ...(byline === '' ? {} : { byline }),
-    ...(hero === undefined ? {} : { hero }),
-    ...(film === undefined ? {} : { film }),
+    ...(byline === '' ? {} : ({ byline } satisfies Partial<SummaryInput>)),
+    ...(hero === undefined ? {} : ({ hero } satisfies Partial<SummaryInput>)),
+    ...(film === undefined ? {} : ({ film } satisfies Partial<SummaryInput>)),
   };
 };
 
@@ -191,6 +195,12 @@ const nothingRead = (setAside: readonly SetAside[]): string =>
     .map((each) => `[${String(each.at)}] ${each.says}`)
     .join(' ; ')}`;
 
+/**
+ * `whole` as a reading's answer, or the refusal `nothingRead` words when not one of the items sent could be read.
+ */
+const unlessNothingRead = <Item, Whole>(intake: Intake<Item>, whole: Whole): Read<Whole> =>
+  intake.kept.length === 0 && intake.setAside.length > 0 ? { refused: nothingRead(intake.setAside) } : { item: whole };
+
 /** A list as a client reads it: what was kept and what was set aside, and how many items the service sent. */
 export type Listing = Readonly<{ intake: Intake<ArticleSummary>; sent: number }>;
 
@@ -209,9 +219,7 @@ export const readList = (answer: unknown): Read<Listing> => {
   }
   const { posts } = envelope.data;
   const intake = readSummaries(posts);
-  return intake.kept.length === 0 && intake.setAside.length > 0
-    ? { refused: nothingRead(intake.setAside) }
-    : { item: { intake, sent: posts.length } };
+  return unlessNothingRead(intake, { intake, sent: posts.length });
 };
 
 /**
@@ -242,9 +250,7 @@ export const readMenu = (answer: unknown): Read<Intake<ListedSection>> => {
     return { refused: saysOf(envelope.error) };
   }
   const intake = intakeOf(envelope.data[SECTIONS_KEY], readSection);
-  return intake.kept.length === 0 && intake.setAside.length > 0
-    ? { refused: nothingRead(intake.setAside) }
-    : { item: intake };
+  return unlessNothingRead(intake, intake);
 };
 
 /** A summary and what the reader was given of its body, as the domain's article, or why it is none. */
