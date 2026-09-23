@@ -1,6 +1,8 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { BLOCK, SECTION, SPAN } from './index.ts';
-import type { Block, Section, Span } from './index.ts';
+import { BLOCK } from './article.ts';
+import type { Block } from './article.ts';
+import { SECTION, SPAN } from './content.ts';
+import type { Section, Span } from './content.ts';
 
 test('SPAN parses each inline kind and validates a link target', () => {
   expectTypeOf(SPAN.parse({ type: 'text', value: 'x' })).toEqualTypeOf<Span>();

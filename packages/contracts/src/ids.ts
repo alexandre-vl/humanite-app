@@ -19,6 +19,17 @@ export const ARTICLE_ID = z
   .brand('ArticleId');
 export type ArticleId = z.infer<typeof ARTICLE_ID>;
 
+/**
+ * An article id the journal's service filed: the only grammar its routes take. A client narrows an `ArticleId` through
+ * this before it builds an address, so an id of the corpus never reaches the service as a path — and the grammar is
+ * the one `ARTICLE_ID` is built on, written once for both.
+ */
+export const FILED_ID = z
+  .string()
+  .regex(new RegExp(`^${FILED}$`, 'u'))
+  .brand('FiledId');
+export type FiledId = z.infer<typeof FILED_ID>;
+
 /** An image key: the id of the item it illustrates, then what it shows — `pol-a5-hero`, `cul-a2-galerie`. */
 export const IMAGE_KEY = z
   .string()

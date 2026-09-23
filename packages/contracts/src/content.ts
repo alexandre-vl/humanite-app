@@ -7,6 +7,7 @@ const LINK_TARGET = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('article'), id: ARTICLE_ID }),
   z.object({ kind: z.literal('external'), url: z.url() }),
 ]);
+export type LinkTarget = z.infer<typeof LINK_TARGET>;
 
 /** An inline run of text inside a paragraph or a quote. */
 export const SPAN = z.discriminatedUnion('type', [

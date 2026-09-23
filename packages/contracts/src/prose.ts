@@ -1,6 +1,7 @@
 import { BLOCK } from './article.ts';
 import type { Block, BlockInput } from './article.ts';
 import type { SpanInput } from './content.ts';
+import type { Finding } from './finding.ts';
 
 /**
  * How a body the journal publishes becomes the blocks a screen knows.
@@ -303,10 +304,7 @@ export const readProse = (html: string): readonly Block[] => {
  */
 export const readPlain = (html: string): string => plain(html).trim();
 
-/**
- * The name of one thing a reading of the journal's markup can get wrong. A union rather than a list, nothing ever
- * walking the codes: a reading names exactly one, and a fixture names the set it expects.
- */
+/** The name of one thing a reading of the journal's markup can get wrong. */
 export type ProseCode =
   | 'prose/markup-left'
   | 'prose/entity-left'
@@ -315,9 +313,6 @@ export type ProseCode =
   | 'prose/break-glued'
   | 'prose/edges-loose'
   | 'prose/nothing-read';
-
-/** One thing a judging found wrong, and what it read to find it out. */
-export type ProseFinding = Readonly<{ code: ProseCode; says: string }>;
 
 /** A way of reading a body, which is what the judging below is handed rather than reaching for one. */
 export type ProseReader = (html: string) => readonly Block[];
@@ -418,7 +413,7 @@ const textOf = (block: Block): string => {
  * A reading that rendered nothing is reported alone: everything below reads what came back, and a judging of nothing
  * would name every fault at once and tell the reader which to fix last.
  */
-export const judgeProse = (read: ProseReaders): readonly ProseFinding[] => {
+export const judgeProse = (read: ProseReaders): readonly Finding<ProseCode>[] => {
   const blocks = read.prose(SAMPLE);
   const line = read.plain(HEADLINE);
   if (blocks.length === 0 || line === '') {

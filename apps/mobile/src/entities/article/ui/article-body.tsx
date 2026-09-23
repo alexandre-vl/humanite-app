@@ -1,4 +1,4 @@
-import type { Article, Block } from '@huma/contracts';
+import type { Article, Block, LinkTarget } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf, visualOf } from '#api';
@@ -6,7 +6,6 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { RichText, Text } from '#primitives/text';
 
-import type { LinkTarget } from '../model/spans';
 import { runsOf } from '../model/spans';
 import { ArticleCallout } from './article-callout';
 import { ArticleFigure } from './article-figure';

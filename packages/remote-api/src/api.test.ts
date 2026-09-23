@@ -3,33 +3,18 @@ import type { ContentErrorCode, SetAside } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { createRemoteApi } from './api.ts';
 import type { Client } from './api.ts';
+import { replayed, reply } from './bench.ts';
 import { RECORDED } from './recorded.ts';
-import { routeOf, SERVICE, SERVICE_ROOT } from './routes.ts';
+import { partsOf, routeOf, SERVICE, SERVICE_ROOT } from './routes.ts';
 import type { RouteName } from './routes.ts';
 import type { Reply } from './transport.ts';
 
-/** What the service answered, by route, as the capture kept it. */
-const ANSWERS: Readonly<Record<Exclude<RouteName, 'article'>, unknown>> = {
-  front: RECORDED.front.answer,
-  wire: RECORDED.wire.answer,
-  menu: RECORDED.menu.answer,
-  section: RECORDED.section.answer,
-  search: RECORDED.search.answer,
-};
-
-const reply = async (status: number, body: unknown): Promise<Reply> =>
-  Promise.resolve({ status, text: async () => Promise.resolve(JSON.stringify(body)) });
-
-/** The path under the service's root an address asks for, and its query. */
-const partsOf = (address: string): readonly [string, string] => {
-  const [path = '', query = ''] = address.slice(`${SERVICE}${SERVICE_ROOT}`.length).split('?');
-  return [path, query];
-};
+/** A reply of the service holding `body`, written as the JSON it arrives as. */
+const json = async (status: number, body: unknown): Promise<Reply> => reply(status, JSON.stringify(body));
 
 /**
- * A client over a replay of the capture: each route answered with what it answered then, an article by the one of its
- * number the capture kept, and anything else with a 404. `answer` may take a route over, and every address asked and
- * every item set aside is kept for the test to read.
+ * A client over a replay of the capture, which `answer` may take a route of over; every address asked and every item
+ * set aside is kept for the test to read.
  */
 const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> | undefined) => {
   const asked: string[] = [];
@@ -37,17 +22,9 @@ const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> 
   const client: Client<number> = {
     fetch: async (address) => {
       asked.push(address);
-      const [path, query] = partsOf(address);
-      const route = routeOf(path);
-      const taken = route === undefined ? undefined : answer?.(route, query);
-      if (taken !== undefined) {
-        return taken;
-      }
-      if (route === 'article') {
-        const kept = Object.values(RECORDED.articles).find((each) => each.path === path);
-        return kept === undefined ? reply(404, {}) : reply(200, kept.answer);
-      }
-      return route === undefined ? reply(404, {}) : reply(200, ANSWERS[route]);
+      const parts = partsOf(address);
+      const route = parts === null ? undefined : routeOf(parts.path);
+      return (route === undefined ? undefined : answer?.(route, parts?.query ?? '')) ?? replayed(address);
     },
     abortable: () => ({ signal: 0, abort: () => undefined }),
     after: () => () => undefined,
@@ -58,7 +35,8 @@ const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> 
   return { api: createRemoteApi(client), asked, setAside };
 };
 
-const causeOf = async (read: Promise<unknown>): Promise<ContentErrorCode | null> =>
+/** The cause a read failed with, or `null` when it answered or failed with no cause of the contract's. */
+const failedWith = async (read: Promise<unknown>): Promise<ContentErrorCode | null> =>
   read.then(
     () => null,
     (error: unknown) => (error instanceof ContentApiError ? error.code : null),
@@ -91,7 +69,7 @@ test('a full page of a section opens the next, and a short one ends the list', a
   const [first] = RECORDED.section.answer.posts;
   const full = Array.from({ length: 30 }, (...[, at]) => ({ ...first, id: String(3_900_000 + at) }));
   const { api, asked } = replaying((route, query): Promise<Reply> | undefined =>
-    route === 'section' ? reply(200, { posts: query.includes('page=1') ? full : [first] }) : undefined,
+    route === 'section' ? json(200, { posts: query.includes('page=1') ? full : [first] }) : undefined,
   );
   const section = SECTION_ID.parse('monde');
   const one = await api.getFeed({ section });
@@ -116,18 +94,18 @@ test('a menu that failed is not kept: the next question asks for it again', asyn
       return undefined;
     }
     answered += 1;
-    return answered === 1 ? reply(503, {}) : reply(200, RECORDED.menu.answer);
+    return answered === 1 ? json(503, {}) : json(200, RECORDED.menu.answer);
   });
-  expect(await causeOf(api.getSections())).toBe('unavailable');
+  expect(await failedWith(api.getSections())).toBe('unavailable');
   expect(await api.getSections()).toHaveLength(11);
   expect(asked.filter((address) => address.includes('/wordpress/menu')).length).toBe(2);
 });
 
 test('a section the menu does not list, and an article of the corpus, are not found — and never asked', async () => {
   const { api, asked } = replaying();
-  expect(await causeOf(api.getFeed({ section: SECTION_ID.parse('sport') }))).toBe('not-found');
+  expect(await failedWith(api.getFeed({ section: SECTION_ID.parse('sport') }))).toBe('not-found');
   const before = asked.length;
-  expect(await causeOf(api.getArticle(ARTICLE_ID.parse('pol-a1')))).toBe('not-found');
+  expect(await failedWith(api.getArticle(ARTICLE_ID.parse('pol-a1')))).toBe('not-found');
   expect(asked.length).toBe(before);
 });
 
@@ -150,7 +128,7 @@ test('a search asks its question in the path, ten at a time', async () => {
 test('what a reading sets aside is told, by the route it came from', async () => {
   const [first, ...rest] = RECORDED.wire.answer.posts;
   const { api, setAside } = replaying((route): Promise<Reply> | undefined =>
-    route === 'wire' ? reply(200, { posts: [{ ...first, date: 'hier soir' }, ...rest] }) : undefined,
+    route === 'wire' ? json(200, { posts: [{ ...first, date: 'hier soir' }, ...rest] }) : undefined,
   );
   const wire = await api.getLiveFeed({});
   expect(wire.items).toHaveLength(rest.length);
@@ -159,7 +137,7 @@ test('what a reading sets aside is told, by the route it came from', async () =>
 
 test('an answer that holds no list is refused as unreadable', async () => {
   const { api } = replaying((route): Promise<Reply> | undefined =>
-    route === 'wire' ? reply(200, { error: true }) : undefined,
+    route === 'wire' ? json(200, { error: true }) : undefined,
   );
-  expect(await causeOf(api.getLiveFeed({}))).toBe('malformed');
+  expect(await failedWith(api.getLiveFeed({}))).toBe('malformed');
 });

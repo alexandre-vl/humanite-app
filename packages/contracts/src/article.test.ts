@@ -1,6 +1,6 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { ARTICLE, ARTICLE_SUMMARY, blocksOf, HERO } from './index.ts';
-import type { Article, ArticleSummary, Hero } from './index.ts';
+import { ARTICLE, ARTICLE_SUMMARY, blocksOf, HERO } from './article.ts';
+import type { Article, ArticleSummary, Hero } from './article.ts';
 
 const validSummary = {
   id: 'pol-a1',

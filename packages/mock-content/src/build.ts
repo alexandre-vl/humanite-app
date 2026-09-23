@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { ARTICLE, ARTICLE_SUMMARY, instantAt } from '@huma/contracts';
-import type { Article, ArticleSummary, BlockInput, SectionId, SpanInput } from '@huma/contracts';
+import type { Article, ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -51,10 +51,7 @@ const splitList = (value: string | undefined): readonly string[] =>
  * A `légende | crédit` hero scalar. Its key is the item's own, so a lead picture is named without being authored, and
  * it is a picture of the corpus: the only kind whose file the bundler holds.
  */
-const toHero = (
-  id: string,
-  value: string,
-): Readonly<{ picture: Readonly<{ kind: 'corpus'; key: string }>; caption?: string; credit?: string }> => {
+const toHero = (id: string, value: string): HeroInput => {
   const [caption = '', credit = ''] = value.split('|').map((part) => part.trim());
   return {
     picture: { kind: 'corpus', key: `${id}-hero` },

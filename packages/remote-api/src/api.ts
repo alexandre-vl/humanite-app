@@ -1,4 +1,4 @@
-import { ContentApiError, readArticle, readList, readMenu } from '@huma/contracts';
+import { ContentApiError, FILED_ID, readArticle, readList, readMenu, SERVICE_PAGES } from '@huma/contracts';
 import type {
   Article,
   ArticleId,
@@ -13,7 +13,7 @@ import type {
   SectionId,
   SetAside,
 } from '@huma/contracts';
-import { ROUTES, SEARCH_PAGE, SECTION_PAGE } from './routes.ts';
+import { ROUTES } from './routes.ts';
 import type { Request, RouteName } from './routes.ts';
 import { ask } from './transport.ts';
 import type { Ports } from './transport.ts';
@@ -27,9 +27,6 @@ import type { Ports } from './transport.ts';
  */
 export type Client<Signal> = Ports<Signal> &
   Readonly<{ setAside: (route: RouteName, setAside: readonly SetAside[]) => void }>;
-
-/** How the service numbers an article: the only ids it was ever asked about. */
-const FILED = /^\d+$/u;
 
 /** The page a cursor opens. No cursor is the first; a cursor is the number of the page it opens, minted below. */
 const pageOf = (cursor: string | undefined): number => {
@@ -114,17 +111,18 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
       }
       const number = pageOf(cursor);
       const listing = await listed('section', ROUTES.section.request(filed.serviceId, number), section);
-      return page(listing.intake.kept, nextOf(number, listing, SECTION_PAGE));
+      return page(listing.intake.kept, nextOf(number, listing, SERVICE_PAGES.section));
     },
 
     getLiveFeed: async (): Promise<Page<ArticleSummary>> =>
       page((await listed('wire', ROUTES.wire.request())).intake.kept, null),
 
     getArticle: async (id: ArticleId): Promise<Article> => {
-      if (!FILED.test(id)) {
+      const filed = FILED_ID.safeParse(id);
+      if (!filed.success) {
         throw new ContentApiError('not-found', `article inconnu du service : ${id}`);
       }
-      const request = ROUTES.article.request(id);
+      const request = ROUTES.article.request(filed.data);
       const read = readArticle(await ask(client, request));
       if ('refused' in read) {
         throw new ContentApiError('malformed', `${request.path} : ${read.refused}`);
@@ -135,7 +133,7 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
     search: async ({ text, cursor }: SearchQuery): Promise<Page<ArticleSummary>> => {
       const number = pageOf(cursor);
       const listing = await listed('search', ROUTES.search.request(text.trim(), number));
-      return page(listing.intake.kept, nextOf(number, listing, SEARCH_PAGE));
+      return page(listing.intake.kept, nextOf(number, listing, SERVICE_PAGES.search));
     },
   };
 };

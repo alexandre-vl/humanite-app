@@ -1,4 +1,4 @@
-import type { Article, ArticleId, DisplayText } from '@huma/contracts';
+import type { Article, ArticleId, DisplayText, LinkTarget } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -11,7 +11,6 @@ import { articleQuery } from '../api/queries';
 import { signatureOf } from '../model/byline';
 import { stateOf } from '../model/paged-feed';
 import type { SectionNames } from '../model/section-names';
-import type { LinkTarget } from '../model/spans';
 import { ArticleBody } from './article-body';
 import { ArticleCallout } from './article-callout';
 import { ArticleLead, ArticleTitle } from './article-lead';

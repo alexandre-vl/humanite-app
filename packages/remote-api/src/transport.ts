@@ -43,6 +43,9 @@ export const HEADERS = {
   'user-agent': 'humanite-lecteur (client non officiel)',
 } as const;
 
+/** Whether a header's value is one OkHttp will send: printable ASCII, and nothing else — an accent fails the request. */
+export const isSendable = (value: string): boolean => /^[\x20-\x7e]*$/u.test(value);
+
 /** The cause a status of the service names, or `undefined` for a status that answered. */
 export const causeOf = (status: number): ContentErrorCode | undefined => {
   if (status >= 200 && status < 300) {

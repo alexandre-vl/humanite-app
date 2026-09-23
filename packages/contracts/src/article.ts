@@ -19,6 +19,12 @@ export const HERO = z.object({
   credit: DISPLAY_TEXT.optional(),
 });
 export type Hero = z.infer<typeof HERO>;
+/**
+ * The raw shape `HERO` accepts, before it brands and validates it: what a reading builds and hands the schema. Typed,
+ * so a key spelt wrong is refused by the compiler rather than dropped by the parse — an object schema strips the keys
+ * it does not name, and an optional one missing would read as a picture with nothing under it.
+ */
+export type HeroInput = z.input<typeof HERO>;
 
 /**
  * An item as a feed shows it: everything but the body.
@@ -49,6 +55,8 @@ export const ARTICLE_SUMMARY = z.object({
   emphasis: z.boolean().optional(),
 });
 export type ArticleSummary = z.infer<typeof ARTICLE_SUMMARY>;
+/** The raw shape `ARTICLE_SUMMARY` accepts, typed for the reason `HeroInput` is. */
+export type SummaryInput = z.input<typeof ARTICLE_SUMMARY>;
 
 /**
  * A block of an article body.

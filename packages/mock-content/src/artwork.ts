@@ -1,3 +1,4 @@
+import type { Finding } from '@huma/contracts';
 import { sectionColor } from '@huma/design-tokens';
 import type { SectionCode } from '@huma/design-tokens';
 
@@ -76,14 +77,9 @@ export const artworkSvg = (key: string, code: SectionCode): string => {
 
 /**
  * The name of one thing a reading of the drawing can find wrong: one code per thing that can stop being true of it, so
- * the rule is proven by a fixture that makes exactly its code appear rather than by a test nobody can point at. A union
- * rather than a list, nothing ever walking the codes: a reading names exactly one, and a fixture names the set it
- * expects.
+ * the rule is proven by a fixture that makes exactly its code appear rather than by a test nobody can point at.
  */
 export type ArtworkCode = 'artwork/not-deterministic' | 'artwork/key-ignored' | 'artwork/section-ignored';
-
-/** One thing a reading found wrong, and what it drew to find it out. */
-export type ArtworkFinding = Readonly<{ code: ArtworkCode; says: string }>;
 
 /** A way of drawing a visual, which is what the reading below is handed rather than reaching for one. */
 export type Draw = (key: string, code: SectionCode) => string;
@@ -105,7 +101,7 @@ const OTHER_SECTION: SectionCode = 'env';
  * Determinism is what a rebuild rests on: the same name draws the same picture on any machine and in any order, so
  * regenerating the corpus moves no pixel and adds no file to a commit.
  */
-export const judgeArtwork = (draw: Draw): readonly ArtworkFinding[] => {
+export const judgeArtwork = (draw: Draw): readonly Finding<ArtworkCode>[] => {
   const drawn = draw(ONE_KEY, ONE_SECTION);
   return [
     ...(drawn === draw(ONE_KEY, ONE_SECTION)

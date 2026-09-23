@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Finding } from './finding.ts';
 import { IMAGE_KEY } from './ids.ts';
 
 /**
@@ -43,14 +44,8 @@ export const atWidth = (address: string, width: number): string =>
     ? address.replace(WIDTH, (whole, lead: string) => `${lead}w=${String(width)}`)
     : `${address}${address.includes('?') ? '&' : '?'}w=${String(width)}`;
 
-/**
- * The name of one thing a way of asking for a picture can get wrong. A union rather than a list, nothing ever walking
- * the codes: a judging names each it finds, and a fixture names the set it expects.
- */
+/** The name of one thing a way of asking for a picture can get wrong. */
 export type PictureCode = 'picture/width-ignored' | 'picture/address-changed' | 'picture/query-lost';
-
-/** One thing a judging found wrong, and what it read to find it out. */
-export type PictureFinding = Readonly<{ code: PictureCode; says: string }>;
 
 /** A way of asking for a picture at a width, which is what the judging below is handed rather than reaching for one. */
 export type Resize = (address: string, width: number) => string;
@@ -84,7 +79,7 @@ const othersOf = (address: string): readonly string[] =>
  * listed it, or sends the address somewhere else, or drops what else the address says — and read the code that comes
  * back. Both samples are shapes the journal's own server was seen answering.
  */
-export const judgePicture = (resize: Resize): readonly PictureFinding[] => {
+export const judgePicture = (resize: Resize): readonly Finding<PictureCode>[] => {
   const asked = [LISTED, CROPPED].map((address) => ({ address, answer: resize(address, WANTED) }));
   const any = (test: (pair: Readonly<{ address: string; answer: string }>) => boolean): boolean => asked.some(test);
   return [

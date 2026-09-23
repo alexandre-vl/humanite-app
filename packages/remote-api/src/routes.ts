@@ -1,4 +1,5 @@
-import type { ArticleId } from '@huma/contracts';
+import { SERVICE_PAGES } from '@huma/contracts';
+import type { FiledId } from '@huma/contracts';
 
 /**
  * The routes of the journal's service the app reads, written once: how each request is made, and which recorded path
@@ -24,12 +25,6 @@ const ANONYMOUS = [
   ['language', 'fr'],
   ['ano', '1'],
 ] as const;
-
-/** How many items a section's own list answers per page, whatever it is asked: thirty on every page captured. */
-export const SECTION_PAGE = 30;
-
-/** How many items a search answers per page: the ten the official client asks for, and the ten it is given. */
-export const SEARCH_PAGE = 10;
 
 /**
  * The routes, each as the request that asks it and the pattern of the paths that answer it.
@@ -59,7 +54,7 @@ export const ROUTES = {
     answers: /\/wordpress\/\d+\/posts\/$/u,
   },
   article: {
-    request: (id: ArticleId): Request => ({
+    request: (id: FiledId): Request => ({
       path: `/wordpress/post/${id}`,
       query: [['type', 'post'], ['output_format', 'array'], ...ANONYMOUS],
     }),
@@ -68,7 +63,7 @@ export const ROUTES = {
   search: {
     request: (text: string, page: number): Request => ({
       path: `/article/search/${encodeURIComponent(text)}`,
-      query: [['page', String(page)], ['per_page', String(SEARCH_PAGE)], ...ANONYMOUS],
+      query: [['page', String(page)], ['per_page', String(SERVICE_PAGES.search)], ...ANONYMOUS],
     }),
     answers: /\/article\/search\/[^/]+$/u,
   },
@@ -88,3 +83,16 @@ export const addressOf = (request: Request): string =>
   `${SERVICE}${SERVICE_ROOT}${request.path}?${request.query
     .map(([name, value]) => `${encodeURIComponent(name)}=${encodeURIComponent(value)}`)
     .join('&')}`;
+
+/**
+ * What an address of the service asks, the other way round from `addressOf`: the path under the service's root, and
+ * the query as it was written. `null` for an address anywhere else, which no request of this client is.
+ */
+export const partsOf = (address: string): Readonly<{ path: string; query: string }> | null => {
+  const root = `${SERVICE}${SERVICE_ROOT}`;
+  if (!address.startsWith(`${root}/`)) {
+    return null;
+  }
+  const [path = '', query = ''] = address.slice(root.length).split('?');
+  return { path, query };
+};

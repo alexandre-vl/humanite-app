@@ -1,4 +1,4 @@
-import { ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY, issueIdAt } from '@huma/contracts';
+import { ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY, issueIdAt, SERVICE_PAGES } from '@huma/contracts';
 import type {
   Article,
   ArticleId,
@@ -13,13 +13,6 @@ import type {
   Section,
 } from '@huma/contracts';
 import { CORPUS, SECTIONS } from '@huma/mock-content';
-
-/**
- * How much each list answers at once: what the journal's service answered in the capture of 21/09/2026, so every
- * screen runs on the mock at the geometry of the paper it will read. The front and the wire come in one answer each,
- * the service having never been seen to page either; a section's own list and a search come thirty and ten at a time.
- */
-const PAGE_SIZES = { front: 13, wire: 10, section: 30, search: 10 } as const;
 
 const summarize = (article: Article): ArticleSummary => ARTICLE_SUMMARY.parse(article);
 
@@ -133,15 +126,15 @@ export const contentApi: ContentApi & Required<Pick<ContentApi, 'getIssues'>> = 
     const { section } = query;
     return Promise.resolve(
       section === undefined
-        ? whole(CHRONOLOGICAL, PAGE_SIZES.front)
+        ? whole(CHRONOLOGICAL, SERVICE_PAGES.front)
         : pageOf(
             CHRONOLOGICAL.filter((summary) => summary.section === section),
             query,
-            PAGE_SIZES.section,
+            SERVICE_PAGES.section,
           ),
     );
   },
-  getLiveFeed: async (): Promise<Page<ArticleSummary>> => Promise.resolve(whole(CHRONOLOGICAL, PAGE_SIZES.wire)),
+  getLiveFeed: async (): Promise<Page<ArticleSummary>> => Promise.resolve(whole(CHRONOLOGICAL, SERVICE_PAGES.wire)),
   getArticle: async (id: ArticleId): Promise<Article> => Promise.resolve(asAnonymous(find(id))),
   getIssues: async (): Promise<readonly IssueSummary[]> => Promise.resolve(SHELF),
   search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
@@ -150,7 +143,7 @@ export const contentApi: ContentApi & Required<Pick<ContentApi, 'getIssues'>> = 
       pageOf(
         INDEXED.filter((indexed) => indexed.searchable.includes(needle)).map((indexed) => indexed.summary),
         query,
-        PAGE_SIZES.search,
+        SERVICE_PAGES.search,
       ),
     );
   },

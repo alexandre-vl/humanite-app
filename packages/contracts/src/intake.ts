@@ -1,10 +1,11 @@
 import type { z } from 'zod';
-import type { Article, ArticleSummary } from './article.ts';
+import type { Article, ArticleSummary, HeroInput, SummaryInput } from './article.ts';
 import { ARTICLE, ARTICLE_SUMMARY } from './article.ts';
 import { instantAt } from './clock.ts';
 import type { Section } from './content.ts';
 import { SECTION } from './content.ts';
 import type { ArticleFormat } from './enums.ts';
+import type { Finding } from './finding.ts';
 import type { SectionId } from './ids.ts';
 import { PICTURE } from './picture.ts';
 import { readPlain, readProse } from './prose.ts';
@@ -93,7 +94,7 @@ const saysOf = (error: z.ZodError): string =>
  * The picture an item carries, or nothing. A picture the contract refuses — one served from anywhere but the
  * journal's own pictures — costs the item its picture and not the item: a story with no photograph is still a story.
  */
-const heroOf = (post: RemotePost): Readonly<Record<string, unknown>> | undefined => {
+const heroOf = (post: RemotePost): HeroInput | undefined => {
   if (post.image === '') {
     return undefined;
   }
@@ -113,7 +114,7 @@ const heroOf = (post: RemotePost): Readonly<Record<string, unknown>> | undefined
  * stands in only where the standfirst is empty — a signed column is often filed with an empty one. Of 519 items, none
  * came with both empty.
  */
-const inputOf = (post: RemotePost, publishedAt: string, context: Context): Readonly<Record<string, unknown>> => {
+const inputOf = (post: RemotePost, publishedAt: string, context: Context): SummaryInput => {
   const standfirst = readPlain(post.description);
   const byline = readPlain(post.author ?? '');
   const hero = heroOf(post);
@@ -273,29 +274,20 @@ export const readArticle = (answer: unknown): Read<Article> => {
     : { refused: saysOf(body.error) };
 };
 
-/**
- * The name of one thing a reading of a list can get wrong. A union rather than a list, nothing ever walking the codes:
- * a judging names each it finds, and a fixture names the set it expects.
- */
+/** The name of one thing a reading of a list can get wrong. */
 export type IntakeCode =
   'intake/unreadable-kept' | 'intake/readable-dropped' | 'intake/loss-unnamed' | 'intake/order-lost';
-
-/** One thing a judging found wrong, and what it read to find it out. */
-export type IntakeFinding = Readonly<{ code: IntakeCode; says: string }>;
 
 /** A way of reading a list of the service, which is what the judging below is handed rather than reaching for one. */
 export type Take = (posts: readonly unknown[]) => Intake<ArticleSummary>;
 
 /** What every item of the sample shares: an item the way the service sends one, with no picture to keep it short. */
 const POST = {
-  type: 'post',
-  slug: 'un-article',
   excerpt: '',
   image: '',
   image_caption: null,
   author: 'La rédaction',
   article_format: 'classic',
-  has_audio: false,
   premium: false,
   right: true,
   highlighted: null,
@@ -333,7 +325,7 @@ const SAMPLE: readonly unknown[] = [
  * knows, or refuses more than it must, or drops what it cannot read without a word, or sorts the list by date — and
  * read the code that comes back.
  */
-export const judgeIntake = (take: Take): readonly IntakeFinding[] => {
+export const judgeIntake = (take: Take): readonly Finding<IntakeCode>[] => {
   const intake = take(SAMPLE);
   const ids: readonly string[] = intake.kept.map((summary) => summary.id);
   const served = ids.filter((id) => READABLE.some((readable) => readable === id));

@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, test } from 'vitest';
-import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './index.ts';
-import type { ArticleId, ImageKey, SectionId } from './index.ts';
+import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
+import type { ArticleId, ImageKey, SectionId } from './ids.ts';
 
 describe('ARTICLE_ID', () => {
   test('accepts a well-formed id and brands it', () => {

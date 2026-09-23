@@ -1,6 +1,6 @@
 import { expect, expectTypeOf, test } from 'vitest';
-import { ACCESS, ARTICLE_FORMAT } from './index.ts';
-import type { Access, ArticleFormat } from './index.ts';
+import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
+import type { Access, ArticleFormat } from './enums.ts';
 
 test('ARTICLE_FORMAT parses its members and rejects others', () => {
   expectTypeOf(ARTICLE_FORMAT.parse('video')).toEqualTypeOf<ArticleFormat>();

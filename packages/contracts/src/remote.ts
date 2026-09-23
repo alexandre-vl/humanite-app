@@ -29,8 +29,14 @@ export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
 /**
  * An item as any list of the service carries it.
  *
- * Four fields are absent from the front-page route and present everywhere else, so they are optional here rather than
- * in a second shape: `article_format`, `has_audio`, and — as null — `author` and `image_caption`.
+ * It holds the keys a reading reads, and no other. The service sends more — a slug, a type that is always `post`, an
+ * audio flag never once set, a number for a video's cover that no route resolves — and a schema that held those to a
+ * type would let a change to a key nobody reads cost the reader every item of a list: a `slug` sent as null tomorrow
+ * would set all thirty aside. An object schema drops the keys it does not name, which is what they are owed.
+ *
+ * `author` and `image_caption` come as null, or not at all, on items of every route. `article_format` is left out only
+ * by the sectioned front `a-la-une`, a route the app does not ask; it is read as optional all the same, and an item
+ * without one is read as the classic article it would be.
  *
  * `highlighted` is sent on every item and was null on all 519 of them. It is modelled all the same, because it is the
  * one thing the service could say about an item that the wire marks on screen — the filled bead of « En continu » —
@@ -39,9 +45,7 @@ export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
  */
 export const REMOTE_POST = z.object({
   id: REMOTE_ID,
-  type: z.string(),
   date: z.string(),
-  slug: z.string(),
   title: z.string(),
   description: z.string(),
   excerpt: z.string(),
@@ -49,11 +53,8 @@ export const REMOTE_POST = z.object({
   image_caption: z.string().nullish(),
   author: z.string().nullish(),
   article_format: REMOTE_FORMAT.optional(),
-  has_audio: z.boolean().optional(),
   premium: z.boolean(),
   right: z.boolean(),
-  video_cover: z.number().optional(),
-  video_url: z.string().optional(),
   highlighted: z.boolean().nullish(),
 });
 export type RemotePost = z.infer<typeof REMOTE_POST>;
@@ -68,6 +69,16 @@ export type RemotePost = z.infer<typeof REMOTE_POST>;
  * reader may have one.
  */
 export const REMOTE_BODY = z.object({ content_array: z.array(z.string()) });
+
+/**
+ * How many items each list of the service answers at once, as the capture of 21/09/2026 measured them.
+ *
+ * A section's own list and a search are paged, thirty and ten at a time: a client knows a page is the last when it
+ * comes short, so it is held to these. The front and the wire come in one answer each — thirteen and ten — and the
+ * service was never seen to page either: a client reads whatever they hold, and only a source that stands in for the
+ * service, laying out its own paper at the paper's geometry, needs their size.
+ */
+export const SERVICE_PAGES = { front: 13, wire: 10, section: 30, search: 10 } as const;
 
 /**
  * What every list of the service answers — the front, the wire, a section's own list and a search: its items, each

@@ -1,4 +1,4 @@
-import { ARTICLE_ID } from '@huma/contracts';
+import { FILED_ID } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { RECORDED } from './recorded.ts';
 import { addressOf, ROUTES, routeOf } from './routes.ts';
@@ -21,7 +21,7 @@ test('a question travels in the path as itself, spaces and accents encoded', () 
 });
 
 test('an article is asked by the number the journal filed it under', () => {
-  expect(ROUTES.article.request(ARTICLE_ID.parse('3860965')).path).toBe('/wordpress/post/3860965');
+  expect(ROUTES.article.request(FILED_ID.parse('3860965')).path).toBe('/wordpress/post/3860965');
 });
 
 /** The capture sorts its answers through the same table: each answer it kept is filed under the route it answers. */
