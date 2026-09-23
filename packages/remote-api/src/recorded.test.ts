@@ -201,12 +201,22 @@ test('a video of the journal is read as a video, with its body open', () => {
   expect(read.item.body.kind).toBe('open');
 });
 
+/** The recorded column as an answer that holds every field of the item and no body. */
+const BODILESS = Object.fromEntries(
+  Object.entries(RECORDED.articles.opinion.answer).filter(([field]) => field !== 'content_array'),
+);
+
 /**
  * The service answers every list without a token, and there `right` only repeats `premium`; on an article it is the
- * reader's own. What it sends beside `right: false` is not this reader's body, and reading it would unlock it.
+ * reader's own. Asked for a reserved article without a token, it sends the item and no body at all — measured on the
+ * phone, 23/09/2026. A body sent beside `right: false` would not be this reader's either, and reading it would unlock
+ * it: both shapes are withheld, and nothing of a body is read.
  */
-test('an article the service withholds from this reader is read as withheld, and nothing of its body is read', () => {
-  const read = readArticle({ ...RECORDED.articles.opinion.answer, right: false });
+test.each([
+  { shape: 'the item alone, as the service answers it', answer: { ...BODILESS, right: false } },
+  { shape: 'a body beside the refusal', answer: { ...RECORDED.articles.opinion.answer, right: false } },
+])('a reserved article is read as withheld — $shape', ({ answer }) => {
+  const read = readArticle(answer);
   if (!('item' in read)) {
     throw new Error(read.refused);
   }
@@ -231,13 +241,36 @@ test('an item the schemas cannot read is set aside where it sat, and the rest ar
   expect(intake.kept.map((summary) => summary.id)).toEqual([first.id, '3999999']);
 });
 
+/** A reason names the value it refused: a shape nobody has seen is known by its name the first time it comes. */
+test('the reason an item is set aside names what the service sent, and not only where', () => {
+  const [first] = RECORDED.front.answer.posts;
+  const [aside] = readSummaries([{ ...first, article_format: 'podcast' }]).setAside;
+  expect(aside?.says).toMatch(/^article_format : .* \(reçu « podcast »\)$/u);
+});
+
+/** `live` came on the phone's wire after the capture: the running coverage of an event, an article that grows. */
+test('an item of running coverage is read as an article', () => {
+  const [first] = RECORDED.front.answer.posts;
+  const intake = readSummaries([{ ...first, article_format: 'live' }]);
+  expect(intake.setAside).toEqual([]);
+  expect(intake.kept.map((summary) => summary.format)).toEqual(['article']);
+});
+
 test('a list of which no item could be read is refused, and says why; an empty one is a list holding nothing', () => {
   const unread = readList({ posts: RECORDED.wire.answer.posts.map((post) => ({ ...post, date: 'hier soir' })) });
   expect('refused' in unread && unread.refused).toContain('hier soir');
   expect(readList({ posts: [] })).toEqual({ item: { intake: { kept: [], setAside: [] }, sent: 0 } });
 });
 
-test('an article whose body is not the service’s is refused with its reason, not read as an empty one', () => {
-  const read = readArticle({ ...RECORDED.articles.opinion.answer, content_array: 'pas une liste' });
+test.each([
+  {
+    shape: 'a body that is not the service’s',
+    answer: { ...RECORDED.articles.opinion.answer, content_array: 'pas une liste' },
+    received: '« pas une liste »',
+  },
+  { shape: 'no body where the reader has a right to one', answer: BODILESS, received: 'rien' },
+])('an article with $shape is refused with its reason, not read as an empty one', ({ answer, received }) => {
+  const read = readArticle(answer);
   expect('refused' in read && read.refused).toContain('content_array');
+  expect('refused' in read && read.refused).toContain(`(reçu ${received})`);
 });

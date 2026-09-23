@@ -9,7 +9,7 @@ import type { SectionId } from './ids.ts';
 import { PICTURE } from './picture.ts';
 import { readPlain, readProse } from './prose.ts';
 import type { RemoteFormat, RemotePost } from './remote.ts';
-import { REMOTE_ARTICLE, REMOTE_LIST, REMOTE_MENU, REMOTE_POST, REMOTE_SECTION, SECTIONS_KEY } from './remote.ts';
+import { REMOTE_BODY, REMOTE_LIST, REMOTE_MENU, REMOTE_POST, REMOTE_SECTION, SECTIONS_KEY } from './remote.ts';
 
 /**
  * How what the journal's service answers becomes what a screen may show — item by item, and never in silence.
@@ -48,19 +48,45 @@ const SERIES = 'serie';
  * list, so a fifth shape added to the wire is a type error here before it is anything else.
  *
  * `opinion` is a column: the items the service files under it are the paper's signed pieces — its chroniqueurs and
- * its editorials — and a column is what a card announces its writer on. An article of a series is read as an article.
+ * its editorials — and a column is what a card announces its writer on. An article of a series is read as an article,
+ * and so is a `live`, the running coverage of an event: an article that keeps growing, which no screen yet tells apart.
  */
 const FORMATS = {
   classic: 'article',
   opinion: 'column',
   video: 'video',
   [SERIES]: 'article',
+  live: 'article',
 } as const satisfies Readonly<Record<RemoteFormat, ArticleFormat>>;
 
-/** Why a schema refused, as the one line a set-aside carries: which field, and what was wrong with it. */
+/**
+ * What every parse of a reading asks of the schema: to keep, on each issue, the value it refused. A reason that says a
+ * format was not one of four, and not which format it was, is a reason nobody can act on.
+ */
+const REPORTED = { reportInput: true } as const;
+
+/** A refused value as a line can carry it: a word or a number as the service wrote it, anything larger by its kind. */
+const shown = (input: unknown): string => {
+  if (typeof input === 'string') {
+    return `« ${input.length > 40 ? `${input.slice(0, 40)}…` : input} »`;
+  }
+  if (typeof input === 'number' || typeof input === 'boolean' || input === null) {
+    return String(input);
+  }
+  if (input === undefined) {
+    return 'rien';
+  }
+  return Array.isArray(input) ? 'une liste' : 'un objet';
+};
+
+/** Why a schema refused, as the one line a set-aside carries: which field, what was wrong with it, and what came. */
 const saysOf = (error: z.ZodError): string =>
   error.issues
-    .map((issue) => `${issue.path.length === 0 ? 'réponse' : issue.path.map(String).join('.')} : ${issue.message}`)
+    .map((issue) => {
+      const where = issue.path.length === 0 ? 'réponse' : issue.path.map(String).join('.');
+      const received = 'input' in issue ? ` (reçu ${shown(issue.input)})` : '';
+      return `${where} : ${issue.message}${received}`;
+    })
     .join(' ; ');
 
 /**
@@ -111,13 +137,13 @@ const summaryOf = (post: RemotePost, context: Context): Read<ArticleSummary> => 
   if (publishedAt === null) {
     return { refused: `date : « ${post.date} » ne nomme aucun instant` };
   }
-  const summary = ARTICLE_SUMMARY.safeParse(inputOf(post, publishedAt, context));
+  const summary = ARTICLE_SUMMARY.safeParse(inputOf(post, publishedAt, context), REPORTED);
   return summary.success ? { item: summary.data } : { refused: saysOf(summary.error) };
 };
 
 /** One item of a list of the service, read. */
 const readPost = (raw: unknown, context: Context): Read<ArticleSummary> => {
-  const wire = REMOTE_POST.safeParse(raw);
+  const wire = REMOTE_POST.safeParse(raw, REPORTED);
   return wire.success ? summaryOf(wire.data, context) : { refused: saysOf(wire.error) };
 };
 
@@ -170,7 +196,7 @@ export type Listing = Readonly<{ intake: Intake<ArticleSummary>; sent: number }>
  * where no item could be read is not a list with nothing in it.
  */
 export const readList = (answer: unknown, context: Context = {}): Read<Listing> => {
-  const envelope = REMOTE_LIST.safeParse(answer);
+  const envelope = REMOTE_LIST.safeParse(answer, REPORTED);
   if (!envelope.success) {
     return { refused: saysOf(envelope.error) };
   }
@@ -189,11 +215,11 @@ export type ListedSection = Readonly<{ section: Section; serviceId: string }>;
 
 /** One section of the menu, read: its slug is its id, and its name — markup and all — is read as the line it is. */
 const readSection = (raw: unknown): Read<ListedSection> => {
-  const wire = REMOTE_SECTION.safeParse(raw);
+  const wire = REMOTE_SECTION.safeParse(raw, REPORTED);
   if (!wire.success) {
     return { refused: saysOf(wire.error) };
   }
-  const section = SECTION.safeParse({ id: wire.data.slug, label: readPlain(wire.data.name) });
+  const section = SECTION.safeParse({ id: wire.data.slug, label: readPlain(wire.data.name) }, REPORTED);
   return section.success
     ? { item: { section: section.data, serviceId: String(wire.data.id) } }
     : { refused: saysOf(section.error) };
@@ -204,7 +230,7 @@ const readSection = (raw: unknown): Read<ListedSection> => {
  * section carries. A menu the reading kept nothing of is refused, as a list is.
  */
 export const readMenu = (answer: unknown): Read<Intake<ListedSection>> => {
-  const envelope = REMOTE_MENU.safeParse(answer);
+  const envelope = REMOTE_MENU.safeParse(answer, REPORTED);
   if (!envelope.success) {
     return { refused: saysOf(envelope.error) };
   }
@@ -214,15 +240,23 @@ export const readMenu = (answer: unknown): Read<Intake<ListedSection>> => {
     : { item: intake };
 };
 
+/** A summary and what the reader was given of its body, as the domain's article, or why it is none. */
+const withBody = (summary: ArticleSummary, body: unknown): Read<Article> => {
+  const article = ARTICLE.safeParse({ ...summary, body }, REPORTED);
+  return article.success ? { item: article.data } : { refused: saysOf(article.error) };
+};
+
 /**
  * An article of the service, read whole: its summary as a list reads it, and its body as blocks — or as withheld, when
  * the service says this reader has no right to it.
  *
- * A withheld body is not read at all. What the service sends beside `right: false` is not the article's body for this
- * reader, whatever it holds, and a reading that turned it into blocks would unlock what the service kept back.
+ * The answer is read as an item first. A reserved article asked for without a right comes with every field of the item
+ * and no body at all, so a reading that asked for the body before the right would refuse, as unreadable, an answer that
+ * said exactly what it meant. A withheld body is not read, whatever comes with it: what the service sends beside
+ * `right: false` is not this reader's, and a reading that turned it into blocks would unlock what it kept back.
  */
 export const readArticle = (answer: unknown): Read<Article> => {
-  const wire = REMOTE_ARTICLE.safeParse(answer);
+  const wire = REMOTE_POST.safeParse(answer, REPORTED);
   if (!wire.success) {
     return { refused: saysOf(wire.error) };
   }
@@ -230,11 +264,13 @@ export const readArticle = (answer: unknown): Read<Article> => {
   if ('refused' in summary) {
     return summary;
   }
-  const body = wire.data.right
-    ? { kind: 'open', blocks: readProse(wire.data.content_array.join('')) }
-    : { kind: 'withheld' };
-  const article = ARTICLE.safeParse({ ...summary.item, body });
-  return article.success ? { item: article.data } : { refused: saysOf(article.error) };
+  if (!wire.data.right) {
+    return withBody(summary.item, { kind: 'withheld' });
+  }
+  const body = REMOTE_BODY.safeParse(answer, REPORTED);
+  return body.success
+    ? withBody(summary.item, { kind: 'open', blocks: readProse(body.data.content_array.join('')) })
+    : { refused: saysOf(body.error) };
 };
 
 /**

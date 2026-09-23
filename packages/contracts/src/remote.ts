@@ -18,10 +18,12 @@ import { z } from 'zod';
 const REMOTE_ID = z.union([z.string(), z.number()]).transform((value) => String(value));
 
 /**
- * The four shapes the service gives an item. A fifth would be news, and a parse that names it is how we would hear
- * about it — so this stays closed rather than falling back to the most common one.
+ * The shapes the service gives an item. The list stays closed rather than falling back to the most common one: a new
+ * shape is news, and a parse that names it is how it is heard of. That is how `live` was — the journal's running
+ * coverage of an event, absent from the 519 items of the first capture and set aside, by name, on the phone's wire
+ * on 23/09/2026.
  */
-const REMOTE_FORMAT = z.enum(['classic', 'opinion', 'video', 'serie']);
+const REMOTE_FORMAT = z.enum(['classic', 'opinion', 'video', 'serie', 'live']);
 export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
 
 /**
@@ -57,10 +59,15 @@ export const REMOTE_POST = z.object({
 export type RemotePost = z.infer<typeof REMOTE_POST>;
 
 /**
- * An item with its body. The body is an array the service has only ever filled with one string: the whole article as
- * WordPress rendered it, scripts and donation form included. Splitting it is the reading's work, not the wire's.
+ * The body an article answer carries, when it carries one: an array the service has only ever filled with one string,
+ * the whole article as WordPress rendered it, scripts and donation form included. Splitting it is the reading's work.
+ *
+ * It is apart from the item because the service leaves it out: an article a reader has no right to comes with every
+ * field of the item and no `content_array` at all — measured on the phone, 23/09/2026, on a reserved article asked
+ * for without a token. An answer is therefore read as an item first, and as a body only where the item says the
+ * reader may have one.
  */
-export const REMOTE_ARTICLE = REMOTE_POST.extend({ content_array: z.array(z.string()) });
+export const REMOTE_BODY = z.object({ content_array: z.array(z.string()) });
 
 /**
  * What every list of the service answers — the front, the wire, a section's own list and a search: its items, each
