@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { BLOCK } from './content.ts';
+import { SPAN } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
-import { ARTICLE_ID, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
 import { PICTURE } from './picture.ts';
 
 /**
@@ -49,6 +49,27 @@ export const ARTICLE_SUMMARY = z.object({
   emphasis: z.boolean().optional(),
 });
 export type ArticleSummary = z.infer<typeof ARTICLE_SUMMARY>;
+
+/**
+ * A block of an article body.
+ *
+ * A body that sends a reader to another article carries that article's summary, and not only its id. The card it
+ * draws needs the title, the standfirst and the picture, and asking for them by id would be a second reading to make
+ * after the body — of a batch the journal's service has no route for. What a body points at is written into it when
+ * the body is.
+ */
+export const BLOCK = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('paragraph'), spans: z.array(SPAN) }),
+  z.object({ type: z.literal('heading'), text: DISPLAY_TEXT }),
+  z.object({ type: z.literal('quote'), spans: z.array(SPAN), source: DISPLAY_TEXT.optional() }),
+  z.object({ type: z.literal('image'), caption: DISPLAY_TEXT, key: IMAGE_KEY }),
+  z.object({ type: z.literal('video'), title: DISPLAY_TEXT, durationSeconds: z.number().int().positive() }),
+  z.object({ type: z.literal('related'), summary: ARTICLE_SUMMARY }),
+  z.object({ type: z.literal('callout'), title: DISPLAY_TEXT, text: DISPLAY_TEXT, button: DISPLAY_TEXT }),
+]);
+export type Block = z.infer<typeof BLOCK>;
+/** The raw shape `BLOCK` accepts as input, before it brands and validates it. */
+export type BlockInput = z.input<typeof BLOCK>;
 
 /**
  * An item with its body, as the reader opens it.

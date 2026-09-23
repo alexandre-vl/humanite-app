@@ -25,8 +25,9 @@ export type SearchQuery = PageQuery & Readonly<{ text: string }>;
  *
  * `getFeed` with no section is the front, in the order its desk laid it out; with one, that section's own list, the
  * newest first. `getArticle` names one piece and fails when it is not there — asking for it is opening it.
- * `getSummaries` names several and answers with those that exist, in the order asked: its ids come from lists that
- * outlive the paper, and one withdrawn piece must not cost the reader the rest of them.
+ *
+ * Nothing here reads several pieces by id. The journal's service has no route for it, and neither thing that asked for
+ * one needs it: what a reader keeps is kept with its summary, and what a body points at comes written into the body.
  *
  * `getIssues` answers with every numéro at once: a day's paper is a closed thing of a few dozen pieces, and the
  * newsstand stands them in a row. It takes no cursor, because it has no next page — that is what tells a numéro from
@@ -37,7 +38,6 @@ export type ContentApi = Readonly<{
   getFeed: (query: FeedQuery) => Promise<Page<ArticleSummary>>;
   getLiveFeed: (query: PageQuery) => Promise<Page<ArticleSummary>>;
   getArticle: (id: ArticleId) => Promise<Article>;
-  getSummaries: (ids: readonly ArticleId[]) => Promise<readonly ArticleSummary[]>;
   getIssues: () => Promise<readonly IssueSummary[]>;
   search: (query: SearchQuery) => Promise<Page<ArticleSummary>>;
 }>;

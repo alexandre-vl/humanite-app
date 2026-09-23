@@ -1,7 +1,7 @@
 import { SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { ArticleFeed, useKeptFeed } from '#entities/article';
+import { ArticleFeed, feedOf } from '#entities/article';
 import { useSectionNames } from '#entities/section';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
@@ -47,7 +47,7 @@ const useStyles = createStyles(() => ({
 export function BookmarksPage(): ReactNode {
   const styles = useStyles();
   const names = useSectionNames();
-  const kept = useKeptFeed(useBookmarks((state) => state.ids));
+  const kept = feedOf(useBookmarks((state) => state.kept));
   return (
     <Surface>
       <ArticleFeed
@@ -56,7 +56,7 @@ export function BookmarksPage(): ReactNode {
         onOpen={(id) => {
           router.push(articleHref(id));
         }}
-        action={(summary) => <BookmarkToggle id={summary.id} />}
+        action={(summary) => <BookmarkToggle summary={summary} />}
         names={names}
         header={
           <Box style={styles.masthead}>

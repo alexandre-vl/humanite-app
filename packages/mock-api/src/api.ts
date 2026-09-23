@@ -32,9 +32,6 @@ const CHRONOLOGICAL: readonly ArticleSummary[] = [...CORPUS.map(summarize)].sort
   right.publishedAt.localeCompare(left.publishedAt),
 );
 
-/** The same summaries, reachable by id: a related block names ids, and resolves them without pulling whole bodies. */
-const SUMMARIES = new Map(CHRONOLOGICAL.map((summary): readonly [ArticleId, ArticleSummary] => [summary.id, summary]));
-
 const notFound = (id: ArticleId): never => {
   throw new ContentApiError('not-found', `article introuvable : ${id}`);
 };
@@ -116,21 +113,6 @@ const whole = (items: readonly ArticleSummary[], size: number): Page<ArticleSumm
 const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
 
 /**
- * The summaries of the ids that name an article, in the order they were asked for and no other — the caller's order is
- * the only one it can be, a batch being asked by whoever already knows how its answers are to be read.
- *
- * An id that names nothing is left out rather than raised. A batch is not a lookup: the ids come from somewhere that
- * outlives the paper — a body pointing at a piece since withdrawn, a reader's own list kept on the phone across a
- * corpus that has changed under it — and a whole screen that fails because one line of it no longer exists tells the
- * reader nothing true. What is still printed is served; what is not, is not there.
- */
-const summariesOf = (ids: readonly ArticleId[]): readonly ArticleSummary[] =>
-  ids.flatMap((id) => {
-    const summary = SUMMARIES.get(id);
-    return summary === undefined ? [] : [summary];
-  });
-
-/**
  * The content the corpus serves, as the app's door reads it. It answers at once and never fails: a test that wants a
  * screen to see a failure hands the screen a failing read of its own, and what a screen does while it waits is shown
  * by holding a promise open, not by sleeping.
@@ -151,8 +133,6 @@ export const contentApi: ContentApi = {
   },
   getLiveFeed: async (): Promise<Page<ArticleSummary>> => Promise.resolve(whole(CHRONOLOGICAL, PAGE_SIZES.wire)),
   getArticle: async (id: ArticleId): Promise<Article> => Promise.resolve(find(id)),
-  getSummaries: async (ids: readonly ArticleId[]): Promise<readonly ArticleSummary[]> =>
-    Promise.resolve(summariesOf(ids)),
   getIssues: async (): Promise<readonly IssueSummary[]> => Promise.resolve(SHELF),
   search: async (query: SearchQuery): Promise<Page<ArticleSummary>> => {
     const needle = fold(query.text.trim());

@@ -1,4 +1,4 @@
-import type { ArticleId } from '@huma/contracts';
+import type { ArticleSummary } from '@huma/contracts';
 import { RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
@@ -8,7 +8,7 @@ import { Icon } from '#primitives/icon';
 import { Pressable } from '#primitives/pressable';
 import { useBookmarks } from '../model/store';
 
-export type BookmarkToggleProps = Readonly<{ id: ArticleId }>;
+export type BookmarkToggleProps = Readonly<{ summary: ArticleSummary }>;
 
 const useStyles = createStyles((theme) => ({
   target: {
@@ -53,10 +53,10 @@ const REACH = SPACING.sm;
  * carries nothing else, a card opened on forty-eight points of empty page with one bookmark floating at the end.
  * The disc is a third of a grid step wider than the mark it holds, and reachable over forty-eight all the same.
  */
-export function BookmarkToggle({ id }: BookmarkToggleProps): ReactNode {
+export function BookmarkToggle({ summary }: BookmarkToggleProps): ReactNode {
   const styles = useStyles();
   const theme = useTheme();
-  const kept = useBookmarks((state) => state.ids.includes(id));
+  const kept = useBookmarks((state) => state.kept.some((each) => each.id === summary.id));
   const toggle = useBookmarks((state) => state.toggle);
   return (
     <Pressable
@@ -65,7 +65,7 @@ export function BookmarkToggle({ id }: BookmarkToggleProps): ReactNode {
       label={t(kept ? 'bookmark.remove' : 'bookmark.add')}
       role="button"
       onPress={() => {
-        toggle(id);
+        toggle(summary);
       }}
     >
       <Icon

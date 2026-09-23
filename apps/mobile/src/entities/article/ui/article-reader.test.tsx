@@ -241,7 +241,7 @@ describe('ArticleReader', () => {
     if (related === undefined) {
       throw new Error('bloc lié introuvable');
     }
-    const target = await content.getArticle(related.id);
+    const target = related.summary;
     await read(article);
     const title = await screen.findByText(target.title);
     // The one thing on a reading screen that answers a press of its own: prose sets its links as words, without a
@@ -261,12 +261,12 @@ describe('ArticleReader', () => {
     if (related === undefined) {
       throw new Error('bloc lié introuvable');
     }
-    const target = await content.getArticle(related.id);
+    const target = related.summary;
     const follow = jest.fn();
     await read(article, follow);
     expect(await screen.findByText('Sur le même thème')).toBeTruthy();
     await fireEvent.press(await screen.findByText(target.title));
-    expect(follow).toHaveBeenCalledWith({ kind: 'article', id: related.id });
+    expect(follow).toHaveBeenCalledWith({ kind: 'article', id: related.summary.id });
   });
 
   it('porte la durée de la vidéo, la seule chose que le contrat en dise avec son titre', async () => {

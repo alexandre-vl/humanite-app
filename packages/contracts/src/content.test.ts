@@ -24,7 +24,17 @@ test('BLOCK parses each block kind and rejects an unknown one', () => {
   expect(BLOCK.safeParse({ type: 'image', caption: 'c', key: 'pol-a1-hero' }).success).toBe(true);
   expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: 192 }).success).toBe(true);
   expect(BLOCK.safeParse({ type: 'video', title: 'T', durationSeconds: '3:12' }).success).toBe(false);
-  expect(BLOCK.safeParse({ type: 'related', id: 'pol-a2' }).success).toBe(true);
+  // A related block carries the summary of what it points at, and an id alone is no longer enough to draw its card.
+  const pointed = {
+    id: 'pol-a2',
+    format: 'article',
+    access: 'free',
+    title: 'Un titre',
+    standfirst: 'Un chapô.',
+    publishedAt: '2026-09-10T08:30:00.000Z',
+  };
+  expect(BLOCK.safeParse({ type: 'related', summary: pointed }).success).toBe(true);
+  expect(BLOCK.safeParse({ type: 'related', id: 'pol-a2' }).success).toBe(false);
   expect(BLOCK.safeParse({ type: 'callout', title: 'T', text: 'x', button: 'Voir' }).success).toBe(true);
   expect(BLOCK.safeParse({ type: 'sidebar' }).success).toBe(false);
 });

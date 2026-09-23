@@ -55,7 +55,7 @@ const firstSection = async (): Promise<Section> => {
 beforeEach(async () => {
   jest.mocked(router.push).mockClear();
   await act(() => {
-    useBookmarks.setState({ ids: [] });
+    useBookmarks.setState({ kept: [] });
   });
 });
 

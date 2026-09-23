@@ -1,4 +1,4 @@
-import type { Article, ArticleSummary, Block } from '@huma/contracts';
+import type { Article, Block } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf, visualOf } from '#api';
@@ -15,7 +15,6 @@ import { ArticleVideo } from './article-video';
 
 export type ArticleBodyProps = Readonly<{
   article: Article;
-  related: readonly ArticleSummary[];
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;
@@ -43,7 +42,7 @@ const useStyles = createStyles((theme) => ({
  * A body picture carries a caption and no credit: the contract gives a credit only to the article's own picture, so a
  * figure inside the body has none to show, and says so by not showing one.
  */
-function BlockView({ block, article, related, onFollow, onSupport }: BlockProps): ReactNode {
+function BlockView({ block, article, onFollow, onSupport }: BlockProps): ReactNode {
   const styles = useStyles();
   switch (block.type) {
     case 'paragraph':
@@ -86,17 +85,15 @@ function BlockView({ block, article, related, onFollow, onSupport }: BlockProps)
           recyclingKey={`${article.id}-video`}
         />
       );
-    case 'related': {
-      const summary = related.find((candidate) => candidate.id === block.id) ?? null;
-      return summary === null ? null : (
+    case 'related':
+      return (
         <ArticleRelated
-          summary={summary}
+          summary={block.summary}
           onOpen={() => {
-            onFollow({ kind: 'article', id: block.id });
+            onFollow({ kind: 'article', id: block.summary.id });
           }}
         />
       );
-    }
     case 'callout':
       return <ArticleCallout title={block.title} text={block.text} button={block.button} onPress={onSupport} />;
   }
@@ -115,18 +112,11 @@ const place = (blocks: readonly Block[]): readonly PlacedBlock[] => {
 };
 
 /** The body of an article, block by block, in the order it was written. */
-export function ArticleBody({ article, related, onFollow, onSupport }: ArticleBodyProps): ReactNode {
+export function ArticleBody({ article, onFollow, onSupport }: ArticleBodyProps): ReactNode {
   return (
     <>
       {place(article.blocks).map(({ key, block }) => (
-        <BlockView
-          key={key}
-          block={block}
-          article={article}
-          related={related}
-          onFollow={onFollow}
-          onSupport={onSupport}
-        />
+        <BlockView key={key} block={block} article={article} onFollow={onFollow} onSupport={onSupport} />
       ))}
     </>
   );

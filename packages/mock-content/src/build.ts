@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { ARTICLE, instantAt } from '@huma/contracts';
-import type { Article, BlockInput, SectionId, SpanInput } from '@huma/contracts';
+import { ARTICLE, ARTICLE_SUMMARY, instantAt } from '@huma/contracts';
+import type { Article, ArticleSummary, BlockInput, SectionId, SpanInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
@@ -15,8 +15,16 @@ const CORPUS = new URL('../corpus/', import.meta.url);
 
 /** The shapes `ARTICLE` accepts as input, before it brands and validates them, derived from the contracts. */
 type RawSpan = SpanInput;
-type RawBlock = BlockInput;
 type RawTarget = Extract<RawSpan, { type: 'link' }>['target'];
+
+/**
+ * A block as a corpus file writes it. A related block names the item it points at by id: the summary the domain's
+ * block carries is the other item's, so it is written into the body only once every item has been read.
+ */
+type RawBlock = Exclude<BlockInput, { type: 'related' }> | Readonly<{ type: 'related'; id: string }>;
+
+/** An item as its file writes it: everything a summary holds, read, and a body whose related blocks still name ids. */
+type WrittenItem = Readonly<{ summary: ArticleSummary; blocks: readonly RawBlock[] }>;
 
 /** A `::name[label]{attribute="value"}` line, the node `mdast-util-directive` adds to the tree. */
 type Directive = Extract<RootContent, { type: 'leafDirective' }>;
@@ -169,8 +177,11 @@ const toBlock = (node: RootContent): RawBlock => {
   throw new Error(`bloc non pris en charge : ${node.type}`);
 };
 
-/** Parse one item file to the shape `ARTICLE` validates. Exported so its refusals can be pinned by a test. */
-export const parseItem = (text: string): Article => {
+/**
+ * Parse one item file: its summary, read, and its body as written. Exported so its refusals can be pinned by a test.
+ * The body is read first, so a block the file gets wrong is what the refusal names, whatever the front matter holds.
+ */
+export const parseItem = (text: string): WrittenItem => {
   const tree = fromMarkdown(text, {
     extensions: [frontmatter(['yaml']), directive()],
     mdastExtensions: [frontmatterFromMarkdown(['yaml']), directiveFromMarkdown()],
@@ -182,7 +193,8 @@ export const parseItem = (text: string): Article => {
   const byline = bylineOf(splitList(front['authors']));
   const published = front['published'];
   const body = tree.children.filter((node): node is Exclude<RootContent, { type: 'yaml' }> => node.type !== 'yaml');
-  return ARTICLE.parse({
+  const blocks = body.map(toBlock);
+  const summary = ARTICLE_SUMMARY.parse({
     id,
     section: front['section'],
     format: front['format'],
@@ -193,14 +205,30 @@ export const parseItem = (text: string): Article => {
     ...(byline === undefined ? {} : { byline }),
     ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
     ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
-    blocks: body.map(toBlock),
   });
+  return { summary, blocks };
 };
+
+/** An item whole: its related blocks given the summary of the item each names, which must be one of the corpus. */
+const resolved = (item: WrittenItem, summaries: ReadonlyMap<string, ArticleSummary>): Article =>
+  ARTICLE.parse({
+    ...item.summary,
+    blocks: item.blocks.map((block) => {
+      if (block.type !== 'related') {
+        return block;
+      }
+      const summary = summaries.get(block.id);
+      if (summary === undefined) {
+        throw new Error(`::related vers un item absent du corpus : ${block.id}`);
+      }
+      return { type: 'related', summary };
+    }),
+  });
 
 /** Reads and validates every item, throwing an aggregate error when the corpus breaks any rule. */
 export function buildCorpus(): readonly Article[] {
   const errors: string[] = [];
-  const items: { readonly folder: SectionId; readonly article: Article }[] = [];
+  const written: { readonly folder: SectionId; readonly file: string; readonly item: WrittenItem }[] = [];
   for (const section of SECTIONS) {
     const directory = new URL(`${section.id}/`, CORPUS);
     const files = readdirSync(directory)
@@ -208,12 +236,21 @@ export function buildCorpus(): readonly Article[] {
       .toSorted((left, right) => left.localeCompare(right));
     for (const file of files) {
       try {
-        items.push({ folder: section.id, article: parseItem(readFileSync(new URL(file, directory), 'utf8')) });
+        written.push({ folder: section.id, file, item: parseItem(readFileSync(new URL(file, directory), 'utf8')) });
       } catch (error) {
         errors.push(`${section.id}/${file} : ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   }
+  const summaries = new Map(written.map(({ item }) => [item.summary.id, item.summary]));
+  const items = written.flatMap(({ folder, file, item }) => {
+    try {
+      return [{ folder, article: resolved(item, summaries) }];
+    } catch (error) {
+      errors.push(`${folder}/${file} : ${error instanceof Error ? error.message : String(error)}`);
+      return [];
+    }
+  });
   errors.push(...validateCorpus(items));
   if (errors.length > 0) {
     throw new Error(`corpus invalide :\n${errors.join('\n')}`);

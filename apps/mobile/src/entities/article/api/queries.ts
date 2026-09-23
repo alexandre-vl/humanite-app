@@ -16,14 +16,13 @@ import { searchable } from '../model/search';
 const ARTICLES = 'articles';
 
 /**
- * The two branches a reading of the reader's own making is filed under: what they asked for, and what they kept.
+ * The branch a reading of the reader's own making is filed under: what they asked for.
  *
- * They are named apart from the rest because the app asks about them: such a reading is worth answering from memory
- * while the reader is still on the screen, and not worth keeping on disk after — see the persistence options, which
- * read this and nothing else about a key.
+ * It is named apart from the rest because the app asks about it: such a reading is worth answering from memory while
+ * the reader is still on the screen, and not worth keeping on disk after — see the persistence options, which read
+ * this and nothing else about a key.
  */
 const SEARCH = 'search';
-const KEPT = 'kept';
 
 /**
  * No cursor at all: the content serves the first page to a query that asks for none. It is an empty string rather than
@@ -45,8 +44,6 @@ const KEYS = {
   live: (): readonly string[] => [ARTICLES, 'live'],
   search: (text: string): readonly string[] => [ARTICLES, SEARCH, text],
   one: (id: ArticleId): readonly string[] => [ARTICLES, 'one', id],
-  summaries: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, 'summaries', ...ids],
-  kept: (ids: readonly ArticleId[]): readonly string[] => [ARTICLES, KEPT, ...ids],
 } as const;
 
 /**
@@ -105,36 +102,15 @@ export const searchQuery = (text: string): PagedFeed =>
   );
 
 /** Whether a key in the cache is a reading of the reader's own making rather than a reading of the paper. */
-export const isReaderKey = (key: readonly unknown[]): boolean =>
-  key[0] === ARTICLES && (key[1] === SEARCH || key[1] === KEPT);
+export const isReaderKey = (key: readonly unknown[]): boolean => key[0] === ARTICLES && key[1] === SEARCH;
 
-/** One reading of the content under one key, whatever it answers with, and whether it is to be read at all. */
-const single = <Value>(queryKey: readonly string[], read: () => Promise<Value>, enabled = true) =>
-  queryOptions({ queryKey, queryFn: async () => read(), enabled });
-
-/** The options of one such reading, read off the factory rather than off any one of the readings below. */
-type Single<Value> = ReturnType<typeof single<Value>>;
-
-/** One article, body and all: what the reading screen reads. */
-export const articleQuery = (id: ArticleId): Single<Article> =>
-  single(KEYS.one(id), async () => content.getArticle(id));
+/** One article, body and all, under the key of its id. */
+const one = (id: ArticleId) =>
+  queryOptions({ queryKey: KEYS.one(id), queryFn: async (): Promise<Article> => content.getArticle(id) });
 
 /**
- * The summaries a screen needs to announce a set of articles it already knows the ids of. They are read as summaries
- * and not as articles: a summary carries everything a card shows and none of the body behind it, which over the corpus
- * is a fifth of the bytes, and one call answers for however many are named.
- *
- * No ids, no question. A screen asks before it knows which articles it is announcing — a body that has not arrived
- * names none, a reader who has kept none has none — and an empty list asked for is still a reading, filed in the cache
- * and written to disk with the rest.
+ * The reading of one article: what the reading screen reads, and what the screen around it reads too when it has
+ * something of its own to do with the article — both under this one key, so the article is asked for once. The type
+ * is read off the factory, which is where the library writes it.
  */
-export const summariesQuery = (ids: readonly ArticleId[]): Single<readonly ArticleSummary[]> =>
-  single(KEYS.summaries(ids), async () => content.getSummaries(ids), ids.length > 0);
-
-/**
- * The same reading, for the list the reader keeps rather than for the one an article points at. It is the same call
- * and a different question: this one is theirs, it is a different one after every mark they make, and it is answered
- * from the corpus the app carries — so it is filed apart, and stays out of what is written to disk.
- */
-export const keptQuery = (ids: readonly ArticleId[]): Single<readonly ArticleSummary[]> =>
-  single(KEYS.kept(ids), async () => content.getSummaries(ids), ids.length > 0);
+export const articleQuery = (id: ArticleId): ReturnType<typeof one> => one(id);

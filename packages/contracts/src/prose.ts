@@ -1,5 +1,6 @@
-import { BLOCK } from './content.ts';
-import type { Block, BlockInput, SpanInput } from './content.ts';
+import { BLOCK } from './article.ts';
+import type { Block, BlockInput } from './article.ts';
+import type { SpanInput } from './content.ts';
 
 /**
  * How a body the journal publishes becomes the blocks a screen knows.

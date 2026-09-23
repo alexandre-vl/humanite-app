@@ -1,7 +1,6 @@
 import type { ArticleId, ArticleSummary } from '@huma/contracts';
 import type { QueryStatus } from '@tanstack/react-query';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { keptQuery } from '../api/queries';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import type { PagedFeed } from '../api/queries';
 
 /** Why a feed is showing no article: it has not answered yet, it failed, or it truly holds none. */
@@ -86,23 +85,17 @@ export function usePagedFeed(query: PagedFeed): ReadFeed {
   };
 }
 
+/** What a feed does when asked again for something it already holds whole. */
+const nothing = (): void => undefined;
+
 /**
- * Reads the articles someone else's list names, in the order it names them, as a feed.
- *
- * A list of none is a feed holding none, not a feed still loading: nothing is asked when there is nothing to ask
- * about, so the answer would never come and the stand-in would turn for ever. There is no next page to reach: the
- * whole list is one call, however long it is.
+ * A feed of articles a screen already holds, in the order it holds them: nothing to wait for and nothing to ask again,
+ * so it stands in only when it holds none. What a reader kept is one — it is drawn from the phone, not from the content.
  */
-export function useKeptFeed(ids: readonly ArticleId[]): ReadFeed {
-  const { data, status, refetch, isRefetching } = useQuery(keptQuery(ids));
-  const again = (): void => {
-    void refetch();
-  };
-  return {
-    items: data ?? [],
-    state: ids.length === 0 ? 'empty' : stateOf(status),
-    retry: again,
-    refresh: again,
-    refreshing: isRefetching,
-  };
-}
+export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
+  items,
+  state: 'empty',
+  retry: nothing,
+  refresh: nothing,
+  refreshing: false,
+});

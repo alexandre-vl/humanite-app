@@ -37,7 +37,7 @@ const anArticle = async (): Promise<ArticleSummary> => {
 beforeEach(async () => {
   jest.mocked(router.back).mockClear();
   await act(() => {
-    useBookmarks.setState({ ids: [] });
+    useBookmarks.setState({ kept: [] });
   });
 });
 
@@ -56,7 +56,7 @@ describe('BookmarksPage', () => {
   it('sert ce que le lecteur a gardé, sous le nom de l’écran', async () => {
     const article = await anArticle();
     await act(() => {
-      useBookmarks.setState({ ids: [article.id] });
+      useBookmarks.setState({ kept: [article] });
     });
     await renderPage();
     expect(screen.getByText('Mes lectures')).toBeTruthy();
@@ -68,7 +68,7 @@ describe('BookmarksPage', () => {
   it('rend un article depuis l’étagère, qui se vide sous le doigt', async () => {
     const article = await anArticle();
     await act(() => {
-      useBookmarks.setState({ ids: [article.id] });
+      useBookmarks.setState({ kept: [article] });
     });
     await renderPage();
     await fireEvent.press(await screen.findByLabelText('Retirer des favoris'));

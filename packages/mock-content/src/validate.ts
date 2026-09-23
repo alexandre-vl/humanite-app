@@ -116,7 +116,7 @@ export const imageKeys = (article: Article): readonly ImageKey[] => [
 const linkedIds = (article: Article): readonly ArticleId[] =>
   article.blocks.flatMap((block): readonly ArticleId[] => {
     if (block.type === 'related') {
-      return [block.id];
+      return [block.summary.id];
     }
     if (block.type === 'paragraph' || block.type === 'quote') {
       return block.spans.flatMap((span) =>

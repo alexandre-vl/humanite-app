@@ -1,4 +1,4 @@
-import type { ArticleId, Block, Span } from '@huma/contracts';
+import type { Span } from '@huma/contracts';
 import type { TextRun } from '#primitives/text';
 
 /** Where a link inside a body points: another item of the corpus, or a page outside it. */
@@ -27,10 +27,3 @@ export const runsOf = (spans: readonly Span[], open: (target: LinkTarget) => voi
         };
     }
   });
-
-/**
- * The articles a body announces at its foot. They are gathered before anything renders so the screen asks for all of
- * them at once: the content answers a list of ids in one call, and a card needs a summary, never a body.
- */
-export const relatedIds = (blocks: readonly Block[]): readonly ArticleId[] =>
-  blocks.flatMap((block) => (block.type === 'related' ? [block.id] : []));

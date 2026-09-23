@@ -4,6 +4,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { NEWSROOM } from '#config';
+import { useBookmarks } from '#features/bookmark';
+import { t } from '#i18n';
 import { openExternal } from '#lib/routing';
 import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { ArticlePage } from './article-page';
@@ -61,6 +63,7 @@ const linkWords = (article: Article, kind: 'article' | 'external'): string | nul
 beforeEach(() => {
   jest.mocked(router.replace).mockClear();
   jest.mocked(openExternal).mockClear();
+  useBookmarks.setState({ kept: [] });
 });
 
 describe('ArticlePage', () => {
@@ -101,5 +104,16 @@ describe('ArticlePage', () => {
     await open(article);
     await fireEvent.press(await screen.findByText(callout.button));
     expect(jest.mocked(openExternal)).toHaveBeenCalledWith(NEWSROOM.subscription);
+  });
+
+  /** The mark keeps what the shelf will show — the article's card, read off the article the screen opened. */
+  it('garde l’article ouvert depuis sa barre, tel que sa carte le montre', async () => {
+    const [article] = await everyArticle(content);
+    if (article === undefined) {
+      throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
+    }
+    await open(await content.getArticle(article.id));
+    await fireEvent.press(await screen.findByLabelText(t('bookmark.add')));
+    expect(useBookmarks.getState().kept).toEqual([article]);
   });
 });

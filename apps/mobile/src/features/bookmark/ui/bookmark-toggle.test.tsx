@@ -1,4 +1,4 @@
-import type { ArticleId } from '@huma/contracts';
+import type { ArticleSummary } from '@huma/contracts';
 import { beforeEach, describe, expect, it } from '@jest/globals';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { content } from '#api';
@@ -7,12 +7,12 @@ import { ICONS } from '#primitives/icon';
 import { useBookmarks } from '../model/store';
 import { BookmarkToggle } from './bookmark-toggle';
 
-const anArticle = async (): Promise<ArticleId> => {
+const anArticle = async (): Promise<ArticleSummary> => {
   const [first] = (await content.getFeed({})).items;
   if (first === undefined) {
     throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
   }
-  return first.id;
+  return first;
 };
 
 /** What a node was given to paint its own box with, read one flattened style at a time. */
@@ -24,7 +24,7 @@ const groundOf = (node: unknown): unknown => {
 
 beforeEach(async () => {
   await act(() => {
-    useBookmarks.setState({ ids: [] });
+    useBookmarks.setState({ kept: [] });
   });
 });
 
@@ -36,8 +36,8 @@ describe('BookmarkToggle', () => {
    * is the second difference, and the one a reader who does not separate the two hues has.
    */
   it('dit l’article gardé par un fond, et pas seulement par une encre', async () => {
-    const id = await anArticle();
-    await render(<BookmarkToggle id={id} />);
+    const summary = await anArticle();
+    await render(<BookmarkToggle summary={summary} />);
     const free = screen.getByLabelText(t('bookmark.add'));
     expect(groundOf(free)).toBeUndefined();
     await fireEvent.press(free);
@@ -51,8 +51,8 @@ describe('BookmarkToggle', () => {
    * that spelt the platform name itself would be a second answer to it.
    */
   it('change de marque avec l’état, ce qu’iOS dessine en plein', async () => {
-    const id = await anArticle();
-    await render(<BookmarkToggle id={id} />);
+    const summary = await anArticle();
+    await render(<BookmarkToggle summary={summary} />);
     const seen = { includeHiddenElements: true };
     expect(screen.getByTestId(`symbol:${ICONS.bookmark.android}`, seen)).toBeTruthy();
     await fireEvent.press(screen.getByLabelText(t('bookmark.add')));
@@ -60,11 +60,11 @@ describe('BookmarkToggle', () => {
   });
 
   it('rend l’article au journal quand on le touche une seconde fois', async () => {
-    const id = await anArticle();
-    await render(<BookmarkToggle id={id} />);
+    const summary = await anArticle();
+    await render(<BookmarkToggle summary={summary} />);
     await fireEvent.press(screen.getByLabelText(t('bookmark.add')));
     await fireEvent.press(screen.getByLabelText(t('bookmark.remove')));
     expect(screen.getByLabelText(t('bookmark.add'))).toBeTruthy();
-    expect(useBookmarks.getState().ids).toEqual([]);
+    expect(useBookmarks.getState().kept).toEqual([]);
   });
 });

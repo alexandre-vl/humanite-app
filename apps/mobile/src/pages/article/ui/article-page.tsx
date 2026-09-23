@@ -1,8 +1,9 @@
 import { ARTICLE_ID } from '@huma/contracts';
+import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
-import { ArticleReader } from '#entities/article';
+import { ArticleReader, articleQuery } from '#entities/article';
 import { useSectionNames } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { NEWSROOM } from '#config';
@@ -23,7 +24,8 @@ import { Surface } from '#primitives/surface';
  *
  * Keeping the article is offered from that same bar, opposite the chevron. The screen this copies puts the mark in
  * the flow of the text, where it scrolls out of reach of a reader who has read down to the end and decided: the two
- * things one does to an article one is reading — leave it, keep it — belong together and stay.
+ * things one does to an article one is reading — leave it, keep it — belong together and stay. The mark appears with
+ * the article, which is what it keeps: the reader below asks for it, and this screen reads the same answer.
  *
  * Following a link inside the body leads to another article by replacing this screen rather than stacking one more,
  * the way one section replaces another: a reader who followed four links back to back should step back to the feed,
@@ -34,13 +36,14 @@ import { Surface } from '#primitives/surface';
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
   const names = useSectionNames();
+  const article = useQuery(articleQuery(id)).data;
   return (
     <Surface>
       <TopBar
         onBack={() => {
           router.back();
         }}
-        actions={<BookmarkToggle id={id} />}
+        actions={article === undefined ? null : <BookmarkToggle summary={article} />}
       />
       <ArticleReader
         id={id}

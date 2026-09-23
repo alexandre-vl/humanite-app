@@ -87,20 +87,6 @@ test('search pages by ten, newest first, and its pages share nothing', async () 
   expect(newestFirst([...first.items, ...second.items].map((item) => item.publishedAt))).toBe(true);
 });
 
-test('getSummaries answers in the order asked', async () => {
-  const ids = [ARTICLE_ID.parse('mon-a2'), ARTICLE_ID.parse('pol-a1')];
-  const summaries = await contentApi.getSummaries(ids);
-  expect(summaries.map((summary) => summary.id)).toEqual(ids);
-});
-
-test('getSummaries leaves out an id the paper no longer prints, and serves the rest', async () => {
-  const withdrawn = ARTICLE_ID.parse('zzz-a1');
-  const kept = ARTICLE_ID.parse('pol-a1');
-  const summaries = await contentApi.getSummaries([withdrawn, kept, ARTICLE_ID.parse('mon-a2')]);
-  expect(summaries.map((summary) => summary.id)).toEqual([kept, ARTICLE_ID.parse('mon-a2')]);
-  await expect(contentApi.getSummaries([withdrawn])).resolves.toEqual([]);
-});
-
 test('getIssues gathers the corpus into one numéro a day, the most recent first', async () => {
   const shelf = await contentApi.getIssues();
   expect(shelf.map((issue) => issue.id)).toEqual(['2026-09-13', '2026-09-12', '2026-09-11', '2026-09-10']);

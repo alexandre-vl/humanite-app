@@ -33,13 +33,13 @@ export const queryClient = new QueryClient({
 
 /**
  * What of the cache is written to disk. A reading of the paper is worth keeping: the same pages will be wanted
- * tomorrow, and finding them already there is the whole point of persisting anything. A reading of the reader's own
- * making is not: it is answered from the corpus the app already carries, it is different after every question typed
- * and every mark made, and keeping it would file each one beside the journal — and re-serialise them all on each of
- * the next day's writes. It stays in memory, where the reader still on the screen finds it, and goes no further.
+ * tomorrow, and finding them already there is the whole point of persisting anything. A question the reader typed is
+ * not: it is a different one after every word, and keeping each would file it beside the journal — and re-serialise
+ * them all on each of the next day's writes. It stays in memory, where the reader still on the screen finds it, and
+ * goes no further.
  *
- * What they kept is not lost with it: that list is theirs and is written under its own key, not as an answer of the
- * paper's.
+ * What the reader kept is not an answer of the cache at all: that list is theirs, with every card it shows, and is
+ * written under its own key.
  */
 const isWorthKeeping = (query: Readonly<{ queryKey: readonly unknown[] }>): boolean => !isReaderKey(query.queryKey);
 

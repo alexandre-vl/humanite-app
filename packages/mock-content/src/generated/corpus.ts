@@ -230,7 +230,26 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'cul-a5',
+        summary: {
+          id: 'cul-a5',
+          section: 'culture-et-savoir',
+          format: 'article',
+          access: 'free',
+          title:
+            "À Aval-sur-Loue, des habitants numérisent la mémoire ouvrière de leur vallée avant qu'elle ne s'efface",
+          standfirst:
+            "Photographies, carnets d'atelier, bulletins de paie : un collectif de bénévoles rassemble et scanne les archives privées d'anciens ouvriers du textile, pour constituer un fonds accessible à tous.",
+          byline: 'Hélène Marchetti',
+          publishedAt: '2026-09-12T08:20:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'cul-a5-hero',
+            },
+            caption: "Des bénévoles trient de vieilles photographies d'atelier",
+            credit: 'Photo : Marie Estève / CC BY 4.0',
+          },
+        },
       },
     ],
   },
@@ -1005,7 +1024,26 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'eco-a3',
+        summary: {
+          id: 'eco-a3',
+          section: 'social-eco',
+          format: 'article',
+          access: 'premium',
+          title:
+            "Après les suppressions de postes, le Val d'Arche cherche à bâtir un plan de reconversion industrielle",
+          standfirst:
+            "Élus, chambre de commerce et organismes de formation planchent sur l'avenir d'un bassin d'emploi fragilisé. Objectif : anticiper les reconversions plutôt que de les subir, dans un territoire longtemps tourné vers la métallurgie.",
+          byline: 'Marion Castel et Julien Ferrand',
+          publishedAt: '2026-09-11T06:10:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'eco-a3-hero',
+            },
+            caption: "Une friche industrielle en bordure de Villefranche-d'Arvor",
+            credit: 'Photo : Léo Prat / Studio Arvor',
+          },
+        },
       },
     ],
   },
@@ -1242,7 +1280,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'eco-a2',
+        summary: {
+          id: 'eco-a2',
+          section: 'social-eco',
+          format: 'article',
+          access: 'free',
+          title: "Sur les marchés du Val d'Arche, la flambée des prix pousse les clients à rogner sur les quantités",
+          standfirst:
+            "Fruits, légumes, fromages : en un an, les étals ont vu leurs tarifs grimper. Commerçants et clients décrivent une même spirale, entre coûts de production en hausse et pouvoir d'achat en berne, à l'approche de l'hiver.",
+          byline: 'Julien Ferrand',
+          publishedAt: '2026-09-10T13:30:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'eco-a2-hero',
+            },
+            caption: 'Un étal de primeurs sur le marché de Sainte-Coline',
+            credit: 'Photo : Nadia Rous / Studio Arvor',
+          },
+        },
       },
     ],
   },
@@ -1879,7 +1935,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'env-a3',
+        summary: {
+          id: 'env-a3',
+          section: 'environnement',
+          format: 'article',
+          access: 'premium',
+          title: 'Aux marais de Grand-Rieu, la renaturation porte ses premiers fruits deux ans après les travaux',
+          standfirst:
+            "Le conservatoire des espaces naturels des Trois-Vallées constate le retour d'oiseaux nicheurs sur la zone humide restaurée, un signe encourageant pour un chantier longtemps contesté par les riverains de la vallée.",
+          byline: 'Hugo Lambert et Léa Fontanel',
+          publishedAt: '2026-09-11T07:40:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'env-a3-hero',
+            },
+            caption: 'Les vasières restaurées des marais de Grand-Rieu',
+            credit: 'Photo : Malo Renard',
+          },
+        },
       },
     ],
   },
@@ -2029,7 +2103,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'env-a1',
+        summary: {
+          id: 'env-a1',
+          section: 'environnement',
+          format: 'article',
+          access: 'premium',
+          title: "Sécheresse à Val-Mareuil : la régie des eaux impose des restrictions jusqu'à la fin octobre",
+          standfirst:
+            "Le niveau de la nappe du bassin de la Sonne n'a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l'arrosage des jardins et à réduire la pression du réseau sur onze communes.",
+          byline: 'Hugo Lambert',
+          publishedAt: '2026-09-10T06:30:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'env-a1-hero',
+            },
+            caption: 'La retenue de la Sonne à son étiage',
+            credit: 'Photo : Camille Ancel',
+          },
+        },
       },
     ],
   },
@@ -2160,7 +2252,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'env-a1',
+        summary: {
+          id: 'env-a1',
+          section: 'environnement',
+          format: 'article',
+          access: 'premium',
+          title: "Sécheresse à Val-Mareuil : la régie des eaux impose des restrictions jusqu'à la fin octobre",
+          standfirst:
+            "Le niveau de la nappe du bassin de la Sonne n'a jamais été aussi bas pour un mois de septembre, contraignant la régie des eaux à interdire l'arrosage des jardins et à réduire la pression du réseau sur onze communes.",
+          byline: 'Hugo Lambert',
+          publishedAt: '2026-09-10T06:30:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'env-a1-hero',
+            },
+            caption: 'La retenue de la Sonne à son étiage',
+            credit: 'Photo : Camille Ancel',
+          },
+        },
       },
     ],
   },
@@ -3042,7 +3152,26 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'fem-a1',
+        summary: {
+          id: 'fem-a1',
+          section: 'feminisme',
+          format: 'article',
+          access: 'premium',
+          title:
+            'Écart de salaires : dans les métiers du soin à domicile, les femmes gagnent un quart de moins que prévu',
+          standfirst:
+            'Une étude locale rendue publique mardi chiffre pour la première fois les écarts de rémunération dans un secteur presque entièrement féminin, où le temps partiel subi pèse lourd sur les fiches de paie.',
+          byline: 'Claire Vasseur et Inès Benali',
+          publishedAt: '2026-09-10T06:00:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'fem-a1-hero',
+            },
+            caption: 'Une aide à domicile en tournée dans un quartier pavillonnaire',
+            credit: 'Photo : Sonia Ferrer / CC BY 4.0',
+          },
+        },
       },
     ],
   },
@@ -3693,7 +3822,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'mon-a3',
+        summary: {
+          id: 'mon-a3',
+          section: 'monde',
+          format: 'article',
+          access: 'premium',
+          title: "À Port-Méridienne, l'automatisation du terminal portuaire inquiète les dockers venus de Valdavie",
+          standfirst:
+            "L'arrivée de portiques automatisés sur le premier terminal à conteneurs de la région fait craindre des centaines de suppressions d'emplois, dans une ville où la manutention fait vivre des quartiers entiers.",
+          byline: 'Élise Morvan et Samir Haddad',
+          publishedAt: '2026-09-12T06:05:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'mon-a3-hero',
+            },
+            caption: 'Les portiques du terminal de Port-Méridienne',
+            credit: 'Photo : Agence Méridien / CC BY 4.0',
+          },
+        },
       },
     ],
   },
@@ -4312,7 +4459,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'mon-a2',
+        summary: {
+          id: 'mon-a2',
+          section: 'monde',
+          format: 'article',
+          access: 'free',
+          title: "Après les inondations, l'archipel des Cargues attend toujours l'aide promise par ses voisins",
+          standfirst:
+            "Trois semaines après les crues qui ont ravagé plusieurs îles, les habitants dénoncent la lenteur des secours et le manque d'eau potable, tandis que l'Union des États du Levant peine à coordonner les convois.",
+          byline: 'Samir Haddad',
+          publishedAt: '2026-09-11T07:15:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'mon-a2-hero',
+            },
+            caption: "Un quartier encore inondé sur l'île principale des Cargues",
+            credit: 'Photo : Agence Méridien / CC BY 4.0',
+          },
+        },
       },
     ],
   },
@@ -4583,7 +4748,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'pol-a3',
+        summary: {
+          id: 'pol-a3',
+          section: 'politique',
+          format: 'article',
+          access: 'premium',
+          title: "Fusion des intercommunalités : le Val d'Arche et le pays de l'Ombre butent sur le partage du pouvoir",
+          standfirst:
+            "Engagées depuis un an vers un rapprochement, les deux communautés de communes ne s'accordent ni sur le nombre de vice-présidents ni sur le siège de la future collectivité. Une réunion décisive est prévue la semaine prochaine.",
+          byline: 'Lucie Varenne et Karim Belhadj',
+          publishedAt: '2026-09-11T05:45:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'pol-a3-hero',
+            },
+            caption: "La salle du conseil communautaire du Val d'Arche",
+            credit: 'Photo : Léo Prat / Studio Arvor',
+          },
+        },
       },
     ],
   },
@@ -4841,7 +5024,26 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'pol-a2',
+        summary: {
+          id: 'pol-a2',
+          section: 'politique',
+          format: 'article',
+          access: 'free',
+          title:
+            'Logements vacants à Sainte-Coline : la commune lance un plan pour remettre cent appartements sur le marché',
+          standfirst:
+            "La municipalité veut récupérer une centaine de logements laissés vides dans le centre ancien. Elle mise d'abord sur des aides à la rénovation, puis, en dernier recours, sur la réquisition, une piste qui divise déjà le conseil municipal.",
+          byline: 'Karim Belhadj',
+          publishedAt: '2026-09-10T10:15:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'pol-a2-hero',
+            },
+            caption: 'Une façade du centre ancien de Sainte-Coline',
+            credit: 'Photo : Nadia Rous / Studio Arvor',
+          },
+        },
       },
     ],
   },
@@ -5443,7 +5645,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'soc-a3',
+        summary: {
+          id: 'soc-a3',
+          section: 'societe',
+          format: 'article',
+          access: 'premium',
+          title: "Déserts médicaux : la maison de santé du Val d'Arche cherche à attirer de jeunes praticiens",
+          standfirst:
+            "Ouverte il y a un an à Saint-Clair-du-Roc, la structure peine encore à recruter des généralistes, malgré des logements de fonction et une prime d'installation financée par cinq communes réunies.",
+          byline: 'Nadia Oussedik et Thomas Lécuyer',
+          publishedAt: '2026-09-12T05:50:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'soc-a3-hero',
+            },
+            caption: "La façade de la maison de santé du Val d'Arche",
+            credit: 'Photo : Studio Arche / CC BY 4.0',
+          },
+        },
       },
     ],
   },
@@ -6124,7 +6344,26 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'soc-a1',
+        summary: {
+          id: 'soc-a1',
+          section: 'societe',
+          format: 'article',
+          access: 'premium',
+          title:
+            "Hébergement d'urgence à Villeneuve-sur-Arche : le collectif Toits d'abord obtient l'ouverture d'un gymnase",
+          standfirst:
+            "Après une nuit de veille devant la mairie, la municipalité a accepté mercredi d'ouvrir le gymnase des Charmilles pour accueillir une soixantaine de personnes sans abri avant les premières gelées.",
+          byline: 'Nadia Oussedik',
+          publishedAt: '2026-09-11T06:15:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'soc-a1-hero',
+            },
+            caption: 'Le gymnase des Charmilles réaménagé en dortoir',
+            credit: 'Photo : Studio Arche / CC BY 4.0',
+          },
+        },
       },
     ],
   },
@@ -6407,7 +6646,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'spo-a2',
+        summary: {
+          id: 'spo-a2',
+          section: 'sport',
+          format: 'article',
+          access: 'free',
+          title: "Les Aiglons de Val-Mareuil, révélation de la saison, portent l'espoir du handball féminin local",
+          standfirst:
+            'Monté de deux divisions en trois ans, le club féminin attire un public nouveau et bouscule les hiérarchies régionales, porté par une formation patiente et un noyau de joueuses fidèles au maillot.',
+          byline: 'Sofia Laurenti',
+          publishedAt: '2026-09-10T14:40:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'spo-a2-hero',
+            },
+            caption: "Les joueuses des Aiglons à l'entraînement",
+            credit: 'Photo : Fanny Delcourt / agence Plein-Cadre',
+          },
+        },
       },
     ],
   },
@@ -6547,7 +6804,25 @@ export const CORPUS_DATA = [
       },
       {
         type: 'related',
-        id: 'spo-a1',
+        summary: {
+          id: 'spo-a1',
+          section: 'sport',
+          format: 'article',
+          access: 'premium',
+          title: "L'Union sportive de Bourg-la-Rivière rêve de montée mais joue son avenir sur un stade vétuste",
+          standfirst:
+            'Promu au printemps, le club de football amateur enchaîne les bons résultats, mais son stade centenaire ne répond plus aux normes de la division supérieure et la municipalité tarde encore à trancher.',
+          byline: 'Maxime Renaud',
+          publishedAt: '2026-09-10T07:20:00.000Z',
+          hero: {
+            picture: {
+              kind: 'corpus',
+              key: 'spo-a1-hero',
+            },
+            caption: 'Les tribunes en bois du stade de Bourg-la-Rivière',
+            credit: 'Photo : Théo Vasseur / agence Grand-Angle',
+          },
+        },
       },
     ],
   },

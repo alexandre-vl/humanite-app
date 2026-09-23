@@ -52,7 +52,7 @@ export function SearchPage(): ReactNode {
           onOpen={(id) => {
             router.push(articleHref(id));
           }}
-          action={(summary) => <BookmarkToggle id={summary.id} />}
+          action={(summary) => <BookmarkToggle summary={summary} />}
           names={names}
           empty={{ title: t('search.none.title', { query: asked }), message: t('search.none.message') }}
         />

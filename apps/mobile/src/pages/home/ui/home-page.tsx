@@ -43,7 +43,7 @@ function Sheet({ leaf }: SheetProps): ReactNode {
       onOpen={(id) => {
         router.push(articleHref(id));
       }}
-      action={(summary) => <BookmarkToggle id={summary.id} />}
+      action={(summary) => <BookmarkToggle summary={summary} />}
       names={section === null ? names : undefined}
     />
   );
