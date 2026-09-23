@@ -1,1 +1,1 @@
-export { everyArticle, renderWithCache, settle } from './testing';
+export { everyArticle, renderWithCache, settle, standfirstOf } from './testing';

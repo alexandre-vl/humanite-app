@@ -5,7 +5,7 @@ import { content } from '#api';
 import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
 import { formatHour, formatLongDate } from '#lib/format';
-import { everyArticle } from '#lib/testing';
+import { everyArticle, standfirstOf } from '#lib/testing';
 import { Text } from '#primitives/text';
 import type { CardShape } from '../model/rhythm';
 import { ArticleCard } from './article-card';
@@ -99,7 +99,7 @@ describe('ArticleCard', () => {
   it.each(WITH_SUMMARY)('donne à %s le chapô qui répond à son titre', async (shape) => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape={shape} summary={summary} />);
-    expect(screen.getByText(summary.standfirst)).toBeTruthy();
+    expect(screen.getByText(standfirstOf(summary))).toBeTruthy();
   });
 
   /**
@@ -110,7 +110,7 @@ describe('ArticleCard', () => {
   it.each(['line', 'column'] as const)('ne met pas de chapô sur %s', async (shape) => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape={shape} summary={summary} />);
-    expect(screen.queryByText(summary.standfirst)).toBeNull();
+    expect(screen.queryByText(standfirstOf(summary))).toBeNull();
   });
 
   /** A headline cut is a headline lost: the journal's lost their end on two cards in five at the old clamps. */
@@ -178,7 +178,7 @@ describe('ArticleCard', () => {
   it.each(WITH_SUMMARY)('sépare sur %s l’encre du titre de celle du chapô', async (shape) => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape={shape} summary={summary} />);
-    expect(inkOf(summary.title)).not.toBe(inkOf(summary.standfirst));
+    expect(inkOf(summary.title)).not.toBe(inkOf(standfirstOf(summary)));
   });
 
   it.each(SHAPES)('porte sur %s ce que l’écran permet de faire de l’article', async (shape) => {

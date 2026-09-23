@@ -57,7 +57,9 @@ test('a lead picture keyed to another item is refused', () => {
 test('a title or a standfirst outside what this corpus measures is refused', () => {
   const article = illustrated();
   expect(errorsAbout(bent(article, { title: 'Climat' }), 'titre de')).toEqual([expect.stringContaining('6 signes')]);
-  expect(errorsAbout(bent(article, { standfirst: '' }), 'chapô de')).toEqual([expect.stringContaining('0 signes')]);
+  expect(errorsAbout(bent(article, { standfirst: undefined }), 'chapô de')).toEqual([
+    expect.stringContaining('0 signes'),
+  ]);
 });
 
 test('an item of this corpus carries a byline', () => {

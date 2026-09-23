@@ -81,9 +81,11 @@ test.each(LISTS)(
 );
 
 test.each(LISTS)('$route: no title or standfirst reaches the domain carrying the journal’s markup', ({ answer }) => {
-  const lines = readSummaries(answer.posts).kept.flatMap((summary) => [summary.title, summary.standfirst]);
+  const lines = readSummaries(answer.posts).kept.flatMap((summary) => [
+    summary.title,
+    ...(summary.standfirst === undefined ? [] : [summary.standfirst]),
+  ]);
   expect(lines.filter((line) => /<[^>]*>|&[a-z]+;|&#\d+;/iu.test(line))).toEqual([]);
-  expect(lines.filter((line) => line === '')).toEqual([]);
 });
 
 /** Every caption the capture kept, as the service wrote it: the lists' pictures, then the articles'. */
@@ -282,9 +284,9 @@ test('an open article carries no standfirst its body already opens on, and a wit
   if (!('item' in open) || !('item' in withheld)) {
     throw new Error('l’article enregistré n’a pas été lu');
   }
-  expect(open.item.standfirst).toBe('');
+  expect(open.item.standfirst).toBeUndefined();
   expect(withheld.item.standfirst).toBe(readPlain(RECORDED.articles.opinion.answer.excerpt));
-  expect(withheld.item.standfirst).not.toBe('');
+  expect(withheld.item.standfirst).toBeDefined();
 });
 
 /** A speaker of a debate is introduced in one line — the name in bold, then what she does — as the journal writes it. */

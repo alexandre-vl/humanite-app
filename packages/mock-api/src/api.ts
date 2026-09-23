@@ -95,7 +95,7 @@ type Indexed = Readonly<{ summary: ArticleSummary; searchable: string }>;
  */
 const INDEXED: readonly Indexed[] = CHRONOLOGICAL.map((summary) => ({
   summary,
-  searchable: fold([summary.title, summary.standfirst].join(' ')),
+  searchable: fold([summary.title, summary.standfirst].filter((part) => part !== undefined).join(' ')),
 }));
 
 /** The page of `items` a cursor opens — an offset, minted here and nowhere else — `size` items long. */

@@ -172,7 +172,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   // files: a text still set some other way reached a screen by some path that skipped the one rule.
   const texts = [
     article.title,
-    article.standfirst,
+    article.standfirst ?? '',
     article.hero?.caption ?? '',
     article.hero?.credit ?? '',
     ...blocksOf(article).map(textOf),
@@ -183,7 +183,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   }
   for (const [field, text, bounds] of [
     ['titre', article.title, SIGNS.title],
-    ['chapô', article.standfirst, SIGNS.standfirst],
+    ['chapô', article.standfirst ?? '', SIGNS.standfirst],
   ] as const) {
     if (text.length < bounds.min || text.length > bounds.max) {
       errors.push(

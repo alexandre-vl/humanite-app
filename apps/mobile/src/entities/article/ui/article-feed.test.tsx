@@ -3,7 +3,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { content } from '#api';
-import { renderWithCache, settle } from '#lib/testing';
+import { renderWithCache, settle, standfirstOf } from '#lib/testing';
 import { feedQuery } from '../api/queries';
 import { usePagedFeed } from '../model/paged-feed';
 import type { FeedRhythm } from '../model/rhythm';
@@ -37,7 +37,7 @@ describe('ArticleFeed', () => {
     const first = firstOf(await served());
     await mounted('paper', () => undefined);
     expect(await screen.findByText(first.title)).toBeTruthy();
-    expect(await screen.findByText(first.standfirst)).toBeTruthy();
+    expect(await screen.findByText(standfirstOf(first))).toBeTruthy();
   });
 
   it('rapporte l’article pressé, sans naviguer lui-même', async () => {

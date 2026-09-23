@@ -68,9 +68,11 @@ export function ArticleRelated({ summary, onOpen }: ArticleRelatedProps): ReactN
             <Text variant="title" numberOfLines={3}>
               {summary.title}
             </Text>
-            <Text variant="prose" numberOfLines={2}>
-              {summary.standfirst}
-            </Text>
+            {summary.standfirst === undefined ? null : (
+              <Text variant="prose" numberOfLines={2}>
+                {summary.standfirst}
+              </Text>
+            )}
           </Box>
         </Pressable>
       </Paper>

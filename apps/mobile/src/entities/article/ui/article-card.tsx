@@ -142,7 +142,7 @@ function Words({ summary, standfirst }: Readonly<{ summary: ArticleSummary; stan
           two cards in five — median 101 signs, 117 on a front page — and what a French headline says after its colon
           is the news; the Guardian, Le Monde and Mediapart cut none of theirs in a feed. */}
       <Text variant="title">{summary.title}</Text>
-      {standfirst ? (
+      {standfirst && summary.standfirst !== undefined ? (
         <Text variant="summary" numberOfLines={3}>
           {summary.standfirst}
         </Text>

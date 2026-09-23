@@ -42,7 +42,8 @@ test('a summary carries these fields and no others', () => {
 test('ARTICLE_SUMMARY takes what the journal actually files, which no bound would have let through', () => {
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'Climat' }).success).toBe(true);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: 'T'.repeat(226) }).success).toBe(true);
-  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, standfirst: '' }).success).toBe(true);
+  const bare = Object.fromEntries(Object.entries(validSummary).filter(([field]) => field !== 'standfirst'));
+  expect(ARTICLE_SUMMARY.safeParse(bare).success).toBe(true);
   // A whole route of the service signs nothing: fifty-five items of one capture came with no name at all.
   const unsigned = Object.fromEntries(Object.entries(validSummary).filter(([field]) => field !== 'byline'));
   expect(ARTICLE_SUMMARY.safeParse(unsigned).success).toBe(true);
@@ -53,6 +54,16 @@ test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, 
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: 'pol-z9' }).success).toBe(false);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: '3861029-x' }).success).toBe(false);
   expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, id: 'pol-a1-hero' }).success).toBe(false);
+});
+
+/**
+ * A text the domain carries is never empty: a field with nothing in it is a field the item does not carry, and says
+ * so by being absent. The empty standfirst was how an item said it had none, and a screen had to know to test for it.
+ */
+test('ARTICLE_SUMMARY refuses an empty text, where an absent one says there is none', () => {
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, standfirst: '' }).success).toBe(false);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, title: '' }).success).toBe(false);
+  expect(ARTICLE_SUMMARY.safeParse({ ...validSummary, byline: '' }).success).toBe(false);
 });
 
 test('ARTICLE extends the summary with a body, which a video of the journal leaves empty', () => {

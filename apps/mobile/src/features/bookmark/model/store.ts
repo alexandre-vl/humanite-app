@@ -9,9 +9,14 @@ import { STORAGE_KEYS, field, stateStorage } from '#lib/storage';
  *
  * It is read back before anything is restored, so what was written under another number is either brought forward or
  * dropped, never read as though it had always meant the same thing. The first version held ids alone, and nothing
- * here can turn an id back into a card without reading the article again: what it wrote is dropped.
+ * here can turn an id back into a card without reading the article again: what it wrote is dropped. The second wrote
+ * an item with no standfirst with an empty one, which the contract now refuses: it is brought forward, the empty
+ * standfirst dropped, rather than losing the reader every article kept from the page of one opening on its excerpt.
  */
-const VERSION = 2;
+const VERSION = 3;
+
+/** The version whose summaries are brought forward, and not dropped. */
+const BROUGHT_FORWARD = 2;
 
 /** What the reader has kept, the last kept first, and the one thing they do to it. */
 type Kept = Readonly<{
@@ -20,6 +25,18 @@ type Kept = Readonly<{
 }>;
 
 const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
+
+/** A summary as the second version wrote it, with the empty standfirst it wrote for none left out. */
+const withoutEmptyStandfirst = (entry: unknown): unknown =>
+  typeof entry === 'object' && entry !== null && field(entry, 'standfirst') === ''
+    ? Object.fromEntries(Object.entries(entry).filter(([name]) => name !== 'standfirst'))
+    : entry;
+
+/** What an older version wrote, as this one reads it: the second brought forward, anything older dropped. */
+const broughtForward = (persisted: unknown, version: number): Readonly<{ kept: readonly unknown[] }> => {
+  const kept = field(persisted, 'kept');
+  return version === BROUGHT_FORWARD && isList(kept) ? { kept: kept.map(withoutEmptyStandfirst) } : { kept: [] };
+};
 
 /**
  * The summaries a disk holds, as summaries.
@@ -67,7 +84,7 @@ export const useBookmarks = create<Kept>()(
       version: VERSION,
       storage: createJSONStorage(() => stateStorage(STORAGE_KEYS.bookmarks)),
       partialize: (state) => ({ kept: state.kept }),
-      migrate: () => ({ kept: [] }),
+      migrate: broughtForward,
       merge: (persisted, current) => ({ ...current, kept: keptSummaries(persisted) }),
     },
   ),

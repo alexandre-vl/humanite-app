@@ -1,4 +1,4 @@
-import type { ArticleSummary, ContentApi, Page, PageQuery } from '@huma/contracts';
+import type { ArticleSummary, ContentApi, DisplayText, Page, PageQuery } from '@huma/contracts';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
@@ -42,4 +42,15 @@ export const everyArticle = async (content: ContentApi): Promise<readonly Articl
     sections.map(async (section) => everyPage(async (query) => content.getFeed({ ...query, section: section.id }))),
   );
   return lists.flat();
+};
+
+/**
+ * The standfirst of an item a test chose to have one. An item may carry none, and a test that reads one off an item it
+ * never checked would be reading nothing and finding it; this says which item broke the choice instead.
+ */
+export const standfirstOf = (summary: ArticleSummary): DisplayText => {
+  if (summary.standfirst === undefined) {
+    throw new Error(`${summary.id} n’a pas de chapô`);
+  }
+  return summary.standfirst;
 };

@@ -34,7 +34,7 @@ describe('useBookmarks', () => {
   it('écrit sous la clé du registre ce que la carte montre, avec la version de ce qu’il écrit', async () => {
     const [first] = await twoArticles();
     useBookmarks.getState().toggle(first);
-    expect(onDisk()).toEqual({ state: { kept: [first] }, version: 2 });
+    expect(onDisk()).toEqual({ state: { kept: [first] }, version: 3 });
   });
 
   /** An article opened whole is kept as its card: a body written beside the shelf would be a copy of the paper. */
@@ -56,16 +56,32 @@ describe('useBookmarks', () => {
     const [first, second] = await twoArticles();
     storage.set(
       STORAGE_KEYS.bookmarks,
-      JSON.stringify({ state: { kept: [first, 42, { id: 'PAS UN IDENTIFIANT' }, null, second] }, version: 2 }),
+      JSON.stringify({ state: { kept: [first, 42, { id: 'PAS UN IDENTIFIANT' }, null, second] }, version: 3 }),
     );
     await useBookmarks.persist.rehydrate();
     expect(useBookmarks.getState().kept).toEqual([first, second]);
   });
 
   it('repart de rien quand le disque ne porte pas la forme attendue', async () => {
-    storage.set(STORAGE_KEYS.bookmarks, JSON.stringify({ state: { kept: 'pol-a1' }, version: 2 }));
+    storage.set(STORAGE_KEYS.bookmarks, JSON.stringify({ state: { kept: 'pol-a1' }, version: 3 }));
     await useBookmarks.persist.rehydrate();
     expect(useBookmarks.getState().kept).toEqual([]);
+  });
+
+  /**
+   * The second format wrote an item with no standfirst with an empty one, which the contract now refuses: read as it
+   * was, every such article would vanish from the shelf. It is brought forward instead, as an item with none.
+   */
+  it('garde ce que le deuxième format a écrit, le chapô vide lu comme absent', async () => {
+    const [first, second] = await twoArticles();
+    const { standfirst, ...bare } = first;
+    expect(standfirst).toBeDefined();
+    storage.set(
+      STORAGE_KEYS.bookmarks,
+      JSON.stringify({ state: { kept: [{ ...bare, standfirst: '' }, second] }, version: 2 }),
+    );
+    await useBookmarks.persist.rehydrate();
+    expect(useBookmarks.getState().kept).toEqual([bare, second]);
   });
 
   /** The first format held ids alone, which nothing on the phone can turn back into cards: it is dropped, not misread. */

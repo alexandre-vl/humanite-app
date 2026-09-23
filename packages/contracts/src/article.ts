@@ -43,7 +43,7 @@ export const FILM = z.object({
  *
  * No field carries a length or a count. Measured on 375 items the journal's service answered, a title of fifty to a
  * hundred and forty signs misses sixteen per cent of them, in both directions, and a standfirst of a hundred and fifty
- * to three hundred misses forty-eight per cent, some being empty: a bound half the real items break is not a rule, it
+ * to three hundred misses forty-eight per cent, some having none: a bound half the real items break is not a rule, it
  * is a way of losing articles. The corpus, which is written and so can be held to bounds, is held to them where it is
  * written — `packages/mock-content/src/validate.ts`.
  *
@@ -53,14 +53,15 @@ export const FILM = z.object({
  * item, and it was set on none of 514.
  *
  * `byline` is who signed the piece, written out as the journal writes it — one name, or `La rédaction` — with nobody
- * behind it to look up.
+ * behind it to look up. `standfirst` is absent from an item filed without one, and from an article whose body opens on
+ * the words that stood in for it.
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
   format: ARTICLE_FORMAT,
   access: ACCESS,
   title: DISPLAY_TEXT,
-  standfirst: DISPLAY_TEXT,
+  standfirst: DISPLAY_TEXT.optional(),
   byline: DISPLAY_TEXT.optional(),
   publishedAt: z.iso.datetime(),
   hero: HERO.optional(),
@@ -137,7 +138,7 @@ export const textOf = (block: Block): string => {
     case 'image':
       return [block.caption, block.credit].filter((part) => part !== undefined).join(' ');
     case 'related':
-      return [block.summary.title, block.summary.standfirst].join(' ');
+      return [block.summary.title, block.summary.standfirst].filter((part) => part !== undefined).join(' ');
   }
 };
 

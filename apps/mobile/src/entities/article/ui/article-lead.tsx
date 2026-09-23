@@ -99,7 +99,7 @@ export function ArticleLead({ article, byline, onFollow }: ArticleLeadProps): Re
         />
       ) : null}
       {/* An article whose body opens on the words a list stood in for its missing standfirst has none of its own. */}
-      {article.standfirst === '' ? null : (
+      {article.standfirst === undefined ? null : (
         <Box style={styles.standfirst}>
           <Text variant="standfirst">{article.standfirst}</Text>
         </Box>

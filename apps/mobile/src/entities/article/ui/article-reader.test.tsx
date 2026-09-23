@@ -5,7 +5,7 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { formatPublished } from '#lib/format';
-import { everyArticle, renderWithCache, settle } from '#lib/testing';
+import { everyArticle, renderWithCache, settle, standfirstOf } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
 const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
@@ -176,7 +176,7 @@ describe('ArticleReader', () => {
     const article = await holdingSeveralRuns();
     await read(article);
     expect(await screen.findByText(article.title)).toBeTruthy();
-    expect(screen.getByText(article.standfirst)).toBeTruthy();
+    expect(screen.getByText(standfirstOf(article))).toBeTruthy();
     const words = blocksOf(article).flatMap((block) =>
       block.type === 'paragraph' ? block.spans.map((span) => span.text) : [],
     );
@@ -227,7 +227,7 @@ describe('ArticleReader', () => {
     await read(article);
     await screen.findByText(article.title);
     const order = inOrder(screen.toJSON());
-    expect(order.indexOf(`Par ${signature}`)).toBeGreaterThan(order.indexOf(article.standfirst));
+    expect(order.indexOf(`Par ${signature}`)).toBeGreaterThan(order.indexOf(standfirstOf(article)));
     expect(order.indexOf(`Par ${signature}`)).toBeLessThan(order.indexOf(caption));
   });
 

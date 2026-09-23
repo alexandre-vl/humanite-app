@@ -117,10 +117,10 @@ const filmOf = (post: RemotePost): Readonly<{ url: string }> | undefined => {
  *
  * The standfirst is the journal's `chapo`, which it sets in `description`; its excerpt is the opening of the body, and
  * stands in only where the standfirst is empty — a signed column is often filed with an empty one. Of 519 items, none
- * came with both empty.
+ * came with both empty, and one that does is an item with no standfirst rather than one with an empty one.
  */
 const inputOf = (post: RemotePost, publishedAt: string): SummaryInput => {
-  const standfirst = readPlain(post.description);
+  const standfirst = [readPlain(post.description), readPlain(post.excerpt)].find((text) => text !== '');
   const byline = readPlain(post.author ?? '');
   const hero = heroOf(post);
   const film = filmOf(post);
@@ -129,7 +129,7 @@ const inputOf = (post: RemotePost, publishedAt: string): SummaryInput => {
     format: FORMATS[post.article_format ?? 'classic'],
     access: post.premium ? 'premium' : 'free',
     title: readPlain(post.title),
-    standfirst: standfirst === '' ? readPlain(post.excerpt) : standfirst,
+    ...(standfirst === undefined ? {} : { standfirst }),
     publishedAt,
     ...(byline === '' ? {} : { byline }),
     ...(hero === undefined ? {} : { hero }),
@@ -278,7 +278,7 @@ export const readArticle = (answer: unknown): Read<Article> => {
   }
   // An item filed with no standfirst of its own stands in the opening of its body — a column, nearly always. Beside a
   // body the reader was given, that is the same words twice, the second time whole: it is the body's to say them.
-  const opens = readPlain(wire.data.description) === '' ? { ...summary.item, standfirst: '' } : summary.item;
+  const opens = readPlain(wire.data.description) === '' ? { ...summary.item, standfirst: undefined } : summary.item;
   return withBody(opens, { kind: 'open', blocks: readProse(body.data.content_array.join('')) });
 };
 
