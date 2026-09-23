@@ -1,7 +1,7 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
-import { chromeStyle, useTheme } from '#lib/styles';
+import { tabBarColors, useTheme } from '#lib/styles';
 import { ICONS } from '#primitives/icon';
 
 /**
@@ -32,18 +32,8 @@ import { ICONS } from '#primitives/icon';
  * reader who cannot see where they are is not being given room, they are being given a guess.
  */
 export function TabsLayout(): ReactNode {
-  const theme = useTheme();
   return (
-    <NativeTabs
-      backgroundColor={theme.surface}
-      tintColor={theme.primary}
-      iconColor={theme.textMuted}
-      indicatorColor={theme.card}
-      rippleColor={theme.border}
-      labelVisibilityMode="labeled"
-      minimizeBehavior="onScrollDown"
-      labelStyle={chromeStyle('textMuted', theme)}
-    >
+    <NativeTabs {...tabBarColors(useTheme())} labelVisibilityMode="labeled" minimizeBehavior="onScrollDown">
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf={ICONS.headline.ios} md={ICONS.headline.android} />
         <NativeTabs.Trigger.Label>{t('nav.headline')}</NativeTabs.Trigger.Label>

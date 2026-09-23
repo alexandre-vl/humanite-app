@@ -10,6 +10,7 @@ import { Text } from '#primitives/text';
 import { frameOf } from '../model/format';
 import { ArticleFigure } from './article-figure';
 import { ArticleFilm } from './article-film';
+import { ItemWord } from './item-word';
 
 export type ArticleTitleProps = Readonly<{ title: DisplayText; word: DisplayText | null }>;
 export type ArticleLeadProps = Readonly<{
@@ -48,11 +49,7 @@ export function ArticleTitle({ title, word }: ArticleTitleProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.title}>
-      {word === null ? null : (
-        <Text variant="kicker" tone="textPrimary">
-          {word}
-        </Text>
-      )}
+      <ItemWord word={word} />
       <Text variant="headline" heading>
         {title}
       </Text>

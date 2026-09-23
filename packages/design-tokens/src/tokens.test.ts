@@ -56,10 +56,9 @@ test('sizes give a list its bands and the scroll inset each arrangement adds up 
   expectTypeOf(SIZES.headerBandPair).toEqualTypeOf<Space>();
 });
 
-test('a bar keeps both its ends free, and more than one control fits in either', () => {
+test('a bar keeps both its ends free for the square each of them holds', () => {
   expect(SIZES.bar).toBe(56);
-  // Two touch targets of the 48 points the grid keeps for one, so a bar carrying two controls still centres its name.
-  expect(SIZES.barSide).toBeGreaterThan(SPACING.xxxl);
-  expect(SIZES.barSide).toBeLessThan(SPACING.xxxl * 2);
+  // The bar's margin and one touch target of the 48 points the grid keeps for one, at either end.
+  expect(SIZES.barSide).toBe(SPACING.sm + SPACING.xxxl);
   expectTypeOf(SIZES.bar).toEqualTypeOf<Space>();
 });

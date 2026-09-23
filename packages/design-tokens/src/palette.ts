@@ -21,6 +21,11 @@ import { color } from './brand.ts';
  * untouched where it is a ground rather than a letter: that is the paper's, and the rule names the departure instead
  * of hiding it.
  *
+ * `darkInkRed` is the same step taken the other way, for the dark theme, which has no measurement to depart from: the
+ * paper's red with four parts in a hundred of white mixed in, which is the least that reads as a letter on the dark
+ * theme's bar. The tab a reader is on is named there in it, and the red itself measured 4.35 on that bar; lifted, it
+ * measures 4.53 there, and 5.01 on the dark page where the red measured 4.81.
+ *
  * `inkGrey` and `darkSecondary` are the middle step of an ink that had only two. A card sets a title and the summary
  * under it, and both were printed in the same colour at the same weight — so the summary read as a second title
  * rather than as what answers one. The two new values sit between the ink and the muted grey at roughly half the
@@ -31,6 +36,7 @@ import { color } from './brand.ts';
 export const PALETTE = {
   uiRed: color('#f13c47'),
   inkRed: color('#ca323c'),
+  darkInkRed: color('#f2444e'),
   aubergine: color('#230434'),
   inkGrey: color('#4c3f57'),
   blueGrey: color('#ecf2f2'),

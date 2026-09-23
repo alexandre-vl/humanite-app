@@ -1,8 +1,11 @@
+import { SPACING } from '@huma/design-tokens';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { act, fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
+import { t } from '#i18n';
 import { renderWithCache, settle } from '#lib/testing';
+import { ICONS } from '#primitives/icon';
 import { SearchPage } from './search-page';
 
 // The double is built inside the factory: jest hoists the call above everything else in the file, so anything it read
@@ -31,6 +34,25 @@ const type = async (text: string): Promise<void> => {
 // update inside act, where React can account for it.
 afterEach(settle);
 
+const hasSide = (value: unknown): value is Readonly<{ width: number }> =>
+  typeof value === 'object' &&
+  value !== null &&
+  !Array.isArray(value) &&
+  typeof Reflect.get(value, 'width') === 'number';
+
+/** The side a mark is drawn at, read from the nearest box around its glyph that is given one. */
+const sideOf = (glyph: ReturnType<typeof screen.getByText>): number => {
+  let node = glyph.parent;
+  while (node !== null && !hasSide(node.props['style'])) {
+    node = node.parent;
+  }
+  const style: unknown = node?.props['style'];
+  if (!hasSide(style)) {
+    throw new Error('rien autour du signe ne dit sa taille : le test ne vérifierait pas la cible');
+  }
+  return style.width;
+};
+
 describe('SearchPage', () => {
   /**
    * A single letter reaches all 72 articles of the corpus, so a screen that asked would answer with the whole paper.
@@ -42,6 +64,19 @@ describe('SearchPage', () => {
     await type('c');
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
     expect(screen.queryByText(/Résultats pour/u)).toBeNull();
+  });
+
+  /**
+   * The cross is a sixteen-point mark, and it was the whole of its target: 42 pixels of an A065 under a thumb that
+   * wants 126. What it answers past its own edges gives the finger back its grid step.
+   */
+  it('donne à la croix qui efface un pas de grille entier sous le doigt', async () => {
+    await renderPage();
+    await type('jeunes');
+    const cross = screen.getByLabelText(t('search.clear'));
+    const reach: unknown = cross.props['hitSlop'];
+    const glyph = within(cross).getByTestId(`symbol:${ICONS.clear.android}`, { includeHiddenElements: true });
+    expect(sideOf(glyph) + 2 * (typeof reach === 'number' ? reach : 0)).toBeGreaterThanOrEqual(SPACING.xxxl);
   });
 
   it('laisse le lecteur finir de taper avant d’interroger le journal', async () => {

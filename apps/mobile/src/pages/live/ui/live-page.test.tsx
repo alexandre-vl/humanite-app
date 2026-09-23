@@ -62,6 +62,34 @@ describe('LivePage', () => {
     expect(screen.queryByText(/\d{2}\/\d{2}/)).toBeNull();
   });
 
+  /** A headline cut is a headline lost, on the wire as on a card: the row cut its title at four lines. */
+  it('ne coupe jamais le titre d’un item', async () => {
+    const item = await newest();
+    await renderPage();
+    expect((await screen.findByText(item.title)).props['numberOfLines']).toBeUndefined();
+  });
+
+  /**
+   * The mark a card prints at its foot is printed under the row of the same item, and only for an item any reader may
+   * open: four in five are reserved, and a mark on those would be a mark on nearly every row.
+   */
+  it.each([
+    { access: 'free', marks: 1 },
+    { access: 'premium', marks: 0 },
+  ] as const)(
+    'marque sous son titre un item $access autant de fois qu’il est ouvert à tous : $marks',
+    async ({ access, marks }) => {
+      const item = (await everyArticle(content)).find((summary) => summary.access === access);
+      if (item === undefined) {
+        throw new Error(`le contenu ne sert aucun item ${access} : le test ne vérifierait rien`);
+      }
+      jest.spyOn(content, 'getLiveFeed').mockResolvedValue({ items: [item], nextCursor: null });
+      await renderPage();
+      expect(await screen.findByText(item.title)).toBeTruthy();
+      expect(screen.queryAllByText(t('article.free'))).toHaveLength(marks);
+    },
+  );
+
   /** Every section runs down this one column: what sets a row apart is what the item is, when it is not an article. */
   it('dit sur la ligne d’une vidéo qu’elle en est une', async () => {
     const video = (await everyArticle(content)).find((summary) => summary.format === 'video');

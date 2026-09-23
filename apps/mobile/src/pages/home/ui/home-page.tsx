@@ -76,7 +76,7 @@ export function HomePage(): ReactNode {
       <TopBar
         title={t('app.name')}
         names="paper"
-        actions={
+        action={
           <TopBarButton
             icon="reading"
             label={t('settings.title')}

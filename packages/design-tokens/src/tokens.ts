@@ -122,9 +122,11 @@ export const TRACKING = {
  * is typed on. It is here rather than on the spacing grid because it is finer than the grid's smallest step.
  *
  * `bar` is the height of the bar every screen draws across its top, and `barSide` the width kept free at each of its
- * ends for the controls it hangs there. The name in the middle is laid over the row between those two margins rather
- * than placed in it, so it sits in the middle of the screen whether the bar carries one control or three — which is
- * what a bar the platform lays out does, and what the app had to take over when it stopped drawing one.
+ * ends: the bar's own margin of eight points and the grid step square each end holds, the way back at one and the one
+ * thing a screen offers at the other. The name in the middle is laid over the row between those two margins rather
+ * than placed in it, so it sits in the middle of the screen whether the bar carries a control at one end, at both or
+ * at neither — which is what a bar the platform lays out does, and what the app had to take over when it stopped
+ * drawing one. It was eighty-eight, room for two controls at one end, which no screen hangs any more.
  *
  * `thumbnail` is the side of the small square picture a card in a line carries beside its standfirst, and `cover` the
  * width of a numéro standing on the newsstand's shelf. Both are widths, not heights, and the only two the paper names:
@@ -158,7 +160,7 @@ export const SIZES = {
   headerBand: space(HEADER_EXPANDED + BAND),
   headerBandPair: space(HEADER_EXPANDED + BAND * 2),
   bar: space(56),
-  barSide: space(88),
+  barSide: space(56),
   stroke: space(2),
   thumbnail: space(96),
   cover: space(140),

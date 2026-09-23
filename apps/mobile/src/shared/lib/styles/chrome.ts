@@ -9,8 +9,38 @@ import type { Color, TextTone, Theme } from '@huma/design-tokens';
  * there, it would be a second place where the palette is decided, and the one place no rule about tokens can see.
  */
 
-/** The colour a piece of text the platform draws is set in — a label under a tab bar, a title in a native header. */
-export const chromeStyle = (tone: TextTone, theme: Theme): Readonly<{ color: Color }> => ({ color: theme[tone] });
+/**
+ * The colour a word the platform draws is set in. It is read from a tone of text and from nothing else, so the only
+ * colours a bar can print its words in are the ones the legibility rule of the tokens holds against their ground.
+ */
+const textColor = (tone: TextTone, theme: Theme): Color => theme[tone];
+
+/** What a native tab bar is told: the ground it lays, the ink of its symbols and words, and the colours of a touch. */
+type TabBarColors = Readonly<{
+  backgroundColor: Color;
+  tintColor: Color;
+  iconColor: Color;
+  indicatorColor: Color;
+  rippleColor: Color;
+  labelStyle: Readonly<{ color: Color }>;
+}>;
+
+/**
+ * The colours the native tab bar is handed, in the colours in force.
+ *
+ * The tab a reader is on is named in `link`, the red a letter is read in, and no longer in the paper's own: a word of
+ * the bar is small print, owed four and a half to one, and the red measured 3.83 on the light bar and 4.35 on the dark
+ * one. Every other tab is named in the muted ink the paper sets its small print in. The pill Material lays behind the
+ * tab one is on stays in `card`, which the bar barely shows — the red of its symbol and of its word says which tab it is.
+ */
+export const tabBarColors = (theme: Theme): TabBarColors => ({
+  backgroundColor: theme.surface,
+  tintColor: textColor('link', theme),
+  iconColor: textColor('textMuted', theme),
+  indicatorColor: theme.card,
+  rippleColor: theme.border,
+  labelStyle: { color: textColor('textMuted', theme) },
+});
 
 /** What a native stack is told: that it draws no bar of its own, and the ground it shows between two screens. */
 type ChromeOptions = Readonly<{

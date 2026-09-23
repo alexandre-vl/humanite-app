@@ -1,4 +1,4 @@
-export { chromeOptions, chromeStyle } from './chrome';
+export { chromeOptions, tabBarColors } from './chrome';
 export { createStyles } from './create-styles';
 export type { StyleRef } from './create-styles';
 export type { TextAlign } from './text-style';

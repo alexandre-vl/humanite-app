@@ -31,11 +31,12 @@ import { PALETTE } from './palette.ts';
  * the one above, near twice the one below — so the order in which a card is read is set by the ink and not only by
  * the size.
  *
- * `link` is the red a word takes when pressing it goes somewhere, and it is not `primary` for the reason `headline`
- * is not one value either: a ground and a letter want the red from opposite ends. A ground carrying white has to be
- * dark enough to carry it; a letter on a light page has to be dark enough to be read, and a letter on a dark page
- * has to be light enough. The paper's own red answers only the last of those — 4.81 to 1 on the dark page, 3.83 on
- * the light one — so the light theme writes its links in the deeper `inkRed` and the dark theme in the red itself.
+ * `link` is the red a word takes when pressing it goes somewhere — a link in prose, and the name of the tab a reader
+ * is on — and it is not `primary` for the reason `headline` is not one value either: a ground and a letter want the
+ * red from opposite ends. A ground carrying white has to be dark enough to carry it; a letter on a light page has to
+ * be dark enough to be read, and a letter on a dark page has to be light enough. The paper's own red answers only the
+ * last of those, and not everywhere: 4.81 to 1 on the dark page, 4.35 on the dark bar, 3.83 on the light page. So the
+ * light theme writes its links in the deeper `inkRed`, and the dark theme in `darkInkRed`, lifted just enough.
  *
  * `rule` is the line the paper actually draws, and `border` is not it. The one rule in the app — under what an
  * article says about itself, before the article itself — was painted in `border`, which is the light theme's ground
@@ -99,7 +100,7 @@ export const DARK_THEME = {
   onPrimary: PALETTE.white,
   headline: PALETTE.white,
   mark: PALETTE.uiRed,
-  link: PALETTE.uiRed,
+  link: PALETTE.darkInkRed,
   primary: PALETTE.uiRed,
   border: PALETTE.darkBorder,
   rule: PALETTE.darkRule,

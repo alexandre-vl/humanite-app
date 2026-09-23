@@ -71,10 +71,6 @@ describe('HomePage', () => {
   });
 
   /**
-   * The two things a reader wants from anywhere in the paper and could reach from nowhere. They are in the masthead
-   * and not in the feed, so they are there at the top of the paper and there again at the bottom of it.
-   */
-  /**
    * One control, where there were two. The other opened what the reader kept, and it was here because that shelf was
    * reachable from nowhere else; it has a tab now, standing directly under this bar, so the mark was a second door.
    */
@@ -88,8 +84,8 @@ describe('HomePage', () => {
   /** What the front page no longer holds: the shelf of what one kept, which is a screen of its own. */
   it('ne montre pas sur la une ce que le lecteur a gardé', async () => {
     await renderPage();
-    expect(screen.queryByText('Aucun article gardé')).toBeNull();
-    // The mark in the masthead opens the shelf; it does not show it, and nothing on this screen is that shelf.
+    expect(screen.queryByText('Aucune lecture pour l’instant')).toBeNull();
+    // The tab bar names the shelf and is not drawn here; nothing on this screen is that shelf, nor names it.
     expect(screen.queryAllByText('Mes lectures')).toHaveLength(0);
   });
 
@@ -117,12 +113,12 @@ describe('HomePage', () => {
     const article = await frontArticle();
     await renderPage();
     expect(await screen.findByText(article.title)).toBeTruthy();
-    const [mark] = screen.getAllByLabelText('Ajouter aux favoris');
+    const [mark] = screen.getAllByLabelText('Ajouter à mes lectures');
     if (mark === undefined) {
       throw new Error('aucune carte ne porte de marque-page : le test ne vérifierait rien');
     }
     await fireEvent.press(mark);
     await settle();
-    expect(screen.getAllByLabelText('Retirer des favoris')).toHaveLength(1);
+    expect(screen.getAllByLabelText('Retirer de mes lectures')).toHaveLength(1);
   });
 });

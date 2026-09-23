@@ -24,6 +24,14 @@ const useStyles = createStyles((theme) => ({
 }));
 
 /**
+ * What the cross answers past its own edges. The mark is sixteen points, and it was the whole of the target: 42 pixels
+ * of an A065 under a thumb that wants 126. Sixteen more on every side is the grid step a finger is owed, and it stays
+ * inside the line the cross sits on — that line is a grid step tall, and the screen's margin is sixteen points — which
+ * is as far as a reach goes: React Native hands a child no touch past the edges of its parent.
+ */
+const REACH = SPACING.lg;
+
+/**
  * The field a reader puts a question in: a magnifier saying what it is for, the line being typed, and a cross to take
  * it back. It is underlined rather than boxed, which is how the paper draws it.
  *
@@ -41,6 +49,7 @@ export function SearchField({ value, onChange }: SearchFieldProps): ReactNode {
       <TextField value={value} onChange={onChange} placeholder={t('search.placeholder')} style={styles.input} />
       {value === '' ? null : (
         <Pressable
+          hitSlop={REACH}
           label={t('search.clear')}
           role="button"
           onPress={() => {

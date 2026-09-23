@@ -1,8 +1,9 @@
-import { SIZES } from '@huma/design-tokens';
+import { SIZES, SPACING } from '@huma/design-tokens';
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { t } from '../../../i18n';
 import { asDisplayText } from '../../../lib/display-text';
+import { Text } from '../../primitives/text';
 import { TopBar } from './top-bar';
 
 const NAME = 'Rubrique';
@@ -28,6 +29,27 @@ const margins = (): Margins => {
   return style;
 };
 
+type Square = Readonly<{ width: number; height: number }>;
+
+const isSquare = (value: unknown): value is Square =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof Reflect.get(value, 'width') === 'number' &&
+  Reflect.get(value, 'width') === Reflect.get(value, 'height');
+
+/** The side of the square a control of the bar hangs in, read from the nearest box around it held at a fixed size. */
+const squareAround = (control: ReturnType<typeof screen.getByText>): number => {
+  let node = control.parent;
+  while (node !== null && !isSquare(node.props['style'])) {
+    node = node.parent;
+  }
+  const style: unknown = node?.props['style'];
+  if (!isSquare(style)) {
+    throw new Error('rien autour du contrôle ne le tient à une taille : le test ne vérifierait pas où il pend');
+  }
+  return style.width;
+};
+
 describe('TopBar', () => {
   it('nomme l’écran, et dit que c’est un nom et non une phrase', async () => {
     await render(<TopBar title={asDisplayText(NAME)} />);
@@ -47,6 +69,17 @@ describe('TopBar', () => {
     await render(<TopBar title={asDisplayText(NAME)} onBack={leave} />);
     await fireEvent.press(screen.getByLabelText(t('action.back')));
     expect(leave).toHaveBeenCalledTimes(1);
+  });
+
+  /**
+   * What a screen offers hangs in a square the size of the way back's, whatever it draws. Laid straight in the bar it
+   * took its own size: on an A065 the article's marque-page, once kept, drew its disc 22 pixels from the edge of the
+   * screen, where the front page's control stood 58 from it.
+   */
+  it('pend ce que l’écran offre dans un carré de la taille du retour', async () => {
+    await render(<TopBar onBack={jest.fn()} action={<Text>{asDisplayText('Garder')}</Text>} />);
+    expect(squareAround(screen.getByLabelText(t('action.back')))).toBe(SPACING.xxxl);
+    expect(squareAround(screen.getByText('Garder'))).toBe(SPACING.xxxl);
   });
 
   it('ne dessine aucun retour là où rien n’a poussé l’écran', async () => {

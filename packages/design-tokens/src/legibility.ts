@@ -68,8 +68,10 @@ const PRINTINGS = {
   // The paper's own name, in the bar across the top of the front page and in no other type. Its size is the reason
   // it may be printed in this red at all: a step under twenty-four would put it under a bar it cannot clear.
   mark: { smallest: 'masthead', grounds: ['background'] },
-  // A word that answers a press lives inside prose, and takes the size of the paragraph around it.
-  link: { smallest: 'prose', grounds: ['background'] },
+  // A word that answers a press lives inside prose, and takes the size of the paragraph around it. The tab a reader is
+  // on is named in it too, on the ground of the bar at the bottom; the platform sets that word at its own size, which
+  // no variant names, and under twenty-four points every size owes the same.
+  link: { smallest: 'prose', grounds: ['background', 'surface'] },
 } as const satisfies Readonly<Record<TextTone, Printing>>;
 
 /**

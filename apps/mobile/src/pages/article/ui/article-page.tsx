@@ -47,7 +47,7 @@ export function ArticlePage(): ReactNode {
           onBack={() => {
             router.back();
           }}
-          actions={article === undefined ? null : <BookmarkToggle summary={article} />}
+          action={article === undefined ? null : <BookmarkToggle summary={article} />}
         />
         <ArticleReader
           id={id}

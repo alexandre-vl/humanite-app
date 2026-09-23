@@ -1,9 +1,12 @@
 # Un article s’ouvre en plein écran, et le retour rend le fil.
 #
-# La carte est touchée par un point plutôt que par son titre : les titres viennent du corpus, pas du dictionnaire, et
-# un parcours qui en recopierait un dirait deux fois ce qui n’est écrit qu’une. Ce qui prouve qu’un article s’est
-# ouvert est la disparition de la bande du fil : un article est poussé à la racine de la pile et couvre la barre du
-# bas, ce que la cible demande et que rien d’autre sur cet écran ne fait.
+# La carte est touchée par le mot qui la dit ouverte à tous, et non par son titre : les titres viennent du corpus, pas
+# du dictionnaire, et un parcours qui en recopierait un dirait deux fois ce qui n’est écrit qu’une. Elle l’était par
+# un point de l’écran, à 62 % de sa hauteur, qui tombait sur ce que la mise en page y posait — une carte, l’espace
+# entre deux, ou le marque-page de l’une d’elles. Chaque carte de la une du corpus est en accès libre : le mot est à
+# l’écran quelle que soit la carte en tête, et celle qu’il ouvre se lit jusqu’au bout. Ce qui prouve qu’un article
+# s’est ouvert est la disparition de la bande du fil : un article est poussé à la racine de la pile et couvre la barre
+# du bas, ce que la cible demande et que rien d’autre sur cet écran ne fait.
 #
 # Le marque-page de l’en-tête n’est pas touché ici, et ce n’est pas un oubli : le menu flottant du client de
 # développement occupe exactement ce coin, et un parcours qui l’ouvrirait à chaque passage mesurerait le client, pas
@@ -11,8 +14,7 @@
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
-- tapOn:
-    point: 50%,62%
+- tapOn: 'Accès libre'
 - extendedWaitUntil:
     notVisible: 'À la une'
     timeout: 20000

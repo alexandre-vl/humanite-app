@@ -19,8 +19,11 @@ export type TopBarProps = Readonly<{
   names?: 'screen' | 'paper';
   /** What leaving this screen does. A screen nothing pushed is left by the tab bar and takes none. */
   onBack?: (() => void) | undefined;
-  /** What the screen lets a reader do to what it is showing, hung at the far end. */
-  actions?: ReactNode;
+  /**
+   * The one thing the screen lets a reader do to what it is showing, hung at the far end in the square the way back
+   * is given at the near one — so whatever the control draws, it stands as far from the edge on every screen.
+   */
+  action?: ReactNode;
 }>;
 
 const useStyles = createStyles((theme) => ({
@@ -34,9 +37,9 @@ const useStyles = createStyles((theme) => ({
     paddingHorizontal: SPACING.sm,
     backgroundColor: theme.background,
   },
-  // Laid over the row, not in it: the name stays in the middle of the screen whether the bar carries one control or
-  // three. Both ends are kept free by the same margin, so the name is centred on the screen and not on what is left
-  // of it.
+  // Laid over the row, not in it: the name stays in the middle of the screen whether the bar carries a control at one
+  // end, at both or at neither. Both ends are kept free by the same margin, so the name is centred on the screen and
+  // not on what is left of it.
   middle: {
     position: 'absolute',
     top: SPACING.none,
@@ -46,8 +49,11 @@ const useStyles = createStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  end: { flexDirection: 'row', alignItems: 'center' },
-  target: { width: SPACING.xxxl, height: SPACING.xxxl, alignItems: 'center', justifyContent: 'center' },
+  // Each end of the bar is one grid step square, whatever it holds or whether it holds anything. A control hung there
+  // used to take its own size: on an A065 the article's marque-page, once kept, drew its disc 22 pixels from the edge
+  // of the screen, where the front page's control stood 58 from it — the same corner, a thumb's width apart.
+  end: { width: SPACING.xxxl, height: SPACING.xxxl, alignItems: 'center', justifyContent: 'center' },
+  target: { alignSelf: 'stretch', flex: 1, alignItems: 'center', justifyContent: 'center' },
 }));
 
 export type TopBarButtonProps = Readonly<{
@@ -61,7 +67,8 @@ export type TopBarButtonProps = Readonly<{
  * One control hung off a bar: a symbol, and the word that says what it does.
  *
  * A symbol says nothing out loud, so the word is not a courtesy — it is the whole of what a screen reader reads, and
- * the only thing a parcours can press. The target is a full grid step square whatever the symbol measures.
+ * the only thing a parcours can press. The target is the whole square the bar gives the end it hangs from, whatever
+ * the symbol measures.
  */
 export function TopBarButton({ icon, label, onPress }: TopBarButtonProps): ReactNode {
   const styles = useStyles();
@@ -81,10 +88,10 @@ export function TopBarButton({ icon, label, onPress }: TopBarButtonProps): React
  * bar the platform lays out takes none of the style table, so neither the paper's own letters nor a second control
  * could be put in one. Drawn here, the same bar serves every screen, pushed or not.
  *
- * The name is laid over the row rather than placed in it. Placed in it, a bar with one control on the left and two on
- * the right would centre its name on what those controls left over, which is not the middle of anything.
+ * The name is laid over the row rather than placed in it. Placed in it, a bar with a way back and nothing at the other
+ * end would centre its name on what the control left over, which is not the middle of anything.
  */
-export function TopBar({ title, names = 'screen', onBack, actions }: TopBarProps): ReactNode {
+export function TopBar({ title, names = 'screen', onBack, action }: TopBarProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.bar}>
@@ -102,7 +109,7 @@ export function TopBar({ title, names = 'screen', onBack, actions }: TopBarProps
           </Pressable>
         )}
       </Box>
-      <Box style={styles.end}>{actions}</Box>
+      <Box style={styles.end}>{action}</Box>
     </Box>
   );
 }

@@ -1,8 +1,7 @@
-import type { Access, ArticleSummary, DisplayText } from '@huma/contracts';
+import type { ArticleSummary, DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
 import { formatWhen, useToday } from '#lib/format';
 import { createStyles, useTheme } from '#lib/styles';
@@ -11,9 +10,11 @@ import { Icon } from '#primitives/icon';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
 
+import { accessWord } from '../model/access';
 import { formatWord, frameOf } from '../model/format';
 import { FRAMES } from '../model/picture';
 import type { CardShape } from '../model/rhythm';
+import { ItemWord } from './item-word';
 
 export type ArticleCardProps = Readonly<{
   shape: CardShape;
@@ -21,17 +22,6 @@ export type ArticleCardProps = Readonly<{
   action?: ReactNode | undefined;
   signature?: DisplayText | null | undefined;
 }>;
-
-/**
- * Whether a card says the item is open to any reader, access by access.
- *
- * Four items in five are reserved to subscribers — twelve of the thirteen on a front page — so a mark on each of those
- * was a mark on four cards in five, and told a reader nothing a card without it did not. The mark goes on the
- * exception: the item anyone can read, which is what Mediapart marks on a paper as closed as this one. The table
- * answers for every access the contract declares, so an access added there stops the build here rather than
- * travelling the feed unmarked.
- */
-const OPEN = { free: true, premium: false } satisfies Readonly<Record<Access, boolean>>;
 
 /** The square the small picture of a card in a line is cut to. */
 const THUMBNAIL_RATIO = 1;
@@ -113,11 +103,7 @@ function Head({ summary, signature }: Pick<PartProps, 'summary' | 'signature'>):
   }
   return (
     <Box style={styles.head}>
-      {word === null ? null : (
-        <Text variant="kicker" tone="textPrimary">
-          {word}
-        </Text>
-      )}
+      <ItemWord word={word} />
       {signature === null ? null : <Text variant="caption">{signature}</Text>}
     </Box>
   );
@@ -140,11 +126,7 @@ function Foot({ summary, action }: Pick<PartProps, 'summary' | 'action'>): React
     <Box style={styles.foot}>
       <Box style={styles.said}>
         <Text variant="caption">{formatWhen(summary.publishedAt, today)}</Text>
-        {OPEN[summary.access] ? (
-          <Text variant="kicker" tone="textPrimary">
-            {t('article.free')}
-          </Text>
-        ) : null}
+        <ItemWord word={accessWord(summary.access)} />
       </Box>
       {action}
     </Box>

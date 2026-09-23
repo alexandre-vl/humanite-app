@@ -48,8 +48,8 @@ describe('BookmarksPage', () => {
    */
   it('dit comment garder un article quand rien ne l’est, au lieu d’annoncer un journal vide', async () => {
     await renderPage();
-    expect(await screen.findByText('Aucun article gardé')).toBeTruthy();
-    expect(screen.getByText('Touchez le marque-page d’un article pour le retrouver ici.')).toBeTruthy();
+    expect(await screen.findByText('Aucune lecture pour l’instant')).toBeTruthy();
+    expect(screen.getByText('Touchez le marque-page d’un article pour l’ajouter à vos lectures.')).toBeTruthy();
     expect(screen.queryByText('Rien à lire pour l’instant')).toBeNull();
   });
 
@@ -61,7 +61,7 @@ describe('BookmarksPage', () => {
     await renderPage();
     expect(screen.getByText('Mes lectures')).toBeTruthy();
     expect(await screen.findByText(article.title)).toBeTruthy();
-    expect(screen.queryByText('Aucun article gardé')).toBeNull();
+    expect(screen.queryByText('Aucune lecture pour l’instant')).toBeNull();
   });
 
   /** Rendering an article from here takes it off the shelf, and the shelf says so without being left. */
@@ -71,9 +71,9 @@ describe('BookmarksPage', () => {
       useBookmarks.setState({ kept: [article] });
     });
     await renderPage();
-    await fireEvent.press(await screen.findByLabelText('Retirer des favoris'));
+    await fireEvent.press(await screen.findByLabelText('Retirer de mes lectures'));
     await settle();
-    expect(await screen.findByText('Aucun article gardé')).toBeTruthy();
+    expect(await screen.findByText('Aucune lecture pour l’instant')).toBeTruthy();
   });
 
   /**

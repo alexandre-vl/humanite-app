@@ -24,7 +24,7 @@ describe('Icon', () => {
   /**
    * A symbol is drawn and not written, so it says nothing out loud unless it is given something to say. Most of the
    * app's marks sit inside a target that already names itself — a chevron in a row that opens a screen, a bookmark in
-   * a button called "Ajouter aux favoris" — and a mark that spoke there would say the same thing twice.
+   * a button called "Ajouter à mes lectures" — and a mark that spoke there would say the same thing twice.
    */
   it('est passée sans un mot quand la cible autour d’elle se nomme déjà', async () => {
     await render(<Icon name="play" announces={DECORATIVE} />);

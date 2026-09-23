@@ -15,14 +15,14 @@
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
-- tapOn: 'Ajouter aux favoris'
-- assertVisible: 'Retirer des favoris'
+- tapOn: 'Ajouter à mes lectures'
+- assertVisible: 'Retirer de mes lectures'
 - tapOn: 'Mes lectures'
-- assertNotVisible: 'Aucun article gardé'
+- assertNotVisible: 'Aucune lecture pour l’instant'
 - takeScreenshot: bookmarks-kept
 - runFlow: parts/launch.yaml
 - tapOn: 'Mes lectures'
-- assertNotVisible: 'Aucun article gardé'
+- assertNotVisible: 'Aucune lecture pour l’instant'
 - takeScreenshot: bookmarks-survived
-- tapOn: 'Retirer des favoris'
-- assertVisible: 'Aucun article gardé'
+- tapOn: 'Retirer de mes lectures'
+- assertVisible: 'Aucune lecture pour l’instant'
