@@ -22,12 +22,18 @@ describe('feedRows, rythme du journal', () => {
   /** A front is laid to open on a picture — by the journal's desk, and by the corpus for its own — and it opens large. */
   it('ouvre sur un article en grand, et c’est un article illustré', async () => {
     const rows = feedRows(await theFront(), 'paper');
-    const [lead] = rows;
-    if (lead === undefined) {
+    const [opening] = rows;
+    if (opening === undefined) {
       throw new Error('le journal ne sert aucun article : le test ne vérifierait rien');
     }
-    expect(lead.shape).toBe('lead');
-    expect(pictureOf(lead.summary, 'card')).not.toBeNull();
+    expect(opening.shape).toBe('opening');
+    expect(pictureOf(opening.summary, 'card')).not.toBeNull();
+  });
+
+  /** The standfirst belongs to the card a page opens on, so there is exactly one such card, and it is the first. */
+  it('n’ouvre une page qu’une fois, sur son premier article', async () => {
+    const rows = feedRows(await everything(), 'paper');
+    expect(rows.flatMap((row, rank) => (row.shape === 'opening' ? [rank] : []))).toEqual([0]);
   });
 
   /**
@@ -40,7 +46,7 @@ describe('feedRows, rythme du journal', () => {
     const rows = feedRows(await everything(), 'paper');
     // A film is shown at its own width wherever it falls; the rhythm is what the rank raises.
     const raised = rows.flatMap((row, rank) =>
-      row.shape === 'lead' && frameOf(row.summary.format) !== 'film' ? [rank] : [],
+      ['opening', 'lead'].includes(row.shape) && frameOf(row.summary.format) !== 'film' ? [rank] : [],
     );
     expect(raised.length).toBeGreaterThan(2);
     for (const [index, rank] of raised.entries()) {
@@ -60,17 +66,32 @@ describe('feedRows, rythme du journal', () => {
     }
   });
 
+  /**
+   * Past the card a page opens on, which opens it with or without a picture, an item without one is a brief and every
+   * item with one keeps it.
+   */
   it('ne demande jamais d’image à un article qui n’en a pas', async () => {
-    for (const row of feedRows(await everything(), 'paper')) {
+    for (const row of feedRows(await everything(), 'paper').slice(1)) {
       const illustrated = pictureOf(row.summary, 'card') !== null;
       expect(row.shape === 'brief').toBe(!illustrated && row.summary.format !== 'column');
       expect(['lead', 'line'].includes(row.shape)).toBe(illustrated);
     }
   });
 
+  it('ouvre une page sur son premier article même sans image, et sur une chronique en chronique', async () => {
+    const items = await everything();
+    const bare = items.find((item) => pictureOf(item, 'card') === null && item.format !== 'column');
+    const column = items.find((item) => item.format === 'column');
+    if (bare === undefined || column === undefined) {
+      throw new Error('le contenu ne sert ni brève ni chronique : le test ne vérifierait rien');
+    }
+    expect(feedRows([bare], 'paper').map(rowShape)).toEqual(['opening']);
+    expect(feedRows([column], 'paper').map(rowShape)).toEqual(['column']);
+  });
+
   it('sert un fil trop court pour tourner, et un fil vide', async () => {
     const one = (await everything()).filter((item) => item.hero !== undefined).slice(0, 1);
-    expect(feedRows(one, 'paper')).toEqual([{ shape: 'lead', summary: one[0] }]);
+    expect(feedRows(one, 'paper')).toEqual([{ shape: 'opening', summary: one[0] }]);
     expect(feedRows([], 'paper')).toEqual([]);
   });
 });
@@ -86,6 +107,7 @@ describe('feedRows, rythme d’une liste', () => {
     const rows = feedRows(items, 'list');
     expect(rows.map(rowName)).toEqual(items.map((item) => item.id));
     expect(rows.filter((row) => rowShape(row) === 'lead').every((row) => row.summary.format === 'video')).toBe(true);
+    expect(rows.some((row) => rowShape(row) === 'opening')).toBe(false);
   });
 
   it('met en ligne tout ce qui porte une photo, un film en grand, et garde le reste tel quel', async () => {
@@ -108,7 +130,7 @@ describe('rowShape et rowName', () => {
   it('donnent un nom propre à chaque rangée, et le nom de sa forme', async () => {
     const rows = feedRows(await everything(), 'paper');
     expect(new Set(rows.map(rowName)).size).toBe(rows.length);
-    expect(new Set(rows.map(rowShape))).toEqual(new Set(['lead', 'line', 'column', 'brief']));
+    expect(new Set(rows.map(rowShape))).toEqual(new Set(['opening', 'lead', 'line', 'column', 'brief']));
   });
 });
 
@@ -127,7 +149,7 @@ describe('feedRows, sur un article du journal illustré', () => {
     const url = 'https://www.humanite.fr/wp-content/uploads/2026/09/x.jpg?w=1200';
     const filed = ARTICLE_SUMMARY.parse({ ...sample, id: '3861029', hero: { picture: { kind: 'journal', url } } });
     const [row] = feedRows([filed], 'paper');
-    expect(row?.shape).toBe('lead');
+    expect(row?.shape).toBe('opening');
     expect(pictureOf(filed, 'card')).toEqual({ source: { uri: url.replace('w=1200', 'w=1080') } });
   });
 });

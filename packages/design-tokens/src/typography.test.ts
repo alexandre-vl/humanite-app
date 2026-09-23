@@ -13,6 +13,7 @@ test('the typography table answers for every variant, and for no other', () => {
   expectTypeOf<TextVariant>().toEqualTypeOf<
     | 'headline'
     | 'masthead'
+    | 'lead'
     | 'display'
     | 'title'
     | 'standfirst'
@@ -31,7 +32,7 @@ test('the typography table answers for every variant, and for no other', () => {
 
 test('a line height derives from a size times its multiple', () => {
   expect(paper('body').size * paper('body').leading).toBeCloseTo(25.6); // 16 × 1.6
-  expect(paper('title').size * paper('title').leading).toBeCloseTo(23); // 20 × 1.15
+  expect(paper('title').size * paper('title').leading).toBeCloseTo(20.7); // 18 × 1.15
 });
 
 /**
@@ -59,6 +60,17 @@ test('a headline is set at the size a phone sets a headline, and led as one', ()
   expect(paper('headline').size).toBe(28);
   expect(paper('headline').size).toBe(paper('masthead').size);
   expect(paper('headline').leading).toBeLessThanOrEqual(1.25); // Guardian 1,15 · BBC 34/28 = 1,21
+});
+
+/**
+ * A page ranks its cards by their titles as well as by their pictures. Every card set its title at twenty, and the
+ * story a front opens on stood no taller than a card far down a section; a card the page raises now sets its title a
+ * fourth above a card in a line, in the same face, so what separates the two is size and nothing a reader must decode.
+ */
+test('a card the page raises titles itself a fourth above a card in a line, in the same face', () => {
+  expect(paper('lead').size / paper('title').size).toBeGreaterThanOrEqual(4 / 3);
+  expect(paper('lead').family).toBe(paper('title').family);
+  expect(paper('lead').size).toBeLessThan(paper('headline').size);
 });
 
 /** The four stops the body text reads at, which is the range the current app's own slider covers. */

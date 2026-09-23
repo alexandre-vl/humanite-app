@@ -69,6 +69,7 @@ export type RunFace = keyof typeof RUN_FACES;
 export const TEXT_VARIANTS = [
   'headline',
   'masthead',
+  'lead',
   'display',
   'title',
   'standfirst',
@@ -91,11 +92,11 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * Two reading roles are set from the article captures, read at 2.625 px per point (the 24-point gesture bar measures
  * 63 px): a legend steps 16.0 points and the table gives 12 × 1.4 = 16.8; prose steps 23.8 against the table's
  * 16 × 1.6 = 25.6, the one role the scale reaches least closely. The headline was the third — it steps 47.0, and the
- * table gave 34 × 1.4 = 47.6 — and it left the capture on purpose: see the note on `xl` beside the sizes. Prose differs
- * from body by its face alone, and that is what was measured: the current app sets its article copy in a light weight,
- * matched word for word at 1.000 against Roboto Light, the next candidate — Overpass Light — scoring 0.943 (README:97).
- * It is the weight that carries over and not the family: the site declares Overpass and this app is set in it
- * throughout, while the current app shows its copy in Roboto (README:103).
+ * table gave 34 × 1.4 = 47.6 — and it left the capture on purpose: see the note on `xxxl` beside the sizes. Prose
+ * differs from body by its face alone, and that is what was measured: the current app sets its article copy in a light
+ * weight, matched word for word at 1.000 against Roboto Light, the next candidate — Overpass Light — scoring 0.943
+ * (README:97). It is the weight that carries over and not the family: the site declares Overpass and this app is set in
+ * it throughout, while the current app shows its copy in Roboto (README:103).
  *
  * `standfirst` and `summary` were one role and had to become two. A card and an article both carry a sentence under
  * their title, and the two are not the same sentence: on an article it is the opening of the piece, read straight
@@ -104,9 +105,9 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * on an article it read as no larger than the body it introduced. The article's is now regular at twenty points and
  * keeps the ink; the card's is regular at sixteen in the middle ink.
  *
- * `masthead` is the paper's own name, which was set in `display` — twenty points, the size of a card's title — so
- * the front page opened on a name no larger than the first headline under it. It is set in the red the paper is
- * printed in, which a smaller size would forbid: see the note on `xl` beside the sizes. That red is `mark` and not
+ * `masthead` is the paper's own name, which was set in `display` — twenty points, the size a card's title had then —
+ * so the front page opened on a name no larger than the first headline under it. It is set in the red the paper is
+ * printed in, which a smaller size would forbid: see the note on `xxxl` beside the sizes. That red is `mark` and not
  * `headline`, which turns white on the dark page along with every other headline; a headline is type and a masthead
  * is the paper. It measures what a headline measures and is a role of its own all the same: one is a line that never
  * wraps and the other is four that do, and what they may be asked to do next is not the same thing.
@@ -118,18 +119,25 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * has no way of saying so. Its leading is `tight` because that is what a headline set over four lines wants, and what
  * the Guardian's own `headlineMedium28` and the BBC's mobile rule both set: 1.15 and 1.21.
  *
+ * `lead` and `title` are the two sizes of a card's title, and the difference between them is the page's hierarchy. A
+ * card set with its picture across the whole width — the one a page opens on, a film, one item in four after them —
+ * sets its title at `lead`; a card in a line, a column and a brief set theirs at `title`, a fourth under it, which is
+ * also the size of a heading inside a screen: a crosshead of a body, the head of the wall, the title of an empty
+ * shelf. The measurements are beside the sizes.
+ *
  * `kicker` is a label rather than a line: the word that marks what an item is or who may read it, and the name over a
  * block an article sets apart, in small capitals. It is the one role whose letters are set apart — the only way twelve
  * points of type reads as a label and not as the first line of the title under it.
  */
 const TYPOGRAPHY = {
-  headline: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
-  masthead: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'mark' },
-  display: { face: 'display', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
+  headline: { face: 'display', size: FONT_SIZES.xxxl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
+  masthead: { face: 'display', size: FONT_SIZES.xxxl, leading: LINE_HEIGHTS.tight, tone: 'mark' },
+  lead: { face: 'bold', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
+  display: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   standfirst: {
     face: 'regular',
-    size: FONT_SIZES.lg,
+    size: FONT_SIZES.xl,
     leading: LINE_HEIGHTS.normal,
     tone: 'textPrimary',
   },

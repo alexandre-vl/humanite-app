@@ -14,7 +14,7 @@ import { TEXT_SCALES, TEXT_TONES, typographyAt } from './typography.ts';
  * set and the table that holds what contrast it owes did not know about each other.
  *
  * So the threshold is derived instead, from the smallest type each colour is ever set in, at the smallest step a
- * reader can choose. Of the twelve variants exactly two are large text by WCAG's measure — an article's own headline
+ * reader can choose. Of the thirteen variants exactly two are large text by WCAG's measure — an article's own headline
  * and the paper's masthead, the two roles set at twenty-eight points. Every other role owes four and a half to one,
  * and six of them were being held to three.
  */

@@ -31,7 +31,15 @@ export const RADII = {
 /**
  * Font sizes in points; the body text measures 16 (docs/app-actuelle).
  *
- * `xl` is the largest the paper sets anything in, and it carries the two things printed in red: the paper's own name
+ * `lg` and `xxl` are the two sizes a feed titles its cards in, and they used to be one. Every card set its title at
+ * twenty, the story a front opens on no larger than any card far down a section, so nothing on a page ranked above
+ * anything else but by the size of its picture. Laid out in Overpass Bold over the 375 items of the service's capture,
+ * twenty points beside the ninety-six-point square of a line ran to six lines at the ninetieth percentile and nine at
+ * most, and ran past the square on 45 % of them; eighteen keeps the median title to four lines of 20.7 points, which
+ * the square holds on 73 %. A card the page raises sets its title a fourth above that, at twenty-four: four lines at
+ * the median across the whole width, 110 points against 69 at twenty.
+ *
+ * `xxxl` is the largest the paper sets anything in, and it carries the two things printed in red: the paper's own name
  * and the headline of an article. Its value is not free. WCAG reads type as large from twenty-four points up, and a
  * reader may set the paper an eighth smaller than it is written; twenty-eight is the first step of the scale that
  * still clears twenty-four once taken down — 24.5, set at 25 — which is what lets either be printed in that red at
@@ -47,8 +55,10 @@ export const FONT_SIZES = {
   xs: fontSize(12),
   sm: fontSize(14),
   md: fontSize(16),
-  lg: fontSize(20),
-  xl: fontSize(28),
+  lg: fontSize(18),
+  xl: fontSize(20),
+  xxl: fontSize(24),
+  xxxl: fontSize(28),
 } as const satisfies Readonly<Record<string, FontSize>>;
 
 /** Line heights as a multiple of the font size. */

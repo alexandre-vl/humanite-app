@@ -9,14 +9,17 @@ import { frameOf, isColumn } from './format';
  * answer the same name, and two items that mount different components under one name would leave the wrong views
  * behind. So the paper's own words — a brief, a column — appear here only where they really do change the tree.
  *
- * There were five, and `stacked` was the fifth: the title, then the picture, then the standfirst under it. Reading
- * one after a `lead` meant learning a second order for the same four things, and what told them apart was not what
- * they were but where they fell. Le Monde runs a hundred and seven cards off one component, varying which parts are
- * present and never where they sit; Nielsen's own rule for a grid of cards is to keep the internal template identical
- * so a reader learns it once, and that variation must carry meaning rather than whimsy. The four left are one order —
- * picture, section, title, standfirst — at two sizes, with or without a picture, plus the one the paper itself marks.
+ * All five are one order — picture, what the item is, title, standfirst, when and whether it may be read — and differ
+ * in which of those parts they carry and how large: Nielsen's rule for a grid of cards is to keep the internal
+ * template identical so a reader learns it once, and to let a variation carry meaning. `stacked`, a shape since
+ * removed, broke it: it put the title above the picture and the standfirst under it, so two cards a scroll apart
+ * taught two orders for the same four things.
+ *
+ * `opening` is the card a page opens on, and the one card that keeps its standfirst: a `lead` with the sentence under
+ * its title, whole. `lead` is a card the page raises further down, and a film wherever it falls, at the same size and
+ * without it.
  */
-export type CardShape = 'lead' | 'line' | 'column' | 'brief';
+export type CardShape = 'opening' | 'lead' | 'line' | 'column' | 'brief';
 
 /**
  * What kind of feed is being laid out, which is what its rhythm follows.
@@ -50,12 +53,18 @@ const LEAD_EVERY = 4;
  * given one by its place in the page, and a film is shown at its own width. The still of a film is sixteen by nine,
  * and the journal's carry their titles printed on them: cut to the square beside a line, they lost half a face and
  * half a word on every row (« ENTION / CAINE », on the phone). Only then does the rank speak, and only on a page of
- * the paper — which raises one article in full at the top and again every fourth item, and runs everything between
- * them on one line.
+ * the paper — which opens on one article in full, raises another every fourth item, and runs everything between them
+ * on one line.
+ *
+ * The article a page opens on is asked before its picture: it opens the page with or without one, the card simply
+ * holding no picture when the item has none, and a film opens it in its own frame.
  */
 const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): CardShape => {
   if (isColumn(summary.format)) {
     return 'column';
+  }
+  if (rhythm === 'paper' && rank === 0) {
+    return 'opening';
   }
   if (pictureOf(summary, 'card') === null) {
     return 'brief';

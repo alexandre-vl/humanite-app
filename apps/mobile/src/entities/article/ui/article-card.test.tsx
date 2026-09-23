@@ -1,4 +1,5 @@
 import type { ArticleSummary, DisplayText } from '@huma/contracts';
+import { typographyAt } from '@huma/design-tokens';
 import { describe, expect, it, jest } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { content } from '#api';
@@ -60,17 +61,33 @@ const holdingBoth = (one: Node, other: Node): Node => {
  * trees that do not match, and the recycling would be wrong rather than absent. The table answers for every shape
  * the rhythm declares, so a shape added there stops the build here.
  */
-const PICTURES = { lead: 1, line: 1, column: 0, brief: 0 } satisfies Readonly<Record<CardShape, number>>;
+const PICTURES = { opening: 1, lead: 1, line: 1, column: 0, brief: 0 } satisfies Readonly<Record<CardShape, number>>;
 
-const SHAPES: readonly CardShape[] = ['lead', 'line', 'column', 'brief'];
+const SHAPES: readonly CardShape[] = ['opening', 'lead', 'line', 'column', 'brief'];
+
+/**
+ * The size each shape sets its title in, which is the page's hierarchy: a card set with its picture across the block
+ * titles itself a fourth above a card in a line. The table answers for every shape, so a shape added to the rhythm
+ * without a place in the hierarchy stops the build here.
+ */
+const TITLE_SIZES = {
+  opening: 'lead',
+  lead: 'lead',
+  line: 'title',
+  column: 'title',
+  brief: 'title',
+} as const satisfies Readonly<Record<CardShape, 'lead' | 'title'>>;
 
 const DAY = 86_400_000;
 
 /**
- * The shapes with room for the sentence under a title. A line has none, and that is the point of a line; a column has
- * none either, two in three of the journal's being filed without one and served with the opening of the body cut off.
+ * The one shape that carries the sentence under its title: the card a page opens on. The service's standfirsts run six
+ * lines of a card at the median and fifteen at most, so three of them on every fourth card were a fragment cut short —
+ * and Android clips the last point of the ellipsis it cuts them with, in this face.
  */
-const WITH_SUMMARY: readonly CardShape[] = ['lead', 'brief'];
+const WITH_SUMMARY: readonly CardShape[] = ['opening'];
+
+const WITHOUT_SUMMARY: readonly CardShape[] = SHAPES.filter((shape) => !WITH_SUMMARY.includes(shape));
 
 const CASES: readonly (readonly [CardShape, number])[] = SHAPES.map((shape) => [shape, PICTURES[shape]]);
 
@@ -97,14 +114,31 @@ describe('ArticleCard', () => {
   });
 
   /**
-   * A line is the shape three cards in four take, and it carries no standfirst. On a phone the Guardian shows none on
-   * any card and the BBC shows none on any card; Le Monde shows one on fifteen of a hundred and seven. A sentence
-   * under every title is what made this front a wall of grey in which nothing was subordinate to anything.
+   * A line is the shape three cards in four take, and a column's standfirst is, two times in three, the opening of its
+   * body cut at a « … » by the service: neither carries one, and nor does any card but the one a page opens on.
    */
-  it.each(['line', 'column'] as const)('ne met pas de chapô sur %s', async (shape) => {
+  it.each(WITHOUT_SUMMARY)('ne met pas de chapô sur %s', async (shape) => {
     const summary = illustrated(await everything());
     await render(<ArticleCard shape={shape} summary={summary} />);
     expect(screen.queryByText(standfirstOf(summary))).toBeNull();
+  });
+
+  /**
+   * The standfirst the opening card carries is whole: a clamp cut nearly all of the service's, and ended each on an
+   * ellipsis Android draws a fifth of an em wider than it measured, its last point clipped by the line.
+   */
+  it('donne son chapô entier à la carte qui ouvre la page', async () => {
+    const summary = illustrated(await everything());
+    await render(<ArticleCard shape="opening" summary={summary} />);
+    expect(screen.getByText(standfirstOf(summary)).props['numberOfLines']).toBeUndefined();
+  });
+
+  it.each(SHAPES)('titre %s à la taille de sa place dans la page', async (shape) => {
+    const summary = illustrated(await everything());
+    await render(<ArticleCard shape={shape} summary={summary} />);
+    expect(styleOf(screen.getByText(summary.title))['fontSize']).toBe(
+      typographyAt(TITLE_SIZES[shape], 'normal', 'paper').size,
+    );
   });
 
   /** A headline cut is a headline lost: the journal's lost their end on two cards in five at the old clamps. */

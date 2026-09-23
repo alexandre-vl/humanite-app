@@ -24,6 +24,12 @@ export type TextProps = Readonly<{
  * the lines of the whole paragraph, the lines cut away included, and starts a line early to do it: a standfirst cut at
  * three lines showed fewer words than three lines hold, with room left at the end of its first.
  *
+ * A cut is for a line that fits, not for one that runs over. Android ends a cut line on an ellipsis it measures in the
+ * system's font — React Native gives the view the size of the type but never its face — and draws it in the paper's,
+ * and Overpass sets its « … » at 0.9 em where the system's takes about two thirds: the last point falls past the line
+ * and is clipped, so a cut standfirst ended « est c.. » on the A065. Nothing written in JavaScript reaches the face the
+ * view measures with; the cards stopped cutting their standfirsts rather than live with it.
+ *
  * `heading` says the line opens what follows it, which is how a reader listening to the paper skips through it: a
  * screen reader offers to jump from one heading to the next, and a page with none is a page that can only be walked
  * word by word. It is not read off the variant, because the same type serves a headline and the title of a card in a

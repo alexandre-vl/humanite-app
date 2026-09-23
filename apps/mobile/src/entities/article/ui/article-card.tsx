@@ -133,20 +133,36 @@ function Foot({ summary, action }: Pick<PartProps, 'summary' | 'action'>): React
   );
 }
 
-/** The words of a card: its title, whole, and the sentence under it when the shape has room for one. */
-function Words({ summary, standfirst }: Readonly<{ summary: ArticleSummary; standfirst: boolean }>): ReactNode {
+/**
+ * The size a card sets its title in, which is its place in the page: `lead` across a card the page raises, `title`
+ * beside a picture in a line and on every card without one.
+ */
+type TitleSize = 'lead' | 'title';
+
+/**
+ * The words of a card: its title, whole, at the size of the card's place, and the standfirst under it on the one card
+ * that carries one.
+ *
+ * A headline is never cut. At the clamps the cards were drawn with, the journal's own titles lost their end on two
+ * cards in five — median 101 signs, 117 on a front page — and what a French headline says after its colon is the news.
+ *
+ * Nor is the standfirst, which is why only the card a page opens on carries one. The service's run 284 signs at the
+ * median and 733 at most: six lines of this card, seven on the front, fifteen at the longest. Cut at three lines, it
+ * was cut on nearly every card, and Android cannot end a cut line in the paper's face — it measures the ellipsis in the
+ * system's font and draws Overpass's, which is 0.9 em wide against the system's two thirds, so the last of its points
+ * falls past the line and is clipped (« est c.. », read on the A065). Whole on the card a page opens on, a standfirst
+ * is the story's own summary; three lines of it on every fourth card were a fragment.
+ */
+function Words({
+  summary,
+  size,
+  standfirst,
+}: Readonly<{ summary: ArticleSummary; size: TitleSize; standfirst: boolean }>): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.words}>
-      {/* A headline is never cut. At the clamps the cards were drawn with, the journal's own titles lost their end on
-          two cards in five — median 101 signs, 117 on a front page — and what a French headline says after its colon
-          is the news; the Guardian, Le Monde and Mediapart cut none of theirs in a feed. */}
-      <Text variant="title">{summary.title}</Text>
-      {standfirst && summary.standfirst !== undefined ? (
-        <Text variant="summary" numberOfLines={3}>
-          {summary.standfirst}
-        </Text>
-      ) : null}
+      <Text variant={size}>{summary.title}</Text>
+      {standfirst && summary.standfirst !== undefined ? <Text variant="summary">{summary.standfirst}</Text> : null}
     </Box>
   );
 }
@@ -180,14 +196,30 @@ function Picture({ summary }: Readonly<{ summary: ArticleSummary }>): ReactNode 
   );
 }
 
-/** The front of a page: the picture first, at the width of the block, then the words under it. */
+/**
+ * The card a page opens on: the picture first, at the width of the block, then the title a fourth above a line's, and
+ * the standfirst under it, whole.
+ */
+function Opening({ summary, action, signature }: PartProps): ReactNode {
+  const styles = useStyles();
+  return (
+    <Box style={styles.card}>
+      <Picture summary={summary} />
+      <Head summary={summary} signature={signature} />
+      <Words summary={summary} size="lead" standfirst />
+      <Foot summary={summary} action={action} />
+    </Box>
+  );
+}
+
+/** A card the page raises further down, and a film: the opening's picture and title, without its standfirst. */
 function Lead({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
       <Picture summary={summary} />
       <Head summary={summary} signature={signature} />
-      <Words summary={summary} standfirst />
+      <Words summary={summary} size="lead" standfirst={false} />
       <Foot summary={summary} action={action} />
     </Box>
   );
@@ -203,9 +235,9 @@ function Lead({ summary, action, signature }: PartProps): ReactNode {
  * title flush against the same edge whether or not a picture is there. It hangs from the top of the title, however
  * long the title runs.
  *
- * It carries no standfirst. On a phone the Guardian shows none on any card and the BBC shows none on any card; Le
- * Monde shows one on fifteen of a hundred and seven. A sentence under every title is what turned this front into a
- * wall of grey where nothing was subordinate to anything.
+ * It carries no standfirst — only the card a page opens on does — and its title is set a fourth under a raised card's:
+ * at eighteen points the median title of the service holds in four lines beside the square, where twenty ran past it
+ * on nearly half the cards.
  */
 function Line({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
@@ -215,7 +247,7 @@ function Line({ summary, action, signature }: PartProps): ReactNode {
       <Head summary={summary} signature={signature} />
       <Box style={styles.line}>
         <Box style={styles.rest}>
-          <Words summary={summary} standfirst={false} />
+          <Words summary={summary} size="title" standfirst={false} />
         </Box>
         {visual === null ? null : (
           <Image
@@ -251,7 +283,7 @@ function Column({ summary, action, signature }: PartProps): ReactNode {
       <Box style={styles.rest}>
         <Box style={styles.card}>
           <Head summary={summary} signature={signature} />
-          <Words summary={summary} standfirst={false} />
+          <Words summary={summary} size="title" standfirst={false} />
           <Foot summary={summary} action={action} />
         </Box>
       </Box>
@@ -259,13 +291,16 @@ function Column({ summary, action, signature }: PartProps): ReactNode {
   );
 }
 
-/** An item written without a picture: its words are the whole card (capture 02). */
+/**
+ * An item written without a picture: its title is the whole card, at the size of a line's, since nothing on it is
+ * raised. Its standfirst stays in the article, as every card's does but the opening one's.
+ */
 function Brief({ summary, action, signature }: PartProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
       <Head summary={summary} signature={signature} />
-      <Words summary={summary} standfirst />
+      <Words summary={summary} size="title" standfirst={false} />
       <Foot summary={summary} action={action} />
     </Box>
   );
@@ -276,14 +311,14 @@ function Brief({ summary, action, signature }: PartProps): ReactNode {
  *
  * The shape arrives decided: a card does not read the item to choose one, because the list recycles a cell only
  * between items that answered the same shape, and the only place that can answer for a whole feed at once is the one
- * that laid it out. The four shapes are kept in this one file, built of the same four parts, so that what separates
- * them — how much room the picture takes, and whether there is one — can be read at a glance.
+ * that laid it out. The five shapes are kept in this one file, built of the same parts, so that what separates them
+ * — how much room the picture takes, how large the title is set, and whether a standfirst follows it — can be read
+ * at a glance.
  *
- * They are four orderings of one order: what the item is, its title, the sentence under it if the shape has room for
- * one, and what closes it; what changes is the picture. That is Le Monde's card, which runs a whole front off one
- * component and varies which parts are present rather than where they sit, and it is what the fifth shape broke:
- * `stacked` put the title above the picture and the standfirst below it, so two cards a scroll apart taught two
- * different templates for the same four things.
+ * They keep one order: the picture, what the item is, its title, the standfirst where there is one, and what closes
+ * the card. The page's hierarchy is in the sizes, never in the order: a card the page raises sets its picture across
+ * the block and its title at twenty-four points, a card in a line sets both smaller, and only the card a page opens
+ * on carries its standfirst.
  *
  * `action` is whatever the screen lets a reader do to the article from the feed, and `signature` who signed it. The
  * card takes both already made: an entity may not name a route, nor hold an action of its own.
@@ -291,6 +326,9 @@ function Brief({ summary, action, signature }: PartProps): ReactNode {
 export function ArticleCard({ shape, summary, action = null, signature = null }: ArticleCardProps): ReactNode {
   const parts = { summary, action, signature };
   switch (shape) {
+    case 'opening': {
+      return <Opening {...parts} />;
+    }
     case 'lead': {
       return <Lead {...parts} />;
     }
