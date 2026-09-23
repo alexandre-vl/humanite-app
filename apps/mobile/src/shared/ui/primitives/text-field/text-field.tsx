@@ -1,7 +1,7 @@
 import type { DisplayText } from '@huma/contracts';
 import type { TextVariant } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { TextInput as NativeTextInput } from 'react-native';
+import { Keyboard, TextInput as NativeTextInput } from 'react-native';
 import type { StyleRef } from '../../../lib/styles';
 import { inputStyle, useTheme, useTypesetting } from '../../../lib/styles';
 
@@ -41,3 +41,14 @@ export function TextField({ value, onChange, placeholder, variant = 'body', styl
     />
   );
 }
+
+/**
+ * Puts the keyboard away, from whichever field holds it.
+ *
+ * A screen that opens something from under a field calls it on the way: an article opened from a search answer is
+ * read, and a keyboard left up over it would hide half of what was opened. It lives beside the field because the
+ * keyboard is the native layer's, and a screen may not reach that layer itself.
+ */
+export const dismissKeyboard = (): void => {
+  Keyboard.dismiss();
+};

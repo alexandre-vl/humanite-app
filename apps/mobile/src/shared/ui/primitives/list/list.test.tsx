@@ -8,6 +8,18 @@ import { List } from './list';
 /** More items than any window holds, so what the list leaves out is visible. */
 const MANY = [...Array.from({ length: 60 }).keys()];
 
+/** The native scroll view the list renders, found from the item `un` up. */
+const scrollView = (): ReturnType<typeof screen.getByTestId> => {
+  let node = screen.getByTestId('un').parent;
+  while (node !== null && node.type !== 'RCTScrollView') {
+    node = node.parent;
+  }
+  if (node === null) {
+    throw new Error('la liste ne rend aucune vue défilante');
+  }
+  return node;
+};
+
 /**
  * How far down the list pushed its own content, read off the scroll view it renders.
  *
@@ -15,11 +27,7 @@ const MANY = [...Array.from({ length: 60 }).keys()];
  * and a test that read only where the masthead was laid would let a list hide its first row under it and stay green.
  */
 const contentInset = (): number => {
-  let node = screen.getByTestId('un').parent;
-  while (node !== null && node.type !== 'RCTScrollView') {
-    node = node.parent;
-  }
-  const inset = node === null ? undefined : styleOf(node, 'contentContainerStyle')['paddingTop'];
+  const inset = styleOf(scrollView(), 'contentContainerStyle')['paddingTop'];
   if (typeof inset !== 'number') {
     throw new Error('la liste ne dit pas de combien elle décale son contenu');
   }
@@ -63,6 +71,19 @@ describe('List', () => {
     );
     await settle();
     expect(contentInset()).toBe(SPACING.none);
+  });
+
+  /**
+   * A search answer pressed straight after typing only put the keyboard away on the A065, and a second press opened
+   * it: the scroll view spends the first touch on the keyboard unless told the item handles it.
+   */
+  it('laisse un élément répondre au premier toucher sous le clavier, et range le clavier au défilement', async () => {
+    await render(
+      <List items={['un']} keyOf={(item) => item} typeOf={() => 'row'} renderItem={(item) => <View testID={item} />} />,
+    );
+    await settle();
+    expect(scrollView().props['keyboardShouldPersistTaps']).toBe('handled');
+    expect(scrollView().props['keyboardDismissMode']).toBe('on-drag');
   });
 
   it('montre ce qui en tient lieu quand elle ne contient rien', async () => {

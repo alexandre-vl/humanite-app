@@ -89,6 +89,11 @@ const useStyles = createStyles(() => ({
  * underneath would then quietly stop pinning anything at all, with nothing said. Places read off the data it is
  * rendering cannot say that. A `pinned` that keeps its identity between renders keeps the work down to the renders
  * that change the data.
+ *
+ * An item answers the first touch even while a keyboard is up. A scroll view otherwise spends that touch putting the
+ * keyboard away and hands the item nothing: on the A065, a search answer pressed straight after typing only closed the
+ * keyboard, and it took a second press to open it. Dragging the list is what puts the keyboard away now — the moment a
+ * reader stops typing to read what came back.
  */
 export function List<Item>({
   items,
@@ -132,6 +137,8 @@ export function List<Item>({
           scrollY.set(event.nativeEvent.contentOffset.y);
         }}
         scrollEventThrottle={SCROLL_PERIOD}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       />
       {header === undefined ? null : <Animated.View style={[styles.masthead, mastheadStyle]}>{header}</Animated.View>}
     </Animated.View>

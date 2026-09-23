@@ -1,8 +1,9 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { PALETTE, typographyAt } from '@huma/design-tokens';
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { Keyboard } from 'react-native';
 import { asDisplayText } from '../../../lib/display-text';
-import { TextField } from './text-field';
+import { dismissKeyboard, TextField } from './text-field';
 
 const PLACEHOLDER = 'Saisissez ici le sujet';
 
@@ -45,5 +46,12 @@ describe('TextField', () => {
   it('n’emporte pas l’interligne de son variant, qu’une ligne unique n’a pas à empiler', async () => {
     await render(<TextField value="" onChange={() => undefined} placeholder={asDisplayText(PLACEHOLDER)} />);
     expect(Object.keys(letters())).not.toContain('lineHeight');
+  });
+
+  it('range le clavier quand un écran ouvre quelque chose depuis le champ', () => {
+    const dismiss = jest.spyOn(Keyboard, 'dismiss').mockImplementation(() => undefined);
+    dismissKeyboard();
+    expect(dismiss).toHaveBeenCalledTimes(1);
+    dismiss.mockRestore();
   });
 });

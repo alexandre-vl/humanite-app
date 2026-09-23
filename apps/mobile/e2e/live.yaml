@@ -10,7 +10,9 @@ appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
 - tapOn: 'En continu'
-- assertVisible: Dimanche 13 septembre
+# Le point tient la place de l’espace insécable qui lie le jour à son mois : un sélecteur Maestro est une
+# expression régulière, et un blanc n’y reconnaît pas l’insécable.
+- assertVisible: Dimanche 13.septembre
 - takeScreenshot: live-top
 - scroll
 - scroll

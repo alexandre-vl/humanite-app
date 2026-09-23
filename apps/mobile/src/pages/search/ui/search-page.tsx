@@ -11,6 +11,7 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Surface } from '#primitives/surface';
 import { Text } from '#primitives/text';
+import { dismissKeyboard } from '#primitives/text-field';
 import { useDebounced } from '../model/debounced';
 import { SearchField } from './search-field';
 
@@ -50,6 +51,7 @@ export function SearchPage(): ReactNode {
           feed={feed}
           rhythm="list"
           onOpen={(id) => {
+            dismissKeyboard();
             router.push(articleHref(id));
           }}
           action={(summary) => <BookmarkToggle summary={summary} />}

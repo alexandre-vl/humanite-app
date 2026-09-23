@@ -56,6 +56,15 @@ const nameAt = (names: readonly string[], index: number): string => {
 const dayOf = (day: number): string => (day === 1 ? '1er' : String(day));
 
 /**
+ * A day and its month, held on one line: `21\u00A0septembre`, `1er\u00A0juillet`.
+ *
+ * The number is held to its month the way the hour is held to its letter, and the way the journal holds its own dates
+ * — « jeudi 3\u00A0juillet » in the standfirsts its service sends. Every date the app wrote broke there instead, so a
+ * line could end on « 21 » and open the next on « septembre », the number read as a count of something.
+ */
+const dayAndMonth = (day: number, month: number): string => `${dayOf(day)}\u00A0${nameAt(MONTHS, month - 1)}`;
+
+/**
  * The hour an item was filed, as the paper prints it wherever it prints one: `19\u00A0h\u00A052`, the letter held to
  * its numbers, and the hour without a zero in front of it.
  *
@@ -72,19 +81,19 @@ export const formatHour = (instant: Instant): DisplayText => {
 // groups its runs under and a card is dated against.
 
 /**
- * That same day as a timeline heads the run it opens, and as a card names a day of the week before: `Samedi 13
- * septembre`. The year is left out, a wire reaching back weeks at most; the weekday is read from the Paris calendar
- * date rather than from the instant, so a publication just before Paris midnight heads the day the newsroom filed it
- * under, not the one UTC was already on.
+ * That same day as a timeline heads the run it opens, and as a card names a day of the week before: `Samedi
+ * 13\u00A0septembre`. The year is left out, a wire reaching back weeks at most; the weekday is read from the Paris
+ * calendar date rather than from the instant, so a publication just before Paris midnight heads the day the newsroom
+ * filed it under, not the one UTC was already on.
  */
 export const formatDayLabel = (instant: Instant): DisplayText => {
   const clock = clockOf(instant);
   const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
-  return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
+  return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${dayAndMonth(clock.day, clock.month)}`);
 };
 
 /**
- * That same day as a cover carries it, and as a card does once it is older than a week: `13 septembre`.
+ * That same day as a cover carries it, and as a card does once it is older than a week: `13\u00A0septembre`.
  *
  * The weekday is left off, and not to save room for its own sake. A wire needs it because a wire spans days and a
  * reader arriving in the middle of one is orienting themself in time; a cover is dated, and on a shelf of consecutive
@@ -95,11 +104,11 @@ export const formatDayLabel = (instant: Instant): DisplayText => {
  */
 export const formatDayDate = (instant: Instant): DisplayText => {
   const clock = clockOf(instant);
-  return asDisplayText(`${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)}`);
+  return asDisplayText(dayAndMonth(clock.day, clock.month));
 };
 
 /**
- * The day an article was published, written out in full: `13 septembre 2026`.
+ * The day an article was published, written out in full: `13\u00A0septembre 2026`.
  *
  * It is the one date that carries a year: an article reached from a search two years on is read out of the day it
  * was written in, and Nielsen's homepage guideline has the full article print its date prominently, year and all. A
@@ -107,11 +116,11 @@ export const formatDayDate = (instant: Instant): DisplayText => {
  */
 export const formatLongDate = (instant: Instant): DisplayText => {
   const clock = clockOf(instant);
-  return asDisplayText(`${dayOf(clock.day)} ${nameAt(MONTHS, clock.month - 1)} ${String(clock.year)}`);
+  return asDisplayText(`${dayAndMonth(clock.day, clock.month)} ${String(clock.year)}`);
 };
 
 /**
- * When an article was published, as its head prints it: `23 septembre 2026 à 6\u00A0h\u00A057`. The wire lists the
+ * When an article was published, as its head prints it: `23\u00A0septembre 2026 à 6\u00A0h\u00A057`. The wire lists the
  * same piece at its hour, and an article of the morning and one of the evening are not the same news: the day alone
  * said less of the piece than the wire did.
  */
@@ -128,8 +137,8 @@ const dayNumber = (year: number, month: number, day: number): number => Date.UTC
 
 /**
  * When an item was published, as a card says it, against the day the reader is reading on: `12\u00A0h\u00A001` for an
- * item of that day, `Hier à 18\u00A0h\u00A030` for one of the day before, `Lundi 21 septembre` within the week,
- * `4 juillet` earlier in the year and `4 juillet 2025` before it.
+ * item of that day, `Hier à 18\u00A0h\u00A030` for one of the day before, `Lundi 21\u00A0septembre` within the week,
+ * `4\u00A0juillet` earlier in the year and `4\u00A0juillet 2025` before it.
  *
  * Every card carries it, the front's included. The front went without, on Nielsen's guideline that a homepage whose
  * stories are all of one week needs no date on each — a guideline that asks for a date at the top of the page instead,

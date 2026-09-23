@@ -7,12 +7,21 @@ import { content } from '#api';
 import { t } from '#i18n';
 import { renderWithCache, settle } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
+import { dismissKeyboard } from '#primitives/text-field';
 import { SETTLE } from '../model/debounced';
 import { SearchPage } from './search-page';
 
 // The double is built inside the factory: jest hoists the call above everything else in the file, so anything it read
 // from outside would still be undefined when the screen first asks for the router.
 jest.mock('expo-router', () => ({ __esModule: true, router: { push: jest.fn() } }));
+
+// The keyboard is the native layer's, and no runner has one: the field stays real, and the one call the screen makes
+// to put the keyboard away is counted instead.
+jest.mock('#primitives/text-field', () => ({
+  __esModule: true,
+  ...jest.requireActual<Readonly<Record<string, unknown>>>('#primitives/text-field'),
+  dismissKeyboard: jest.fn(),
+}));
 
 const PLACEHOLDER = t('search.placeholder');
 
@@ -137,7 +146,11 @@ describe('SearchPage', () => {
     await settle();
   });
 
-  it('ouvre l’article pressé sur sa propre route', async () => {
+  /**
+   * The answer opens on the first press, keyboard up or not (the list lets the press through), and the keyboard goes
+   * with the question: an article opened under it would be read through half a screen.
+   */
+  it('ouvre l’article pressé sur sa propre route, clavier rangé', async () => {
     const [first] = (await content.search({ text: QUESTION.parse('jeunes') })).items;
     if (first === undefined) {
       throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
@@ -146,6 +159,7 @@ describe('SearchPage', () => {
     await type('jeunes');
     await fireEvent.press(await screen.findByText(first.title));
     expect(jest.mocked(router.push)).toHaveBeenCalledWith({ pathname: '/article/[id]', params: { id: first.id } });
+    expect(jest.mocked(dismissKeyboard)).toHaveBeenCalledTimes(1);
     await settle();
   });
 });
