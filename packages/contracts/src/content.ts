@@ -9,11 +9,15 @@ const LINK_TARGET = z.discriminatedUnion('kind', [
 ]);
 export type LinkTarget = z.infer<typeof LINK_TARGET>;
 
-/** An inline run of text inside a paragraph or a quote. */
+/**
+ * An inline run of text inside a paragraph or a quote. Every kind keeps its words under the one name, `text`: what
+ * sets a run apart is how it is read — slanted, bold, or answering a press — and never where its words are kept, so
+ * no reader of a sentence has to ask a run's kind before it can read what the run says.
+ */
 export const SPAN = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('text'), value: DISPLAY_TEXT }),
-  z.object({ type: z.literal('emphasis'), value: DISPLAY_TEXT }),
-  z.object({ type: z.literal('strong'), value: DISPLAY_TEXT }),
+  z.object({ type: z.literal('text'), text: DISPLAY_TEXT }),
+  z.object({ type: z.literal('emphasis'), text: DISPLAY_TEXT }),
+  z.object({ type: z.literal('strong'), text: DISPLAY_TEXT }),
   z.object({ type: z.literal('link'), text: DISPLAY_TEXT, target: LINK_TARGET }),
 ]);
 export type Span = z.infer<typeof SPAN>;

@@ -99,6 +99,34 @@ const BODY = z.discriminatedUnion('kind', [
 export const ARTICLE = ARTICLE_SUMMARY.extend({ body: BODY });
 export type Article = z.infer<typeof ARTICLE>;
 
+/**
+ * The words a block puts on a screen, run together the way a screen draws them: the runs of a sentence one straight
+ * after the other, the separate parts of a block that has several with a space between. It is what a judging searches
+ * a reading for and what a count of words counts, from the one switch that answers for every kind the union declares —
+ * a kind added there stops the build here rather than being read, somewhere, as a block with nothing in it.
+ */
+export const textOf = (block: Block): string => {
+  switch (block.type) {
+    case 'paragraph':
+      return block.spans.map((span) => span.text).join('');
+    case 'quote':
+      return [
+        block.spans.map((span) => span.text).join(''),
+        ...(block.source === undefined ? [] : [block.source]),
+      ].join(' ');
+    case 'heading':
+      return block.text;
+    case 'image':
+      return block.caption;
+    case 'video':
+      return block.title;
+    case 'related':
+      return [block.summary.title, block.summary.standfirst].join(' ');
+    case 'callout':
+      return [block.title, block.text, block.button].join(' ');
+  }
+};
+
 /** The blocks of a body the reader was given, and none of one withheld. */
 export const blocksOf = (article: Article): readonly Block[] =>
   article.body.kind === 'open' ? article.body.blocks : [];

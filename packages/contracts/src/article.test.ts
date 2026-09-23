@@ -59,7 +59,7 @@ test('ARTICLE_SUMMARY reads an id of the journal as it reads one of the corpus, 
 test('ARTICLE extends the summary with a body, which a video of the journal leaves empty', () => {
   const article: Article = ARTICLE.parse({
     ...validSummary,
-    body: { kind: 'open', blocks: [{ type: 'paragraph', spans: [{ type: 'text', value: 'x' }] }] },
+    body: { kind: 'open', blocks: [{ type: 'paragraph', spans: [{ type: 'text', text: 'x' }] }] },
   });
   expectTypeOf(article).toEqualTypeOf<Article>();
   expect(blocksOf(article)).toHaveLength(1);

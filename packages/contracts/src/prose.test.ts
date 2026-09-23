@@ -14,7 +14,7 @@ test('the readings of this module leave a screen nothing but text a reader shoul
 const drawn = (html: string): string =>
   readProse(`<p>${html}</p>`)
     .flatMap((block) => (block.type === 'paragraph' ? block.spans : []))
-    .map((span) => ('value' in span ? span.value : span.text))
+    .map((span) => span.text)
     .join('');
 
 test.each([
@@ -43,8 +43,8 @@ test.each([
 test('a run carries its words bare, and the blank at its edges goes to the plain words beside it', () => {
   const [block] = readProse('<p>voir <a href="https://www.humanite.fr/"> ici </a>et là</p>');
   expect(block?.type === 'paragraph' && block.spans).toEqual([
-    { type: 'text', value: 'voir ' },
+    { type: 'text', text: 'voir ' },
     { type: 'link', text: 'ici', target: { kind: 'external', url: 'https://www.humanite.fr/' } },
-    { type: 'text', value: ' et là' },
+    { type: 'text', text: ' et là' },
   ]);
 });

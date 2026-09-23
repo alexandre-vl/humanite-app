@@ -178,7 +178,7 @@ describe('ArticleReader', () => {
     expect(await screen.findByText(article.title)).toBeTruthy();
     expect(screen.getByText(article.standfirst)).toBeTruthy();
     const words = blocksOf(article).flatMap((block) =>
-      block.type === 'paragraph' ? block.spans.map((span) => ('value' in span ? span.value : span.text)) : [],
+      block.type === 'paragraph' ? block.spans.map((span) => span.text) : [],
     );
     for (const run of words) {
       expect(screen.getByText(run)).toBeTruthy();

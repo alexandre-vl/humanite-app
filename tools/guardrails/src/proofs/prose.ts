@@ -25,7 +25,7 @@ const saying =
   (words: string): ProseReader =>
   (html) => [
     ...readProse(html),
-    ...BLOCK.array().parse([{ type: 'paragraph', spans: [{ type: 'text', value: words }] }]),
+    ...BLOCK.array().parse([{ type: 'paragraph', spans: [{ type: 'text', text: words }] }]),
   ];
 
 /**
@@ -35,7 +35,7 @@ const saying =
 const soldering: ProseReader = (html) =>
   readProse(html).map((block) =>
     block.type === 'paragraph' || block.type === 'quote'
-      ? { ...block, spans: block.spans.filter((span) => ('value' in span ? span.value : span.text).trim() !== '') }
+      ? { ...block, spans: block.spans.filter((span) => span.text.trim() !== '') }
       : block,
   );
 

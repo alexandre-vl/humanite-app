@@ -10,11 +10,11 @@ export const runsOf = (spans: readonly Span[], open: (target: LinkTarget) => voi
   spans.map((span): TextRun => {
     switch (span.type) {
       case 'text':
-        return { text: span.value };
+        return { text: span.text };
       case 'emphasis':
-        return { text: span.value, face: 'italic' };
+        return { text: span.text, face: 'italic' };
       case 'strong':
-        return { text: span.value, face: 'strong' };
+        return { text: span.text, face: 'strong' };
       case 'link':
         return {
           text: span.text,

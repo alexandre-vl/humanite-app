@@ -8,6 +8,7 @@ import {
   readProse,
   readSummaries,
   SECTIONS_KEY,
+  textOf,
 } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { RECORDED } from './recorded.ts';
@@ -58,18 +59,7 @@ const LINES = fieldsOf(RECORDED, ['title', 'description', 'excerpt', 'image_capt
 const IMAGES = fieldsOf(RECORDED, ['image']);
 
 /** What a reading made of a body, run together, so a whole can be searched for what should not be in it. */
-const words = (html: string): string =>
-  readProse(html)
-    .map((block) => {
-      if (block.type === 'heading') {
-        return block.text;
-      }
-      if (block.type === 'paragraph' || block.type === 'quote') {
-        return block.spans.map((span) => ('value' in span ? span.value : span.text)).join('');
-      }
-      return '';
-    })
-    .join('\n');
+const words = (html: string): string => readProse(html).map(textOf).join('\n');
 
 test('the capture holds lists, bodies, short fields and pictures to read', () => {
   expect(ARTICLES.length).toBeGreaterThan(0);

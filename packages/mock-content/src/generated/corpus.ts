@@ -32,8 +32,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reportage — la scène se découvre au ralenti, centimètre carré après centimètre carré. Dans la nef fraîche de l'église Saint-Genou, à Belleroche, une équipe de restaurateurs dégage depuis le printemps une peinture murale que personne n'attendait.",
+              text: "Reportage — la scène se découvre au ralenti, centimètre carré après centimètre carré. Dans la nef fraîche de l'église Saint-Genou, à Belleroche, une équipe de restaurateurs dégage depuis le printemps une peinture murale que personne n'attendait.",
             },
           ],
         },
@@ -42,8 +41,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Tout a commencé par un sondage de routine. En grattant un badigeon jauni, un ouvrier a fait apparaître un fragment de bleu profond. Les travaux ont aussitôt été suspendus, le temps d'alerter le service régional de l'archéologie.",
+              text: "Tout a commencé par un sondage de routine. En grattant un badigeon jauni, un ouvrier a fait apparaître un fragment de bleu profond. Les travaux ont aussitôt été suspendus, le temps d'alerter le service régional de l'archéologie.",
             },
           ],
         },
@@ -52,26 +50,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "L'œuvre, datée du milieu du XIVe siècle, représenterait une procession de saints. ",
+              text: "L'œuvre, datée du milieu du XIVe siècle, représenterait une procession de saints. ",
             },
             {
               type: 'emphasis',
-              value: 'Fragile',
+              text: 'Fragile',
             },
             {
               type: 'text',
-              value:
-                ", elle avait été recouverte d'un enduit au XVIIIe siècle, ce qui l'a paradoxalement protégée de la lumière et de l'humidité.",
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          spans: [
-            {
-              type: 'text',
-              value:
-                'Chaque matin, la restauratrice en chef, Sylvaine Corbel, applique des compresses pour ramollir les couches parasites, puis retire la matière au scalpel, sous une loupe binoculaire. « On ne restaure pas, on révèle », résume-t-elle sans quitter la paroi des yeux.',
+              text: ", elle avait été recouverte d'un enduit au XVIIIe siècle, ce qui l'a paradoxalement protégée de la lumière et de l'humidité.",
             },
           ],
         },
@@ -80,8 +67,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le chantier, minutieux, devrait durer encore deux hivers. Il faudra ensuite stabiliser les couleurs et traiter les remontées d'humidité qui menacent le bas de la composition.",
+              text: 'Chaque matin, la restauratrice en chef, Sylvaine Corbel, applique des compresses pour ramollir les couches parasites, puis retire la matière au scalpel, sous une loupe binoculaire. « On ne restaure pas, on révèle », résume-t-elle sans quitter la paroi des yeux.',
             },
           ],
         },
@@ -90,8 +76,16 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La commune, elle, espère déjà rouvrir l'édifice au public. Une souscription a été lancée auprès des habitants pour financer l'éclairage définitif de la chapelle et la passerelle qui permettra d'admirer la fresque de plus près.",
+              text: "Le chantier, minutieux, devrait durer encore deux hivers. Il faudra ensuite stabiliser les couleurs et traiter les remontées d'humidité qui menacent le bas de la composition.",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          spans: [
+            {
+              type: 'text',
+              text: "La commune, elle, espère déjà rouvrir l'édifice au public. Une souscription a été lancée auprès des habitants pour financer l'éclairage définitif de la chapelle et la passerelle qui permettra d'admirer la fresque de plus près.",
             },
           ],
         },
@@ -124,8 +118,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Après vingt-trois mois de fermeture, le musée Berthelin retrouve ses visiteurs. La municipalité de Villeneuve-sur-Arche a confirmé la réouverture pour samedi, à l'issue d'un chantier de dix millions d'euros financé par la ville et la région.",
+              text: "Après vingt-trois mois de fermeture, le musée Berthelin retrouve ses visiteurs. La municipalité de Villeneuve-sur-Arche a confirmé la réouverture pour samedi, à l'issue d'un chantier de dix millions d'euros financé par la ville et la région.",
             },
           ],
         },
@@ -138,17 +131,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Fini le dédale de petites salles sombres. Les architectes ont ouvert les perspectives, abattu deux cloisons et rétabli la lumière naturelle sous la verrière d'origine, longtemps masquée par un faux plafond. ",
+              text: "Fini le dédale de petites salles sombres. Les architectes ont ouvert les perspectives, abattu deux cloisons et rétabli la lumière naturelle sous la verrière d'origine, longtemps masquée par un faux plafond. ",
             },
             {
               type: 'emphasis',
-              value: 'Le résultat',
+              text: 'Le résultat',
             },
             {
               type: 'text',
-              value:
-                " frappe dès l'entrée : la grande galerie déroule désormais trois siècles de peinture régionale d'un seul tenant.",
+              text: " frappe dès l'entrée : la grande galerie déroule désormais trois siècles de peinture régionale d'un seul tenant.",
             },
           ],
         },
@@ -162,8 +153,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Un tiers des œuvres exposées n'avait jamais été montré au public. « Nous avions des trésors qui dormaient dans les réserves faute de place », explique la conservatrice, Agnès Vaillant. Le nouvel accrochage fait aussi une place aux artistes femmes de la région, longtemps reléguées aux marges des collections.",
+              text: "Un tiers des œuvres exposées n'avait jamais été montré au public. « Nous avions des trésors qui dormaient dans les réserves faute de place », explique la conservatrice, Agnès Vaillant. Le nouvel accrochage fait aussi une place aux artistes femmes de la région, longtemps reléguées aux marges des collections.",
             },
           ],
         },
@@ -172,7 +162,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Ce musée appartient d'abord aux habitants ; nous voulions qu'ils s'y sentent chez eux.",
+              text: "Ce musée appartient d'abord aux habitants ; nous voulions qu'ils s'y sentent chez eux.",
             },
           ],
           source: 'La conservatrice du musée Berthelin',
@@ -186,8 +176,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Nouveauté attendue : un parcours dédié au jeune public, avec des reproductions à toucher, des jeux de piste et des ateliers le mercredi après-midi. Le service éducatif espère doubler la fréquentation scolaire, tombée très bas avant la fermeture.',
+              text: 'Nouveauté attendue : un parcours dédié au jeune public, avec des reproductions à toucher, des jeux de piste et des ateliers le mercredi après-midi. Le service éducatif espère doubler la fréquentation scolaire, tombée très bas avant la fermeture.',
             },
           ],
         },
@@ -196,8 +185,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La direction promet aussi une politique tarifaire accessible. L'entrée restera gratuite le premier dimanche du mois, comme le rappelle ",
+              text: "La direction promet aussi une politique tarifaire accessible. L'entrée restera gratuite le premier dimanche du mois, comme le rappelle ",
             },
             {
               type: 'link',
@@ -209,7 +197,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ". Un tarif réduit sera par ailleurs proposé aux demandeurs d'emploi et aux étudiants.",
+              text: ". Un tarif réduit sera par ailleurs proposé aux demandeurs d'emploi et aux étudiants.",
             },
           ],
         },
@@ -222,8 +210,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Reste à faire revenir le public. Avant les travaux, le musée peinait à dépasser les vingt mille visiteurs annuels. La municipalité vise désormais le double, en misant sur des expositions temporaires plus ambitieuses et des soirées thématiques. Un premier accrochage temporaire, consacré aux paysages de la vallée, est déjà annoncé pour décembre. Les responsables comptent aussi sur les scolaires et sur un partenariat avec les offices de tourisme voisins pour drainer un public de fin de semaine.',
+              text: 'Reste à faire revenir le public. Avant les travaux, le musée peinait à dépasser les vingt mille visiteurs annuels. La municipalité vise désormais le double, en misant sur des expositions temporaires plus ambitieuses et des soirées thématiques. Un premier accrochage temporaire, consacré aux paysages de la vallée, est déjà annoncé pour décembre. Les responsables comptent aussi sur les scolaires et sur un partenariat avec les offices de tourisme voisins pour drainer un public de fin de semaine.',
             },
           ],
         },
@@ -277,8 +264,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Je repense souvent à cette phrase d'une bibliothécaire de quartier, croisée l'hiver dernier : « Ici, personne ne me demande jamais pourquoi je suis venu. » Elle disait vrai. La bibliothèque est peut-être le dernier lieu de nos villes où l'on peut passer une après-midi entière sans rien consommer, sans se justifier, sans même parler à quiconque.",
+              text: "Je repense souvent à cette phrase d'une bibliothécaire de quartier, croisée l'hiver dernier : « Ici, personne ne me demande jamais pourquoi je suis venu. » Elle disait vrai. La bibliothèque est peut-être le dernier lieu de nos villes où l'on peut passer une après-midi entière sans rien consommer, sans se justifier, sans même parler à quiconque.",
             },
           ],
         },
@@ -291,8 +277,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Nous avons pris l'habitude de mesurer la valeur des choses à leur prix. Un café, une place de cinéma, un abonnement : tout se monnaie. La bibliothèque, elle, oppose à cette logique une obstinée gratuité. On y entre les mains vides et l'on en ressort chargé. J'y vois moins une survivance qu'une promesse : celle d'une ville qui n'a pas entièrement renoncé à offrir sans compter.",
+              text: "Nous avons pris l'habitude de mesurer la valeur des choses à leur prix. Un café, une place de cinéma, un abonnement : tout se monnaie. La bibliothèque, elle, oppose à cette logique une obstinée gratuité. On y entre les mains vides et l'on en ressort chargé. J'y vois moins une survivance qu'une promesse : celle d'une ville qui n'a pas entièrement renoncé à offrir sans compter.",
             },
           ],
         },
@@ -301,8 +286,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Cette promesse coûte, bien sûr. Des salaires, du chauffage, des acquisitions. Mais je m'agace d'entendre parler de ces dépenses comme d'un fardeau. Une commune qui ferme sa bibliothèque n'économise pas : elle se prive d'un de ses rares biens communs.",
+              text: "Cette promesse coûte, bien sûr. Des salaires, du chauffage, des acquisitions. Mais je m'agace d'entendre parler de ces dépenses comme d'un fardeau. Une commune qui ferme sa bibliothèque n'économise pas : elle se prive d'un de ses rares biens communs.",
             },
           ],
         },
@@ -315,8 +299,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Enfant, je croyais qu'on venait à la bibliothèque pour les livres. Je sais aujourd'hui qu'on y apprend autre chose : la patience, le silence partagé, la présence tranquille des autres. On y côtoie des gens que l'on n'aurait jamais rencontrés ailleurs — le lycéen qui révise, le retraité qui déplie son journal, la personne sans abri qui se réchauffe.",
+              text: "Enfant, je croyais qu'on venait à la bibliothèque pour les livres. Je sais aujourd'hui qu'on y apprend autre chose : la patience, le silence partagé, la présence tranquille des autres. On y côtoie des gens que l'on n'aurait jamais rencontrés ailleurs — le lycéen qui révise, le retraité qui déplie son journal, la personne sans abri qui se réchauffe.",
             },
           ],
         },
@@ -325,12 +308,11 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'emphasis',
-              value: 'Aucun algorithme',
+              text: 'Aucun algorithme',
             },
             {
               type: 'text',
-              value:
-                " ne remplace cela. On nous vante des services numériques qui liraient nos envies mieux que nous : je veux bien. Mais rien ne recrée le hasard d'un rayon où la main s'égare, ni la voix d'une bibliothécaire qui glisse « celui-là, essayez donc ».",
+              text: " ne remplace cela. On nous vante des services numériques qui liraient nos envies mieux que nous : je veux bien. Mais rien ne recrée le hasard d'un rayon où la main s'égare, ni la voix d'une bibliothécaire qui glisse « celui-là, essayez donc ».",
             },
           ],
         },
@@ -343,8 +325,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Je n'écris pas cette chronique par nostalgie. J'écris parce que je vois, ici et là, des horaires réduits, des annexes fermées « provisoirement ». Nous savons ce que valent ces provisoires. Défendre nos bibliothèques n'est pas un combat d'esthète ; c'est une manière de dire quel genre de ville nous voulons habiter.",
+              text: "Je n'écris pas cette chronique par nostalgie. J'écris parce que je vois, ici et là, des horaires réduits, des annexes fermées « provisoirement ». Nous savons ce que valent ces provisoires. Défendre nos bibliothèques n'est pas un combat d'esthète ; c'est une manière de dire quel genre de ville nous voulons habiter.",
             },
           ],
         },
@@ -353,8 +334,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Alors poussons la porte, empruntons, inscrivons nos enfants. Une bibliothèque vivante est une bibliothèque fréquentée. C'est peut-être la seule institution que l'on sauve simplement en s'en servant.",
+              text: "Alors poussons la porte, empruntons, inscrivons nos enfants. Une bibliothèque vivante est une bibliothèque fréquentée. C'est peut-être la seule institution que l'on sauve simplement en s'en servant.",
             },
           ],
         },
@@ -387,8 +367,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le nouveau pass culturel régional est officiellement lancé. Depuis lundi, les habitants de la région âgés de 15 à 24 ans peuvent activer un compte leur donnant droit à un crédit annuel de 120 euros, utilisable chez les partenaires agréés.',
+              text: 'Le nouveau pass culturel régional est officiellement lancé. Depuis lundi, les habitants de la région âgés de 15 à 24 ans peuvent activer un compte leur donnant droit à un crédit annuel de 120 euros, utilisable chez les partenaires agréés.',
             },
           ],
         },
@@ -401,17 +380,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le dispositif couvre trois grands postes : les billets de spectacle et de cinéma, les entrées de musées, et l'achat de livres dans les librairies indépendantes. ",
+              text: "Le dispositif couvre trois grands postes : les billets de spectacle et de cinéma, les entrées de musées, et l'achat de livres dans les librairies indépendantes. ",
             },
             {
               type: 'emphasis',
-              value: 'Volontairement',
+              text: 'Volontairement',
             },
             {
               type: 'text',
-              value:
-                ", les plateformes de streaming en ont été exclues, afin de flécher l'argent vers les lieux physiques et les commerces de proximité.",
+              text: ", les plateformes de streaming en ont été exclues, afin de flécher l'argent vers les lieux physiques et les commerces de proximité.",
             },
           ],
         },
@@ -420,8 +397,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Selon le conseil régional, près de 90 000 jeunes seraient éligibles. Le barème complet et la liste des partenaires sont consultables sur ',
+              text: 'Selon le conseil régional, près de 90 000 jeunes seraient éligibles. Le barème complet et la liste des partenaires sont consultables sur ',
             },
             {
               type: 'link',
@@ -433,7 +409,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -442,7 +418,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Nous voulions un outil simple : un crédit, une carte, et le moins de paperasse possible.',
+              text: 'Nous voulions un outil simple : un crédit, une carte, et le moins de paperasse possible.',
             },
           ],
           source: 'La vice-présidente chargée de la culture',
@@ -456,8 +432,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste la question de l'argent. L'enveloppe, estimée à onze millions d'euros par an, repose pour moitié sur des fonds régionaux et pour moitié sur une contribution des communes volontaires. Or plusieurs petites communes rurales redoutent de ne pouvoir suivre.",
+              text: "Reste la question de l'argent. L'enveloppe, estimée à onze millions d'euros par an, repose pour moitié sur des fonds régionaux et pour moitié sur une contribution des communes volontaires. Or plusieurs petites communes rurales redoutent de ne pouvoir suivre.",
             },
           ],
         },
@@ -466,8 +441,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On nous demande de cofinancer un dispositif décidé sans nous », regrette le maire d'une commune de la vallée, qui réclame une clause de revoyure. La région, de son côté, promet un premier bilan au printemps et n'exclut pas d'ajuster les critères.",
+              text: "« On nous demande de cofinancer un dispositif décidé sans nous », regrette le maire d'une commune de la vallée, qui réclame une clause de revoyure. La région, de son côté, promet un premier bilan au printemps et n'exclut pas d'ajuster les critères.",
             },
           ],
         },
@@ -480,8 +454,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour les libraires, l'enjeu est concret. Beaucoup espèrent voir revenir un public jeune déserté depuis des années, comme le racontait déjà ",
+              text: "Pour les libraires, l'enjeu est concret. Beaucoup espèrent voir revenir un public jeune déserté depuis des années, comme le racontait déjà ",
             },
             {
               type: 'link',
@@ -493,8 +466,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value:
-                ". D'autres se montrent prudents, craignant une ruée sur quelques succès de librairie au détriment de la diversité éditoriale.",
+              text: ". D'autres se montrent prudents, craignant une ruée sur quelques succès de librairie au détriment de la diversité éditoriale.",
             },
           ],
         },
@@ -503,8 +475,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les premiers chiffres d'activation seront scrutés de près. En trois jours, la région annonce déjà plus de dix mille comptes ouverts, un démarrage jugé « encourageant » sans être décisif.",
+              text: "Les premiers chiffres d'activation seront scrutés de près. En trois jours, la région annonce déjà plus de dix mille comptes ouverts, un démarrage jugé « encourageant » sans être décisif.",
             },
           ],
         },
@@ -513,8 +484,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les associations de jeunesse, elles, réclament une campagne d'information dans les lycées et les missions locales, afin que le dispositif ne profite pas seulement aux familles déjà familières des lieux culturels. La région dit y travailler et promet des permanences d'aide à l'inscription dès la mi-octobre.",
+              text: "Les associations de jeunesse, elles, réclament une campagne d'information dans les lycées et les missions locales, afin que le dispositif ne profite pas seulement aux familles déjà familières des lieux culturels. La région dit y travailler et promet des permanences d'aide à l'inscription dès la mi-octobre.",
             },
           ],
         },
@@ -547,8 +517,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Chaque samedi matin, la salle des fêtes d'Aval-sur-Loue se transforme en atelier d'archivistes amateurs. Autour de grandes tables, une quinzaine de bénévoles trient des cartons entiers de documents prêtés par les familles de la vallée.",
+              text: "Chaque samedi matin, la salle des fêtes d'Aval-sur-Loue se transforme en atelier d'archivistes amateurs. Autour de grandes tables, une quinzaine de bénévoles trient des cartons entiers de documents prêtés par les familles de la vallée.",
             },
           ],
         },
@@ -561,8 +530,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'initiative est née il y a un an, quand le collectif Mémoire vive a lancé un appel aux habitants. « Beaucoup de gens allaient jeter des trésors sans le savoir », raconte sa coordinatrice, Fatou Ndiaye. Depuis, les dons affluent : photographies d'atelier, carnets de contremaître, tracts jaunis, bulletins de paie des anciennes filatures.",
+              text: "L'initiative est née il y a un an, quand le collectif Mémoire vive a lancé un appel aux habitants. « Beaucoup de gens allaient jeter des trésors sans le savoir », raconte sa coordinatrice, Fatou Ndiaye. Depuis, les dons affluent : photographies d'atelier, carnets de contremaître, tracts jaunis, bulletins de paie des anciennes filatures.",
             },
           ],
         },
@@ -576,16 +544,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Chaque pièce est dépoussiérée, numérisée, puis décrite dans une base de données consultable en ligne. ',
+              text: 'Chaque pièce est dépoussiérée, numérisée, puis décrite dans une base de données consultable en ligne. ',
             },
             {
               type: 'emphasis',
-              value: 'Rien',
+              text: 'Rien',
             },
             {
               type: 'text',
-              value: " n'est jeté sans l'accord des donateurs, qui repartent toujours avec leurs originaux.",
+              text: " n'est jeté sans l'accord des donateurs, qui repartent toujours avec leurs originaux.",
             },
           ],
         },
@@ -598,8 +565,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Au-delà des documents, le collectif enregistre des témoignages. D'anciens ouvriers, parfois nonagénaires, viennent raconter le bruit des métiers à tisser, les grèves de l'hiver, la fermeture de la dernière usine, à la fin des années 1990.",
+              text: "Au-delà des documents, le collectif enregistre des témoignages. D'anciens ouvriers, parfois nonagénaires, viennent raconter le bruit des métiers à tisser, les grèves de l'hiver, la fermeture de la dernière usine, à la fin des années 1990.",
             },
           ],
         },
@@ -608,8 +574,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On croyait notre travail sans importance ; voir des jeunes s'y intéresser, ça bouleverse », confie l'un d'eux. Les enregistrements, une fois transcrits, viendront enrichir le fonds et nourrir un futur parcours sonore.",
+              text: "« On croyait notre travail sans importance ; voir des jeunes s'y intéresser, ça bouleverse », confie l'un d'eux. Les enregistrements, une fois transcrits, viendront enrichir le fonds et nourrir un futur parcours sonore.",
             },
           ],
         },
@@ -622,8 +587,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "À terme, l'ensemble numérisé sera consultable gratuitement à la médiathèque intercommunale, et une exposition itinérante circulera dans les écoles de la vallée. Les enseignants sont déjà nombreux à s'y intéresser, y voyant un support concret pour parler d'histoire locale.",
+              text: "À terme, l'ensemble numérisé sera consultable gratuitement à la médiathèque intercommunale, et une exposition itinérante circulera dans les écoles de la vallée. Les enseignants sont déjà nombreux à s'y intéresser, y voyant un support concret pour parler d'histoire locale.",
             },
           ],
         },
@@ -632,8 +596,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le succès dépasse les frontières de la commune. Deux villages voisins ont demandé à rejoindre le projet, et les archives départementales, séduites, envisagent d'accueillir une copie du fonds pour en garantir la conservation à long terme.",
+              text: "Le succès dépasse les frontières de la commune. Deux villages voisins ont demandé à rejoindre le projet, et les archives départementales, séduites, envisagent d'accueillir une copie du fonds pour en garantir la conservation à long terme.",
             },
           ],
         },
@@ -642,8 +605,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le collectif cherche encore des bénévoles pour la saisie et la description des documents. Un simple ordinateur et un peu de patience suffisent, assure-t-on ; le reste s'apprend sur place.",
+              text: "Le collectif cherche encore des bénévoles pour la saisie et la description des documents. Un simple ordinateur et un peu de patience suffisent, assure-t-on ; le reste s'apprend sur place.",
             },
           ],
         },
@@ -676,8 +638,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La librairie du Beffroi ne baissera pas le rideau. Après six mois d'incertitude, l'unique commerce de livres de Belleroche a rouvert début septembre sous une forme inédite pour la commune : une coopérative de clients.",
+              text: "La librairie du Beffroi ne baissera pas le rideau. Après six mois d'incertitude, l'unique commerce de livres de Belleroche a rouvert début septembre sous une forme inédite pour la commune : une coopérative de clients.",
             },
           ],
         },
@@ -690,8 +651,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'histoire a bien failli mal tourner. Au printemps, le gérant historique, à la veille de la retraite, ne trouvait aucun repreneur. La perspective d'une vitrine vide de plus dans la rue principale a fini par mobiliser les habitués.",
+              text: "L'histoire a bien failli mal tourner. Au printemps, le gérant historique, à la veille de la retraite, ne trouvait aucun repreneur. La perspective d'une vitrine vide de plus dans la rue principale a fini par mobiliser les habitués.",
             },
           ],
         },
@@ -700,16 +660,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une poignée d'entre eux a lancé une souscription. En quelques semaines, deux cent quarante personnes ont apporté chacune entre cinquante et mille euros. ",
+              text: "Une poignée d'entre eux a lancé une souscription. En quelques semaines, deux cent quarante personnes ont apporté chacune entre cinquante et mille euros. ",
             },
             {
               type: 'emphasis',
-              value: 'Ensemble',
+              text: 'Ensemble',
             },
             {
               type: 'text',
-              value: ', ils ont réuni de quoi racheter le fonds et négocier le bail des murs.',
+              text: ', ils ont réuni de quoi racheter le fonds et négocier le bail des murs.',
             },
           ],
         },
@@ -722,8 +681,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La coopérative emploie désormais deux libraires salariées et s'appuie sur une trentaine de bénévoles pour les permanences du soir et les livraisons. Les décisions importantes se prennent en assemblée générale, une fois par trimestre, une personne valant une voix quel que soit son apport.",
+              text: "La coopérative emploie désormais deux libraires salariées et s'appuie sur une trentaine de bénévoles pour les permanences du soir et les livraisons. Les décisions importantes se prennent en assemblée générale, une fois par trimestre, une personne valant une voix quel que soit son apport.",
             },
           ],
         },
@@ -732,8 +690,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Nous ne voulions pas d'un musée du livre, mais d'une librairie qui vit », insiste l'une des salariées. Le pari commercial reste fragile : il faut vendre, animer, attirer les scolaires et tenir tête aux géants de la vente en ligne. Mais après un premier mois encourageant, les coopérateurs veulent croire à leur pari.",
+              text: "« Nous ne voulions pas d'un musée du livre, mais d'une librairie qui vit », insiste l'une des salariées. Le pari commercial reste fragile : il faut vendre, animer, attirer les scolaires et tenir tête aux géants de la vente en ligne. Mais après un premier mois encourageant, les coopérateurs veulent croire à leur pari.",
             },
           ],
         },
@@ -746,8 +703,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour fêter sa renaissance, la coopérative organise en octobre un mois de rencontres avec des auteurs de la région. Lectures, ateliers d'écriture et heures du conte se succéderont, gratuitement, dans l'arrière-salle réaménagée.",
+              text: "Pour fêter sa renaissance, la coopérative organise en octobre un mois de rencontres avec des auteurs de la région. Lectures, ateliers d'écriture et heures du conte se succéderont, gratuitement, dans l'arrière-salle réaménagée.",
             },
           ],
         },
@@ -756,8 +712,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste un défi de taille : convaincre les plus jeunes de pousser la porte. La librairie compte pour cela sur le nouveau pass culturel régional, qui devrait ramener une clientèle étudiante, et sur un partenariat avec les collèges voisins. Les coopérateurs, eux, ne manquent pas d'idées : un club de lecture mensuel et une boîte à livres installée devant la vitrine ont déjà vu le jour, portés par des bénévoles enthousiastes.",
+              text: "Reste un défi de taille : convaincre les plus jeunes de pousser la porte. La librairie compte pour cela sur le nouveau pass culturel régional, qui devrait ramener une clientèle étudiante, et sur un partenariat avec les collèges voisins. Les coopérateurs, eux, ne manquent pas d'idées : un club de lecture mensuel et une boîte à livres installée devant la vitrine ont déjà vu le jour, portés par des bénévoles enthousiastes.",
             },
           ],
         },
@@ -782,8 +737,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La scène nationale de Courtebief a présenté mardi sa nouvelle saison. Au total, quatorze spectacles sont programmés d'octobre à juin, dont six créations, une proportion en hausse par rapport à l'an dernier.",
+              text: "La scène nationale de Courtebief a présenté mardi sa nouvelle saison. Au total, quatorze spectacles sont programmés d'octobre à juin, dont six créations, une proportion en hausse par rapport à l'an dernier.",
             },
           ],
         },
@@ -792,8 +746,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La direction assume un cap : faire une large place aux écritures contemporaines. Un festival de lectures, en janvier, mettra en voix des textes d'auteurs encore non publiés, choisis parmi près de trois cents manuscrits reçus.",
+              text: "La direction assume un cap : faire une large place aux écritures contemporaines. Un festival de lectures, en janvier, mettra en voix des textes d'auteurs encore non publiés, choisis parmi près de trois cents manuscrits reçus.",
             },
           ],
         },
@@ -802,8 +755,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Côté tarifs, l'établissement maintient sa formule à prix libre pour les moins de vingt-six ans, une mesure reconduite après le succès de la saison passée.",
+              text: "Côté tarifs, l'établissement maintient sa formule à prix libre pour les moins de vingt-six ans, une mesure reconduite après le succès de la saison passée.",
             },
           ],
         },
@@ -829,8 +781,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les ouvriers n'en croyaient pas leurs yeux. En creusant une tranchée d'assainissement à la sortie de Mérignial, une entreprise de travaux publics a mis au jour, la semaine dernière, une jarre remplie de monnaies anciennes.",
+              text: "Les ouvriers n'en croyaient pas leurs yeux. En creusant une tranchée d'assainissement à la sortie de Mérignial, une entreprise de travaux publics a mis au jour, la semaine dernière, une jarre remplie de monnaies anciennes.",
             },
           ],
         },
@@ -839,8 +790,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Alertés, les archéologues du service régional ont pris le relais. Le dépôt, encore en cours d'étude, compterait plusieurs centaines de pièces, vraisemblablement enfouies il y a près de deux mille ans. Les spécialistes évoquent une découverte rare pour le secteur.",
+              text: "Alertés, les archéologues du service régional ont pris le relais. Le dépôt, encore en cours d'étude, compterait plusieurs centaines de pièces, vraisemblablement enfouies il y a près de deux mille ans. Les spécialistes évoquent une découverte rare pour le secteur.",
             },
           ],
         },
@@ -849,8 +799,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le chantier est suspendu le temps de la fouille, qui pourrait durer plusieurs semaines. Les pièces, une fois nettoyées et inventoriées, devraient rejoindre les collections du musée départemental.',
+              text: 'Le chantier est suspendu le temps de la fouille, qui pourrait durer plusieurs semaines. Les pièces, une fois nettoyées et inventoriées, devraient rejoindre les collections du musée départemental.',
             },
           ],
         },
@@ -875,8 +824,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'université de Belleroche a annoncé la création d'une chaire de recherche consacrée à l'histoire des métiers de l'eau, des moulins aux canaux de flottage. Elle sera financée pendant cinq ans par un mécénat d'entreprises locales.",
+              text: "L'université de Belleroche a annoncé la création d'une chaire de recherche consacrée à l'histoire des métiers de l'eau, des moulins aux canaux de flottage. Elle sera financée pendant cinq ans par un mécénat d'entreprises locales.",
             },
           ],
         },
@@ -885,8 +833,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Portée par le département d'histoire, la chaire associera historiens, géographes et archéologues. Elle prévoit de recruter deux doctorants dès la rentrée et d'ouvrir ses séminaires au public.",
+              text: "Portée par le département d'histoire, la chaire associera historiens, géographes et archéologues. Elle prévoit de recruter deux doctorants dès la rentrée et d'ouvrir ses séminaires au public.",
             },
           ],
         },
@@ -895,8 +842,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Un premier colloque, consacré aux anciens ports fluviaux de la vallée, se tiendra au printemps. Les organisateurs espèrent en faire un rendez-vous annuel.',
+              text: 'Un premier colloque, consacré aux anciens ports fluviaux de la vallée, se tiendra au printemps. Les organisateurs espèrent en faire un rendez-vous annuel.',
             },
           ],
         },
@@ -929,8 +875,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La nouvelle est tombée en comité social et économique, jeudi matin : la direction des Fonderies du Vernay entend supprimer 120 postes sur les 540 que compte son site de Villefranche-d'Arvor. L'annonce a provoqué un arrêt de travail spontané dans l'après-midi.",
+              text: "La nouvelle est tombée en comité social et économique, jeudi matin : la direction des Fonderies du Vernay entend supprimer 120 postes sur les 540 que compte son site de Villefranche-d'Arvor. L'annonce a provoqué un arrêt de travail spontané dans l'après-midi.",
             },
           ],
         },
@@ -943,8 +888,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La direction met en avant un plan reposant d'abord sur des départs volontaires et des préretraites. Elle invoque la baisse des commandes du secteur automobile et la hausse des coûts de l'énergie, qui pèsent sur la compétitivité de l'usine.",
+              text: "La direction met en avant un plan reposant d'abord sur des départs volontaires et des préretraites. Elle invoque la baisse des commandes du secteur automobile et la hausse des coûts de l'énergie, qui pèsent sur la compétitivité de l'usine.",
             },
           ],
         },
@@ -953,8 +897,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Nous voulons préserver l'essentiel de l'activité en ajustant nos effectifs sans licenciements contraints », a assuré le directeur du site, Gérald Monnier, devant la presse.",
+              text: "« Nous voulons préserver l'essentiel de l'activité en ajustant nos effectifs sans licenciements contraints », a assuré le directeur du site, Gérald Monnier, devant la presse.",
             },
           ],
         },
@@ -963,7 +906,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Du côté des salariés, le discours ne passe pas.',
+              text: 'Du côté des salariés, le discours ne passe pas.',
             },
           ],
         },
@@ -972,8 +915,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "On nous parle de départs volontaires, mais quand la charge de travail reste la même pour ceux qui restent, ce n'est pas un choix, c'est une pression.",
+              text: "On nous parle de départs volontaires, mais quand la charge de travail reste la même pour ceux qui restent, ce n'est pas un choix, c'est une pression.",
             },
           ],
           source: 'Le syndicat Métaux-Avenir du Vernay',
@@ -987,8 +929,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les représentants du personnel redoutent que ce plan ne soit qu'une étape. Selon eux, la direction n'a jamais confirmé les investissements promis il y a deux ans sur une nouvelle ligne de production.",
+              text: "Les représentants du personnel redoutent que ce plan ne soit qu'une étape. Selon eux, la direction n'a jamais confirmé les investissements promis il y a deux ans sur une nouvelle ligne de production.",
             },
           ],
         },
@@ -1002,8 +943,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le maire de Villefranche-d'Arvor a demandé une réunion en urgence avec la direction et les services de l'État. Une pétition lancée par le ",
+              text: "Le maire de Villefranche-d'Arvor a demandé une réunion en urgence avec la direction et les services de l'État. Une pétition lancée par le ",
             },
             {
               type: 'link',
@@ -1015,7 +955,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ' a recueilli plusieurs milliers de signatures en deux jours.',
+              text: ' a recueilli plusieurs milliers de signatures en deux jours.',
             },
           ],
         },
@@ -1024,8 +964,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Dans le bassin, l'inquiétude gagne au-delà des grilles de l'usine. Plusieurs sous-traitants, qui dépendent des commandes du Vernay pour une large part de leur activité, redoutent un effet domino sur leurs propres effectifs. Les commerçants de Villefranche-d'Arvor, eux, se souviennent du coup porté au centre-ville lors du dernier plan social, il y a une dizaine d'années.",
+              text: "Dans le bassin, l'inquiétude gagne au-delà des grilles de l'usine. Plusieurs sous-traitants, qui dépendent des commandes du Vernay pour une large part de leur activité, redoutent un effet domino sur leurs propres effectifs. Les commerçants de Villefranche-d'Arvor, eux, se souviennent du coup porté au centre-ville lors du dernier plan social, il y a une dizaine d'années.",
             },
           ],
         },
@@ -1034,8 +973,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une nouvelle réunion du comité est prévue la semaine prochaine. Les élus locaux, eux, s'inquiètent des effets en chaîne sur les sous-traitants du bassin, comme le détaille notre enquête sur ",
+              text: "Une nouvelle réunion du comité est prévue la semaine prochaine. Les élus locaux, eux, s'inquiètent des effets en chaîne sur les sous-traitants du bassin, comme le détaille notre enquête sur ",
             },
             {
               type: 'link',
@@ -1047,7 +985,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -1103,8 +1041,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sur le marché couvert de Sainte-Coline, un samedi matin, les cabas se remplissent plus lentement qu'avant. « Les gens achètent trois pommes au lieu d'un kilo », observe une maraîchère installée là depuis vingt ans.",
+              text: "Sur le marché couvert de Sainte-Coline, un samedi matin, les cabas se remplissent plus lentement qu'avant. « Les gens achètent trois pommes au lieu d'un kilo », observe une maraîchère installée là depuis vingt ans.",
             },
           ],
         },
@@ -1117,8 +1054,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En un an, selon un relevé mené par l'association de consommateurs Panier commun, le prix moyen d'un panier de saison a augmenté de près de 9 % sur les marchés du Val d'Arche. Les fromages fermiers et les fruits figurent parmi les produits les plus touchés.",
+              text: "En un an, selon un relevé mené par l'association de consommateurs Panier commun, le prix moyen d'un panier de saison a augmenté de près de 9 % sur les marchés du Val d'Arche. Les fromages fermiers et les fruits figurent parmi les produits les plus touchés.",
             },
           ],
         },
@@ -1127,16 +1063,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les commerçants se défendent de tout excès. Ils invoquent la hausse de leurs propres charges : gasoil pour les tournées, emballages, cotisations de place. ',
+              text: 'Les commerçants se défendent de tout excès. Ils invoquent la hausse de leurs propres charges : gasoil pour les tournées, emballages, cotisations de place. ',
             },
             {
               type: 'emphasis',
-              value: 'Rien',
+              text: 'Rien',
             },
             {
               type: 'text',
-              value: ', disent-ils, ne reste dans leurs marges.',
+              text: ', disent-ils, ne reste dans leurs marges.',
             },
           ],
         },
@@ -1149,8 +1084,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Côté clients, les stratégies se multiplient : venir en fin de matinée pour les invendus, privilégier les produits bruts, cuisiner davantage. Certains renoncent tout simplement au marché pour la grande distribution, jugée moins chère.',
+              text: 'Côté clients, les stratégies se multiplient : venir en fin de matinée pour les invendus, privilégier les produits bruts, cuisiner davantage. Certains renoncent tout simplement au marché pour la grande distribution, jugée moins chère.',
             },
           ],
         },
@@ -1159,8 +1093,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les épiceries solidaires du secteur, elles, confirment une hausse de la fréquentation. « Nous voyons arriver des familles qui travaillent, ce qui était rare il y a encore deux ans », note un responsable associatif. Le phénomène touche désormais des ménages jusque-là épargnés.',
+              text: 'Les épiceries solidaires du secteur, elles, confirment une hausse de la fréquentation. « Nous voyons arriver des familles qui travaillent, ce qui était rare il y a encore deux ans », note un responsable associatif. Le phénomène touche désormais des ménages jusque-là épargnés.',
             },
           ],
         },
@@ -1169,8 +1102,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les producteurs, eux, se disent pris en étau. « Si j'augmente mes prix, je perds des clients ; si je ne les augmente pas, je travaille à perte », résume un éleveur de chèvres venu de la vallée voisine. Beaucoup rognent sur leurs marges pour ne pas décourager une clientèle fidèle, mais reconnaissent que la situation ne tiendra pas éternellement. Certains envisagent déjà de réduire la voilure la saison prochaine.",
+              text: "Les producteurs, eux, se disent pris en étau. « Si j'augmente mes prix, je perds des clients ; si je ne les augmente pas, je travaille à perte », résume un éleveur de chèvres venu de la vallée voisine. Beaucoup rognent sur leurs marges pour ne pas décourager une clientèle fidèle, mais reconnaissent que la situation ne tiendra pas éternellement. Certains envisagent déjà de réduire la voilure la saison prochaine.",
             },
           ],
         },
@@ -1179,8 +1111,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'association Panier commun appelle les collectivités à soutenir les circuits courts, par exemple en réduisant les droits de place pour les producteurs locaux. La chambre d'agriculture, prudente, renvoie la question aux communes.",
+              text: "L'association Panier commun appelle les collectivités à soutenir les circuits courts, par exemple en réduisant les droits de place pour les producteurs locaux. La chambre d'agriculture, prudente, renvoie la question aux communes.",
             },
           ],
         },
@@ -1189,8 +1120,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste une inquiétude partagée, à l'approche de l'hiver : celle de voir se creuser l'écart entre ceux qui peuvent encore choisir la qualité et ceux qui doivent d'abord compter.",
+              text: "Reste une inquiétude partagée, à l'approche de l'hiver : celle de voir se creuser l'écart entre ceux qui peuvent encore choisir la qualité et ceux qui doivent d'abord compter.",
             },
           ],
         },
@@ -1223,8 +1153,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'annonce des suppressions de postes aux Fonderies du Vernay a agi comme un électrochoc. Autour de la table, cette semaine, une trentaine d'acteurs du territoire ont lancé les premières réunions d'un futur plan de reconversion du bassin d'emploi. Une démarche présentée comme inédite à cette échelle sur le territoire.",
+              text: "L'annonce des suppressions de postes aux Fonderies du Vernay a agi comme un électrochoc. Autour de la table, cette semaine, une trentaine d'acteurs du territoire ont lancé les premières réunions d'un futur plan de reconversion du bassin d'emploi. Une démarche présentée comme inédite à cette échelle sur le territoire.",
             },
           ],
         },
@@ -1237,8 +1166,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'idée n'est pas neuve, mais elle prend un tour d'urgence. Le Val d'Arche, longtemps porté par la métallurgie, voit ses grands employeurs vieillir. « Nous ne voulons pas revivre ce qu'ont connu d'autres bassins, où l'on a réagi dix ans trop tard », résume la présidente de la chambre de commerce, Sabine Ledoux.",
+              text: "L'idée n'est pas neuve, mais elle prend un tour d'urgence. Le Val d'Arche, longtemps porté par la métallurgie, voit ses grands employeurs vieillir. « Nous ne voulons pas revivre ce qu'ont connu d'autres bassins, où l'on a réagi dix ans trop tard », résume la présidente de la chambre de commerce, Sabine Ledoux.",
             },
           ],
         },
@@ -1247,8 +1175,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le plan esquissé repose sur trois axes : la formation des salariés vers des métiers en tension, l'accueil de nouvelles activités sur les friches, et le soutien aux petites entreprises locales. La situation des Fonderies, détaillée dans ",
+              text: "Le plan esquissé repose sur trois axes : la formation des salariés vers des métiers en tension, l'accueil de nouvelles activités sur les friches, et le soutien aux petites entreprises locales. La situation des Fonderies, détaillée dans ",
             },
             {
               type: 'link',
@@ -1260,7 +1187,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ", sert de cas d'école.",
+              text: ", sert de cas d'école.",
             },
           ],
         },
@@ -1273,8 +1200,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste à financer l'ensemble. Les organismes de formation du territoire manquent de places dans les filières porteuses, notamment la maintenance des réseaux et les métiers de la rénovation énergétique.",
+              text: "Reste à financer l'ensemble. Les organismes de formation du territoire manquent de places dans les filières porteuses, notamment la maintenance des réseaux et les métiers de la rénovation énergétique.",
             },
           ],
         },
@@ -1288,8 +1214,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La région a été sollicitée pour cofinancer un « campus des métiers » qui regrouperait plusieurs formations sur un même site. La décision n'est pas attendue avant plusieurs mois.",
+              text: "La région a été sollicitée pour cofinancer un « campus des métiers » qui regrouperait plusieurs formations sur un même site. La décision n'est pas attendue avant plusieurs mois.",
             },
           ],
         },
@@ -1298,8 +1223,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les premières formations pourraient toutefois démarrer dès le printemps, à titre expérimental, pour les salariés les plus proches d'un départ. La maison de l'emploi de Villefranche-d'Arvor a été chargée de recenser les compétences disponibles et les besoins des entreprises qui recrutent encore, du bâtiment aux services à la personne.",
+              text: "Les premières formations pourraient toutefois démarrer dès le printemps, à titre expérimental, pour les salariés les plus proches d'un départ. La maison de l'emploi de Villefranche-d'Arvor a été chargée de recenser les compétences disponibles et les besoins des entreprises qui recrutent encore, du bâtiment aux services à la personne.",
             },
           ],
         },
@@ -1308,8 +1232,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les syndicats, associés aux discussions, réclament des engagements chiffrés et un calendrier précis. Ils redoutent qu'un énième plan ne reste au stade des intentions, sans moyens à la hauteur des besoins. Les élus locaux, de leur côté, veulent inscrire la démarche dans la durée, au-delà des échéances électorales, pour éviter qu'elle ne s'essouffle au premier changement de majorité.",
+              text: "Les syndicats, associés aux discussions, réclament des engagements chiffrés et un calendrier précis. Ils redoutent qu'un énième plan ne reste au stade des intentions, sans moyens à la hauteur des besoins. Les élus locaux, de leur côté, veulent inscrire la démarche dans la durée, au-delà des échéances électorales, pour éviter qu'elle ne s'essouffle au premier changement de majorité.",
             },
           ],
         },
@@ -1356,8 +1279,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Je passe chaque samedi devant l'épicerie solidaire de mon quartier. Depuis un an, la file d'attente s'y allonge, discrètement, sans éclat. On y croise désormais des visages que l'on n'y voyait pas : des salariés, des étudiants, des retraités qui, il y a peu encore, se seraient crus à l'abri.",
+              text: "Je passe chaque samedi devant l'épicerie solidaire de mon quartier. Depuis un an, la file d'attente s'y allonge, discrètement, sans éclat. On y croise désormais des visages que l'on n'y voyait pas : des salariés, des étudiants, des retraités qui, il y a peu encore, se seraient crus à l'abri.",
             },
           ],
         },
@@ -1366,8 +1288,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Nous avons pris l'habitude de mesurer l'économie à distance, à travers des indicateurs qui montent ou qui descendent. La croissance, l'inflation, la confiance des ménages. Mais il existe une autre manière de la lire, plus modeste et plus juste : regarder ce que les gens font quand ils n'ont plus vraiment le choix.",
+              text: "Nous avons pris l'habitude de mesurer l'économie à distance, à travers des indicateurs qui montent ou qui descendent. La croissance, l'inflation, la confiance des ménages. Mais il existe une autre manière de la lire, plus modeste et plus juste : regarder ce que les gens font quand ils n'ont plus vraiment le choix.",
             },
           ],
         },
@@ -1380,8 +1301,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Ce que je vois, c'est l'essor d'une économie du dépannage. Des groupes d'entraide qui s'échangent des heures de garde. Des ateliers de réparation où l'on prolonge la vie d'un grille-pain plutôt que d'en racheter un. Des jardins partagés où l'on cultive, l'air de rien, un complément de repas.",
+              text: "Ce que je vois, c'est l'essor d'une économie du dépannage. Des groupes d'entraide qui s'échangent des heures de garde. Des ateliers de réparation où l'on prolonge la vie d'un grille-pain plutôt que d'en racheter un. Des jardins partagés où l'on cultive, l'air de rien, un complément de repas.",
             },
           ],
         },
@@ -1390,8 +1310,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'On célèbre volontiers ces initiatives comme des preuves de solidarité, et elles le sont. Mais soyons honnêtes : elles prospèrent aussi parce que le reste ne suit plus. On ne répare pas son manteau par pure conviction quand on pourrait, sans y penser, en acheter un neuf.',
+              text: 'On célèbre volontiers ces initiatives comme des preuves de solidarité, et elles le sont. Mais soyons honnêtes : elles prospèrent aussi parce que le reste ne suit plus. On ne répare pas son manteau par pure conviction quand on pourrait, sans y penser, en acheter un neuf.',
             },
           ],
         },
@@ -1400,8 +1319,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Je me méfie du récit qui transforme la débrouille en vertu. Il déresponsabilise. Il laisse entendre que chacun s'en sortira à force d'ingéniosité, et que la collectivité n'a rien à voir dans l'affaire.",
+              text: "Je me méfie du récit qui transforme la débrouille en vertu. Il déresponsabilise. Il laisse entendre que chacun s'en sortira à force d'ingéniosité, et que la collectivité n'a rien à voir dans l'affaire.",
             },
           ],
         },
@@ -1414,16 +1332,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La file du samedi matin dit autre chose. Elle dit qu'un travail ne protège plus toujours de la précarité. Elle dit que le mot ",
+              text: "La file du samedi matin dit autre chose. Elle dit qu'un travail ne protège plus toujours de la précarité. Elle dit que le mot ",
             },
             {
               type: 'emphasis',
-              value: 'dignité',
+              text: 'dignité',
             },
             {
               type: 'text',
-              value: " n'a pas le même poids selon qu'on choisit la sobriété ou qu'on la subit.",
+              text: " n'a pas le même poids selon qu'on choisit la sobriété ou qu'on la subit.",
             },
           ],
         },
@@ -1432,7 +1349,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Une bénévole me confiait récemment une phrase que je n'oublie pas.",
+              text: "Une bénévole me confiait récemment une phrase que je n'oublie pas.",
             },
           ],
         },
@@ -1441,8 +1358,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les gens ne viennent pas seulement chercher de la nourriture. Ils viennent chercher un peu de répit.',
+              text: 'Les gens ne viennent pas seulement chercher de la nourriture. Ils viennent chercher un peu de répit.',
             },
           ],
           source: "Une bénévole de l'épicerie solidaire",
@@ -1452,8 +1368,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le répit, voilà peut-être le vrai bien rare de notre époque. Le temps de souffler, la marge pour voir venir, la possibilité de refuser un mauvais emploi ou un logement insalubre.',
+              text: 'Le répit, voilà peut-être le vrai bien rare de notre époque. Le temps de souffler, la marge pour voir venir, la possibilité de refuser un mauvais emploi ou un logement insalubre.',
             },
           ],
         },
@@ -1462,8 +1377,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Je ne crois pas que l'entraide doive remplacer les services publics. Je crois qu'elle les révèle en creux, là où ils manquent. Chaque file qui s'allonge est une question posée à la collectivité : qu'avons-nous décidé de ne plus garantir ?",
+              text: "Je ne crois pas que l'entraide doive remplacer les services publics. Je crois qu'elle les révèle en creux, là où ils manquent. Chaque file qui s'allonge est une question posée à la collectivité : qu'avons-nous décidé de ne plus garantir ?",
             },
           ],
         },
@@ -1472,8 +1386,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Nous aurions tort de nous en remettre à la seule générosité des bénévoles. Elle est précieuse, elle est admirable, mais elle n'a pas à colmater, indéfiniment, les brèches que nous laissons ouvertes. La solidarité entre voisins est une richesse. Elle ne saurait devenir une politique par défaut.",
+              text: "Nous aurions tort de nous en remettre à la seule générosité des bénévoles. Elle est précieuse, elle est admirable, mais elle n'a pas à colmater, indéfiniment, les brèches que nous laissons ouvertes. La solidarité entre voisins est une richesse. Elle ne saurait devenir une politique par défaut.",
             },
           ],
         },
@@ -1506,8 +1419,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'histoire aurait pu s'achever par un rideau baissé. Elle s'est poursuivie autrement. À Montreuil-l'Abbé, la menuiserie Boisclair, menacée de fermeture au départ à la retraite de son fondateur, a été reprise il y a un an par ses propres salariés, sous forme de société coopérative.",
+              text: "L'histoire aurait pu s'achever par un rideau baissé. Elle s'est poursuivie autrement. À Montreuil-l'Abbé, la menuiserie Boisclair, menacée de fermeture au départ à la retraite de son fondateur, a été reprise il y a un an par ses propres salariés, sous forme de société coopérative.",
             },
           ],
         },
@@ -1520,8 +1432,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Faute de repreneur extérieur, les dix-huit employés ont fait le pari de racheter eux-mêmes l'entreprise. Chacun a apporté une part au capital, complétée par un prêt d'une structure de financement de l'économie sociale.",
+              text: "Faute de repreneur extérieur, les dix-huit employés ont fait le pari de racheter eux-mêmes l'entreprise. Chacun a apporté une part au capital, complétée par un prêt d'une structure de financement de l'économie sociale.",
             },
           ],
         },
@@ -1530,8 +1441,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On ne se voyait pas laisser filer un savoir-faire de trente ans », raconte l'une des salariées devenue codirigeante. La transition n'a pas été simple : il a fallu apprendre la gestion, les devis, la relation avec les banques.",
+              text: "« On ne se voyait pas laisser filer un savoir-faire de trente ans », raconte l'une des salariées devenue codirigeante. La transition n'a pas été simple : il a fallu apprendre la gestion, les devis, la relation avec les banques.",
             },
           ],
         },
@@ -1549,8 +1459,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Un an plus tard, le carnet de commandes est rempli jusqu'au printemps. La coopérative a même embauché deux apprentis. Les décisions se prennent désormais collectivement, lors de réunions mensuelles parfois longues, mais que les salariés disent préférer à l'ancien fonctionnement.",
+              text: "Un an plus tard, le carnet de commandes est rempli jusqu'au printemps. La coopérative a même embauché deux apprentis. Les décisions se prennent désormais collectivement, lors de réunions mensuelles parfois longues, mais que les salariés disent préférer à l'ancien fonctionnement.",
             },
           ],
         },
@@ -1559,8 +1468,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La coopérative a aussi noué un partenariat avec le lycée professionnel voisin pour accueillir des stagiaires. « Transmettre, c'est une manière d'assurer l'avenir de l'atelier », souligne l'un des menuisiers, qui forme deux jeunes cette année.",
+              text: "La coopérative a aussi noué un partenariat avec le lycée professionnel voisin pour accueillir des stagiaires. « Transmettre, c'est une manière d'assurer l'avenir de l'atelier », souligne l'un des menuisiers, qui forme deux jeunes cette année.",
             },
           ],
         },
@@ -1569,8 +1477,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le changement de statut a modifié le rapport au travail. « Quand c'est votre entreprise, vous ne comptez pas de la même manière », glisse un ouvrier. Les salariés-associés se partagent désormais les résultats, une part étant systématiquement réinvestie dans l'outil de production et le renouvellement des machines.",
+              text: "Le changement de statut a modifié le rapport au travail. « Quand c'est votre entreprise, vous ne comptez pas de la même manière », glisse un ouvrier. Les salariés-associés se partagent désormais les résultats, une part étant systématiquement réinvestie dans l'outil de production et le renouvellement des machines.",
             },
           ],
         },
@@ -1579,8 +1486,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Tout n'est pas gagné pour autant. Les marges restent minces, et la hausse du prix du bois pèse sur les devis. Les codirigeants le reconnaissent : il faudra plusieurs exercices avant de parler de réussite durable.",
+              text: "Tout n'est pas gagné pour autant. Les marges restent minces, et la hausse du prix du bois pèse sur les devis. Les codirigeants le reconnaissent : il faudra plusieurs exercices avant de parler de réussite durable.",
             },
           ],
         },
@@ -1589,8 +1495,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Leur exemple intéresse déjà d'autres entreprises du territoire confrontées à des départs en retraite sans successeur. Une chambre régionale de l'économie sociale a proposé d'organiser des visites de l'atelier pour d'autres candidats à la reprise.",
+              text: "Leur exemple intéresse déjà d'autres entreprises du territoire confrontées à des départs en retraite sans successeur. Une chambre régionale de l'économie sociale a proposé d'organiser des visites de l'atelier pour d'autres candidats à la reprise.",
             },
           ],
         },
@@ -1623,8 +1528,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est une érosion lente, presque imperceptible d'une saison à l'autre, mais que les habitants du pays de l'Ombre finissent par ressentir durement. En deux ans, plusieurs bureaux de poste du secteur ont vu leurs horaires réduits, certains n'ouvrant plus que trois matinées par semaine.",
+              text: "C'est une érosion lente, presque imperceptible d'une saison à l'autre, mais que les habitants du pays de l'Ombre finissent par ressentir durement. En deux ans, plusieurs bureaux de poste du secteur ont vu leurs horaires réduits, certains n'ouvrant plus que trois matinées par semaine.",
             },
           ],
         },
@@ -1637,8 +1541,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une vingtaine de maires ont signé cette semaine une lettre commune pour dénoncer ce qu'ils appellent un « abandon silencieux » des campagnes. Ils réclament une concertation préalable à toute nouvelle réduction d'horaires.",
+              text: "Une vingtaine de maires ont signé cette semaine une lettre commune pour dénoncer ce qu'ils appellent un « abandon silencieux » des campagnes. Ils réclament une concertation préalable à toute nouvelle réduction d'horaires.",
             },
           ],
         },
@@ -1647,8 +1550,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On ne ferme jamais officiellement. On grignote. Un jour de moins ici, une heure de moins là, jusqu'à ce que le bureau n'ait plus de sens », résume le maire d'une commune de 800 habitants.",
+              text: "« On ne ferme jamais officiellement. On grignote. Un jour de moins ici, une heure de moins là, jusqu'à ce que le bureau n'ait plus de sens », résume le maire d'une commune de 800 habitants.",
             },
           ],
         },
@@ -1657,8 +1559,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'enjeu dépasse le courrier. Dans ces territoires, le bureau de poste sert aussi de point d'accès bancaire, de lieu de retrait d'espèces et, parfois, de dernier service ouvert au public.",
+              text: "L'enjeu dépasse le courrier. Dans ces territoires, le bureau de poste sert aussi de point d'accès bancaire, de lieu de retrait d'espèces et, parfois, de dernier service ouvert au public.",
             },
           ],
         },
@@ -1671,8 +1572,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Du côté de l'opérateur, on met en avant la chute continue du volume de courrier et la fréquentation en baisse des guichets. La réorganisation viserait, dit-on, à « adapter le service à son usage réel », en développant les points de contact chez les commerçants.",
+              text: "Du côté de l'opérateur, on met en avant la chute continue du volume de courrier et la fréquentation en baisse des guichets. La réorganisation viserait, dit-on, à « adapter le service à son usage réel », en développant les points de contact chez les commerçants.",
             },
           ],
         },
@@ -1681,8 +1581,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Dans plusieurs villages, des habitants se sont regroupés pour organiser un covoiturage vers le bureau encore ouvert le plus proche, parfois à quinze kilomètres. Une solution de fortune qui pénalise d'abord les personnes âgées et sans voiture.",
+              text: "Dans plusieurs villages, des habitants se sont regroupés pour organiser un covoiturage vers le bureau encore ouvert le plus proche, parfois à quinze kilomètres. Une solution de fortune qui pénalise d'abord les personnes âgées et sans voiture.",
             },
           ],
         },
@@ -1691,8 +1590,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Des élus avancent une autre piste : installer des agences postales communales, gérées par les mairies en échange d'une compensation financière. La formule permettrait de maintenir un guichet ouvert, mais transfère de fait la charge sur des communes déjà exsangues, préviennent ses détracteurs, qui y voient un désengagement déguisé.",
+              text: "Des élus avancent une autre piste : installer des agences postales communales, gérées par les mairies en échange d'une compensation financière. La formule permettrait de maintenir un guichet ouvert, mais transfère de fait la charge sur des communes déjà exsangues, préviennent ses détracteurs, qui y voient un désengagement déguisé.",
             },
           ],
         },
@@ -1701,8 +1599,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les élus ne s'en satisfont pas. Ils demandent un moratoire et la publication d'un état des lieux commune par commune. Une réunion avec la direction régionale est espérée avant la fin de l'année, sans garantie à ce stade. Le sujet devrait s'inviter au prochain conseil communautaire.",
+              text: "Les élus ne s'en satisfont pas. Ils demandent un moratoire et la publication d'un état des lieux commune par commune. Une réunion avec la direction régionale est espérée avant la fin de l'année, sans garantie à ce stade. Le sujet devrait s'inviter au prochain conseil communautaire.",
             },
           ],
         },
@@ -1728,8 +1625,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le taux de chômage du bassin d'emploi du Val d'Arche est repassé sous la barre des 9 % au deuxième trimestre, selon les chiffres publiés jeudi par l'observatoire régional de l'emploi. Il s'établit à 8,7 %, en léger recul sur un an.",
+              text: "Le taux de chômage du bassin d'emploi du Val d'Arche est repassé sous la barre des 9 % au deuxième trimestre, selon les chiffres publiés jeudi par l'observatoire régional de l'emploi. Il s'établit à 8,7 %, en léger recul sur un an.",
             },
           ],
         },
@@ -1738,8 +1634,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Cette amélioration est portée par les services à la personne et la construction, tandis que l'industrie continue de perdre des postes. Les acteurs locaux se félicitent de la tendance, tout en restant prudents : les annonces récentes dans la métallurgie pourraient peser sur les prochains relevés.",
+              text: "Cette amélioration est portée par les services à la personne et la construction, tandis que l'industrie continue de perdre des postes. Les acteurs locaux se félicitent de la tendance, tout en restant prudents : les annonces récentes dans la métallurgie pourraient peser sur les prochains relevés.",
             },
           ],
         },
@@ -1764,8 +1659,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une monnaie locale a été lancée lundi à Sainte-Coline. Baptisée « l'arche », elle est pour l'instant acceptée par une quarantaine de commerçants et artisans du centre-ville, qui affichent un autocollant à leur vitrine.",
+              text: "Une monnaie locale a été lancée lundi à Sainte-Coline. Baptisée « l'arche », elle est pour l'instant acceptée par une quarantaine de commerçants et artisans du centre-ville, qui affichent un autocollant à leur vitrine.",
             },
           ],
         },
@@ -1774,8 +1668,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le principe est simple : un euro échangé donne une unité de la monnaie locale, utilisable uniquement chez les adhérents. L'objectif, selon l'association qui la porte, est de maintenir la richesse sur le territoire et d'encourager les circuits courts.",
+              text: "Le principe est simple : un euro échangé donne une unité de la monnaie locale, utilisable uniquement chez les adhérents. L'objectif, selon l'association qui la porte, est de maintenir la richesse sur le territoire et d'encourager les circuits courts.",
             },
           ],
         },
@@ -1784,8 +1677,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une centaine d'habitants se sont déjà procuré des coupures lors du lancement. L'association vise deux cents commerces partenaires d'ici un an.",
+              text: "Une centaine d'habitants se sont déjà procuré des coupures lors du lancement. L'association vise deux cents commerces partenaires d'ici un an.",
             },
           ],
         },
@@ -1810,8 +1702,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une grève d'avertissement a été suivie jeudi matin dans deux entrepôts logistiques du Val d'Arche. Selon les organisateurs, près de la moitié des salariés de l'équipe du matin ont débrayé pendant deux heures.",
+              text: "Une grève d'avertissement a été suivie jeudi matin dans deux entrepôts logistiques du Val d'Arche. Selon les organisateurs, près de la moitié des salariés de l'équipe du matin ont débrayé pendant deux heures.",
             },
           ],
         },
@@ -1820,8 +1711,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les représentants du personnel réclament une hausse générale des salaires pour compenser l'inflation, ainsi qu'une révision des primes de nuit. Ils dénoncent des cadences en augmentation constante.",
+              text: "Les représentants du personnel réclament une hausse générale des salaires pour compenser l'inflation, ainsi qu'une révision des primes de nuit. Ils dénoncent des cadences en augmentation constante.",
             },
           ],
         },
@@ -1830,8 +1720,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La direction, de son côté, dit comprendre « le besoin de reconnaissance » des équipes et s'est engagée à ouvrir des négociations dès la semaine prochaine. Les syndicats préviennent qu'un mouvement plus dur n'est pas exclu si les discussions n'aboutissent pas.",
+              text: "La direction, de son côté, dit comprendre « le besoin de reconnaissance » des équipes et s'est engagée à ouvrir des négociations dès la semaine prochaine. Les syndicats préviennent qu'un mouvement plus dur n'est pas exclu si les discussions n'aboutissent pas.",
             },
           ],
         },
@@ -1864,8 +1753,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le constat est tombé lundi matin, à la lecture des relevés hebdomadaires : la nappe qui alimente Val-Mareuil et onze communes voisines a perdu près d'un tiers de son volume habituel depuis le printemps.",
+              text: "Le constat est tombé lundi matin, à la lecture des relevés hebdomadaires : la nappe qui alimente Val-Mareuil et onze communes voisines a perdu près d'un tiers de son volume habituel depuis le printemps.",
             },
           ],
         },
@@ -1878,16 +1766,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les hydrogéologues de la régie des eaux parlent d'un étiage « historique pour la saison ». La retenue de la Sonne, qui sert d'appoint pendant l'été, affiche un niveau que l'on n'observe d'ordinaire qu'en fin d'automne. ",
+              text: "Les hydrogéologues de la régie des eaux parlent d'un étiage « historique pour la saison ». La retenue de la Sonne, qui sert d'appoint pendant l'été, affiche un niveau que l'on n'observe d'ordinaire qu'en fin d'automne. ",
             },
             {
               type: 'emphasis',
-              value: 'Rien',
+              text: 'Rien',
             },
             {
               type: 'text',
-              value: ', dans les relevés des vingt dernières années, ne ressemble à cet automne précoce.',
+              text: ', dans les relevés des vingt dernières années, ne ressemble à cet automne précoce.',
             },
           ],
         },
@@ -1896,8 +1783,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Nous préférons agir maintenant, tant que la situation reste gérable, plutôt que de subir des coupures cet hiver.',
+              text: 'Nous préférons agir maintenant, tant que la situation reste gérable, plutôt que de subir des coupures cet hiver.',
             },
           ],
           source: 'La directrice de la régie des eaux de Val-Mareuil',
@@ -1907,8 +1793,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La régie a donc pris un arrêté de restriction. L'arrosage des jardins, le lavage des voitures et le remplissage des piscines privées sont interdits jusqu'au 31 octobre. La pression sera abaissée la nuit sur l'ensemble du réseau, ce qui pourrait provoquer de légères baisses de débit dans les étages élevés.",
+              text: "La régie a donc pris un arrêté de restriction. L'arrosage des jardins, le lavage des voitures et le remplissage des piscines privées sont interdits jusqu'au 31 octobre. La pression sera abaissée la nuit sur l'ensemble du réseau, ce qui pourrait provoquer de légères baisses de débit dans les étages élevés.",
             },
           ],
         },
@@ -1921,8 +1806,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Dans les exploitations maraîchères de la vallée, la mesure passe mal. La coopérative Champs d'avenir redoute des pertes sur les cultures d'arrière-saison, déjà fragilisées par un été sans pluie.",
+              text: "Dans les exploitations maraîchères de la vallée, la mesure passe mal. La coopérative Champs d'avenir redoute des pertes sur les cultures d'arrière-saison, déjà fragilisées par un été sans pluie.",
             },
           ],
         },
@@ -1931,7 +1815,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Selon les projections publiées sur ',
+              text: 'Selon les projections publiées sur ',
             },
             {
               type: 'link',
@@ -1943,8 +1827,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value:
-                ", un retour à la normale n'est pas attendu avant les pluies de décembre. Les foyers sont invités à signaler la moindre fuite, qui peut représenter, à l'échelle d'une commune, plusieurs milliers de litres perdus chaque jour.",
+              text: ", un retour à la normale n'est pas attendu avant les pluies de décembre. Les foyers sont invités à signaler la moindre fuite, qui peut représenter, à l'échelle d'une commune, plusieurs milliers de litres perdus chaque jour.",
             },
           ],
         },
@@ -1962,7 +1845,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'La sécheresse rappelle la fragilité de tout le bassin. Notre ',
+              text: 'La sécheresse rappelle la fragilité de tout le bassin. Notre ',
             },
             {
               type: 'link',
@@ -1974,8 +1857,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value:
-                " montrait comment ces zones humides jouent un rôle d'éponge naturelle, précieux quand la nappe faiblit.",
+              text: " montrait comment ces zones humides jouent un rôle d'éponge naturelle, précieux quand la nappe faiblit.",
             },
           ],
         },
@@ -1984,8 +1866,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le syndicat mixte du bassin de la Sonne promet un point d'étape à la mi-octobre. D'ici là, chaque geste compte, rappelle la régie, qui mise autant sur la pédagogie que sur la contrainte. Des relevés seront publiés chaque semaine, afin que chacun puisse suivre l'évolution de la nappe presque en temps réel.",
+              text: "Le syndicat mixte du bassin de la Sonne promet un point d'étape à la mi-octobre. D'ici là, chaque geste compte, rappelle la régie, qui mise autant sur la pédagogie que sur la contrainte. Des relevés seront publiés chaque semaine, afin que chacun puisse suivre l'évolution de la nappe presque en temps réel.",
             },
           ],
         },
@@ -2040,8 +1921,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le dossier dormait depuis deux ans. Énergies du Plateau, société d'économie mixte détenue par plusieurs communes, veut le rouvrir : un parc solaire de grande ampleur sur les anciennes carrières de Montbrel, à l'abandon depuis la fermeture de l'exploitation de pierre.",
+              text: "Le dossier dormait depuis deux ans. Énergies du Plateau, société d'économie mixte détenue par plusieurs communes, veut le rouvrir : un parc solaire de grande ampleur sur les anciennes carrières de Montbrel, à l'abandon depuis la fermeture de l'exploitation de pierre.",
             },
           ],
         },
@@ -2054,17 +1934,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les promoteurs du projet y voient un atout. Plutôt que d'entamer des terres agricoles ou forestières, le parc s'installerait sur un sol déjà retourné, aujourd'hui colonisé par les ronces. ",
+              text: "Les promoteurs du projet y voient un atout. Plutôt que d'entamer des terres agricoles ou forestières, le parc s'installerait sur un sol déjà retourné, aujourd'hui colonisé par les ronces. ",
             },
             {
               type: 'emphasis',
-              value: "L'argument",
+              text: "L'argument",
             },
             {
               type: 'text',
-              value:
-                " séduit une partie des habitants, sensibles à l'idée de ne pas grignoter davantage d'espaces naturels.",
+              text: " séduit une partie des habitants, sensibles à l'idée de ne pas grignoter davantage d'espaces naturels.",
             },
           ],
         },
@@ -2073,8 +1951,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La société promet une production suffisante pour alimenter l'équivalent de six mille foyers, et une redevance annuelle versée aux communes propriétaires. Le détail technique est consultable sur ",
+              text: "La société promet une production suffisante pour alimenter l'équivalent de six mille foyers, et une redevance annuelle versée aux communes propriétaires. Le détail technique est consultable sur ",
             },
             {
               type: 'link',
@@ -2086,7 +1963,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -2099,8 +1976,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Tous ne partagent pas cet enthousiasme. Le collectif Rives vivantes redoute que les pistes d'accès et les clôtures ne coupent plusieurs sentiers fréquentés le week-end. Ses membres réclament un tracé revu et le maintien des passages historiques.",
+              text: "Tous ne partagent pas cet enthousiasme. Le collectif Rives vivantes redoute que les pistes d'accès et les clôtures ne coupent plusieurs sentiers fréquentés le week-end. Ses membres réclament un tracé revu et le maintien des passages historiques.",
             },
           ],
         },
@@ -2109,8 +1985,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La question de l'eau se pose aussi : le lavage des panneaux, même occasionnel, interroge en période de restrictions, comme celles décrétées cette semaine dans la vallée voisine.",
+              text: "La question de l'eau se pose aussi : le lavage des panneaux, même occasionnel, interroge en période de restrictions, comme celles décrétées cette semaine dans la vallée voisine.",
             },
           ],
         },
@@ -2123,8 +1998,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'enquête publique s'ouvrira en novembre. D'ici là, Énergies du Plateau organise trois réunions dans les communes concernées. Le porte-parole du collectif, lui, appelle à « ne pas opposer le climat et le cadre de vie ».",
+              text: "L'enquête publique s'ouvrira en novembre. D'ici là, Énergies du Plateau organise trois réunions dans les communes concernées. Le porte-parole du collectif, lui, appelle à « ne pas opposer le climat et le cadre de vie ».",
             },
           ],
         },
@@ -2133,8 +2007,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les élus, eux, avancent prudemment. Beaucoup soutiennent le principe d'une production locale d'électricité, mais redoutent un vote qui diviserait durablement les villages. Plusieurs réclament déjà une étude indépendante sur l'impact paysager et sur les retombées réelles pour les finances communales, avant le moindre engagement. D'autres suggèrent de réduire la surface du parc pour préserver les points de vue les plus prisés des promeneurs du dimanche.",
+              text: "Les élus, eux, avancent prudemment. Beaucoup soutiennent le principe d'une production locale d'électricité, mais redoutent un vote qui diviserait durablement les villages. Plusieurs réclament déjà une étude indépendante sur l'impact paysager et sur les retombées réelles pour les finances communales, avant le moindre engagement. D'autres suggèrent de réduire la surface du parc pour préserver les points de vue les plus prisés des promeneurs du dimanche.",
             },
           ],
         },
@@ -2143,8 +2016,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le sujet dépasse le seul plateau. Il rejoint le débat plus large sur les usages des sols, que nous abordions dans ',
+              text: 'Le sujet dépasse le seul plateau. Il rejoint le débat plus large sur les usages des sols, que nous abordions dans ',
             },
             {
               type: 'link',
@@ -2156,7 +2028,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ' et ses haies.',
+              text: ' et ses haies.',
             },
           ],
         },
@@ -2211,8 +2083,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Deux ans après la fin des travaux, les marais de Grand-Rieu se laissent enfin regarder. Là où s'étendait une prairie drainée, l'eau a repris ses droits, et avec elle une vie discrète mais tenace.",
+              text: "Deux ans après la fin des travaux, les marais de Grand-Rieu se laissent enfin regarder. Là où s'étendait une prairie drainée, l'eau a repris ses droits, et avec elle une vie discrète mais tenace.",
             },
           ],
         },
@@ -2225,16 +2096,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les naturalistes du conservatoire des espaces naturels des Trois-Vallées ont recensé ce printemps plusieurs couples d'oiseaux d'eau qui avaient déserté le site depuis des décennies. ",
+              text: "Les naturalistes du conservatoire des espaces naturels des Trois-Vallées ont recensé ce printemps plusieurs couples d'oiseaux d'eau qui avaient déserté le site depuis des décennies. ",
             },
             {
               type: 'emphasis',
-              value: 'Une surprise',
+              text: 'Une surprise',
             },
             {
               type: 'text',
-              value: ', même pour les plus optimistes.',
+              text: ', même pour les plus optimistes.',
             },
           ],
         },
@@ -2243,8 +2113,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "On n'imaginait pas un retour aussi rapide. La nature va plus vite que nos calendriers quand on lui rend de la place.",
+              text: "On n'imaginait pas un retour aussi rapide. La nature va plus vite que nos calendriers quand on lui rend de la place.",
             },
           ],
           source: 'Un chargé de mission du conservatoire des Trois-Vallées',
@@ -2254,8 +2123,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le chantier avait pourtant mauvaise presse. Reboucher des fossés, casser des drains, laisser monter l'eau : les riverains y voyaient un gâchis, voire un risque d'inondation pour les parcelles voisines.",
+              text: "Le chantier avait pourtant mauvaise presse. Reboucher des fossés, casser des drains, laisser monter l'eau : les riverains y voyaient un gâchis, voire un risque d'inondation pour les parcelles voisines.",
             },
           ],
         },
@@ -2264,8 +2132,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les chiffres, encore provisoires, encouragent l'équipe. Le nombre d'espèces d'oiseaux recensées a doublé en deux ans, et des libellules devenues rares ailleurs ont refait leur apparition au bord des mares. Les naturalistes restent toutefois mesurés : une seule bonne saison ne fait pas une tendance, rappellent-ils, et il faudra plusieurs printemps de suivi patient pour confirmer ce réveil discret de la vie sauvage. Ils invitent d'ailleurs les habitants à signaler leurs observations, afin d'étoffer un inventaire encore lacunaire.",
+              text: "Les chiffres, encore provisoires, encouragent l'équipe. Le nombre d'espèces d'oiseaux recensées a doublé en deux ans, et des libellules devenues rares ailleurs ont refait leur apparition au bord des mares. Les naturalistes restent toutefois mesurés : une seule bonne saison ne fait pas une tendance, rappellent-ils, et il faudra plusieurs printemps de suivi patient pour confirmer ce réveil discret de la vie sauvage. Ils invitent d'ailleurs les habitants à signaler leurs observations, afin d'étoffer un inventaire encore lacunaire.",
             },
           ],
         },
@@ -2278,8 +2145,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Deux étés secs ont changé le regard. En stockant l'eau des pluies d'hiver, la zone humide agit comme une éponge et soutient le débit de la Sonne quand la nappe faiblit — un rôle devenu précieux alors que la vallée vit sous restrictions.",
+              text: "Deux étés secs ont changé le regard. En stockant l'eau des pluies d'hiver, la zone humide agit comme une éponge et soutient le débit de la Sonne quand la nappe faiblit — un rôle devenu précieux alors que la vallée vit sous restrictions.",
             },
           ],
         },
@@ -2293,8 +2159,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le conservatoire veut désormais ouvrir un sentier pédagogique, en s'appuyant sur l'observatoire déjà installé au bord des vasières. Les scolaires seront les premiers invités, dès le printemps prochain.",
+              text: "Le conservatoire veut désormais ouvrir un sentier pédagogique, en s'appuyant sur l'observatoire déjà installé au bord des vasières. Les scolaires seront les premiers invités, dès le printemps prochain.",
             },
           ],
         },
@@ -2307,8 +2172,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Fort de ce résultat, le syndicat mixte du bassin de la Sonne étudie deux autres sites. Rien n'est décidé : chaque renaturation suppose des accords fonciers longs à nouer. Mais l'exemple de Grand-Rieu, longtemps cité comme un pari risqué, sert désormais d'argument aux défenseurs des zones humides.",
+              text: "Fort de ce résultat, le syndicat mixte du bassin de la Sonne étudie deux autres sites. Rien n'est décidé : chaque renaturation suppose des accords fonciers longs à nouer. Mais l'exemple de Grand-Rieu, longtemps cité comme un pari risqué, sert désormais d'argument aux défenseurs des zones humides.",
             },
           ],
         },
@@ -2363,8 +2227,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les relevés de l'été ont fait figure d'électrochoc. Dans le centre ancien de Villeneuve-sur-Arche, le thermomètre est resté au-dessus de vingt-cinq degrés plusieurs nuits d'affilée, quand les quartiers arborés respiraient déjà.",
+              text: "Les relevés de l'été ont fait figure d'électrochoc. Dans le centre ancien de Villeneuve-sur-Arche, le thermomètre est resté au-dessus de vingt-cinq degrés plusieurs nuits d'affilée, quand les quartiers arborés respiraient déjà.",
             },
           ],
         },
@@ -2377,8 +2240,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'association Canopée urbaine a passé l'été à mesurer. Capteurs sur les façades, relevés au sol, comptage des arbres rue par rue : le résultat tient sur une carte où le centre apparaît en rouge vif.",
+              text: "L'association Canopée urbaine a passé l'été à mesurer. Capteurs sur les façades, relevés au sol, comptage des arbres rue par rue : le résultat tient sur une carte où le centre apparaît en rouge vif.",
             },
           ],
         },
@@ -2387,17 +2249,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les rues les plus minérales, bordées de pierre et de bitume, emmagasinent la chaleur le jour et la restituent la nuit. ',
+              text: 'Les rues les plus minérales, bordées de pierre et de bitume, emmagasinent la chaleur le jour et la restituent la nuit. ',
             },
             {
               type: 'emphasis',
-              value: 'Îlot de chaleur',
+              text: 'Îlot de chaleur',
             },
             {
               type: 'text',
-              value:
-                " : l'expression, longtemps réservée aux grandes métropoles, s'invite désormais dans les villes moyennes.",
+              text: " : l'expression, longtemps réservée aux grandes métropoles, s'invite désormais dans les villes moyennes.",
             },
           ],
         },
@@ -2410,8 +2270,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La mairie a repris ce travail à son compte. Le plan prévoit deux mille plantations en trois ans, en priorité dans les quartiers identifiés comme les plus exposés. Places de stationnement transformées en fosses, cours d'école débitumées, alignements le long des avenues : la palette est large.",
+              text: "La mairie a repris ce travail à son compte. Le plan prévoit deux mille plantations en trois ans, en priorité dans les quartiers identifiés comme les plus exposés. Places de stationnement transformées en fosses, cours d'école débitumées, alignements le long des avenues : la palette est large.",
             },
           ],
         },
@@ -2425,8 +2284,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le choix des essences ne doit rien au hasard. On privilégiera des arbres sobres en eau, capables de résister aux étés secs, plutôt que des espèces gourmandes qui souffriraient dès la première canicule.',
+              text: 'Le choix des essences ne doit rien au hasard. On privilégiera des arbres sobres en eau, capables de résister aux étés secs, plutôt que des espèces gourmandes qui souffriraient dès la première canicule.',
             },
           ],
         },
@@ -2435,8 +2293,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le financement, lui, s'annonce serré. La ville table sur un étalement des dépenses et sur des aides régionales encore incertaines. Elle compte aussi sur les habitants pour arroser les jeunes arbres durant les premiers étés, un geste modeste mais décisif pour la reprise. Des chantiers participatifs seront organisés dès l'automne, quartier par quartier, afin d'associer riverains, écoles et commerçants aux plantations. La municipalité y voit une façon de faire adopter les arbres par ceux qui vivront à leur ombre.",
+              text: "Le financement, lui, s'annonce serré. La ville table sur un étalement des dépenses et sur des aides régionales encore incertaines. Elle compte aussi sur les habitants pour arroser les jeunes arbres durant les premiers étés, un geste modeste mais décisif pour la reprise. Des chantiers participatifs seront organisés dès l'automne, quartier par quartier, afin d'associer riverains, écoles et commerçants aux plantations. La municipalité y voit une façon de faire adopter les arbres par ceux qui vivront à leur ombre.",
             },
           ],
         },
@@ -2449,8 +2306,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste la patience. Un arbre planté aujourd'hui n'ombragera vraiment la rue que dans dix ou quinze ans. La ville promet d'associer les habitants au choix des emplacements, quartier par quartier, pour éviter les plantations mal vécues.",
+              text: "Reste la patience. Un arbre planté aujourd'hui n'ombragera vraiment la rue que dans dix ou quinze ans. La ville promet d'associer les habitants au choix des emplacements, quartier par quartier, pour éviter les plantations mal vécues.",
             },
           ],
         },
@@ -2459,8 +2315,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Canopée urbaine, elle, veut surtout que la carte de la chaleur soit mise à jour chaque année, histoire de vérifier, chiffres à l'appui, que le rouge finit par reculer.",
+              text: "Canopée urbaine, elle, veut surtout que la carte de la chaleur soit mise à jour chaque année, histoire de vérifier, chiffres à l'appui, que le rouge finit par reculer.",
             },
           ],
         },
@@ -2493,8 +2348,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Il faut parfois revenir en arrière pour avancer. Sur le plateau, la coopérative Champs d'avenir replante ce que des décennies de remembrement avaient effacé : des haies, des talus, des bandes fleuries en bordure de champs.",
+              text: "Il faut parfois revenir en arrière pour avancer. Sur le plateau, la coopérative Champs d'avenir replante ce que des décennies de remembrement avaient effacé : des haies, des talus, des bandes fleuries en bordure de champs.",
             },
           ],
         },
@@ -2507,26 +2361,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'idée n'a rien de nostalgique. Ces bandes végétales abritent coccinelles, syrphes et autres insectes auxiliaires qui se nourrissent des ravageurs. ",
+              text: "L'idée n'a rien de nostalgique. Ces bandes végétales abritent coccinelles, syrphes et autres insectes auxiliaires qui se nourrissent des ravageurs. ",
             },
             {
               type: 'emphasis',
-              value: 'Moins de pucerons',
+              text: 'Moins de pucerons',
             },
             {
               type: 'text',
-              value: ", donc moins de traitements : le calcul est simple, la mise en œuvre l'est moins.",
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          spans: [
-            {
-              type: 'text',
-              value:
-                "Une trentaine de maraîchers se sont engagés. Chacun consacre une part de sa surface à ces aménagements, avec l'appui technique de la coopérative et un suivi des rendements, parcelle par parcelle.",
+              text: ", donc moins de traitements : le calcul est simple, la mise en œuvre l'est moins.",
             },
           ],
         },
@@ -2535,8 +2378,16 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les bénéfices ne se limitent pas aux insectes. Les haies coupent le vent, retiennent la terre sur les pentes et offrent un peu d'ombre au bétail des fermes voisines. Certains maraîchers y voient même un atout commercial, à l'heure où une partie des clients réclame des produits cultivés avec moins de traitements. La coopérative, prudente, préfère toutefois attendre des données solides avant de transformer l'argument en promesse. Elle rappelle qu'une haie mal placée peut aussi faire de l'ombre aux cultures ou compliquer le passage des engins.",
+              text: "Une trentaine de maraîchers se sont engagés. Chacun consacre une part de sa surface à ces aménagements, avec l'appui technique de la coopérative et un suivi des rendements, parcelle par parcelle.",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          spans: [
+            {
+              type: 'text',
+              text: "Les bénéfices ne se limitent pas aux insectes. Les haies coupent le vent, retiennent la terre sur les pentes et offrent un peu d'ombre au bétail des fermes voisines. Certains maraîchers y voient même un atout commercial, à l'heure où une partie des clients réclame des produits cultivés avec moins de traitements. La coopérative, prudente, préfère toutefois attendre des données solides avant de transformer l'argument en promesse. Elle rappelle qu'une haie mal placée peut aussi faire de l'ombre aux cultures ou compliquer le passage des engins.",
             },
           ],
         },
@@ -2549,8 +2400,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Car les producteurs veulent des preuves. Des pièges à insectes, un comptage régulier et un carnet partagé doivent dire, d'ici deux ou trois saisons, si les haies tiennent leurs promesses.",
+              text: "Car les producteurs veulent des preuves. Des pièges à insectes, un comptage régulier et un carnet partagé doivent dire, d'ici deux ou trois saisons, si les haies tiennent leurs promesses.",
             },
           ],
         },
@@ -2559,8 +2409,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les premiers retours restent prudents. Sur certaines parcelles, les traitements ont déjà baissé d'un cran ; sur d'autres, l'effet se fait attendre. La coopérative assume ce tâtonnement, préférant les chiffres aux slogans.",
+              text: "Les premiers retours restent prudents. Sur certaines parcelles, les traitements ont déjà baissé d'un cran ; sur d'autres, l'effet se fait attendre. La coopérative assume ce tâtonnement, préférant les chiffres aux slogans.",
             },
           ],
         },
@@ -2573,8 +2422,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste la question du coût. Planter et entretenir une haie prend du temps et de la main-d'œuvre, sans revenu direct à la clé. Champs d'avenir plaide pour une aide des collectivités, à l'image de ce qui se discute autour du ",
+              text: "Reste la question du coût. Planter et entretenir une haie prend du temps et de la main-d'œuvre, sans revenu direct à la clé. Champs d'avenir plaide pour une aide des collectivités, à l'image de ce qui se discute autour du ",
             },
             {
               type: 'link',
@@ -2586,7 +2434,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ", autre bras de fer sur l'usage des sols.",
+              text: ", autre bras de fer sur l'usage des sols.",
             },
           ],
         },
@@ -2595,8 +2443,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'À terme, la coopérative espère faire école. Elle organisera cet hiver des visites de parcelles pour les exploitants voisins, curieux mais encore hésitants.',
+              text: 'À terme, la coopérative espère faire école. Elle organisera cet hiver des visites de parcelles pour les exploitants voisins, curieux mais encore hésitants.',
             },
           ],
         },
@@ -2629,8 +2476,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'ancienne gare de Saint-Prieux ne voyait plus passer de trains depuis longtemps. Elle accueille désormais un autre trafic : celui des grille-pain, des vélos et des chaises qui cherchent une seconde vie.",
+              text: "L'ancienne gare de Saint-Prieux ne voyait plus passer de trains depuis longtemps. Elle accueille désormais un autre trafic : celui des grille-pain, des vélos et des chaises qui cherchent une seconde vie.",
             },
           ],
         },
@@ -2643,16 +2489,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La recyclerie Le Second Souffle y a ouvert un atelier partagé. Le principe est simple : plutôt que de jeter un appareil en panne, on vient tenter de le réparer, seul ou accompagné d'un bénévole. ",
+              text: "La recyclerie Le Second Souffle y a ouvert un atelier partagé. Le principe est simple : plutôt que de jeter un appareil en panne, on vient tenter de le réparer, seul ou accompagné d'un bénévole. ",
             },
             {
               type: 'emphasis',
-              value: 'Gratuit',
+              text: 'Gratuit',
             },
             {
               type: 'text',
-              value: " pour l'adhésion de base, l'accès aux outils est ouvert plusieurs après-midi par semaine.",
+              text: " pour l'adhésion de base, l'accès aux outils est ouvert plusieurs après-midi par semaine.",
             },
           ],
         },
@@ -2661,8 +2506,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Derrière le geste, un constat. Une part importante des objets déposés en déchetterie fonctionnerait encore avec une pièce ou deux. La structure estime détourner ainsi plusieurs tonnes de déchets chaque année.',
+              text: 'Derrière le geste, un constat. Une part importante des objets déposés en déchetterie fonctionnerait encore avec une pièce ou deux. La structure estime détourner ainsi plusieurs tonnes de déchets chaque année.',
             },
           ],
         },
@@ -2675,8 +2519,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Au-delà de la réparation, l'atelier veut transmettre. Des sessions d'initiation apprennent à changer une résistance, recoudre un ourlet ou regonfler proprement un pneu. Les places partent vite.",
+              text: "Au-delà de la réparation, l'atelier veut transmettre. Des sessions d'initiation apprennent à changer une résistance, recoudre un ourlet ou regonfler proprement un pneu. Les places partent vite.",
             },
           ],
         },
@@ -2685,8 +2528,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les bénévoles, eux, y trouvent du lien autant qu'une cause. Retraités bricoleurs, étudiants, curieux de tous âges : l'atelier brasse un public que peu de lieux réunissent.",
+              text: "Les bénévoles, eux, y trouvent du lien autant qu'une cause. Retraités bricoleurs, étudiants, curieux de tous âges : l'atelier brasse un public que peu de lieux réunissent.",
             },
           ],
         },
@@ -2695,8 +2537,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'affluence dépasse déjà les prévisions. Certains après-midi, il faut patienter pour accéder à un établi, et les bénévoles peinent à répondre à toutes les demandes. La recyclerie cherche donc de nouveaux volontaires, en particulier des personnes à l'aise avec l'électronique, domaine où les pannes sont les plus fréquentes et les réparations les plus techniques.",
+              text: "L'affluence dépasse déjà les prévisions. Certains après-midi, il faut patienter pour accéder à un établi, et les bénévoles peinent à répondre à toutes les demandes. La recyclerie cherche donc de nouveaux volontaires, en particulier des personnes à l'aise avec l'électronique, domaine où les pannes sont les plus fréquentes et les réparations les plus techniques.",
             },
           ],
         },
@@ -2709,8 +2550,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le Second Souffle vit de peu : cotisations, ventes d'objets remis en état et un local prêté par la commune. L'équilibre reste précaire, mais la fréquentation grimpe de mois en mois.",
+              text: "Le Second Souffle vit de peu : cotisations, ventes d'objets remis en état et un local prêté par la commune. L'équilibre reste précaire, mais la fréquentation grimpe de mois en mois.",
             },
           ],
         },
@@ -2719,8 +2559,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La structure rêve déjà d'élargir ses horaires et de nouer des liens avec les écoles voisines. Une manière, dit-elle, de semer tôt l'idée qu'un objet cassé n'est pas forcément un objet perdu.",
+              text: "La structure rêve déjà d'élargir ses horaires et de nouer des liens avec les écoles voisines. Une manière, dit-elle, de semer tôt l'idée qu'un objet cassé n'est pas forcément un objet perdu.",
             },
           ],
         },
@@ -2729,8 +2568,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La commune, de son côté, observe l'expérience avec intérêt. Elle y voit un moyen de réduire le volume de déchets à traiter, et donc son coût, tout en créant du lien dans un quartier longtemps assoupi depuis l'arrêt de la ligne. Un bail de trois ans a été signé pour sécuriser l'occupation des lieux.",
+              text: "La commune, de son côté, observe l'expérience avec intérêt. Elle y voit un moyen de réduire le volume de déchets à traiter, et donc son coût, tout en créant du lien dans un quartier longtemps assoupi depuis l'arrêt de la ligne. Un bail de trois ans a été signé pour sécuriser l'occupation des lieux.",
             },
           ],
         },
@@ -2756,8 +2594,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La préfecture a déclenché mercredi soir la procédure d'alerte à l'ozone sur l'agglomération de Val-Mareuil, après trois jours de fortes chaleurs et d'air stagnant. Le seuil réglementaire a été dépassé à deux stations de mesure.",
+              text: "La préfecture a déclenché mercredi soir la procédure d'alerte à l'ozone sur l'agglomération de Val-Mareuil, après trois jours de fortes chaleurs et d'air stagnant. Le seuil réglementaire a été dépassé à deux stations de mesure.",
             },
           ],
         },
@@ -2766,8 +2603,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'À partir de jeudi matin, la circulation différenciée entre en vigueur : seuls les véhicules les moins polluants pourront circuler dans le centre, et la vitesse sera abaissée de vingt kilomètres-heure sur les principaux axes.',
+              text: 'À partir de jeudi matin, la circulation différenciée entre en vigueur : seuls les véhicules les moins polluants pourront circuler dans le centre, et la vitesse sera abaissée de vingt kilomètres-heure sur les principaux axes.',
             },
           ],
         },
@@ -2776,8 +2612,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les autorités sanitaires recommandent aux personnes fragiles, aux enfants et aux personnes âgées de limiter les efforts physiques en plein air jusqu'à la fin de l'épisode. Un retour à la normale est espéré en fin de semaine, avec l'arrivée annoncée d'un air plus frais et d'un léger vent.",
+              text: "Les autorités sanitaires recommandent aux personnes fragiles, aux enfants et aux personnes âgées de limiter les efforts physiques en plein air jusqu'à la fin de l'épisode. Un retour à la normale est espéré en fin de semaine, avec l'arrivée annoncée d'un air plus frais et d'un léger vent.",
             },
           ],
         },
@@ -2802,8 +2637,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Près de trois cents bénévoles ont répondu dimanche à l'appel du collectif Rives vivantes pour nettoyer les berges de la Sonne, entre le pont de Montbrel et l'écluse de Saint-Prieux.",
+              text: "Près de trois cents bénévoles ont répondu dimanche à l'appel du collectif Rives vivantes pour nettoyer les berges de la Sonne, entre le pont de Montbrel et l'écluse de Saint-Prieux.",
             },
           ],
         },
@@ -2812,8 +2646,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En une matinée, plus de deux tonnes de déchets ont été extraites du lit et des rives : plastiques, ferraille, pneus et même un vieux vélo. Le tri a été assuré sur place, en lien avec le service de collecte de l'agglomération.",
+              text: "En une matinée, plus de deux tonnes de déchets ont été extraites du lit et des rives : plastiques, ferraille, pneus et même un vieux vélo. Le tri a été assuré sur place, en lien avec le service de collecte de l'agglomération.",
             },
           ],
         },
@@ -2822,8 +2655,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le collectif, qui organise cette opération chaque automne, se félicite d'une participation en hausse, portée cette année par de nombreuses familles. Il annonce déjà une deuxième journée au printemps, cette fois en amont de la rivière.",
+              text: "Le collectif, qui organise cette opération chaque automne, se félicite d'une participation en hausse, portée cette année par de nombreuses familles. Il annonce déjà une deuxième journée au printemps, cette fois en amont de la rivière.",
             },
           ],
         },
@@ -2848,8 +2680,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La mairie de Villeneuve-sur-Arche a voté lundi soir la création d'une aide locale pour l'installation de panneaux solaires en toiture chez les particuliers. La prime, complémentaire des dispositifs existants, vise en priorité les foyers modestes.",
+              text: "La mairie de Villeneuve-sur-Arche a voté lundi soir la création d'une aide locale pour l'installation de panneaux solaires en toiture chez les particuliers. La prime, complémentaire des dispositifs existants, vise en priorité les foyers modestes.",
             },
           ],
         },
@@ -2858,8 +2689,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Son montant dépendra des revenus du ménage et de la puissance installée, dans la limite d'une enveloppe annuelle fixée par le conseil municipal. Les demandes se feront en ligne, à partir du mois d'octobre.",
+              text: "Son montant dépendra des revenus du ménage et de la puissance installée, dans la limite d'une enveloppe annuelle fixée par le conseil municipal. Les demandes se feront en ligne, à partir du mois d'octobre.",
             },
           ],
         },
@@ -2868,8 +2698,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La commune espère accompagner une centaine d'installations dès la première année. Elle y voit un double bénéfice : alléger la facture des habitants et réduire, à son échelle, les émissions liées au chauffage et à l'électricité.",
+              text: "La commune espère accompagner une centaine d'installations dès la première année. Elle y voit un double bénéfice : alléger la facture des habitants et réduire, à son échelle, les émissions liées au chauffage et à l'électricité.",
             },
           ],
         },
@@ -2902,8 +2731,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est un secteur presque invisible et pourtant essentiel. Une étude publiée mardi par l'observatoire local de l'égalité met des chiffres sur une réalité longtemps restée dans l'ombre : dans les métiers de l'aide à domicile, les femmes perçoivent en moyenne un quart de moins que ce que laisserait attendre leur qualification.",
+              text: "C'est un secteur presque invisible et pourtant essentiel. Une étude publiée mardi par l'observatoire local de l'égalité met des chiffres sur une réalité longtemps restée dans l'ombre : dans les métiers de l'aide à domicile, les femmes perçoivent en moyenne un quart de moins que ce que laisserait attendre leur qualification.",
             },
           ],
         },
@@ -2916,16 +2744,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "L'étude, menée sur près de deux mille fiches de paie, pointe d'abord le temps partiel. ",
+              text: "L'étude, menée sur près de deux mille fiches de paie, pointe d'abord le temps partiel. ",
             },
             {
               type: 'emphasis',
-              value: 'Subi',
+              text: 'Subi',
             },
             {
               type: 'text',
-              value:
-                ' dans huit cas sur dix, il découpe les journées en interventions courtes, entrecoupées de trajets non rémunérés.',
+              text: ' dans huit cas sur dix, il découpe les journées en interventions courtes, entrecoupées de trajets non rémunérés.',
             },
           ],
         },
@@ -2939,8 +2766,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On me paie une heure chez l'une, une heure chez l'autre, mais pas la demi-heure de bus entre les deux », témoigne une professionnelle interrogée dans l'enquête. Cumulés, ces temps morts représenteraient l'équivalent d'une journée de travail par semaine, jamais rétribuée.",
+              text: "« On me paie une heure chez l'une, une heure chez l'autre, mais pas la demi-heure de bus entre les deux », témoigne une professionnelle interrogée dans l'enquête. Cumulés, ces temps morts représenteraient l'équivalent d'une journée de travail par semaine, jamais rétribuée.",
             },
           ],
         },
@@ -2953,8 +2779,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le sous-emploi n'explique pas tout. À ancienneté égale, les rares postes d'encadrement du secteur échoient plus souvent aux hommes, pourtant très minoritaires parmi les effectifs. Les autrices y voient un plafond de verre d'autant plus injuste qu'il concerne une profession féminine à plus de 95 %.",
+              text: "Le sous-emploi n'explique pas tout. À ancienneté égale, les rares postes d'encadrement du secteur échoient plus souvent aux hommes, pourtant très minoritaires parmi les effectifs. Les autrices y voient un plafond de verre d'autant plus injuste qu'il concerne une profession féminine à plus de 95 %.",
             },
           ],
         },
@@ -2967,8 +2792,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'étude avance plusieurs leviers : mensualiser les contrats, regrouper les interventions par quartier, et surtout reconnaître les temps de déplacement. Elle chiffre le surcoût à environ six millions d'euros par an pour l'ensemble du bassin d'emploi.",
+              text: "L'étude avance plusieurs leviers : mensualiser les contrats, regrouper les interventions par quartier, et surtout reconnaître les temps de déplacement. Elle chiffre le surcoût à environ six millions d'euros par an pour l'ensemble du bassin d'emploi.",
             },
           ],
         },
@@ -2977,8 +2801,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le collectif Toutes debout, qui a soutenu l'enquête, demande une table ronde avec les employeurs et les collectivités. « Ces femmes tiennent à bout de bras le maintien à domicile de nos aînés ; il est temps de les payer en conséquence », plaide sa porte-parole, Djamila Ferran.",
+              text: "Le collectif Toutes debout, qui a soutenu l'enquête, demande une table ronde avec les employeurs et les collectivités. « Ces femmes tiennent à bout de bras le maintien à domicile de nos aînés ; il est temps de les payer en conséquence », plaide sa porte-parole, Djamila Ferran.",
             },
           ],
         },
@@ -2987,8 +2810,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste à convaincre les financeurs. Les structures du secteur, souvent associatives, rappellent qu'elles dépendent de tarifs fixés par le département, et qu'aucune revalorisation n'est possible sans un geste des pouvoirs publics. Une rencontre entre les employeurs, le département et les représentantes du personnel est évoquée pour l'automne, sans qu'aucune date n'ait encore été arrêtée.",
+              text: "Reste à convaincre les financeurs. Les structures du secteur, souvent associatives, rappellent qu'elles dépendent de tarifs fixés par le département, et qu'aucune revalorisation n'est possible sans un geste des pouvoirs publics. Une rencontre entre les employeurs, le département et les représentantes du personnel est évoquée pour l'automne, sans qu'aucune date n'ait encore été arrêtée.",
             },
           ],
         },
@@ -3021,8 +2843,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Elles s'appellent des « marraines ». Depuis deux ans, à Saint-Maur-des-Vignes, une centaine de femmes actives consacrent quelques heures par mois à en accompagner d'autres, plus éloignées de l'emploi. Le réseau Élan a présenté cette semaine un bilan qu'il juge prometteur.",
+              text: "Elles s'appellent des « marraines ». Depuis deux ans, à Saint-Maur-des-Vignes, une centaine de femmes actives consacrent quelques heures par mois à en accompagner d'autres, plus éloignées de l'emploi. Le réseau Élan a présenté cette semaine un bilan qu'il juge prometteur.",
             },
           ],
         },
@@ -3035,8 +2856,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le principe est simple : chaque marraine suit une « filleule » pendant six mois. Au programme, préparation d'entretiens, relecture de CV, mais aussi, souvent, un travail plus discret sur la confiance en soi.",
+              text: "Le principe est simple : chaque marraine suit une « filleule » pendant six mois. Au programme, préparation d'entretiens, relecture de CV, mais aussi, souvent, un travail plus discret sur la confiance en soi.",
             },
           ],
         },
@@ -3045,7 +2865,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Beaucoup de ces femmes ont tout, sauf la certitude qu'elles en sont capables.",
+              text: "Beaucoup de ces femmes ont tout, sauf la certitude qu'elles en sont capables.",
             },
           ],
           source: 'La fondatrice du réseau Élan',
@@ -3055,12 +2875,11 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'emphasis',
-              value: 'Ce déclic',
+              text: 'Ce déclic',
             },
             {
               type: 'text',
-              value:
-                ', justement, fait la différence. Sur les cent vingt femmes accompagnées la première année, plus de la moitié ont retrouvé un emploi ou repris une formation, selon les chiffres du réseau.',
+              text: ', justement, fait la différence. Sur les cent vingt femmes accompagnées la première année, plus de la moitié ont retrouvé un emploi ou repris une formation, selon les chiffres du réseau.',
             },
           ],
         },
@@ -3073,8 +2892,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Au fil des rendez-vous, la relation déborde souvent le cadre de l'emploi. On y parle garde d'enfants, mobilité, parfois séparation. « Trouver un travail, c'est aussi régler tout ce qui, autour, empêchait d'en chercher un », résume une marraine.",
+              text: "Au fil des rendez-vous, la relation déborde souvent le cadre de l'emploi. On y parle garde d'enfants, mobilité, parfois séparation. « Trouver un travail, c'est aussi régler tout ce qui, autour, empêchait d'en chercher un », résume une marraine.",
             },
           ],
         },
@@ -3083,8 +2901,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Pour tenir dans la durée, le réseau mise sur la formation de ses bénévoles. Deux fois par an, des sessions leur apprennent à repérer les situations sensibles — surendettement, isolement, violences — et à orienter, le cas échéant, vers des structures spécialisées.',
+              text: 'Pour tenir dans la durée, le réseau mise sur la formation de ses bénévoles. Deux fois par an, des sessions leur apprennent à repérer les situations sensibles — surendettement, isolement, violences — et à orienter, le cas échéant, vers des structures spécialisées.',
             },
           ],
         },
@@ -3097,8 +2914,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Fort de ce succès, le réseau est sollicité par des communes voisines. Mais ses animatrices restent prudentes : « Nous ne voulons pas devenir une machine, prévient l'une d'elles. La force du dispositif, c'est le lien humain, pas le volume. »",
+              text: "Fort de ce succès, le réseau est sollicité par des communes voisines. Mais ses animatrices restent prudentes : « Nous ne voulons pas devenir une machine, prévient l'une d'elles. La force du dispositif, c'est le lien humain, pas le volume. »",
             },
           ],
         },
@@ -3107,8 +2923,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Faute de financements pérennes, Élan fonctionne encore largement grâce au bénévolat et à de petites subventions. Une demande de soutien plus structurel a été déposée auprès de l'intercommunalité, qui doit se prononcer avant la fin de l'année.",
+              text: "Faute de financements pérennes, Élan fonctionne encore largement grâce au bénévolat et à de petites subventions. Une demande de soutien plus structurel a été déposée auprès de l'intercommunalité, qui doit se prononcer avant la fin de l'année.",
             },
           ],
         },
@@ -3117,8 +2932,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Ses responsables aimeraient aussi salarier une coordinatrice à mi-temps, tant la gestion des binômes et le suivi des filleules réclament désormais un travail quotidien que le seul bénévolat peine à absorber. En attendant, ce sont deux retraitées qui s'en chargent, agenda partagé et téléphone à la main.",
+              text: "Ses responsables aimeraient aussi salarier une coordinatrice à mi-temps, tant la gestion des binômes et le suivi des filleules réclament désormais un travail quotidien que le seul bénévolat peine à absorber. En attendant, ce sont deux retraitées qui s'en chargent, agenda partagé et téléphone à la main.",
             },
           ],
         },
@@ -3151,8 +2965,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La parité dans les assemblées n'est pas la parité dans le pouvoir. C'est, en substance, le constat d'une étude publiée cette semaine sur la composition des exécutifs municipaux de la région.",
+              text: "La parité dans les assemblées n'est pas la parité dans le pouvoir. C'est, en substance, le constat d'une étude publiée cette semaine sur la composition des exécutifs municipaux de la région.",
             },
           ],
         },
@@ -3165,16 +2978,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sur le papier, les progrès sont réels. Grâce aux règles de constitution des listes, les conseils municipaux des communes de plus de mille habitants comptent désormais presque autant de femmes que d'hommes. ",
+              text: "Sur le papier, les progrès sont réels. Grâce aux règles de constitution des listes, les conseils municipaux des communes de plus de mille habitants comptent désormais presque autant de femmes que d'hommes. ",
             },
             {
               type: 'emphasis',
-              value: 'En apparence',
+              text: 'En apparence',
             },
             {
               type: 'text',
-              value: ", l'égalité serait acquise.",
+              text: ", l'égalité serait acquise.",
             },
           ],
         },
@@ -3187,8 +2999,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le tableau change dès que l'on regarde qui détient quoi. L'étude a passé au crible les délégations confiées aux adjoints. Résultat : les femmes héritent massivement des affaires scolaires, de la petite enfance et de la culture, tandis que les finances, l'urbanisme et la sécurité restent aux mains des hommes dans plus de sept communes sur dix.",
+              text: "Le tableau change dès que l'on regarde qui détient quoi. L'étude a passé au crible les délégations confiées aux adjoints. Résultat : les femmes héritent massivement des affaires scolaires, de la petite enfance et de la culture, tandis que les finances, l'urbanisme et la sécurité restent aux mains des hommes dans plus de sept communes sur dix.",
             },
           ],
         },
@@ -3197,8 +3008,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On veut bien de nous pour les crèches, moins pour le budget », résume une adjointe d'une commune de la vallée, citée dans l'enquête. Les autrices y voient le signe d'une répartition genrée des rôles, qui cantonne les élues aux domaines dits « du soin ».",
+              text: "« On veut bien de nous pour les crèches, moins pour le budget », résume une adjointe d'une commune de la vallée, citée dans l'enquête. Les autrices y voient le signe d'une répartition genrée des rôles, qui cantonne les élues aux domaines dits « du soin ».",
             },
           ],
         },
@@ -3211,8 +3021,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Comment l'expliquer ? L'étude écarte l'idée d'un manque de compétences et pointe plutôt le poids des habitudes : réunions tardives peu compatibles avec la vie de famille, entre-soi masculin dans les commissions techniques, autocensure entretenue par l'absence de modèles.",
+              text: "Comment l'expliquer ? L'étude écarte l'idée d'un manque de compétences et pointe plutôt le poids des habitudes : réunions tardives peu compatibles avec la vie de famille, entre-soi masculin dans les commissions techniques, autocensure entretenue par l'absence de modèles.",
             },
           ],
         },
@@ -3225,8 +3034,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les règles paritaires ayant montré leurs limites, l'étude plaide pour des engagements volontaires des maires sur la répartition des délégations. Elle suggère aussi de mieux former et accompagner les élues qui souhaitent investir les fonctions budgétaires ou d'aménagement. Quelques communes ont commencé à s'y essayer. Dans deux d'entre elles, une femme a récemment pris la délégation aux finances, une première locale saluée par les autrices comme la preuve qu'une autre répartition est possible.",
+              text: "Les règles paritaires ayant montré leurs limites, l'étude plaide pour des engagements volontaires des maires sur la répartition des délégations. Elle suggère aussi de mieux former et accompagner les élues qui souhaitent investir les fonctions budgétaires ou d'aménagement. Quelques communes ont commencé à s'y essayer. Dans deux d'entre elles, une femme a récemment pris la délégation aux finances, une première locale saluée par les autrices comme la preuve qu'une autre répartition est possible.",
             },
           ],
         },
@@ -3235,7 +3043,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Le sujet recoupe d'autres formes d'inégalités déjà documentées dans le monde du travail.",
+              text: "Le sujet recoupe d'autres formes d'inégalités déjà documentées dans le monde du travail.",
             },
           ],
         },
@@ -3291,8 +3099,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le problème n'est pas nouveau, mais il devient criant. À Courtebief, les footballeuses du club municipal en ont assez de jouer les seconds rôles. Elles ont adressé cette semaine une lettre à la mairie pour réclamer un accès équitable au stade principal.",
+              text: "Le problème n'est pas nouveau, mais il devient criant. À Courtebief, les footballeuses du club municipal en ont assez de jouer les seconds rôles. Elles ont adressé cette semaine une lettre à la mairie pour réclamer un accès équitable au stade principal.",
             },
           ],
         },
@@ -3305,16 +3112,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Aujourd'hui, les matchs des équipes masculines occupent l'essentiel des créneaux du soir et du week-end sur la pelouse d'honneur. Les féminines, elles, s'entraînent sur un terrain annexe, souvent tôt le matin, parfois sans éclairage. ",
+              text: "Aujourd'hui, les matchs des équipes masculines occupent l'essentiel des créneaux du soir et du week-end sur la pelouse d'honneur. Les féminines, elles, s'entraînent sur un terrain annexe, souvent tôt le matin, parfois sans éclairage. ",
             },
             {
               type: 'emphasis',
-              value: 'Chaque hiver',
+              text: 'Chaque hiver',
             },
             {
               type: 'text',
-              value: ', la boue transforme leurs séances en épreuve.',
+              text: ', la boue transforme leurs séances en épreuve.',
             },
           ],
         },
@@ -3323,8 +3129,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« On ne demande pas de faveur, seulement l'égalité », résume la capitaine de l'équipe première. En trois ans, la section féminine est passée de deux à cinq équipes, des poussines aux seniors, mais les infrastructures n'ont pas suivi.",
+              text: "« On ne demande pas de faveur, seulement l'égalité », résume la capitaine de l'équipe première. En trois ans, la section féminine est passée de deux à cinq équipes, des poussines aux seniors, mais les infrastructures n'ont pas suivi.",
             },
           ],
         },
@@ -3337,8 +3142,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Un collectif de parents s'est joint à la démarche. Il souligne que plusieurs adolescentes hésitent à s'inscrire, découragées par des horaires incompatibles avec leurs devoirs et les transports du soir. « À ce compte-là, on décourage une génération de joueuses », s'inquiète l'un d'eux.",
+              text: "Un collectif de parents s'est joint à la démarche. Il souligne que plusieurs adolescentes hésitent à s'inscrire, découragées par des horaires incompatibles avec leurs devoirs et les transports du soir. « À ce compte-là, on décourage une génération de joueuses », s'inquiète l'un d'eux.",
             },
           ],
         },
@@ -3347,8 +3151,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les dirigeantes rappellent que leur essor s'inscrit dans un mouvement plus large de féminisation des clubs, également porté par des dispositifs d'accompagnement vers l'autonomie, comme ",
+              text: "Les dirigeantes rappellent que leur essor s'inscrit dans un mouvement plus large de féminisation des clubs, également porté par des dispositifs d'accompagnement vers l'autonomie, comme ",
             },
             {
               type: 'link',
@@ -3360,7 +3163,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -3373,8 +3176,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Interrogée, la municipalité dit « comprendre la demande » tout en invoquant des contraintes d'entretien de la pelouse d'honneur, très sollicitée. Une réunion de conciliation est prévue à la fin du mois avec les dirigeants du club et les services des sports.",
+              text: "Interrogée, la municipalité dit « comprendre la demande » tout en invoquant des contraintes d'entretien de la pelouse d'honneur, très sollicitée. Une réunion de conciliation est prévue à la fin du mois avec les dirigeants du club et les services des sports.",
             },
           ],
         },
@@ -3383,8 +3185,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les joueuses, elles, veulent y croire. Elles rappellent qu'une commune voisine a récemment instauré un partage strictement égal des créneaux, sans dommage pour la qualité des terrains. Elles envisagent, si rien ne bouge, d'organiser un match symbolique un dimanche après-midi sur la pelouse d'honneur, pour rendre visible une inégalité qui, disent-elles, dure depuis trop longtemps.",
+              text: "Les joueuses, elles, veulent y croire. Elles rappellent qu'une commune voisine a récemment instauré un partage strictement égal des créneaux, sans dommage pour la qualité des terrains. Elles envisagent, si rien ne bouge, d'organiser un match symbolique un dimanche après-midi sur la pelouse d'honneur, pour rendre visible une inégalité qui, disent-elles, dure depuis trop longtemps.",
             },
           ],
         },
@@ -3393,8 +3194,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En attendant, elles continuent de s'entraîner à l'aube, dossards fluo sur le dos, bien décidées à ne rien lâcher.",
+              text: "En attendant, elles continuent de s'entraîner à l'aube, dossards fluo sur le dos, bien décidées à ne rien lâcher.",
             },
           ],
         },
@@ -3427,8 +3227,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est un camping-car un peu particulier qui s'installe, chaque semaine, sur les places de marché de la vallée. À l'intérieur, pas de souvenirs ni de fromages, mais deux écoutantes formées et une bouilloire toujours chaude. Le dispositif, baptisé La Halte, va à la rencontre des femmes isolées des zones rurales.",
+              text: "C'est un camping-car un peu particulier qui s'installe, chaque semaine, sur les places de marché de la vallée. À l'intérieur, pas de souvenirs ni de fromages, mais deux écoutantes formées et une bouilloire toujours chaude. Le dispositif, baptisé La Halte, va à la rencontre des femmes isolées des zones rurales.",
             },
           ],
         },
@@ -3441,8 +3240,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'idée est partie d'un constat. « Dans nos villages, beaucoup de femmes n'appellent jamais un numéro d'aide, par pudeur ou par habitude », explique la coordinatrice de l'association porteuse. Alors, plutôt que d'attendre, La Halte se déplace.",
+              text: "L'idée est partie d'un constat. « Dans nos villages, beaucoup de femmes n'appellent jamais un numéro d'aide, par pudeur ou par habitude », explique la coordinatrice de l'association porteuse. Alors, plutôt que d'attendre, La Halte se déplace.",
             },
           ],
         },
@@ -3451,12 +3249,11 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'emphasis',
-              value: 'Sans rendez-vous',
+              text: 'Sans rendez-vous',
             },
             {
               type: 'text',
-              value:
-                ', on y parle de tout : un mari malade, une retraite trop maigre, un voisinage pesant, parfois des violences. Les écoutantes orientent, expliquent les démarches, tendent la main vers les bons interlocuteurs.',
+              text: ', on y parle de tout : un mari malade, une retraite trop maigre, un voisinage pesant, parfois des violences. Les écoutantes orientent, expliquent les démarches, tendent la main vers les bons interlocuteurs.',
             },
           ],
         },
@@ -3469,8 +3266,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le camion ne prétend pas tout résoudre. Il s'appuie sur un annuaire de partenaires — services sociaux, permanences juridiques, associations spécialisées — dont les coordonnées sont aussi rassemblées sur ",
+              text: "Le camion ne prétend pas tout résoudre. Il s'appuie sur un annuaire de partenaires — services sociaux, permanences juridiques, associations spécialisées — dont les coordonnées sont aussi rassemblées sur ",
             },
             {
               type: 'link',
@@ -3482,7 +3278,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -3491,8 +3287,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En six mois, plus de trois cents femmes ont poussé la porte du véhicule. « Certaines reviennent juste pour un café et quelques mots ; c'est déjà beaucoup », glisse une bénévole. Les demandes les plus fréquentes concernent l'accès aux droits et la lutte contre l'isolement, loin devant les situations d'urgence.",
+              text: "En six mois, plus de trois cents femmes ont poussé la porte du véhicule. « Certaines reviennent juste pour un café et quelques mots ; c'est déjà beaucoup », glisse une bénévole. Les demandes les plus fréquentes concernent l'accès aux droits et la lutte contre l'isolement, loin devant les situations d'urgence.",
             },
           ],
         },
@@ -3505,8 +3300,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les élus locaux, d'abord sceptiques, se montrent aujourd'hui plus attentifs. Trois maires de la vallée ont proposé de mettre à disposition une salle chauffée pour l'hiver, quand tenir permanence dans un véhicule deviendra difficile.",
+              text: "Les élus locaux, d'abord sceptiques, se montrent aujourd'hui plus attentifs. Trois maires de la vallée ont proposé de mettre à disposition une salle chauffée pour l'hiver, quand tenir permanence dans un véhicule deviendra difficile.",
             },
           ],
         },
@@ -3515,8 +3309,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Faute de moyens, l'association ne peut couvrir qu'une partie du territoire. Elle cherche des financements pour un second véhicule et lance un appel aux bénévoles disposant du permis et d'un peu de temps. Plusieurs intercommunalités voisines, dit-elle, observent l'expérience de près.",
+              text: "Faute de moyens, l'association ne peut couvrir qu'une partie du territoire. Elle cherche des financements pour un second véhicule et lance un appel aux bénévoles disposant du permis et d'un peu de temps. Plusieurs intercommunalités voisines, dit-elle, observent l'expérience de près.",
             },
           ],
         },
@@ -3525,8 +3318,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En attendant, les tournées continuent, par tous les temps. « Tant qu'une seule femme nous attend sur la place, on repart », sourit une écoutante, en rangeant les tasses avant de reprendre la route.",
+              text: "En attendant, les tournées continuent, par tous les temps. « Tant qu'une seule femme nous attend sur la place, on repart », sourit une écoutante, en rangeant les tasses avant de reprendre la route.",
             },
           ],
         },
@@ -3559,8 +3351,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Dans la salle de technologie du collège des Tilleuls, l'ambiance est studieuse mais joyeuse. Une vingtaine de filles de troisième programment de petits robots sous l'œil d'une ingénieure venue en voisine. La scène résume tout l'esprit du programme Déclic, déployé cette année dans une dizaine d'établissements de la région.",
+              text: "Dans la salle de technologie du collège des Tilleuls, l'ambiance est studieuse mais joyeuse. Une vingtaine de filles de troisième programment de petits robots sous l'œil d'une ingénieure venue en voisine. La scène résume tout l'esprit du programme Déclic, déployé cette année dans une dizaine d'établissements de la région.",
             },
           ],
         },
@@ -3573,16 +3364,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le constat qui a présidé à sa création est connu : à niveau égal, les filles s'orientent bien moins souvent que les garçons vers les filières scientifiques et techniques. ",
+              text: "Le constat qui a présidé à sa création est connu : à niveau égal, les filles s'orientent bien moins souvent que les garçons vers les filières scientifiques et techniques. ",
             },
             {
               type: 'emphasis',
-              value: 'Non par manque de capacités',
+              text: 'Non par manque de capacités',
             },
             {
               type: 'text',
-              value: ", mais par autocensure, faute de modèles auxquels s'identifier.",
+              text: ", mais par autocensure, faute de modèles auxquels s'identifier.",
             },
           ],
         },
@@ -3591,8 +3381,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le programme mise donc sur la rencontre. Chaque mois, une professionnelle — ingénieure, chercheuse, technicienne — vient raconter son parcours, sans langue de bois, et animer un atelier concret : coder un jeu, monter un circuit, piloter un drone.',
+              text: 'Le programme mise donc sur la rencontre. Chaque mois, une professionnelle — ingénieure, chercheuse, technicienne — vient raconter son parcours, sans langue de bois, et animer un atelier concret : coder un jeu, monter un circuit, piloter un drone.',
             },
           ],
         },
@@ -3605,8 +3394,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Quand une élève voit qu'une femme peut réparer une éolienne ou concevoir un logiciel, quelque chose se débloque », observe la professeure de sciences à l'origine du projet dans son collège. Les premiers retours sont encourageants : les vœux d'orientation vers les spécialités scientifiques ont progressé parmi les filles concernées.",
+              text: "« Quand une élève voit qu'une femme peut réparer une éolienne ou concevoir un logiciel, quelque chose se débloque », observe la professeure de sciences à l'origine du projet dans son collège. Les premiers retours sont encourageants : les vœux d'orientation vers les spécialités scientifiques ont progressé parmi les filles concernées.",
             },
           ],
         },
@@ -3619,8 +3407,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les garçons ne sont pas oubliés. Une partie des ateliers leur est aussi ouverte, afin, expliquent les organisatrices, de faire évoluer le regard de toute une classe, et pas seulement celui des filles. « Les stéréotypes, ça se déconstruit à plusieurs », résume une intervenante.',
+              text: 'Les garçons ne sont pas oubliés. Une partie des ateliers leur est aussi ouverte, afin, expliquent les organisatrices, de faire évoluer le regard de toute une classe, et pas seulement celui des filles. « Les stéréotypes, ça se déconstruit à plusieurs », résume une intervenante.',
             },
           ],
         },
@@ -3629,8 +3416,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les familles, elles aussi, sont invitées à une soirée de restitution en fin d'année. L'occasion, pour les parents, de découvrir des métiers parfois méconnus et de mesurer le chemin parcouru par leurs enfants.",
+              text: "Les familles, elles aussi, sont invitées à une soirée de restitution en fin d'année. L'occasion, pour les parents, de découvrir des métiers parfois méconnus et de mesurer le chemin parcouru par leurs enfants.",
             },
           ],
         },
@@ -3639,8 +3425,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le dispositif reste toutefois suspendu à des financements annuels et au bénévolat des intervenantes. Ses promotrices espèrent le pérenniser et l'étendre, dès l'an prochain, aux écoles primaires, là où, disent-elles, les stéréotypes s'installent déjà.",
+              text: "Le dispositif reste toutefois suspendu à des financements annuels et au bénévolat des intervenantes. Ses promotrices espèrent le pérenniser et l'étendre, dès l'an prochain, aux écoles primaires, là où, disent-elles, les stéréotypes s'installent déjà.",
             },
           ],
         },
@@ -3666,8 +3451,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les signalements de violences conjugales ont progressé de 12 % en un an dans le département, selon un bilan rendu public mercredi. Au total, plusieurs milliers de situations ont été portées à la connaissance des services et des associations spécialisées.',
+              text: 'Les signalements de violences conjugales ont progressé de 12 % en un an dans le département, selon un bilan rendu public mercredi. Au total, plusieurs milliers de situations ont été portées à la connaissance des services et des associations spécialisées.',
             },
           ],
         },
@@ -3676,8 +3460,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les acteurs de terrain se gardent d'une lecture unique. Pour eux, cette hausse traduit d'abord une parole qui se libère et une meilleure connaissance des dispositifs d'aide, sans exclure une aggravation réelle de certaines situations.",
+              text: "Les acteurs de terrain se gardent d'une lecture unique. Pour eux, cette hausse traduit d'abord une parole qui se libère et une meilleure connaissance des dispositifs d'aide, sans exclure une aggravation réelle de certaines situations.",
             },
           ],
         },
@@ -3686,8 +3469,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Ils appellent, une nouvelle fois, à renforcer les places d'hébergement d'urgence, jugées très insuffisantes à l'échelle du territoire.",
+              text: "Ils appellent, une nouvelle fois, à renforcer les places d'hébergement d'urgence, jugées très insuffisantes à l'échelle du territoire.",
             },
           ],
         },
@@ -3712,8 +3494,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une sociologue de l'université de Belleroche recevra le mois prochain le prix régional des sciences humaines pour l'ensemble de ses travaux sur le travail domestique.",
+              text: "Une sociologue de l'université de Belleroche recevra le mois prochain le prix régional des sciences humaines pour l'ensemble de ses travaux sur le travail domestique.",
             },
           ],
         },
@@ -3722,8 +3503,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Depuis une dizaine d'années, ses enquêtes s'attachent à mesurer et à faire reconnaître les tâches invisibles — ménage, soin, organisation du foyer — qui reposent encore massivement sur les femmes. Un chantier longtemps négligé par les statistiques publiques.",
+              text: "Depuis une dizaine d'années, ses enquêtes s'attachent à mesurer et à faire reconnaître les tâches invisibles — ménage, soin, organisation du foyer — qui reposent encore massivement sur les femmes. Un chantier longtemps négligé par les statistiques publiques.",
             },
           ],
         },
@@ -3732,8 +3512,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La lauréate a annoncé qu'elle consacrerait la dotation du prix au financement d'une nouvelle enquête, cette fois en milieu rural.",
+              text: "La lauréate a annoncé qu'elle consacrerait la dotation du prix au financement d'une nouvelle enquête, cette fois en milieu rural.",
             },
           ],
         },
@@ -3758,8 +3537,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Un forum dédié à l'entrepreneuriat des femmes se tiendra le mois prochain à Villeneuve-sur-Arche, à l'initiative d'un collectif d'associations et de la chambre consulaire locale.",
+              text: "Un forum dédié à l'entrepreneuriat des femmes se tiendra le mois prochain à Villeneuve-sur-Arche, à l'initiative d'un collectif d'associations et de la chambre consulaire locale.",
             },
           ],
         },
@@ -3768,8 +3546,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Au programme : des ateliers pratiques sur le financement et la comptabilité, des rencontres avec des créatrices déjà installées, et un stand consacré aux dispositifs de micro-crédit. L'entrée sera gratuite, sur inscription.",
+              text: "Au programme : des ateliers pratiques sur le financement et la comptabilité, des rencontres avec des créatrices déjà installées, et un stand consacré aux dispositifs de micro-crédit. L'entrée sera gratuite, sur inscription.",
             },
           ],
         },
@@ -3778,8 +3555,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les organisatrices rappellent que les femmes ne représentent encore qu'une minorité des créateurs d'entreprise du bassin, et espèrent, avec ce rendez-vous, contribuer à faire bouger les lignes.",
+              text: "Les organisatrices rappellent que les femmes ne représentent encore qu'une minorité des créateurs d'entreprise du bassin, et espèrent, avec ce rendez-vous, contribuer à faire bouger les lignes.",
             },
           ],
         },
@@ -3812,8 +3588,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est une poignée de main que beaucoup n'attendaient plus. Après trois jours de négociations à huis clos à Port-Méridienne, la République de Savarie et la fédération du Norland ont signé mercredi une trêve encadrant la pêche dans le détroit de Kessel, théâtre d'incidents répétés depuis le printemps.",
+              text: "C'est une poignée de main que beaucoup n'attendaient plus. Après trois jours de négociations à huis clos à Port-Méridienne, la République de Savarie et la fédération du Norland ont signé mercredi une trêve encadrant la pêche dans le détroit de Kessel, théâtre d'incidents répétés depuis le printemps.",
             },
           ],
         },
@@ -3826,8 +3601,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le texte partage les eaux contestées en trois zones, dont une réservée à l'exploitation conjointe. Il prévoit aussi un mécanisme d'alerte commun en cas d'arraisonnement, afin d'éviter que de simples contrôles ne dégénèrent en crise diplomatique.",
+              text: "Le texte partage les eaux contestées en trois zones, dont une réservée à l'exploitation conjointe. Il prévoit aussi un mécanisme d'alerte commun en cas d'arraisonnement, afin d'éviter que de simples contrôles ne dégénèrent en crise diplomatique.",
             },
           ],
         },
@@ -3836,17 +3610,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La médiation a été confiée à l'Union des États du Levant, dont l'envoyée spéciale a fait la navette entre les deux délégations. ",
+              text: "La médiation a été confiée à l'Union des États du Levant, dont l'envoyée spéciale a fait la navette entre les deux délégations. ",
             },
             {
               type: 'emphasis',
-              value: "Personne n'a obtenu tout ce qu'il voulait",
+              text: "Personne n'a obtenu tout ce qu'il voulait",
             },
             {
               type: 'text',
-              value:
-                ", a reconnu un négociateur savarien, résumant l'esprit d'un accord fait de concessions mutuelles.",
+              text: ", a reconnu un négociateur savarien, résumant l'esprit d'un accord fait de concessions mutuelles.",
             },
           ],
         },
@@ -3860,8 +3632,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sur les quais, les pêcheurs accueillent la nouvelle avec un soulagement prudent. Plusieurs d'entre eux avaient vu leurs filets confisqués ces derniers mois, et certains bateaux étaient restés à quai faute de garanties de sécurité.",
+              text: "Sur les quais, les pêcheurs accueillent la nouvelle avec un soulagement prudent. Plusieurs d'entre eux avaient vu leurs filets confisqués ces derniers mois, et certains bateaux étaient restés à quai faute de garanties de sécurité.",
             },
           ],
         },
@@ -3870,8 +3641,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les incidents avaient culminé cet été, quand deux chalutiers s'étaient retrouvés bloqués plusieurs jours au large, ravivant de vieilles rancunes de part et d'autre du détroit. Les criées des deux rives en avaient souffert, avec des prix qui s'étaient envolés et des mareyeurs contraints d'importer le poisson de plus loin.",
+              text: "Les incidents avaient culminé cet été, quand deux chalutiers s'étaient retrouvés bloqués plusieurs jours au large, ravivant de vieilles rancunes de part et d'autre du détroit. Les criées des deux rives en avaient souffert, avec des prix qui s'étaient envolés et des mareyeurs contraints d'importer le poisson de plus loin.",
             },
           ],
         },
@@ -3884,8 +3654,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'accord entrera en vigueur dans un mois, le temps de former les patrouilles conjointes. Des observateurs de l'Union des États du Levant seront déployés à bord pour vérifier le respect des quotas, un point sur lequel les deux capitales s'étaient longtemps opposées.",
+              text: "L'accord entrera en vigueur dans un mois, le temps de former les patrouilles conjointes. Des observateurs de l'Union des États du Levant seront déployés à bord pour vérifier le respect des quotas, un point sur lequel les deux capitales s'étaient longtemps opposées.",
             },
           ],
         },
@@ -3894,7 +3663,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Nous voulons pêcher, pas patrouiller. Si la trêve tient, c'est déjà beaucoup.",
+              text: "Nous voulons pêcher, pas patrouiller. Si la trêve tient, c'est déjà beaucoup.",
             },
           ],
           source: 'La coopérative des marins de Port-Méridienne',
@@ -3904,8 +3673,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les analystes de l'observatoire Méridien restent mesurés. Ils rappellent que deux précédentes tentatives avaient échoué en moins d'un an, faute de contrôle indépendant. Cette fois, la présence d'observateurs pourrait changer la donne, estiment-ils, à condition que les financements suivent.",
+              text: "Les analystes de l'observatoire Méridien restent mesurés. Ils rappellent que deux précédentes tentatives avaient échoué en moins d'un an, faute de contrôle indépendant. Cette fois, la présence d'observateurs pourrait changer la donne, estiment-ils, à condition que les financements suivent.",
             },
           ],
         },
@@ -3914,8 +3682,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le sort des populations déplacées par les tensions reste, lui, en suspens, un dossier que nous détaillons dans ',
+              text: 'Le sort des populations déplacées par les tensions reste, lui, en suspens, un dossier que nous détaillons dans ',
             },
             {
               type: 'link',
@@ -3927,7 +3694,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -3982,8 +3749,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Trois semaines après les crues qui ont submergé une partie de l'archipel des Cargues, l'eau s'est retirée mais pas la colère. Sur l'île principale, des milliers d'habitants vivent encore sous des bâches, dans l'attente d'une aide annoncée mais lente à venir.",
+              text: "Trois semaines après les crues qui ont submergé une partie de l'archipel des Cargues, l'eau s'est retirée mais pas la colère. Sur l'île principale, des milliers d'habitants vivent encore sous des bâches, dans l'attente d'une aide annoncée mais lente à venir.",
             },
           ],
         },
@@ -3996,8 +3762,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'Union des États du Levant avait promis un pont maritime d'urgence. Dans les faits, seuls deux navires ont accosté, faute de coordination entre les pays donateurs et d'un port endommagé qui ne peut recevoir que de petites embarcations.",
+              text: "L'Union des États du Levant avait promis un pont maritime d'urgence. Dans les faits, seuls deux navires ont accosté, faute de coordination entre les pays donateurs et d'un port endommagé qui ne peut recevoir que de petites embarcations.",
             },
           ],
         },
@@ -4006,8 +3771,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le principal besoin reste l'eau potable. Les puits ont été contaminés par les remontées salines, et les familles doivent parfois marcher plusieurs kilomètres pour un bidon. L'ONG Ponts citoyens a installé trois unités de filtration, très insuffisantes selon ses propres équipes.",
+              text: "Le principal besoin reste l'eau potable. Les puits ont été contaminés par les remontées salines, et les familles doivent parfois marcher plusieurs kilomètres pour un bidon. L'ONG Ponts citoyens a installé trois unités de filtration, très insuffisantes selon ses propres équipes.",
             },
           ],
         },
@@ -4016,7 +3780,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'On nous parle de millions débloqués, mais nous, nous comptons les jours sans eau propre.',
+              text: 'On nous parle de millions débloqués, mais nous, nous comptons les jours sans eau propre.',
             },
           ],
           source: 'Un habitant du village de Kalanne',
@@ -4026,8 +3790,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les autorités locales, débordées, reconnaissent leurs limites. Elles réclament surtout des moyens logistiques : des barges à faible tirant d'eau, des groupes électrogènes, et des équipes capables de réparer le réseau d'assainissement avant l'arrivée des pluies suivantes.",
+              text: "Les autorités locales, débordées, reconnaissent leurs limites. Elles réclament surtout des moyens logistiques : des barges à faible tirant d'eau, des groupes électrogènes, et des équipes capables de réparer le réseau d'assainissement avant l'arrivée des pluies suivantes.",
             },
           ],
         },
@@ -4036,8 +3799,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le bilan humain, encore provisoire, fait état de plusieurs dizaines de disparus et de milliers de personnes déplacées vers des écoles transformées en abris. Les écoles, justement, restent fermées, et les enseignants s'inquiètent d'une génération d'enfants privée de classe pour une durée indéterminée.",
+              text: "Le bilan humain, encore provisoire, fait état de plusieurs dizaines de disparus et de milliers de personnes déplacées vers des écoles transformées en abris. Les écoles, justement, restent fermées, et les enseignants s'inquiètent d'une génération d'enfants privée de classe pour une durée indéterminée.",
             },
           ],
         },
@@ -4050,8 +3812,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Passé le pic médiatique, les habitants redoutent désormais l'oubli. Les reconstructions promises après une précédente tempête n'avaient jamais été achevées, rappellent les plus âgés, encore marqués par des chantiers abandonnés.",
+              text: "Passé le pic médiatique, les habitants redoutent désormais l'oubli. Les reconstructions promises après une précédente tempête n'avaient jamais été achevées, rappellent les plus âgés, encore marqués par des chantiers abandonnés.",
             },
           ],
         },
@@ -4060,8 +3821,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour maintenir la pression, un collectif d'îliens documente chaque jour la situation et transmet ses relevés aux organisations internationales. Une démarche qui rejoint les difficultés de financement évoquées dans ",
+              text: "Pour maintenir la pression, un collectif d'îliens documente chaque jour la situation et transmet ses relevés aux organisations internationales. Une démarche qui rejoint les difficultés de financement évoquées dans ",
             },
             {
               type: 'link',
@@ -4073,7 +3833,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -4082,8 +3842,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le prochain conseil de l'Union des États du Levant doit se tenir la semaine prochaine. Les Cargues y seront à l'ordre du jour, sans garantie, cette fois, que les annonces se traduisent en actes.",
+              text: "Le prochain conseil de l'Union des États du Levant doit se tenir la semaine prochaine. Les Cargues y seront à l'ordre du jour, sans garantie, cette fois, que les annonces se traduisent en actes.",
             },
           ],
         },
@@ -4116,8 +3875,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Vus du quai, les nouveaux portiques ressemblent à de longs bras d'acier qui saisissent les conteneurs sans le moindre opérateur. Sur le premier terminal de Port-Méridienne, cette mécanique silencieuse suscite autant d'admiration que d'angoisse.",
+              text: "Vus du quai, les nouveaux portiques ressemblent à de longs bras d'acier qui saisissent les conteneurs sans le moindre opérateur. Sur le premier terminal de Port-Méridienne, cette mécanique silencieuse suscite autant d'admiration que d'angoisse.",
             },
           ],
         },
@@ -4130,8 +3888,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La compagnie Trans-Cargues, concessionnaire du terminal, promet des cadences doublées et une baisse des coûts. Elle assure que l'automatisation est nécessaire pour rester compétitive face aux grands ports voisins, sous peine de perdre les lignes maritimes qui font vivre la cité.",
+              text: "La compagnie Trans-Cargues, concessionnaire du terminal, promet des cadences doublées et une baisse des coûts. Elle assure que l'automatisation est nécessaire pour rester compétitive face aux grands ports voisins, sous peine de perdre les lignes maritimes qui font vivre la cité.",
             },
           ],
         },
@@ -4140,8 +3897,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Mais pour les dockers, beaucoup originaires de Valdavie voisine et installés ici depuis des années, l'équation est brutale. Selon leur association, jusqu'à trois cents postes pourraient disparaître en deux ans, sans plan de reconversion sérieux à ce stade.",
+              text: "Mais pour les dockers, beaucoup originaires de Valdavie voisine et installés ici depuis des années, l'équation est brutale. Selon leur association, jusqu'à trois cents postes pourraient disparaître en deux ans, sans plan de reconversion sérieux à ce stade.",
             },
           ],
         },
@@ -4150,12 +3906,11 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'emphasis',
-              value: 'On ne remplace pas une vie de métier par une formation de trois semaines',
+              text: 'On ne remplace pas une vie de métier par une formation de trois semaines',
             },
             {
               type: 'text',
-              value:
-                ", souffle un manutentionnaire, la trentaine d'années de quai derrière lui. La crainte dépasse le seul emploi : c'est tout un tissu de commerces et de foyers qui vit au rythme du port.",
+              text: ", souffle un manutentionnaire, la trentaine d'années de quai derrière lui. La crainte dépasse le seul emploi : c'est tout un tissu de commerces et de foyers qui vit au rythme du port.",
             },
           ],
         },
@@ -4173,8 +3928,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les représentants du personnel réclament un accord garantissant le reclassement de chaque salarié concerné. La direction, elle, propose des départs volontaires et une prime, jugés très insuffisants par l'association des dockers.",
+              text: "Les représentants du personnel réclament un accord garantissant le reclassement de chaque salarié concerné. La direction, elle, propose des départs volontaires et une prime, jugés très insuffisants par l'association des dockers.",
             },
           ],
         },
@@ -4183,7 +3937,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Nous ne sommes pas contre le progrès. Nous demandons qu'il ne se fasse pas sur notre dos.",
+              text: "Nous ne sommes pas contre le progrès. Nous demandons qu'il ne se fasse pas sur notre dos.",
             },
           ],
           source: "L'association des dockers de Port-Méridienne",
@@ -4193,8 +3947,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Des économistes de l'observatoire Méridien appellent à anticiper la transition plutôt qu'à la subir. Leurs travaux, publiés cette semaine, sont consultables sur ",
+              text: "Des économistes de l'observatoire Méridien appellent à anticiper la transition plutôt qu'à la subir. Leurs travaux, publiés cette semaine, sont consultables sur ",
             },
             {
               type: 'link',
@@ -4206,7 +3959,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ' et plaident pour un fonds régional de reconversion.',
+              text: ' et plaident pour un fonds régional de reconversion.',
             },
           ],
         },
@@ -4215,8 +3968,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Ils rappellent qu'ailleurs, des ports ayant automatisé sans accompagnement ont vu se former des poches de chômage durable, quand d'autres ont réussi à réorienter leurs salariés vers la maintenance des équipements ou la logistique. La différence, soulignent-ils, tient moins à la technologie qu'à la qualité du dialogue engagé en amont.",
+              text: "Ils rappellent qu'ailleurs, des ports ayant automatisé sans accompagnement ont vu se former des poches de chômage durable, quand d'autres ont réussi à réorienter leurs salariés vers la maintenance des équipements ou la logistique. La différence, soulignent-ils, tient moins à la technologie qu'à la qualité du dialogue engagé en amont.",
             },
           ],
         },
@@ -4225,8 +3977,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En attendant, la tension monte. Un préavis de grève a été déposé pour la fin du mois, le premier d'une telle ampleur depuis l'ouverture du terminal. La municipalité, prise entre attractivité économique et paix sociale, tente une médiation dont l'issue reste incertaine.",
+              text: "En attendant, la tension monte. Un préavis de grève a été déposé pour la fin du mois, le premier d'une telle ampleur depuis l'ouverture du terminal. La municipalité, prise entre attractivité économique et paix sociale, tente une médiation dont l'issue reste incertaine.",
             },
           ],
         },
@@ -4264,8 +4015,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La scène se joue chaque samedi à l'aube, sur un terrain vague du centre de Serravia. Là où s'élevaient les anciennes halles, fermées l'an dernier pour vétusté, une trentaine de jeunes commerçants dressent désormais leurs étals sous des bâches colorées.",
+              text: "La scène se joue chaque samedi à l'aube, sur un terrain vague du centre de Serravia. Là où s'élevaient les anciennes halles, fermées l'an dernier pour vétusté, une trentaine de jeunes commerçants dressent désormais leurs étals sous des bâches colorées.",
             },
           ],
         },
@@ -4274,8 +4024,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Maraîchers, fromagers, artisans : tous ont moins de trente-cinq ans et n'avaient pas les moyens de louer un emplacement dans les galeries marchandes de la périphérie. En occupant la friche, avec l'accord tacite de la municipalité, ils ont créé un marché qui attire aujourd'hui des familles de toute la ville.",
+              text: "Maraîchers, fromagers, artisans : tous ont moins de trente-cinq ans et n'avaient pas les moyens de louer un emplacement dans les galeries marchandes de la périphérie. En occupant la friche, avec l'accord tacite de la municipalité, ils ont créé un marché qui attire aujourd'hui des familles de toute la ville.",
             },
           ],
         },
@@ -4284,22 +4033,11 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'emphasis',
-              value: 'Ici, on se parle, on négocie, on se connaît',
+              text: 'Ici, on se parle, on négocie, on se connaît',
             },
             {
               type: 'text',
-              value:
-                ", résume une vendeuse de conserves, qui écoulait auparavant sa production en ligne. Le succès a surpris jusqu'aux organisateurs : certains samedis, plus de deux mille visiteurs se pressent entre les tréteaux.",
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          spans: [
-            {
-              type: 'text',
-              value:
-                "La caméra suit une matinée entière, du déchargement des cageots à la dernière vente. Elle montre aussi les fragilités du projet : pas d'eau courante, pas d'électricité, et une autorisation d'occupation qui pourrait être retirée si la friche venait à être vendue.",
+              text: ", résume une vendeuse de conserves, qui écoulait auparavant sa production en ligne. Le succès a surpris jusqu'aux organisateurs : certains samedis, plus de deux mille visiteurs se pressent entre les tréteaux.",
             },
           ],
         },
@@ -4308,8 +4046,16 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les jeunes commerçants réclament désormais un bail précaire et quelques aménagements de base. La mairie, séduite par l'animation retrouvée, promet d'étudier la demande. En attendant, le marché continue, semaine après semaine, à faire revivre un quartier que beaucoup disaient endormi.",
+              text: "La caméra suit une matinée entière, du déchargement des cageots à la dernière vente. Elle montre aussi les fragilités du projet : pas d'eau courante, pas d'électricité, et une autorisation d'occupation qui pourrait être retirée si la friche venait à être vendue.",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          spans: [
+            {
+              type: 'text',
+              text: "Les jeunes commerçants réclament désormais un bail précaire et quelques aménagements de base. La mairie, séduite par l'animation retrouvée, promet d'étudier la demande. En attendant, le marché continue, semaine après semaine, à faire revivre un quartier que beaucoup disaient endormi.",
             },
           ],
         },
@@ -4334,8 +4080,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "J'ai lu, cette semaine, deux dépêches presque simultanées. L'une annonçait une trêve dans le détroit de Kessel ; l'autre décrivait des familles de l'archipel des Cargues marchant des kilomètres pour un bidon d'eau. Deux visages de la coopération internationale, et une même question que je ne parviens pas à écarter : à quoi sert une belle signature si elle ne change rien pour ceux qui attendent sur un quai ?",
+              text: "J'ai lu, cette semaine, deux dépêches presque simultanées. L'une annonçait une trêve dans le détroit de Kessel ; l'autre décrivait des familles de l'archipel des Cargues marchant des kilomètres pour un bidon d'eau. Deux visages de la coopération internationale, et une même question que je ne parviens pas à écarter : à quoi sert une belle signature si elle ne change rien pour ceux qui attendent sur un quai ?",
             },
           ],
         },
@@ -4348,8 +4093,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Nous applaudissons volontiers les accords. Ils rassurent, ils font de bonnes photographies, ils permettent aux responsables de rentrer chez eux la tête haute. Mais je me méfie des textes qui se suffisent à eux-mêmes. Une trêve n'existe vraiment que le jour où un pêcheur ressort son filet sans crainte, et un secours n'a de sens que lorsqu'il touche celui qui en a besoin.",
+              text: "Nous applaudissons volontiers les accords. Ils rassurent, ils font de bonnes photographies, ils permettent aux responsables de rentrer chez eux la tête haute. Mais je me méfie des textes qui se suffisent à eux-mêmes. Une trêve n'existe vraiment que le jour où un pêcheur ressort son filet sans crainte, et un secours n'a de sens que lorsqu'il touche celui qui en a besoin.",
             },
           ],
         },
@@ -4358,8 +4102,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Or, entre l'annonce et l'acte, il y a un espace immense où se perdent trop de bonnes intentions. Aux Cargues, ce ne sont pas les millions promis qui manquent, mais les barges capables d'accoster. La solidarité, ai-je envie d'écrire, se mesure en logistique bien plus qu'en discours.",
+              text: "Or, entre l'annonce et l'acte, il y a un espace immense où se perdent trop de bonnes intentions. Aux Cargues, ce ne sont pas les millions promis qui manquent, mais les barges capables d'accoster. La solidarité, ai-je envie d'écrire, se mesure en logistique bien plus qu'en discours.",
             },
           ],
         },
@@ -4372,17 +4115,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Il serait facile de tout reprocher aux diplomates. Je ne m'en priverai pas tout à fait, car la lenteur des convois relève aussi d'un défaut de volonté. Mais soyons honnêtes : ",
+              text: "Il serait facile de tout reprocher aux diplomates. Je ne m'en priverai pas tout à fait, car la lenteur des convois relève aussi d'un défaut de volonté. Mais soyons honnêtes : ",
             },
             {
               type: 'emphasis',
-              value: 'nous',
+              text: 'nous',
             },
             {
               type: 'text',
-              value:
-                " aussi, lecteurs lointains, oublions vite. Passé l'émotion des premières images, notre attention se déplace, et avec elle la pression qui, seule, tient les gouvernants à leurs engagements.",
+              text: " aussi, lecteurs lointains, oublions vite. Passé l'émotion des premières images, notre attention se déplace, et avec elle la pression qui, seule, tient les gouvernants à leurs engagements.",
             },
           ],
         },
@@ -4391,8 +4132,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est là, je crois, que le journalisme garde un rôle modeste mais tenace : compter les jours, rappeler les promesses, revenir sur les lieux quand les caméras sont parties. Les îliens des Cargues l'ont compris, eux qui documentent chaque matin leur quotidien et transmettent leurs relevés aux organisations, comme on peut le lire sur ",
+              text: "C'est là, je crois, que le journalisme garde un rôle modeste mais tenace : compter les jours, rappeler les promesses, revenir sur les lieux quand les caméras sont parties. Les îliens des Cargues l'ont compris, eux qui documentent chaque matin leur quotidien et transmettent leurs relevés aux organisations, comme on peut le lire sur ",
             },
             {
               type: 'link',
@@ -4404,7 +4144,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -4417,8 +4157,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Je ne plaide pas pour le cynisme, qui est la paresse déguisée en lucidité. Je plaide pour une solidarité vérifiable. Qu'on annonce moins, mais qu'on tienne davantage. Qu'un accord prévoie, dès la première ligne, qui contrôle son application. Qu'une aide s'accompagne d'un calendrier et d'un nom à qui demander des comptes.",
+              text: "Je ne plaide pas pour le cynisme, qui est la paresse déguisée en lucidité. Je plaide pour une solidarité vérifiable. Qu'on annonce moins, mais qu'on tienne davantage. Qu'un accord prévoie, dès la première ligne, qui contrôle son application. Qu'une aide s'accompagne d'un calendrier et d'un nom à qui demander des comptes.",
             },
           ],
         },
@@ -4427,8 +4166,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La trêve de Kessel, justement, a prévu des observateurs à bord des patrouilles. C'est peu de chose, et c'est énorme : pour une fois, la parole donnée s'assortit d'un moyen de la vérifier. Souhaitons que les Cargues aient droit, elles aussi, à cette rigueur.",
+              text: "La trêve de Kessel, justement, a prévu des observateurs à bord des patrouilles. C'est peu de chose, et c'est énorme : pour une fois, la parole donnée s'assortit d'un moyen de la vérifier. Souhaitons que les Cargues aient droit, elles aussi, à cette rigueur.",
             },
           ],
         },
@@ -4437,7 +4175,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Nous jugerons, dans six mois, sur les quais. Pas dans les communiqués.',
+              text: 'Nous jugerons, dans six mois, sur les quais. Pas dans les communiqués.',
             },
           ],
         },
@@ -4470,8 +4208,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les chiffres ont de quoi refroidir les espoirs. Un an après la sécheresse qui a ruiné les récoltes de la région de Terragne, le fonds Solidarité Sud, censé financer la reconstruction, n'a encaissé qu'un tiers des contributions promises par ses pays membres.",
+              text: "Les chiffres ont de quoi refroidir les espoirs. Un an après la sécheresse qui a ruiné les récoltes de la région de Terragne, le fonds Solidarité Sud, censé financer la reconstruction, n'a encaissé qu'un tiers des contributions promises par ses pays membres.",
             },
           ],
         },
@@ -4484,8 +4221,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Créé dans l'urgence, le fonds devait mutualiser les aides pour reconstruire les réseaux d'irrigation et soutenir les paysans ruinés. Sur les montants annoncés lors de son lancement, une large part n'a jamais été versée, freinée par des procédures budgétaires et des priorités nationales concurrentes.",
+              text: "Créé dans l'urgence, le fonds devait mutualiser les aides pour reconstruire les réseaux d'irrigation et soutenir les paysans ruinés. Sur les montants annoncés lors de son lancement, une large part n'a jamais été versée, freinée par des procédures budgétaires et des priorités nationales concurrentes.",
             },
           ],
         },
@@ -4494,16 +4230,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le rapport interne, que nous avons pu consulter, pointe aussi un défaut de gouvernance. Faute d'un secrétariat permanent, les décaissements dépendent de réunions trimestrielles, souvent reportées. ",
+              text: "Le rapport interne, que nous avons pu consulter, pointe aussi un défaut de gouvernance. Faute d'un secrétariat permanent, les décaissements dépendent de réunions trimestrielles, souvent reportées. ",
             },
             {
               type: 'emphasis',
-              value: 'Chaque report coûte une saison agricole',
+              text: 'Chaque report coûte une saison agricole',
             },
             {
               type: 'text',
-              value: ', résume un membre du comité de suivi.',
+              text: ', résume un membre du comité de suivi.',
             },
           ],
         },
@@ -4512,8 +4247,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Sur le terrain, les conséquences sont concrètes : des canaux à moitié réparés, des semences distribuées trop tard, des familles qui quittent les campagnes faute de perspectives. Les autorités régionales redoutent un exode durable vers les villes déjà surpeuplées.',
+              text: 'Sur le terrain, les conséquences sont concrètes : des canaux à moitié réparés, des semences distribuées trop tard, des familles qui quittent les campagnes faute de perspectives. Les autorités régionales redoutent un exode durable vers les villes déjà surpeuplées.',
             },
           ],
         },
@@ -4526,8 +4260,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Plusieurs voix réclament une refonte du dispositif. L'observatoire Méridien propose de conditionner l'adhésion au versement effectif des contributions, et de publier chaque année un bilan transparent. Ses recommandations sont détaillées sur ",
+              text: "Plusieurs voix réclament une refonte du dispositif. L'observatoire Méridien propose de conditionner l'adhésion au versement effectif des contributions, et de publier chaque année un bilan transparent. Ses recommandations sont détaillées sur ",
             },
             {
               type: 'link',
@@ -4539,7 +4272,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -4548,7 +4281,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Un fonds qui ne verse pas n'est pas un fonds, c'est une déclaration d'intention.",
+              text: "Un fonds qui ne verse pas n'est pas un fonds, c'est une déclaration d'intention.",
             },
           ],
           source: 'Le comité paysan de Terragne',
@@ -4558,8 +4291,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les pays membres se réuniront le mois prochain pour tenter de débloquer la situation. L'enjeu dépasse la seule Terragne : d'autres régions, exposées aux mêmes aléas, observent de près la crédibilité de ce mécanisme, appelé à servir de modèle.",
+              text: "Les pays membres se réuniront le mois prochain pour tenter de débloquer la situation. L'enjeu dépasse la seule Terragne : d'autres régions, exposées aux mêmes aléas, observent de près la crédibilité de ce mécanisme, appelé à servir de modèle.",
             },
           ],
         },
@@ -4568,8 +4300,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les organisations de terrain, elles, n'attendent plus. Elles nouent des partenariats directs avec des coopératives locales, contournant un fonds jugé trop lent, une débrouille qui rappelle les difficultés déjà vues ailleurs dans la région.",
+              text: "Les organisations de terrain, elles, n'attendent plus. Elles nouent des partenariats directs avec des coopératives locales, contournant un fonds jugé trop lent, une débrouille qui rappelle les difficultés déjà vues ailleurs dans la région.",
             },
           ],
         },
@@ -4578,8 +4309,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Ce contournement inquiète toutefois les défenseurs du multilatéralisme, qui redoutent qu'à force de solutions parallèles, le fonds commun ne perde le peu de crédibilité qui lui reste. Sans un sursaut rapide des États membres, préviennent-ils, c'est l'idée même d'une solidarité régionale organisée qui pourrait s'effriter, au profit de logiques strictement nationales.",
+              text: "Ce contournement inquiète toutefois les défenseurs du multilatéralisme, qui redoutent qu'à force de solutions parallèles, le fonds commun ne perde le peu de crédibilité qui lui reste. Sans un sursaut rapide des États membres, préviennent-ils, c'est l'idée même d'une solidarité régionale organisée qui pourrait s'effriter, au profit de logiques strictement nationales.",
             },
           ],
         },
@@ -4627,8 +4357,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La Valdavie et la fédération du Norland ont annoncé vendredi la réouverture du poste-frontière de Vireux, fermé depuis six mois à la suite d'un litige sur les droits de douane. Les premiers camions ont franchi la barrière dans la matinée.",
+              text: "La Valdavie et la fédération du Norland ont annoncé vendredi la réouverture du poste-frontière de Vireux, fermé depuis six mois à la suite d'un litige sur les droits de douane. Les premiers camions ont franchi la barrière dans la matinée.",
             },
           ],
         },
@@ -4637,8 +4366,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La fermeture avait paralysé les échanges dans une région où de nombreux habitants travaillent d'un côté et vivent de l'autre. Les commerçants estiment leurs pertes à plusieurs millions, et beaucoup avaient dû réduire leurs effectifs.",
+              text: "La fermeture avait paralysé les échanges dans une région où de nombreux habitants travaillent d'un côté et vivent de l'autre. Les commerçants estiment leurs pertes à plusieurs millions, et beaucoup avaient dû réduire leurs effectifs.",
             },
           ],
         },
@@ -4647,8 +4375,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Un accord douanier provisoire a permis de débloquer la situation. Il prévoit un contrôle allégé et une commission mixte chargée de régler les différends à venir. Les autorités promettent que le poste restera ouvert, sauf incident majeur.',
+              text: 'Un accord douanier provisoire a permis de débloquer la situation. Il prévoit un contrôle allégé et une commission mixte chargée de régler les différends à venir. Les autorités promettent que le poste restera ouvert, sauf incident majeur.',
             },
           ],
         },
@@ -4673,8 +4400,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les États membres de l'Union des États du Levant ont adopté jeudi un plan commun de lutte contre les incendies de forêt. Il prévoit la mise en commun d'une flotte d'avions bombardiers d'eau, mobilisable dans un délai de quelques heures.",
+              text: "Les États membres de l'Union des États du Levant ont adopté jeudi un plan commun de lutte contre les incendies de forêt. Il prévoit la mise en commun d'une flotte d'avions bombardiers d'eau, mobilisable dans un délai de quelques heures.",
             },
           ],
         },
@@ -4683,8 +4409,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La saison écoulée a été marquée par des feux d'une ampleur inédite, qui ont dépassé les moyens de plusieurs pays pris isolément. Le partage des appareils vise à éviter que les secours n'arrivent trop tard, faute de matériel disponible sur place.",
+              text: "La saison écoulée a été marquée par des feux d'une ampleur inédite, qui ont dépassé les moyens de plusieurs pays pris isolément. Le partage des appareils vise à éviter que les secours n'arrivent trop tard, faute de matériel disponible sur place.",
             },
           ],
         },
@@ -4693,8 +4418,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le dispositif sera cofinancé par l'ensemble des membres et coordonné par un centre régional. Sa première mise à l'épreuve n'interviendra toutefois qu'au printemps prochain, au début de la prochaine saison à risque.",
+              text: "Le dispositif sera cofinancé par l'ensemble des membres et coordonné par un centre régional. Sa première mise à l'épreuve n'interviendra toutefois qu'au printemps prochain, au début de la prochaine saison à risque.",
             },
           ],
         },
@@ -4719,8 +4443,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Un ancien bus municipal repeint en bleu sillonne depuis la rentrée les quartiers périphériques de Serravia. Reconverti en médiathèque mobile, il propose des livres, des jeux et un accès à Internet aux habitants éloignés des équipements culturels du centre.',
+              text: 'Un ancien bus municipal repeint en bleu sillonne depuis la rentrée les quartiers périphériques de Serravia. Reconverti en médiathèque mobile, il propose des livres, des jeux et un accès à Internet aux habitants éloignés des équipements culturels du centre.',
             },
           ],
         },
@@ -4729,8 +4452,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le véhicule s'arrête deux à trois heures dans chaque quartier, selon un calendrier fixe. Les premières semaines ont attiré surtout des enfants et des personnes âgées, deux publics souvent privés de moyens de transport pour rejoindre la grande bibliothèque.",
+              text: "Le véhicule s'arrête deux à trois heures dans chaque quartier, selon un calendrier fixe. Les premières semaines ont attiré surtout des enfants et des personnes âgées, deux publics souvent privés de moyens de transport pour rejoindre la grande bibliothèque.",
             },
           ],
         },
@@ -4739,8 +4461,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le service, gratuit, est financé par la municipalité pour une année d'essai. En cas de succès, un second bus pourrait être mis en circulation, afin de couvrir les zones encore non desservies par cette tournée hebdomadaire.",
+              text: "Le service, gratuit, est financé par la municipalité pour une année d'essai. En cas de succès, un second bus pourrait être mis en circulation, afin de couvrir les zones encore non desservies par cette tournée hebdomadaire.",
             },
           ],
         },
@@ -4773,8 +4494,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le vote est tombé peu avant vingt-trois heures, au terme d'une séance tendue de l'assemblée départementale de la Sèvre-et-Coteaux. Les élus ont renoncé à supprimer les lignes de car 7, 12 et 19, qui relient une dizaine de villages du plateau au collège de Villefranche-d'Arvor.",
+              text: "Le vote est tombé peu avant vingt-trois heures, au terme d'une séance tendue de l'assemblée départementale de la Sèvre-et-Coteaux. Les élus ont renoncé à supprimer les lignes de car 7, 12 et 19, qui relient une dizaine de villages du plateau au collège de Villefranche-d'Arvor.",
             },
           ],
         },
@@ -4783,8 +4503,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Présenté au printemps par la commission des mobilités, le projet devait permettre d'économiser près de 480 000 euros par an. Il avait provoqué une levée de boucliers dans les communes concernées, où ces cars restent souvent le seul moyen de transport pour les familles sans voiture.",
+              text: "Présenté au printemps par la commission des mobilités, le projet devait permettre d'économiser près de 480 000 euros par an. Il avait provoqué une levée de boucliers dans les communes concernées, où ces cars restent souvent le seul moyen de transport pour les familles sans voiture.",
             },
           ],
         },
@@ -4797,8 +4516,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La majorité départementale, longtemps silencieuse, a cédé sous la pression conjointe des maires ruraux et des associations de parents. « Nous ne pouvions pas demander aux enfants du plateau une heure de route de plus matin et soir », a reconnu la vice-présidente aux transports, Aline Dupas, en défendant un amendement de dernière minute.',
+              text: 'La majorité départementale, longtemps silencieuse, a cédé sous la pression conjointe des maires ruraux et des associations de parents. « Nous ne pouvions pas demander aux enfants du plateau une heure de route de plus matin et soir », a reconnu la vice-présidente aux transports, Aline Dupas, en défendant un amendement de dernière minute.',
             },
           ],
         },
@@ -4807,7 +4525,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "L'opposition, elle, dénonce une volte-face opportuniste à quelques mois des élections.",
+              text: "L'opposition, elle, dénonce une volte-face opportuniste à quelques mois des élections.",
             },
           ],
         },
@@ -4816,8 +4534,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "On nous a expliqué pendant six mois que ces lignes n'étaient pas tenables, et voilà qu'elles le redeviennent comme par miracle.",
+              text: "On nous a expliqué pendant six mois que ces lignes n'étaient pas tenables, et voilà qu'elles le redeviennent comme par miracle.",
             },
           ],
           source: 'Le groupe Cap citoyen au conseil départemental',
@@ -4831,8 +4548,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste la question de l'argent. Le maintien des trois dessertes sera financé cette année par un redéploiement des crédits de voirie, un choix que la chambre régionale des comptes pourrait examiner de près. Selon le ",
+              text: "Reste la question de l'argent. Le maintien des trois dessertes sera financé cette année par un redéploiement des crédits de voirie, un choix que la chambre régionale des comptes pourrait examiner de près. Selon le ",
             },
             {
               type: 'link',
@@ -4844,8 +4560,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value:
-                ", qui a recensé les usagers, près de 320 élèves empruntent chaque jour ces lignes. Sans desserte, certains d'entre eux devraient parcourir jusqu'à quinze kilomètres pour rejoindre un arrêt praticable, dans des communes dépourvues de toute autre solution de transport collectif.",
+              text: ", qui a recensé les usagers, près de 320 élèves empruntent chaque jour ces lignes. Sans desserte, certains d'entre eux devraient parcourir jusqu'à quinze kilomètres pour rejoindre un arrêt praticable, dans des communes dépourvues de toute autre solution de transport collectif.",
             },
           ],
         },
@@ -4859,16 +4574,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Pour la rentrée 2027, la collectivité promet un ',
+              text: 'Pour la rentrée 2027, la collectivité promet un ',
             },
             {
               type: 'emphasis',
-              value: 'schéma pérenne',
+              text: 'schéma pérenne',
             },
             {
               type: 'text',
-              value:
-                " des mobilités rurales, assorti d'une concertation avec les communes. Les élus locaux, échaudés, attendent de voir les actes suivre les promesses. Notre suivi se poursuit avec ",
+              text: " des mobilités rurales, assorti d'une concertation avec les communes. Les élus locaux, échaudés, attendent de voir les actes suivre les promesses. Notre suivi se poursuit avec ",
             },
             {
               type: 'link',
@@ -4880,7 +4594,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -4936,8 +4650,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La mairie de Sainte-Coline a dévoilé lundi les grandes lignes de son plan « Centre habité », qui vise à remettre sur le marché une centaine de logements aujourd'hui vacants dans le cœur historique de la ville.",
+              text: "La mairie de Sainte-Coline a dévoilé lundi les grandes lignes de son plan « Centre habité », qui vise à remettre sur le marché une centaine de logements aujourd'hui vacants dans le cœur historique de la ville.",
             },
           ],
         },
@@ -4946,8 +4659,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Selon le recensement mené cet été par les services municipaux, 112 appartements sont inoccupés depuis plus de deux ans, souvent au-dessus de commerces fermés. « Ces volets clos font mourir la rue à petit feu », résume l'adjoint à l'urbanisme, Marc Vidal.",
+              text: "Selon le recensement mené cet été par les services municipaux, 112 appartements sont inoccupés depuis plus de deux ans, souvent au-dessus de commerces fermés. « Ces volets clos font mourir la rue à petit feu », résume l'adjoint à l'urbanisme, Marc Vidal.",
             },
           ],
         },
@@ -4960,8 +4672,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le dispositif repose sur trois étages. La commune propose d'abord une prime à la rénovation pouvant atteindre 12 000 euros par logement, à condition que le bien soit ensuite loué à un loyer modéré pendant six ans au moins.",
+              text: "Le dispositif repose sur trois étages. La commune propose d'abord une prime à la rénovation pouvant atteindre 12 000 euros par logement, à condition que le bien soit ensuite loué à un loyer modéré pendant six ans au moins.",
             },
           ],
         },
@@ -4970,17 +4681,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Vient ensuite un guichet d'accompagnement pour aider les propriétaires à monter leurs dossiers, souvent découragés par la complexité administrative. ",
+              text: "Vient ensuite un guichet d'accompagnement pour aider les propriétaires à monter leurs dossiers, souvent découragés par la complexité administrative. ",
             },
             {
               type: 'emphasis',
-              value: "C'est là",
+              text: "C'est là",
             },
             {
               type: 'text',
-              value:
-                ', selon la mairie, que se joue la vraie bataille : convaincre des héritiers dispersés ou des bailleurs âgés de se lancer.',
+              text: ', selon la mairie, que se joue la vraie bataille : convaincre des héritiers dispersés ou des bailleurs âgés de se lancer.',
             },
           ],
         },
@@ -4989,8 +4698,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Enfin, pour les logements laissés volontairement à l'abandon, la municipalité n'exclut pas de recourir à la procédure de réquisition, très encadrée par la loi.",
+              text: "Enfin, pour les logements laissés volontairement à l'abandon, la municipalité n'exclut pas de recourir à la procédure de réquisition, très encadrée par la loi.",
             },
           ],
         },
@@ -5003,8 +4711,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est ce dernier point qui a fait débat en séance. Une partie de l'opposition y voit une atteinte au droit de propriété, tandis que le collectif Habiter le centre, qui réunit des commerçants et des riverains, réclame au contraire des mesures plus fermes.",
+              text: "C'est ce dernier point qui a fait débat en séance. Une partie de l'opposition y voit une atteinte au droit de propriété, tandis que le collectif Habiter le centre, qui réunit des commerçants et des riverains, réclame au contraire des mesures plus fermes.",
             },
           ],
         },
@@ -5013,8 +4720,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La maire, Camille Ferrière, a tenté de rassurer : la réquisition ne concernerait qu'« une poignée de cas manifestes », après épuisement de toutes les autres voies. Le plan doit être soumis au vote définitif du budget en décembre.",
+              text: "La maire, Camille Ferrière, a tenté de rassurer : la réquisition ne concernerait qu'« une poignée de cas manifestes », après épuisement de toutes les autres voies. Le plan doit être soumis au vote définitif du budget en décembre.",
             },
           ],
         },
@@ -5023,8 +4729,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les premiers dossiers de rénovation pourraient toutefois être ouverts dès le mois de novembre, la commune espérant afficher rapidement quelques chantiers concrets pour convaincre les propriétaires hésitants.',
+              text: 'Les premiers dossiers de rénovation pourraient toutefois être ouverts dès le mois de novembre, la commune espérant afficher rapidement quelques chantiers concrets pour convaincre les propriétaires hésitants.',
             },
           ],
         },
@@ -5057,8 +4762,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le projet devait être bouclé avant l'été. Il patine. Les communautés de communes du Val d'Arche et du pays de l'Ombre, qui négocient depuis un an leur fusion, n'ont toujours pas réglé les questions les plus sensibles : qui dirigera, et depuis où.",
+              text: "Le projet devait être bouclé avant l'été. Il patine. Les communautés de communes du Val d'Arche et du pays de l'Ombre, qui négocient depuis un an leur fusion, n'ont toujours pas réglé les questions les plus sensibles : qui dirigera, et depuis où.",
             },
           ],
         },
@@ -5071,8 +4775,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Sur le papier, le rapprochement fait consensus. Réunies, les deux intercommunalités formeraient un ensemble de 46 communes et près de 70 000 habitants, de quoi peser davantage face à la région et prétendre à de nouveaux financements.',
+              text: 'Sur le papier, le rapprochement fait consensus. Réunies, les deux intercommunalités formeraient un ensemble de 46 communes et près de 70 000 habitants, de quoi peser davantage face à la région et prétendre à de nouveaux financements.',
             },
           ],
         },
@@ -5081,8 +4784,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Mais l'équilibre politique se révèle plus difficile à trouver. Le Val d'Arche, plus peuplé, réclame la présidence et la majorité des sièges au futur conseil. Le pays de l'Ombre, plus étendu, redoute d'être réduit au rôle de figurant.",
+              text: "Mais l'équilibre politique se révèle plus difficile à trouver. Le Val d'Arche, plus peuplé, réclame la présidence et la majorité des sièges au futur conseil. Le pays de l'Ombre, plus étendu, redoute d'être réduit au rôle de figurant.",
             },
           ],
         },
@@ -5091,8 +4793,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Nous ne fusionnerons pas pour disparaître », prévient le président sortant du pays de l'Ombre, Théo Rassat, qui exige des garanties écrites sur la répartition des compétences.",
+              text: "« Nous ne fusionnerons pas pour disparaître », prévient le président sortant du pays de l'Ombre, Théo Rassat, qui exige des garanties écrites sur la répartition des compétences.",
             },
           ],
         },
@@ -5105,8 +4806,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'autre pierre d'achoppement tient au lieu. Installer le siège à Villefranche-d'Arvor, ville-centre du Val d'Arche, aurait une logique administrative, mais froisserait les élus de l'Ombre, attachés à leur bourg de Montreuil-l'Abbé.",
+              text: "L'autre pierre d'achoppement tient au lieu. Installer le siège à Villefranche-d'Arvor, ville-centre du Val d'Arche, aurait une logique administrative, mais froisserait les élus de l'Ombre, attachés à leur bourg de Montreuil-l'Abbé.",
             },
           ],
         },
@@ -5120,8 +4820,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Plusieurs maires plaident pour une solution intermédiaire : un siège partagé entre deux sites, avec des services répartis. D'autres jugent l'idée coûteuse et peu lisible.",
+              text: "Plusieurs maires plaident pour une solution intermédiaire : un siège partagé entre deux sites, avec des services répartis. D'autres jugent l'idée coûteuse et peu lisible.",
             },
           ],
         },
@@ -5130,8 +4829,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "À ces désaccords s'ajoutent des craintes plus discrètes. Les agents des deux collectivités s'interrogent sur le devenir de leurs postes, tandis que plusieurs petites communes redoutent de voir s'éloigner des services de proximité déjà rares. Les syndicats du personnel réclament, eux, des garanties écrites sur le maintien de l'emploi avant tout vote de rapprochement.",
+              text: "À ces désaccords s'ajoutent des craintes plus discrètes. Les agents des deux collectivités s'interrogent sur le devenir de leurs postes, tandis que plusieurs petites communes redoutent de voir s'éloigner des services de proximité déjà rares. Les syndicats du personnel réclament, eux, des garanties écrites sur le maintien de l'emploi avant tout vote de rapprochement.",
             },
           ],
         },
@@ -5140,8 +4838,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La question du financement des services publics, déjà tendue, plane sur les débats, comme l'a montré le récent bras de fer sur les transports scolaires détaillé dans ",
+              text: "La question du financement des services publics, déjà tendue, plane sur les débats, comme l'a montré le récent bras de fer sur les transports scolaires détaillé dans ",
             },
             {
               type: 'link',
@@ -5153,7 +4850,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -5162,8 +4859,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une réunion des deux exécutifs est prévue la semaine prochaine. En cas d'échec, le préfet pourrait être saisi pour arbitrer, une perspective que personne, des deux côtés, ne souhaite vraiment.",
+              text: "Une réunion des deux exécutifs est prévue la semaine prochaine. En cas d'échec, le préfet pourrait être saisi pour arbitrer, une perspective que personne, des deux côtés, ne souhaite vraiment.",
             },
           ],
         },
@@ -5219,8 +4915,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La salle des fêtes de Villefranche-d'Arvor était comble, mardi soir, pour la première réunion publique sur la piétonnisation du centre-ville. Deux heures de débat parfois vif, à l'image d'un sujet qui divise la commune depuis des mois.",
+              text: "La salle des fêtes de Villefranche-d'Arvor était comble, mardi soir, pour la première réunion publique sur la piétonnisation du centre-ville. Deux heures de débat parfois vif, à l'image d'un sujet qui divise la commune depuis des mois.",
             },
           ],
         },
@@ -5229,8 +4924,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le projet municipal prévoit de fermer à la circulation la rue Marchande et trois rues adjacentes, du mardi au samedi, entre 10 heures et 19 heures. Objectif affiché : réduire le trafic, végétaliser et redonner de la place aux terrasses.',
+              text: 'Le projet municipal prévoit de fermer à la circulation la rue Marchande et trois rues adjacentes, du mardi au samedi, entre 10 heures et 19 heures. Objectif affiché : réduire le trafic, végétaliser et redonner de la place aux terrasses.',
             },
           ],
         },
@@ -5243,8 +4937,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Dans la salle, les partisans du projet, souvent jeunes, ont mis en avant la qualité de l'air et la sécurité des piétons. Les opposants, eux, redoutent une baisse de fréquentation des commerces.",
+              text: "Dans la salle, les partisans du projet, souvent jeunes, ont mis en avant la qualité de l'air et la sécurité des piétons. Les opposants, eux, redoutent une baisse de fréquentation des commerces.",
             },
           ],
         },
@@ -5253,8 +4946,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Si mes clients ne peuvent plus se garer devant, ils iront à la zone commerciale. C'est aussi simple que cela.",
+              text: "Si mes clients ne peuvent plus se garer devant, ils iront à la zone commerciale. C'est aussi simple que cela.",
             },
           ],
           source: "L'union des commerçants de la rue Marchande",
@@ -5264,16 +4956,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Plusieurs habitants ont aussi soulevé la question du report de circulation vers les quartiers voisins, déjà saturés aux heures de pointe. ',
+              text: 'Plusieurs habitants ont aussi soulevé la question du report de circulation vers les quartiers voisins, déjà saturés aux heures de pointe. ',
             },
             {
               type: 'emphasis',
-              value: 'La crainte',
+              text: 'La crainte',
             },
             {
               type: 'text',
-              value: " d'un simple déplacement du problème est revenue à plusieurs reprises.",
+              text: " d'un simple déplacement du problème est revenue à plusieurs reprises.",
             },
           ],
         },
@@ -5286,8 +4977,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour sortir de l'affrontement, la municipalité a annoncé une phase de test dès octobre : la piétonnisation sera appliquée les samedis, pendant deux mois, avant une évaluation.",
+              text: "Pour sortir de l'affrontement, la municipalité a annoncé une phase de test dès octobre : la piétonnisation sera appliquée les samedis, pendant deux mois, avant une évaluation.",
             },
           ],
         },
@@ -5296,8 +4986,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Nous jugerons sur pièces, avec des comptages précis et un questionnaire aux commerçants », a promis l'adjointe à la mobilité, Fanny Leroux. La décision définitive n'interviendra qu'au printemps.",
+              text: "« Nous jugerons sur pièces, avec des comptages précis et un questionnaire aux commerçants », a promis l'adjointe à la mobilité, Fanny Leroux. La décision définitive n'interviendra qu'au printemps.",
             },
           ],
         },
@@ -5306,8 +4995,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Des habitants ont également plaidé pour des solutions intermédiaires : une piétonnisation limitée aux week-ends, ou l'aménagement de nouvelles places de stationnement en périphérie du centre, reliées par une navette gratuite.",
+              text: "Des habitants ont également plaidé pour des solutions intermédiaires : une piétonnisation limitée aux week-ends, ou l'aménagement de nouvelles places de stationnement en périphérie du centre, reliées par une navette gratuite.",
             },
           ],
         },
@@ -5316,8 +5004,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La mairie a promis de publier les résultats des comptages en toute transparence et d'associer à l'évaluation un panel d'habitants tirés au sort. Une seconde réunion publique se tiendra à la fin du mois, avant le lancement de la phase de test, pour préciser les modalités pratiques.",
+              text: "La mairie a promis de publier les résultats des comptages en toute transparence et d'associer à l'évaluation un panel d'habitants tirés au sort. Une seconde réunion publique se tiendra à la fin du mois, avant le lancement de la phase de test, pour préciser les modalités pratiques.",
             },
           ],
         },
@@ -5326,8 +5013,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En attendant, les esprits restent échauffés. À la sortie, chacun campait sur ses positions, signe que la mairie devra beaucoup argumenter pour rallier une majorité d'habitants.",
+              text: "En attendant, les esprits restent échauffés. À la sortie, chacun campait sur ses positions, signe que la mairie devra beaucoup argumenter pour rallier une majorité d'habitants.",
             },
           ],
         },
@@ -5365,8 +5051,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Il est 21 heures passées quand la séance reprend, après une courte suspension. Sur les bancs, une vingtaine d'élus, des dossiers en pile et des gobelets de café tièdes. À l'ordre du jour, un budget supplémentaire de 1,2 million d'euros, ligne après ligne.",
+              text: "Il est 21 heures passées quand la séance reprend, après une courte suspension. Sur les bancs, une vingtaine d'élus, des dossiers en pile et des gobelets de café tièdes. À l'ordre du jour, un budget supplémentaire de 1,2 million d'euros, ligne après ligne.",
             },
           ],
         },
@@ -5375,8 +5060,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le débat s'anime autour d'une somme modeste : 18 000 euros pour prolonger l'éclairage nocturne dans deux quartiers. Certains y voient une question de sécurité, d'autres une dépense énergétique à contre-courant.",
+              text: "Le débat s'anime autour d'une somme modeste : 18 000 euros pour prolonger l'éclairage nocturne dans deux quartiers. Certains y voient une question de sécurité, d'autres une dépense énergétique à contre-courant.",
             },
           ],
         },
@@ -5389,8 +5073,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Loin des grandes déclarations, c'est ici que se décide une part concrète de la vie de la commune : le prix d'un repas à la cantine, la réfection d'un trottoir, la subvention à une association sportive.",
+              text: "Loin des grandes déclarations, c'est ici que se décide une part concrète de la vie de la commune : le prix d'un repas à la cantine, la réfection d'un trottoir, la subvention à une association sportive.",
             },
           ],
         },
@@ -5399,8 +5082,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Les gens croient que tout se joue ailleurs. En réalité, l'essentiel se décide dans cette salle », confie une conseillère entre deux votes.",
+              text: "« Les gens croient que tout se joue ailleurs. En réalité, l'essentiel se décide dans cette salle », confie une conseillère entre deux votes.",
             },
           ],
         },
@@ -5409,8 +5091,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'À minuit passé, la dernière délibération est adoptée. Les élus rangent leurs dossiers. Demain, il faudra expliquer ces choix aux habitants, dont beaucoup ignorent tout de ces longues heures de discussions.',
+              text: 'À minuit passé, la dernière délibération est adoptée. Les élus rangent leurs dossiers. Demain, il faudra expliquer ces choix aux habitants, dont beaucoup ignorent tout de ces longues heures de discussions.',
             },
           ],
         },
@@ -5443,8 +5124,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La communauté d'agglomération du Val d'Arche s'est dotée jeudi d'une charte de déontologie, un document de douze pages censé encadrer le comportement de ses cent trente élus. Une première pour la collectivité. Le texte a été adopté à une large majorité, au terme de plusieurs mois de travail d'une commission dédiée réunissant élus de la majorité et de l'opposition.",
+              text: "La communauté d'agglomération du Val d'Arche s'est dotée jeudi d'une charte de déontologie, un document de douze pages censé encadrer le comportement de ses cent trente élus. Une première pour la collectivité. Le texte a été adopté à une large majorité, au terme de plusieurs mois de travail d'une commission dédiée réunissant élus de la majorité et de l'opposition.",
             },
           ],
         },
@@ -5457,8 +5137,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le texte pose des règles précises. Les élus devront déclarer tout intérêt personnel dans les dossiers qu'ils examinent et se retirer des délibérations concernées. Les cadeaux d'une valeur supérieure à 80 euros seront désormais proscrits.",
+              text: "Le texte pose des règles précises. Les élus devront déclarer tout intérêt personnel dans les dossiers qu'ils examinent et se retirer des délibérations concernées. Les cadeaux d'une valeur supérieure à 80 euros seront désormais proscrits.",
             },
           ],
         },
@@ -5467,8 +5146,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La charte crée surtout une fonction de déontologue, confiée à une juriste extérieure à la collectivité. Elle pourra être saisie par les élus eux-mêmes, mais aussi par les agents et par les habitants, via un formulaire en ligne.',
+              text: 'La charte crée surtout une fonction de déontologue, confiée à une juriste extérieure à la collectivité. Elle pourra être saisie par les élus eux-mêmes, mais aussi par les agents et par les habitants, via un formulaire en ligne.',
             },
           ],
         },
@@ -5477,8 +5155,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "« Il ne s'agit pas de présumer que nos élus fraudent, mais de lever tout soupçon », a expliqué le président de l'agglomération en défendant le dispositif.",
+              text: "« Il ne s'agit pas de présumer que nos élus fraudent, mais de lever tout soupçon », a expliqué le président de l'agglomération en défendant le dispositif.",
             },
           ],
         },
@@ -5491,8 +5168,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Tous ne sont pas convaincus. Une partie des élus juge la charte trop timide, faute de sanctions automatiques : la déontologue ne pourra qu'émettre des recommandations, sans pouvoir contraignant.",
+              text: "Tous ne sont pas convaincus. Une partie des élus juge la charte trop timide, faute de sanctions automatiques : la déontologue ne pourra qu'émettre des recommandations, sans pouvoir contraignant.",
             },
           ],
         },
@@ -5501,8 +5177,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le collectif Transparence citoyenne, qui milite pour un contrôle renforcé des marchés publics, salue « un premier pas » tout en réclamant la publication systématique des déclarations d'intérêts.",
+              text: "Le collectif Transparence citoyenne, qui milite pour un contrôle renforcé des marchés publics, salue « un premier pas » tout en réclamant la publication systématique des déclarations d'intérêts.",
             },
           ],
         },
@@ -5511,8 +5186,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La déontologue, dont le nom sera connu en décembre, disposera d'un budget propre et pourra publier un rapport annuel. Elle sera aussi chargée de former les nouveaux élus aux règles de prévention des conflits d'intérêts, un volet pédagogique que plusieurs collectivités voisines n'avaient pas prévu. Reste à savoir si les habitants s'empareront de ce nouvel outil, encore largement méconnu.",
+              text: "La déontologue, dont le nom sera connu en décembre, disposera d'un budget propre et pourra publier un rapport annuel. Elle sera aussi chargée de former les nouveaux élus aux règles de prévention des conflits d'intérêts, un volet pédagogique que plusieurs collectivités voisines n'avaient pas prévu. Reste à savoir si les habitants s'empareront de ce nouvel outil, encore largement méconnu.",
             },
           ],
         },
@@ -5521,8 +5195,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Plusieurs communes membres ont annoncé vouloir adopter une charte similaire à l'échelon municipal, afin d'harmoniser les pratiques sur l'ensemble du territoire.",
+              text: "Plusieurs communes membres ont annoncé vouloir adopter une charte similaire à l'échelon municipal, afin d'harmoniser les pratiques sur l'ensemble du territoire.",
             },
           ],
         },
@@ -5531,8 +5204,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La charte entrera en vigueur au 1er janvier. Un bilan est prévu au bout d'un an. Le débat rejoint d'autres tensions locales sur la participation des habitants, comme lors de ",
+              text: "La charte entrera en vigueur au 1er janvier. Un bilan est prévu au bout d'un an. Le débat rejoint d'autres tensions locales sur la participation des habitants, comme lors de ",
             },
             {
               type: 'link',
@@ -5544,7 +5216,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -5570,8 +5242,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La préfecture a annoncé mercredi le report de l'enquête publique sur le contournement routier de Montreuil-l'Abbé, initialement prévue en octobre. La consultation est repoussée à la fin de l'hiver.",
+              text: "La préfecture a annoncé mercredi le report de l'enquête publique sur le contournement routier de Montreuil-l'Abbé, initialement prévue en octobre. La consultation est repoussée à la fin de l'hiver.",
             },
           ],
         },
@@ -5580,8 +5251,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En cause, un dossier environnemental jugé incomplet, qui devra être révisé par le maître d'ouvrage avant toute nouvelle date. Les associations opposées au projet réclament, elles, un abandon pur et simple du tracé, qu'elles estiment coûteux et daté au regard des besoins réels du territoire.",
+              text: "En cause, un dossier environnemental jugé incomplet, qui devra être révisé par le maître d'ouvrage avant toute nouvelle date. Les associations opposées au projet réclament, elles, un abandon pur et simple du tracé, qu'elles estiment coûteux et daté au regard des besoins réels du territoire.",
             },
           ],
         },
@@ -5606,8 +5276,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La commune de Sainte-Coline lance son premier budget participatif, doté de 100 000 euros. À partir d'octobre, les habitants de plus de seize ans pourront déposer des projets d'intérêt local sur une plateforme dédiée ou dans les mairies de quartier.",
+              text: "La commune de Sainte-Coline lance son premier budget participatif, doté de 100 000 euros. À partir d'octobre, les habitants de plus de seize ans pourront déposer des projets d'intérêt local sur une plateforme dédiée ou dans les mairies de quartier.",
             },
           ],
         },
@@ -5616,8 +5285,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Après une phase d'examen technique, les propositions retenues seront soumises au vote des habitants en janvier. Les lauréats seront réalisés dans l'année. La municipalité espère mobiliser les quartiers les plus éloignés de la vie publique, où la participation électorale reste faible.",
+              text: "Après une phase d'examen technique, les propositions retenues seront soumises au vote des habitants en janvier. Les lauréats seront réalisés dans l'année. La municipalité espère mobiliser les quartiers les plus éloignés de la vie publique, où la participation électorale reste faible.",
             },
           ],
         },
@@ -5642,8 +5310,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le conseil départemental de la Sèvre-et-Coteaux a voté vendredi un fonds d'urgence de deux millions d'euros destiné aux communes touchées par les orages violents du mois d'août.",
+              text: "Le conseil départemental de la Sèvre-et-Coteaux a voté vendredi un fonds d'urgence de deux millions d'euros destiné aux communes touchées par les orages violents du mois d'août.",
             },
           ],
         },
@@ -5652,8 +5319,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une trentaine de communes avaient signalé des dégâts : routes affaissées, ponts fragilisés, écoles inondées. Le fonds financera jusqu'à 60 % du coût des réparations les plus urgentes.",
+              text: "Une trentaine de communes avaient signalé des dégâts : routes affaissées, ponts fragilisés, écoles inondées. Le fonds financera jusqu'à 60 % du coût des réparations les plus urgentes.",
             },
           ],
         },
@@ -5662,8 +5328,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les premières enveloppes seront versées avant la fin octobre, a précisé la collectivité. Les maires concernés réclamaient depuis des semaines un geste rapide, redoutant que les travaux ne s'éternisent avant l'hiver.",
+              text: "Les premières enveloppes seront versées avant la fin octobre, a précisé la collectivité. Les maires concernés réclamaient depuis des semaines un geste rapide, redoutant que les travaux ne s'éternisent avant l'hiver.",
             },
           ],
         },
@@ -5696,8 +5361,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le vote n'a pris que quelques minutes, mais il a mis fin à trois nuits de tension. Réuni en urgence mercredi matin, le conseil municipal de Villeneuve-sur-Arche a validé la mise à disposition du gymnase des Charmilles jusqu'à la fin mars, le temps de la période hivernale.",
+              text: "Le vote n'a pris que quelques minutes, mais il a mis fin à trois nuits de tension. Réuni en urgence mercredi matin, le conseil municipal de Villeneuve-sur-Arche a validé la mise à disposition du gymnase des Charmilles jusqu'à la fin mars, le temps de la période hivernale.",
             },
           ],
         },
@@ -5710,8 +5374,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Depuis lundi, une trentaine de bénévoles du collectif Toits d'abord s'étaient relayés sous les fenêtres de l'hôtel de ville. Le mouvement réclamait une solution pour les personnes dormant sous le viaduc de l'Arche, dont le nombre a doublé en un an selon le centre d'action sociale de la commune.",
+              text: "Depuis lundi, une trentaine de bénévoles du collectif Toits d'abord s'étaient relayés sous les fenêtres de l'hôtel de ville. Le mouvement réclamait une solution pour les personnes dormant sous le viaduc de l'Arche, dont le nombre a doublé en un an selon le centre d'action sociale de la commune.",
             },
           ],
         },
@@ -5720,12 +5383,11 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'emphasis',
-              value: "Le froid n'attend pas les réunions de commission",
+              text: "Le froid n'attend pas les réunions de commission",
             },
             {
               type: 'text',
-              value:
-                ", résume l'un des porte-parole du collectif. La municipalité, qui invoquait jusque-là un manque de moyens humains, a finalement accepté d'affecter deux agents et de solliciter la fédération Solidarités Arche pour l'encadrement de nuit.",
+              text: ", résume l'un des porte-parole du collectif. La municipalité, qui invoquait jusque-là un manque de moyens humains, a finalement accepté d'affecter deux agents et de solliciter la fédération Solidarités Arche pour l'encadrement de nuit.",
             },
           ],
         },
@@ -5734,7 +5396,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Nous ne demandions pas un miracle, seulement un toit avant que les températures ne chutent.',
+              text: 'Nous ne demandions pas un miracle, seulement un toit avant que les températures ne chutent.',
             },
           ],
           source: "Le collectif Toits d'abord",
@@ -5749,8 +5411,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le dispositif prévoit soixante places, des repas du soir et un accès aux douches du complexe sportif. Les associations partenaires assureront une permanence sociale trois matinées par semaine, afin d'orienter les personnes vers des solutions plus durables.",
+              text: "Le dispositif prévoit soixante places, des repas du soir et un accès aux douches du complexe sportif. Les associations partenaires assureront une permanence sociale trois matinées par semaine, afin d'orienter les personnes vers des solutions plus durables.",
             },
           ],
         },
@@ -5763,8 +5424,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La question du relogement reste entière. La commune ne dispose que de douze logements d'insertion, un chiffre inchangé depuis six ans, tandis que la liste d'attente atteint désormais près de deux cents dossiers. Le collectif réclame la création d'une pension de famille, portée par plusieurs communes de la vallée.",
+              text: "La question du relogement reste entière. La commune ne dispose que de douze logements d'insertion, un chiffre inchangé depuis six ans, tandis que la liste d'attente atteint désormais près de deux cents dossiers. Le collectif réclame la création d'une pension de famille, portée par plusieurs communes de la vallée.",
             },
           ],
         },
@@ -5773,16 +5433,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'adjointe aux affaires sociales a promis l'ouverture d'un groupe de travail dès octobre, sans s'engager sur un calendrier. Une prudence que les bénévoles jugent ",
+              text: "L'adjointe aux affaires sociales a promis l'ouverture d'un groupe de travail dès octobre, sans s'engager sur un calendrier. Une prudence que les bénévoles jugent ",
             },
             {
               type: 'emphasis',
-              value: 'insuffisante',
+              text: 'insuffisante',
             },
             {
               type: 'text',
-              value: ", mais qui n'entame pas le soulagement de voir le gymnase ouvrir dès jeudi soir.",
+              text: ", mais qui n'entame pas le soulagement de voir le gymnase ouvrir dès jeudi soir.",
             },
           ],
         },
@@ -5791,8 +5450,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La scolarisation des enfants concernés fera l'objet d'un point spécifique, un sujet que nous suivons dans ",
+              text: "La scolarisation des enfants concernés fera l'objet d'un point spécifique, un sujet que nous suivons dans ",
             },
             {
               type: 'link',
@@ -5804,8 +5462,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value:
-                ". Reste à savoir si l'expérience des Charmilles servira de modèle aux autres bourgs de l'agglomération.",
+              text: ". Reste à savoir si l'expérience des Charmilles servira de modèle aux autres bourgs de l'agglomération.",
             },
           ],
         },
@@ -5860,8 +5517,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Vingt minutes, montre en main. C'est le temps dont disposent désormais les élèves du second service à l'école des Peupliers, à Bourg-Méran, pour s'installer, déjeuner et débarrasser. La faute à une fréquentation en hausse que les locaux ne suivent plus.",
+              text: "Vingt minutes, montre en main. C'est le temps dont disposent désormais les élèves du second service à l'école des Peupliers, à Bourg-Méran, pour s'installer, déjeuner et débarrasser. La faute à une fréquentation en hausse que les locaux ne suivent plus.",
             },
           ],
         },
@@ -5874,8 +5530,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Depuis la rentrée, quatre écoles de la commune ont dédoublé le temps de midi. Les effectifs inscrits à la restauration ont bondi de près d'un quart en deux ans, portés par l'arrivée de jeunes ménages dans les nouveaux lotissements du plateau.",
+              text: "Depuis la rentrée, quatre écoles de la commune ont dédoublé le temps de midi. Les effectifs inscrits à la restauration ont bondi de près d'un quart en deux ans, portés par l'arrivée de jeunes ménages dans les nouveaux lotissements du plateau.",
             },
           ],
         },
@@ -5884,8 +5539,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les parents réunis au sein de l'association Les Cartables du Val d'Arche décrivent des enfants qui rentrent le ventre creux et des personnels débordés. Ils réclament un plan pluriannuel d'agrandissement, ainsi que le recrutement d'agents supplémentaires.",
+              text: "Les parents réunis au sein de l'association Les Cartables du Val d'Arche décrivent des enfants qui rentrent le ventre creux et des personnels débordés. Ils réclament un plan pluriannuel d'agrandissement, ainsi que le recrutement d'agents supplémentaires.",
             },
           ],
         },
@@ -5894,8 +5548,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'On ne peut pas apprendre à un enfant à bien manger en lui laissant vingt minutes pour tout faire.',
+              text: 'On ne peut pas apprendre à un enfant à bien manger en lui laissant vingt minutes pour tout faire.',
             },
           ],
           source: "L'association Les Cartables du Val d'Arche",
@@ -5905,8 +5558,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La mairie reconnaît la tension mais met en avant le coût des travaux. Selon les services techniques, l'agrandissement d'un seul réfectoire dépasserait le million d'euros, une somme jugée difficile à mobiliser sans aide du département.",
+              text: "La mairie reconnaît la tension mais met en avant le coût des travaux. Selon les services techniques, l'agrandissement d'un seul réfectoire dépasserait le million d'euros, une somme jugée difficile à mobiliser sans aide du département.",
             },
           ],
         },
@@ -5915,8 +5567,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les enseignants, eux, pointent des effets moins visibles. Un déjeuner avalé trop vite, expliquent-ils, se paie l'après-midi par une agitation accrue et une attention en berne. Plusieurs directions d'école ont commencé à consigner ces observations, dans l'espoir de peser sur les arbitrages budgétaires à venir. La question dépasse la seule logistique : elle touche au temps que l'école accorde à un repas partagé.",
+              text: "Les enseignants, eux, pointent des effets moins visibles. Un déjeuner avalé trop vite, expliquent-ils, se paie l'après-midi par une agitation accrue et une attention en berne. Plusieurs directions d'école ont commencé à consigner ces observations, dans l'espoir de peser sur les arbitrages budgétaires à venir. La question dépasse la seule logistique : elle touche au temps que l'école accorde à un repas partagé.",
             },
           ],
         },
@@ -5925,8 +5576,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Du côté des agents de restauration, la fatigue s'accumule. Servir deux fois plus d'enfants dans le même créneau suppose de nettoyer, réapprovisionner et réinstaller les salles en un temps record, sans effectif supplémentaire.",
+              text: "Du côté des agents de restauration, la fatigue s'accumule. Servir deux fois plus d'enfants dans le même créneau suppose de nettoyer, réapprovisionner et réinstaller les salles en un temps record, sans effectif supplémentaire.",
             },
           ],
         },
@@ -5939,8 +5589,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Une réunion publique est annoncée pour la mi-octobre. Elle devra trancher entre plusieurs pistes : construction modulaire, réorganisation des horaires, ou passage à un self-service pour les plus grands. Les familles, elles, demandent surtout des engagements chiffrés.',
+              text: 'Une réunion publique est annoncée pour la mi-octobre. Elle devra trancher entre plusieurs pistes : construction modulaire, réorganisation des horaires, ou passage à un self-service pour les plus grands. Les familles, elles, demandent surtout des engagements chiffrés.',
             },
           ],
         },
@@ -5949,16 +5598,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En attendant, les équipes enseignantes s'adaptent, décalant parfois les récréations pour fluidifier les passages. ",
+              text: "En attendant, les équipes enseignantes s'adaptent, décalant parfois les récréations pour fluidifier les passages. ",
             },
             {
               type: 'emphasis',
-              value: 'Une bricole quotidienne',
+              text: 'Une bricole quotidienne',
             },
             {
               type: 'text',
-              value: " qui, préviennent-elles, ne tiendra pas toute l'année scolaire.",
+              text: " qui, préviennent-elles, ne tiendra pas toute l'année scolaire.",
             },
           ],
         },
@@ -5991,8 +5639,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sur le papier, tout est prêt : quatre cabinets équipés, une salle de soins infirmiers, un logement rénové à l'étage. Mais un an après son inauguration, la maison de santé du Val d'Arche, à Saint-Clair-du-Roc, n'a réussi à fixer qu'un seul médecin à temps plein.",
+              text: "Sur le papier, tout est prêt : quatre cabinets équipés, une salle de soins infirmiers, un logement rénové à l'étage. Mais un an après son inauguration, la maison de santé du Val d'Arche, à Saint-Clair-du-Roc, n'a réussi à fixer qu'un seul médecin à temps plein.",
             },
           ],
         },
@@ -6005,16 +5652,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le projet est né d'un pari : mutualiser les moyens de cinq communes rurales pour enrayer le départ des soignants. La construction a coûté près de deux millions d'euros, financés en partie par un emprunt intercommunal que les élus assument ",
+              text: "Le projet est né d'un pari : mutualiser les moyens de cinq communes rurales pour enrayer le départ des soignants. La construction a coûté près de deux millions d'euros, financés en partie par un emprunt intercommunal que les élus assument ",
             },
             {
               type: 'emphasis',
-              value: 'pleinement',
+              text: 'pleinement',
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -6023,8 +5669,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'établissement propose une prime d'installation et un accompagnement administratif pour les remplaçants. Le syndicat intercommunal a même publié une brochure détaillée, consultable en ligne, pour vanter la qualité de vie de la vallée sur ",
+              text: "L'établissement propose une prime d'installation et un accompagnement administratif pour les remplaçants. Le syndicat intercommunal a même publié une brochure détaillée, consultable en ligne, pour vanter la qualité de vie de la vallée sur ",
             },
             {
               type: 'link',
@@ -6036,7 +5681,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -6050,8 +5695,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Malgré ces efforts, les jeunes praticiens hésitent. Beaucoup redoutent l'isolement professionnel, l'absence de spécialistes à proximité et la charge de patients accumulée depuis le départ à la retraite de deux anciens médecins.",
+              text: "Malgré ces efforts, les jeunes praticiens hésitent. Beaucoup redoutent l'isolement professionnel, l'absence de spécialistes à proximité et la charge de patients accumulée depuis le départ à la retraite de deux anciens médecins.",
             },
           ],
         },
@@ -6064,8 +5708,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour renverser la tendance, la maison de santé accueille désormais des internes en stage, dans l'espoir de créer un attachement au territoire. Deux cabines de télémédecine ont aussi été installées, permettant des consultations à distance avec un centre hospitalier situé à quarante kilomètres.",
+              text: "Pour renverser la tendance, la maison de santé accueille désormais des internes en stage, dans l'espoir de créer un attachement au territoire. Deux cabines de télémédecine ont aussi été installées, permettant des consultations à distance avec un centre hospitalier situé à quarante kilomètres.",
             },
           ],
         },
@@ -6074,7 +5717,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: "Un interne qui passe six mois chez nous, c'est une chance sur deux qu'il revienne s'installer.",
+              text: "Un interne qui passe six mois chez nous, c'est une chance sur deux qu'il revienne s'installer.",
             },
           ],
           source: "Le syndicat intercommunal du Val d'Arche",
@@ -6084,16 +5727,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les élus veulent croire à cette stratégie de long terme. Ils réclament aussi une meilleure coordination régionale, estimant que la concurrence entre territoires pour attirer les mêmes praticiens finit par ',
+              text: 'Les élus veulent croire à cette stratégie de long terme. Ils réclament aussi une meilleure coordination régionale, estimant que la concurrence entre territoires pour attirer les mêmes praticiens finit par ',
             },
             {
               type: 'emphasis',
-              value: 'épuiser',
+              text: 'épuiser',
             },
             {
               type: 'text',
-              value: ' les finances locales sans résoudre le fond du problème.',
+              text: ' les finances locales sans résoudre le fond du problème.',
             },
           ],
         },
@@ -6102,8 +5744,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "D'ici la fin de l'année, une deuxième campagne de recrutement sera lancée, cette fois tournée vers les praticiens étrangers en cours d'équivalence. Un dossier que la structure suit avec prudence, conscient des délais administratifs.",
+              text: "D'ici la fin de l'année, une deuxième campagne de recrutement sera lancée, cette fois tournée vers les praticiens étrangers en cours d'équivalence. Un dossier que la structure suit avec prudence, conscient des délais administratifs.",
             },
           ],
         },
@@ -6136,8 +5777,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Il est quinze heures et la cuisine pédagogique de la résidence Les Tilleuls sent la pâte à tarte. Autour du plan de travail, quatre pensionnaires guident les gestes hésitants d'une poignée de collégiens venus à pied depuis l'établissement voisin.",
+              text: "Il est quinze heures et la cuisine pédagogique de la résidence Les Tilleuls sent la pâte à tarte. Autour du plan de travail, quatre pensionnaires guident les gestes hésitants d'une poignée de collégiens venus à pied depuis l'établissement voisin.",
             },
           ],
         },
@@ -6150,8 +5790,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'initiative est née d'un constat partagé par le personnel : trop de résidents passaient leurs journées sans visite. Le projet, baptisé « Les mardis mêlés », associe désormais une classe de quatrième et une quinzaine de pensionnaires volontaires.",
+              text: "L'initiative est née d'un constat partagé par le personnel : trop de résidents passaient leurs journées sans visite. Le projet, baptisé « Les mardis mêlés », associe désormais une classe de quatrième et une quinzaine de pensionnaires volontaires.",
             },
           ],
         },
@@ -6160,16 +5799,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les activités varient au fil des semaines : jardinage dans les bacs surélevés, lecture à voix haute, initiation aux jeux de société d'autrefois. L'idée n'est pas de meubler le temps, mais de créer de véritables ",
+              text: "Les activités varient au fil des semaines : jardinage dans les bacs surélevés, lecture à voix haute, initiation aux jeux de société d'autrefois. L'idée n'est pas de meubler le temps, mais de créer de véritables ",
             },
             {
               type: 'emphasis',
-              value: 'complicités',
+              text: 'complicités',
             },
             {
               type: 'text',
-              value: ' entre les générations.',
+              text: ' entre les générations.',
             },
           ],
         },
@@ -6178,7 +5816,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Depuis que les jeunes viennent, ma mère se recoiffe le mardi matin. Ça dit tout.',
+              text: 'Depuis que les jeunes viennent, ma mère se recoiffe le mardi matin. Ça dit tout.',
             },
           ],
           source: "La fille d'une pensionnaire",
@@ -6193,8 +5831,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Côté collège, l'enseignante qui encadre le projet y voit un prolongement concret du programme d'éducation civique. Plusieurs élèves, d'abord intimidés, réclament aujourd'hui de prolonger les séances au-delà de l'heure prévue.",
+              text: "Côté collège, l'enseignante qui encadre le projet y voit un prolongement concret du programme d'éducation civique. Plusieurs élèves, d'abord intimidés, réclament aujourd'hui de prolonger les séances au-delà de l'heure prévue.",
             },
           ],
         },
@@ -6203,8 +5840,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les bénéfices se lisent aussi du côté des soignants. Depuis le lancement des ateliers, l'équipe observe une baisse des prescriptions de somnifères et une meilleure participation aux repas collectifs. Rien de spectaculaire, préviennent les animateurs, mais des signaux qui comptent dans un établissement où la routine pèse souvent lourd sur le moral des résidents.",
+              text: "Les bénéfices se lisent aussi du côté des soignants. Depuis le lancement des ateliers, l'équipe observe une baisse des prescriptions de somnifères et une meilleure participation aux repas collectifs. Rien de spectaculaire, préviennent les animateurs, mais des signaux qui comptent dans un établissement où la routine pèse souvent lourd sur le moral des résidents.",
             },
           ],
         },
@@ -6213,8 +5849,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les familles, longtemps tenues à distance par les horaires de visite, se réapproprient elles aussi les lieux. Certaines viennent désormais assister aux séances, transformant le mardi en véritable rendez-vous ouvert sur le quartier.',
+              text: 'Les familles, longtemps tenues à distance par les horaires de visite, se réapproprient elles aussi les lieux. Certaines viennent désormais assister aux séances, transformant le mardi en véritable rendez-vous ouvert sur le quartier.',
             },
           ],
         },
@@ -6227,8 +5862,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Fort de ce succès, le centre d'action sociale réfléchit à étendre la formule à deux autres résidences de l'agglomération. Mais la direction des Tilleuls appelle à la prudence : la réussite tient à la régularité et à la petite taille des groupes, préviennent les animateurs.",
+              text: "Fort de ce succès, le centre d'action sociale réfléchit à étendre la formule à deux autres résidences de l'agglomération. Mais la direction des Tilleuls appelle à la prudence : la réussite tient à la régularité et à la petite taille des groupes, préviennent les animateurs.",
             },
           ],
         },
@@ -6237,8 +5871,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le financement, assuré jusqu'ici par une subvention communale, devra être reconduit au prochain budget. En attendant, les mardis continuent, et la prochaine séance sera consacrée aux confitures de l'arrière-saison.",
+              text: "Le financement, assuré jusqu'ici par une subvention communale, devra être reconduit au prochain budget. En attendant, les mardis continuent, et la prochaine séance sera consacrée aux confitures de l'arrière-saison.",
             },
           ],
         },
@@ -6271,8 +5904,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sept heures quarante, au hameau de Faverolles. Un minibus vert se range devant l'ancien lavoir, où trois habitantes attendent déjà. C'est le premier trajet d'un service de transport à la demande que six communes expérimentent depuis lundi.",
+              text: "Sept heures quarante, au hameau de Faverolles. Un minibus vert se range devant l'ancien lavoir, où trois habitantes attendent déjà. C'est le premier trajet d'un service de transport à la demande que six communes expérimentent depuis lundi.",
             },
           ],
         },
@@ -6285,8 +5917,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le principe est simple : un appel avant dix-huit heures, et la navette passe le lendemain matin. Elle relie les hameaux isolés au bourg-centre, où se trouvent le marché, la pharmacie et la gare routière. Le tarif, volontairement modeste, a été fixé à deux euros le trajet.',
+              text: 'Le principe est simple : un appel avant dix-huit heures, et la navette passe le lendemain matin. Elle relie les hameaux isolés au bourg-centre, où se trouvent le marché, la pharmacie et la gare routière. Le tarif, volontairement modeste, a été fixé à deux euros le trajet.',
             },
           ],
         },
@@ -6295,25 +5926,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Le service vise en priorité les personnes âgées et les adolescents sans moyen de locomotion. ',
+              text: 'Le service vise en priorité les personnes âgées et les adolescents sans moyen de locomotion. ',
             },
             {
               type: 'emphasis',
-              value: "Sortir de chez soi ne devrait pas dépendre d'un voisin disponible",
+              text: "Sortir de chez soi ne devrait pas dépendre d'un voisin disponible",
             },
             {
               type: 'text',
-              value: ", résume l'élue chargée du dossier à la communauté de communes.",
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          spans: [
-            {
-              type: 'text',
-              value:
-                "Les premiers retours sont encourageants. Dès la première semaine, une soixantaine de réservations ont été enregistrées, bien au-delà des prévisions. La difficulté sera de tenir le rythme sans saturer l'unique véhicule disponible.",
+              text: ", résume l'élue chargée du dossier à la communauté de communes.",
             },
           ],
         },
@@ -6322,8 +5943,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour les usagers, le changement est concret. Une habitante de Faverolles, qui renonçait jusqu'ici à certains rendez-vous médicaux faute de moyen de transport, dit avoir retrouvé une forme d'autonomie. D'autres apprécient de croiser des voisins qu'ils ne voyaient plus, la navette devenant peu à peu un lieu d'échange autant qu'un moyen de déplacement.",
+              text: "Les premiers retours sont encourageants. Dès la première semaine, une soixantaine de réservations ont été enregistrées, bien au-delà des prévisions. La difficulté sera de tenir le rythme sans saturer l'unique véhicule disponible.",
             },
           ],
         },
@@ -6332,8 +5952,16 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les chauffeurs bénévoles, eux, adaptent les tournées au fil des demandes, quitte à ajouter un arrêt de dernière minute pour dépanner un habitant isolé.',
+              text: "Pour les usagers, le changement est concret. Une habitante de Faverolles, qui renonçait jusqu'ici à certains rendez-vous médicaux faute de moyen de transport, dit avoir retrouvé une forme d'autonomie. D'autres apprécient de croiser des voisins qu'ils ne voyaient plus, la navette devenant peu à peu un lieu d'échange autant qu'un moyen de déplacement.",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          spans: [
+            {
+              type: 'text',
+              text: 'Les chauffeurs bénévoles, eux, adaptent les tournées au fil des demandes, quitte à ajouter un arrêt de dernière minute pour dépanner un habitant isolé.',
             },
           ],
         },
@@ -6346,8 +5974,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le coût du dispositif repose pour l'instant sur une aide régionale et sur le bénévolat de deux chauffeurs à la retraite. Au-delà des six mois d'expérimentation, sa pérennité dépendra d'un cofinancement encore incertain.",
+              text: "Le coût du dispositif repose pour l'instant sur une aide régionale et sur le bénévolat de deux chauffeurs à la retraite. Au-delà des six mois d'expérimentation, sa pérennité dépendra d'un cofinancement encore incertain.",
             },
           ],
         },
@@ -6356,8 +5983,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les élus espèrent démontrer que le désenclavement rural ne passe pas uniquement par la voiture individuelle. Un enjeu qui rejoint les débats sur l'accès aux soins que nous évoquions dans ",
+              text: "Les élus espèrent démontrer que le désenclavement rural ne passe pas uniquement par la voiture individuelle. Un enjeu qui rejoint les débats sur l'accès aux soins que nous évoquions dans ",
             },
             {
               type: 'link',
@@ -6369,7 +5995,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '.',
+              text: '.',
             },
           ],
         },
@@ -6378,8 +6004,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Si l'essai est concluant, un second véhicule pourrait être acquis au printemps, avec des créneaux élargis aux fins de semaine. Les habitants, eux, redoutent surtout de voir le minibus disparaître une fois la subvention épuisée.",
+              text: "Si l'essai est concluant, un second véhicule pourrait être acquis au printemps, avec des créneaux élargis aux fins de semaine. Les habitants, eux, redoutent surtout de voir le minibus disparaître une fois la subvention épuisée.",
             },
           ],
         },
@@ -6412,8 +6037,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les cageots de légumes arrivent à peine que déjà la file s'allonge sur le trottoir. À l'épicerie solidaire de Longeval, la rentrée a des allures de test grandeur nature : jamais l'association Le Pain partagé n'avait accueilli autant de familles en une seule matinée.",
+              text: "Les cageots de légumes arrivent à peine que déjà la file s'allonge sur le trottoir. À l'épicerie solidaire de Longeval, la rentrée a des allures de test grandeur nature : jamais l'association Le Pain partagé n'avait accueilli autant de familles en une seule matinée.",
             },
           ],
         },
@@ -6426,8 +6050,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En un an, le nombre de foyers inscrits a augmenté de près de moitié. Étudiants, familles monoparentales, retraités modestes : le public s'est élargi, signe que la précarité ne se limite plus aux profils habituels, observent les responsables.",
+              text: "En un an, le nombre de foyers inscrits a augmenté de près de moitié. Étudiants, familles monoparentales, retraités modestes : le public s'est élargi, signe que la précarité ne se limite plus aux profils habituels, observent les responsables.",
             },
           ],
         },
@@ -6436,8 +6059,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour tenir, l'épicerie s'appuie sur une quinzaine de bénévoles réguliers. Mais plusieurs d'entre eux, âgés, souhaitent lever le pied. Sans renfort, l'association craint de devoir fermer un après-midi par semaine, au risque de laisser des familles sans solution.",
+              text: "Pour tenir, l'épicerie s'appuie sur une quinzaine de bénévoles réguliers. Mais plusieurs d'entre eux, âgés, souhaitent lever le pied. Sans renfort, l'association craint de devoir fermer un après-midi par semaine, au risque de laisser des familles sans solution.",
             },
           ],
         },
@@ -6446,7 +6068,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Nous ne voulons refuser personne, mais nous ne sommes pas assez nombreux pour tout porter.',
+              text: 'Nous ne voulons refuser personne, mais nous ne sommes pas assez nombreux pour tout porter.',
             },
           ],
           source: "L'association Le Pain partagé",
@@ -6456,8 +6078,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'organisation a mis en ligne un formulaire d'inscription pour les volontaires, accessible depuis ",
+              text: "L'organisation a mis en ligne un formulaire d'inscription pour les volontaires, accessible depuis ",
             },
             {
               type: 'link',
@@ -6469,7 +6090,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: '. Une matinée par mois suffit, insiste-t-elle, pour faire tourner les distributions.',
+              text: '. Une matinée par mois suffit, insiste-t-elle, pour faire tourner les distributions.',
             },
           ],
         },
@@ -6478,8 +6099,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le profil des nouveaux inscrits éclaire la crise à sa manière. Aux côtés des familles habituées de l'aide alimentaire, les responsables voient arriver des salariés à temps partiel, des apprentis, des personnes qui n'auraient jamais imaginé pousser cette porte. Beaucoup hésitent longtemps avant de franchir le seuil, freinés par la honte, un frein que l'équipe tente de lever par un accueil discret et sans formalités inutiles.",
+              text: "Le profil des nouveaux inscrits éclaire la crise à sa manière. Aux côtés des familles habituées de l'aide alimentaire, les responsables voient arriver des salariés à temps partiel, des apprentis, des personnes qui n'auraient jamais imaginé pousser cette porte. Beaucoup hésitent longtemps avant de franchir le seuil, freinés par la honte, un frein que l'équipe tente de lever par un accueil discret et sans formalités inutiles.",
             },
           ],
         },
@@ -6488,8 +6108,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'épicerie fonctionne selon un principe de participation : les bénéficiaires règlent une petite part du prix, gage de dignité autant que de gestion. Ce modèle, fragile, suppose un flux régulier de dons pour rester à flot.",
+              text: "L'épicerie fonctionne selon un principe de participation : les bénéficiaires règlent une petite part du prix, gage de dignité autant que de gestion. Ce modèle, fragile, suppose un flux régulier de dons pour rester à flot.",
             },
           ],
         },
@@ -6502,16 +6121,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Au-delà des bras, l'épicerie cherche à sécuriser ses approvisionnements. Elle négocie des partenariats avec des maraîchers de la vallée pour récupérer les invendus, une piste qui permettrait aussi de proposer des produits ",
+              text: "Au-delà des bras, l'épicerie cherche à sécuriser ses approvisionnements. Elle négocie des partenariats avec des maraîchers de la vallée pour récupérer les invendus, une piste qui permettrait aussi de proposer des produits ",
             },
             {
               type: 'emphasis',
-              value: 'frais',
+              text: 'frais',
             },
             {
               type: 'text',
-              value: ' plutôt que des seules conserves.',
+              text: ' plutôt que des seules conserves.',
             },
           ],
         },
@@ -6520,8 +6138,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La municipalité, sollicitée, étudie la mise à disposition d'un local plus grand. Rien n'est encore acté, mais l'association veut croire à une issue avant l'hiver, période où la demande grimpe encore.",
+              text: "La municipalité, sollicitée, étudie la mise à disposition d'un local plus grand. Rien n'est encore acté, mais l'association veut croire à une issue avant l'hiver, période où la demande grimpe encore.",
             },
           ],
         },
@@ -6570,8 +6187,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La ville de Villeneuve-sur-Arche a annoncé mercredi l'ouverture prochaine d'une halte de jour, dans un local du centre-ville prêté par la paroisse. Le lieu accueillera les personnes sans domicile en journée, un créneau jusqu'ici non couvert par les dispositifs existants.",
+              text: "La ville de Villeneuve-sur-Arche a annoncé mercredi l'ouverture prochaine d'une halte de jour, dans un local du centre-ville prêté par la paroisse. Le lieu accueillera les personnes sans domicile en journée, un créneau jusqu'ici non couvert par les dispositifs existants.",
             },
           ],
         },
@@ -6580,8 +6196,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les usagers pourront s'y réchauffer, laver leur linge et rencontrer un travailleur social. La fédération Solidarités Arche assurera l'animation, avec le concours de bénévoles. L'accueil fonctionnera du lundi au samedi, de neuf heures à dix-sept heures, à partir de la mi-novembre.",
+              text: "Les usagers pourront s'y réchauffer, laver leur linge et rencontrer un travailleur social. La fédération Solidarités Arche assurera l'animation, avec le concours de bénévoles. L'accueil fonctionnera du lundi au samedi, de neuf heures à dix-sept heures, à partir de la mi-novembre.",
             },
           ],
         },
@@ -6590,8 +6205,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le financement, estimé à quarante mille euros pour la saison, sera partagé entre la commune et le département. Les associations réclament désormais une pérennisation au-delà du seul hiver.',
+              text: 'Le financement, estimé à quarante mille euros pour la saison, sera partagé entre la commune et le département. Les associations réclament désormais une pérennisation au-delà du seul hiver.',
             },
           ],
         },
@@ -6616,8 +6230,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La médiathèque de Bourg-Méran étendra ses horaires dès le mois d'octobre. Trois soirs par semaine, l'établissement restera ouvert jusqu'à vingt-deux heures, avec une équipe renforcée de deux agents et de plusieurs vacataires étudiants.",
+              text: "La médiathèque de Bourg-Méran étendra ses horaires dès le mois d'octobre. Trois soirs par semaine, l'établissement restera ouvert jusqu'à vingt-deux heures, avec une équipe renforcée de deux agents et de plusieurs vacataires étudiants.",
             },
           ],
         },
@@ -6626,8 +6239,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La mesure répond à une demande récurrente des lycéens et des étudiants, souvent contraints de réviser chez eux faute de lieu adapté. Une salle silencieuse et une trentaine de places supplémentaires seront réservées à cet usage.',
+              text: 'La mesure répond à une demande récurrente des lycéens et des étudiants, souvent contraints de réviser chez eux faute de lieu adapté. Une salle silencieuse et une trentaine de places supplémentaires seront réservées à cet usage.',
             },
           ],
         },
@@ -6636,8 +6248,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'expérimentation durera une année scolaire. Si la fréquentation se confirme, la municipalité envisage d'ouvrir aussi le dimanche après-midi, un créneau plébiscité lors de la consultation menée au printemps auprès des usagers.",
+              text: "L'expérimentation durera une année scolaire. Si la fréquentation se confirme, la municipalité envisage d'ouvrir aussi le dimanche après-midi, un créneau plébiscité lors de la consultation menée au printemps auprès des usagers.",
             },
           ],
         },
@@ -6662,8 +6273,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Trois écoles de Saint-Clair-du-Roc se sont équipées cette semaine de composteurs, dans le cadre d'un projet pédagogique porté par la communauté de communes. Les élèves apprendront à trier les restes de repas, désormais collectés séparément à la cantine.",
+              text: "Trois écoles de Saint-Clair-du-Roc se sont équipées cette semaine de composteurs, dans le cadre d'un projet pédagogique porté par la communauté de communes. Les élèves apprendront à trier les restes de repas, désormais collectés séparément à la cantine.",
             },
           ],
         },
@@ -6672,8 +6282,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les enseignants intègrent l'opération à leurs cours de sciences, avec un suivi du compost sur toute l'année. Le compost obtenu servira aux potagers scolaires et aux espaces verts des établissements.",
+              text: "Les enseignants intègrent l'opération à leurs cours de sciences, avec un suivi du compost sur toute l'année. Le compost obtenu servira aux potagers scolaires et aux espaces verts des établissements.",
             },
           ],
         },
@@ -6682,8 +6291,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les organisateurs espèrent réduire d'environ un tiers le volume des poubelles classiques. En cas de réussite, le dispositif pourrait être étendu à l'ensemble des écoles du territoire dès la rentrée prochaine.",
+              text: "Les organisateurs espèrent réduire d'environ un tiers le volume des poubelles classiques. En cas de réussite, le dispositif pourrait être étendu à l'ensemble des écoles du territoire dès la rentrée prochaine.",
             },
           ],
         },
@@ -6716,8 +6324,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Trois victoires en trois journées : l'Union sportive de Bourg-la-Rivière n'avait plus connu pareil début de saison depuis des lustres. Dans les gradins, on ose à peine prononcer le mot de montée. Sur le terrain, les joueurs, eux, y pensent déjà.",
+              text: "Trois victoires en trois journées : l'Union sportive de Bourg-la-Rivière n'avait plus connu pareil début de saison depuis des lustres. Dans les gradins, on ose à peine prononcer le mot de montée. Sur le terrain, les joueurs, eux, y pensent déjà.",
             },
           ],
         },
@@ -6730,16 +6337,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Promu au printemps, le club évolue pour la première fois depuis vingt ans à ce niveau. L'effectif, largement composé de joueurs formés au club, déjoue les pronostics. ",
+              text: "Promu au printemps, le club évolue pour la première fois depuis vingt ans à ce niveau. L'effectif, largement composé de joueurs formés au club, déjoue les pronostics. ",
             },
             {
               type: 'emphasis',
-              value: 'Personne',
+              text: 'Personne',
             },
             {
               type: 'text',
-              value: ' ne les attendait si haut.',
+              text: ' ne les attendait si haut.',
             },
           ],
         },
@@ -6748,8 +6354,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'On avance match après match, sans se projeter trop loin. Mais je ne vais pas mentir : ce groupe a quelque chose.',
+              text: 'On avance match après match, sans se projeter trop loin. Mais je ne vais pas mentir : ce groupe a quelque chose.',
             },
           ],
           source: "L'entraîneur de l'Union sportive de Bourg-la-Rivière",
@@ -6759,8 +6364,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'engouement suit. Les affluences ont doublé, la buvette est prise d'assaut et le parking déborde. Le club, longtemps discret, redevient un sujet de conversation sur les marchés du dimanche.",
+              text: "L'engouement suit. Les affluences ont doublé, la buvette est prise d'assaut et le parking déborde. Le club, longtemps discret, redevient un sujet de conversation sur les marchés du dimanche.",
             },
           ],
         },
@@ -6773,8 +6377,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Mais un nuage plane sur cette embellie. Le stade municipal, avec ses tribunes en bois inscrites au patrimoine local, ne répond plus aux exigences de la division supérieure : éclairage insuffisant, vestiaires exigus, accès des secours à revoir.',
+              text: 'Mais un nuage plane sur cette embellie. Le stade municipal, avec ses tribunes en bois inscrites au patrimoine local, ne répond plus aux exigences de la division supérieure : éclairage insuffisant, vestiaires exigus, accès des secours à revoir.',
             },
           ],
         },
@@ -6788,8 +6391,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'En cas de montée, le club devrait présenter un plan de mise aux normes, voire jouer ailleurs le temps des travaux. Une perspective qui inquiète les supporters, très attachés à leur enceinte.',
+              text: 'En cas de montée, le club devrait présenter un plan de mise aux normes, voire jouer ailleurs le temps des travaux. Une perspective qui inquiète les supporters, très attachés à leur enceinte.',
             },
           ],
         },
@@ -6798,8 +6400,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Une pétition circule déjà pour préserver les tribunes historiques, tandis que d'autres supporters plaident au contraire pour un stade neuf, quitte à quitter le centre-ville. Le débat, encore feutré, monte d'un cran à chaque nouvelle victoire, et personne au club ne veut voir l'euphorie sportive tourner à la querelle de clocher entre partisans du patrimoine et adeptes de la modernité.",
+              text: "Une pétition circule déjà pour préserver les tribunes historiques, tandis que d'autres supporters plaident au contraire pour un stade neuf, quitte à quitter le centre-ville. Le débat, encore feutré, monte d'un cran à chaque nouvelle victoire, et personne au club ne veut voir l'euphorie sportive tourner à la querelle de clocher entre partisans du patrimoine et adeptes de la modernité.",
             },
           ],
         },
@@ -6812,8 +6413,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La municipalité, elle, temporise. Rénover coûte cher, et la facture des travaux dépasse largement le budget annuel du club. Une réunion est prévue en fin de mois pour arbitrer.',
+              text: 'La municipalité, elle, temporise. Rénover coûte cher, et la facture des travaux dépasse largement le budget annuel du club. Une réunion est prévue en fin de mois pour arbitrer.',
             },
           ],
         },
@@ -6822,8 +6422,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sur le terrain, en attendant, l'Union avance. Le sport féminin local n'est d'ailleurs pas en reste, comme le montre ",
+              text: "Sur le terrain, en attendant, l'Union avance. Le sport féminin local n'est d'ailleurs pas en reste, comme le montre ",
             },
             {
               type: 'link',
@@ -6835,7 +6434,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value: ', autre belle histoire de la rentrée.',
+              text: ', autre belle histoire de la rentrée.',
             },
           ],
         },
@@ -6890,8 +6489,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La salle omnisports de Val-Mareuil ne désemplit plus les soirs de match. En trois ans, les Aiglons, l'équipe féminine de handball du club, sont passées de la discrétion aux gradins combles.",
+              text: "La salle omnisports de Val-Mareuil ne désemplit plus les soirs de match. En trois ans, les Aiglons, l'équipe féminine de handball du club, sont passées de la discrétion aux gradins combles.",
             },
           ],
         },
@@ -6904,16 +6502,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La progression tient du roman. Deux divisions gravies en trois saisons, un effectif largement issu du centre de formation, et une identité de jeu rapide qui séduit les néophytes. ',
+              text: 'La progression tient du roman. Deux divisions gravies en trois saisons, un effectif largement issu du centre de formation, et une identité de jeu rapide qui séduit les néophytes. ',
             },
             {
               type: 'emphasis',
-              value: 'Rien',
+              text: 'Rien',
             },
             {
               type: 'text',
-              value: ", pourtant, n'était écrit d'avance.",
+              text: ", pourtant, n'était écrit d'avance.",
             },
           ],
         },
@@ -6922,8 +6519,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le club a fait un choix il y a cinq ans : miser sur les jeunes du bassin plutôt que sur des recrues coûteuses. Le pari a mis du temps à payer, puis tout s'est accéléré.",
+              text: "Le club a fait un choix il y a cinq ans : miser sur les jeunes du bassin plutôt que sur des recrues coûteuses. Le pari a mis du temps à payer, puis tout s'est accéléré.",
             },
           ],
         },
@@ -6936,8 +6532,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Dans les tribunes, le public s'est élargi. Familles, lycéens, curieux venus voir « l'équipe dont on parle » : l'affluence a triplé en deux saisons. La billetterie reste volontairement accessible, pour ne pas perdre ce nouveau public.",
+              text: "Dans les tribunes, le public s'est élargi. Familles, lycéens, curieux venus voir « l'équipe dont on parle » : l'affluence a triplé en deux saisons. La billetterie reste volontairement accessible, pour ne pas perdre ce nouveau public.",
             },
           ],
         },
@@ -6951,8 +6546,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les dirigeantes veulent capitaliser. Stages pour les écolières, partenariats avec les collèges, créneaux d'initiation : l'objectif est de transformer l'engouement en licences durables.",
+              text: "Les dirigeantes veulent capitaliser. Stages pour les écolières, partenariats avec les collèges, créneaux d'initiation : l'objectif est de transformer l'engouement en licences durables.",
             },
           ],
         },
@@ -6961,8 +6555,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les moyens, eux, restent limités. Le club fonctionne grâce à une poignée de bénévoles et à quelques partenaires locaux, sans budget comparable à celui des grosses écuries régionales. Trouver un créneau de gymnase aux bons horaires relève déjà de l'exploit, et l'encadrement manque de bras pour accompagner toutes les jeunes venues s'inscrire cette rentrée.",
+              text: "Les moyens, eux, restent limités. Le club fonctionne grâce à une poignée de bénévoles et à quelques partenaires locaux, sans budget comparable à celui des grosses écuries régionales. Trouver un créneau de gymnase aux bons horaires relève déjà de l'exploit, et l'encadrement manque de bras pour accompagner toutes les jeunes venues s'inscrire cette rentrée.",
             },
           ],
         },
@@ -6975,8 +6568,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La saison qui s'ouvre s'annonce plus rude. Les adversaires connaissent désormais les Aiglons et les attendent au tournant. Le staff prêche la prudence, conscient que l'enthousiasme ne remplace pas l'expérience.",
+              text: "La saison qui s'ouvre s'annonce plus rude. Les adversaires connaissent désormais les Aiglons et les attendent au tournant. Le staff prêche la prudence, conscient que l'enthousiasme ne remplace pas l'expérience.",
             },
           ],
         },
@@ -6985,8 +6577,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le club rêve pourtant grand, à l'image de tout un bassin sportif en mouvement. Comme l'Union sportive de Bourg-la-Rivière côté football, Val-Mareuil savoure une saison à part.",
+              text: "Le club rêve pourtant grand, à l'image de tout un bassin sportif en mouvement. Comme l'Union sportive de Bourg-la-Rivière côté football, Val-Mareuil savoure une saison à part.",
             },
           ],
         },
@@ -6995,8 +6586,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sur le parquet, l'ambition reste mesurée : se maintenir d'abord, progresser ensuite. Les joueuses, elles, ne cachent pas qu'un maintien tranquille serait déjà une belle récompense pour trois saisons d'efforts et de trajets sur les routes du plateau.",
+              text: "Sur le parquet, l'ambition reste mesurée : se maintenir d'abord, progresser ensuite. Les joueuses, elles, ne cachent pas qu'un maintien tranquille serait déjà une belle récompense pour trois saisons d'efforts et de trajets sur les routes du plateau.",
             },
           ],
         },
@@ -7056,8 +6646,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Il est six heures et le jour hésite encore quand les premiers bénévoles déplient les barrières sur la place du village. La Ronde des Trois-Vallées, épreuve cycliste amateur, va traverser aujourd'hui une trentaine de communes du plateau.",
+              text: "Il est six heures et le jour hésite encore quand les premiers bénévoles déplient les barrières sur la place du village. La Ronde des Trois-Vallées, épreuve cycliste amateur, va traverser aujourd'hui une trentaine de communes du plateau.",
             },
           ],
         },
@@ -7070,8 +6659,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Derrière les coureurs, c'est toute une organisation invisible qui s'active. Signaleurs aux carrefours, ravitailleurs, chauffeurs de la voiture-balai : ils sont plus de deux cents à donner de leur temps, souvent d'année en année.",
+              text: "Derrière les coureurs, c'est toute une organisation invisible qui s'active. Signaleurs aux carrefours, ravitailleurs, chauffeurs de la voiture-balai : ils sont plus de deux cents à donner de leur temps, souvent d'année en année.",
             },
           ],
         },
@@ -7080,8 +6668,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Sur le bord de la route, les habitants sortent les chaises. Les enfants tendent la main au passage du peloton, les anciens commentent les échappées comme on refait le monde.',
+              text: 'Sur le bord de la route, les habitants sortent les chaises. Les enfants tendent la main au passage du peloton, les anciens commentent les échappées comme on refait le monde.',
             },
           ],
         },
@@ -7094,8 +6681,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La Ronde n'a pas le clinquant des grandes épreuves. Pas de vedettes, peu de moyens, mais une ferveur intacte. Les coureurs, souvent salariés la semaine, roulent ici pour le plaisir et pour l'honneur d'un maillot.",
+              text: "La Ronde n'a pas le clinquant des grandes épreuves. Pas de vedettes, peu de moyens, mais une ferveur intacte. Les coureurs, souvent salariés la semaine, roulent ici pour le plaisir et pour l'honneur d'un maillot.",
             },
           ],
         },
@@ -7104,8 +6690,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "À l'arrivée, dans un village pavoisé, la remise des prix tient autant du repas de famille que de la cérémonie sportive. La Ronde repartira l'an prochain, fidèle à ses routes et à ses bénévoles.",
+              text: "À l'arrivée, dans un village pavoisé, la remise des prix tient autant du repas de famille que de la cérémonie sportive. La Ronde repartira l'an prochain, fidèle à ses routes et à ses bénévoles.",
             },
           ],
         },
@@ -7138,8 +6723,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Sur la piste un peu usée du stade de Saint-Prieux, une silhouette file plus vite que les autres. Awa Diakité a seize ans et, depuis cet été, un nom qui circule bien au-delà du plateau.',
+              text: 'Sur la piste un peu usée du stade de Saint-Prieux, une silhouette file plus vite que les autres. Awa Diakité a seize ans et, depuis cet été, un nom qui circule bien au-delà du plateau.',
             },
           ],
         },
@@ -7152,16 +6736,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Tout est allé vite. En quelques semaines, la sprinteuse a battu trois records du club d'athlétisme de Saint-Prieux, puis s'est imposée sur cent mètres au championnat régional. ",
+              text: "Tout est allé vite. En quelques semaines, la sprinteuse a battu trois records du club d'athlétisme de Saint-Prieux, puis s'est imposée sur cent mètres au championnat régional. ",
             },
             {
               type: 'emphasis',
-              value: 'Une éclosion',
+              text: 'Une éclosion',
             },
             {
               type: 'text',
-              value: " que même ses entraîneurs n'avaient pas vue venir si tôt.",
+              text: " que même ses entraîneurs n'avaient pas vue venir si tôt.",
             },
           ],
         },
@@ -7170,7 +6753,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value: 'Les chronos, consultables sur ',
+              text: 'Les chronos, consultables sur ',
             },
             {
               type: 'link',
@@ -7182,8 +6765,7 @@ export const CORPUS_DATA = [
             },
             {
               type: 'text',
-              value:
-                ", la placent parmi les meilleures de sa catégorie d'âge. De quoi attirer l'attention des pôles espoirs, qui suivent désormais ses courses de près.",
+              text: ", la placent parmi les meilleures de sa catégorie d'âge. De quoi attirer l'attention des pôles espoirs, qui suivent désormais ses courses de près.",
             },
           ],
         },
@@ -7192,8 +6774,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Rien n'est encore signé, et le club tient à le rappeler. Rejoindre un pôle supposerait de quitter le plateau, la famille et les camarades d'entraînement, une décision lourde pour une adolescente. Les entraîneurs plaident pour un accompagnement sur place le plus longtemps possible, avec des stages ponctuels plutôt qu'un départ définitif.",
+              text: "Rien n'est encore signé, et le club tient à le rappeler. Rejoindre un pôle supposerait de quitter le plateau, la famille et les camarades d'entraînement, une décision lourde pour une adolescente. Les entraîneurs plaident pour un accompagnement sur place le plus longtemps possible, avec des stages ponctuels plutôt qu'un départ définitif.",
             },
           ],
         },
@@ -7206,8 +6787,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Face à cet emballement, le club prêche la patience. Pas question de multiplier les compétitions ni de céder aux sirènes d'un départ précoce. La priorité reste la scolarité et une progression sans blessure.",
+              text: "Face à cet emballement, le club prêche la patience. Pas question de multiplier les compétitions ni de céder aux sirènes d'un départ précoce. La priorité reste la scolarité et une progression sans blessure.",
             },
           ],
         },
@@ -7216,8 +6796,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Sa famille partage cette prudence. On veut préserver l'adolescente de la pression, laisser le plaisir intact et éviter que le talent ne se transforme en fardeau.",
+              text: "Sa famille partage cette prudence. On veut préserver l'adolescente de la pression, laisser le plaisir intact et éviter que le talent ne se transforme en fardeau.",
             },
           ],
         },
@@ -7230,8 +6809,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour le petit club, la réussite d'Awa est une aubaine. Les inscriptions ont grimpé à la rentrée, portées par des vocations soudaines chez les plus jeunes. L'entraîneur y voit une chance, mais aussi une responsabilité.",
+              text: "Pour le petit club, la réussite d'Awa est une aubaine. Les inscriptions ont grimpé à la rentrée, portées par des vocations soudaines chez les plus jeunes. L'entraîneur y voit une chance, mais aussi une responsabilité.",
             },
           ],
         },
@@ -7240,8 +6818,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La sprinteuse, elle, garde la tête froide. Elle parle peu, s'entraîne beaucoup et fixe déjà son regard sur la saison en salle. Sans se presser, mais sans rien lâcher.",
+              text: "La sprinteuse, elle, garde la tête froide. Elle parle peu, s'entraîne beaucoup et fixe déjà son regard sur la saison en salle. Sans se presser, mais sans rien lâcher.",
             },
           ],
         },
@@ -7250,8 +6827,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "En attendant, elle continue de s'entraîner avec le même groupe qu'à ses débuts, sur la piste un peu usée où tout a commencé. Une fidélité qui, dans le petit monde de l'athlétisme régional, force déjà le respect des entraîneurs adverses.",
+              text: "En attendant, elle continue de s'entraîner avec le même groupe qu'à ses débuts, sur la piste un peu usée où tout a commencé. Une fidélité qui, dans le petit monde de l'athlétisme régional, force déjà le respect des entraîneurs adverses.",
             },
           ],
         },
@@ -7284,8 +6860,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "On a longtemps juré que cela n'arriverait jamais. Et pourtant : le Racing de Fontenay-les-Prés et le club rival du canton viennent d'annoncer leur fusion, sous un nom et des couleurs entièrement nouveaux.",
+              text: "On a longtemps juré que cela n'arriverait jamais. Et pourtant : le Racing de Fontenay-les-Prés et le club rival du canton viennent d'annoncer leur fusion, sous un nom et des couleurs entièrement nouveaux.",
             },
           ],
         },
@@ -7298,26 +6873,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Le constat était sans appel. Dans les catégories jeunes, faute de licenciés, les deux clubs peinaient à aligner des équipes complètes. ',
+              text: 'Le constat était sans appel. Dans les catégories jeunes, faute de licenciés, les deux clubs peinaient à aligner des équipes complètes. ',
             },
             {
               type: 'emphasis',
-              value: 'Jouer à treize contre quinze',
+              text: 'Jouer à treize contre quinze',
             },
             {
               type: 'text',
-              value: ', forfaits à répétition : la situation devenait intenable.',
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          spans: [
-            {
-              type: 'text',
-              value:
-                "Plutôt que de disparaître chacun de son côté, les dirigeants ont fini par se parler. Après des mois de discussions parfois tendues, l'assemblée générale a tranché : ce sera l'union.",
+              text: ', forfaits à répétition : la situation devenait intenable.',
             },
           ],
         },
@@ -7326,8 +6890,16 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le déclic est venu des parents. Fatigués de voir leurs enfants renoncer faute d'équipe complète, ils ont poussé les deux bureaux à s'asseoir enfin autour d'une table. L'argument a fait mouche : sans jeunes, aucun des deux clubs n'avait d'avenir à moyen terme, et chacun le savait au fond depuis longtemps.",
+              text: "Plutôt que de disparaître chacun de son côté, les dirigeants ont fini par se parler. Après des mois de discussions parfois tendues, l'assemblée générale a tranché : ce sera l'union.",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          spans: [
+            {
+              type: 'text',
+              text: "Le déclic est venu des parents. Fatigués de voir leurs enfants renoncer faute d'équipe complète, ils ont poussé les deux bureaux à s'asseoir enfin autour d'une table. L'argument a fait mouche : sans jeunes, aucun des deux clubs n'avait d'avenir à moyen terme, et chacun le savait au fond depuis longtemps.",
             },
           ],
         },
@@ -7340,8 +6912,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Rien n'a été simple. Entre les deux villages, la rivalité remonte à des générations, et chaque camp tenait à son blason. Le choix d'un nom neuf, ni l'un ni l'autre, a permis de sauver l'accord.",
+              text: "Rien n'a été simple. Entre les deux villages, la rivalité remonte à des générations, et chaque camp tenait à son blason. Le choix d'un nom neuf, ni l'un ni l'autre, a permis de sauver l'accord.",
             },
           ],
         },
@@ -7350,8 +6921,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les couleurs, elles aussi, mélangent celles des deux clubs. Un symbole autant qu'un compromis, pour que personne ne se sente absorbé par le voisin.",
+              text: "Les couleurs, elles aussi, mélangent celles des deux clubs. Un symbole autant qu'un compromis, pour que personne ne se sente absorbé par le voisin.",
             },
           ],
         },
@@ -7364,8 +6934,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Sur le terrain, les premiers entraînements communs se passent bien. Les jeunes, eux, se moquent des vieilles querelles : ils veulent surtout jouer, et enfin en nombre suffisant.',
+              text: 'Sur le terrain, les premiers entraînements communs se passent bien. Les jeunes, eux, se moquent des vieilles querelles : ils veulent surtout jouer, et enfin en nombre suffisant.',
             },
           ],
         },
@@ -7374,8 +6943,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les seniors, eux, ont mis un peu plus de temps à s'y faire. Se retrouver dans le même vestiaire que d'anciens adversaires, porter un maillot inédit, défendre d'autres couleurs : il a fallu quelques entraînements pour que la glace fonde vraiment. Les premiers matchs amicaux ont fait le reste, portés par un public curieux venu des deux villages.",
+              text: "Les seniors, eux, ont mis un peu plus de temps à s'y faire. Se retrouver dans le même vestiaire que d'anciens adversaires, porter un maillot inédit, défendre d'autres couleurs : il a fallu quelques entraînements pour que la glace fonde vraiment. Les premiers matchs amicaux ont fait le reste, portés par un public curieux venu des deux villages.",
             },
           ],
         },
@@ -7384,8 +6952,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les dirigeants espèrent que d'autres suivront. Dans un canton où les clubs peinent à recruter, cette fusion pourrait faire figure de modèle, quitte à froisser encore quelques nostalgiques.",
+              text: "Les dirigeants espèrent que d'autres suivront. Dans un canton où les clubs peinent à recruter, cette fusion pourrait faire figure de modèle, quitte à froisser encore quelques nostalgiques.",
             },
           ],
         },
@@ -7418,8 +6985,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'odeur de chlore est de retour à Clairefont. Après deux ans de fermeture et un chantier plus long que prévu, la piscine intercommunale a rouvert ses bassins ce week-end, sous les applaudissements des habitués.",
+              text: "L'odeur de chlore est de retour à Clairefont. Après deux ans de fermeture et un chantier plus long que prévu, la piscine intercommunale a rouvert ses bassins ce week-end, sous les applaudissements des habitués.",
             },
           ],
         },
@@ -7432,27 +6998,15 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "La rénovation était devenue inévitable. Le bâtiment, vieux de quarante ans, fuyait de partout et engloutissait l'énergie. ",
+              text: "La rénovation était devenue inévitable. Le bâtiment, vieux de quarante ans, fuyait de partout et engloutissait l'énergie. ",
             },
             {
               type: 'emphasis',
-              value: 'Tout',
+              text: 'Tout',
             },
             {
               type: 'text',
-              value:
-                " a été repris : toiture, filtration, vestiaires et surtout le chauffage de l'eau, désormais assuré par un système bien plus sobre.",
-            },
-          ],
-        },
-        {
-          type: 'paragraph',
-          spans: [
-            {
-              type: 'text',
-              value:
-                "Le résultat séduit. Bassin plus clair, eau à bonne température, gradins refaits : les premiers nageurs n'ont pas boudé leur plaisir. La fréquentation des premiers jours a dépassé les attentes.",
+              text: " a été repris : toiture, filtration, vestiaires et surtout le chauffage de l'eau, désormais assuré par un système bien plus sobre.",
             },
           ],
         },
@@ -7461,8 +7015,16 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'Les nageurs les plus assidus ont retrouvé leurs repères en quelques longueurs. Beaucoup avaient dû, pendant la fermeture, se rabattre sur les bassins des communes voisines, souvent bondés et parfois lointains. Le retour à Clairefont sonne, pour eux, comme une petite délivrance.',
+              text: "Le résultat séduit. Bassin plus clair, eau à bonne température, gradins refaits : les premiers nageurs n'ont pas boudé leur plaisir. La fréquentation des premiers jours a dépassé les attentes.",
+            },
+          ],
+        },
+        {
+          type: 'paragraph',
+          spans: [
+            {
+              type: 'text',
+              text: 'Les nageurs les plus assidus ont retrouvé leurs repères en quelques longueurs. Beaucoup avaient dû, pendant la fermeture, se rabattre sur les bassins des communes voisines, souvent bondés et parfois lointains. Le retour à Clairefont sonne, pour eux, comme une petite délivrance.',
             },
           ],
         },
@@ -7475,8 +7037,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Reste un casse-tête. Entre les écoles, les clubs de natation, l'aquagym et le public, les créneaux du bassin unique sont déjà surchargés. Chacun défend ses heures, et le planning ressemble à un puzzle.",
+              text: "Reste un casse-tête. Entre les écoles, les clubs de natation, l'aquagym et le public, les créneaux du bassin unique sont déjà surchargés. Chacun défend ses heures, et le planning ressemble à un puzzle.",
             },
           ],
         },
@@ -7485,8 +7046,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le cercle des nageurs de Clairefont redoute d'être le parent pauvre du partage. Le club, qui forme des dizaines de jeunes, réclame des plages horaires stables pour préparer sereinement la saison.",
+              text: "Le cercle des nageurs de Clairefont redoute d'être le parent pauvre du partage. Le club, qui forme des dizaines de jeunes, réclame des plages horaires stables pour préparer sereinement la saison.",
             },
           ],
         },
@@ -7495,8 +7055,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'intercommunalité promet une concertation dans les prochaines semaines pour répartir les heures au plus juste. Rien ne garantit qu'elle contentera tout le monde : le bassin est unique, les demandes nombreuses, et chaque plage d'eau chaude a désormais un coût que personne ne veut plus ignorer. Les clubs, eux, réclament d'être associés à l'élaboration du planning.",
+              text: "L'intercommunalité promet une concertation dans les prochaines semaines pour répartir les heures au plus juste. Rien ne garantit qu'elle contentera tout le monde : le bassin est unique, les demandes nombreuses, et chaque plage d'eau chaude a désormais un coût que personne ne veut plus ignorer. Les clubs, eux, réclament d'être associés à l'élaboration du planning.",
             },
           ],
         },
@@ -7509,8 +7068,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "L'intercommunalité, elle, devra tenir ses comptes. L'entrée reste volontairement peu chère, mais le fonctionnement d'une piscine coûte cher, même rénovée. Un tarif préférentiel est maintenu pour les scolaires et les familles modestes.",
+              text: "L'intercommunalité, elle, devra tenir ses comptes. L'entrée reste volontairement peu chère, mais le fonctionnement d'une piscine coûte cher, même rénovée. Un tarif préférentiel est maintenu pour les scolaires et les familles modestes.",
             },
           ],
         },
@@ -7519,8 +7077,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour l'heure, l'humeur est à la fête. Les longueurs peuvent reprendre, et avec elles les leçons de natation qui manquaient tant aux écoliers du secteur.",
+              text: "Pour l'heure, l'humeur est à la fête. Les longueurs peuvent reprendre, et avec elles les leçons de natation qui manquaient tant aux écoliers du secteur.",
             },
           ],
         },
@@ -7546,8 +7103,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "C'est la petite bombe de ce début de saison dans le football régional. L'attaquant le plus prolifique du championnat de la saison passée a signé cette semaine à l'Union sportive de Bourg-la-Rivière, le promu, plutôt que dans un club mieux établi.",
+              text: "C'est la petite bombe de ce début de saison dans le football régional. L'attaquant le plus prolifique du championnat de la saison passée a signé cette semaine à l'Union sportive de Bourg-la-Rivière, le promu, plutôt que dans un club mieux établi.",
             },
           ],
         },
@@ -7556,8 +7112,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le joueur, courtisé par plusieurs formations du haut de tableau, a expliqué avoir été séduit par le projet et par l'ambiance retrouvée autour du club. Le montant de l'opération n'a pas été dévoilé, mais il resterait modeste à l'échelle du championnat.",
+              text: "Le joueur, courtisé par plusieurs formations du haut de tableau, a expliqué avoir été séduit par le projet et par l'ambiance retrouvée autour du club. Le montant de l'opération n'a pas été dévoilé, mais il resterait modeste à l'échelle du championnat.",
             },
           ],
         },
@@ -7566,8 +7121,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Pour l'Union, l'arrivée de ce buteur confirmé change la donne. Elle conforte des ambitions que la direction n'osait pas encore formuler à voix haute, et promet des affiches disputées tout au long de l'automne.",
+              text: "Pour l'Union, l'arrivée de ce buteur confirmé change la donne. Elle conforte des ambitions que la direction n'osait pas encore formuler à voix haute, et promet des affiches disputées tout au long de l'automne.",
             },
           ],
         },
@@ -7592,8 +7146,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le derby de handball tant attendu entre Val-Mareuil et Saint-Prieux, prévu ce samedi, n'aura pas lieu à la date annoncée. La rencontre a été reportée en raison d'une panne du chauffage de la salle omnisports.",
+              text: "Le derby de handball tant attendu entre Val-Mareuil et Saint-Prieux, prévu ce samedi, n'aura pas lieu à la date annoncée. La rencontre a été reportée en raison d'une panne du chauffage de la salle omnisports.",
             },
           ],
         },
@@ -7602,8 +7155,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La température de la salle, tombée bien en dessous des minima réglementaires, a conduit les arbitres et les deux clubs à renoncer, par souci de sécurité pour les joueuses. La réparation est en cours, mais les délais restent incertains.',
+              text: 'La température de la salle, tombée bien en dessous des minima réglementaires, a conduit les arbitres et les deux clubs à renoncer, par souci de sécurité pour les joueuses. La réparation est en cours, mais les délais restent incertains.',
             },
           ],
         },
@@ -7612,8 +7164,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                'La ligue régionale doit fixer dans les prochains jours une nouvelle date. Les deux clubs, qui comptaient sur ce rendez-vous pour lancer leur saison, appellent leurs supporters à patienter et à conserver leurs billets, qui resteront valables.',
+              text: 'La ligue régionale doit fixer dans les prochains jours une nouvelle date. Les deux clubs, qui comptaient sur ce rendez-vous pour lancer leur saison, appellent leurs supporters à patienter et à conserver leurs billets, qui resteront valables.',
             },
           ],
         },
@@ -7638,8 +7189,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Villeneuve-sur-Arche a inauguré samedi son premier terrain de football synthétique, aménagé à côté du stade municipal. L'équipement, financé par la commune et l'intercommunalité, était réclamé depuis des années par les clubs du secteur.",
+              text: "Villeneuve-sur-Arche a inauguré samedi son premier terrain de football synthétique, aménagé à côté du stade municipal. L'équipement, financé par la commune et l'intercommunalité, était réclamé depuis des années par les clubs du secteur.",
             },
           ],
         },
@@ -7648,8 +7198,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Le principal avantage tient à sa robustesse : la surface se joue par tous les temps, là où les terrains en herbe deviennent vite impraticables l'hiver. Les créneaux disponibles pour les écoles de football devraient ainsi augmenter sensiblement.",
+              text: "Le principal avantage tient à sa robustesse : la surface se joue par tous les temps, là où les terrains en herbe deviennent vite impraticables l'hiver. Les créneaux disponibles pour les écoles de football devraient ainsi augmenter sensiblement.",
             },
           ],
         },
@@ -7658,8 +7207,7 @@ export const CORPUS_DATA = [
           spans: [
             {
               type: 'text',
-              value:
-                "Les dirigeants saluent un investissement qui bénéficiera surtout aux plus jeunes. Ils espèrent désormais que l'éclairage sera renforcé pour permettre des entraînements en soirée, afin de tirer pleinement parti de ce nouvel espace.",
+              text: "Les dirigeants saluent un investissement qui bénéficiera surtout aux plus jeunes. Ils espèrent désormais que l'éclairage sera renforcé pour permettre des entraînements en soirée, afin de tirer pleinement parti de ce nouvel espace.",
             },
           ],
         },

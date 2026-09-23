@@ -1,4 +1,4 @@
-import { BLOCK } from './article.ts';
+import { BLOCK, textOf } from './article.ts';
 import type { Block, BlockInput } from './article.ts';
 import type { SpanInput } from './content.ts';
 import type { Finding } from './finding.ts';
@@ -153,7 +153,7 @@ const attribute = (attributes: string, name: string): string =>
   new RegExp(`${name}="([^"]*)"`, 'iu').exec(attributes)?.[1] ?? '';
 
 /** Plain words, the run a sentence is made of wherever the markup marks out nothing else. */
-const asText = (value: string): SpanInput => ({ type: 'text', value });
+const asText = (text: string): SpanInput => ({ type: 'text', text });
 
 /** The kind of run the markup around some words makes of them, once those words are bare. */
 const runOf = (tag: string, attributes: string): ((bare: string) => SpanInput) => {
@@ -163,10 +163,10 @@ const runOf = (tag: string, attributes: string): ((bare: string) => SpanInput) =
     return url.startsWith('http') ? (text) => ({ type: 'link', text, target: { kind: 'external', url } }) : asText;
   }
   if (tag === 'em' || tag === 'i') {
-    return (value) => ({ type: 'emphasis', value });
+    return (text) => ({ type: 'emphasis', text });
   }
   if (tag === 'strong' || tag === 'b') {
-    return (value) => ({ type: 'strong', value });
+    return (text) => ({ type: 'strong', text });
   }
   return asText;
 };
@@ -216,10 +216,10 @@ const spansFrom = (pieces: readonly Piece[]): SpanInput[] => {
     if (gap === null || last === undefined) {
       spans.push(piece);
     } else if (last.type === 'text') {
-      spans[spans.length - 1] = { ...last, value: `${last.value}${gap.blank}` };
+      spans[spans.length - 1] = { ...last, text: `${last.text}${gap.blank}` };
       spans.push(piece);
     } else if (piece.type === 'text') {
-      spans.push({ ...piece, value: `${gap.blank}${piece.value}` });
+      spans.push({ ...piece, text: `${gap.blank}${piece.text}` });
     } else {
       spans.push(asText(gap.blank), piece);
     }
@@ -227,9 +227,6 @@ const spansFrom = (pieces: readonly Piece[]): SpanInput[] => {
   }
   return spans;
 };
-
-/** The text a run carries, whatever kind of run it is. */
-const wordsOf = (span: SpanInput): string => ('value' in span ? span.value : span.text);
 
 /** A sentence, cut into the runs the markup marks out and the plain words between them. */
 const spansOf = (markup: string): SpanInput[] => {
@@ -372,29 +369,6 @@ export const THE_BODY = {
   before: BEFORE,
   after: AFTER,
 } as const;
-
-/**
- * The words a block carries, whatever kind of block it is — a sentence's runs joined as a screen draws them, with
- * nothing between, since a judging that put a space there would see two words where a reader sees one.
- */
-const textOf = (block: Block): string => {
-  if (block.type === 'heading') {
-    return block.text;
-  }
-  if (block.type === 'paragraph' || block.type === 'quote') {
-    return block.spans.map(wordsOf).join('');
-  }
-  if (block.type === 'image') {
-    return block.caption;
-  }
-  if (block.type === 'video') {
-    return block.title;
-  }
-  if (block.type === 'callout') {
-    return [block.title, block.text, block.button].join(' ');
-  }
-  return '';
-};
 
 /**
  * Whether a reading of the journal's markup leaves a screen nothing but text a reader should see.

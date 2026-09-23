@@ -1,5 +1,5 @@
-import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId, Span } from '@huma/contracts';
-import { blocksOf, instantAt, SECTION_ID } from '@huma/contracts';
+import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId } from '@huma/contracts';
+import { blocksOf, instantAt, SECTION_ID, textOf } from '@huma/contracts';
 import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
 
 type Quota = Readonly<{ video: number; column: number; callout: number }>;
@@ -76,20 +76,10 @@ type Item = Readonly<{ folder: SectionId; article: Article }>;
 
 const countWords = (text: string): number => text.split(/\s+/u).filter((word) => word.length > 0).length;
 
-const spanText = (span: Span): string => ('value' in span ? span.value : span.text);
+/** The blocks whose words an article's length is measured in: its prose, and not what is laid beside it. */
+const PROSE: ReadonlySet<Block['type']> = new Set(['heading', 'paragraph', 'quote']);
 
-const blockWords = (block: Block): number => {
-  if (block.type === 'heading') {
-    return countWords(block.text);
-  }
-  if (block.type === 'paragraph') {
-    return countWords(block.spans.map(spanText).join(' '));
-  }
-  if (block.type === 'quote') {
-    return countWords([...block.spans.map(spanText), block.source ?? ''].join(' '));
-  }
-  return 0;
-};
+const blockWords = (block: Block): number => (PROSE.has(block.type) ? countWords(textOf(block)) : 0);
 
 const wordCount = (article: Article): number => blocksOf(article).reduce((sum, block) => sum + blockWords(block), 0);
 

@@ -85,19 +85,19 @@ const toTarget = (url: string): RawTarget =>
 const toSpans = (nodes: readonly PhrasingContent[]): RawSpan[] =>
   nodes.flatMap((node): RawSpan[] => {
     if (node.type === 'text') {
-      return [{ type: 'text', value: node.value }];
+      return [{ type: 'text', text: node.value }];
     }
     if (node.type === 'emphasis') {
-      return [{ type: 'emphasis', value: plain(node.children) }];
+      return [{ type: 'emphasis', text: plain(node.children) }];
     }
     if (node.type === 'strong') {
-      return [{ type: 'strong', value: plain(node.children) }];
+      return [{ type: 'strong', text: plain(node.children) }];
     }
     if (node.type === 'link') {
       return [{ type: 'link', text: plain(node.children), target: toTarget(node.url) }];
     }
     if (node.type === 'break' || node.type === 'inlineCode') {
-      return [{ type: 'text', value: node.type === 'break' ? ' ' : node.value }];
+      return [{ type: 'text', text: node.type === 'break' ? ' ' : node.value }];
     }
     return [];
   });
@@ -110,13 +110,13 @@ const toQuote = (children: readonly (BlockContent | DefinitionContent)[]): RawBl
   }
   const spans = toSpans(paragraph.children);
   const last = spans.at(-1);
-  if (last?.type === 'text' && last.value.includes('\n')) {
-    const lines = last.value.split('\n');
+  if (last?.type === 'text' && last.text.includes('\n')) {
+    const lines = last.text.split('\n');
     const tail = lines.at(-1) ?? '';
     if (/^\s*—/u.test(tail)) {
       const head = lines.slice(0, -1).join(' ').trimEnd();
       const body: RawSpan[] =
-        head.length > 0 ? [...spans.slice(0, -1), { type: 'text', value: head }] : spans.slice(0, -1);
+        head.length > 0 ? [...spans.slice(0, -1), { type: 'text', text: head }] : spans.slice(0, -1);
       return { type: 'quote', spans: body, source: tail.replace(/^\s*—\s*/u, '') };
     }
   }

@@ -5,8 +5,8 @@ import { SECTION, SPAN } from './content.ts';
 import type { Section, Span } from './content.ts';
 
 test('SPAN parses each inline kind and validates a link target', () => {
-  expectTypeOf(SPAN.parse({ type: 'text', value: 'x' })).toEqualTypeOf<Span>();
-  expect(SPAN.safeParse({ type: 'strong', value: 'x' }).success).toBe(true);
+  expectTypeOf(SPAN.parse({ type: 'text', text: 'x' })).toEqualTypeOf<Span>();
+  expect(SPAN.safeParse({ type: 'strong', text: 'x' }).success).toBe(true);
   expect(SPAN.safeParse({ type: 'link', text: 'x', target: { kind: 'article', id: 'pol-a1' } }).success).toBe(true);
   expect(
     SPAN.safeParse({ type: 'link', text: 'x', target: { kind: 'external', url: 'https://example.org/a' } }).success,
@@ -17,10 +17,10 @@ test('SPAN parses each inline kind and validates a link target', () => {
 });
 
 test('BLOCK parses each block kind and rejects an unknown one', () => {
-  const block: Block = BLOCK.parse({ type: 'paragraph', spans: [{ type: 'text', value: 'x' }] });
+  const block: Block = BLOCK.parse({ type: 'paragraph', spans: [{ type: 'text', text: 'x' }] });
   expectTypeOf(block).toEqualTypeOf<Block>();
   expect(BLOCK.safeParse({ type: 'heading', text: 'Titre' }).success).toBe(true);
-  expect(BLOCK.safeParse({ type: 'quote', spans: [{ type: 'text', value: 'x' }], source: 'Une source' }).success).toBe(
+  expect(BLOCK.safeParse({ type: 'quote', spans: [{ type: 'text', text: 'x' }], source: 'Une source' }).success).toBe(
     true,
   );
   expect(BLOCK.safeParse({ type: 'image', caption: 'c', key: 'pol-a1-hero' }).success).toBe(true);
