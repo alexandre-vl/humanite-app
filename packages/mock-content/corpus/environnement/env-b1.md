@@ -7,7 +7,6 @@ title: Pic de pollution à l'ozone : la préfecture déclenche l'alerte sur l'ag
 standfirst: La circulation sera différenciée dès jeudi matin et la vitesse abaissée sur les principaux axes, tandis que les personnes fragiles sont invitées à limiter leurs efforts en plein air jusqu'à la fin de l'épisode.
 authors: hugo-lambert
 published: 2026-09-11 07:30
-emphasis: true
 ---
 
 La préfecture a déclenché mercredi soir la procédure d'alerte à l'ozone sur l'agglomération de Val-Mareuil, après trois jours de fortes chaleurs et d'air stagnant. Le seuil réglementaire a été dépassé à deux stations de mesure.

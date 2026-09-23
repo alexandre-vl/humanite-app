@@ -57,11 +57,11 @@ test('the front is one answer, in the order the desk laid it out', async () => {
 });
 
 /** A section's list is asked under the number the menu files it under, which the domain never carries. */
-test('a section is asked by the number the menu gives it, and its items are placed in it', async () => {
+test('a section is asked by the number the menu gives it, and serves its own list', async () => {
   const { api, asked } = replaying();
   const own = await api.getFeed({ section: SECTION_ID.parse('politique') });
   expect(asked.at(-1)).toBe(`${SERVICE}${SERVICE_ROOT}/wordpress/19565/posts/?page=1&language=fr&ano=1`);
-  expect(own.items.every((item) => item.section === 'politique')).toBe(true);
+  expect(own.items.map((item) => item.id)).toEqual(RECORDED.section.answer.posts.map((post) => post.id));
 });
 
 /** A full page has another after it — thirty sent, whatever the reading kept — and a short page is the last. */

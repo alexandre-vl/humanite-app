@@ -2,6 +2,7 @@ import type { ArticleSummary, DisplayText } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { content } from '#api';
+import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
 import { everyArticle } from '#lib/testing';
 import { Text } from '#primitives/text';
@@ -185,42 +186,38 @@ describe('ArticleCard', () => {
     expect(screen.queryByText('Abonnés')).toBeNull();
   });
 
-  it('annonce une chronique comme telle, et la signe quand la rédaction est arrivée', async () => {
-    const summary = illustrated(await everything());
-    const view = await render(<ArticleCard shape="column" summary={summary} signature={asDisplayText('Yves K.')} />);
-    expect(screen.getByText('Chronique')).toBeTruthy();
+  it('annonce une opinion comme telle, et la signe quand la rédaction est arrivée', async () => {
+    const column = (await everything()).find((summary) => summary.format === 'column');
+    if (column === undefined) {
+      throw new Error('le contenu ne sert aucune opinion : le test ne vérifierait rien');
+    }
+    const view = await render(<ArticleCard shape="column" summary={column} signature={asDisplayText('Yves K.')} />);
+    expect(screen.getByText(t('format.column'))).toBeTruthy();
     expect(screen.getByText('Yves K.')).toBeTruthy();
-    await view.rerender(<ArticleCard shape="column" summary={summary} />);
-    expect(screen.getByText('Chronique')).toBeTruthy();
+    await view.rerender(<ArticleCard shape="column" summary={column} />);
+    expect(screen.getByText(t('format.column'))).toBeTruthy();
     expect(screen.queryByText('Yves K.')).toBeNull();
   });
 
-  it.each(SHAPES.filter((shape) => shape !== 'column'))('ne dit pas « Chronique » sur %s', async (shape) => {
-    await render(<ArticleCard shape={shape} summary={illustrated(await everything())} />);
-    expect(screen.queryByText('Chronique')).toBeNull();
-  });
-
   /**
-   * The section is drawn only where a screen supplies it. A front page and a search both mix sections and a card
-   * that did not say which it came from left the reader nothing to sort by; inside one section the very same word on
-   * every card says nothing, so the screen decides and the card obeys. A chronicle is the exception: it already
-   * carries a mark saying what it is, and two labels stacked over one title are one too many.
+   * What an item is, when it is anything but an article, is said over its title on every shape: of all a paper prints
+   * there, it is the one word the service knows of every item. An article, which most items are, carries none.
    */
   it.each(SHAPES.filter((shape) => shape !== 'column'))(
-    'nomme sur %s la rubrique que l’écran lui donne',
+    'dit sur %s qu’une vidéo en est une, et rien d’un article',
     async (shape) => {
-      const summary = illustrated(await everything());
-      const view = await render(<ArticleCard shape={shape} summary={summary} name={asDisplayText('Monde')} />);
-      expect(screen.getByText('Monde')).toBeTruthy();
-      await view.rerender(<ArticleCard shape={shape} summary={summary} />);
-      expect(screen.queryByText('Monde')).toBeNull();
+      const all = await everything();
+      const video = all.find((summary) => summary.format === 'video');
+      const written = all.find((summary) => summary.format === 'article');
+      if (video === undefined || written === undefined) {
+        throw new Error('le contenu ne sert pas une vidéo et un article : le test ne vérifierait rien');
+      }
+      const view = await render(<ArticleCard shape={shape} summary={video} />);
+      expect(screen.getByText(t('format.video'))).toBeTruthy();
+      await view.rerender(<ArticleCard shape={shape} summary={written} />);
+      for (const word of [t('format.video'), t('format.column'), t('format.series'), t('format.live')]) {
+        expect(screen.queryByText(word)).toBeNull();
+      }
     },
   );
-
-  it('ne nomme pas deux fois ce qu’une chronique est déjà marquée être', async () => {
-    const summary = illustrated(await everything());
-    await render(<ArticleCard shape="column" summary={summary} name={asDisplayText('Monde')} />);
-    expect(screen.getByText('Chronique')).toBeTruthy();
-    expect(screen.queryByText('Monde')).toBeNull();
-  });
 });

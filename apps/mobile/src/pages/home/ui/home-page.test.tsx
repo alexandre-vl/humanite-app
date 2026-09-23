@@ -65,7 +65,7 @@ describe('HomePage', () => {
     const section = await firstSection();
     await renderPage();
     expect(await screen.findByText('L’Humanité')).toBeTruthy();
-    // All of them: the band names every section, and each card now names the one it ran in over its own title.
+    // The band names every section.
     expect(await screen.findAllByText(section.label)).not.toHaveLength(0);
     expect(await screen.findByText(article.title)).toBeTruthy();
   });

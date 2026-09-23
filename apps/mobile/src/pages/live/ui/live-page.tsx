@@ -1,7 +1,6 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleWire, liveFeedQuery, usePagedFeed } from '#entities/article';
-import { useSectionNames } from '#entities/section';
 import { articleHref } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
@@ -25,16 +24,14 @@ import { Surface } from '#primitives/surface';
  * second is that the reference document counts the stacked bands of the front page among its own faults, the content
  * left with two thirds of the screen; a wire read by the minute is the last place to spend a row on somewhere else.
  * The third is what the screen is: one column, every section at once, in the order things happened — a band naming
- * one section would offer to leave, and leaving is already a tab away. What each row ran in is printed on the row.
+ * one section would offer to leave, and leaving is already a tab away.
  */
 export function LivePage(): ReactNode {
   const feed = usePagedFeed(liveFeedQuery);
-  const names = useSectionNames();
   return (
     <Surface>
       <ArticleWire
         feed={feed}
-        names={names}
         onOpen={(id) => {
           router.push(articleHref(id));
         }}

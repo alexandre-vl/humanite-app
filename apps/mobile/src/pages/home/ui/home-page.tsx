@@ -6,7 +6,6 @@ import type { LabelBarItem } from '#components/label-bar';
 import { LabelBar } from '#components/label-bar';
 import { TopBar, TopBarButton } from '#components/top-bar';
 import { ArticleFeed, feedQuery, sectionFeedQuery, usePagedFeed } from '#entities/article';
-import { useSectionNames, useSections } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref, SETTINGS_HREF } from '#lib/routing';
@@ -14,6 +13,7 @@ import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Pager } from '#primitives/pager';
 import { Surface } from '#primitives/surface';
+import { useSections } from '../model/sections';
 
 /** The identifier the band reports for the front page itself, which is no section and has none. */
 const FRONT = 'front';
@@ -29,11 +29,9 @@ type SheetProps = Readonly<{ leaf: Leaf }>;
  * One page's feed: the whole paper, or one section of it.
  *
  * A page is a component of its own because each asks for its own feed, and a hook cannot be called in a loop over a
- * list whose length arrives from the newsroom. Only the front page names the section each card ran in: inside a
- * section, the same word over every card says nothing at all.
+ * list whose length arrives from the newsroom.
  */
 function Sheet({ leaf }: SheetProps): ReactNode {
-  const names = useSectionNames();
   const section = leaf.section;
   const feed = usePagedFeed(section === null ? feedQuery : sectionFeedQuery(section));
   return (
@@ -44,7 +42,6 @@ function Sheet({ leaf }: SheetProps): ReactNode {
         router.push(articleHref(id));
       }}
       action={(summary) => <BookmarkToggle summary={summary} />}
-      names={section === null ? names : undefined}
     />
   );
 }

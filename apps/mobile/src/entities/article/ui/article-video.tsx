@@ -72,7 +72,7 @@ export function ArticleVideo({ title, durationSeconds, poster, recyclingKey }: A
         {/* The mark is the only thing that says this is a video at all: the running time beside it would otherwise be
             read out as a bare number. It is the one symbol in the app that carries a word of its own. */}
         <Box style={styles.badge}>
-          <Icon name="play" announces={t('article.video')} size={SPACING.md} tintColor={theme.onPrimary} />
+          <Icon name="play" announces={t('format.video')} size={SPACING.md} tintColor={theme.onPrimary} />
           <Text variant="label" tone="onPrimary">
             {formatDuration(durationSeconds)}
           </Text>

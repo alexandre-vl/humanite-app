@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { EmptyState } from '#components/empty-state';
 import { ArticleFeed, searchQuery, searchable, usePagedFeed } from '#entities/article';
-import { useSectionNames } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref } from '#lib/routing';
@@ -35,7 +34,6 @@ export function SearchPage(): ReactNode {
   const styles = useStyles();
   const [typed, setTyped] = useState('');
   const asked = useDebounced(typed).trim();
-  const names = useSectionNames();
   const feed = usePagedFeed(searchQuery(asked));
   return (
     <Surface>
@@ -53,7 +51,6 @@ export function SearchPage(): ReactNode {
             router.push(articleHref(id));
           }}
           action={(summary) => <BookmarkToggle summary={summary} />}
-          names={names}
           empty={{ title: t('search.none.title', { query: asked }), message: t('search.none.message') }}
         />
       ) : (

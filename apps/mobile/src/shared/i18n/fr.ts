@@ -19,8 +19,6 @@ export const FR = {
   'action.retry': 'Réessayer',
   'app.name': 'L’Humanité',
   'article.premium': 'Abonnés',
-  'article.column': 'Chronique',
-  'article.video': 'Vidéo',
   'article.related': 'Sur le même thème',
   'article.withheld.title': 'Réservé aux abonnés',
   'article.withheld.message': 'Le journal réserve la suite de cet article à ses abonnés numériques.',
@@ -46,6 +44,10 @@ export const FR = {
   'failure.malformed.message': 'Le journal a répondu dans une forme que l’app ne sait pas lire.',
   'feed.empty.title': 'Rien à lire pour l’instant',
   'feed.empty.message': 'Aucun article n’est encore paru.',
+  'format.column': 'Opinion',
+  'format.live': 'En direct',
+  'format.series': 'Série',
+  'format.video': 'Vidéo',
   'issue.count.one': '{count} article',
   'issue.count.many': '{count} articles',
   'issue.cover': 'Numéro du {date} : {opener}. {count}.',
@@ -80,7 +82,4 @@ export const FR = {
   'settings.preview.text':
     'Les grévistes de la raffinerie ont voté la reconduction du mouvement jusqu’à lundi, au terme d’une assemblée générale qui a réuni près de six cents salariés.',
   'settings.reset': 'Réinitialiser',
-  // What the newsroom marked on the wire, said in a word. It was said in a font weight and nothing else, and the
-  // reference document asks, of the screen this replaces, what a title in bold there is supposed to mean.
-  'wire.marked': 'L’essentiel',
 } as const satisfies Readonly<Record<string, string>>;

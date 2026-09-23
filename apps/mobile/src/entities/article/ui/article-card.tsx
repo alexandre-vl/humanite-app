@@ -1,4 +1,4 @@
-import type { Access, ArticleSummary, DisplayText } from '@huma/contracts';
+import type { Access, ArticleFormat, ArticleSummary, DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
@@ -10,6 +10,7 @@ import { Box } from '#primitives/box';
 import { Image } from '#primitives/image';
 import { Text } from '#primitives/text';
 
+import { formatWord } from '../model/format';
 import { HERO_RATIO } from '../model/picture';
 import type { CardShape } from '../model/rhythm';
 
@@ -18,8 +19,6 @@ export type ArticleCardProps = Readonly<{
   summary: ArticleSummary;
   action?: ReactNode | undefined;
   signature?: DisplayText | null | undefined;
-  /** What the article belongs to, named over its title. A screen that is already one section names none. */
-  name?: DisplayText | null | undefined;
 }>;
 
 /**
@@ -89,28 +88,23 @@ function Meta({ summary, action, said }: MetaProps): ReactNode {
 }
 
 /**
- * The section a card belongs to, set over its title in small capitals.
- *
- * Without it a front page is a column of headlines with nothing to say which part of the paper each came from — the
- * one thing a reader sorting twenty cards actually uses. It is drawn only where the screen supplies a name: inside a
- * section, every card would carry the same word and say nothing.
+ * What an item is, set over its title in small capitals when it is anything but an article: a video, a piece of
+ * opinion, a chapter of a series, the running coverage of an event. It is the word a paper prints there that the
+ * service knows of every item — the section it ran in being known of none outside that section's own list.
  */
-function Kicker({ name }: Readonly<{ name: DisplayText | null }>): ReactNode {
-  if (name === null) {
-    return null;
-  }
-  return <Text variant="kicker">{name}</Text>;
+function Kicker({ format }: Readonly<{ format: ArticleFormat }>): ReactNode {
+  const word = formatWord(format);
+  return word === null ? null : (
+    <Text variant="kicker" tone="textPrimary">
+      {word}
+    </Text>
+  );
 }
 
-type BodyProps = Readonly<{
-  summary: ArticleSummary;
-  action: ReactNode;
-  signature: DisplayText | null;
-  name: DisplayText | null;
-}>;
+type BodyProps = Readonly<{ summary: ArticleSummary; action: ReactNode; signature: DisplayText | null }>;
 
 /** The front of a page: the picture first, at the width of the block, then the words under it. */
-function Lead({ summary, action, name }: BodyProps): ReactNode {
+function Lead({ summary, action }: BodyProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'card');
   return (
@@ -124,7 +118,7 @@ function Lead({ summary, action, name }: BodyProps): ReactNode {
           style={styles.picture}
         />
       )}
-      <Meta summary={summary} action={action} said={<Kicker name={name} />} />
+      <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />
       <Box style={styles.title}>
         <Text variant="title" numberOfLines={3}>
           {summary.title}
@@ -151,12 +145,12 @@ function Lead({ summary, action, name }: BodyProps): ReactNode {
  * Monde shows one on fifteen of a hundred and seven. A sentence under every title is what turned this front into a
  * wall of grey where nothing was subordinate to anything.
  */
-function Line({ summary, action, name }: BodyProps): ReactNode {
+function Line({ summary, action }: BodyProps): ReactNode {
   const styles = useStyles();
   const visual = pictureOf(summary, 'thumbnail');
   return (
     <Box style={styles.card}>
-      <Meta summary={summary} action={action} said={<Kicker name={name} />} />
+      <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />
       <Box style={styles.line}>
         <Box style={styles.rest}>
           {/* Four lines and not three. The column left beside a picture of ninety-six points measures twenty-nine
@@ -202,9 +196,7 @@ function Column({ summary, action, signature }: BodyProps): ReactNode {
             action={action}
             said={
               <>
-                <Text variant="kicker" tone="textPrimary">
-                  {t('article.column')}
-                </Text>
+                <Kicker format={summary.format} />
                 {signature === null ? null : <Text variant="caption">{signature}</Text>}
               </>
             }
@@ -224,11 +216,11 @@ function Column({ summary, action, signature }: BodyProps): ReactNode {
 }
 
 /** An item written without a picture: its words are the whole card (capture 02). */
-function Brief({ summary, action, name }: BodyProps): ReactNode {
+function Brief({ summary, action }: BodyProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.card}>
-      <Meta summary={summary} action={action} said={<Kicker name={name} />} />
+      <Meta summary={summary} action={action} said={<Kicker format={summary.format} />} />
       <Box style={styles.title}>
         <Text variant="title" numberOfLines={3}>
           {summary.title}
@@ -249,19 +241,17 @@ function Brief({ summary, action, name }: BodyProps): ReactNode {
  * that laid it out. The four shapes are kept in this one file so that what separates them — how much room the picture
  * takes, and whether there is one — can be read at a glance rather than diffed across four.
  *
- * They are four orderings of one order. Every card says what it belongs to first, then its title, then the sentence
- * under it if it has room for one; what changes is the picture. That is Le Monde's card, which runs a whole front off
- * one component and varies which parts are present rather than where they sit, and it is what the fifth shape broke:
+ * They are four orderings of one order. Every card says what it is first, then its title, then the sentence under
+ * it if it has room for one; what changes is the picture. That is Le Monde's card, which runs a whole front off one
+ * component and varies which parts are present rather than where they sit, and it is what the fifth shape broke:
  * `stacked` put the title above the picture and the standfirst below it, so two cards a scroll apart taught two
  * different templates for the same four things.
  *
- * `action` is whatever the screen lets a reader do to the article from the feed, `signature` who signed it, and
- * `name` the section it ran in. The card takes all three already made: an entity may not name a route, hold an
- * action of its own, nor ask another entity for the newsroom's sections from inside a cell that is mounted and
- * thrown away as the reader scrolls.
+ * `action` is whatever the screen lets a reader do to the article from the feed, and `signature` who signed it. The
+ * card takes both already made: an entity may not name a route, nor hold an action of its own.
  */
-export function ArticleCard({ shape, summary, action, signature = null, name = null }: ArticleCardProps): ReactNode {
-  const body = { summary, action, signature, name };
+export function ArticleCard({ shape, summary, action, signature = null }: ArticleCardProps): ReactNode {
+  const body = { summary, action, signature };
   switch (shape) {
     case 'lead': {
       return <Lead {...body} />;

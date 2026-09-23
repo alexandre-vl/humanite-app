@@ -4,7 +4,7 @@ import { screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { formatClockTime, formatDayLabel } from '#lib/format';
-import { renderWithCache, settle } from '#lib/testing';
+import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { LivePage } from './live-page';
 
 const renderPage = async (): Promise<void> => {
@@ -62,26 +62,15 @@ describe('LivePage', () => {
     expect(screen.queryByText(/\d{2}\/\d{2}/)).toBeNull();
   });
 
-  it('nomme la rubrique de chaque ligne, huit rubriques tenant une seule colonne', async () => {
-    const item = await newest();
-    const ran = (await content.getSections()).find((section) => section.id === item.section);
-    if (ran === undefined) {
-      throw new Error('le contenu ne nomme pas la rubrique de cet item : le test ne vérifierait rien');
+  /** Every section runs down this one column: what sets a row apart is what the item is, when it is not an article. */
+  it('dit sur la ligne d’une vidéo qu’elle en est une', async () => {
+    const video = (await everyArticle(content)).find((summary) => summary.format === 'video');
+    if (video === undefined) {
+      throw new Error('le contenu ne sert aucune vidéo : le test ne vérifierait rien');
     }
+    jest.spyOn(content, 'getLiveFeed').mockResolvedValue({ items: [video], nextCursor: null });
     await renderPage();
-    expect(await screen.findAllByText(ran.label)).not.toHaveLength(0);
-  });
-
-  /**
-   * The newsroom's own mark was a font weight and nothing else — the reference document asks what a title set in bold
-   * on this screen is supposed to mean, and leaves the question open. A word answers it.
-   */
-  it('dit en toutes lettres ce que la rédaction a marqué', async () => {
-    const { items } = await content.getLiveFeed({});
-    if (!items.some((item) => item.emphasis === true)) {
-      throw new Error('la première page ne porte aucun item marqué : le test ne vérifierait rien');
-    }
-    await renderPage();
-    expect(await screen.findAllByText(t('wire.marked'))).not.toHaveLength(0);
+    expect(await screen.findByText(video.title)).toBeTruthy();
+    expect(screen.getByText(t('format.video'))).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-import { ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY, issueIdAt, SERVICE_PAGES } from '@huma/contracts';
+import { ARTICLE, ARTICLE_SUMMARY, ContentApiError, ISSUE_SUMMARY, issueIdAt, SERVICE_PAGES } from '@huma/contracts';
 import type {
   Article,
   ArticleId,
@@ -13,17 +13,21 @@ import type {
   Section,
 } from '@huma/contracts';
 import { CORPUS, SECTIONS } from '@huma/mock-content';
+import type { CorpusArticle } from '@huma/mock-content';
 
 const summarize = (article: Article): ArticleSummary => ARTICLE_SUMMARY.parse(article);
 
 /**
- * Every summary, newest first — the order a section's list, the wire and a search present, and the order the corpus
- * lays its front in, having no desk to lay it otherwise. The app bundles this module, so it runs on Hermes, which has
- * no `Array.prototype.toSorted`: a copy sorted in place says the same thing to both engines.
+ * Every item of the corpus, newest first — the order a section's list, the wire and a search present, and the order
+ * the corpus lays its front in, having no desk to lay it otherwise. The app bundles this module, so it runs on Hermes,
+ * which has no `Array.prototype.toSorted`: a copy sorted in place says the same thing to both engines.
  */
-const CHRONOLOGICAL: readonly ArticleSummary[] = [...CORPUS.map(summarize)].sort((left, right) =>
+const NEWEST_FIRST: readonly CorpusArticle[] = [...CORPUS].sort((left, right) =>
   right.publishedAt.localeCompare(left.publishedAt),
 );
+
+/** The same items as the feeds hand them out: as summaries, which carry no section, the service's carrying none. */
+const CHRONOLOGICAL: readonly ArticleSummary[] = NEWEST_FIRST.map(summarize);
 
 const notFound = (id: ArticleId): never => {
   throw new ContentApiError('not-found', `article introuvable : ${id}`);
@@ -103,7 +107,7 @@ const whole = (items: readonly ArticleSummary[], size: number): Page<ArticleSumm
   nextCursor: null,
 });
 
-const find = (id: ArticleId): Article => CORPUS.find((each) => each.id === id) ?? notFound(id);
+const find = (id: ArticleId): Article => ARTICLE.parse(CORPUS.find((each) => each.id === id) ?? notFound(id));
 
 /**
  * An article as a reader who holds no subscription is given it: whole when it is free, its body withheld when it is not.
@@ -128,7 +132,7 @@ export const contentApi: ContentApi & Required<Pick<ContentApi, 'getIssues'>> = 
       section === undefined
         ? whole(CHRONOLOGICAL, SERVICE_PAGES.front)
         : pageOf(
-            CHRONOLOGICAL.filter((summary) => summary.section === section),
+            NEWEST_FIRST.filter((entry) => entry.section === section).map(summarize),
             query,
             SERVICE_PAGES.section,
           ),

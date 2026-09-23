@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
 
-/** The root every section key starts with: one entity, one namespace in the cache the app persists. */
+/** The root every section key starts with: one namespace in the cache the app persists. */
 const SECTIONS = 'sections';
 
 /**

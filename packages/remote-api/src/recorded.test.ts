@@ -86,20 +86,20 @@ test.each(LISTS)('$route: no title or standfirst reaches the domain carrying the
   expect(lines.filter((line) => line === '')).toEqual([]);
 });
 
-/** The recorded section's list is found in the menu by the number in its own path, and not named by hand. */
-test('an item of a section’s own list is placed in that section, and an item of the front page in none', () => {
-  const menu = readMenu(RECORDED.menu.answer);
-  if (!('item' in menu)) {
-    throw new Error(menu.refused);
-  }
-  const listed = menu.item.kept.find((each) => RECORDED.section.path === `/wordpress/${each.serviceId}/posts/`);
-  if (listed === undefined) {
-    throw new Error('la rubrique enregistrée manque au menu enregistré');
-  }
-  const { section } = listed;
-  const own = readSummaries(RECORDED.section.answer.posts, { section: section.id }).kept;
-  expect(own.every((summary) => summary.section === section.id)).toBe(true);
-  expect(readSummaries(RECORDED.front.answer.posts).kept.every((summary) => summary.section === undefined)).toBe(true);
+/** Every caption the capture kept, as the service wrote it: the lists' pictures, then the articles'. */
+const CAPTIONS = fieldsOf(RECORDED, ['image_caption']);
+
+/** The journal writes its credit into the caption, behind a « © »; a reading sets it apart, whole, and keeps no mark. */
+test('a credit written into a caption is read apart from it, and the caption keeps no mark of it', () => {
+  const credited = CAPTIONS.filter((html) => readPlain(html).includes('©'));
+  expect(credited.length).toBeGreaterThan(0);
+  const read = LISTS.flatMap(({ answer }) => readSummaries(answer.posts).kept).flatMap((summary) =>
+    summary.hero === undefined ? [] : [summary.hero],
+  );
+  const split = read.filter((hero) => hero.credit !== undefined);
+  expect(split.length).toBeGreaterThan(0);
+  expect(split.filter((hero) => !(hero.credit ?? '').startsWith('©\u00A0'))).toEqual([]);
+  expect(read.filter((hero) => (hero.caption ?? '').includes('©'))).toEqual([]);
 });
 
 test('the menu is read whole, in the newsroom’s order, each section with the id its list is filed under', () => {
@@ -238,12 +238,18 @@ test('the reason an item is set aside names what the service sent, and not only 
   expect(aside?.says).toMatch(/^article_format : .* \(reçu « podcast »\)$/u);
 });
 
-/** `live` came on the phone's wire after the capture: the running coverage of an event, an article that grows. */
-test('an item of running coverage is read as an article', () => {
+/**
+ * `live` came on the phone's wire after the capture: the running coverage of an event. It keeps its own name, and so
+ * does a chapter of a series — each is an article a reader is told is one.
+ */
+test('an item of running coverage and a chapter of a series are read as what they are', () => {
   const [first] = RECORDED.front.answer.posts;
-  const intake = readSummaries([{ ...first, article_format: 'live' }]);
+  const intake = readSummaries([
+    { ...first, article_format: 'live' },
+    { ...first, id: '3999999', article_format: 'serie' },
+  ]);
   expect(intake.setAside).toEqual([]);
-  expect(intake.kept.map((summary) => summary.format)).toEqual(['article']);
+  expect(intake.kept.map((summary) => summary.format)).toEqual(['live', 'series']);
 });
 
 test('a list of which no item could be read is refused, and says why; an empty one is a list holding nothing', () => {
@@ -263,4 +269,20 @@ test.each([
   const read = readArticle(answer);
   expect('refused' in read && read.refused).toContain('content_array');
   expect('refused' in read && read.refused).toContain(`(reçu ${received})`);
+});
+
+/**
+ * An item filed with no standfirst stands in the opening of its body. Beside the body the reader was given, that is the
+ * same words twice, and the article carries none; kept back, the opening is all the reader has, and it stays.
+ */
+test('an open article carries no standfirst its body already opens on, and a withheld one keeps it', () => {
+  const excerpted = { ...RECORDED.articles.opinion.answer, description: '' };
+  const open = readArticle(excerpted);
+  const withheld = readArticle({ ...BODILESS, description: '', right: false });
+  if (!('item' in open) || !('item' in withheld)) {
+    throw new Error('l’article enregistré n’a pas été lu');
+  }
+  expect(open.item.standfirst).toBe('');
+  expect(withheld.item.standfirst).toBe(readPlain(RECORDED.articles.opinion.answer.excerpt));
+  expect(withheld.item.standfirst).not.toBe('');
 });

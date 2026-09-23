@@ -30,18 +30,14 @@ export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
  * An item as any list of the service carries it.
  *
  * It holds the keys a reading reads, and no other. The service sends more — a slug, a type that is always `post`, an
- * audio flag never once set, a number for a video's cover that no route resolves — and a schema that held those to a
- * type would let a change to a key nobody reads cost the reader every item of a list: a `slug` sent as null tomorrow
- * would set all thirty aside. An object schema drops the keys it does not name, which is what they are owed.
+ * audio flag never once set, a number for a video's cover that no route resolves, a flag for what the desk picked out
+ * that was null on all 514 items of a capture — and a schema that held those to a type would let a change to a key
+ * nobody reads cost the reader every item of a list: a `slug` sent as null tomorrow would set all thirty aside. An
+ * object schema drops the keys it does not name, which is what they are owed.
  *
  * `author` and `image_caption` come as null, or not at all, on items of every route. `article_format` is left out only
  * by the sectioned front `a-la-une`, a route the app does not ask; it is read as optional all the same, and an item
  * without one is read as the classic article it would be.
- *
- * `highlighted` is sent on every item and was null on all 519 of them. It is modelled all the same, because it is the
- * one thing the service could say about an item that the wire marks on screen — the filled bead of « En continu » —
- * and a flag the journal starts setting tomorrow should light up, not be stripped by a schema that decided today it
- * would always be empty. Anything but a flag there stops the item, and the reading names it.
  */
 export const REMOTE_POST = z.object({
   id: REMOTE_ID,
@@ -55,7 +51,6 @@ export const REMOTE_POST = z.object({
   article_format: REMOTE_FORMAT.optional(),
   premium: z.boolean(),
   right: z.boolean(),
-  highlighted: z.boolean().nullish(),
 });
 export type RemotePost = z.infer<typeof REMOTE_POST>;
 

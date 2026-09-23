@@ -7,7 +7,6 @@ title: Le taux de chômage du bassin du Val d'Arche repasse sous la barre des ne
 standfirst: Selon les chiffres trimestriels publiés jeudi, l'emploi progresse légèrement, porté par les services et la construction. Les acteurs locaux restent prudents, à l'ombre des difficultés du secteur industriel.
 authors: julien-ferrand
 published: 2026-09-10 10:40
-emphasis: true
 ---
 
 Le taux de chômage du bassin d'emploi du Val d'Arche est repassé sous la barre des 9 % au deuxième trimestre, selon les chiffres publiés jeudi par l'observatoire régional de l'emploi. Il s'établit à 8,7 %, en léger recul sur un an.

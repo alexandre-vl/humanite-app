@@ -301,6 +301,35 @@ export const readProse = (html: string): readonly Block[] => {
  */
 export const readPlain = (html: string): string => plain(html).trim();
 
+/** The mark a picture's credit follows, and the word the pictures of a body are credited with when it is not there. */
+const COPYRIGHT = '©';
+const SOURCED = /\s*\|\s*(source\s*:.*)$/iu;
+
+/**
+ * What the journal writes under a picture, read as the two things it is: what the picture shows, and who took it.
+ *
+ * The service sends a caption and no credit, and the journal writes the credit into the caption: on 264 of the 287
+ * captions of a capture, after the caption's last sentence and behind a « © » — « …Nations unies. ©DPA/ABACA » — and
+ * behind « | Source : » under the pictures a body carries. Read apart, the credit can be set as what it is: quieter, and
+ * never read as part of the sentence about the picture. The « © » keeps its name on the same line as the name.
+ *
+ * A caption with neither mark is all caption, and one with nothing but the mark all credit. A « © » with nothing after
+ * it credits no one, and is dropped with the nothing.
+ */
+export const readLegend = (html: string): Readonly<{ caption: string; credit: string }> => {
+  const line = readPlain(html);
+  const at = line.lastIndexOf(COPYRIGHT);
+  if (at >= 0) {
+    const caption = line.slice(0, at).replace(/[\s|–—-]+$/u, '');
+    const who = line.slice(at + COPYRIGHT.length).trim();
+    return { caption, credit: who === '' ? '' : `${COPYRIGHT}${UNBREAKABLE}${who}` };
+  }
+  const sourced = SOURCED.exec(line);
+  return sourced === null
+    ? { caption: line, credit: '' }
+    : { caption: line.slice(0, sourced.index), credit: sourced[1] ?? '' };
+};
+
 /** The name of one thing a reading of the journal's markup can get wrong. */
 export type ProseCode =
   | 'prose/markup-left'

@@ -29,12 +29,10 @@ test('a summary carries these fields and no others', () => {
   expect([...Object.keys(ARTICLE_SUMMARY.shape)].sort((left, right) => left.localeCompare(right))).toEqual([
     'access',
     'byline',
-    'emphasis',
     'format',
     'hero',
     'id',
     'publishedAt',
-    'section',
     'standfirst',
     'title',
   ]);

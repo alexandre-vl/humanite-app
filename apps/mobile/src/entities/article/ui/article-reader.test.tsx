@@ -4,13 +4,10 @@ import { blocksOf, ContentApiError } from '@huma/contracts';
 import { PALETTE } from '@huma/design-tokens';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
-import { asDisplayText } from '#lib/display-text';
+import { t } from '#i18n';
 import { formatLongDate } from '#lib/format';
 import { everyArticle, renderWithCache, settle } from '#lib/testing';
 import { ArticleReader } from './article-reader';
-
-/** What the screen answers when the reader asks which section an article ran in, in one word the corpus never uses. */
-const SECTION = asDisplayText('Rubrique');
 
 const isList = (value: unknown): value is readonly unknown[] => Array.isArray(value);
 
@@ -93,9 +90,7 @@ const read = async (
   onFollow: () => void = () => undefined,
   onSupport: () => void = () => undefined,
 ): Promise<void> => {
-  await renderWithCache(
-    <ArticleReader id={article.id} names={() => SECTION} onFollow={onFollow} onSupport={onSupport} />,
-  );
+  await renderWithCache(<ArticleReader id={article.id} onFollow={onFollow} onSupport={onSupport} />);
   await settle();
 };
 
@@ -161,15 +156,23 @@ describe('ArticleReader, face à un corps retenu', () => {
 
 describe('ArticleReader', () => {
   /**
-   * An article opened from a search, from a shelf of kept pieces or from a link inside another article arrived with
-   * nothing saying which part of the paper it came from. The word is the screen's to supply — the sections belong to
-   * another entity — and it is asked for the section the article itself declares.
+   * An article opened from anywhere says what it is before it says anything else, in the word a card prints over the
+   * same title — and a plain article, which most are, says nothing there.
    */
-  it('nomme au-dessus du titre la rubrique où l’article a paru', async () => {
-    const article = await first('n’importe quel article', () => true);
-    await read(article);
-    expect(await screen.findByText(article.title)).toBeTruthy();
-    expect(screen.getByText(SECTION)).toBeTruthy();
+  it('dit au-dessus du titre ce qu’est une opinion, et rien d’un article', async () => {
+    const column = await first('une opinion', (article) => article.format === 'column');
+    await read(column);
+    expect(await screen.findByText(column.title)).toBeTruthy();
+    expect(screen.getByText(t('format.column'))).toBeTruthy();
+  });
+
+  it('ne met aucun mot au-dessus du titre d’un article', async () => {
+    const written = await first('un article', (article) => article.format === 'article');
+    await read(written);
+    expect(await screen.findByText(written.title)).toBeTruthy();
+    for (const word of [t('format.video'), t('format.column'), t('format.series'), t('format.live')]) {
+      expect(screen.queryByText(word)).toBeNull();
+    }
   });
 
   it('rend le titre, le chapô et chaque fragment de chaque paragraphe', async () => {

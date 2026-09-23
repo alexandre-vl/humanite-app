@@ -10,7 +10,7 @@ import { Text } from '#primitives/text';
 
 import { ArticleFigure } from './article-figure';
 
-export type ArticleTitleProps = Readonly<{ title: DisplayText; name: DisplayText | null }>;
+export type ArticleTitleProps = Readonly<{ title: DisplayText; word: DisplayText | null }>;
 export type ArticleLeadProps = Readonly<{ article: Article; byline: DisplayText | null }>;
 
 const useStyles = createStyles((theme) => ({
@@ -23,7 +23,8 @@ const useStyles = createStyles((theme) => ({
 }));
 
 /**
- * An article's headline, under the name of the section it ran in, set flush left on the page the article is read on.
+ * An article's headline, under the word for what it is when it is not an article, set flush left on the page the
+ * article is read on.
  *
  * It was centred, and centred over five lines: every line began at a different place, so a reader arriving at the end
  * of one had to hunt for the start of the next. The W3C's own low-vision guidance lists centred blocks of text as a
@@ -36,15 +37,18 @@ const useStyles = createStyles((theme) => ({
  * sheet and nothing else. A coloured ground behind a headline is real — the Guardian paints one — but full bleed, with
  * no card under it, and only for the pieces it calls immersive. A daily's own news article is printed on the page.
  *
- * The section over it is what every paper worth copying prints there and what this one printed nowhere: an article
- * opened from a search, from a shelf of kept pieces or from a link inside another article arrived with nothing at all
- * saying which part of the paper it came from.
+ * The word over it is the one a card prints over the same title — a video, a piece of opinion, a chapter of a series,
+ * a running coverage — so an article opened from anywhere says what it is before it says anything else.
  */
-export function ArticleTitle({ title, name }: ArticleTitleProps): ReactNode {
+export function ArticleTitle({ title, word }: ArticleTitleProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.title}>
-      {name === null ? null : <Text variant="kicker">{name}</Text>}
+      {word === null ? null : (
+        <Text variant="kicker" tone="textPrimary">
+          {word}
+        </Text>
+      )}
       <Text variant="headline" heading>
         {title}
       </Text>
@@ -81,9 +85,12 @@ export function ArticleLead({ article, byline }: ArticleLeadProps): ReactNode {
   const visual = plays ? null : pictureOf(article, 'lead');
   return (
     <>
-      <Box style={styles.standfirst}>
-        <Text variant="standfirst">{article.standfirst}</Text>
-      </Box>
+      {/* An article whose body opens on the words a list stood in for its missing standfirst has none of its own. */}
+      {article.standfirst === '' ? null : (
+        <Box style={styles.standfirst}>
+          <Text variant="standfirst">{article.standfirst}</Text>
+        </Box>
+      )}
       <Box style={styles.meta}>
         {/* Named a label rather than left to the default: the signature fell to the body's own type, so who wrote a
             piece was set in the same letters, at the same size and in the same ink as the piece itself. */}

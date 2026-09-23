@@ -10,7 +10,6 @@ import type {
   Page,
   SearchQuery,
   Section,
-  SectionId,
   SetAside,
 } from '@huma/contracts';
 import { ROUTES } from './routes.ts';
@@ -57,8 +56,8 @@ const nextOf = (page: number, listing: Listing, size: number): string | null =>
  */
 export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
   /** A list of the service, read, and what the reading set aside told; an answer that holds no list is refused. */
-  const listed = async (route: RouteName, request: Request, section?: SectionId): Promise<Listing> => {
-    const read = readList(await ask(client, request), section === undefined ? {} : { section });
+  const listed = async (route: RouteName, request: Request): Promise<Listing> => {
+    const read = readList(await ask(client, request));
     if ('refused' in read) {
       throw new ContentApiError('malformed', `${request.path} : ${read.refused}`);
     }
@@ -110,7 +109,7 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
         throw new ContentApiError('not-found', `rubrique inconnue du service : ${section}`);
       }
       const number = pageOf(cursor);
-      const listing = await listed('section', ROUTES.section.request(filed.serviceId, number), section);
+      const listing = await listed('section', ROUTES.section.request(filed.serviceId, number));
       return page(listing.intake.kept, nextOf(number, listing, SERVICE_PAGES.section));
     },
 

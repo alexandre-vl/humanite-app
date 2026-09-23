@@ -1,4 +1,4 @@
-import type { Article, ArticleId, DisplayText, LinkTarget } from '@huma/contracts';
+import type { Article, ArticleId, LinkTarget } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -9,8 +9,8 @@ import { Scroll } from '#primitives/scroll';
 import { ThemeScope } from '#primitives/theme';
 import { articleQuery } from '../api/queries';
 import { signatureOf } from '../model/byline';
+import { formatWord, readsDark } from '../model/format';
 import { stateOf } from '../model/paged-feed';
-import type { SectionNames } from '../model/section-names';
 import { ArticleBody } from './article-body';
 import { ArticleCallout } from './article-callout';
 import { ArticleLead, ArticleTitle } from './article-lead';
@@ -18,15 +18,12 @@ import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleReaderProps = Readonly<{
   id: ArticleId;
-  /** What the newsroom calls the section an article ran in, answered by the screen. */
-  names: SectionNames;
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;
 
 type ReadingProps = Readonly<{
   article: Article;
-  name: DisplayText | null;
   onFollow: (target: LinkTarget) => void;
   onSupport: () => void;
 }>;
@@ -68,11 +65,11 @@ function Wall({ onSupport }: Readonly<{ onSupport: () => void }>): ReactNode {
  * The dark theme had already said as much by accident: there its ground and its sheet take the same value, the sheet
  * stops showing, and the page runs edge to edge — which is what every article does now.
  */
-function Reading({ article, name, onFollow, onSupport }: ReadingProps): ReactNode {
+function Reading({ article, onFollow, onSupport }: ReadingProps): ReactNode {
   const styles = useStyles();
   return (
     <Scroll axis="vertical" style={styles.page} contentStyle={styles.column}>
-      <ArticleTitle title={article.title} name={name} />
+      <ArticleTitle title={article.title} word={formatWord(article.format)} />
       <ArticleLead article={article} byline={signatureOf(article)} />
       {article.body.kind === 'open' ? (
         <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} onSupport={onSupport} />
@@ -90,7 +87,7 @@ function Reading({ article, name, onFollow, onSupport }: ReadingProps): ReactNod
  * being read, not to a setting: the current app prints its videos on it and everything else on the light sheet, and a
  * reader who has chosen dark keeps it for every other article.
  */
-export function ArticleReader({ id, names, onFollow, onSupport }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, onFollow, onSupport }: ArticleReaderProps): ReactNode {
   const styles = useStyles();
   const { data: article, status, error, refetch } = useQuery(articleQuery(id));
   if (article === undefined) {
@@ -113,6 +110,6 @@ export function ArticleReader({ id, names, onFollow, onSupport }: ArticleReaderP
       />
     );
   }
-  const reading = <Reading article={article} name={names(article.section)} onFollow={onFollow} onSupport={onSupport} />;
-  return article.format === 'video' ? <ThemeScope name="dark">{reading}</ThemeScope> : reading;
+  const reading = <Reading article={article} onFollow={onFollow} onSupport={onSupport} />;
+  return readsDark(article.format) ? <ThemeScope name="dark">{reading}</ThemeScope> : reading;
 }

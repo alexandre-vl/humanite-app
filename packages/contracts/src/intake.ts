@@ -6,9 +6,8 @@ import type { Section } from './content.ts';
 import { SECTION } from './content.ts';
 import type { ArticleFormat } from './enums.ts';
 import type { Finding } from './finding.ts';
-import type { SectionId } from './ids.ts';
 import { PICTURE } from './picture.ts';
-import { readPlain, readProse } from './prose.ts';
+import { readLegend, readPlain, readProse } from './prose.ts';
 import type { RemoteFormat, RemotePost } from './remote.ts';
 import { REMOTE_BODY, REMOTE_LIST, REMOTE_MENU, REMOTE_POST, REMOTE_SECTION, SECTIONS_KEY } from './remote.ts';
 
@@ -35,9 +34,6 @@ export type Intake<Item> = Readonly<{ kept: readonly Item[]; setAside: readonly 
 /** One answer read: the item it was, or why it was none. */
 export type Read<Item> = Readonly<{ item: Item }> | Readonly<{ refused: string }>;
 
-/** What a reading may know that the answer does not say: the section whose own list it is reading. */
-export type Context = Readonly<{ section?: SectionId }>;
-
 /**
  * The service's word for an article of a series. Written as a string and used through it, as the wire's other words
  * are, so the table below keeps the service's key without an identifier of this repo being spelt in French.
@@ -46,18 +42,18 @@ const SERIES = 'serie';
 
 /**
  * The shapes the service gives an item, as the screens know them. Written as a total table over the service's own
- * list, so a fifth shape added to the wire is a type error here before it is anything else.
+ * list, so a sixth shape added to the wire is a type error here before it is anything else.
  *
- * `opinion` is a column: the items the service files under it are the paper's signed pieces — its chroniqueurs and
- * its editorials — and a column is what a card announces its writer on. An article of a series is read as an article,
- * and so is a `live`, the running coverage of an event: an article that keeps growing, which no screen yet tells apart.
+ * `opinion` is a column: the items the service files under it are the paper's signed pieces — its chroniqueurs, its
+ * tribunes and its editorials — and a column is what a card announces its writer on. Every other shape keeps its own
+ * name: a chapter of a series and the running coverage of an event are articles a reader is told are one.
  */
 const FORMATS = {
   classic: 'article',
   opinion: 'column',
   video: 'video',
-  [SERIES]: 'article',
-  live: 'article',
+  [SERIES]: 'series',
+  live: 'live',
 } as const satisfies Readonly<Record<RemoteFormat, ArticleFormat>>;
 
 /**
@@ -102,8 +98,8 @@ const heroOf = (post: RemotePost): HeroInput | undefined => {
   if (!picture.success) {
     return undefined;
   }
-  const caption = readPlain(post.image_caption ?? '');
-  return { picture: picture.data, ...(caption === '' ? {} : { caption }) };
+  const { caption, credit } = readLegend(post.image_caption ?? '');
+  return { picture: picture.data, ...(caption === '' ? {} : { caption }), ...(credit === '' ? {} : { credit }) };
 };
 
 /**
@@ -114,7 +110,7 @@ const heroOf = (post: RemotePost): HeroInput | undefined => {
  * stands in only where the standfirst is empty — a signed column is often filed with an empty one. Of 519 items, none
  * came with both empty.
  */
-const inputOf = (post: RemotePost, publishedAt: string, context: Context): SummaryInput => {
+const inputOf = (post: RemotePost, publishedAt: string): SummaryInput => {
   const standfirst = readPlain(post.description);
   const byline = readPlain(post.author ?? '');
   const hero = heroOf(post);
@@ -125,27 +121,25 @@ const inputOf = (post: RemotePost, publishedAt: string, context: Context): Summa
     title: readPlain(post.title),
     standfirst: standfirst === '' ? readPlain(post.excerpt) : standfirst,
     publishedAt,
-    ...(context.section === undefined ? {} : { section: context.section }),
     ...(byline === '' ? {} : { byline }),
     ...(hero === undefined ? {} : { hero }),
-    ...(post.highlighted === true ? { emphasis: true } : {}),
   };
 };
 
 /** An item the wire's schema has read, read again as the domain's. */
-const summaryOf = (post: RemotePost, context: Context): Read<ArticleSummary> => {
+const summaryOf = (post: RemotePost): Read<ArticleSummary> => {
   const publishedAt = instantAt(post.date);
   if (publishedAt === null) {
     return { refused: `date : « ${post.date} » ne nomme aucun instant` };
   }
-  const summary = ARTICLE_SUMMARY.safeParse(inputOf(post, publishedAt, context), REPORTED);
+  const summary = ARTICLE_SUMMARY.safeParse(inputOf(post, publishedAt), REPORTED);
   return summary.success ? { item: summary.data } : { refused: saysOf(summary.error) };
 };
 
 /** One item of a list of the service, read. */
-const readPost = (raw: unknown, context: Context): Read<ArticleSummary> => {
+const readPost = (raw: unknown): Read<ArticleSummary> => {
   const wire = REMOTE_POST.safeParse(raw, REPORTED);
-  return wire.success ? summaryOf(wire.data, context) : { refused: saysOf(wire.error) };
+  return wire.success ? summaryOf(wire.data) : { refused: saysOf(wire.error) };
 };
 
 /**
@@ -172,8 +166,7 @@ const intakeOf = <Item>(raws: readonly unknown[], read: (raw: unknown) => Read<I
  * The order is kept because it is the newsroom's. The front page of the service comes in the order its desk laid it
  * out and not by date, and a reading that sorted would print another paper than the one the journal made.
  */
-export const readSummaries = (posts: readonly unknown[], context: Context = {}): Intake<ArticleSummary> =>
-  intakeOf(posts, (raw) => readPost(raw, context));
+export const readSummaries = (posts: readonly unknown[]): Intake<ArticleSummary> => intakeOf(posts, readPost);
 
 /**
  * Why a reading that set everything aside is no reading at all: a list where not one item could be read is an answer
@@ -196,13 +189,13 @@ export type Listing = Readonly<{ intake: Intake<ArticleSummary>; sent: number }>
  * a full page from the last. A list the reading kept nothing of, having been sent something, is refused: an answer
  * where no item could be read is not a list with nothing in it.
  */
-export const readList = (answer: unknown, context: Context = {}): Read<Listing> => {
+export const readList = (answer: unknown): Read<Listing> => {
   const envelope = REMOTE_LIST.safeParse(answer, REPORTED);
   if (!envelope.success) {
     return { refused: saysOf(envelope.error) };
   }
   const { posts } = envelope.data;
-  const intake = readSummaries(posts, context);
+  const intake = readSummaries(posts);
   return intake.kept.length === 0 && intake.setAside.length > 0
     ? { refused: nothingRead(intake.setAside) }
     : { item: { intake, sent: posts.length } };
@@ -242,7 +235,7 @@ export const readMenu = (answer: unknown): Read<Intake<ListedSection>> => {
 };
 
 /** A summary and what the reader was given of its body, as the domain's article, or why it is none. */
-const withBody = (summary: ArticleSummary, body: unknown): Read<Article> => {
+const withBody = (summary: SummaryInput, body: unknown): Read<Article> => {
   const article = ARTICLE.safeParse({ ...summary, body }, REPORTED);
   return article.success ? { item: article.data } : { refused: saysOf(article.error) };
 };
@@ -261,7 +254,7 @@ export const readArticle = (answer: unknown): Read<Article> => {
   if (!wire.success) {
     return { refused: saysOf(wire.error) };
   }
-  const summary = summaryOf(wire.data, {});
+  const summary = summaryOf(wire.data);
   if ('refused' in summary) {
     return summary;
   }
@@ -269,9 +262,13 @@ export const readArticle = (answer: unknown): Read<Article> => {
     return withBody(summary.item, { kind: 'withheld' });
   }
   const body = REMOTE_BODY.safeParse(answer, REPORTED);
-  return body.success
-    ? withBody(summary.item, { kind: 'open', blocks: readProse(body.data.content_array.join('')) })
-    : { refused: saysOf(body.error) };
+  if (!body.success) {
+    return { refused: saysOf(body.error) };
+  }
+  // An item filed with no standfirst of its own stands in the opening of its body — a column, nearly always. Beside a
+  // body the reader was given, that is the same words twice, the second time whole: it is the body's to say them.
+  const opens = readPlain(wire.data.description) === '' ? { ...summary.item, standfirst: '' } : summary.item;
+  return withBody(opens, { kind: 'open', blocks: readProse(body.data.content_array.join('')) });
 };
 
 /** The name of one thing a reading of a list can get wrong. */
@@ -290,7 +287,6 @@ const POST = {
   article_format: 'classic',
   premium: false,
   right: true,
-  highlighted: null,
 } as const;
 
 /** The two items of the sample a reading must serve, in the order the service sent them. */

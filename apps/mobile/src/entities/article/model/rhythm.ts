@@ -1,5 +1,6 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { pictureOf } from '#api';
+import { isColumn } from './format';
 import { openerOf } from './picture';
 
 /**
@@ -51,7 +52,7 @@ const BLOCK = 4;
  * raises one article in full at the top and again every fourth item, and runs everything between them on one line.
  */
 const shapeAt = (summary: ArticleSummary, rank: number, rhythm: FeedRhythm): CardShape => {
-  if (summary.format === 'column') {
+  if (isColumn(summary.format)) {
     return 'column';
   }
   if (pictureOf(summary, 'card') === null) {

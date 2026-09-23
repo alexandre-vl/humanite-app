@@ -1,4 +1,5 @@
 import type { Article, ArticleFormat, ArticleId, Block, ImageKey, SectionId } from '@huma/contracts';
+import type { CorpusArticle } from './item.ts';
 import { blocksOf, instantAt, SECTION_ID, textOf } from '@huma/contracts';
 import { AUTHORS, codeOf, namesOf, SECTIONS } from './registries.ts';
 
@@ -31,15 +32,24 @@ const EXPECTED: ReadonlyMap<SectionId, Quota> = new Map(
 type Words = Readonly<{ min: number; max: number }>;
 
 /**
- * Accepted word counts per item kind. Keyed by the union the contracts declare and not by `string`, so a fourth format
- * added there stops the build here rather than leaving every item of it exempt from any length.
+ * The formats this corpus writes. The journal's series and its running coverage are formats of the journal alone: no
+ * item of the corpus is one, and an item that said it was would be held to no length at all, so it is refused.
+ */
+const WRITTEN = ['article', 'video', 'column'] as const satisfies readonly ArticleFormat[];
+type Written = (typeof WRITTEN)[number];
+
+const isWritten = (format: ArticleFormat): format is Written => WRITTEN.some((each) => each === format);
+
+/**
+ * Accepted word counts per item kind. Keyed by the formats this corpus writes and not by `string`, so a format the
+ * corpus starts writing stops the build here rather than leaving every item of it exempt from any length.
  */
 const WORDS = {
   article: { min: 300, max: 800 },
   video: { min: 120, max: 420 },
   column: { min: 350, max: 700 },
   brief: { min: 50, max: 180 },
-} as const satisfies Readonly<Record<ArticleFormat | 'brief', Words>>;
+} as const satisfies Readonly<Record<Written | 'brief', Words>>;
 
 /**
  * What a title and a standfirst of this corpus measure.
@@ -72,7 +82,7 @@ const WINDOW = { start: written('2026-09-10 07:00'), end: written('2026-09-13 09
 const RUNNING_TIME = { min: 60, max: 900 } as const;
 
 /** An item with the section folder it was read from. */
-type Item = Readonly<{ folder: SectionId; article: Article }>;
+type Item = Readonly<{ folder: SectionId; article: CorpusArticle }>;
 
 const countWords = (text: string): number => text.split(/\s+/u).filter((word) => word.length > 0).length;
 
@@ -91,7 +101,13 @@ const wordCount = (article: Article): number => blocksOf(article).reduce((sum, b
  */
 const isBrief = (article: Article): boolean => /-b[1-3]$/u.test(article.id);
 
-const wordRange = (article: Article): Words => WORDS[isBrief(article) ? 'brief' : article.format];
+/** The length an item is held to, or none for an item of a format this corpus does not write. */
+const wordRange = (article: Article): Words | undefined => {
+  if (isBrief(article)) {
+    return WORDS.brief;
+  }
+  return isWritten(article.format) ? WORDS[article.format] : undefined;
+};
 
 /**
  * Every picture of the corpus an item names: its lead illustration, then the images of its body. A lead picture of the
@@ -145,7 +161,7 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   const words = wordCount(article);
 
   if (article.section !== folder) {
-    errors.push(`${where} : section « ${article.section ?? 'aucune'} » ≠ dossier « ${folder} »`);
+    errors.push(`${where} : section « ${article.section} » ≠ dossier « ${folder} »`);
   }
   if (code !== undefined && !article.id.startsWith(`${code}-`)) {
     errors.push(`${where} : id hors de la rubrique « ${code} »`);
@@ -184,9 +200,6 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (article.format === 'column' && article.hero !== undefined) {
     errors.push(`${where} : pas de hero pour une chronique`);
   }
-  if (article.emphasis !== undefined && !isBrief(article)) {
-    errors.push(`${where} : emphasis réservé à une brève`);
-  }
   if (isBrief(article) && kinds.some((kind) => kind !== 'paragraph')) {
     errors.push(`${where} : une brève ne contient que des paragraphes`);
   }
@@ -214,7 +227,9 @@ const checkItem = ({ folder, article }: Item, ids: ReadonlySet<ArticleId>): read
   if (article.format === 'article' && !isBrief(article) && !kinds.includes('heading')) {
     errors.push(`${where} : au moins un intertitre dans un article`);
   }
-  if (words < range.min || words > range.max) {
+  if (range === undefined) {
+    errors.push(`${where} : format « ${article.format} » que ce corpus n’écrit pas`);
+  } else if (words < range.min || words > range.max) {
     errors.push(`${where} : ${String(words)} mots hors de ${String(range.min)}–${String(range.max)}`);
   }
   if (article.publishedAt < WINDOW.start || article.publishedAt > WINDOW.end) {
@@ -250,9 +265,6 @@ const checkSection = (folder: SectionId, articles: readonly Article[]): readonly
   }
   if (arts.filter((article) => article.access === 'premium').length !== 2) {
     errors.push(`${folder} : deux articles premium attendus`);
-  }
-  if (briefs.filter((article) => article.emphasis === true).length !== 1) {
-    errors.push(`${folder} : une brève emphasis attendue`);
   }
   if (quota === undefined) {
     errors.push(`${folder} : aucun quota de formats déclaré pour cette rubrique`);

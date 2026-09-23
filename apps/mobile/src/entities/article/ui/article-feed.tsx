@@ -10,7 +10,6 @@ import { signatureOf } from '../model/byline';
 import type { ReadFeed } from '../model/paged-feed';
 import type { FeedRhythm, FeedRow } from '../model/rhythm';
 import { feedRows, rowName, rowShape } from '../model/rhythm';
-import type { SectionNames } from '../model/section-names';
 import { ArticleCard } from './article-card';
 import type { EmptyWords } from './feed-stand-in';
 import { FeedStandIn } from './feed-stand-in';
@@ -20,11 +19,6 @@ export type ArticleFeedProps = Readonly<{
   rhythm: FeedRhythm;
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
-  /**
-   * What each article belongs to, if the screen wants its cards to say so. A screen already showing one section gives
-   * none: the same word over every card would say nothing at all.
-   */
-  names?: SectionNames | undefined;
   header?: ReactNode;
   sticky?: ReactNode;
   stickyRows?: BandRows | undefined;
@@ -63,7 +57,6 @@ export function ArticleFeed({
   rhythm,
   onOpen,
   action,
-  names,
   header,
   sticky,
   stickyRows,
@@ -72,7 +65,7 @@ export function ArticleFeed({
   const styles = useStyles();
   const render = (row: FeedRow): ReactNode => (
     <Box style={styles.card}>
-      {/* No label: a card's own words are its name, and they are better than any summary of them — the section, the
+      {/* No label: a card's own words are its name, and they are better than any summary of them — what it is, the
           title and the sentence under it are read in one breath, and the next swipe is the next article. */}
       <Pressable
         role="link"
@@ -85,7 +78,6 @@ export function ArticleFeed({
           summary={row.summary}
           action={action?.(row.summary)}
           signature={row.shape === 'column' ? signatureOf(row.summary) : null}
-          name={names?.(row.summary.section) ?? null}
         />
       </Pressable>
     </Box>

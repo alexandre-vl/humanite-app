@@ -33,7 +33,9 @@ test('getFeed with a section is that section’s own list, newest first', async 
   const section = SECTION_ID.parse('politique');
   const own = await contentApi.getFeed({ section });
   expect(own.items).toHaveLength(9);
-  expect(own.items.every((item) => item.section === section)).toBe(true);
+  const written = new Set(CORPUS.filter((entry) => entry.section === section).map((entry) => entry.id));
+  expect(own.items.every((item) => written.has(item.id))).toBe(true);
+  expect(own.items.some((item) => 'section' in item)).toBe(false);
   expect(newestFirst(own.items.map((item) => item.publishedAt))).toBe(true);
   expect(own.nextCursor).toBeNull();
 });

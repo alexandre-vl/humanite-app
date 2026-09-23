@@ -2,7 +2,6 @@ import { SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { ArticleFeed, feedOf } from '#entities/article';
-import { useSectionNames } from '#entities/section';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref } from '#lib/routing';
@@ -46,7 +45,6 @@ const useStyles = createStyles(() => ({
  */
 export function BookmarksPage(): ReactNode {
   const styles = useStyles();
-  const names = useSectionNames();
   const kept = feedOf(useBookmarks((state) => state.kept));
   return (
     <Surface>
@@ -57,7 +55,6 @@ export function BookmarksPage(): ReactNode {
           router.push(articleHref(id));
         }}
         action={(summary) => <BookmarkToggle summary={summary} />}
-        names={names}
         header={
           <Box style={styles.masthead}>
             <Text variant="display" numberOfLines={1} heading>

@@ -7,7 +7,6 @@ title: Coup de tonnerre sur le marché régional : un buteur confirmé signe à 
 standfirst: À la surprise générale, l'attaquant vedette du championnat de la saison passée rejoint le promu plutôt qu'un club mieux classé, un renfort de poids qui nourrit les ambitions de montée du club.
 authors: maxime-renaud
 published: 2026-09-11 08:10
-emphasis: true
 ---
 
 C'est la petite bombe de ce début de saison dans le football régional. L'attaquant le plus prolifique du championnat de la saison passée a signé cette semaine à l'Union sportive de Bourg-la-Rivière, le promu, plutôt que dans un club mieux établi.

@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
 import { ArticleReader, articleQuery } from '#entities/article';
-import { useSectionNames } from '#entities/section';
 import { BookmarkToggle } from '#features/bookmark';
 import { NEWSROOM } from '#config';
 import { articleHref, openExternal, useRouteParams } from '#lib/routing';
@@ -35,7 +34,6 @@ import { Surface } from '#primitives/surface';
  */
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
-  const names = useSectionNames();
   const article = useQuery(articleQuery(id)).data;
   return (
     <Surface>
@@ -47,7 +45,6 @@ export function ArticlePage(): ReactNode {
       />
       <ArticleReader
         id={id}
-        names={names}
         onFollow={(target) => {
           if (target.kind === 'article') {
             router.replace(articleHref(target.id));

@@ -2,16 +2,16 @@ import { z } from 'zod';
 import { SPAN } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
-import { ARTICLE_ID, IMAGE_KEY, SECTION_ID } from './ids.ts';
+import { ARTICLE_ID, IMAGE_KEY } from './ids.ts';
 import { PICTURE } from './picture.ts';
 
 /**
  * The illustration of an item: its picture, with the caption and the credit that go under it.
  *
  * The picture comes from either of the two sources a picture has. The caption and the credit are what the journal may
- * leave out: of the 519 items of a capture, 353 carry a caption, 111 carry no such field and 55 carry it empty, and
- * none carries a credit, which the journal writes into the caption — « | Source : istock » — when it writes one at
- * all. A picture without words under it is still a picture.
+ * leave out: of the 375 items of a capture, 287 carry a caption and 88 none — columns and videos, nearly all. The
+ * journal sends no credit of its own; it writes one into the caption, after its last sentence and behind a « © », on
+ * 264 of the 287, and a reading sets it apart. A picture without words under it is still a picture.
  */
 export const HERO = z.object({
   picture: PICTURE,
@@ -35,16 +35,16 @@ export type HeroInput = z.input<typeof HERO>;
  * is a way of losing articles. The corpus, which is written and so can be held to bounds, is held to them where it is
  * written — `packages/mock-content/src/validate.ts`.
  *
- * `section` is where an item ran, when that is known. The service names no section on any item, on any route, and
- * only a section's own list says, by being that section's: a reading that knows gives it, one that does not leaves it
- * out, and a screen shows no section rather than a wrong one.
+ * It holds what the service says of every item, and nothing it says of none. Where an item ran is not here: the
+ * service names no section on any item, on any route, so a screen that printed one would print it for the items of a
+ * section's own list and for nothing else. Nor is a flag for what the desk picked out: the service sends one on every
+ * item, and it was set on none of 514.
  *
- * `byline` is who signed the piece, written out as the journal writes it — one name, two joined by a word of its own,
- * or `La rédaction` — with nobody behind it to look up.
+ * `byline` is who signed the piece, written out as the journal writes it — one name, or `La rédaction` — with nobody
+ * behind it to look up.
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
-  section: SECTION_ID.optional(),
   format: ARTICLE_FORMAT,
   access: ACCESS,
   title: DISPLAY_TEXT,
@@ -52,7 +52,6 @@ export const ARTICLE_SUMMARY = z.object({
   byline: DISPLAY_TEXT.optional(),
   publishedAt: z.iso.datetime(),
   hero: HERO.optional(),
-  emphasis: z.boolean().optional(),
 });
 export type ArticleSummary = z.infer<typeof ARTICLE_SUMMARY>;
 /** The raw shape `ARTICLE_SUMMARY` accepts, typed for the reason `HeroInput` is. */

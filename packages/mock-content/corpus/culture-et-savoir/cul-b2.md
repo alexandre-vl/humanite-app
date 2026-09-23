@@ -7,7 +7,6 @@ title: Un trésor de monnaies antiques mis au jour lors de travaux d'assainissem
 standfirst: Les archéologues ont dégagé un lot de plusieurs centaines de pièces enfouies dans une jarre, une découverte qualifiée de rare pour la région et qui va retarder le chantier de plusieurs semaines.
 authors: paul-delorme
 published: 2026-09-12 07:45
-emphasis: true
 ---
 
 Les ouvriers n'en croyaient pas leurs yeux. En creusant une tranchée d'assainissement à la sortie de Mérignial, une entreprise de travaux publics a mis au jour, la semaine dernière, une jarre remplie de monnaies anciennes.

@@ -1,12 +1,13 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { ARTICLE, ARTICLE_SUMMARY, instantAt } from '@huma/contracts';
-import type { Article, ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput } from '@huma/contracts';
+import { ARTICLE, ARTICLE_SUMMARY, instantAt, SECTION_ID } from '@huma/contracts';
+import type { ArticleSummary, BlockInput, HeroInput, SectionId, SpanInput } from '@huma/contracts';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { frontmatterFromMarkdown } from 'mdast-util-frontmatter';
 import type { BlockContent, DefinitionContent, PhrasingContent, RootContent } from 'mdast';
 import { directive } from 'micromark-extension-directive';
 import { frontmatter } from 'micromark-extension-frontmatter';
+import type { CorpusArticle } from './item.ts';
 import { bylineOf, SECTIONS } from './registries.ts';
 import { validateCorpus } from './validate.ts';
 
@@ -23,8 +24,11 @@ type RawTarget = Extract<RawSpan, { type: 'link' }>['target'];
  */
 type RawBlock = Exclude<BlockInput, { type: 'related' }> | Readonly<{ type: 'related'; id: string }>;
 
-/** An item as its file writes it: everything a summary holds, read, and a body whose related blocks still name ids. */
-type WrittenItem = Readonly<{ summary: ArticleSummary; blocks: readonly RawBlock[] }>;
+/**
+ * An item as its file writes it: everything a summary holds, read, the section it was written for, and a body whose
+ * related blocks still name ids.
+ */
+type WrittenItem = Readonly<{ summary: ArticleSummary; section: SectionId; blocks: readonly RawBlock[] }>;
 
 /** A `::name[label]{attribute="value"}` line, the node `mdast-util-directive` adds to the tree. */
 type Directive = Extract<RootContent, { type: 'leafDirective' }>;
@@ -193,7 +197,6 @@ export const parseItem = (text: string): WrittenItem => {
   const blocks = body.map(toBlock);
   const summary = ARTICLE_SUMMARY.parse({
     id,
-    section: front['section'],
     format: front['format'],
     access: front['access'],
     title: front['title'],
@@ -201,14 +204,14 @@ export const parseItem = (text: string): WrittenItem => {
     publishedAt: published === undefined ? undefined : (instantAt(published) ?? published),
     ...(byline === undefined ? {} : { byline }),
     ...(hero === undefined ? {} : { hero: toHero(id, hero) }),
-    ...(front['emphasis'] === 'true' ? { emphasis: true } : {}),
   });
-  return { summary, blocks };
+  return { summary, section: SECTION_ID.parse(front['section']), blocks };
 };
 
 /** An item whole: its related blocks given the summary of the item each names, which must be one of the corpus. */
-const resolved = (item: WrittenItem, summaries: ReadonlyMap<string, ArticleSummary>): Article =>
-  ARTICLE.parse({
+const resolved = (item: WrittenItem, summaries: ReadonlyMap<string, ArticleSummary>): CorpusArticle => ({
+  section: item.section,
+  ...ARTICLE.parse({
     ...item.summary,
     body: {
       kind: 'open',
@@ -223,10 +226,11 @@ const resolved = (item: WrittenItem, summaries: ReadonlyMap<string, ArticleSumma
         return { type: 'related', summary };
       }),
     },
-  });
+  }),
+});
 
 /** Reads and validates every item, throwing an aggregate error when the corpus breaks any rule. */
-export function buildCorpus(): readonly Article[] {
+export function buildCorpus(): readonly CorpusArticle[] {
   const errors: string[] = [];
   const written: { readonly folder: SectionId; readonly file: string; readonly item: WrittenItem }[] = [];
   for (const section of SECTIONS) {

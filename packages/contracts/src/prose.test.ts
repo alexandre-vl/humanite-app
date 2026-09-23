@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { judgeProse, readPlain, readProse } from './index.ts';
+import { readLegend } from './prose.ts';
 
 /**
  * The judging answers whether the readings of this module leave a screen only prose, on a body written for the
@@ -47,4 +48,36 @@ test('a run carries its words bare, and the blank at its edges goes to the plain
     { type: 'link', text: 'ici', target: { kind: 'external', url: 'https://www.humanite.fr/' } },
     { type: 'text', text: ' et là' },
   ]);
+});
+
+/** The journal writes a picture's credit into its caption; a reading sets it apart and keeps the « © » with its name. */
+test.each([
+  {
+    shape: 'a credit glued to the last sentence',
+    html: '<p>Le 8 juillet dernier, à New York. ©DPA/ABACA</p>',
+    caption: 'Le 8 juillet dernier, à New York.',
+    credit: '©\u00A0DPA/ABACA',
+  },
+  {
+    shape: 'a credit behind a bar',
+    html: 'Une manifestation | © Hans Lucas via AFP',
+    caption: 'Une manifestation',
+    credit: '©\u00A0Hans Lucas via AFP',
+  },
+  {
+    shape: 'nothing but a credit',
+    html: '© Yasuyoshi CHIBA / AFP',
+    caption: '',
+    credit: '©\u00A0Yasuyoshi CHIBA / AFP',
+  },
+  {
+    shape: 'a body picture’s source',
+    html: 'Une photo. | Source : iStock',
+    caption: 'Une photo.',
+    credit: 'Source : iStock',
+  },
+  { shape: 'a caption with no credit', html: 'Une photo sans crédit.', caption: 'Une photo sans crédit.', credit: '' },
+  { shape: 'a mark that credits no one', html: 'Un tableau ©', caption: 'Un tableau', credit: '' },
+])('a caption is read apart from its credit: $shape', ({ html, caption, credit }) => {
+  expect(readLegend(html)).toEqual({ caption, credit });
 });
