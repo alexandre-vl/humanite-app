@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
+import { scrollViewAbove, styleOf } from '../../../lib/testing';
 import { LabelBar } from './label-bar';
 
 const ITEMS = [
@@ -43,12 +44,10 @@ describe('LabelBar', () => {
    */
   it('ne prend aucune part de la hauteur qu’on lui offre', async () => {
     await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} />);
-    let node = screen.getByLabelText('Politique').parent;
-    while (node !== null && node.type !== 'RCTScrollView') {
-      node = node.parent;
-    }
-    const style: unknown = node?.props['style'];
-    const share: unknown = typeof style === 'object' && style !== null ? Reflect.get(style, 'flexGrow') : undefined;
-    expect(share).toBe(0);
+    const bar = scrollViewAbove(
+      screen.getByLabelText('Politique'),
+      'la bande ne défile pas : le test ne vérifierait rien',
+    );
+    expect(styleOf(bar)['flexGrow']).toBe(0);
   });
 });

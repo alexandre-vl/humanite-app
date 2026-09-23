@@ -6,7 +6,8 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { formatPublished } from '#lib/format';
-import { firstArticle, renderWithCache, settle, standfirstOf, styleOf } from '#lib/testing';
+import { ancestorsOf, firstArticle, layersOf, renderWithCache, settle, standfirstOf, styleOf } from '#lib/testing';
+import type { Rendered } from '#lib/testing';
 import { ArticleReader } from './article-reader';
 
 /**
@@ -45,27 +46,13 @@ const cornersTurned = (node: unknown): readonly string[] => {
         .map(([, value]) => value)
     : [];
   const turned = styles
-    .flatMap((style) => (isList(style) ? style : [style]))
-    .flatMap((layer) =>
-      isRecord(layer) ? Object.keys(layer).filter((key) => /^borderTop(?:Left|Right)Radius$/u.test(key)) : [],
-    );
+    .flatMap((style) => layersOf(style))
+    .flatMap((layer) => Object.keys(layer).filter((key) => /^borderTop(?:Left|Right)Radius$/u.test(key)));
   return [...turned, ...cornersTurned(node['children'])];
 };
 
-/** One node of the rendered page, named off what the screen hands back rather than off the renderer's own types. */
-type Node = ReturnType<typeof screen.getByText>;
-
-/** Everything a node is laid inside, innermost first. */
-const ancestorsOf = (node: Node): readonly Node[] => {
-  const climbed: Node[] = [];
-  for (let walked = node.parent; walked !== null; walked = walked.parent) {
-    climbed.push(walked);
-  }
-  return climbed;
-};
-
 /** How far apart a box sets the things it holds, or nothing at all, which is the answer that was wrong. */
-const spaceInside = (node: Node): number => {
+const spaceInside = (node: Rendered): number => {
   const gap = styleOf(node)['gap'];
   return typeof gap === 'number' ? gap : 0;
 };

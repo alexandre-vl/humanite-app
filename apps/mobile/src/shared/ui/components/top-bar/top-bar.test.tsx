@@ -4,7 +4,8 @@ import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { t } from '../../../i18n';
 import { asDisplayText } from '../../../lib/display-text';
-import { styleOf } from '../../../lib/testing';
+import { nearestAbove, styleOf } from '../../../lib/testing';
+import type { Rendered } from '../../../lib/testing';
 import { Text } from '../../primitives/text';
 import { TopBar } from './top-bar';
 
@@ -16,17 +17,15 @@ const isCentred = (value: unknown): value is Margins =>
   isRecord(value) && typeof value['left'] === 'number' && typeof value['right'] === 'number';
 
 /** Where the bar laid the name, read back from the layer that carries it. */
-const margins = (): Margins => {
-  let node = screen.getByText(NAME).parent;
-  while (node !== null && !isCentred(styleOf(node))) {
-    node = node.parent;
-  }
-  const style = node === null ? {} : styleOf(node);
-  if (!isCentred(style)) {
-    throw new Error('le nom n’est posé sur rien qui dise où il est : le test ne vérifierait pas qu’il est centré');
-  }
-  return style;
-};
+const margins = (): Margins =>
+  nearestAbove(
+    screen.getByText(NAME),
+    (node) => {
+      const style = styleOf(node);
+      return isCentred(style) ? style : undefined;
+    },
+    'le nom n’est posé sur rien qui dise où il est : le test ne vérifierait pas qu’il est centré',
+  );
 
 type Square = Readonly<{ width: number; height: number }>;
 
@@ -34,17 +33,15 @@ const isSquare = (value: unknown): value is Square =>
   isRecord(value) && typeof value['width'] === 'number' && value['width'] === value['height'];
 
 /** The side of the square a control of the bar hangs in, read from the nearest box around it held at a fixed size. */
-const squareAround = (control: ReturnType<typeof screen.getByText>): number => {
-  let node = control.parent;
-  while (node !== null && !isSquare(styleOf(node))) {
-    node = node.parent;
-  }
-  const style = node === null ? {} : styleOf(node);
-  if (!isSquare(style)) {
-    throw new Error('rien autour du contrôle ne le tient à une taille : le test ne vérifierait pas où il pend');
-  }
-  return style.width;
-};
+const squareAround = (control: Rendered): number =>
+  nearestAbove(
+    control,
+    (node) => {
+      const style = styleOf(node);
+      return isSquare(style) ? style.width : undefined;
+    },
+    'rien autour du contrôle ne le tient à une taille : le test ne vérifierait pas où il pend',
+  );
 
 describe('TopBar', () => {
   it('nomme l’écran, et dit que c’est un nom et non une phrase', async () => {

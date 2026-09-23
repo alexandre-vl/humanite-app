@@ -28,8 +28,8 @@ describe('RichText', () => {
 
   it('donne à la phrase la taille et l’interligne de son variant', async () => {
     await render(<RichText runs={[plain('une phrase')]} variant="prose" />);
-    const sentence: unknown = screen.getByText('une phrase').parent?.props['style'];
-    expect(sentence).toMatchObject({
+    const sentence = screen.getByText('une phrase').parent;
+    expect(sentence === null ? {} : styleOf(sentence)).toMatchObject({
       fontFamily: prose.family,
       fontSize: prose.size,
       lineHeight: prose.size * prose.leading,

@@ -6,7 +6,8 @@ import { content } from '#api';
 import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
 import { formatHour, formatLongDate } from '#lib/format';
-import { everyArticle, standfirstOf, styleOf } from '#lib/testing';
+import { ancestorsOf, everyArticle, standfirstOf, styleOf } from '#lib/testing';
+import type { Rendered } from '#lib/testing';
 import { Text } from '#primitives/text';
 import type { CardShape } from '../model/rhythm';
 import { ArticleCard } from './article-card';
@@ -34,20 +35,9 @@ const pictures = (): number => screen.queryAllByTestId('picture', { includeHidde
 /** The colour a run of text was actually painted in, read back off the style the primitive gave it. */
 const inkOf = (text: DisplayText): unknown => styleOf(screen.getByText(text))['color'];
 
-/** One node of the rendered tree, named off what the screen hands back rather than off the renderer's own types. */
-type Node = ReturnType<typeof screen.getByText>;
-
-const ancestorsOf = (node: Node): readonly Node[] => {
-  const up: Node[] = [];
-  for (let walked = node.parent; walked !== null; walked = walked.parent) {
-    up.push(walked);
-  }
-  return up;
-};
-
 /** The innermost thing that holds both of two nodes, which is what says how the two are laid out against each other. */
-const holdingBoth = (one: Node, other: Node): Node => {
-  const above = new Set<Node>(ancestorsOf(one));
+const holdingBoth = (one: Rendered, other: Rendered): Rendered => {
+  const above = new Set<Rendered>(ancestorsOf(one));
   const shared = ancestorsOf(other).find((node) => above.has(node));
   if (shared === undefined) {
     throw new Error('ces deux éléments ne sont pas sur la même page : le test ne mesurerait rien');

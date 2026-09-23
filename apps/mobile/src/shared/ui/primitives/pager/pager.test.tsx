@@ -1,10 +1,9 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Dimensions, View } from 'react-native';
+import { scrollViewAbove } from '../../../lib/testing';
+import type { Rendered } from '../../../lib/testing';
 import { Pager } from './pager';
-
-/** A node of the rendered tree, named off the query that returns one rather than off a package nothing declares. */
-type Node = ReturnType<typeof screen.getByTestId>;
 
 /** The width one page takes, which is the screen's: the offset a swipe lands on is a multiple of it. */
 const WIDTH = Dimensions.get('window').width;
@@ -12,16 +11,11 @@ const WIDTH = Dimensions.get('window').width;
 const COUNT = 5;
 
 /** The scrolling region the pager owns, climbed to from a page that is mounted: the pager marks nothing for a test. */
-const across = (from: number): Node => {
-  let node: Node | null = screen.getByTestId(`page-${String(from)}`).parent;
-  while (node !== null && node.type !== 'RCTScrollView') {
-    node = node.parent;
-  }
-  if (node === null) {
-    throw new Error('le pager ne tient aucune région défilante : le test ne vérifierait rien');
-  }
-  return node;
-};
+const across = (from: number): Rendered =>
+  scrollViewAbove(
+    screen.getByTestId(`page-${String(from)}`),
+    'le pager ne tient aucune région défilante : le test ne vérifierait rien',
+  );
 
 const swipeTo = async (index: number, from: number): Promise<void> => {
   await fireEvent(across(from), 'momentumScrollEnd', { nativeEvent: { contentOffset: { x: WIDTH * index } } });

@@ -2,6 +2,7 @@ import type { Article, ArticleSummary, ContentApi, DisplayText, Page, PageQuery 
 import { isList, isRecord } from '@huma/unknown';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render } from '@testing-library/react-native';
+import type { screen } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 
 /**
@@ -78,7 +79,7 @@ export const firstArticle = async (
  * The layers of a style in the order React Native applies them, nested lists opened and empty slots left out: a
  * layer is a record of properties, as opposed to a list of layers or a layer left out.
  */
-const layersOf = (style: unknown): readonly Readonly<Record<string, unknown>>[] => {
+export const layersOf = (style: unknown): readonly Readonly<Record<string, unknown>>[] => {
   if (isList(style)) {
     return style.flatMap((layer) => layersOf(layer));
   }
@@ -95,3 +96,38 @@ export const styleOf = (
   prop = 'style',
 ): Readonly<Record<string, unknown>> =>
   layersOf(node.props[prop]).reduce<Readonly<Record<string, unknown>>>((flat, layer) => ({ ...flat, ...layer }), {});
+
+/** A node of a rendered tree, named off the query that returns one rather than off a package nothing declares. */
+export type Rendered = ReturnType<typeof screen.getByTestId>;
+
+/** Everything a node is laid inside, innermost first. */
+export const ancestorsOf = (node: Rendered): readonly Rendered[] => {
+  const climbed: Rendered[] = [];
+  for (let walked = node.parent; walked !== null; walked = walked.parent) {
+    climbed.push(walked);
+  }
+  return climbed;
+};
+
+/**
+ * What `read` finds on the nearest node above `node` it finds anything on. A test climbs to the view that paints or
+ * scrolls what it asks about, and one that found none would verify nothing, so `missing` says why it stops there
+ * instead of passing.
+ */
+export function nearestAbove<Found>(
+  node: Rendered,
+  read: (each: Rendered) => Found | undefined,
+  missing: string,
+): Found {
+  for (const each of ancestorsOf(node)) {
+    const found = read(each);
+    if (found !== undefined) {
+      return found;
+    }
+  }
+  throw new Error(missing);
+}
+
+/** The native view `node` scrolls in. */
+export const scrollViewAbove = (node: Rendered, missing: string): Rendered =>
+  nearestAbove(node, (each) => (each.type === 'RCTScrollView' ? each : undefined), missing);

@@ -2,23 +2,15 @@ import { SIZES, SPACING } from '@huma/design-tokens';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { View } from 'react-native';
-import { settle, styleOf } from '../../../lib/testing';
+import { scrollViewAbove, settle, styleOf } from '../../../lib/testing';
+import type { Rendered } from '../../../lib/testing';
 import { List } from './list';
 
 /** More items than any window holds, so what the list leaves out is visible. */
 const MANY = [...Array.from({ length: 60 }).keys()];
 
 /** The native scroll view the list renders, found from the item `un` up. */
-const scrollView = (): ReturnType<typeof screen.getByTestId> => {
-  let node = screen.getByTestId('un').parent;
-  while (node !== null && node.type !== 'RCTScrollView') {
-    node = node.parent;
-  }
-  if (node === null) {
-    throw new Error('la liste ne rend aucune vue défilante');
-  }
-  return node;
-};
+const scrollView = (): Rendered => scrollViewAbove(screen.getByTestId('un'), 'la liste ne rend aucune vue défilante');
 
 /**
  * How far down the list pushed its own content, read off the scroll view it renders.

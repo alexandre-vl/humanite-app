@@ -6,7 +6,8 @@ import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { t } from '#i18n';
-import { renderWithCache, settle } from '#lib/testing';
+import { nearestAbove, renderWithCache, settle } from '#lib/testing';
+import type { Rendered } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { dismissKeyboard } from '#primitives/text-field';
 import { SETTLE } from '../model/debounced';
@@ -60,17 +61,15 @@ const hasSide = (value: unknown): value is Readonly<{ width: number }> =>
   isRecord(value) && typeof value['width'] === 'number';
 
 /** The side a mark is drawn at, read from the nearest box around its glyph that is given one. */
-const sideOf = (glyph: ReturnType<typeof screen.getByText>): number => {
-  let node = glyph.parent;
-  while (node !== null && !hasSide(node.props['style'])) {
-    node = node.parent;
-  }
-  const style: unknown = node?.props['style'];
-  if (!hasSide(style)) {
-    throw new Error('rien autour du signe ne dit sa taille : le test ne vérifierait pas la cible');
-  }
-  return style.width;
-};
+const sideOf = (glyph: Rendered): number =>
+  nearestAbove(
+    glyph,
+    (node) => {
+      const style: unknown = node.props['style'];
+      return hasSide(style) ? style.width : undefined;
+    },
+    'rien autour du signe ne dit sa taille : le test ne vérifierait pas la cible',
+  );
 
 describe('SearchPage', () => {
   /**
