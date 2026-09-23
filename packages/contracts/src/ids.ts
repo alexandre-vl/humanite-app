@@ -3,8 +3,11 @@ import { z } from 'zod';
 /** How an item is named: a three-letter section code, then a slot. Shared so an image key is built on it, not beside it. */
 const ITEM = String.raw`[a-z]{3}-(?:a[1-6]|b[1-3])`;
 
-/** How the journal's own service names an item: the number its newsroom system gave it — `3861029`. */
-const FILED = String.raw`\d+`;
+/**
+ * How the journal's own service names an item: the number its newsroom system gave it — `3861029`. Exported as the
+ * pattern it is, so the address of an article is matched on the grammar its id is parsed with.
+ */
+export const FILED_PATTERN = String.raw`\d+`;
 
 /**
  * An article or brief id, in either of the two grammars the app reads: a slot of the corpus — `pol-a1`, `mon-b3` — or
@@ -15,7 +18,7 @@ const FILED = String.raw`\d+`;
  */
 export const ARTICLE_ID = z
   .string()
-  .regex(new RegExp(`^(?:${ITEM}|${FILED})$`, 'u'))
+  .regex(new RegExp(`^(?:${ITEM}|${FILED_PATTERN})$`, 'u'))
   .brand('ArticleId');
 export type ArticleId = z.infer<typeof ARTICLE_ID>;
 
@@ -26,7 +29,7 @@ export type ArticleId = z.infer<typeof ARTICLE_ID>;
  */
 export const FILED_ID = z
   .string()
-  .regex(new RegExp(`^${FILED}$`, 'u'))
+  .regex(new RegExp(`^${FILED_PATTERN}$`, 'u'))
   .brand('FiledId');
 export type FiledId = z.infer<typeof FILED_ID>;
 

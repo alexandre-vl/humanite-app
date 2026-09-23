@@ -1,5 +1,5 @@
 import { RECORDED } from './recorded.ts';
-import { partsOf, routeOf } from './routes.ts';
+import { routeAt } from './routes.ts';
 import type { RouteName } from './routes.ts';
 import type { Reply } from './transport.ts';
 
@@ -29,11 +29,8 @@ export const RECORDINGS: Readonly<
  * path, any list by the one list of its route the capture kept — and anything else with a 404.
  */
 export const replayed = async (address: string): Promise<Reply> => {
-  const parts = partsOf(address);
-  const route = parts === null ? undefined : routeOf(parts.path);
+  const at = routeAt(address);
   const kept =
-    route === undefined
-      ? undefined
-      : RECORDINGS[route].find((each) => route !== 'article' || each.path === parts?.path);
+    at === undefined ? undefined : RECORDINGS[at.route].find((each) => at.route !== 'article' || each.path === at.path);
   return kept === undefined ? reply(404, '{}') : reply(200, JSON.stringify(kept.answer));
 };

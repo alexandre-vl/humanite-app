@@ -1,11 +1,11 @@
-import { ARTICLE_ID, ContentApiError, QUESTION, SECTION_ID } from '@huma/contracts';
+import { ARTICLE_ID, ContentApiError, QUESTION, SECTION_ID, SECTIONS_KEY } from '@huma/contracts';
 import type { ContentErrorCode, SetAside } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { createRemoteApi } from './api.ts';
 import type { Client } from './api.ts';
 import { replayed, reply } from './bench.ts';
 import { RECORDED } from './recorded.ts';
-import { partsOf, routeOf, SERVICE, SERVICE_ROOT } from './routes.ts';
+import { routeAt, SERVICE, SERVICE_ROOT } from './routes.ts';
 import type { RouteName } from './routes.ts';
 import type { Reply } from './transport.ts';
 
@@ -22,9 +22,8 @@ const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> 
   const client: Client<number> = {
     fetch: async (address) => {
       asked.push(address);
-      const parts = partsOf(address);
-      const route = parts === null ? undefined : routeOf(parts.path);
-      return (route === undefined ? undefined : answer?.(route, parts?.query ?? '')) ?? replayed(address);
+      const at = routeAt(address);
+      return (at === undefined ? undefined : answer?.(at.route, at.query)) ?? replayed(address);
     },
     abortable: () => ({ signal: 0, abort: () => undefined }),
     after: () => () => undefined,
@@ -79,12 +78,41 @@ test('a full page of a section opens the next, and a short one ends the list', a
   expect(two.nextCursor).toBeNull();
 });
 
-test('the menu is asked once, however many sections are read after it', async () => {
+/** The recorded menu as the service would answer it once the newsroom dropped the section `slug`. */
+const withoutSection = (slug: string): unknown => ({
+  [SECTIONS_KEY]: RECORDED.menu.answer[SECTIONS_KEY].filter((each) => each.slug !== slug),
+});
+
+/** How many times the menu was asked for, of every address a client asked. */
+const menuAsks = (asked: readonly string[]): number =>
+  asked.filter((address) => address.includes('/wordpress/menu')).length;
+
+test('the pages of a section go by the menu as last read, and never ask for it again', async () => {
   const { api, asked } = replaying();
   await api.getFeed({ section: SECTION_ID.parse('politique') });
   await api.getFeed({ section: SECTION_ID.parse('monde') });
-  await api.getSections();
-  expect(asked.filter((address) => address.includes('/wordpress/menu')).length).toBe(1);
+  expect(menuAsks(asked)).toBe(1);
+});
+
+/**
+ * The app reads its sections again once they are stale, and that reading has to reach the service: a menu kept for
+ * as long as the app ran answered every re-reading with the first, and a section the newsroom added or removed never
+ * showed until the app was started again.
+ */
+test('the sections are read anew each time, and the lists they open go by the last reading', async () => {
+  let answered = 0;
+  const { api, asked } = replaying((route): Promise<Reply> | undefined => {
+    if (route !== 'menu') {
+      return undefined;
+    }
+    answered += 1;
+    return json(200, answered === 1 ? RECORDED.menu.answer : withoutSection('monde'));
+  });
+  expect((await api.getSections()).map((each) => each.id)).toContain('monde');
+  expect((await api.getSections()).map((each) => each.id)).not.toContain('monde');
+  expect(menuAsks(asked)).toBe(2);
+  expect(await failedWith(api.getFeed({ section: SECTION_ID.parse('monde') }))).toBe('not-found');
+  expect(menuAsks(asked)).toBe(2);
 });
 
 test('a menu that failed is not kept: the next question asks for it again', async () => {
@@ -98,7 +126,7 @@ test('a menu that failed is not kept: the next question asks for it again', asyn
   });
   expect(await failedWith(api.getSections())).toBe('unavailable');
   expect(await api.getSections()).toHaveLength(11);
-  expect(asked.filter((address) => address.includes('/wordpress/menu')).length).toBe(2);
+  expect(menuAsks(asked)).toBe(2);
 });
 
 test('a section the menu does not list, and an article of the corpus, are not found — and never asked', async () => {

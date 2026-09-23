@@ -2,7 +2,7 @@ import { ARTICLE_ID, ContentApiError, QUESTION } from '@huma/contracts';
 import type { ContentApi, ContentErrorCode, Finding } from '@huma/contracts';
 import type { Client } from './api.ts';
 import { RECORDINGS, replayed, reply } from './bench.ts';
-import { partsOf, routeOf } from './routes.ts';
+import { routeAt } from './routes.ts';
 import { isSendable } from './transport.ts';
 import type { Reply } from './transport.ts';
 
@@ -230,13 +230,12 @@ const addresses = async (make: Make): Promise<readonly Finding<TransportCode>[]>
     ...(ARTICLE_ID.safeParse(filed).success ? [api.getArticle(ARTICLE_ID.parse(filed))] : []),
   ]);
   const unknown = asked.flatMap(({ address }) => {
-    const parts = partsOf(address);
-    const route = parts === null ? undefined : routeOf(parts.path);
-    if (parts === null || route === undefined) {
+    const at = routeAt(address);
+    if (at === undefined) {
       return [address];
     }
-    const heard = RECORDINGS[route].map((each) => besidesAno(namesOf(each.query)));
-    return heard.includes(besidesAno(namesOf(parts.query))) ? [] : [address];
+    const heard = RECORDINGS[at.route].map((each) => besidesAno(namesOf(each.query)));
+    return heard.includes(besidesAno(namesOf(at.query))) ? [] : [address];
   });
   return unknown.length === 0
     ? []

@@ -1,5 +1,5 @@
 export type { Access, ArticleFormat } from './enums.ts';
-export { ARTICLE_ID, FILED_ID, SECTION_ID, SECTION_NUMBER } from './ids.ts';
+export { ARTICLE_ID, FILED_ID, FILED_PATTERN, SECTION_ID, SECTION_NUMBER } from './ids.ts';
 export type { ArticleId, FiledId, ImageKey, IssueId, SectionId, SectionNumber } from './ids.ts';
 export { clockOf, INSTANT, instantAt, instantOf, issueIdAt } from './clock.ts';
 export type { Instant } from './clock.ts';
@@ -12,7 +12,7 @@ export { atSquare, atWidth, judgePicture, PICTURE } from './picture.ts';
 export type { Picture, PictureCode, Resize } from './picture.ts';
 export type { Article, ArticleSummary, Block, BlockInput, HeroInput, SummaryInput } from './article.ts';
 export { judgeIntake, readArticle, readList, readMenu, readSummaries } from './intake.ts';
-export type { IntakeCode, ListedSection, Listing, SetAside, Take } from './intake.ts';
+export type { IntakeCode, ListedSection, Listing, Read, SetAside, Take } from './intake.ts';
 export { DONATION, judgeProse, readPlain, readProse, THE_BODY } from './prose.ts';
 export { SECTIONS_KEY, SERVICE_PAGES } from './remote.ts';
 export type { PlainReader, ProseCode, ProseReader } from './prose.ts';

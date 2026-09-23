@@ -1,4 +1,4 @@
-import { SERVICE_PAGES } from '@huma/contracts';
+import { FILED_PATTERN, SERVICE_PAGES } from '@huma/contracts';
 import type { FiledId, SectionNumber } from '@huma/contracts';
 
 /**
@@ -58,7 +58,7 @@ export const ROUTES = {
       path: `/wordpress/post/${id}`,
       query: [['type', 'post'], ['output_format', 'array'], ...ANONYMOUS],
     }),
-    answers: /\/wordpress\/post\/\d+$/u,
+    answers: new RegExp(`/wordpress/post/${FILED_PATTERN}$`, 'u'),
   },
   search: {
     request: (text: string, page: number): Request => ({
@@ -88,11 +88,22 @@ export const addressOf = (request: Request): string =>
  * What an address of the service asks, the other way round from `addressOf`: the path under the service's root, and
  * the query as it was written. `null` for an address anywhere else, which no request of this client is.
  */
-export const partsOf = (address: string): Readonly<{ path: string; query: string }> | null => {
+const partsOf = (address: string): Readonly<{ path: string; query: string }> | null => {
   const root = `${SERVICE}${SERVICE_ROOT}`;
   if (!address.startsWith(`${root}/`)) {
     return null;
   }
   const [path = '', query = ''] = address.slice(root.length).split('?');
   return { path, query };
+};
+
+/**
+ * The route an address of the service asks, with the path and the query it asks it with: `undefined` for an address
+ * anywhere else, or for a path no route of this client answers. What a replay or a judge reads of an address it did
+ * not build, in one place.
+ */
+export const routeAt = (address: string): Readonly<{ route: RouteName; path: string; query: string }> | undefined => {
+  const parts = partsOf(address);
+  const route = parts === null ? undefined : routeOf(parts.path);
+  return parts === null || route === undefined ? undefined : { route, ...parts };
 };

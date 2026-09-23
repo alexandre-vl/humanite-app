@@ -8,6 +8,7 @@ import type {
   ListedSection,
   Listing,
   Page,
+  Read,
   SearchQuery,
   Section,
   SetAside,
@@ -50,52 +51,59 @@ const nextOf = (page: number, listing: Listing, size: number): string | null =>
  * The content the journal's service serves, read through the contracts, as the app's door reads it.
  *
  * It holds no source of its own: a section's list is asked under the number the service's menu files it under, which
- * the domain never carries, so the menu is read once and kept — and dropped when it failed, for the next question to
- * ask again. It shelves no numéros: the journal's are the PDF files of a publisher's own reader, which no route of the
+ * the domain never carries, so the last reading of the menu is kept — and dropped when it failed, for the next
+ * question to ask again. It shelves no numéros: the journal's are the PDF files of a publisher's own reader, which no route of the
  * service lists, and a method answering none would be a newsstand saying it is empty.
  */
 export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
-  /** A list of the service, read, and what the reading set aside told; an answer that holds no list is refused. */
-  const listed = async (route: RouteName, request: Request): Promise<Listing> => {
-    const read = readList(await ask(client, request));
+  /** What `reading` makes of the answer to `request`, or the refusal of an answer it could read nothing of. */
+  const answered = async <Item>(request: Request, reading: (answer: unknown) => Read<Item>): Promise<Item> => {
+    const read = reading(await ask(client, request));
     if ('refused' in read) {
       throw new ContentApiError('malformed', `${request.path} : ${read.refused}`);
-    }
-    if (read.item.intake.setAside.length > 0) {
-      client.setAside(route, read.item.intake.setAside);
     }
     return read.item;
   };
 
+  /** Tells the client what a reading of `route` set aside, when it set anything aside. */
+  const report = (route: RouteName, setAside: readonly SetAside[]): void => {
+    if (setAside.length > 0) {
+      client.setAside(route, setAside);
+    }
+  };
+
+  /** A list of the service, read, and what the reading set aside told. */
+  const listed = async (route: RouteName, request: Request): Promise<Listing> => {
+    const listing = await answered(request, readList);
+    report(route, listing.intake.setAside);
+    return listing;
+  };
+
   /**
-   * The menu, read once for as long as the app runs: a section's list is found through it, by the number it files the
-   * list under, and a page of a section would otherwise cost two requests. The app's own copy of the sections is read
-   * again once stale and is handed this one, so the bar and the lists it opens agree on what the menu holds.
+   * The menu as last read. A page of a section goes by it, the list being asked under the number the menu files it
+   * under, rather than asking for the menu again; the sections themselves are read anew whenever the app asks for
+   * them, each reading replacing the last. The app's own staleness is so the menu's only lifetime, and the bar and
+   * the lists it opens go by the same reading.
    */
   let menu: Promise<readonly ListedSection[]> | undefined;
 
   const readSections = async (): Promise<readonly ListedSection[]> => {
-    const request = ROUTES.menu.request();
-    const read = readMenu(await ask(client, request));
-    if ('refused' in read) {
-      throw new ContentApiError('malformed', `${request.path} : ${read.refused}`);
-    }
-    if (read.item.setAside.length > 0) {
-      client.setAside('menu', read.item.setAside);
-    }
-    return read.item.kept;
-  };
-
-  const sections = async (): Promise<readonly ListedSection[]> => {
-    const asked = menu ?? readSections();
-    menu = asked;
+    const reading = answered(ROUTES.menu.request(), readMenu).then((intake) => {
+      report('menu', intake.setAside);
+      return intake.kept;
+    });
+    menu = reading;
     try {
-      return await asked;
+      return await reading;
     } catch (error) {
-      menu = undefined;
+      if (menu === reading) {
+        menu = undefined;
+      }
       throw error;
     }
   };
+
+  const lastSections = async (): Promise<readonly ListedSection[]> => menu ?? readSections();
 
   const page = (items: readonly ArticleSummary[], nextCursor: string | null): Page<ArticleSummary> => ({
     items,
@@ -103,13 +111,13 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
   });
 
   return {
-    getSections: async (): Promise<readonly Section[]> => (await sections()).map((each) => each.section),
+    getSections: async (): Promise<readonly Section[]> => (await readSections()).map((each) => each.section),
 
     getFeed: async ({ section, cursor }: FeedQuery): Promise<Page<ArticleSummary>> => {
       if (section === undefined) {
         return page((await listed('front', ROUTES.front.request())).intake.kept, null);
       }
-      const filed = (await sections()).find((each) => each.section.id === section);
+      const filed = (await lastSections()).find((each) => each.section.id === section);
       if (filed === undefined) {
         throw new ContentApiError('not-found', `rubrique inconnue du service : ${section}`);
       }
@@ -126,12 +134,7 @@ export const createRemoteApi = <Signal>(client: Client<Signal>): ContentApi => {
       if (!filed.success) {
         throw new ContentApiError('not-found', `article inconnu du service : ${id}`);
       }
-      const request = ROUTES.article.request(filed.data);
-      const read = readArticle(await ask(client, request));
-      if ('refused' in read) {
-        throw new ContentApiError('malformed', `${request.path} : ${read.refused}`);
-      }
-      return read.item;
+      return answered(ROUTES.article.request(filed.data), readArticle);
     },
 
     search: async ({ text, cursor }: SearchQuery): Promise<Page<ArticleSummary>> => {
