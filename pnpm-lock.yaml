@@ -897,6 +897,9 @@ importers:
       '@huma/lint':
         specifier: workspace:*
         version: link:../lint
+      '@huma/mock-content':
+        specifier: workspace:*
+        version: link:../../packages/mock-content
       '@huma/perf':
         specifier: workspace:*
         version: link:../perf

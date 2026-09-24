@@ -5,10 +5,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./artwork": "./src/artwork.ts",
-    "./assets": "./src/assets.ts"
-  },
-  "scripts": {
-    "generate": "node src/generate.ts"
+    "./assets": "./src/assets.ts",
+    "./generate": "./src/generate.ts"
   },
   "dependencies": {
     "@huma/contracts": "workspace:*",

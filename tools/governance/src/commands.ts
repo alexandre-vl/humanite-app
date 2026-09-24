@@ -85,6 +85,12 @@ export const COMMANDS = {
     audience: 'everyone',
     summary: 'lit une session réseau captée et en écrit les réponses du journal, sans laisser passer de secret',
   },
+  'corpus:generate': {
+    program: cli('corpus-generate'),
+    arguments: [],
+    audience: 'everyone',
+    summary: 'régénère le corpus simulé, ses images et le registre qui les met dans l’app, au format du dépôt',
+  },
   'adr:status': {
     program: cli('adr-status'),
     arguments: [],

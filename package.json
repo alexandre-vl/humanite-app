@@ -16,6 +16,7 @@
     "adr:new": "node tools/governance/src/cli/adr-new.ts",
     "adr:status": "node tools/governance/src/cli/adr-status.ts",
     "capture:read": "node tools/governance/src/cli/capture-read.ts",
+    "corpus:generate": "node tools/governance/src/cli/corpus-generate.ts",
     "deps:check": "node tools/governance/src/cli/deps-check.ts",
     "emulator:build": "node tools/governance/src/cli/emulator-build.ts",
     "emulator:down": "node tools/governance/src/cli/emulator-down.ts",

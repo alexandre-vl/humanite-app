@@ -18,6 +18,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm adr:new`          | crée un ADR proposé au dernier format                                                                                                 |
 | `pnpm adr:status`       | liste les ADR, leur statut et leurs preuves                                                                                           |
 | `pnpm capture:read`     | lit une session réseau captée et en écrit les réponses du journal, sans laisser passer de secret                                      |
+| `pnpm corpus:generate`  | régénère le corpus simulé, ses images et le registre qui les met dans l’app, au format du dépôt                                       |
 | `pnpm deps:check`       | vérifie manifestes, catalog, références TypeScript et lockfile                                                                        |
 | `pnpm emulator:build`   | génère android/ puis confie à un service utilisateur l’attente d’un hôte calme et le build natif                                      |
 | `pnpm emulator:down`    | supprime le conteneur de l’émulateur et attend que le garde root ait restauré l’hôte                                                  |

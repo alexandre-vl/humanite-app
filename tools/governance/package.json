@@ -15,6 +15,7 @@
     "@huma/guardrails": "workspace:*",
     "@huma/kit": "workspace:*",
     "@huma/lint": "workspace:*",
+    "@huma/mock-content": "workspace:*",
     "@huma/perf": "workspace:*",
     "@huma/structure": "workspace:*",
     "@huma/unknown": "workspace:*",
