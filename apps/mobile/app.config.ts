@@ -24,7 +24,14 @@ const config: ExpoConfig = {
     // phone they next sign into. The store in that directory holds what the paper answered; the keystore holding the
     // subscriber's token does not travel, and is asked not to (ADR-0034). Letting the backup run would carry the one
     // half to a device the other half was refused, and carry it through a service neither the journal nor the reader
-    // is party to. The app keeps nothing a new phone cannot fetch again.
+    // is party to.
+    //
+    // It costs something, and the cost is the kept articles. Measured on a capture of the journal's own app on
+    // 24/09/2026: opening its favourites made no call to the service at all, and nothing the service answers carries
+    // a list — `/skin` styles the toggle, `/json_parameters` says the feature exists, and that is the whole of it.
+    // Both apps keep that list on the phone and nowhere else, so a reader changing phone starts their shelf again.
+    // Paying it here is the narrow reading: one file holds both the shelf and the bodies a subscription paid for, and
+    // until those are two files there is no way to send one without the other.
     allowBackup: false,
   },
   plugins: ['expo-router'],
