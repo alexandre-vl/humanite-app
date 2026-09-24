@@ -22,3 +22,11 @@ export type { IssueSummary } from './issue.ts';
 export type { Page } from './page.ts';
 export { CONTENT_ERROR_CODE, ContentApiError, QUESTION } from './api.ts';
 export type { ContentApi, ContentErrorCode, FeedQuery, PageQuery, Question, SearchQuery } from './api.ts';
+export {
+  ANONYMOUS_TOKEN_REPLY,
+  ANONYMOUS_TOKEN_REQUEST,
+  LOGIN_REQUEST,
+  SERVICE_ERROR,
+  USER_TOKEN_REPLY,
+} from './session.ts';
+export type { DeviceAuth, LoginRequest } from './session.ts';
