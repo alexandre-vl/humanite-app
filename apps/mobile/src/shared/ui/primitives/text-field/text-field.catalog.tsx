@@ -8,8 +8,12 @@ import { TextField } from './text-field';
 
 const useStyles = createStyles((theme) => ({
   demo: {
-    height: SPACING.xxxl,
+    // A floor, as the search field has one: the reader sets how large the paper prints, and a demo that cropped the
+    // words it is demonstrating would be showing the wrong thing at the largest setting.
+    minHeight: SPACING.xxxl,
+    justifyContent: 'center',
     paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
     borderBottomWidth: SIZES.stroke,
     borderColor: theme.primary,
   },

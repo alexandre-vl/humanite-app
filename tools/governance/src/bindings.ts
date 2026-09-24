@@ -1136,7 +1136,7 @@ export const BINDINGS = {
     rules: {
       R1: {
         convention:
-          'Le lecteur de l’app est bâti sur le trousseau et sur rien d’autre : apps/mobile/src/shared/api/reader.ts passe keychain à createReader, et apps/mobile/src/shared/lib/storage/keychain.ts est la seule place qui parle à expo-secure-store. Aucun banc hors ligne ne lit ce qu’un téléphone garde ; les tests de l’app relisent l’aller-retour et la reprise de l’ancien magasin.',
+          'Le lecteur de l’app est bâti sur le trousseau et sur rien d’autre : apps/mobile/src/shared/api/reader.ts passe keychain à createReader, et apps/mobile/src/shared/lib/storage/keychain.ts est la seule place qui parle à expo-secure-store. Aucune des trois fonctions du port ne lève : le lecteur les appelle à sa première ligne, qui est celle d’un module, et une entrée que la plateforme ne sait plus ouvrir y est lue comme une absence puis vidée. Aucun banc hors ligne ne lit ce qu’un téléphone garde ; les tests de l’app relisent l’aller-retour, la reprise de l’ancien magasin et cette entrée illisible.',
       },
       R2: ['guardrail/module-expo-secure-store'],
       R3: {

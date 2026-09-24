@@ -16,7 +16,12 @@ const useStyles = createStyles((theme) => ({
     alignItems: 'center',
     gap: SPACING.sm,
     paddingHorizontal: SPACING.lg,
-    height: SPACING.xxxl,
+    // A floor and not a height. Forty-eight points is what a thumb is owed and what the line looks right at, but the
+    // reader sets how large the paper prints and the question they type grows with it: a fixed height cropped the
+    // ascenders and descenders off their own words at the largest setting. The padding keeps the line breathing at
+    // the smallest, where the floor alone would have the text touching the rule underneath it.
+    minHeight: SPACING.xxxl,
+    paddingVertical: SPACING.xs,
     borderBottomWidth: SIZES.stroke,
     borderColor: theme.primary,
   },

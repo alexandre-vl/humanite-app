@@ -45,11 +45,23 @@ jest.mock('react-native-mmkv', () => {
 // expo-secure-store reaches the platform's keystore, which no headless runner has. An in-memory map stands in, with
 // the same synchronous reads and writes and the same asynchronous delete — so the move across from the old store and
 // the overwrite that precedes a delete are exercised here exactly as they run on a phone.
+//
+// A value kept under the word below stands for an entry the platform can no longer open — the state a phone reaches
+// when the hardware key that sealed it is gone, which a screen lock changed, a system upgraded or a restore can all
+// bring about. Reading it raises as the platform raises, which is the one path a map cannot otherwise produce. The
+// same word is written by hand in keychain.test.ts.
 jest.mock('expo-secure-store', () => {
   const kept = new Map<string, string>();
+  const unreadable = 'scellé-par-une-clé-perdue';
   return {
     WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
-    getItem: (key: string): string | null => kept.get(key) ?? null,
+    getItem: (key: string): string | null => {
+      const held = kept.get(key) ?? null;
+      if (held === unreadable) {
+        throw new Error(`Could not decrypt the value for key '${key}' under keychain 'key_v1'. Caused by: bad base-64`);
+      }
+      return held;
+    },
     setItem: (key: string, value: string): void => {
       kept.set(key, value);
     },
