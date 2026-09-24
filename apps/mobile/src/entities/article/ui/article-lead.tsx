@@ -1,4 +1,4 @@
-import type { Article, DisplayText } from '@huma/contracts';
+import type { ArticleSummary, DisplayText } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
@@ -14,7 +14,7 @@ import { ItemWord } from './item-word';
 
 export type ArticleTitleProps = Readonly<{ title: DisplayText; word: DisplayText | null }>;
 export type ArticleLeadProps = Readonly<{
-  article: Article;
+  article: ArticleSummary;
   byline: DisplayText | null;
   onFollow: (url: string) => void;
 }>;
@@ -70,9 +70,12 @@ export function ArticleTitle({ title, word }: ArticleTitleProps): ReactNode {
  * article's picture, and showing it twice would say nothing more. What reads as a video is its format — the service
  * sends a link to the film and a body of prose, when any, that says nothing of it.
  *
- * The head is the same whether the body follows or not. An article whose body the source keeps back from this reader
- * still carries its title, its standfirst and its picture, and the wall that says why the rest is not there is laid
- * where the body would run — under this, not in place of it.
+ * The head is the same whether the body follows or not, which is why what it takes is a summary and not an article.
+ * A body the source keeps back from this reader leaves the title, the standfirst and the picture standing, and the
+ * wall that says why the rest is not there is laid where the body would run — under this, not in place of it. A body
+ * that has simply not arrived yet leaves exactly the same head, and a list that has already read one holds every
+ * field this draws: the head of an article being opened is therefore drawn from what the card held, at once, and
+ * only what is under it waits on the service.
  */
 export function ArticleLead({ article, byline, onFollow }: ArticleLeadProps): ReactNode {
   const styles = useStyles();

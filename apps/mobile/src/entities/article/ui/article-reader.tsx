@@ -1,4 +1,4 @@
-import type { Article, ArticleId } from '@huma/contracts';
+import type { Article, ArticleId, ArticleSummary } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
@@ -15,9 +15,22 @@ import { stateOf } from '../model/paged-feed';
 import { ArticleBody } from './article-body';
 import { ArticleLead, ArticleTitle } from './article-lead';
 import { FeedStandIn } from './feed-stand-in';
+import { ProseStandIn } from './prose-stand-in';
 
 export type ArticleReaderProps = Readonly<{
   id: ArticleId;
+  /**
+   * What the app already knew of this article when the screen opened, or nothing when it knew none of it.
+   *
+   * A reader reaches an article by touching a card, and that card was drawn from a summary that holds every field of
+   * the article but its body. Handed in, it lets the head be drawn at once — the real title, the real standfirst,
+   * the real signature, the real picture — with only the body waiting on the service. Handed nothing, as a link
+   * opened from outside hands nothing, the screen stands in for the whole of itself as it always did.
+   *
+   * The screen finds it, not this: what the app has read is a thing of the app's cache and of a shelf the reader
+   * keeps, neither of which an article knows about.
+   */
+  known: ArticleSummary | null;
   /** The address of a link the reader pressed, or of a film: a page of the web, for the screen to open. */
   onFollow: (url: string) => void;
   /**
@@ -31,6 +44,12 @@ export type ArticleReaderProps = Readonly<{
 }>;
 
 type ReadingProps = Readonly<{ article: Article; onFollow: (url: string) => void; onSignIn: (() => void) | null }>;
+
+type PageProps = Readonly<{
+  summary: ArticleSummary;
+  onFollow: (url: string) => void;
+  children: ReactNode;
+}>;
 
 const useStyles = createStyles((theme) => ({
   page: { backgroundColor: theme.background },
@@ -95,12 +114,21 @@ function Wall({ onSignIn }: Readonly<{ onSignIn: (() => void) | null }>): ReactN
  * used to close the head whatever came next, and on the four articles in five whose body is kept back the phone drew
  * two rules one gap apart — grey, then red — where one says the same.
  */
-function Reading({ article, onFollow, onSignIn }: ReadingProps): ReactNode {
+function Page({ summary, onFollow, children }: PageProps): ReactNode {
   const styles = useStyles();
   return (
     <Scroll axis="vertical" style={styles.page} contentStyle={styles.column}>
-      <ArticleTitle title={article.title} word={formatWord(article.format)} />
-      <ArticleLead article={article} byline={signatureOf(article)} onFollow={onFollow} />
+      <ArticleTitle title={summary.title} word={formatWord(summary.format)} />
+      <ArticleLead article={summary} byline={signatureOf(summary)} onFollow={onFollow} />
+      {children}
+    </Scroll>
+  );
+}
+
+function Reading({ article, onFollow, onSignIn }: ReadingProps): ReactNode {
+  const styles = useStyles();
+  return (
+    <Page summary={article} onFollow={onFollow}>
       {article.body.kind === 'open' ? (
         <>
           <Box style={styles.rule} />
@@ -109,7 +137,7 @@ function Reading({ article, onFollow, onSignIn }: ReadingProps): ReactNode {
       ) : (
         <Wall onSignIn={onSignIn} />
       )}
-    </Scroll>
+    </Page>
   );
 }
 
@@ -117,7 +145,7 @@ function Reading({ article, onFollow, onSignIn }: ReadingProps): ReactNode {
  * One article, read whole, in one reading: what its body points at comes written into it. The ground it is read on is
  * the screen's to choose — a video's page is dark from its status bar down — and not the reading's.
  */
-export function ArticleReader({ id, onFollow, onSignIn }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, known, onFollow, onSignIn }: ArticleReaderProps): ReactNode {
   const styles = useStyles();
   const { data: article, status, error, refetch } = useQuery(articleQuery(id));
   if (article === undefined) {
@@ -129,6 +157,17 @@ export function ArticleReader({ id, onFollow, onSignIn }: ArticleReaderProps): R
         <Box style={styles.away}>
           <Wall onSignIn={onSignIn} />
         </Box>
+      );
+    }
+    // The article is on its way and the app already knew its head: the page opens on the real thing, and only what
+    // is under the hairline is a ghost. A failure is not drawn this way — a head over a stand-in would say the rest
+    // is coming, and it is not.
+    if (state.kind === 'pending' && known !== null) {
+      return (
+        <Page summary={known} onFollow={onFollow}>
+          <Box style={styles.rule} />
+          <ProseStandIn />
+        </Page>
       );
     }
     return (

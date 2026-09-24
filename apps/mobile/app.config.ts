@@ -34,7 +34,18 @@ const config: ExpoConfig = {
     // until those are two files there is no way to send one without the other.
     allowBackup: false,
   },
-  plugins: ['expo-router'],
+  plugins: [
+    'expo-router',
+    // The field the phone paints before a line of this app has run, and the one it paints behind the app after.
+    // No mark on it: the journal's masthead is set in a face the app loads, and a picture of it would be a second
+    // drawing of the same words, out of step with the first the day either changed. What the reader sees instead is
+    // the paper's own ground — white, or the measured #141414 under a dark system — and the masthead laid on it by
+    // the app itself as soon as the faces are in, on the very same ground, so nothing flashes between the two.
+    //
+    // The values are the palette's `white` and `darkBackground`, written out because a config is read by Node,
+    // before anything of the app is built, and cannot import a token.
+    ['expo-splash-screen', { backgroundColor: '#ffffff', dark: { backgroundColor: '#141414' } }],
+  ],
   experiments: { typedRoutes: true, reactCompiler: true },
   updates: { enabled: false },
 };

@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
-import { ArticleReader, articleQuery, readsDark } from '#entities/article';
-import { BookmarkToggle } from '#features/bookmark';
+import { ArticleReader, articleQuery, readsDark, useReadSummary } from '#entities/article';
+import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { useReaderSession } from '#features/sign-in';
 import { openExternal, SIGN_IN_HREF, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
@@ -38,6 +38,13 @@ import { ThemeScope } from '#primitives/theme';
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
   const article = useQuery(articleQuery(id)).data;
+  // Everything the app already holds of this article, from either place it could be holding it: a list it has read,
+  // or the reader's own shelf. Both answer a summary, which is an article without its body, so either lets the head
+  // of the page be drawn before the service has said anything. A link opened from outside reaches neither, and the
+  // screen stands in for the whole of itself, as it did before.
+  const read = useReadSummary(id);
+  const kept = useBookmarks((state) => state.kept.find((each) => each.id === id) ?? null);
+  const known = article ?? read ?? kept;
   // A wall offers the way back in only when there is one to offer: a build given the journal's key, and a reader not
   // already signed in — for whom a wall is the journal withholding this piece, and not a connection to open.
   const { offered, connection } = useReaderSession();
@@ -48,10 +55,13 @@ export function ArticlePage(): ReactNode {
           onBack={() => {
             router.back();
           }}
-          action={article === undefined ? null : <BookmarkToggle summary={article} />}
+          // Drawn from whatever is known rather than from the article alone: the mark used to be missing from the
+          // bar and to appear in it a moment later, on a page whose headline was already there to be kept.
+          action={known === null ? null : <BookmarkToggle summary={known} />}
         />
         <ArticleReader
           id={id}
+          known={read ?? kept}
           onFollow={openExternal}
           onSignIn={
             offered && connection === 'out'

@@ -1,9 +1,11 @@
 import type { ArticleId } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
+import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { createStyles } from '#lib/styles';
 import { List } from '#primitives/list';
 import { Pressable } from '#primitives/pressable';
+import { prefetchArticle } from '../api/queries';
 import type { ReadFeed } from '../model/paged-feed';
 import type { WireRow as Row } from '../model/wire';
 import { rowKey, rowKind, rowPins, wireRows } from '../model/wire';
@@ -36,8 +38,16 @@ const useStyles = createStyles(() => ({
 export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
   const styles = useStyles();
   const rows = wireRows(feed.items);
+  // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
+  // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
+  // list rather than handed down from a screen because the list and the reading share one slice — the card knows
+  // which article it draws, and four screens would otherwise each pass the same line for a thing none of them decides.
+  const cache = useQueryClient();
   const open = (id: ArticleId) => () => {
     onOpen(id);
+  };
+  const near = (id: ArticleId) => () => {
+    prefetchArticle(cache, id);
   };
   const render = (row: Row): ReactNode => {
     switch (row.kind) {
@@ -45,7 +55,7 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
         return <WireDay label={row.label} />;
       case 'item':
         return (
-          <Pressable role="link" onPress={open(row.summary.id)}>
+          <Pressable role="link" onPress={open(row.summary.id)} onPressIn={near(row.summary.id)}>
             <WireRow summary={row.summary} />
           </Pressable>
         );

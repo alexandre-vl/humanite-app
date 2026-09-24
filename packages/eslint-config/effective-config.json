@@ -4982,6 +4982,113 @@
               "disallow": {
                 "to": {
                   "module": {
+                    "source": "react-native-worklets"
+                  }
+                }
+              },
+              "message": "[module/react-native-worklets] react-native-worklets ne s’importe que depuis : primitive"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
                     "source": "react-native-screens"
                   }
                 }
@@ -5429,6 +5536,10 @@
         {
           "selector": "ImportDeclaration[source.value='react-native-safe-area-context'] > ImportNamespaceSpecifier",
           "message": "[module/react-native-safe-area-context] react-native-safe-area-context ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='react-native-worklets'] > ImportNamespaceSpecifier",
+          "message": "[module/react-native-worklets] react-native-worklets ne s’importe que depuis : primitive"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-screens'] > ImportNamespaceSpecifier",
@@ -8890,6 +9001,113 @@
               "disallow": {
                 "to": {
                   "module": {
+                    "source": "react-native-worklets"
+                  }
+                }
+              },
+              "message": "[module/react-native-worklets] react-native-worklets ne s’importe que depuis : primitive"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
                     "source": "react-native-screens"
                   }
                 }
@@ -9340,6 +9558,10 @@
         {
           "selector": "ImportDeclaration[source.value='react-native-safe-area-context'] > ImportNamespaceSpecifier",
           "message": "[module/react-native-safe-area-context] react-native-safe-area-context ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='react-native-worklets'] > ImportNamespaceSpecifier",
+          "message": "[module/react-native-worklets] react-native-worklets ne s’importe que depuis : primitive"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-screens'] > ImportNamespaceSpecifier",
@@ -12797,6 +13019,113 @@
               "disallow": {
                 "to": {
                   "module": {
+                    "source": "react-native-worklets"
+                  }
+                }
+              },
+              "message": "[module/react-native-worklets] react-native-worklets ne s’importe que depuis : primitive"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "lib"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "lib-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
                     "source": "react-native-screens"
                   }
                 }
@@ -13247,6 +13576,10 @@
         {
           "selector": "ImportDeclaration[source.value='react-native-safe-area-context'] > ImportNamespaceSpecifier",
           "message": "[module/react-native-safe-area-context] react-native-safe-area-context ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='react-native-worklets'] > ImportNamespaceSpecifier",
+          "message": "[module/react-native-worklets] react-native-worklets ne s’importe que depuis : primitive"
         },
         {
           "selector": "ImportDeclaration[source.value='react-native-screens'] > ImportNamespaceSpecifier",

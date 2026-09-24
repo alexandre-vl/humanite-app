@@ -8,6 +8,15 @@ export type PressableProps = Readonly<{
   children?: ReactNode;
   style?: StyleRef;
   onPress?: (() => void) | undefined;
+  /**
+   * Called the moment a finger lands, before anyone knows whether it will lift here.
+   *
+   * What it is for is fetching: the press, the lift and the screen that follows are together a few hundred
+   * milliseconds, and a reading started at the first of the three is usually answered by the last. It fires on
+   * presses that end in nothing — a finger that slides away, a scroll begun on a card — so whatever it does must be
+   * worth doing for its own sake and must not be seen if it is wasted.
+   */
+  onPressIn?: (() => void) | undefined;
   label?: DisplayText | undefined;
   role?: 'radio' | 'button' | 'link' | undefined;
   selected?: boolean | undefined;
@@ -47,6 +56,7 @@ export function Pressable({
   children,
   style,
   onPress,
+  onPressIn,
   label,
   role,
   selected,
@@ -58,6 +68,7 @@ export function Pressable({
       style={style}
       hitSlop={hitSlop}
       onPress={onPress}
+      onPressIn={onPressIn}
       accessibilityLabel={label}
       accessibilityRole={role}
       accessibilityState={selected === undefined ? undefined : { selected }}

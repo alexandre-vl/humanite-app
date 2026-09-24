@@ -172,6 +172,19 @@ export function useOpacity(): number {
       }),
     ),
     define(
+      'guardrail/module-react-native-worklets',
+      'un composant qui renvoie du travail au fil de React',
+      ['module/react-native-worklets'],
+      linted({
+        'src/shared/ui/components/badge/report.ts': `import { scheduleOnRN } from 'react-native-worklets';
+
+export function report(done: () => void): void {
+  scheduleOnRN(done);
+}
+`,
+      }),
+    ),
+    define(
       'guardrail/module-react-native-safe-area-context',
       'une page qui lit les marges de sûreté',
       ['module/react-native-safe-area-context'],

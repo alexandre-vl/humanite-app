@@ -240,6 +240,7 @@ export const MODULES = {
   'react-native-mmkv': { places: ['lib'], except: [] },
   'react-native-reanimated': { places: ['primitive'], except: [] },
   'react-native-safe-area-context': { places: ['primitive'], except: [] },
+  'react-native-worklets': { places: ['primitive'], except: [] },
   'react-native-screens': { places: ['primitive'], except: [] },
   zustand: { places: ['feature'], except: [] },
 } as const satisfies Readonly<Record<string, ModulePolicy>>;

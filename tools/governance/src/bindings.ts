@@ -477,6 +477,7 @@ export const BINDINGS = {
         'guardrail/module-react-native-gesture-handler',
         'guardrail/module-react-native-reanimated',
         'guardrail/module-react-native-safe-area-context',
+        'guardrail/module-react-native-worklets',
         'guardrail/module-react-native-screens',
       ],
       R4: ['guardrail/platform-variant', 'guardrail/platform-variant-primitive'],
@@ -1150,6 +1151,53 @@ export const BINDINGS = {
       R5: {
         convention:
           'apps/mobile/app.config.ts pose android.allowBackup à false, ce que le greffon de configuration d’Expo porte à l’attribut android:allowBackup de l’application principale au prebuild. Le dossier android/ étant régénéré et non suivi, la configuration est la seule place où cela se décide.',
+      },
+    },
+  },
+  'ADR-0035': {
+    scope: {
+      // The three screens that wait on the service and what they wait with: the queries that answer from what is
+      // already in hand, the two hooks that read them, the reader's head-first page and its stand-in, the two lists
+      // that ask when a finger lands, the press that reports the landing, and the app's own opening with the layer
+      // it is drawn on and the gate that holds it.
+      paths: [
+        'apps/mobile/src/entities/article/api/queries.ts',
+        'apps/mobile/src/entities/article/model/known.ts',
+        'apps/mobile/src/entities/article/model/search.ts',
+        'apps/mobile/src/entities/article/model/paged-feed.ts',
+        'apps/mobile/src/entities/article/ui/article-reader.tsx',
+        'apps/mobile/src/entities/article/ui/prose-stand-in.tsx',
+        'apps/mobile/src/entities/article/ui/article-feed.tsx',
+        'apps/mobile/src/entities/article/ui/article-wire.tsx',
+        'apps/mobile/src/pages/article/ui/article-page.tsx',
+        'apps/mobile/src/pages/search/ui/search-page.tsx',
+        'apps/mobile/src/shared/ui/primitives/pressable/pressable.tsx',
+        'apps/mobile/src/shared/ui/primitives/curtain/curtain.tsx',
+        'apps/mobile/src/shared/ui/primitives/breathing/breathing.tsx',
+        'apps/mobile/src/_app/routes/opening.tsx',
+        'apps/mobile/src/_app/routes/startup-gate.tsx',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Les deux écrans qui attendent le service lisent d’abord le cache : apps/mobile/src/entities/article/model/known.ts rend le résumé déjà lu de l’article demandé, apps/mobile/src/entities/article/model/search.ts rend les résumés déjà lus dont les mots portent la question, et tous deux passent par summariesRead dans apps/mobile/src/entities/article/api/queries.ts, qui parcourt chaque liste que l’app a lue. Les tests de search-page.test.tsx et d’article-page.test.tsx montent chacun un cache garni et relisent ce qui est affiché avant toute réponse.',
+      },
+      R2: {
+        convention:
+          'La recherche titre ses réponses locales « Déjà lu, sur … » et non « Résultats pour … », et porte « Le journal cherche… » sous le titre tant que la réponse du journal n’est pas là (apps/mobile/src/shared/i18n/fr.ts, clés search.read, search.for et search.asking). La page choisit le titre sur la même condition qui choisit la liste, de sorte qu’aucune des deux ne peut mentir sur l’autre.',
+      },
+      R3: {
+        convention:
+          'La requête de recherche garde la page précédente pendant qu’elle en demande une autre : paged() prend un drapeau keepsPrevious et searchQuery est la seule à le lever, ce qui pose placeholderData sur keepPreviousData. Le fil en tire answering, que la page lit pour dire qu’elle cherche encore.',
+      },
+      R4: {
+        convention:
+          'Les deux listes d’articles demandent la lecture au poser du doigt : apps/mobile/src/entities/article/ui/article-feed.tsx et article-wire.tsx appellent prefetchArticle depuis onPressIn, que le pressable porte. L’échec est avalé, l’écran qui demande vraiment la lecture le lèvera lui-même.',
+      },
+      R5: {
+        convention:
+          'L’ouverture ne compte son plancher qu’une fois le téléphone dessaisi : le portail attend la réponse de hideAsync avant de dire shown, et apps/mobile/src/_app/routes/opening.tsx part de là pour ses 650 ms — un quart de seconde dû au lecteur, plus les 350 ms au pire que le téléphone met à retirer son champ après avoir répondu. Deux tests de startup-gate.test.tsx tiennent les deux bouts : un téléphone qui ne répond jamais garde l’ouverture, un téléphone qui répond la voit partir.',
       },
     },
   },

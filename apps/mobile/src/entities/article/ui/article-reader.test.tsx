@@ -65,7 +65,7 @@ const typesetOf = (text: string): Typeset => {
 };
 
 const read = async (article: Article, onFollow: () => void = () => undefined): Promise<void> => {
-  await renderWithCache(<ArticleReader id={article.id} onFollow={onFollow} onSignIn={null} />);
+  await renderWithCache(<ArticleReader id={article.id} known={null} onFollow={onFollow} onSignIn={null} />);
   await settle();
 };
 
@@ -120,11 +120,40 @@ describe('ArticleReader, face à un corps retenu', () => {
   it('offre la connexion sur le mur, quand l’écran a une connexion à offrir', async () => {
     const article = await reserved();
     const signIn = jest.fn();
-    await renderWithCache(<ArticleReader id={article.id} onFollow={() => undefined} onSignIn={signIn} />);
+    await renderWithCache(<ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={signIn} />);
     await settle();
     await fireEvent.press(await screen.findByText(t('article.withheld.signIn')));
     expect(signIn).toHaveBeenCalledTimes(1);
     expect(screen.getByText(t('article.withheld.where'))).toBeTruthy();
+  });
+
+  /**
+   * The case the head-first page exists for. The service answers an article it has not served lately in as much as
+   * three quarters of a second (mesuré le 24/09/2026), and for all that time the screen used to show nine grey bars
+   * under a bar with nothing in it — having been opened, a moment earlier, by a finger on that very headline.
+   *
+   * Everything the head draws is in the summary the list already held: a title, a standfirst, a signature, an hour.
+   * So the page opens on the real thing, and only what goes under the rule waits.
+   */
+  it('ouvre sur la tête que la liste connaissait déjà, pendant que le corps arrive', async () => {
+    const article = await firstArticle(content, 'un chapô', (each) => each.standfirst !== undefined);
+    // Le service ne répondra pas : ce qui s'affiche ne peut venir que de ce que l'écran savait en entrant.
+    jest.spyOn(content, 'getArticle').mockImplementation(async () => new Promise<Article>(() => undefined));
+    await renderWithCache(<ArticleReader id={article.id} known={article} onFollow={() => undefined} onSignIn={null} />);
+    await settle();
+    expect(screen.getByText(standfirstOf(article))).toBeTruthy();
+    expect(screen.getByText(formatPublished(article.publishedAt))).toBeTruthy();
+    // Et rien du fantôme des listes : ce n'est pas une liste qu'on a ouverte.
+    expect(screen.queryByText(t('failure.offline.title'))).toBeNull();
+  });
+
+  /** Sans rien de connu — un lien ouvert du dehors — l'écran tient toujours lieu de lui-même en entier. */
+  it('tient lieu de la page entière quand elle n’a été ouverte par aucune liste', async () => {
+    const article = await firstArticle(content, 'un chapô', (each) => each.standfirst !== undefined);
+    jest.spyOn(content, 'getArticle').mockImplementation(async () => new Promise<Article>(() => undefined));
+    await renderWithCache(<ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={null} />);
+    await settle();
+    expect(screen.queryByText(standfirstOf(article))).toBeNull();
   });
 
   /** A reader already signed in is looking at a wall the journal put there; there is no connection to offer them. */

@@ -34,6 +34,14 @@ export type ReadFeed = Readonly<{
   items: readonly ArticleSummary[];
   state: FeedState;
   /**
+   * Whether what is on screen is an answer to something other than what was last asked.
+   *
+   * A feed that keeps its previous answer while the next is fetched is showing something true and slightly old, and
+   * a screen that says nothing about it is letting a reader read one question's answer under another's name. Only
+   * the search keeps a previous answer today; every other feed is never in this state.
+   */
+  answering: boolean;
+  /**
    * Reading the feed again, every page it holds from the first: what a pull down the screen asks for, and what a
    * failure offers to try again. The two are one reading, and a feed that named them apart could make them differ.
    */
@@ -71,11 +79,21 @@ const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
  * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
 export function usePagedFeed(query: PagedFeed): ReadFeed {
-  const { data, status, error, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(query);
+  const {
+    data,
+    status,
+    error,
+    refetch,
+    isRefetching,
+    isPlaceholderData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(query);
   return {
     items: once(data?.pages.flatMap((page) => page.items) ?? []),
     state: stateOf(status, error),
+    answering: isPlaceholderData,
     readAgain: () => {
       void refetch();
     },
@@ -101,6 +119,7 @@ const nothing = (): void => undefined;
 export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
   items,
   state: { kind: 'empty' },
+  answering: false,
   readAgain: nothing,
   refreshing: false,
 });

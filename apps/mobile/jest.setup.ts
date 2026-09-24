@@ -73,7 +73,12 @@ jest.mock('expo-secure-store', () => {
 });
 
 // expo-splash-screen and expo-font reach native modules absent from a headless runner; the startup-gate test drives them.
-jest.mock('expo-splash-screen', () => ({ preventAutoHideAsync: jest.fn(), hideAsync: jest.fn() }));
+jest.mock('expo-splash-screen', () => ({
+  preventAutoHideAsync: jest.fn(),
+  // The real one answers when the phone has taken its field away, and the gate waits on that answer: a double
+  // returning nothing would have it wait on `undefined.then`.
+  hideAsync: jest.fn(async () => Promise.resolve()),
+}));
 
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
 
@@ -100,8 +105,42 @@ jest.mock('react-native-reanimated', () => {
     default: reactNative,
     useSharedValue,
     useAnimatedStyle: (updater: () => unknown): unknown => updater(),
+    // A breath is a value going somewhere and back, forever. Off the phone there is no clock to run it on, so each
+    // of these answers the value it was asked to go to: what a test reads is where the animation was headed, which
+    // is the only thing about it a headless runner can be honest about.
+    //
+    // For the same reason an animation given somewhere to report to reports at once, and reports that it arrived:
+    // with no clock, the only run it can stand for is one that took no time and was not interrupted. What that
+    // forecloses is the interrupted rise, which is a phone's to prove.
+    withTiming: (toValue: number, shape?: unknown, whenDone?: (finished: boolean) => void): number => {
+      whenDone?.(true);
+      return toValue;
+    },
+    withRepeat: (animation: number): number => animation,
+    // Each of these shapes how a value travels, and nothing travels here: the shaping is the identity and the two
+    // that take an easing hand it straight back. A curve missing from this list is not caught until a test reaches
+    // the animation that asks for it, which is how `out` went missing — so they are kept complete rather than as
+    // needed.
+    Easing: {
+      ease: (value: number): number => value,
+      in: (easing: unknown): unknown => easing,
+      out: (easing: unknown): unknown => easing,
+      inOut: (easing: unknown): unknown => easing,
+      linear: (value: number): number => value,
+    },
+    // The phone's own setting, which a headless runner has not got. Answered « no » so what a test renders is what a
+    // reader who asked for nothing in particular sees; the still branch is the one a test would have to ask for.
+    useReducedMotion: (): boolean => false,
   };
 });
+
+// react-native-worklets is what reanimated schedules across threads through, and it reaches the same native layer.
+// On a phone `scheduleOnRN` hands work back from the UI thread; here there is one thread and it is already the right one.
+jest.mock('react-native-worklets', () => ({
+  scheduleOnRN: <Args extends readonly unknown[]>(fn: (...args: Args) => void, ...args: Args): void => {
+    fn(...args);
+  },
+}));
 
 // @shopify/flash-list reads its viewport and its cells through the native layer, which a headless runner answers with
 // zeroes. Given no size it never builds a layout manager, so it neither virtualises nor recycles, and a list test would

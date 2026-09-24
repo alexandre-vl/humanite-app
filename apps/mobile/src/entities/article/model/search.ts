@@ -1,5 +1,8 @@
-import type { Question } from '@huma/contracts';
+import type { ArticleSummary, Question } from '@huma/contracts';
 import { QUESTION } from '@huma/contracts';
+import { useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { summariesMatching } from '../api/queries';
 
 /**
  * How short a question may be and still be one. A single letter reaches nearly every article and an empty field every
@@ -16,4 +19,15 @@ const SHORTEST = 2;
 export const questionOf = (words: string): Question | null => {
   const asked = QUESTION.safeParse(words);
   return asked.success && asked.data.length >= SHORTEST ? asked.data : null;
+};
+
+/**
+ * What the app can answer about a question from the lists it has already read, while the journal answers the rest.
+ *
+ * Recomputed when the question changes and not on every render: it walks every summary in the cache, which is a few
+ * dozen and costs nothing, but doing it four times for one keystroke would be four times nothing for no reason.
+ */
+export const useReadMatches = (question: Question | null): readonly ArticleSummary[] => {
+  const cache = useQueryClient();
+  return useMemo(() => (question === null ? [] : summariesMatching(cache, question)), [cache, question]);
 };
