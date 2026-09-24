@@ -11,6 +11,7 @@ import type { WireRow as Row } from '../model/wire';
 import { rowKey, rowKind, rowPins, wireRows } from '../model/wire';
 import { FeedStandIn } from './feed-stand-in';
 import { WireDay } from './wire-day';
+import { WireStandIn } from './wire-stand-in';
 import { WireRow } from './wire-row';
 
 export type ArticleWireProps = Readonly<{
@@ -72,7 +73,7 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
       pinned={rowPins}
       renderItem={render}
       contentStyle={styles.wire}
-      empty={<FeedStandIn state={feed.state} onRetry={feed.readAgain} />}
+      empty={<FeedStandIn state={feed.state} onRetry={feed.readAgain} awaited={<WireStandIn />} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}

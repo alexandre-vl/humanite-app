@@ -3,15 +3,16 @@ import { sectionColor } from '@huma/design-tokens';
 import type { SectionCode } from '@huma/design-tokens';
 
 /**
- * The widths a visual is written at, one per place a picture fills on screen: a thumbnail beside a line of text, a
- * card, and the lead picture of an article on a dense screen.
+ * The widths a visual is written at, one per box a picture fills on screen: a thumbnail beside a line of text, and the
+ * full width of the screen, which is the card in a feed and the head of an article alike.
  *
- * There is no width here that no screen asks for. One was written for a while — 640, between the thumbnail and the
- * card — and nothing could request it: the app names a place, never a count of pixels, and no place stood at that
- * width. It weighed 63 files and 78 ko of the bundle a cold start is measured against, and the check that would have
- * seen it did not exist, because the two lists were only ever held against the files and never against each other.
+ * There is no width here that no screen asks for. Two were written for a while and could not be: 640, between the
+ * thumbnail and the card, which no place stood at — 63 files and 78 ko of the bundle a cold start is measured
+ * against — and 1 600, which the head of an article asked for while the card of the same article asked 1 080. The
+ * second was worse than weight: the two are the same box on the same screen, so the reader downloaded one picture
+ * twice and watched the second arrive.
  */
-export const VISUAL_WIDTHS = [320, 1080, 1600] as const;
+export const VISUAL_WIDTHS = [320, 1080] as const;
 
 /** The shape every visual is drawn in, wide enough that a card may crop it to any of the boxes the app lays out. */
 const WIDTH = 1600;

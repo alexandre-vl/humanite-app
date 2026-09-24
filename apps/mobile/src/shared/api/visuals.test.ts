@@ -36,7 +36,19 @@ describe('une image du journal', () => {
 
   it('se demande à la largeur de chaque place, sans perdre ce que son adresse demande d’autre', () => {
     expect(visualOf(picture, 'card')).toEqual({ source: { uri: url.replace('w=150', 'w=1080') } });
-    expect(visualOf(picture, 'lead')).toEqual({ source: { uri: url.replace('w=150', 'w=1600') } });
+  });
+
+  /**
+   * A card in a feed and the head of the article it opens fill the same box — the width of the screen — so they ask
+   * for the same address, and the picture the reader has just seen is the picture the article paints, off the disk,
+   * on its first frame.
+   *
+   * They asked 1 080 and 1 600. A picture is cached by the address it was asked for, so that was one picture fetched
+   * twice: 119 138 octets on the card, then 163 406 more on the article, measured against the journal's own server on
+   * 24/09/2026 — and the second of them arriving late enough to be watched.
+   */
+  it('se demande à la même adresse pour la carte et pour la tête, qui remplissent la même boîte', () => {
+    expect(visualOf(picture, 'lead')).toEqual(visualOf(picture, 'card'));
   });
 
   /**

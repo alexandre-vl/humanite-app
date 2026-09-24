@@ -72,6 +72,8 @@ export const FR = {
   // réponse plus petite que celle qui arrive. Le titre le dit, pour qu'on ne la prenne pas pour l'autre.
   'search.read': 'Déjà lu, sur «\u00A0{query}\u00A0»',
   'search.asking': 'Le journal cherche…',
+  'search.waiting.title': 'Le journal cherche «\u00A0{query}\u00A0»',
+  'search.waiting.message': 'Sa recherche demande une seconde ou deux.',
   'search.none.title': 'Aucun résultat pour «\u00A0{query}\u00A0»',
   'search.none.message': 'Essayez un autre mot, ou un sujet plus large.',
   'settings.title': 'Préférences d’affichage',

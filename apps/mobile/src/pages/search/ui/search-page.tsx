@@ -39,6 +39,13 @@ const useStyles = createStyles(() => ({
  *  · the answer to the one before, while the next is on its way, with a line saying the journal is still looking;
  *  · on a first question, when there is no answer to keep, the articles the app has already read whose title or
  *    standfirst hold the word — a true answer, and a smaller one, dropped the moment the journal's arrives.
+ *
+ * What it does not show is a page of grey cards. Every other screen of the app knows the shape of what it is waiting
+ * for — a page of the paper opens on one article and runs the rest in lines, a wire hangs hours from a thread — and
+ * draws that shape empty while it waits. A search knows nothing of the kind: the journal answers a question with
+ * anything, of any length, and a screenful of card-shaped ghosts would be telling a reader what is coming and would
+ * be wrong about it. What says the journal is still looking is the rule under the field, which takes no room and
+ * claims no measure, and — when there is nothing at all to list under it — one line naming the question.
  */
 export function SearchPage(): ReactNode {
   const styles = useStyles();
@@ -54,7 +61,7 @@ export function SearchPage(): ReactNode {
   const waiting = standingIn || asked.answering;
   return (
     <Surface>
-      <SearchField value={typed} onChange={setTyped} />
+      <SearchField value={typed} onChange={setTyped} busy={waiting} />
       {question === null || feed.items.length === 0 ? null : (
         <Box style={styles.heading}>
           <Text variant="label">
@@ -74,6 +81,9 @@ export function SearchPage(): ReactNode {
             router.push(articleHref(id));
           }}
           action={(summary) => <BookmarkToggle summary={summary} />}
+          awaited={
+            <EmptyState title={t('search.waiting.title', { query: question })} message={t('search.waiting.message')} />
+          }
           empty={{ title: t('search.none.title', { query: question }), message: t('search.none.message') }}
         />
       )}

@@ -15,6 +15,7 @@ import { Text } from '#primitives/text';
 import { issuesQuery } from '../api/queries';
 import { coverLabel } from '../model/count';
 import { IssueCover } from './issue-cover';
+import { ShelfStandIn } from './shelf-stand-in';
 
 const useStyles = createStyles(() => ({
   page: { padding: SPACING.lg, gap: SPACING.lg },
@@ -68,6 +69,7 @@ export function NewsstandPage(): ReactNode {
             onRetry={() => {
               void refetch();
             }}
+            awaited={<ShelfStandIn />}
             empty={{ title: t('newsstand.empty.title'), message: t('newsstand.empty.message') }}
           />
         ) : (

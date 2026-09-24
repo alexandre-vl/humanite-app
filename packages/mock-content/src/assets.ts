@@ -2,263 +2,200 @@
 
 import i0 from './generated/images/cul-a1-hero-320.webp';
 import i1 from './generated/images/cul-a1-hero-1080.webp';
-import i2 from './generated/images/cul-a1-hero-1600.webp';
-import i3 from './generated/images/cul-a2-hero-320.webp';
-import i4 from './generated/images/cul-a2-hero-1080.webp';
-import i5 from './generated/images/cul-a2-hero-1600.webp';
-import i6 from './generated/images/cul-a2-galerie-320.webp';
-import i7 from './generated/images/cul-a2-galerie-1080.webp';
-import i8 from './generated/images/cul-a2-galerie-1600.webp';
-import i9 from './generated/images/cul-a4-hero-320.webp';
-import i10 from './generated/images/cul-a4-hero-1080.webp';
-import i11 from './generated/images/cul-a4-hero-1600.webp';
-import i12 from './generated/images/cul-a5-hero-320.webp';
-import i13 from './generated/images/cul-a5-hero-1080.webp';
-import i14 from './generated/images/cul-a5-hero-1600.webp';
-import i15 from './generated/images/cul-a5-archives-320.webp';
-import i16 from './generated/images/cul-a5-archives-1080.webp';
-import i17 from './generated/images/cul-a5-archives-1600.webp';
-import i18 from './generated/images/cul-a6-hero-320.webp';
-import i19 from './generated/images/cul-a6-hero-1080.webp';
-import i20 from './generated/images/cul-a6-hero-1600.webp';
-import i21 from './generated/images/eco-a1-hero-320.webp';
-import i22 from './generated/images/eco-a1-hero-1080.webp';
-import i23 from './generated/images/eco-a1-hero-1600.webp';
-import i24 from './generated/images/eco-a1-rassemblement-320.webp';
-import i25 from './generated/images/eco-a1-rassemblement-1080.webp';
-import i26 from './generated/images/eco-a1-rassemblement-1600.webp';
-import i27 from './generated/images/eco-a2-hero-320.webp';
-import i28 from './generated/images/eco-a2-hero-1080.webp';
-import i29 from './generated/images/eco-a2-hero-1600.webp';
-import i30 from './generated/images/eco-a3-hero-320.webp';
-import i31 from './generated/images/eco-a3-hero-1080.webp';
-import i32 from './generated/images/eco-a3-hero-1600.webp';
-import i33 from './generated/images/eco-a3-formation-320.webp';
-import i34 from './generated/images/eco-a3-formation-1080.webp';
-import i35 from './generated/images/eco-a3-formation-1600.webp';
-import i36 from './generated/images/eco-a5-hero-320.webp';
-import i37 from './generated/images/eco-a5-hero-1080.webp';
-import i38 from './generated/images/eco-a5-hero-1600.webp';
-import i39 from './generated/images/eco-a5-atelier-320.webp';
-import i40 from './generated/images/eco-a5-atelier-1080.webp';
-import i41 from './generated/images/eco-a5-atelier-1600.webp';
-import i42 from './generated/images/eco-a6-hero-320.webp';
-import i43 from './generated/images/eco-a6-hero-1080.webp';
-import i44 from './generated/images/eco-a6-hero-1600.webp';
-import i45 from './generated/images/env-a1-hero-320.webp';
-import i46 from './generated/images/env-a1-hero-1080.webp';
-import i47 from './generated/images/env-a1-hero-1600.webp';
-import i48 from './generated/images/env-a1-retenue-320.webp';
-import i49 from './generated/images/env-a1-retenue-1080.webp';
-import i50 from './generated/images/env-a1-retenue-1600.webp';
-import i51 from './generated/images/env-a2-hero-320.webp';
-import i52 from './generated/images/env-a2-hero-1080.webp';
-import i53 from './generated/images/env-a2-hero-1600.webp';
-import i54 from './generated/images/env-a3-hero-320.webp';
-import i55 from './generated/images/env-a3-hero-1080.webp';
-import i56 from './generated/images/env-a3-hero-1600.webp';
-import i57 from './generated/images/env-a3-observatoire-320.webp';
-import i58 from './generated/images/env-a3-observatoire-1080.webp';
-import i59 from './generated/images/env-a3-observatoire-1600.webp';
-import i60 from './generated/images/env-a4-hero-320.webp';
-import i61 from './generated/images/env-a4-hero-1080.webp';
-import i62 from './generated/images/env-a4-hero-1600.webp';
-import i63 from './generated/images/env-a4-cour-320.webp';
-import i64 from './generated/images/env-a4-cour-1080.webp';
-import i65 from './generated/images/env-a4-cour-1600.webp';
-import i66 from './generated/images/env-a5-hero-320.webp';
-import i67 from './generated/images/env-a5-hero-1080.webp';
-import i68 from './generated/images/env-a5-hero-1600.webp';
-import i69 from './generated/images/env-a6-hero-320.webp';
-import i70 from './generated/images/env-a6-hero-1080.webp';
-import i71 from './generated/images/env-a6-hero-1600.webp';
-import i72 from './generated/images/fem-a1-hero-320.webp';
-import i73 from './generated/images/fem-a1-hero-1080.webp';
-import i74 from './generated/images/fem-a1-hero-1600.webp';
-import i75 from './generated/images/fem-a1-tournee-320.webp';
-import i76 from './generated/images/fem-a1-tournee-1080.webp';
-import i77 from './generated/images/fem-a1-tournee-1600.webp';
-import i78 from './generated/images/fem-a2-hero-320.webp';
-import i79 from './generated/images/fem-a2-hero-1080.webp';
-import i80 from './generated/images/fem-a2-hero-1600.webp';
-import i81 from './generated/images/fem-a3-hero-320.webp';
-import i82 from './generated/images/fem-a3-hero-1080.webp';
-import i83 from './generated/images/fem-a3-hero-1600.webp';
-import i84 from './generated/images/fem-a4-hero-320.webp';
-import i85 from './generated/images/fem-a4-hero-1080.webp';
-import i86 from './generated/images/fem-a4-hero-1600.webp';
-import i87 from './generated/images/fem-a5-hero-320.webp';
-import i88 from './generated/images/fem-a5-hero-1080.webp';
-import i89 from './generated/images/fem-a5-hero-1600.webp';
-import i90 from './generated/images/fem-a6-hero-320.webp';
-import i91 from './generated/images/fem-a6-hero-1080.webp';
-import i92 from './generated/images/fem-a6-hero-1600.webp';
-import i93 from './generated/images/mon-a1-hero-320.webp';
-import i94 from './generated/images/mon-a1-hero-1080.webp';
-import i95 from './generated/images/mon-a1-hero-1600.webp';
-import i96 from './generated/images/mon-a1-negociations-320.webp';
-import i97 from './generated/images/mon-a1-negociations-1080.webp';
-import i98 from './generated/images/mon-a1-negociations-1600.webp';
-import i99 from './generated/images/mon-a2-hero-320.webp';
-import i100 from './generated/images/mon-a2-hero-1080.webp';
-import i101 from './generated/images/mon-a2-hero-1600.webp';
-import i102 from './generated/images/mon-a3-hero-320.webp';
-import i103 from './generated/images/mon-a3-hero-1080.webp';
-import i104 from './generated/images/mon-a3-hero-1600.webp';
-import i105 from './generated/images/mon-a3-dockers-320.webp';
-import i106 from './generated/images/mon-a3-dockers-1080.webp';
-import i107 from './generated/images/mon-a3-dockers-1600.webp';
-import i108 from './generated/images/mon-a4-hero-320.webp';
-import i109 from './generated/images/mon-a4-hero-1080.webp';
-import i110 from './generated/images/mon-a4-hero-1600.webp';
-import i111 from './generated/images/mon-a6-hero-320.webp';
-import i112 from './generated/images/mon-a6-hero-1080.webp';
-import i113 from './generated/images/mon-a6-hero-1600.webp';
-import i114 from './generated/images/pol-a1-hero-320.webp';
-import i115 from './generated/images/pol-a1-hero-1080.webp';
-import i116 from './generated/images/pol-a1-hero-1600.webp';
-import i117 from './generated/images/pol-a1-car-scolaire-320.webp';
-import i118 from './generated/images/pol-a1-car-scolaire-1080.webp';
-import i119 from './generated/images/pol-a1-car-scolaire-1600.webp';
-import i120 from './generated/images/pol-a2-hero-320.webp';
-import i121 from './generated/images/pol-a2-hero-1080.webp';
-import i122 from './generated/images/pol-a2-hero-1600.webp';
-import i123 from './generated/images/pol-a3-hero-320.webp';
-import i124 from './generated/images/pol-a3-hero-1080.webp';
-import i125 from './generated/images/pol-a3-hero-1600.webp';
-import i126 from './generated/images/pol-a3-carte-fusion-320.webp';
-import i127 from './generated/images/pol-a3-carte-fusion-1080.webp';
-import i128 from './generated/images/pol-a3-carte-fusion-1600.webp';
-import i129 from './generated/images/pol-a4-hero-320.webp';
-import i130 from './generated/images/pol-a4-hero-1080.webp';
-import i131 from './generated/images/pol-a4-hero-1600.webp';
-import i132 from './generated/images/pol-a5-hero-320.webp';
-import i133 from './generated/images/pol-a5-hero-1080.webp';
-import i134 from './generated/images/pol-a5-hero-1600.webp';
-import i135 from './generated/images/pol-a6-hero-320.webp';
-import i136 from './generated/images/pol-a6-hero-1080.webp';
-import i137 from './generated/images/pol-a6-hero-1600.webp';
-import i138 from './generated/images/soc-a1-hero-320.webp';
-import i139 from './generated/images/soc-a1-hero-1080.webp';
-import i140 from './generated/images/soc-a1-hero-1600.webp';
-import i141 from './generated/images/soc-a1-gymnase-320.webp';
-import i142 from './generated/images/soc-a1-gymnase-1080.webp';
-import i143 from './generated/images/soc-a1-gymnase-1600.webp';
-import i144 from './generated/images/soc-a2-hero-320.webp';
-import i145 from './generated/images/soc-a2-hero-1080.webp';
-import i146 from './generated/images/soc-a2-hero-1600.webp';
-import i147 from './generated/images/soc-a3-hero-320.webp';
-import i148 from './generated/images/soc-a3-hero-1080.webp';
-import i149 from './generated/images/soc-a3-hero-1600.webp';
-import i150 from './generated/images/soc-a3-attente-320.webp';
-import i151 from './generated/images/soc-a3-attente-1080.webp';
-import i152 from './generated/images/soc-a3-attente-1600.webp';
-import i153 from './generated/images/soc-a4-hero-320.webp';
-import i154 from './generated/images/soc-a4-hero-1080.webp';
-import i155 from './generated/images/soc-a4-hero-1600.webp';
-import i156 from './generated/images/soc-a4-atelier-320.webp';
-import i157 from './generated/images/soc-a4-atelier-1080.webp';
-import i158 from './generated/images/soc-a4-atelier-1600.webp';
-import i159 from './generated/images/soc-a5-hero-320.webp';
-import i160 from './generated/images/soc-a5-hero-1080.webp';
-import i161 from './generated/images/soc-a5-hero-1600.webp';
-import i162 from './generated/images/soc-a6-hero-320.webp';
-import i163 from './generated/images/soc-a6-hero-1080.webp';
-import i164 from './generated/images/soc-a6-hero-1600.webp';
-import i165 from './generated/images/spo-a1-hero-320.webp';
-import i166 from './generated/images/spo-a1-hero-1080.webp';
-import i167 from './generated/images/spo-a1-hero-1600.webp';
-import i168 from './generated/images/spo-a1-tribunes-320.webp';
-import i169 from './generated/images/spo-a1-tribunes-1080.webp';
-import i170 from './generated/images/spo-a1-tribunes-1600.webp';
-import i171 from './generated/images/spo-a2-hero-320.webp';
-import i172 from './generated/images/spo-a2-hero-1080.webp';
-import i173 from './generated/images/spo-a2-hero-1600.webp';
-import i174 from './generated/images/spo-a2-tribunes-320.webp';
-import i175 from './generated/images/spo-a2-tribunes-1080.webp';
-import i176 from './generated/images/spo-a2-tribunes-1600.webp';
-import i177 from './generated/images/spo-a3-hero-320.webp';
-import i178 from './generated/images/spo-a3-hero-1080.webp';
-import i179 from './generated/images/spo-a3-hero-1600.webp';
-import i180 from './generated/images/spo-a4-hero-320.webp';
-import i181 from './generated/images/spo-a4-hero-1080.webp';
-import i182 from './generated/images/spo-a4-hero-1600.webp';
-import i183 from './generated/images/spo-a5-hero-320.webp';
-import i184 from './generated/images/spo-a5-hero-1080.webp';
-import i185 from './generated/images/spo-a5-hero-1600.webp';
-import i186 from './generated/images/spo-a6-hero-320.webp';
-import i187 from './generated/images/spo-a6-hero-1080.webp';
-import i188 from './generated/images/spo-a6-hero-1600.webp';
+import i2 from './generated/images/cul-a2-hero-320.webp';
+import i3 from './generated/images/cul-a2-hero-1080.webp';
+import i4 from './generated/images/cul-a2-galerie-320.webp';
+import i5 from './generated/images/cul-a2-galerie-1080.webp';
+import i6 from './generated/images/cul-a4-hero-320.webp';
+import i7 from './generated/images/cul-a4-hero-1080.webp';
+import i8 from './generated/images/cul-a5-hero-320.webp';
+import i9 from './generated/images/cul-a5-hero-1080.webp';
+import i10 from './generated/images/cul-a5-archives-320.webp';
+import i11 from './generated/images/cul-a5-archives-1080.webp';
+import i12 from './generated/images/cul-a6-hero-320.webp';
+import i13 from './generated/images/cul-a6-hero-1080.webp';
+import i14 from './generated/images/eco-a1-hero-320.webp';
+import i15 from './generated/images/eco-a1-hero-1080.webp';
+import i16 from './generated/images/eco-a1-rassemblement-320.webp';
+import i17 from './generated/images/eco-a1-rassemblement-1080.webp';
+import i18 from './generated/images/eco-a2-hero-320.webp';
+import i19 from './generated/images/eco-a2-hero-1080.webp';
+import i20 from './generated/images/eco-a3-hero-320.webp';
+import i21 from './generated/images/eco-a3-hero-1080.webp';
+import i22 from './generated/images/eco-a3-formation-320.webp';
+import i23 from './generated/images/eco-a3-formation-1080.webp';
+import i24 from './generated/images/eco-a5-hero-320.webp';
+import i25 from './generated/images/eco-a5-hero-1080.webp';
+import i26 from './generated/images/eco-a5-atelier-320.webp';
+import i27 from './generated/images/eco-a5-atelier-1080.webp';
+import i28 from './generated/images/eco-a6-hero-320.webp';
+import i29 from './generated/images/eco-a6-hero-1080.webp';
+import i30 from './generated/images/env-a1-hero-320.webp';
+import i31 from './generated/images/env-a1-hero-1080.webp';
+import i32 from './generated/images/env-a1-retenue-320.webp';
+import i33 from './generated/images/env-a1-retenue-1080.webp';
+import i34 from './generated/images/env-a2-hero-320.webp';
+import i35 from './generated/images/env-a2-hero-1080.webp';
+import i36 from './generated/images/env-a3-hero-320.webp';
+import i37 from './generated/images/env-a3-hero-1080.webp';
+import i38 from './generated/images/env-a3-observatoire-320.webp';
+import i39 from './generated/images/env-a3-observatoire-1080.webp';
+import i40 from './generated/images/env-a4-hero-320.webp';
+import i41 from './generated/images/env-a4-hero-1080.webp';
+import i42 from './generated/images/env-a4-cour-320.webp';
+import i43 from './generated/images/env-a4-cour-1080.webp';
+import i44 from './generated/images/env-a5-hero-320.webp';
+import i45 from './generated/images/env-a5-hero-1080.webp';
+import i46 from './generated/images/env-a6-hero-320.webp';
+import i47 from './generated/images/env-a6-hero-1080.webp';
+import i48 from './generated/images/fem-a1-hero-320.webp';
+import i49 from './generated/images/fem-a1-hero-1080.webp';
+import i50 from './generated/images/fem-a1-tournee-320.webp';
+import i51 from './generated/images/fem-a1-tournee-1080.webp';
+import i52 from './generated/images/fem-a2-hero-320.webp';
+import i53 from './generated/images/fem-a2-hero-1080.webp';
+import i54 from './generated/images/fem-a3-hero-320.webp';
+import i55 from './generated/images/fem-a3-hero-1080.webp';
+import i56 from './generated/images/fem-a4-hero-320.webp';
+import i57 from './generated/images/fem-a4-hero-1080.webp';
+import i58 from './generated/images/fem-a5-hero-320.webp';
+import i59 from './generated/images/fem-a5-hero-1080.webp';
+import i60 from './generated/images/fem-a6-hero-320.webp';
+import i61 from './generated/images/fem-a6-hero-1080.webp';
+import i62 from './generated/images/mon-a1-hero-320.webp';
+import i63 from './generated/images/mon-a1-hero-1080.webp';
+import i64 from './generated/images/mon-a1-negociations-320.webp';
+import i65 from './generated/images/mon-a1-negociations-1080.webp';
+import i66 from './generated/images/mon-a2-hero-320.webp';
+import i67 from './generated/images/mon-a2-hero-1080.webp';
+import i68 from './generated/images/mon-a3-hero-320.webp';
+import i69 from './generated/images/mon-a3-hero-1080.webp';
+import i70 from './generated/images/mon-a3-dockers-320.webp';
+import i71 from './generated/images/mon-a3-dockers-1080.webp';
+import i72 from './generated/images/mon-a4-hero-320.webp';
+import i73 from './generated/images/mon-a4-hero-1080.webp';
+import i74 from './generated/images/mon-a6-hero-320.webp';
+import i75 from './generated/images/mon-a6-hero-1080.webp';
+import i76 from './generated/images/pol-a1-hero-320.webp';
+import i77 from './generated/images/pol-a1-hero-1080.webp';
+import i78 from './generated/images/pol-a1-car-scolaire-320.webp';
+import i79 from './generated/images/pol-a1-car-scolaire-1080.webp';
+import i80 from './generated/images/pol-a2-hero-320.webp';
+import i81 from './generated/images/pol-a2-hero-1080.webp';
+import i82 from './generated/images/pol-a3-hero-320.webp';
+import i83 from './generated/images/pol-a3-hero-1080.webp';
+import i84 from './generated/images/pol-a3-carte-fusion-320.webp';
+import i85 from './generated/images/pol-a3-carte-fusion-1080.webp';
+import i86 from './generated/images/pol-a4-hero-320.webp';
+import i87 from './generated/images/pol-a4-hero-1080.webp';
+import i88 from './generated/images/pol-a5-hero-320.webp';
+import i89 from './generated/images/pol-a5-hero-1080.webp';
+import i90 from './generated/images/pol-a6-hero-320.webp';
+import i91 from './generated/images/pol-a6-hero-1080.webp';
+import i92 from './generated/images/soc-a1-hero-320.webp';
+import i93 from './generated/images/soc-a1-hero-1080.webp';
+import i94 from './generated/images/soc-a1-gymnase-320.webp';
+import i95 from './generated/images/soc-a1-gymnase-1080.webp';
+import i96 from './generated/images/soc-a2-hero-320.webp';
+import i97 from './generated/images/soc-a2-hero-1080.webp';
+import i98 from './generated/images/soc-a3-hero-320.webp';
+import i99 from './generated/images/soc-a3-hero-1080.webp';
+import i100 from './generated/images/soc-a3-attente-320.webp';
+import i101 from './generated/images/soc-a3-attente-1080.webp';
+import i102 from './generated/images/soc-a4-hero-320.webp';
+import i103 from './generated/images/soc-a4-hero-1080.webp';
+import i104 from './generated/images/soc-a4-atelier-320.webp';
+import i105 from './generated/images/soc-a4-atelier-1080.webp';
+import i106 from './generated/images/soc-a5-hero-320.webp';
+import i107 from './generated/images/soc-a5-hero-1080.webp';
+import i108 from './generated/images/soc-a6-hero-320.webp';
+import i109 from './generated/images/soc-a6-hero-1080.webp';
+import i110 from './generated/images/spo-a1-hero-320.webp';
+import i111 from './generated/images/spo-a1-hero-1080.webp';
+import i112 from './generated/images/spo-a1-tribunes-320.webp';
+import i113 from './generated/images/spo-a1-tribunes-1080.webp';
+import i114 from './generated/images/spo-a2-hero-320.webp';
+import i115 from './generated/images/spo-a2-hero-1080.webp';
+import i116 from './generated/images/spo-a2-tribunes-320.webp';
+import i117 from './generated/images/spo-a2-tribunes-1080.webp';
+import i118 from './generated/images/spo-a3-hero-320.webp';
+import i119 from './generated/images/spo-a3-hero-1080.webp';
+import i120 from './generated/images/spo-a4-hero-320.webp';
+import i121 from './generated/images/spo-a4-hero-1080.webp';
+import i122 from './generated/images/spo-a5-hero-320.webp';
+import i123 from './generated/images/spo-a5-hero-1080.webp';
+import i124 from './generated/images/spo-a6-hero-320.webp';
+import i125 from './generated/images/spo-a6-hero-1080.webp';
 
 /** The widths every picture is written at, narrowest first. */
-export const ASSET_WIDTHS = [320, 1080, 1600] as const;
+export const ASSET_WIDTHS = [320, 1080] as const;
 
 /** One of the widths a picture is written at. */
 export type AssetWidth = (typeof ASSET_WIDTHS)[number];
 
 /** Every picture of the corpus, by key: the module the bundler resolves at each width. */
 export const ASSETS: Readonly<Record<string, Readonly<Record<AssetWidth, number>>>> = {
-  'cul-a1-hero': { 320: i0, 1080: i1, 1600: i2 },
-  'cul-a2-hero': { 320: i3, 1080: i4, 1600: i5 },
-  'cul-a2-galerie': { 320: i6, 1080: i7, 1600: i8 },
-  'cul-a4-hero': { 320: i9, 1080: i10, 1600: i11 },
-  'cul-a5-hero': { 320: i12, 1080: i13, 1600: i14 },
-  'cul-a5-archives': { 320: i15, 1080: i16, 1600: i17 },
-  'cul-a6-hero': { 320: i18, 1080: i19, 1600: i20 },
-  'eco-a1-hero': { 320: i21, 1080: i22, 1600: i23 },
-  'eco-a1-rassemblement': { 320: i24, 1080: i25, 1600: i26 },
-  'eco-a2-hero': { 320: i27, 1080: i28, 1600: i29 },
-  'eco-a3-hero': { 320: i30, 1080: i31, 1600: i32 },
-  'eco-a3-formation': { 320: i33, 1080: i34, 1600: i35 },
-  'eco-a5-hero': { 320: i36, 1080: i37, 1600: i38 },
-  'eco-a5-atelier': { 320: i39, 1080: i40, 1600: i41 },
-  'eco-a6-hero': { 320: i42, 1080: i43, 1600: i44 },
-  'env-a1-hero': { 320: i45, 1080: i46, 1600: i47 },
-  'env-a1-retenue': { 320: i48, 1080: i49, 1600: i50 },
-  'env-a2-hero': { 320: i51, 1080: i52, 1600: i53 },
-  'env-a3-hero': { 320: i54, 1080: i55, 1600: i56 },
-  'env-a3-observatoire': { 320: i57, 1080: i58, 1600: i59 },
-  'env-a4-hero': { 320: i60, 1080: i61, 1600: i62 },
-  'env-a4-cour': { 320: i63, 1080: i64, 1600: i65 },
-  'env-a5-hero': { 320: i66, 1080: i67, 1600: i68 },
-  'env-a6-hero': { 320: i69, 1080: i70, 1600: i71 },
-  'fem-a1-hero': { 320: i72, 1080: i73, 1600: i74 },
-  'fem-a1-tournee': { 320: i75, 1080: i76, 1600: i77 },
-  'fem-a2-hero': { 320: i78, 1080: i79, 1600: i80 },
-  'fem-a3-hero': { 320: i81, 1080: i82, 1600: i83 },
-  'fem-a4-hero': { 320: i84, 1080: i85, 1600: i86 },
-  'fem-a5-hero': { 320: i87, 1080: i88, 1600: i89 },
-  'fem-a6-hero': { 320: i90, 1080: i91, 1600: i92 },
-  'mon-a1-hero': { 320: i93, 1080: i94, 1600: i95 },
-  'mon-a1-negociations': { 320: i96, 1080: i97, 1600: i98 },
-  'mon-a2-hero': { 320: i99, 1080: i100, 1600: i101 },
-  'mon-a3-hero': { 320: i102, 1080: i103, 1600: i104 },
-  'mon-a3-dockers': { 320: i105, 1080: i106, 1600: i107 },
-  'mon-a4-hero': { 320: i108, 1080: i109, 1600: i110 },
-  'mon-a6-hero': { 320: i111, 1080: i112, 1600: i113 },
-  'pol-a1-hero': { 320: i114, 1080: i115, 1600: i116 },
-  'pol-a1-car-scolaire': { 320: i117, 1080: i118, 1600: i119 },
-  'pol-a2-hero': { 320: i120, 1080: i121, 1600: i122 },
-  'pol-a3-hero': { 320: i123, 1080: i124, 1600: i125 },
-  'pol-a3-carte-fusion': { 320: i126, 1080: i127, 1600: i128 },
-  'pol-a4-hero': { 320: i129, 1080: i130, 1600: i131 },
-  'pol-a5-hero': { 320: i132, 1080: i133, 1600: i134 },
-  'pol-a6-hero': { 320: i135, 1080: i136, 1600: i137 },
-  'soc-a1-hero': { 320: i138, 1080: i139, 1600: i140 },
-  'soc-a1-gymnase': { 320: i141, 1080: i142, 1600: i143 },
-  'soc-a2-hero': { 320: i144, 1080: i145, 1600: i146 },
-  'soc-a3-hero': { 320: i147, 1080: i148, 1600: i149 },
-  'soc-a3-attente': { 320: i150, 1080: i151, 1600: i152 },
-  'soc-a4-hero': { 320: i153, 1080: i154, 1600: i155 },
-  'soc-a4-atelier': { 320: i156, 1080: i157, 1600: i158 },
-  'soc-a5-hero': { 320: i159, 1080: i160, 1600: i161 },
-  'soc-a6-hero': { 320: i162, 1080: i163, 1600: i164 },
-  'spo-a1-hero': { 320: i165, 1080: i166, 1600: i167 },
-  'spo-a1-tribunes': { 320: i168, 1080: i169, 1600: i170 },
-  'spo-a2-hero': { 320: i171, 1080: i172, 1600: i173 },
-  'spo-a2-tribunes': { 320: i174, 1080: i175, 1600: i176 },
-  'spo-a3-hero': { 320: i177, 1080: i178, 1600: i179 },
-  'spo-a4-hero': { 320: i180, 1080: i181, 1600: i182 },
-  'spo-a5-hero': { 320: i183, 1080: i184, 1600: i185 },
-  'spo-a6-hero': { 320: i186, 1080: i187, 1600: i188 },
+  'cul-a1-hero': { 320: i0, 1080: i1 },
+  'cul-a2-hero': { 320: i2, 1080: i3 },
+  'cul-a2-galerie': { 320: i4, 1080: i5 },
+  'cul-a4-hero': { 320: i6, 1080: i7 },
+  'cul-a5-hero': { 320: i8, 1080: i9 },
+  'cul-a5-archives': { 320: i10, 1080: i11 },
+  'cul-a6-hero': { 320: i12, 1080: i13 },
+  'eco-a1-hero': { 320: i14, 1080: i15 },
+  'eco-a1-rassemblement': { 320: i16, 1080: i17 },
+  'eco-a2-hero': { 320: i18, 1080: i19 },
+  'eco-a3-hero': { 320: i20, 1080: i21 },
+  'eco-a3-formation': { 320: i22, 1080: i23 },
+  'eco-a5-hero': { 320: i24, 1080: i25 },
+  'eco-a5-atelier': { 320: i26, 1080: i27 },
+  'eco-a6-hero': { 320: i28, 1080: i29 },
+  'env-a1-hero': { 320: i30, 1080: i31 },
+  'env-a1-retenue': { 320: i32, 1080: i33 },
+  'env-a2-hero': { 320: i34, 1080: i35 },
+  'env-a3-hero': { 320: i36, 1080: i37 },
+  'env-a3-observatoire': { 320: i38, 1080: i39 },
+  'env-a4-hero': { 320: i40, 1080: i41 },
+  'env-a4-cour': { 320: i42, 1080: i43 },
+  'env-a5-hero': { 320: i44, 1080: i45 },
+  'env-a6-hero': { 320: i46, 1080: i47 },
+  'fem-a1-hero': { 320: i48, 1080: i49 },
+  'fem-a1-tournee': { 320: i50, 1080: i51 },
+  'fem-a2-hero': { 320: i52, 1080: i53 },
+  'fem-a3-hero': { 320: i54, 1080: i55 },
+  'fem-a4-hero': { 320: i56, 1080: i57 },
+  'fem-a5-hero': { 320: i58, 1080: i59 },
+  'fem-a6-hero': { 320: i60, 1080: i61 },
+  'mon-a1-hero': { 320: i62, 1080: i63 },
+  'mon-a1-negociations': { 320: i64, 1080: i65 },
+  'mon-a2-hero': { 320: i66, 1080: i67 },
+  'mon-a3-hero': { 320: i68, 1080: i69 },
+  'mon-a3-dockers': { 320: i70, 1080: i71 },
+  'mon-a4-hero': { 320: i72, 1080: i73 },
+  'mon-a6-hero': { 320: i74, 1080: i75 },
+  'pol-a1-hero': { 320: i76, 1080: i77 },
+  'pol-a1-car-scolaire': { 320: i78, 1080: i79 },
+  'pol-a2-hero': { 320: i80, 1080: i81 },
+  'pol-a3-hero': { 320: i82, 1080: i83 },
+  'pol-a3-carte-fusion': { 320: i84, 1080: i85 },
+  'pol-a4-hero': { 320: i86, 1080: i87 },
+  'pol-a5-hero': { 320: i88, 1080: i89 },
+  'pol-a6-hero': { 320: i90, 1080: i91 },
+  'soc-a1-hero': { 320: i92, 1080: i93 },
+  'soc-a1-gymnase': { 320: i94, 1080: i95 },
+  'soc-a2-hero': { 320: i96, 1080: i97 },
+  'soc-a3-hero': { 320: i98, 1080: i99 },
+  'soc-a3-attente': { 320: i100, 1080: i101 },
+  'soc-a4-hero': { 320: i102, 1080: i103 },
+  'soc-a4-atelier': { 320: i104, 1080: i105 },
+  'soc-a5-hero': { 320: i106, 1080: i107 },
+  'soc-a6-hero': { 320: i108, 1080: i109 },
+  'spo-a1-hero': { 320: i110, 1080: i111 },
+  'spo-a1-tribunes': { 320: i112, 1080: i113 },
+  'spo-a2-hero': { 320: i114, 1080: i115 },
+  'spo-a2-tribunes': { 320: i116, 1080: i117 },
+  'spo-a3-hero': { 320: i118, 1080: i119 },
+  'spo-a4-hero': { 320: i120, 1080: i121 },
+  'spo-a5-hero': { 320: i122, 1080: i123 },
+  'spo-a6-hero': { 320: i124, 1080: i125 },
 };

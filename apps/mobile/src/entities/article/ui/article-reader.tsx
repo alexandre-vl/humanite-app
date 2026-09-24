@@ -14,6 +14,7 @@ import { formatWord } from '../model/format';
 import { stateOf } from '../model/paged-feed';
 import { ArticleBody } from './article-body';
 import { ArticleLead, ArticleTitle } from './article-lead';
+import { ArticleStandIn } from './article-stand-in';
 import { FeedStandIn } from './feed-stand-in';
 import { ProseStandIn } from './prose-stand-in';
 
@@ -176,6 +177,7 @@ export function ArticleReader({ id, known, onFollow, onSignIn }: ArticleReaderPr
         onRetry={() => {
           void refetch();
         }}
+        awaited={<ArticleStandIn />}
       />
     );
   }

@@ -5,7 +5,6 @@ import { canRetry } from '#api';
 import { Button } from '#components/button';
 import type { EmptyStateProps } from '#components/empty-state';
 import { EmptyState } from '#components/empty-state';
-import { Skeleton } from '#components/skeleton';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -23,6 +22,15 @@ export type EmptyWords = EmptyStateProps;
 export type FeedStandInProps = Readonly<{
   state: FeedState;
   onRetry: () => void;
+  /**
+   * What stands where the answer will be, while it is on its way.
+   *
+   * It is required and handed in rather than chosen here, because what is coming is the caller's to know and never
+   * this component's: a page of the paper is about to hold cards in a rhythm, a wire is about to hold a thread of
+   * hours, and a search is about to hold anything at all. Nine identical bars stood here for all three, and told a
+   * reader the same nothing whichever screen they had opened.
+   */
+  awaited: ReactNode;
   empty?: EmptyWords | undefined;
 }>;
 
@@ -50,17 +58,11 @@ export const failureWords = (failure: ContentErrorCode): EmptyWords => ({
  * fail again is a button that lies. The empty shelf can be said in the screen's own words: an unpublished paper and a
  * question that matched nothing are both a feed holding nothing, and only the screen knows which.
  */
-export function FeedStandIn({ state, onRetry, empty }: FeedStandInProps): ReactNode {
+export function FeedStandIn({ state, onRetry, awaited, empty }: FeedStandInProps): ReactNode {
   const styles = useStyles();
   switch (state.kind) {
     case 'pending':
-      return (
-        <Box style={styles.standIn}>
-          <Skeleton />
-          <Skeleton />
-          <Skeleton />
-        </Box>
-      );
+      return awaited;
     case 'failed': {
       const words = failureWords(state.failure);
       return (

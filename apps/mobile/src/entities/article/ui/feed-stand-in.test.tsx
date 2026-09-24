@@ -11,7 +11,7 @@ const failed = (failure: ContentErrorCode) => ({ kind: 'failed', failure }) as c
 describe('FeedStandIn', () => {
   it('nomme la cause d’un échec, et offre un nouvel essai quand il peut aboutir', async () => {
     const onRetry = jest.fn();
-    await render(<FeedStandIn state={failed('offline')} onRetry={onRetry} />);
+    await render(<FeedStandIn state={failed('offline')} onRetry={onRetry} awaited={null} />);
     expect(screen.getByText('Pas de connexion')).toBeTruthy();
     await fireEvent.press(screen.getByText(t('action.retry')));
     expect(onRetry).toHaveBeenCalledTimes(1);
@@ -24,7 +24,7 @@ describe('FeedStandIn', () => {
   it.each(CONTENT_ERROR_CODE.options)(
     'dit « %s » par ses propres mots, et n’offre un essai que s’il peut aboutir',
     async (failure) => {
-      await render(<FeedStandIn state={failed(failure)} onRetry={jest.fn()} />);
+      await render(<FeedStandIn state={failed(failure)} onRetry={jest.fn()} awaited={null} />);
       expect(screen.getByText(failureWords(failure).title)).toBeTruthy();
       expect(screen.queryByText(t('action.retry')) !== null).toBe(canRetry(failure));
     },
@@ -38,7 +38,7 @@ describe('FeedStandIn', () => {
 
   it('dit l’étagère vide dans les mots de l’écran quand il en donne', async () => {
     const empty = { title: t('newsstand.empty.title'), message: t('newsstand.empty.message') };
-    await render(<FeedStandIn state={{ kind: 'empty' }} onRetry={jest.fn()} empty={empty} />);
+    await render(<FeedStandIn state={{ kind: 'empty' }} onRetry={jest.fn()} awaited={null} empty={empty} />);
     expect(screen.getByText('Le kiosque est vide')).toBeTruthy();
   });
 });

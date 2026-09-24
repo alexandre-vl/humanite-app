@@ -18,7 +18,7 @@ export type IssueCoverProps = Readonly<{ issue: IssueSummary }>;
  * The shape a numéro stands in on the shelf, measured on capture 04 as a slot of 363 by 465 pixels. The covers there
  * are photographs of newsprint and vary in height between publications; this paper prints one, so one shape.
  */
-const COVER_RATIO = 363 / 465;
+export const COVER_RATIO = 363 / 465;
 
 const useStyles = createStyles((theme) => ({
   shelved: { width: SIZES.cover, gap: SPACING.xs },

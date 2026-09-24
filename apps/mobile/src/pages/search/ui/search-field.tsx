@@ -1,4 +1,4 @@
-import { SIZES, SPACING } from '@huma/design-tokens';
+import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
@@ -6,11 +6,17 @@ import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
 import { Pressable } from '#primitives/pressable';
+import { Progress } from '#primitives/progress';
 import { TextField } from '#primitives/text-field';
 
-export type SearchFieldProps = Readonly<{ value: string; onChange: (text: string) => void }>;
+export type SearchFieldProps = Readonly<{
+  value: string;
+  onChange: (text: string) => void;
+  /** Whether the journal is still being asked, which the rule under the field says. */
+  busy: boolean;
+}>;
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(() => ({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -22,8 +28,6 @@ const useStyles = createStyles((theme) => ({
     // the smallest, where the floor alone would have the text touching the rule underneath it.
     minHeight: SPACING.xxxl,
     paddingVertical: SPACING.xs,
-    borderBottomWidth: SIZES.stroke,
-    borderColor: theme.primary,
   },
   input: { flex: 1 },
 }));
@@ -45,25 +49,30 @@ const REACH = SPACING.lg;
  * search that answers as you type is one a reader must be able to stop, and backspacing twenty times is not stopping.
  * The cross appears only when there is something to clear, and is announced by its label, having nothing to read out.
  */
-export function SearchField({ value, onChange }: SearchFieldProps): ReactNode {
+export function SearchField({ value, onChange, busy }: SearchFieldProps): ReactNode {
   const styles = useStyles();
   const theme = useTheme();
   return (
-    <Box style={styles.bar}>
-      <Icon name="search" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.primary} />
-      <TextField value={value} onChange={onChange} placeholder={t('search.placeholder')} style={styles.input} />
-      {value === '' ? null : (
-        <Pressable
-          hitSlop={REACH}
-          label={t('search.clear')}
-          role="button"
-          onPress={() => {
-            onChange('');
-          }}
-        >
-          <Icon name="clear" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.textMuted} />
-        </Pressable>
-      )}
+    <Box>
+      <Box style={styles.bar}>
+        <Icon name="search" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.primary} />
+        <TextField value={value} onChange={onChange} placeholder={t('search.placeholder')} style={styles.input} />
+        {value === '' ? null : (
+          <Pressable
+            hitSlop={REACH}
+            label={t('search.clear')}
+            role="button"
+            onPress={() => {
+              onChange('');
+            }}
+          >
+            <Icon name="clear" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.textMuted} />
+          </Pressable>
+        )}
+      </Box>
+      {/* Decorative: what the rule says is said in words by the heading under it, and a reader listening to the
+          screen is told by those. */}
+      <Progress busy={busy} announces={DECORATIVE} />
     </Box>
   );
 }

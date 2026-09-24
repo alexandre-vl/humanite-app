@@ -13,6 +13,7 @@ import type { FeedRhythm, FeedRow } from '../model/rhythm';
 import { feedRows, rowName, rowShape } from '../model/rhythm';
 import { ArticleCard } from './article-card';
 import type { EmptyWords } from './feed-stand-in';
+import { FeedCardsStandIn } from './feed-cards-stand-in';
 import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleFeedProps = Readonly<{
@@ -21,6 +22,11 @@ export type ArticleFeedProps = Readonly<{
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
   header?: ReactNode;
+  /**
+   * What stands where the cards will be, for a screen whose answer is not a page of cards. A search answers with
+   * anything of any length, so the shapes below would be a guess; every other screen takes the feed's own.
+   */
+  awaited?: ReactNode | undefined;
   empty?: EmptyWords | undefined;
 }>;
 
@@ -51,7 +57,7 @@ const useStyles = createStyles((theme) => ({
  * A column announces its writer and nothing else does, which is why the signature is read here and not by the card:
  * a card is handed what it draws.
  */
-export function ArticleFeed({ feed, rhythm, onOpen, action, header, empty }: ArticleFeedProps): ReactNode {
+export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, empty }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
   // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
   // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
@@ -88,7 +94,14 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, empty }: Art
       renderItem={render}
       contentStyle={styles.feed}
       header={header}
-      empty={<FeedStandIn state={feed.state} onRetry={feed.readAgain} empty={empty} />}
+      empty={
+        <FeedStandIn
+          state={feed.state}
+          onRetry={feed.readAgain}
+          awaited={awaited ?? <FeedCardsStandIn rhythm={rhythm} />}
+          empty={empty}
+        />
+      }
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}

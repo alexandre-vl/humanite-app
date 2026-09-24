@@ -15,11 +15,19 @@ import { SOURCE } from './source';
  * It is published because it is one half of a pair: the corpus writes a file per width, this names the places, and
  * nothing but a test can hold the two against each other. A width written for no place is bundle a cold start pays
  * for and no screen can ever spend — what the last one weighed is written beside the corpus's widths.
+ *
+ * Two places that lay out the same box ask for the same width, and that is a rule and not a coincidence. A picture is
+ * cached by the address it was asked for, so a card and a head that fill the same screen at 1 080 and 1 600 are two
+ * downloads of one picture: measured on the journal's server on 24/09/2026, 119 138 octets then 163 406 more, the
+ * second of them arriving after the reader had already seen the first on the card they touched. The head now paints
+ * from the disk the moment it opens.
  */
+const FULL_WIDTH = 1080;
+
 export const PLACE_WIDTHS = {
   thumbnail: 320,
-  card: 1080,
-  lead: 1600,
+  card: FULL_WIDTH,
+  lead: FULL_WIDTH,
 } as const satisfies Readonly<Record<string, AssetWidth>>;
 
 /** The place a picture fills, from a row's thumbnail to the lead picture of an article. */

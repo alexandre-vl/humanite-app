@@ -4,6 +4,7 @@ import { catalog as curtainCatalog } from '#primitives/curtain';
 import { catalog as iconCatalog } from '#primitives/icon';
 import { catalog as imageCatalog } from '#primitives/image';
 import { catalog as pressableCatalog } from '#primitives/pressable';
+import { catalog as progressCatalog } from '#primitives/progress';
 import { catalog as scrollCatalog } from '#primitives/scroll';
 import { catalog as surfaceCatalog } from '#primitives/surface';
 import { catalog as switchCatalog } from '#primitives/switch';
@@ -12,9 +13,9 @@ import { catalog as textFieldCatalog } from '#primitives/text-field';
 import { catalog as themeCatalog } from '#primitives/theme';
 import { catalog as buttonCatalog } from '#components/button';
 import { catalog as emptyStateCatalog } from '#components/empty-state';
+import { catalog as ghostCatalog } from '#components/ghost';
 import { catalog as labelBarCatalog } from '#components/label-bar';
 import { catalog as segmentedControlCatalog } from '#components/segmented-control';
-import { catalog as skeletonCatalog } from '#components/skeleton';
 import { catalog as topBarCatalog } from '#components/top-bar';
 import type { CatalogItem } from '#lib/catalogue';
 
@@ -26,6 +27,7 @@ export const REGISTRY = [
   { level: 'L0', entry: iconCatalog },
   { level: 'L0', entry: imageCatalog },
   { level: 'L0', entry: pressableCatalog },
+  { level: 'L0', entry: progressCatalog },
   { level: 'L0', entry: scrollCatalog },
   { level: 'L0', entry: surfaceCatalog },
   { level: 'L0', entry: switchCatalog },
@@ -34,8 +36,8 @@ export const REGISTRY = [
   { level: 'L0', entry: themeCatalog },
   { level: 'L1', entry: buttonCatalog },
   { level: 'L1', entry: emptyStateCatalog },
+  { level: 'L1', entry: ghostCatalog },
   { level: 'L1', entry: labelBarCatalog },
   { level: 'L1', entry: segmentedControlCatalog },
-  { level: 'L1', entry: skeletonCatalog },
   { level: 'L1', entry: topBarCatalog },
 ] as const satisfies readonly CatalogItem[];
