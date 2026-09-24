@@ -46,16 +46,19 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
   const open = (id: ArticleId) => () => {
     onOpen(id);
   };
-  const near = (id: ArticleId) => () => {
-    prefetchArticle(cache, id);
-  };
   const render = (row: Row): ReactNode => {
     switch (row.kind) {
       case 'day':
         return <WireDay label={row.label} />;
       case 'item':
         return (
-          <Pressable role="link" onPress={open(row.summary.id)} onPressIn={near(row.summary.id)}>
+          <Pressable
+            role="link"
+            onPress={open(row.summary.id)}
+            onPressIn={() => {
+              prefetchArticle(cache, row.summary.id);
+            }}
+          >
             <WireRow summary={row.summary} />
           </Pressable>
         );

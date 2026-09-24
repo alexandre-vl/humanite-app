@@ -1191,10 +1191,7 @@ export const BINDINGS = {
         convention:
           'La requête de recherche garde la page précédente pendant qu’elle en demande une autre : paged() prend un drapeau keepsPrevious et searchQuery est la seule à le lever, ce qui pose placeholderData sur keepPreviousData. Le fil en tire answering, que la page lit pour dire qu’elle cherche encore.',
       },
-      R4: {
-        convention:
-          'Les deux listes d’articles demandent la lecture au poser du doigt : apps/mobile/src/entities/article/ui/article-feed.tsx et article-wire.tsx appellent prefetchArticle depuis onPressIn, que le pressable porte. L’échec est avalé, l’écran qui demande vraiment la lecture le lèvera lui-même.',
-      },
+      R4: ['guardrail/reading-press', 'guardrail/reading-press-exempt'],
       R5: {
         convention:
           'L’ouverture ne compte son plancher qu’une fois le téléphone dessaisi : le portail attend la réponse de hideAsync avant de dire shown, et apps/mobile/src/_app/routes/opening.tsx part de là pour ses 650 ms — un quart de seconde dû au lecteur, plus les 350 ms au pire que le téléphone met à retirer son champ après avoir répondu. Deux tests de startup-gate.test.tsx tiennent les deux bouts : un téléphone qui ne répond jamais garde l’ouverture, un téléphone qui répond la voit partir.',

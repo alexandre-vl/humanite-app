@@ -5590,6 +5590,10 @@
           "message": "[query/options] déclarer la requête dans le segment api de sa tranche : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
         },
         {
+          "selector": "CallExpression[callee.name=/^prefetch[A-Z]/]:not(JSXAttribute[name.name='onPressIn'] CallExpression)",
+          "message": "[reading/press] demander la lecture depuis le onPressIn qui la déclenche : ailleurs, elle part quand l’écran se monte et ne recouvre plus rien, ou après le doigt et n’avance à rien"
+        },
+        {
           "selector": "ImportDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]",
           "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
         },
@@ -9612,6 +9616,10 @@
           "message": "[query/options] déclarer la requête dans le segment api de sa tranche : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
         },
         {
+          "selector": "CallExpression[callee.name=/^prefetch[A-Z]/]:not(JSXAttribute[name.name='onPressIn'] CallExpression)",
+          "message": "[reading/press] demander la lecture depuis le onPressIn qui la déclenche : ailleurs, elle part quand l’écran se monte et ne recouvre plus rien, ou après le doigt et n’avance à rien"
+        },
+        {
           "selector": "ImportDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]",
           "message": "[route/params] lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran"
         },
@@ -13628,6 +13636,10 @@
         {
           "selector": "ImportDeclaration[source.value='@tanstack/react-query'] > ImportSpecifier[imported.name=/^(?:query|infiniteQuery)Options$/]",
           "message": "[query/options] déclarer la requête dans le segment api de sa tranche : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit"
+        },
+        {
+          "selector": "CallExpression[callee.name=/^prefetch[A-Z]/]:not(JSXAttribute[name.name='onPressIn'] CallExpression)",
+          "message": "[reading/press] demander la lecture depuis le onPressIn qui la déclenche : ailleurs, elle part quand l’écran se monte et ne recouvre plus rien, ou après le doigt et n’avance à rien"
         },
         {
           "selector": "ImportDeclaration[source.value=/^expo-router(?:\\/.*)?$/] > ImportSpecifier[imported.name=/^use(?:Local|Global)SearchParams$/]",

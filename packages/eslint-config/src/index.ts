@@ -150,6 +150,23 @@ const QUERY_SYNTAX: readonly SyntaxRestriction[] = [
 ];
 
 /**
+ * A reading is asked for when the finger lands, and the call says so where it is written: inside the `onPressIn` that
+ * fires it, and nowhere else. The two ways of getting it wrong are asking at the mount of the screen — which fetches
+ * articles nobody has touched, and no longer runs under the animation that was hiding the wait — and asking at
+ * `onPress`, by which time the screen is already opening and there is nothing left to overlap.
+ *
+ * The selector takes any call whose name begins with `prefetch` and is not held by an `onPressIn`, so a handler lifted
+ * out of the JSX is refused with the rest: what the rule buys is that a card can be read for whether it warms the
+ * article it draws without following a name somewhere else.
+ */
+const READING_SYNTAX: readonly SyntaxRestriction[] = [
+  {
+    policy: 'reading/press',
+    selector: String.raw`CallExpression[callee.name=/^prefetch[A-Z]/]:not(JSXAttribute[name.name='onPressIn'] CallExpression)`,
+  },
+];
+
+/**
  * A route hands over strings: the routing module alone reads them, and a screen takes what an analyser gives back.
  * Re-exporting the reader is restricted beside importing it, since a module that passes it on launders it just as well.
  */
@@ -316,6 +333,7 @@ const HERMES: Runtime = {
     ...ICON_SYNTAX,
     ...NAV_SYNTAX,
     ...QUERY_SYNTAX,
+    ...READING_SYNTAX,
     ...ROUTE_PARAMS_SYNTAX,
     ...UNKNOWN_SYNTAX,
     ...HERMES_GAP_RESTRICTIONS.flatMap((gap) => gap.syntax),

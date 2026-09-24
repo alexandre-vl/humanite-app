@@ -48,6 +48,8 @@ const WRITTEN = {
   'nav/js-tabs': 'composer les onglets avec NativeTabs : les onglets JS Expo Router ne rendent pas une barre native',
   'query/options':
     'déclarer la requête dans le segment api de sa tranche : ailleurs, sa clé et sa lecture cessent d’avoir un seul endroit',
+  'reading/press':
+    'demander la lecture depuis le onPressIn qui la déclenche : ailleurs, elle part quand l’écran se monte et ne recouvre plus rien, ou après le doigt et n’avance à rien',
   'route/params':
     'lire les paramètres de route par useRouteParams : ailleurs, une chaîne qu’aucun analyseur n’a lue atteint l’écran',
   'unknown/record':

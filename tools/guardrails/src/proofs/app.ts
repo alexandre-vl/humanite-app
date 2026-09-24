@@ -297,6 +297,54 @@ export function TabIcons(): ReactNode {
       linted({ 'src/pages/newsstand/api/queries.ts': queryModule('issuesQuery') }),
     ),
     define(
+      'guardrail/reading-press',
+      'une liste qui demande la lecture au montage de l’écran plutôt qu’au poser du doigt',
+      ['reading/press'],
+      linted({
+        'src/entities/article/ui/article-feed.tsx': `import { useEffect } from 'react';
+
+const prefetchArticle = (id: string): void => {
+  globalThis.console.log(id);
+};
+
+export function ArticleFeed({ id }: { id: string }): null {
+  useEffect(() => {
+    prefetchArticle(id);
+  }, [id]);
+  return null;
+}
+`,
+      }),
+    ),
+    define(
+      'guardrail/reading-press-exempt',
+      'une carte qui demande la lecture là où le doigt se pose',
+      [],
+      linted({
+        'src/entities/article/ui/article-wire.tsx': `import type { ReactNode } from 'react';
+
+const prefetchArticle = (id: string): void => {
+  globalThis.console.log(id);
+};
+
+function Pressable({ onPressIn }: { onPressIn: () => void }): ReactNode {
+  onPressIn();
+  return null;
+}
+
+export function ArticleWire({ id }: { id: string }): ReactNode {
+  return (
+    <Pressable
+      onPressIn={() => {
+        prefetchArticle(id);
+      }}
+    />
+  );
+}
+`,
+      }),
+    ),
+    define(
       'guardrail/module-expo-router',
       'une entité qui pousse elle-même un écran sur la pile',
       ['module/expo-router'],
