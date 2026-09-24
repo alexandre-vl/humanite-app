@@ -9,10 +9,10 @@ export type RawParams = Readonly<Record<string, string | readonly string[] | und
 export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly<{ id: ArticleId }> }>;
 
 /**
- * Where to send a reader who chose an article. Five screens open one — the front page, the wire, a section, a search
- * and an article following its own link — and each wrote out the same route and the same parameter name. Written five
- * times, a route is five places to change and four chances to miss one; the file name that mints it stays the single
- * source, and this is the one sentence the rest of the app says about it.
+ * Where to send a reader who chose an article. Four screens open one — the front page with the sections it turns
+ * through, the wire, a search and the reader's shelf — and each wrote out the same route and the same parameter name.
+ * Written four times, a route is four places to change and three chances to miss one; the file name that mints it
+ * stays the single source, and this is the one sentence the rest of the app says about it.
  */
 export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
 

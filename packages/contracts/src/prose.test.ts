@@ -60,6 +60,7 @@ test.each([
   { shape: 'a note of the same page', href: '#note' },
   { shape: 'a path with no host', href: '/politique/un-article' },
   { shape: 'a script', href: 'javascript:void(0)' },
+  { shape: 'a web scheme with no slashes', href: 'http:example.org' },
 ])('an anchor to $shape keeps its words and makes no link', ({ href }) => {
   const [block] = readProse(`<p>voir <a href="${href}">ici</a> et là</p>`);
   const spans = block?.type === 'paragraph' ? block.spans : [];

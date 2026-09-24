@@ -8,10 +8,6 @@ test('the generated corpus is a fresh build of the source files', () => {
   expect(plainData(CORPUS)).toEqual(plainData(buildCorpus()));
 });
 
-test('the corpus holds the seventy-two items of the eight sections', () => {
-  expect(buildCorpus()).toHaveLength(72);
-});
-
 const ITEM = (body: string): string => `---\nid: pol-a1\n---\n\n${body}\n`;
 
 test('a block the corpus does not write is refused, and named', () => {

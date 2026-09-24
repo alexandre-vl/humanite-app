@@ -178,7 +178,11 @@ test('an interview becomes the questions and the answers it is made of, and keep
   const linked = blocks.flatMap((block) =>
     block.type === 'paragraph' ? block.spans.filter((span) => span.type === 'link') : [],
   );
-  expect(linked.length).toBeGreaterThan(0);
+  expect(linked[0]).toEqual({
+    type: 'link',
+    text: 'sa première note sur l’héritage',
+    url: 'https://www.humanite.fr/social-et-economie/fiscalite/quelle-fiscalite-juste-pour-lheritage',
+  });
 });
 
 test('a video of the journal is read as a video, with its film and its body open', () => {

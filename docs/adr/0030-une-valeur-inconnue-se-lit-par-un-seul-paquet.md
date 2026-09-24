@@ -40,11 +40,12 @@ Option retenue : « Un paquet de l’espace de travail, et une interdiction lint
 ### Conséquences
 
 - Bien, parce que `pnpm lint` refuse une comparaison de `typeof` à `'object'`, un `switch` sur `typeof`, et `Array.isArray` appelé, déstructuré ou atteint par `globalThis`, dans l’app, les paquets embarqués et les outils (C2).
-- Bien, parce que les six derniers contrôles écrits à la main passent par le paquet : `pnpm lint` passe sur les 647 fichiers de l’espace de travail, dont seuls les modules du paquet sont exemptés (C1).
+- Bien, parce que les six derniers contrôles écrits à la main passent par le paquet : `pnpm lint` passe sur chaque fichier TypeScript de l’espace de travail, dont seuls les modules du paquet sont exemptés (C1).
 - Bien, parce qu’`isList` rend `readonly unknown[]` là où `Array.isArray` rendait `any[]` (C3).
 - Mauvais, parce qu’une union déjà typée, où rien n’est inconnu, passe aussi par `isList` (`packages/eslint-config/src/react.ts`).
-- Mauvais, parce que la règle lit la syntaxe : un `typeof` comparé à une variable qui vaut `'object'` lui échappe (C2).
+- Mauvais, parce que la règle lit la syntaxe : un `typeof` comparé à une variable qui vaut `'object'`, ou `Array` atteint par un détour comme `globalThis.Array['isArray']`, lui échappe (C2).
 - Neutre, parce que les tests du paquet posent la question par lui, comme tout autre fichier.
+- Neutre, parce que les deux configurations JavaScript de l’app ne reçoivent que les règles sans types, et restent hors de ces politiques comme des autres.
 - Neutre, parce que seize espaces de travail dépendent du paquet, dont la racine et les contrats.
 
 ## Avantages et inconvénients des options

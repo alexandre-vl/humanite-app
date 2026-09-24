@@ -50,8 +50,8 @@ const QUESTION = 'wp-block-huma-question';
  * Containers the renderer puts inside a body that belong to the page and not to the article.
  *
  * `seealso-component` is « Sur le même thème »: other articles' headlines, each in a paragraph of its own, which
- * land in the middle of the prose unless the whole container goes. They cannot become `related` blocks either — the
- * link carries a slug and the service takes an id.
+ * land in the middle of the prose unless the whole container goes. Nothing of the domain could hold them anyway: the
+ * link names an article by a slug, which none of the service's routes takes.
  *
  * This is a list of what has been seen, not a rule about what exists. A body shaped in a way no capture has shown
  * will leak something, and the only thing that will say so is a reading of a new capture.

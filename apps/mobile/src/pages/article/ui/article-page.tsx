@@ -26,11 +26,8 @@ import { ThemeScope } from '#primitives/theme';
  * things one does to an article one is reading — leave it, keep it — belong together and stay. The mark appears with
  * the article, which is what it keeps: the reader below asks for it, and this screen reads the same answer.
  *
- * Following a link inside the body leads to another article by replacing this screen rather than stacking one more,
- * the way one section replaces another: a reader who followed four links back to back should step back to the feed,
- * not walk every article already read. A link that points outside the paper leaves the app entirely, and so does the
- * film of a video: both are pages kept on the open web, and the screen is where that is decided — the article knows
- * it is sending a reader somewhere, never where.
+ * A link inside the body leaves the app, and so does the film of a video: the journal links nowhere but the open web,
+ * and the screen is where that is decided — the article knows it is sending a reader somewhere, never where.
  *
  * A video is read on the dark page, from the status bar down, whatever the reader's theme: the ground belongs to what
  * is read, as the current app prints its videos. The whole screen is scoped — its bar and the inset over it included —
