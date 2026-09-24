@@ -15,6 +15,7 @@ export type TransportCode =
   | 'transport/cause-misnamed'
   | 'transport/impersonates'
   | 'transport/reader-unnamed'
+  | 'transport/expiry-misread'
   | 'transport/address-unknown';
 
 /** The signal the judging hands a client: a number, which is all it takes to tell one request's way out from another. */
@@ -235,6 +236,38 @@ const causes = async (make: Make): Promise<readonly Finding<TransportCode>[]> =>
   return saying('transport/cause-misnamed', 'des échecs sous le nom d’une autre cause', misnamed);
 };
 
+/**
+ * A reader whose connection the service no longer honours is told so, rather than told the thing is not theirs.
+ *
+ * One status carries both: a 403 to nobody says an article is kept for subscribers, and a 403 under a reader's own
+ * token says that token is dead. A client that read the second as the first would sit a paying subscriber in front of
+ * the wall they pay to pass, and nothing downstream — not the screen, not the app holding the token — could tell that
+ * signing in again is what mends it. So the judging asks every route under a reader whose token the service refuses,
+ * and holds the client to naming that case apart.
+ */
+const staleness = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
+  const misread: string[] = [];
+  for (const [route, read] of EVERY_ROUTE) {
+    const { client, timers } = benchOf(
+      only(route, async () => reply(403, '{}')),
+      READER,
+    );
+    const outcome = watch(read(make(client)));
+    await settle();
+    for (const fire of [...timers]) {
+      fire();
+    }
+    await settle();
+    const ended = outcome();
+    if (!(ended.kind === 'failed' && ended.cause === 'expired')) {
+      misread.push(
+        `${route} : ${ended.kind === 'failed' ? String(ended.cause) : 'lu comme une réponse'} au lieu de expired`,
+      );
+    }
+  }
+  return saying('transport/expiry-misread', 'des jetons morts lus comme un refus', misread);
+};
+
 /** Every request the client makes when each of its routes is read once, the service answering as the capture did. */
 const askedOfEveryRoute = async (make: Make, reader?: string): Promise<readonly Asked[]> => {
   const { client, asked } = benchOf(replayed, reader);
@@ -373,15 +406,17 @@ const addresses = (rounds: readonly Round[]): readonly Finding<TransportCode>[] 
  * it reads, with nobody signed in and with a reader who is.
  *
  * The client is handed in rather than reached for, so a fixture can hand in one that sets no deadline, or lets its
- * deadline pass doing nothing, or keeps a connection it gave up on, or names every failure alike, or borrows the
- * official client's name, or carries a token no login earned, or leaves a signed-in reader's token behind, or asks an
- * address of its own making — or does any of it on one route alone — and read the code that comes back.
+ * deadline pass doing nothing, or keeps a connection it gave up on, or names every failure alike, or reads a dead
+ * token as a refusal, or borrows the official client's name, or carries a token no login earned, or leaves a
+ * signed-in reader's token behind, or asks an address of its own making — or does any of it on one route alone — and
+ * read the code that comes back.
  */
 export const judgeTransport = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
   const rounds = await askedBothWays(make);
   return [
     ...(await deadline(make)),
     ...(await causes(make)),
+    ...(await staleness(make)),
     ...honesty(rounds),
     ...named(rounds),
     ...addresses(rounds),

@@ -20,7 +20,7 @@ const withKey = (): void => {
 
 afterEach(() => {
   jest.restoreAllMocks();
-  useConnection.setState({ connection: 'out', refusal: null });
+  useConnection.setState({ connection: 'out' });
 });
 
 describe('AccountPage', () => {
@@ -99,15 +99,34 @@ describe('AccountPage', () => {
     expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(3);
   });
 
-  /** Signing out is done here and opens nothing, so its row carries no mark that a row opens something. */
-  it('propose de se déconnecter, sans marque d’ouverture, quand l’abonné est connecté', async () => {
+  /**
+   * Signing out is done here and opens nothing, so its row carries no mark that a row opens something — and, having
+   * no mark, is set in the colour the paper gives what one may press, or it would read as inert as the newsroom's
+   * address two groups below.
+   */
+  it('propose de se déconnecter, sans marque d’ouverture mais dans l’encre des choses qu’on presse', async () => {
     withKey();
     await act(() => {
-      useConnection.setState({ connection: 'in', refusal: null });
+      useConnection.setState({ connection: 'in' });
     });
     await renderWithCache(<AccountPage />);
-    expect(screen.getByText('Se déconnecter')).toBeTruthy();
     expect(screen.queryByText('Se connecter')).toBeNull();
     expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(2);
+    // Held against a row that answers nothing, on the same card and in the same type: whichever of the two drifts,
+    // the pair stops differing and this fails. Naming a colour here would only repeat the theme.
+    expect(styleOf(screen.getByText('Se déconnecter'))['color']).not.toBe(
+      styleOf(screen.getByText('relationlecteur@humanite.fr'))['color'],
+    );
+  });
+
+  /** The screen says the reader is connected, rather than leaving them to infer it from a way out being offered. */
+  it('dit que l’abonné est connecté, et ce que cela lui ouvre', async () => {
+    withKey();
+    await act(() => {
+      useConnection.setState({ connection: 'in' });
+    });
+    await renderWithCache(<AccountPage />);
+    expect(screen.getByText('Abonné connecté')).toBeTruthy();
+    expect(screen.getByText('Les articles réservés à l’abonnement s’ouvrent.')).toBeTruthy();
   });
 });

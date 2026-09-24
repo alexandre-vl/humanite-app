@@ -5,7 +5,8 @@ import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
 import { ArticleReader, articleQuery, readsDark } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
-import { openExternal, useRouteParams } from '#lib/routing';
+import { useReaderSession } from '#features/sign-in';
+import { openExternal, SIGN_IN_HREF, useRouteParams } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 import { ThemeScope } from '#primitives/theme';
 
@@ -37,6 +38,9 @@ import { ThemeScope } from '#primitives/theme';
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
   const article = useQuery(articleQuery(id)).data;
+  // A wall offers the way back in only when there is one to offer: a build given the journal's key, and a reader not
+  // already signed in — for whom a wall is the journal withholding this piece, and not a connection to open.
+  const { offered, connection } = useReaderSession();
   return (
     <ThemeScope name={article !== undefined && readsDark(article.format) ? 'dark' : null} screen>
       <Surface>
@@ -46,7 +50,17 @@ export function ArticlePage(): ReactNode {
           }}
           action={article === undefined ? null : <BookmarkToggle summary={article} />}
         />
-        <ArticleReader id={id} onFollow={openExternal} />
+        <ArticleReader
+          id={id}
+          onFollow={openExternal}
+          onSignIn={
+            offered && connection === 'out'
+              ? () => {
+                  router.push(SIGN_IN_HREF);
+                }
+              : null
+          }
+        />
       </Surface>
     </ThemeScope>
   );

@@ -61,4 +61,22 @@ describe('Text', () => {
     await render(<Text>{asDisplayText(WORDS)}</Text>);
     expect(screen.getByText(WORDS).props['accessibilityRole']).toBeUndefined();
   });
+
+  /**
+   * A refusal that appears under a button is silent to a reader who is listening: their focus is still on the button.
+   * The line says so itself, so the platform reads it where it stands rather than moving anyone.
+   */
+  it('se fait lire là où elle est quand elle vient d’arriver, sans prendre le focus', async () => {
+    await render(<Text alert>{asDisplayText('Identifiant refusé')}</Text>);
+    const line = screen.getByText('Identifiant refusé');
+    expect(line.props['accessibilityRole']).toBe('alert');
+    expect(line.props['accessibilityLiveRegion']).toBe('assertive');
+  });
+
+  it('ne dit rien de tel d’une ligne qui était déjà là', async () => {
+    await render(<Text>{asDisplayText('Une ligne ordinaire')}</Text>);
+    const line = screen.getByText('Une ligne ordinaire');
+    expect(line.props['accessibilityRole']).toBeUndefined();
+    expect(line.props['accessibilityLiveRegion']).toBeUndefined();
+  });
 });

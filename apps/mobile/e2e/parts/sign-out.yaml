@@ -1,0 +1,16 @@
+# Repose l'app déconnectée, quoi qu'ait fait le parcours qui appelle ceci.
+#
+# Le jeton d'un abonné survit à la fermeture — c'est tout l'objet de ce qu'on éprouve — donc un parcours qui partirait
+# en le laissant derrière lui ferait passer le suivant pour vert alors qu'il n'aurait rien ouvert du tout. C'est une
+# part et non les dernières lignes d'un parcours, parce qu'un parcours qui échoue s'arrête là où il a échoué : la
+# ligne de nettoyage écrite à la fin est celle qui ne tourne jamais le jour où elle sert.
+#
+# La déconnexion est facultative : le parcours a pu échouer avant d'avoir ouvert quoi que ce soit, et il n'y a alors
+# rien à défaire.
+appId: ${APP_ID}
+---
+- runFlow: launch.yaml
+- tapOn: 'Mon compte'
+- tapOn:
+    text: 'Se déconnecter'
+    optional: true

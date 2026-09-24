@@ -12,6 +12,16 @@ export type TextProps = Readonly<{
   align?: TextAlign;
   numberOfLines?: number;
   heading?: boolean;
+  /**
+   * Whether the line is something that has just happened rather than something that was always on the page.
+   *
+   * A reader who is listening has their focus where they left it — on the button they pressed — and a line that
+   * appears below it is silent to them unless the page says otherwise. This says otherwise: the platform reads it out
+   * where it stands, without taking the focus away from what the reader was doing. It is Android's to honour, which
+   * is where this app is read; on iOS the role is carried and the reading is not, and nothing written here can change
+   * that.
+   */
+  alert?: boolean;
 }>;
 
 /**
@@ -30,19 +40,22 @@ export type TextProps = Readonly<{
  * and is clipped, so a cut standfirst ended « est c.. » on the A065. Nothing written in JavaScript reaches the face the
  * view measures with; the feed's cards stopped cutting their standfirsts rather than live with it.
  *
+ * `alert` says the line was not there a moment ago, and a reader listening should hear it without going to look.
+ *
  * `heading` says the line opens what follows it, which is how a reader listening to the paper skips through it: a
  * screen reader offers to jump from one heading to the next, and a page with none is a page that can only be walked
  * word by word. It is not read off the variant, because the same type serves a headline and the title of a card in a
  * feed, and only one of those opens anything — the screen that lays them out is what knows which.
  */
-export function Text({ children, variant = 'body', tone, align, numberOfLines, heading }: TextProps): ReactNode {
+export function Text({ children, variant = 'body', tone, align, numberOfLines, heading, alert }: TextProps): ReactNode {
   const theme = useTheme();
   const typesetting = useTypesetting();
   return (
     <NativeText
       numberOfLines={numberOfLines}
       textBreakStrategy={numberOfLines === undefined ? 'highQuality' : 'simple'}
-      accessibilityRole={heading === true ? 'header' : undefined}
+      accessibilityRole={alert === true ? 'alert' : heading === true ? 'header' : undefined}
+      accessibilityLiveRegion={alert === true ? 'assertive' : undefined}
       style={textStyle(variant, theme, typesetting, tone, align)}
     >
       {children}

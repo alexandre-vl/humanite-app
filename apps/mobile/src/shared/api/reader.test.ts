@@ -1,8 +1,10 @@
+import { ContentApiError, QUESTION } from '@huma/contracts';
+import type { ContentApi } from '@huma/contracts';
 import { SessionError } from '@huma/remote-api';
 import type { Identity, Posting } from '@huma/remote-api';
 import { describe, expect, it } from '@jest/globals';
 import type { StateStorage } from '../lib/storage';
-import { createReader, identityOf, refusalOf } from './reader';
+import { createReader, forgettingDeadTokens, identityOf, refusalOf } from './reader';
 
 /** An identity as a development build is given one: fake through and through, no value of the shape of a secret. */
 const IDENTITY: Identity = {
@@ -27,9 +29,11 @@ const disk = (initial?: string): StateStorage & { held: () => string | null } =>
 };
 
 /** A way of posting that answers a queue of replies in order: the anonymous token, then the user token. */
-const posting = (replies: readonly Readonly<{ status: number; body: string }>[]): Posting => {
+const posting = (replies: readonly Readonly<{ status: number; body: string }>[]): Posting<number> => {
   const queue = [...replies];
   return {
+    abortable: () => ({ signal: 0, abort: () => undefined }),
+    after: () => () => undefined,
     post: async () => {
       const next = queue.shift();
       if (next === undefined) {
@@ -132,5 +136,92 @@ describe('refusalOf', () => {
     expect(refusalOf(new SessionError('malformed', 'forme inattendue'))).toBe('unavailable');
     expect(refusalOf(new Error('la requête n’est jamais partie'))).toBe('unavailable');
     expect(refusalOf('rien du tout')).toBe('unavailable');
+  });
+});
+
+describe('watch', () => {
+  /** A token can go without anyone pressing anything, so whoever shows the connection follows it rather than copies it. */
+  it('prévient à chaque changement du jeton, et se tait une fois qu’on ne l’écoute plus', async () => {
+    const reader = createReader(IDENTITY, posting([...OPENED, ...OPENED]), disk());
+    let changes = 0;
+    const stop = reader.watch(() => {
+      changes += 1;
+    });
+    await reader.signIn({ login: 'lecteur@example.org', password: 'un-mot-de-passe' });
+    reader.signOut();
+    expect(changes).toBe(2);
+    stop();
+    await reader.signIn({ login: 'lecteur@example.org', password: 'un-mot-de-passe' });
+    expect(changes).toBe(2);
+  });
+
+  /** Signing out twice is one change, not two: what did not move is not news. */
+  it('ne prévient de rien quand le jeton ne bouge pas', () => {
+    const reader = createReader(IDENTITY, posting([]), disk());
+    let changes = 0;
+    reader.watch(() => {
+      changes += 1;
+    });
+    reader.signOut();
+    reader.signOut();
+    expect(changes).toBe(0);
+  });
+});
+
+describe('forgettingDeadTokens', () => {
+  /** A content read whose answer never fails, so only the failing one below is doing anything. */
+  const reading = (fails: ContentApiError | null): ContentApi => ({
+    getSections: async () => (fails === null ? [] : Promise.reject(fails)),
+    getFeed: async () => (fails === null ? { items: [], nextCursor: null } : Promise.reject(fails)),
+    getLiveFeed: async () => (fails === null ? { items: [], nextCursor: null } : Promise.reject(fails)),
+    getArticle: async () => Promise.reject(fails ?? new ContentApiError('not-found', 'rien')),
+    search: async () => (fails === null ? { items: [], nextCursor: null } : Promise.reject(fails)),
+  });
+
+  const signedIn = async (): Promise<ReturnType<typeof createReader>> => {
+    const reader = createReader(IDENTITY, posting(OPENED), disk());
+    await reader.signIn({ login: 'lecteur@example.org', password: 'un-mot-de-passe' });
+    return reader;
+  };
+
+  /**
+   * The service answers 403 to a dead token on every route it serves, the front page included, so a token left in
+   * place costs a subscriber the paper and not only the articles they pay for.
+   */
+  it('oublie le jeton dès qu’une lecture échoue sur une connexion expirée', async () => {
+    const reader = await signedIn();
+    const door = forgettingDeadTokens(reading(new ContentApiError('expired', 'statut 403')), reader);
+    await expect(door.getFeed({})).rejects.toMatchObject({ code: 'expired' });
+    expect(reader.token()).toBeUndefined();
+  });
+
+  it('oublie le jeton quelle que soit la lecture qui a échoué', async () => {
+    const reads: readonly ((door: ContentApi) => Promise<unknown>)[] = [
+      async (door) => door.getSections(),
+      async (door) => door.getLiveFeed({}),
+      async (door) => door.search({ text: QUESTION.parse('climat') }),
+      async (door) => door.getFeed({}),
+    ];
+    for (const read of reads) {
+      const reader = await signedIn();
+      const door = forgettingDeadTokens(reading(new ContentApiError('expired', 'statut 403')), reader);
+      await expect(read(door)).rejects.toMatchObject({ code: 'expired' });
+      expect(reader.token()).toBeUndefined();
+    }
+  });
+
+  /** A withheld article is not a dead connection: the reader stays signed in, and the wall is the right answer. */
+  it('garde le jeton quand le service refuse pour toute autre raison', async () => {
+    const reader = await signedIn();
+    const door = forgettingDeadTokens(reading(new ContentApiError('refused', 'réservé')), reader);
+    await expect(door.getFeed({})).rejects.toMatchObject({ code: 'refused' });
+    expect(reader.token()).toBe('jeton-de-labonne');
+  });
+
+  it('laisse passer ce qui a réussi, sans rien oublier', async () => {
+    const reader = await signedIn();
+    const door = forgettingDeadTokens(reading(null), reader);
+    expect(await door.getSections()).toEqual([]);
+    expect(reader.token()).toBe('jeton-de-labonne');
   });
 });

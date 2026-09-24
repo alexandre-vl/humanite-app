@@ -65,7 +65,7 @@ const typesetOf = (text: string): Typeset => {
 };
 
 const read = async (article: Article, onFollow: () => void = () => undefined): Promise<void> => {
-  await renderWithCache(<ArticleReader id={article.id} onFollow={onFollow} />);
+  await renderWithCache(<ArticleReader id={article.id} onFollow={onFollow} onSignIn={null} />);
   await settle();
 };
 
@@ -110,6 +110,27 @@ describe('ArticleReader, face à un corps retenu', () => {
     await read(article);
     expect(await screen.findByText(t('article.withheld.where'))).toBeTruthy();
     expect(screen.queryByText(t('action.retry'))).toBeNull();
+  });
+
+  /**
+   * The wall is where a subscriber finds out they are not signed in, and so the one place they are most likely to
+   * want to be. Buying is still named in words and not linked — an app may not send a reader to a purchase — but
+   * proving an abonnement already paid for is not buying anything.
+   */
+  it('offre la connexion sur le mur, quand l’écran a une connexion à offrir', async () => {
+    const article = await reserved();
+    const signIn = jest.fn();
+    await renderWithCache(<ArticleReader id={article.id} onFollow={() => undefined} onSignIn={signIn} />);
+    await settle();
+    await fireEvent.press(await screen.findByText(t('article.withheld.signIn')));
+    expect(signIn).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(t('article.withheld.where'))).toBeTruthy();
+  });
+
+  /** A reader already signed in is looking at a wall the journal put there; there is no connection to offer them. */
+  it('n’offre rien à presser quand l’écran n’a pas de connexion à offrir', async () => {
+    await read(await reserved());
+    expect(screen.queryByText(t('article.withheld.signIn'))).toBeNull();
   });
 });
 

@@ -41,10 +41,16 @@ export const hasShelf = content.getIssues !== undefined;
  * the same answer next time; a request that never reached the source, one it did not answer in time, and one it could
  * not serve may each pass on the next try. The table answers for every code the contract declares, so a code added
  * there stops the build here rather than becoming retryable by default — a wrong answer nothing would report.
+ *
+ * A connection that expired is the one refusal another try can answer differently, and the reason is not patience: by
+ * the time that try leaves, the token it failed under has been forgotten, so the same request goes out as anybody's
+ * and the source serves it what it serves anybody. The reader is signed out and reading, rather than looking at a
+ * wall with nothing to press.
  */
 const RETRYABLE = {
   'not-found': false,
   refused: false,
+  expired: true,
   offline: true,
   timeout: true,
   unavailable: true,

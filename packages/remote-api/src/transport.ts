@@ -1,5 +1,7 @@
 import { ContentApiError } from '@huma/contracts';
 import type { ContentErrorCode } from '@huma/contracts';
+import { beforeDeadline, DEADLINE } from './deadline.ts';
+import type { Deadline } from './deadline.ts';
 import { addressOf } from './routes.ts';
 import type { Request } from './routes.ts';
 
@@ -11,33 +13,24 @@ import type { Request } from './routes.ts';
  * in, and a test hands in ones it drives. The signal is whatever the platform's request is cancelled by: the client
  * carries it from `abortable` to `fetch` and never looks inside.
  */
-export type Ports<Signal> = Readonly<{
-  /** Asks an address, and answers with the status of the reply and a way to read its body as text. */
-  fetch: (
-    address: string,
-    init: Readonly<{ headers: Readonly<Record<string, string>>; signal: Signal }>,
-  ) => Promise<Reply>;
-  /** One request's way out: the signal that goes with it, and what lets it go. */
-  abortable: () => Readonly<{ signal: Signal; abort: () => void }>;
-  /** Runs `then` once `delay` milliseconds have passed, and answers with what cancels it. */
-  after: (delay: number, then: () => void) => () => void;
-  /**
-   * The token a reader's own login earned, or none while nobody has signed in.
-   *
-   * It is asked anew at every request, and never held: the client is built once, when the app starts, and a reader
-   * signs in and out long after — a token read at build time would be the one there was then, which is none.
-   */
-  token: () => string | undefined;
-}>;
+export type Ports<Signal> = Deadline<Signal> &
+  Readonly<{
+    /** Asks an address, and answers with the status of the reply and a way to read its body as text. */
+    fetch: (
+      address: string,
+      init: Readonly<{ headers: Readonly<Record<string, string>>; signal: Signal }>,
+    ) => Promise<Reply>;
+    /**
+     * The token a reader's own login earned, or none while nobody has signed in.
+     *
+     * It is asked anew at every request, and never held: the client is built once, when the app starts, and a reader
+     * signs in and out long after — a token read at build time would be the one there was then, which is none.
+     */
+    token: () => string | undefined;
+  }>;
 
 /** What the client reads of a reply: its status, and its body as the text it arrived as. */
 export type Reply = Readonly<{ status: number; text: () => Promise<string> }>;
-
-/**
- * How long a request is given before it is let go: fifteen seconds. A section's list the service had to build took 4.4
- * to 6.1 seconds on eight cold reads out of thirteen in a capture, and OkHttp gives the app's requests no limit at all.
- */
-const DEADLINE = 15_000;
 
 /**
  * What every request says of itself: that it wants JSON, in French, and which client asks — this one, under a name of
@@ -68,13 +61,20 @@ const signedIn = (request: Request): Request => ({
 /** Whether a header's value is one OkHttp will send: printable ASCII, and nothing else — an accent fails the request. */
 export const isSendable = (value: string): boolean => /^[\x20-\x7e]*$/u.test(value);
 
-/** The cause a status of the service names, or `undefined` for a status that answered. */
-export const causeOf = (status: number): ContentErrorCode | undefined => {
+/**
+ * The cause a status of the service names, or `undefined` for a status that answered.
+ *
+ * A refusal is read together with what the request carried, because the same status means two opposite things. Asked
+ * for by nobody, a 401 or a 403 says the thing is not this reader's to have. Asked for under a reader's own token, it
+ * says the service no longer honours that token — the reader is a subscriber whose connection died — and the app has
+ * something to do about it, which it has nothing to do about the other.
+ */
+export const causeOf = (status: number, underToken: boolean): ContentErrorCode | undefined => {
   if (status >= 200 && status < 300) {
     return undefined;
   }
   if (status === 401 || status === 403) {
-    return 'refused';
+    return underToken ? 'expired' : 'refused';
   }
   if (status === 404 || status === 410) {
     return 'not-found';
@@ -102,28 +102,23 @@ type Answered = Readonly<{ status: number; text: string }>;
  * read off `right`, never inferred here from the fact that a token was sent.
  */
 export const ask = async <Signal>(ports: Ports<Signal>, request: Request): Promise<unknown> => {
-  const control = ports.abortable();
   const where = request.path;
   const reader = ports.token();
   const asked = reader === undefined ? request : signedIn(request);
   const headers = reader === undefined ? HEADERS : { ...HEADERS, [READER_HEADER]: reader };
-  let cancel = (): void => undefined;
-  const deadline = new Promise<never>((...[, reject]) => {
-    cancel = ports.after(DEADLINE, () => {
-      control.abort();
-      reject(new ContentApiError('timeout', `${where} : aucune réponse en ${String(DEADLINE / 1000)} s`));
-    });
-  });
-  const attempt = (async (): Promise<Answered> => {
-    try {
-      const reply = await ports.fetch(addressOf(asked), { headers, signal: control.signal });
-      return { status: reply.status, text: await reply.text() };
-    } catch {
-      throw new ContentApiError('offline', `${where} : le service n’a pas été atteint`);
-    }
-  })();
-  const answered = await Promise.race([attempt, deadline]).finally(cancel);
-  const cause = causeOf(answered.status);
+  const answered = await beforeDeadline(
+    ports,
+    () => new ContentApiError('timeout', `${where} : aucune réponse en ${String(DEADLINE / 1000)} s`),
+    async (signal): Promise<Answered> => {
+      try {
+        const reply = await ports.fetch(addressOf(asked), { headers, signal });
+        return { status: reply.status, text: await reply.text() };
+      } catch {
+        throw new ContentApiError('offline', `${where} : le service n’a pas été atteint`);
+      }
+    },
+  );
+  const cause = causeOf(answered.status, reader !== undefined);
   if (cause !== undefined) {
     throw new ContentApiError(cause, `${where} : statut ${String(answered.status)}`);
   }

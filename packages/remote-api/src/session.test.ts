@@ -14,14 +14,34 @@ const CREDENTIALS: Credentials = { login: 'reader@example.org', password: 'a-pas
 
 type Sent = Readonly<{ address: string; headers: Readonly<Record<string, string>>; body: string }>;
 
+/** The deadline as a test drives it: nothing fires unless the test fires it, and a request is told when it is let go. */
+type Driven = Posting<number> & Readonly<{ sent: Sent[]; timers: (() => void)[]; aborted: () => boolean }>;
+
 /** A `Posting` that answers a queue of replies in order and keeps what it was sent, so a test can read both. */
-const posting = (
-  replies: readonly Readonly<{ status: number; body: string }>[],
-): Posting & Readonly<{ sent: Sent[] }> => {
+const posting = (replies: readonly Readonly<{ status: number; body: string }>[]): Driven => {
   const queue = [...replies];
   const sent: Sent[] = [];
+  const timers: (() => void)[] = [];
+  let letGo = false;
   return {
     sent,
+    timers,
+    aborted: () => letGo,
+    abortable: () => ({
+      signal: 0,
+      abort: () => {
+        letGo = true;
+      },
+    }),
+    after: (...[, then]) => {
+      timers.push(then);
+      return () => {
+        const at = timers.indexOf(then);
+        if (at >= 0) {
+          timers.splice(at, 1);
+        }
+      };
+    },
     post: async (address, headers, body) => {
       sent.push({ address, headers, body });
       const next = queue.shift();
@@ -31,6 +51,21 @@ const posting = (
       return reply(next.status, next.body);
     },
   };
+};
+
+/** A `Posting` whose service never answers at all, so only the deadline can end anything. */
+const silent = (): Driven => {
+  const ports = posting([]);
+  return { ...ports, post: async () => new Promise<never>(() => undefined) };
+};
+
+/** The error a promise failed with, read without an assertion narrowing it. */
+const failedWith = async (work: Promise<unknown>): Promise<SessionError> => {
+  const reason: unknown = await work.catch((raised: unknown) => raised);
+  if (!(reason instanceof SessionError)) {
+    throw new Error('attendu une SessionError');
+  }
+  return reason;
 };
 
 test('open asks the two exchanges in order and answers the user token', async () => {
@@ -62,37 +97,53 @@ test('a login the service refuses raises SessionError refused, with the service 
     { status: 200, body: JSON.stringify({ x_anonymous_token: 'anon-123' }) },
     { status: 401, body: JSON.stringify({ error: { code: 10053, message: 'Customer login failed' } }) },
   ]);
-  const failed: unknown = await createSession(IDENTITY, ports)
-    .open(CREDENTIALS)
-    .catch((reason: unknown) => reason);
-  expect(failed).toBeInstanceOf(SessionError);
-  if (!(failed instanceof SessionError)) {
-    throw new Error('attendu une SessionError');
-  }
+  const failed = await failedWith(createSession(IDENTITY, ports).open(CREDENTIALS));
   expect(failed.code).toBe('refused');
   expect(failed.message).toBe('Customer login failed');
 });
 
 test('a service answer no reading can make sense of raises SessionError malformed', async () => {
-  const ports = posting([{ status: 200, body: '<html>not json</html>' }]);
-  const failed: unknown = await createSession(IDENTITY, ports)
-    .anonymousToken()
-    .catch((reason: unknown) => reason);
-  expect(failed).toBeInstanceOf(SessionError);
-  if (!(failed instanceof SessionError)) {
-    throw new Error('attendu une SessionError');
-  }
+  const failed = await failedWith(
+    createSession(IDENTITY, posting([{ status: 200, body: '<html>not json</html>' }])).anonymousToken(),
+  );
   expect(failed.code).toBe('malformed');
 });
 
 test('a service that will not answer raises SessionError unavailable', async () => {
-  const ports = posting([{ status: 503, body: 'Service Unavailable' }]);
-  const failed: unknown = await createSession(IDENTITY, ports)
-    .anonymousToken()
-    .catch((reason: unknown) => reason);
-  expect(failed).toBeInstanceOf(SessionError);
-  if (!(failed instanceof SessionError)) {
-    throw new Error('attendu une SessionError');
-  }
+  const failed = await failedWith(
+    createSession(IDENTITY, posting([{ status: 503, body: 'Service Unavailable' }])).anonymousToken(),
+  );
   expect(failed.code).toBe('unavailable');
+});
+
+/**
+ * The failure that stranded a reader: a network that takes a request and never answers. The platform bounds nothing,
+ * so without a deadline of its own the promise never settles, and a screen waiting on it waits for the life of the
+ * app — with the one button that could sign the reader in saying it is already trying.
+ */
+test('a service that takes a login and never answers is let go on the deadline', async () => {
+  const ports = silent();
+  const opened = failedWith(createSession(IDENTITY, ports).open(CREDENTIALS));
+  expect(ports.timers).toHaveLength(1);
+  for (const fire of [...ports.timers]) {
+    fire();
+  }
+  expect((await opened).code).toBe('unavailable');
+  expect(ports.aborted()).toBe(true);
+});
+
+/** A request the platform refused to make is the service not answering, not a shape nobody can read. */
+test('a request the platform never made raises SessionError unavailable', async () => {
+  const ports: Posting<number> = {
+    ...posting([]),
+    post: async () => Promise.reject(new TypeError('Network request failed')),
+  };
+  expect((await failedWith(createSession(IDENTITY, ports).anonymousToken())).code).toBe('unavailable');
+});
+
+/** An answer that came back in time leaves no timer behind, which would otherwise hold the process for fifteen seconds. */
+test('an exchange that answered cancels its own deadline', async () => {
+  const ports = posting([{ status: 200, body: JSON.stringify({ x_anonymous_token: 'anon-123' }) }]);
+  await createSession(IDENTITY, ports).anonymousToken();
+  expect(ports.timers).toEqual([]);
 });

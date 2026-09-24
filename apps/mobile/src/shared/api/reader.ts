@@ -1,3 +1,5 @@
+import { ContentApiError } from '@huma/contracts';
+import type { ContentApi } from '@huma/contracts';
 import { createSession, SERVICE_APP, SessionError } from '@huma/remote-api';
 import type { Credentials, Identity, Posting } from '@huma/remote-api';
 import { STORAGE_KEYS, stateStorage } from '../lib/storage';
@@ -6,10 +8,11 @@ import type { StateStorage } from '../lib/storage';
 /**
  * The reader's own connection to the journal's service: the token their login earned, and where it is kept.
  *
- * It is one string and two ways to change it, and no state at all: what re-paints a screen when a reader signs in is
- * a store of the feature that owns that screen, which is where this app keeps state. Here is the other side — what
- * the client of the service asks at every request, which must answer without a hook, from anywhere, and answer the
- * same to everyone.
+ * It is one string and three ways to change it, and no React state at all: what re-paints a screen when a reader signs
+ * in is a store of the feature that owns that screen, which is where this app keeps state. Here is the other side —
+ * what the client of the service asks at every request, which must answer without a hook, from anywhere, and answer
+ * the same to everyone. A store that wants to follow it watches it, rather than taking a copy at its first line: the
+ * token can go without anyone having pressed anything, when the service stops honouring it.
  *
  * Opening the connection needs the official client's key, which no tracked file of this repository carries: it
  * reaches the bundle through `EXPO_PUBLIC_…`, written by whoever starts the build, and a build given none has no
@@ -17,7 +20,7 @@ import type { StateStorage } from '../lib/storage';
  * is the shape ADR-0032 asks for, and it is the shape a published build has.
  */
 
-/** A reader as the app holds them: the token the client carries, and the two ways it changes. */
+/** A reader as the app holds them: the token the client carries, the ways it changes, and a way to follow it. */
 export type Reader = Readonly<{
   /**
    * Whether this build can open a connection at all — whether it was started with the key the service asks for.
@@ -30,6 +33,8 @@ export type Reader = Readonly<{
   token: () => string | undefined;
   signIn: (credentials: Credentials) => Promise<void>;
   signOut: () => void;
+  /** Calls `whenChanged` whenever the token does, and answers with what stops watching. */
+  watch: (whenChanged: () => void) => () => void;
 }>;
 
 /** Why a connection did not open, as the two things a screen has to say about it. */
@@ -77,16 +82,28 @@ export const identityOf = (env: Readonly<Record<string, string | undefined>>): I
  *
  * The disk is read once, at the first line, and held in memory after: the client asks for the token at every request,
  * which is a synchronous question, and a read of the disk each time would be one store call per request. The two are
- * written together whenever the reader signs in or out, so a phone that restarts opens where it left off.
+ * written together whenever the token changes, so a phone that restarts opens where it left off, and whoever is
+ * watching is told in the same breath.
  */
-export const createReader = (identity: Identity | undefined, ports: Posting, disk: StateStorage): Reader => {
+export const createReader = <Signal>(
+  identity: Identity | undefined,
+  ports: Posting<Signal>,
+  disk: StateStorage,
+): Reader => {
   let held = disk.getItem(STORAGE_KEYS.readerToken) ?? undefined;
+  const watchers = new Set<() => void>();
   const hold = (token: string | undefined): void => {
+    if (token === held) {
+      return;
+    }
     held = token;
     if (token === undefined) {
       disk.removeItem(STORAGE_KEYS.readerToken);
     } else {
       disk.setItem(STORAGE_KEYS.readerToken, token);
+    }
+    for (const watcher of [...watchers]) {
+      watcher();
     }
   };
   return {
@@ -107,14 +124,67 @@ export const createReader = (identity: Identity | undefined, ports: Posting, dis
     signOut: () => {
       hold(undefined);
     },
+    watch: (whenChanged: () => void) => {
+      watchers.add(whenChanged);
+      return () => {
+        watchers.delete(whenChanged);
+      };
+    },
   };
 };
 
-/** One `POST` to the service over the platform's own network, which the read client never makes. */
-const POSTING: Posting = {
-  post: async (address, headers, body) => {
-    const reply = await fetch(address, { method: 'POST', headers, body, credentials: 'omit' });
+/**
+ * The same content, with one thing more: a reading the service refused under this reader's own token forgets that
+ * token (ADR-0033, R9).
+ *
+ * The service answers `403` to a dead token on every route it serves, not only the ones holding a body a subscription
+ * pays for — the front page included. So a token the service has stopped honouring does not cost a subscriber their
+ * premium articles: it costs them the paper. Left in place it would go out with the next request and be refused
+ * again, for as long as the app ran, and the only way out would be for the reader to guess that signing out mends it.
+ *
+ * Forgetting it turns that into nothing at all. `expired` is a cause another try can answer differently — which is
+ * the whole of what makes a cause retryable — because by the time the next try leaves, the token it failed under is
+ * gone, and the same request goes out as anybody's. The reader sees a page load, not a wall, and the screens that ask
+ * whether anyone is signed in say no, which by then is true.
+ */
+export const forgettingDeadTokens = (api: ContentApi, reader: Reader): ContentApi => {
+  const watching = async <Value>(read: Promise<Value>): Promise<Value> => {
+    try {
+      return await read;
+    } catch (reason: unknown) {
+      if (reason instanceof ContentApiError && reason.code === 'expired') {
+        reader.signOut();
+      }
+      throw reason;
+    }
+  };
+  return {
+    getSections: async () => watching(api.getSections()),
+    getFeed: async (query) => watching(api.getFeed(query)),
+    getLiveFeed: async (query) => watching(api.getLiveFeed(query)),
+    getArticle: async (id) => watching(api.getArticle(id)),
+    search: async (query) => watching(api.search(query)),
+  };
+};
+
+/**
+ * One `POST` to the service over the platform's own network, with the abort and the timer the deadline needs.
+ *
+ * It is the same three ports the read client is handed, and for the same reason: the platform bounds nothing, so a
+ * login to a host that takes the request and never answers would never come back — and the screen waiting on it holds
+ * the only button that could sign the reader in.
+ */
+const POSTING: Posting<AbortSignal> = {
+  post: async (address, headers, body, signal) => {
+    const reply = await fetch(address, { method: 'POST', headers, body, signal, credentials: 'omit' });
     return { status: reply.status, text: async (): Promise<string> => reply.text() };
+  },
+  abortable: () => new AbortController(),
+  after: (delay, then) => {
+    const timer = setTimeout(then, delay);
+    return () => {
+      clearTimeout(timer);
+    };
   },
 };
 

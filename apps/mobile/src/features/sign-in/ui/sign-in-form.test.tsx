@@ -3,6 +3,7 @@ import { act, fireEvent, screen } from '@testing-library/react-native';
 import { READER } from '#api';
 import { t } from '#i18n';
 import { renderWithCache } from '#lib/testing';
+import type { Opening } from '../model/store';
 import { useConnection } from '../model/store';
 import { SignInForm } from './sign-in-form';
 
@@ -15,9 +16,21 @@ const fill = async (login: string, password: string): Promise<void> => {
   await fireEvent.changeText(screen.getByPlaceholderText(t('signIn.password.placeholder')), password);
 };
 
+/** The store's own action, answering what the test wants to see the screen do with it. */
+const answering = (opening: Opening): void => {
+  useConnection.setState({ open: async () => Promise.resolve(opening) });
+};
+
+/** Types the pair and presses, then lets the press settle. */
+const attempt = async (): Promise<void> => {
+  await fill(LOGIN, PASSWORD);
+  await fireEvent.press(screen.getByText(t('signIn.submit')));
+  await act(async () => Promise.resolve());
+};
+
 beforeEach(() => {
   jest.restoreAllMocks();
-  useConnection.setState({ connection: 'out', refusal: null });
+  useConnection.setState({ connection: 'out' });
 });
 
 describe('SignInForm', () => {
@@ -25,8 +38,7 @@ describe('SignInForm', () => {
     const opening = jest.spyOn(READER, 'signIn').mockResolvedValue(undefined);
     const opened = jest.fn();
     await renderWithCache(<SignInForm onOpened={opened} />);
-    await fill(LOGIN, PASSWORD);
-    await fireEvent.press(screen.getByText(t('signIn.submit')));
+    await attempt();
     expect(opening).toHaveBeenCalledWith({ login: LOGIN, password: PASSWORD });
     expect(opened).toHaveBeenCalledTimes(1);
   });
@@ -42,20 +54,39 @@ describe('SignInForm', () => {
   });
 
   it('dit que le journal a refusé les identifiants, dans ses mots', async () => {
+    answering({ kind: 'refused', why: 'refused' });
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
     expect(screen.queryByText(t('signIn.refused'))).toBeNull();
-    await act(() => {
-      useConnection.setState({ refusal: 'refused' });
-    });
+    await attempt();
     expect(screen.getByText(t('signIn.refused'))).toBeTruthy();
   });
 
   it('dit que le journal n’a pas répondu, quand c’est cela qui s’est passé', async () => {
+    answering({ kind: 'refused', why: 'unavailable' });
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
-    await act(() => {
-      useConnection.setState({ refusal: 'unavailable' });
-    });
+    await attempt();
     expect(screen.getByText(t('signIn.unavailable'))).toBeTruthy();
+  });
+
+  /**
+   * The refusal belongs to the attempt that earned it. A reader correcting a typo has already understood, and it was
+   * also greeting readers who reopened the screen an hour later, before they had typed anything.
+   */
+  it('efface le refus dès la première touche, sur l’un ou l’autre champ', async () => {
+    answering({ kind: 'refused', why: 'refused' });
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await attempt();
+    expect(screen.getByText(t('signIn.refused'))).toBeTruthy();
+    await fireEvent.changeText(screen.getByPlaceholderText(t('signIn.login.placeholder')), 'l');
+    expect(screen.queryByText(t('signIn.refused'))).toBeNull();
+  });
+
+  /** A reader who is listening has their focus on the button they pressed; the line says itself out loud. */
+  it('fait annoncer le refus à qui écoute l’écran', async () => {
+    answering({ kind: 'refused', why: 'refused' });
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await attempt();
+    expect(screen.getByText(t('signIn.refused')).props['accessibilityLiveRegion']).toBe('assertive');
   });
 
   /** The button keeps its promise while a connection is opening: it says so rather than looking pressable and idle. */

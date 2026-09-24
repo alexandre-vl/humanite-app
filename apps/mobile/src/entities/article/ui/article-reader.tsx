@@ -2,6 +2,7 @@ import type { Article, ArticleId } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { Button } from '#components/button';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
@@ -19,9 +20,17 @@ export type ArticleReaderProps = Readonly<{
   id: ArticleId;
   /** The address of a link the reader pressed, or of a film: a page of the web, for the screen to open. */
   onFollow: (url: string) => void;
+  /**
+   * Where a subscriber signs in, or `null` when there is nobody to sign in — a build with no way to open a
+   * connection, or a reader already signed in, for whom a wall means the journal withheld this from them too.
+   *
+   * The screen decides it. This reading knows a body was kept back; only the screen knows whether the app has a
+   * connection to offer, which is a thing of the app and not of the article.
+   */
+  onSignIn: (() => void) | null;
 }>;
 
-type ReadingProps = Readonly<{ article: Article; onFollow: (url: string) => void }>;
+type ReadingProps = Readonly<{ article: Article; onFollow: (url: string) => void; onSignIn: (() => void) | null }>;
 
 const useStyles = createStyles((theme) => ({
   page: { backgroundColor: theme.background },
@@ -46,11 +55,16 @@ const useStyles = createStyles((theme) => ({
  * Where a body the source keeps back would run: the paper's own words for why the rest is not there, and where a
  * subscription is taken. Nothing of the body is shown, the source having said this reader may not have it.
  *
- * The place is named and not linked. A reader's app may not send its reader to a purchase — the App Store's rule
- * 3.1.1(a), Google Play's payments policy — and the journal's site is where its subscriptions are sold; so the line
- * says where, in words, and nothing on it answers a press.
+ * The place a subscription is bought is named and not linked. A reader's app may not send its reader to a purchase —
+ * the App Store's rule 3.1.1(a), Google Play's payments policy — and the journal's site is where its subscriptions
+ * are sold; so that line says where, in words, and nothing on it answers a press.
+ *
+ * Signing in is the other thing, and is not a purchase: a subscriber who has already paid is being asked to prove it,
+ * which is the one thing they can do here and the one place they are most likely to want to. Leaving it out sent them
+ * looking through the account screen for a way back to the article they were reading, and told them meanwhile to go
+ * and buy what they had bought.
  */
-function Wall(): ReactNode {
+function Wall({ onSignIn }: Readonly<{ onSignIn: (() => void) | null }>): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.wall}>
@@ -58,6 +72,7 @@ function Wall(): ReactNode {
         {t('article.withheld.title')}
       </Text>
       <Text variant="prose">{t('article.withheld.message')}</Text>
+      {onSignIn === null ? null : <Button label={t('article.withheld.signIn')} onPress={onSignIn} />}
       <Text variant="caption">{t('article.withheld.where')}</Text>
     </Box>
   );
@@ -80,7 +95,7 @@ function Wall(): ReactNode {
  * used to close the head whatever came next, and on the four articles in five whose body is kept back the phone drew
  * two rules one gap apart — grey, then red — where one says the same.
  */
-function Reading({ article, onFollow }: ReadingProps): ReactNode {
+function Reading({ article, onFollow, onSignIn }: ReadingProps): ReactNode {
   const styles = useStyles();
   return (
     <Scroll axis="vertical" style={styles.page} contentStyle={styles.column}>
@@ -92,7 +107,7 @@ function Reading({ article, onFollow }: ReadingProps): ReactNode {
           <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} />
         </>
       ) : (
-        <Wall />
+        <Wall onSignIn={onSignIn} />
       )}
     </Scroll>
   );
@@ -102,7 +117,7 @@ function Reading({ article, onFollow }: ReadingProps): ReactNode {
  * One article, read whole, in one reading: what its body points at comes written into it. The ground it is read on is
  * the screen's to choose — a video's page is dark from its status bar down — and not the reading's.
  */
-export function ArticleReader({ id, onFollow }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, onFollow, onSignIn }: ArticleReaderProps): ReactNode {
   const styles = useStyles();
   const { data: article, status, error, refetch } = useQuery(articleQuery(id));
   if (article === undefined) {
@@ -112,7 +127,7 @@ export function ArticleReader({ id, onFollow }: ArticleReaderProps): ReactNode {
     if (state.kind === 'failed' && state.failure === 'refused') {
       return (
         <Box style={styles.away}>
-          <Wall />
+          <Wall onSignIn={onSignIn} />
         </Box>
       );
     }
@@ -125,5 +140,5 @@ export function ArticleReader({ id, onFollow }: ArticleReaderProps): ReactNode {
       />
     );
   }
-  return <Reading article={article} onFollow={onFollow} />;
+  return <Reading article={article} onFollow={onFollow} onSignIn={onSignIn} />;
 }

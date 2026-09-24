@@ -20,12 +20,14 @@
 # n’y était, et une absence sur une page qui n’a pas fini de se charger ne prouve rien. Les deux captures sont prises
 # de part et d’autre de la connexion, sur la même adresse et à la même profondeur.
 #
-# La dernière ligne repose l’app comme elle l’a trouvée. Le jeton d’un abonné survit à la fermeture — c’est tout
-# l’objet de ce qu’on éprouve ici — donc un parcours qui partirait en le laissant derrière lui ferait passer le
-# suivant pour vert alors qu’il n’aurait rien ouvert du tout.
+# L’app est reposée déconnectée par un crochet de fin, et non par les dernières lignes du parcours : un parcours qui
+# échoue s’arrête où il a échoué, et une ligne de nettoyage écrite à la fin est celle qui ne tourne pas le jour où
+# elle servirait — celui où l’assertion du mur tombe.
 appId: ${APP_ID}
 tags:
   - abonne
+onFlowComplete:
+  - runFlow: parts/sign-out.yaml
 ---
 - runFlow: parts/launch.yaml
 - openLink: ${ARTICLE_LINK}
@@ -61,6 +63,3 @@ tags:
       - scroll
 - assertNotVisible: 'Réservé aux abonnés'
 - takeScreenshot: mur-tombe
-- back
-- tapOn: 'Se déconnecter'
-- assertVisible: 'Se connecter'

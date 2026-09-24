@@ -6,7 +6,10 @@ import {
   USER_TOKEN_REPLY,
 } from '@huma/contracts';
 import type { DeviceAuth, LoginRequest } from '@huma/contracts';
+import { beforeDeadline, DEADLINE } from './deadline.ts';
+import type { Deadline } from './deadline.ts';
 import { SERVICE, SERVICE_ROOT } from './routes.ts';
+import type { Reply } from './transport.ts';
 
 /**
  * Opening a subscriber's connection to the journal's service, so the app reads what their subscription pays for.
@@ -17,6 +20,11 @@ import { SERVICE, SERVICE_ROOT } from './routes.ts';
  * app. The secret is not written here: it reaches `createSession` at runtime, from where a build keeps its secrets and
  * a tracked file never does. What the two exchanges give back is one string, the user token, which the read client
  * then carries as its own — a token a reader's own login earned, not a secret of the official client's.
+ *
+ * Both exchanges are held to the same deadline the reads are, and for a sharper reason: a reading that never comes
+ * back leaves a screen loading, which a reader can leave, while a login that never comes back leaves them signed out
+ * in front of the one button that could sign them in. Everything raised here is a `SessionError`, the platform's own
+ * failures included, so a screen has one shape of thing to read.
  */
 
 /** Why opening a connection failed, as the one word a screen branches on — the causes `ContentApiError` names, less. */
@@ -32,14 +40,14 @@ export class SessionError extends Error {
   }
 }
 
-/** One request out and its reply's status and body — a `POST` the read client's GET-only transport does not make. */
-export type Posting = Readonly<{
-  post: (
-    address: string,
-    headers: Readonly<Record<string, string>>,
-    body: string,
-  ) => Promise<Readonly<{ status: number; text: () => Promise<string> }>>;
-}>;
+/**
+ * One request out and its reply — a `POST` the read client's GET-only transport does not make — with the same two
+ * ports every request of this package is held by: a way to call it off, and a way to run something later.
+ */
+export type Posting<Signal> = Deadline<Signal> &
+  Readonly<{
+    post: (address: string, headers: Readonly<Record<string, string>>, body: string, signal: Signal) => Promise<Reply>;
+  }>;
 
 /** Who asks for an anonymous token: the app's id, its borrowed secret, and the device it attests, injected at runtime. */
 export type Identity = Readonly<{ appId: number; appSecret: string; device: DeviceAuth }>;
@@ -82,12 +90,32 @@ export type Session = Readonly<{
  * `open` does both, and is what a screen calls with what a reader typed. Each answers a token, or raises a
  * `SessionError` a screen can read — a wrong password is `refused`, a service that will not answer is `unavailable`.
  */
-export const createSession = (identity: Identity, ports: Posting): Session => {
+export const createSession = <Signal>(identity: Identity, ports: Posting<Signal>): Session => {
   const address = (path: string): string => `${SERVICE}${SERVICE_ROOT}${path}`;
 
+  /** One exchange, held to the deadline and read to the end of its body, or the reason it could not be. */
+  const exchange = async (
+    path: string,
+    headers: Readonly<Record<string, string>>,
+    body: string,
+  ): Promise<Readonly<{ status: number; text: string }>> =>
+    beforeDeadline(
+      ports,
+      () => new SessionError('unavailable', `le service n’a pas répondu en ${String(DEADLINE / 1000)} s`),
+      async (signal) => {
+        let reply;
+        try {
+          reply = await ports.post(address(path), headers, body, signal);
+        } catch {
+          throw new SessionError('unavailable', 'le service n’a pas été atteint');
+        }
+        return { status: reply.status, text: await reply.text() };
+      },
+    );
+
   const anonymousToken = async (): Promise<string> => {
-    const reply = await ports.post(
-      address('/anonymous-token'),
+    const answered = await exchange(
+      '/anonymous-token',
       { 'content-type': 'text/plain' },
       JSON.stringify(
         ANONYMOUS_TOKEN_REQUEST.parse({
@@ -97,11 +125,10 @@ export const createSession = (identity: Identity, ports: Posting): Session => {
         }),
       ),
     );
-    const text = await reply.text();
-    if (reply.status !== 200) {
-      throw refusal(reply.status, text);
+    if (answered.status !== 200) {
+      throw refusal(answered.status, answered.text);
     }
-    const read = ANONYMOUS_TOKEN_REPLY.safeParse(asJson(text));
+    const read = ANONYMOUS_TOKEN_REPLY.safeParse(asJson(answered.text));
     if (!read.success) {
       throw new SessionError('malformed', 'le service a répondu une forme inattendue au jeton anonyme');
     }
@@ -109,16 +136,15 @@ export const createSession = (identity: Identity, ports: Posting): Session => {
   };
 
   const login = async (credentials: Credentials, anonymous: string): Promise<string> => {
-    const reply = await ports.post(
-      address('/user/login'),
+    const answered = await exchange(
+      '/user/login',
       { 'content-type': 'application/json', 'x-anonymous-token': anonymous },
       JSON.stringify(LOGIN_REQUEST.parse({ login: credentials.login, password: credentials.password })),
     );
-    const text = await reply.text();
-    if (reply.status !== 200) {
-      throw refusal(reply.status, text);
+    if (answered.status !== 200) {
+      throw refusal(answered.status, answered.text);
     }
-    const read = USER_TOKEN_REPLY.safeParse(asJson(text));
+    const read = USER_TOKEN_REPLY.safeParse(asJson(answered.text));
     if (!read.success) {
       throw new SessionError('malformed', 'le service a répondu une forme inattendue au jeton d’usager');
     }

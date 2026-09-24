@@ -23,6 +23,7 @@ export const FR = {
   'article.withheld.title': 'Réservé aux abonnés',
   'article.withheld.message': 'Le journal réserve la suite de cet article à ses abonnés numériques.',
   'article.withheld.where': 'L’abonnement se souscrit sur humanite.fr.',
+  'article.withheld.signIn': 'Déjà abonné\u00A0? Se connecter',
   'article.film': 'Regarder sur YouTube',
   'bookmark.title': 'Mes lectures',
   'bookmark.add': 'Ajouter à mes lectures',
@@ -35,6 +36,8 @@ export const FR = {
   'failure.not-found.message': 'Le journal ne sert plus ce que vous cherchez.',
   'failure.refused.title': 'Réservé aux abonnés',
   'failure.refused.message': 'Le journal réserve cette page à ses abonnés numériques.',
+  'failure.expired.title': 'Votre connexion a expiré',
+  'failure.expired.message': 'Reconnectez-vous pour retrouver ce que votre abonnement ouvre.',
   'failure.offline.title': 'Pas de connexion',
   'failure.offline.message': 'Le téléphone n’atteint pas le journal. Vérifiez la connexion, puis réessayez.',
   'failure.timeout.title': 'Le journal tarde à répondre',
@@ -97,5 +100,6 @@ export const FR = {
   'signIn.unavailable': 'Le journal n’a pas répondu. Réessayez dans un instant.',
   'signIn.where': 'L’abonnement se souscrit sur humanite.fr.',
   'signIn.done': 'Abonné connecté',
+  'signIn.done.hint': 'Les articles réservés à l’abonnement s’ouvrent.',
   'signIn.out': 'Se déconnecter',
 } as const satisfies Readonly<Record<string, string>>;

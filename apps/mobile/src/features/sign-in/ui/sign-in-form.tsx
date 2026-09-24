@@ -1,12 +1,13 @@
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import type { Refusal } from '#api';
+import { Button } from '#components/button';
 import { t } from '#i18n';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
 import { TextField } from '#primitives/text-field';
-import { Button } from '#components/button';
 import { useReaderSession } from '../model/session';
 
 export type SignInFormProps = Readonly<{
@@ -24,20 +25,24 @@ const useStyles = createStyles((theme) => ({
     borderBottomWidth: SIZES.stroke,
     borderColor: theme.primary,
   },
-  refusal: { gap: SPACING.xs },
 }));
 
 /**
  * What a subscriber signs in with: their identifier, their password, and one button.
  *
- * Neither field is held anywhere but here. A password in a store would outlive the screen that asked for it, and the
- * store is the one thing in this app written to a disk — so the two strings live as long as this component does, go
- * to the service, and go nowhere else. The phone's own keychain fills them, each field saying which of the two it
- * holds, which is the only part of signing in a reader should not have to do by hand.
+ * Nothing a reader types is held anywhere but here, and neither is what the service said of it. A password in a store
+ * would outlive the screen that asked for it, and the store is the one thing in this app written to a disk; a refusal
+ * in a store would outlive the attempt that earned it, and greet the next reader to open this screen with an
+ * accusation about a password they had not typed. Both live as long as this component does, which is exactly as long
+ * as they mean anything.
  *
- * The button keeps its promise while a connection is opening: it says so, and a second press does nothing, the
- * connection being the one thing that knows whether one is already under way. Nothing is greyed out — a control that
- * looks disabled has to say why, and the label saying a connection is under way already does.
+ * The refusal goes at the first keystroke, on either field. A reader correcting a typo has already understood, and
+ * the line telling them about it is from that moment in the way.
+ *
+ * The phone's own keychain fills the pair, each field saying which of the two it holds, which is the only part of
+ * signing in a reader should not have to do by hand. The button keeps its promise while a connection is opening: it
+ * says so, and a second press does nothing. Nothing is greyed out — a control that looks disabled has to say why, and
+ * the label already does.
  *
  * Where a subscription is taken is named and not linked, as it is on a withheld article: the App Store's rule
  * 3.1.1(a) and Google Play's payments policy leave a reader's app no way to send anyone to a purchase. Signing in is
@@ -45,18 +50,26 @@ const useStyles = createStyles((theme) => ({
  */
 export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
   const styles = useStyles();
-  const { connection, refusal, signIn } = useReaderSession();
+  const { connection, signIn } = useReaderSession();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [refusal, setRefusal] = useState<Refusal | null>(null);
   const opening = connection === 'opening';
   const submit = (): void => {
     if (opening || login === '' || password === '') {
       return;
     }
-    void signIn(login, password).then((opened) => {
-      if (opened) {
+    void (async (): Promise<void> => {
+      const opened = await signIn(login, password);
+      if (opened.kind === 'opened') {
         onOpened();
+      } else if (opened.kind === 'refused') {
+        setRefusal(opened.why);
       }
+    })().catch(() => {
+      // Nothing under the service is expected to fail, and a screen that quietly did nothing on a press would be the
+      // worst of both: the reader is told what they are told when the journal does not answer, which is what it is.
+      setRefusal('unavailable');
     });
   };
   return (
@@ -68,7 +81,10 @@ export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
         <Text variant="label">{t('signIn.login')}</Text>
         <TextField
           value={login}
-          onChange={setLogin}
+          onChange={(text) => {
+            setRefusal(null);
+            setLogin(text);
+          }}
           placeholder={t('signIn.login.placeholder')}
           style={styles.line}
           fills="login"
@@ -80,7 +96,10 @@ export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
         <Text variant="label">{t('signIn.password')}</Text>
         <TextField
           value={password}
-          onChange={setPassword}
+          onChange={(text) => {
+            setRefusal(null);
+            setPassword(text);
+          }}
           placeholder={t('signIn.password.placeholder')}
           style={styles.line}
           fills="password"
@@ -90,9 +109,9 @@ export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
       </Box>
       <Button label={opening ? t('signIn.opening') : t('signIn.submit')} onPress={submit} />
       {refusal === null ? null : (
-        <Box style={styles.refusal}>
-          <Text variant="body">{t(refusal === 'refused' ? 'signIn.refused' : 'signIn.unavailable')}</Text>
-        </Box>
+        <Text variant="body" alert>
+          {t(refusal === 'refused' ? 'signIn.refused' : 'signIn.unavailable')}
+        </Text>
       )}
       <Text variant="caption">{t('signIn.where')}</Text>
     </Box>

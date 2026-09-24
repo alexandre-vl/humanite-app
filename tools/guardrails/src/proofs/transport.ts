@@ -37,6 +37,33 @@ const sayingOneThing = (api: ContentApi): ContentApi => ({
   search: async (query) => mislabelled(api.search(query)),
 });
 
+/** A read whose expired connection is reported as the thing simply being withheld. */
+const asRefusal = async <Value>(read: Promise<Value>): Promise<Value> => {
+  try {
+    return await read;
+  } catch (error) {
+    if (error instanceof ContentApiError && error.code === 'expired') {
+      throw new ContentApiError('refused', 'réservé aux abonnés');
+    }
+    throw error;
+  }
+};
+
+/**
+ * A client that reads a dead token as a wall.
+ *
+ * It is the reading the status alone invites: 403 is 403, and a client that never asked what the request carried
+ * cannot tell a subscriber whose connection expired from a passer-by who was never entitled. The first is owed a way
+ * back in; this client shows them a sales pitch instead.
+ */
+const readingExpiryAsWall = (api: ContentApi): ContentApi => ({
+  getSections: async () => asRefusal(api.getSections()),
+  getFeed: async (query) => asRefusal(api.getFeed(query)),
+  getLiveFeed: async (query) => asRefusal(api.getLiveFeed(query)),
+  getArticle: async (id) => asRefusal(api.getArticle(id)),
+  search: async (query) => asRefusal(api.search(query)),
+});
+
 /** Whether an address asks the service for one article: the one route a bent client below is bent on alone. */
 const isArticle = (address: string): boolean => address.includes('/wordpress/post/');
 
@@ -68,7 +95,9 @@ export const TRANSPORT_FIXTURES = [
   define(
     'transport/cause-misnamed',
     'un client qui dit « indisponible » de tout échec, quelle qu’en soit la cause',
-    ['transport/cause-misnamed'],
+    // Deux fautes, et la seconde suit de la première : qui ne nomme aucune cause ne nomme pas non plus celle d’une
+    // connexion expirée, et l’abonné dont le jeton est mort s’entend dire que le journal ne répond pas.
+    ['transport/cause-misnamed', 'transport/expiry-misread'],
     judged((client) => sayingOneThing(createRemoteApi(client))),
   ),
   define(
@@ -120,7 +149,9 @@ export const TRANSPORT_FIXTURES = [
   define(
     'transport/reader-unnamed',
     'un client qui laisse au vestiaire le jeton que la connexion de l’abonné a gagné',
-    ['transport/reader-unnamed'],
+    // Et il ne peut pas davantage voir un jeton mourir : sa requête ne portant rien, le refus qu’elle reçoit est
+    // celui qu’on fait à personne, ce qui est justement ce que le service répond à qui ne présente rien.
+    ['transport/reader-unnamed', 'transport/expiry-misread'],
     judged((client) => createRemoteApi({ ...client, token: () => undefined })),
   ),
   define(
@@ -137,9 +168,17 @@ export const TRANSPORT_FIXTURES = [
     ),
   ),
   define(
+    'transport/expiry-misread',
+    'un client qui lit le jeton mort d’un abonné comme un article qu’on lui refuse',
+    ['transport/expiry-misread'],
+    judged((client) => readingExpiryAsWall(createRemoteApi(client))),
+  ),
+  define(
     'transport/invents-token',
     'un client qui porte un jeton d’usager qu’aucune connexion n’a gagné',
-    ['transport/impersonates'],
+    // Le jeton inventé part aussi quand personne n’est connecté, si bien qu’un refus fait à personne se lit comme une
+    // connexion expirée : le juge nomme les deux, l’emprunt d’identité et la cause qui s’en trouve fausse.
+    ['transport/impersonates', 'transport/cause-misnamed'],
     judged((client) => createRemoteApi({ ...client, token: () => 'jeton-invente' })),
   ),
   define(
@@ -154,7 +193,7 @@ export const TRANSPORT_FIXTURES = [
   define(
     'transport/cause-misnamed-article',
     'un client qui dit « indisponible » de tout échec d’un article',
-    ['transport/cause-misnamed'],
+    ['transport/cause-misnamed', 'transport/expiry-misread'],
     judged((client) => {
       const api = createRemoteApi(client);
       return { ...api, getArticle: async (id) => mislabelled(api.getArticle(id)) };

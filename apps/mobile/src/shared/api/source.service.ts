@@ -1,5 +1,5 @@
 import { createRemoteApi } from '@huma/remote-api';
-import { READER } from './reader';
+import { forgettingDeadTokens, READER } from './reader';
 import { noteSetAside } from './set-aside';
 import type { Source } from './source';
 
@@ -14,20 +14,23 @@ import type { Source } from './source';
  */
 export const SOURCE: Source = {
   name: 'service',
-  content: createRemoteApi<AbortSignal>({
-    fetch: async (address, init) => {
-      const reply = await fetch(address, { headers: init.headers, signal: init.signal, credentials: 'omit' });
-      return { status: reply.status, text: async () => reply.text() };
-    },
-    abortable: () => new AbortController(),
-    after: (delay, then) => {
-      const timer = setTimeout(then, delay);
-      return () => {
-        clearTimeout(timer);
-      };
-    },
-    setAside: noteSetAside,
-    token: () => READER.token(),
-  }),
+  content: forgettingDeadTokens(
+    createRemoteApi<AbortSignal>({
+      fetch: async (address, init) => {
+        const reply = await fetch(address, { headers: init.headers, signal: init.signal, credentials: 'omit' });
+        return { status: reply.status, text: async () => reply.text() };
+      },
+      abortable: () => new AbortController(),
+      after: (delay, then) => {
+        const timer = setTimeout(then, delay);
+        return () => {
+          clearTimeout(timer);
+        };
+      },
+      setAside: noteSetAside,
+      token: () => READER.token(),
+    }),
+    READER,
+  ),
   corpusPicture: () => null,
 };

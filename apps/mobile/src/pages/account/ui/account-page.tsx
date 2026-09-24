@@ -66,13 +66,22 @@ function OpenRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: () 
   );
 }
 
-/** A row that does something here rather than opening a screen, and so carries no mark that one opens. */
+/**
+ * A row that does something here rather than opening a screen.
+ *
+ * It carries no mark, a mark on this card meaning a screen opens, and it would be indistinguishable from the rows
+ * that answer nothing — the newsroom's address sits two groups below in the same type, on the same card — so the
+ * words are set in the colour the paper gives the things one may press. That is the whole of what tells a reader it
+ * is a control: a row that looks inert and is not is the same broken promise as a button that leads nowhere.
+ */
 function ActionRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: () => void }>): ReactNode {
   const styles = useStyles();
   return (
     <Pressable style={styles.row} onPress={onPress} role="button">
       <Box style={styles.words}>
-        <Text variant="body">{label}</Text>
+        <Text variant="body" tone="link">
+          {label}
+        </Text>
       </Box>
     </Pressable>
   );
@@ -93,7 +102,10 @@ function Subscription(): ReactNode {
   return (
     <Group label={t('account.subscription')}>
       {connection === 'in' ? (
-        <ActionRow label={t('signIn.out')} onPress={signOut} />
+        <>
+          <InfoRow line={t('signIn.done')} hint={t('signIn.done.hint')} />
+          <ActionRow label={t('signIn.out')} onPress={signOut} />
+        </>
       ) : (
         <OpenRow
           label={t('signIn.title')}

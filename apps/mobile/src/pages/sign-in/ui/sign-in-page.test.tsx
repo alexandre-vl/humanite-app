@@ -12,7 +12,7 @@ jest.mock('expo-router', () => ({ __esModule: true, router: { back: jest.fn() } 
 beforeEach(() => {
   jest.restoreAllMocks();
   jest.mocked(router.back).mockClear();
-  useConnection.setState({ connection: 'out', refusal: null });
+  useConnection.setState({ connection: 'out' });
 });
 
 describe('SignInPage', () => {

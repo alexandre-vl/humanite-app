@@ -58,12 +58,25 @@ export type ContentApi = Readonly<{
  * - `not-found` — the source has no such piece, and asking again will not give it one;
  * - `refused` — the source will not serve this reader what was asked, and asking again as the same reader changes
  *   nothing;
+ * - `expired` — the source refused a reading carried under a connection it no longer honours: the reader was signed
+ *   in, is not any more, and asking again changes nothing until they sign in again. It is told apart from `refused`
+ *   because the two are opposite situations wearing the same status — one reader is being told the thing is not
+ *   theirs, the other that it is theirs and the app forgot how to prove it, and only the second is mended by the
+ *   reader doing something;
  * - `offline` — the request never reached the source;
  * - `timeout` — the source did not answer within the time a read is given;
  * - `unavailable` — the source answered that it cannot serve now, or its answer was cut off on the way;
  * - `malformed` — the source answered something no reading can make an answer of.
  */
-export const CONTENT_ERROR_CODE = z.enum(['not-found', 'refused', 'offline', 'timeout', 'unavailable', 'malformed']);
+export const CONTENT_ERROR_CODE = z.enum([
+  'not-found',
+  'refused',
+  'expired',
+  'offline',
+  'timeout',
+  'unavailable',
+  'malformed',
+]);
 export type ContentErrorCode = z.infer<typeof CONTENT_ERROR_CODE>;
 
 /** An error the content api raises, tagged with a code the caller can branch on. */
