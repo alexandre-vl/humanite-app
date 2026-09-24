@@ -35,8 +35,8 @@ describe('SOURCE, variante de service', () => {
     if (picture.kind !== 'corpus') {
       throw new Error('la clé ne se lit pas comme une image du corpus : le test ne vérifierait rien');
     }
-    expect(CORPUS.corpusPicture(picture.key, 320)).not.toBeNull();
-    expect(SOURCE.corpusPicture(picture.key, 320)).toBeNull();
+    expect(CORPUS.corpusPicture(picture.key, 480)).not.toBeNull();
+    expect(SOURCE.corpusPicture(picture.key, 480)).toBeNull();
     expect(SOURCE.name).toBe('service');
   });
   /**

@@ -2,9 +2,11 @@ import type { ArticleId, ArticleSummary } from '@huma/contracts';
 import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { pictureOf } from '#api';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { List } from '#primitives/list';
+import { prefetchPicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
 import { prefetchArticle } from '../api/queries';
 import { signatureOf } from '../model/byline';
@@ -75,6 +77,7 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, emp
         }}
         onPressIn={() => {
           prefetchArticle(cache, row.summary.id);
+          prefetchPicture(pictureOf(row.summary, 'lead')?.source ?? null);
         }}
       >
         <ArticleCard

@@ -22,7 +22,7 @@ describe('t', () => {
    */
   it('refuse à la compilation un trou vide, un trou en trop, et un nom mal écrit', () => {
     // @ts-expect-error une clé à trous n’est pas appelable sans ses valeurs
-    expect(t('search.for')).toBeTruthy();
+    expect(t('search.none.title')).toBeTruthy();
     // @ts-expect-error une clé sans trou n’accepte aucune valeur
     expect(t('nav.search', { count: 1 })).toBeTruthy();
     // @ts-expect-error le nom d’un trou est celui que le français écrit, et « subject » n’y est pas

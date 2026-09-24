@@ -10,7 +10,7 @@ import type {
   SectionId,
 } from '@huma/contracts';
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
-import { infiniteQueryOptions, keepPreviousData, queryOptions } from '@tanstack/react-query';
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
 
 /** The root every article key starts with: one entity, one namespace in the cache the app persists. */
@@ -59,7 +59,6 @@ const paged = (
   queryKey: readonly string[],
   read: (query: PageQuery) => Promise<Page<ArticleSummary>>,
   enabled = true,
-  keepsPrevious = false,
 ) =>
   infiniteQueryOptions({
     queryKey,
@@ -67,7 +66,6 @@ const paged = (
     initialPageParam: FIRST,
     getNextPageParam: (page) => page.nextCursor,
     enabled,
-    ...(keepsPrevious ? { placeholderData: keepPreviousData } : {}),
   });
 
 /**
@@ -110,11 +108,6 @@ export const searchQuery = (question: Question | null): PagedFeed =>
           const asked: SearchQuery = { ...query, text: question };
           return content.search(asked);
         },
-        true,
-        // Each question is its own key, so a new one arrives with nothing under it and the screen used to go from an
-        // answer to nine grey bars on every settled keystroke — for the second and a half the journal's search takes
-        // (mesuré le 24/09/2026 : 1 552 à 1 923 ms, et jamais servie d'un cache, une question n'étant jamais deux
-        // fois la même). The answer already on screen stays until the next one is there to take its place.
         true,
       );
 

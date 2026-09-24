@@ -2,8 +2,10 @@ import type { ArticleId } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { pictureOf } from '#api';
 import { createStyles } from '#lib/styles';
 import { List } from '#primitives/list';
+import { prefetchPicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
 import { prefetchArticle } from '../api/queries';
 import type { ReadFeed } from '../model/paged-feed';
@@ -58,6 +60,7 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
             onPress={open(row.summary.id)}
             onPressIn={() => {
               prefetchArticle(cache, row.summary.id);
+              prefetchPicture(pictureOf(row.summary, 'lead')?.source ?? null);
             }}
           >
             <WireRow summary={row.summary} />

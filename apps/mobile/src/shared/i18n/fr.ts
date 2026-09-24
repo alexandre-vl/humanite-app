@@ -67,13 +67,8 @@ export const FR = {
   'search.clear': 'Effacer la recherche',
   'search.rest.title': 'Cherchez dans le journal',
   'search.rest.message': 'Un mot, un nom ou un lieu.',
-  'search.for': 'Résultats pour «\u00A0{query}\u00A0»',
   // Ce que l'app trouve elle-même pendant que le journal cherche : des articles déjà chargés, donc vrais, mais une
   // réponse plus petite que celle qui arrive. Le titre le dit, pour qu'on ne la prenne pas pour l'autre.
-  'search.read': 'Déjà lu, sur «\u00A0{query}\u00A0»',
-  'search.asking': 'Le journal cherche…',
-  'search.waiting.title': 'Le journal cherche «\u00A0{query}\u00A0»',
-  'search.waiting.message': 'Sa recherche demande une seconde ou deux.',
   'search.none.title': 'Aucun résultat pour «\u00A0{query}\u00A0»',
   'search.none.message': 'Essayez un autre mot, ou un sujet plus large.',
   'settings.title': 'Préférences d’affichage',

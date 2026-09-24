@@ -45,20 +45,6 @@ export const atWidth = (address: string, width: number): string =>
     ? address.replace(WIDTH, (whole, lead: string) => `${lead}w=${String(width)}`)
     : `${address}${address.includes('?') ? '&' : '?'}w=${String(width)}`;
 
-/**
- * The same picture of the journal, cut square by the journal's own server at the side asked for — its width, its
- * height and `crop=1`, the three the server was seen answering for the portraits of a debate.
- *
- * A picture of the journal is wider than it is tall. Asked for by its width alone and laid in a square, it is scaled
- * up until its height fills the square: a thumbnail of 320 pixels asked that way is a picture 213 pixels tall drawn
- * half as large again, on every row of a list. Cut by the server at the square's own size, it is as sharp as its place.
- */
-export const atSquare = (address: string, side: number): string => {
-  const [place = address, query = ''] = address.split('?');
-  const kept = query.split('&').filter((pair) => pair !== '' && !/^(?:w|h|crop)=/u.test(pair));
-  return `${place}?${[...kept, `w=${String(side)}`, `h=${String(side)}`, 'crop=1'].join('&')}`;
-};
-
 /** The name of one thing a way of asking for a picture can get wrong. */
 export type PictureCode = 'picture/width-ignored' | 'picture/address-changed' | 'picture/query-lost';
 

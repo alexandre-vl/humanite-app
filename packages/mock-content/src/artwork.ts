@@ -11,8 +11,13 @@ import type { SectionCode } from '@huma/design-tokens';
  * against — and 1 600, which the head of an article asked for while the card of the same article asked 1 080. The
  * second was worse than weight: the two are the same box on the same screen, so the reader downloaded one picture
  * twice and watched the second arrive.
+ *
+ * The thumbnail is 480 and was 320. A picture is drawn wide and cropped by the box it is laid in, and 320 across is
+ * 180 tall against a thumbnail box 264 pixels high on a phone at 2.75×: every row of every list drew it half as large
+ * again. It is also what the head of an article paints while its own width is coming, which it can only be if it is
+ * the same picture cut the same way.
  */
-export const VISUAL_WIDTHS = [320, 1080] as const;
+export const VISUAL_WIDTHS = [480, 1080] as const;
 
 /** The shape every visual is drawn in, wide enough that a card may crop it to any of the boxes the app lays out. */
 const WIDTH = 1600;

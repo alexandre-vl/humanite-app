@@ -44,6 +44,7 @@ export function ArticleFigure({ visual, frame, recyclingKey, caption, credit }: 
         recyclingKey={recyclingKey}
         announces={DECORATIVE}
         thumbhash={visual.thumbhash}
+        standingIn={visual.standingIn}
         style={styles[frame]}
       />
       {caption === undefined && credit === undefined ? null : (

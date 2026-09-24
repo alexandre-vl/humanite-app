@@ -106,7 +106,7 @@ describe('SearchPage', () => {
     await settle();
   });
 
-  it('sert les articles qu’une question atteint, sous la question qu’ils répondent', async () => {
+  it('sert les articles qu’une question atteint, et rien au-dessus d’eux', async () => {
     const found = await content.search({ text: QUESTION.parse('jeunes') });
     const [first] = found.items;
     if (first === undefined) {
@@ -115,7 +115,28 @@ describe('SearchPage', () => {
     await renderPage();
     await type('jeunes');
     expect(await screen.findByText(first.title)).toBeTruthy();
-    expect(screen.getByText('Résultats pour «\u00A0jeunes\u00A0»')).toBeTruthy();
+    // Three headings named three kinds of answer on this screen, and a reader had to read them before the paper.
+    // The rule under the field says the one thing there is to say, and says it without words.
+    expect(screen.queryByText(/Résultats pour|Déjà lu/u)).toBeNull();
+    await settle();
+  });
+
+  /**
+   * A feed that kept its previous answer while the next was fetched put one question's articles under another's
+   * question, for the second and a half the journal's search takes. What a reader sees answers what the field holds,
+   * or nothing at all.
+   */
+  it('ne laisse pas la réponse d’une question que le lecteur a déjà remplacée', async () => {
+    const found = await content.search({ text: QUESTION.parse('jeunes') });
+    const [first] = found.items;
+    if (first === undefined) {
+      throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
+    }
+    await renderPage();
+    await type('jeunes');
+    expect(await screen.findByText(first.title)).toBeTruthy();
+    await type('zzzz');
+    expect(screen.queryByText(first.title)).toBeNull();
     await settle();
   });
 

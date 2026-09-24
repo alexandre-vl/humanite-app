@@ -1,4 +1,4 @@
-import { atSquare, atWidth } from '@huma/contracts';
+import { atWidth } from '@huma/contracts';
 import type { ArticleSummary, Picture } from '@huma/contracts';
 import type { AssetWidth } from '@huma/mock-content/assets';
 import { SOURCE } from './source';
@@ -16,16 +16,31 @@ import { SOURCE } from './source';
  * nothing but a test can hold the two against each other. A width written for no place is bundle a cold start pays
  * for and no screen can ever spend — what the last one weighed is written beside the corpus's widths.
  *
- * Two places that lay out the same box ask for the same width, and that is a rule and not a coincidence. A picture is
- * cached by the address it was asked for, so a card and a head that fill the same screen at 1 080 and 1 600 are two
- * downloads of one picture: measured on the journal's server on 24/09/2026, 119 138 octets then 163 406 more, the
- * second of them arriving after the reader had already seen the first on the card they touched. The head now paints
- * from the disk the moment it opens.
+ * There are two widths and not three, and that is the whole design. A picture is held in the cache by the address it
+ * was asked for, so every width added is one more download of the same photograph; two widths mean a reader who has
+ * seen a picture anywhere has it in hand everywhere. A card and a head fill the same box and ask the same address, so
+ * the head paints off the disk. A row's thumbnail is the only other thing drawn, and it is what the head paints while
+ * the full width is still coming.
  */
 const FULL_WIDTH = 1080;
 
+/**
+ * The width a thumbnail is asked at.
+ *
+ * It is wide rather than square, and that costs 9 615 octets a row — 38 174 against 28 559, measured on the journal's
+ * server on 24/09/2026. What it buys is that the thumbnail and the head are the same photograph cut the same way: laid
+ * in the article's three-by-two box, a wide thumbnail shows x ∈ [84, 996] of a picture 1 080 across, and the full
+ * width shows x ∈ [85, 995]. Cut square by the server, it showed x ∈ [236, 844] — a zoom into the middle, which
+ * cannot stand in for the picture it is a crop of without visibly pulling back when the picture lands.
+ *
+ * It is 480 and not 320 because the box is drawn at 96 points, which is 264 pixels on a phone at 2.75× and more on a
+ * denser one. A wide picture asked at 320 is 180 tall and would be drawn half as large again in that box; asked at
+ * 480 it is 270 tall, which fills it at 0.98 and is the reason the square crop existed in the first place.
+ */
+const THUMBNAIL_WIDTH = 480;
+
 export const PLACE_WIDTHS = {
-  thumbnail: 320,
+  thumbnail: THUMBNAIL_WIDTH,
   card: FULL_WIDTH,
   lead: FULL_WIDTH,
 } as const satisfies Readonly<Record<string, AssetWidth>>;
@@ -34,28 +49,36 @@ export const PLACE_WIDTHS = {
 type PicturePlace = keyof typeof PLACE_WIDTHS;
 
 /**
- * Which places are square, and so have a picture of the journal cut square by its server rather than scaled up to fill
- * them. A picture of the corpus is a file of the bundle, drawn at its width and cut by the view.
+ * A picture ready for a native view: the module the bundler resolved or the address the phone asks for, the hash
+ * painted until it arrives for a picture of the corpus, and — for the head of an article — the smaller copy of itself
+ * to paint meanwhile.
+ *
+ * A picture of the journal has no hash to paint: the service sends none. What it has instead is the thumbnail, which
+ * the reader has already been shown and the phone therefore already holds.
  */
-const SQUARE = { thumbnail: true, card: false, lead: false } as const satisfies Readonly<Record<PicturePlace, boolean>>;
-
-/**
- * A picture ready for a native view: the module the bundler resolved or the address the phone asks for, and — for a
- * picture of the corpus — the hash painted until it arrives. A picture of the journal has no hash to paint: the
- * service sends none, and the box keeps its ground colour until the picture lands.
- */
-export type Visual = Readonly<{ source: number | Readonly<{ uri: string }>; thumbhash?: string }>;
+export type Visual = Readonly<{
+  source: number | Readonly<{ uri: string }>;
+  thumbhash?: string;
+  standingIn?: Readonly<{ uri: string }>;
+}>;
 
 /**
  * A picture for the place it fills. A key of the corpus is drawn by the source the build bundled, which gives `null`
  * for a key that names nothing — and for every key, in a build that reads the service and carries no corpus — rather
  * than a broken view. A picture of the journal is always an address, which its schema has already held to the
  * journal's own server; it is asked for at the width of the place it fills and not at the one the service listed.
+ *
+ * The head of an article is handed the thumbnail's address as well as its own. A reader reaches an article by touching
+ * a card, the card drew one of those two addresses, and whichever it drew is on the phone: the head paints it at once
+ * and sharpens when the full width lands. Measured on this phone on 24/09/2026, that wait was a grey box for at least
+ * 533 ms — tap at 1,20 s, picture at 1,90 s — on every article opened from a list.
+ *
+ * A picture of the corpus needs none of it: it is a file of the bundle, already on the phone, and it carries a hash.
  */
 export const visualOf = (picture: Picture, place: PicturePlace): Visual | null => {
   if (picture.kind === 'journal') {
-    const width = PLACE_WIDTHS[place];
-    return { source: { uri: SQUARE[place] ? atSquare(picture.url, width) : atWidth(picture.url, width) } };
+    const source = { uri: atWidth(picture.url, PLACE_WIDTHS[place]) };
+    return place === 'lead' ? { source, standingIn: { uri: atWidth(picture.url, THUMBNAIL_WIDTH) } } : { source };
   }
   const drawn = SOURCE.corpusPicture(picture.key, PLACE_WIDTHS[place]);
   return drawn === null ? null : { source: drawn.module, thumbhash: drawn.thumbhash };
