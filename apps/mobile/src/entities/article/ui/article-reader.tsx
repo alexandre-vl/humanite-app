@@ -44,7 +44,12 @@ export type ArticleReaderProps = Readonly<{
   onSignIn: (() => void) | null;
 }>;
 
-type ReadingProps = Readonly<{ article: Article; onFollow: (url: string) => void; onSignIn: (() => void) | null }>;
+/** What is drawn under the head: the article when it is here, and nothing — a ghost of its prose — while it is not. */
+type UnderProps = Readonly<{
+  article: Article | null;
+  onFollow: (url: string) => void;
+  onSignIn: (() => void) | null;
+}>;
 
 type PageProps = Readonly<{
   summary: ArticleSummary;
@@ -126,19 +131,33 @@ function Page({ summary, onFollow, children }: PageProps): ReactNode {
   );
 }
 
-function Reading({ article, onFollow, onSignIn }: ReadingProps): ReactNode {
+/**
+ * What goes under the head: a ghost of the prose while the article is on its way, the prose itself when it lands, and
+ * the wall where the body is kept back.
+ *
+ * It is a branch inside the page rather than a page of its own, and that is the whole point. Drawn as two pages — one
+ * for the wait, one for the reading — React saw two different things in the same place and took the first down to put
+ * the second up, picture included: measured on the phone on 24/09/2026, the head's photograph left the screen for one
+ * frame, 400 ms after the page had settled, and came back identical. One page whose children change keeps the view
+ * that holds the picture, and the reader sees the body arrive under a head that never moved.
+ */
+function Under({ article, onFollow, onSignIn }: UnderProps): ReactNode {
   const styles = useStyles();
-  return (
-    <Page summary={article} onFollow={onFollow}>
-      {article.body.kind === 'open' ? (
-        <>
-          <Box style={styles.rule} />
-          <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} />
-        </>
-      ) : (
-        <Wall onSignIn={onSignIn} />
-      )}
-    </Page>
+  if (article === null) {
+    return (
+      <>
+        <Box style={styles.rule} />
+        <ProseStandIn />
+      </>
+    );
+  }
+  return article.body.kind === 'open' ? (
+    <>
+      <Box style={styles.rule} />
+      <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} />
+    </>
+  ) : (
+    <Wall onSignIn={onSignIn} />
   );
 }
 
@@ -163,23 +182,25 @@ export function ArticleReader({ id, known, onFollow, onSignIn }: ArticleReaderPr
     // The article is on its way and the app already knew its head: the page opens on the real thing, and only what
     // is under the hairline is a ghost. A failure is not drawn this way — a head over a stand-in would say the rest
     // is coming, and it is not.
-    if (state.kind === 'pending' && known !== null) {
+    if (state.kind !== 'pending' || known === null) {
       return (
-        <Page summary={known} onFollow={onFollow}>
-          <Box style={styles.rule} />
-          <ProseStandIn />
-        </Page>
+        <FeedStandIn
+          state={state}
+          onRetry={() => {
+            void refetch();
+          }}
+          awaited={<ArticleStandIn />}
+        />
       );
     }
-    return (
-      <FeedStandIn
-        state={state}
-        onRetry={() => {
-          void refetch();
-        }}
-        awaited={<ArticleStandIn />}
-      />
-    );
   }
-  return <Reading article={article} onFollow={onFollow} onSignIn={onSignIn} />;
+  // One page, whichever of the two the app is holding. The head is the same either way — a summary carries the
+  // title, the standfirst and the picture, and the article adds nothing to them — so the page a reader opens is the
+  // page they keep, and nothing in it is built a second time when the body arrives.
+  const head = article ?? known;
+  return head === null ? null : (
+    <Page summary={head} onFollow={onFollow}>
+      <Under article={article ?? null} onFollow={onFollow} onSignIn={onSignIn} />
+    </Page>
+  );
 }

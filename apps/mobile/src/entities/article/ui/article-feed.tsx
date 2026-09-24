@@ -77,7 +77,9 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, emp
         }}
         onPressIn={() => {
           prefetchArticle(cache, row.summary.id);
-          prefetchPicture(pictureOf(row.summary, 'lead')?.source ?? null);
+          const head = pictureOf(row.summary, 'lead');
+          prefetchPicture(head?.standingIn ?? null);
+          prefetchPicture(head?.source ?? null);
         }}
       >
         <ArticleCard

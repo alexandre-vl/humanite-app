@@ -98,7 +98,10 @@ export function ArticleLead({ article, byline, onFollow }: ArticleLeadProps): Re
           }
         />
       ) : null}
-      {/* An article whose body opens on the words a list stood in for its missing standfirst has none of its own. */}
+      {/* The standfirst and never the excerpt. An article filed without a standfirst opens its body on the words a
+          card printed in its place, and printing them here too would say them twice — but the reason they are not
+          printed here is that they must not appear and then leave: this head is drawn first from what a list knew and
+          again from the article itself, and it has to be the same head both times. */}
       {article.standfirst === undefined ? null : (
         <Box style={styles.standfirst}>
           <Text variant="standfirst">{article.standfirst}</Text>

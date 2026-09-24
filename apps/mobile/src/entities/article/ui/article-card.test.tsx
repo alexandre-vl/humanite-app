@@ -104,6 +104,20 @@ describe('ArticleCard', () => {
   });
 
   /**
+   * A column is filed with no standfirst two times in three, and the service sends the opening of its body beside it.
+   * A card prints that instead, having no body under it to say the same words again — which is the whole reason the
+   * two are separate fields: the head of an article prints the standfirst alone, so it cannot lose a sentence when
+   * the article lands on top of what a list knew.
+   */
+  it.each(WITH_SUMMARY)('donne à %s le début du corps quand le journal n’a déposé aucun standfirst', async (shape) => {
+    const summary = illustrated(await everything());
+    const opening = asDisplayText('Ce que le journal met quand une colonne est déposée sans standfirst.');
+    const filedWithout = { ...summary, standfirst: undefined, excerpt: opening };
+    await render(<ArticleCard shape={shape} summary={filedWithout} />);
+    expect(screen.getByText(opening)).toBeTruthy();
+  });
+
+  /**
    * A line is the shape three cards in four take, and a column's standfirst is, two times in three, the opening of its
    * body cut at a « … » by the service: neither carries one, and nor does any card but the one a page opens on.
    */

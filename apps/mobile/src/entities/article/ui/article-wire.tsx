@@ -60,7 +60,9 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
             onPress={open(row.summary.id)}
             onPressIn={() => {
               prefetchArticle(cache, row.summary.id);
-              prefetchPicture(pictureOf(row.summary, 'lead')?.source ?? null);
+              const head = pictureOf(row.summary, 'lead');
+              prefetchPicture(head?.standingIn ?? null);
+              prefetchPicture(head?.source ?? null);
             }}
           >
             <WireRow summary={row.summary} />

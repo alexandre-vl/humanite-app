@@ -122,12 +122,14 @@ const filmOf = (post: RemotePost): Readonly<{ url: string }> | undefined => {
  * An item of the service as the contracts' schema is handed it. Every field of text is read as the line it is, the
  * date as the instant it names, and the flags as the words the domain uses for them.
  *
- * The standfirst is the journal's `chapo`, which it sets in `description`; its excerpt is the opening of the body, and
- * stands in only where the standfirst is empty — a signed column is often filed with an empty one. Of 519 items, none
- * came with both empty, and one that does is an item with no standfirst rather than one with an empty one.
+ * The standfirst is the journal's `chapo`, which it sets in `description`; its excerpt is the opening of the body.
+ * Each is read into the field of its own name and neither stands in for the other: which of the two a screen may
+ * print is the screen's to decide, and a card and the head of an article do not decide it the same way. Of 519 items,
+ * none came with both empty, and one that does is an item with neither rather than one with an empty one.
  */
 const inputOf = (post: RemotePost, publishedAt: Instant): SummaryInput => {
-  const standfirst = [readPlain(post.description), readPlain(post.excerpt)].find((text) => text !== '');
+  const standfirst = readPlain(post.description);
+  const excerpt = readPlain(post.excerpt);
   const byline = readPlain(post.author ?? '');
   const hero = heroOf(post);
   const film = filmOf(post);
@@ -136,7 +138,8 @@ const inputOf = (post: RemotePost, publishedAt: Instant): SummaryInput => {
     format: FORMATS[post.article_format ?? 'classic'],
     access: post.premium ? 'premium' : 'free',
     title: readPlain(post.title),
-    ...(standfirst === undefined ? {} : ({ standfirst } satisfies Partial<SummaryInput>)),
+    ...(standfirst === '' ? {} : ({ standfirst } satisfies Partial<SummaryInput>)),
+    ...(excerpt === '' ? {} : ({ excerpt } satisfies Partial<SummaryInput>)),
     publishedAt,
     ...(byline === '' ? {} : ({ byline } satisfies Partial<SummaryInput>)),
     ...(hero === undefined ? {} : ({ hero } satisfies Partial<SummaryInput>)),
@@ -285,10 +288,7 @@ export const readArticle = (answer: unknown): Read<Article> => {
   if (!body.success) {
     return { refused: saysOf(body.error) };
   }
-  // An item filed with no standfirst of its own stands in the opening of its body — a column, nearly always. Beside a
-  // body the reader was given, that is the same words twice, the second time whole: it is the body's to say them.
-  const opens = readPlain(wire.data.description) === '' ? { ...summary.item, standfirst: undefined } : summary.item;
-  return withBody(opens, { kind: 'open', blocks: readProse(body.data.content_array.join('')) });
+  return withBody(summary.item, { kind: 'open', blocks: readProse(body.data.content_array.join('')) });
 };
 
 /** The name of one thing a reading of a list can get wrong. */

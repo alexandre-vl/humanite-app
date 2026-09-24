@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import type { Article, Block } from '@huma/contracts';
-import { ARTICLE, blocksOf, ContentApiError } from '@huma/contracts';
+import { ARTICLE, ARTICLE_SUMMARY, blocksOf, ContentApiError } from '@huma/contracts';
 import { isList, isRecord } from '@huma/unknown';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
@@ -296,5 +296,30 @@ describe('ArticleReader', () => {
     await read(video);
     expect(await screen.findByText(video.title)).toBeTruthy();
     expect(screen.queryByText(t('article.film'))).toBeNull();
+  });
+  /**
+   * The head is drawn twice — from what the list knew, then from the article — and the reader sees one head. So the
+   * head prints the standfirst and never the opening of the body a card prints in its place: two columns in three are
+   * filed with no standfirst, and on those the head used to lose nine lines the moment the article landed, taking the
+   * picture and everything under it up with them.
+   */
+  it('ne met jamais le début du corps dans la tête, ni avant ni après l’arrivée de l’article', async () => {
+    const article = await holding('paragraph');
+    const opening = 'Ce que la liste avait mis à la place du standfirst manquant.';
+    const known = ARTICLE_SUMMARY.parse({ ...article, standfirst: undefined, excerpt: opening });
+    let donne: (whole: Article) => void = () => undefined;
+    jest.spyOn(content, 'getArticle').mockReturnValue(
+      new Promise<Article>((resolve) => {
+        donne = resolve;
+      }),
+    );
+    await renderWithCache(<ArticleReader id={article.id} known={known} onFollow={() => undefined} onSignIn={null} />);
+    await settle();
+    expect(await screen.findByText(article.title)).toBeTruthy();
+    expect(screen.queryByText(opening)).toBeNull();
+    donne(ARTICLE.parse({ ...article, standfirst: undefined, excerpt: opening }));
+    await settle();
+    expect(screen.queryByText(opening)).toBeNull();
+    expect(await screen.findByText(article.title)).toBeTruthy();
   });
 });

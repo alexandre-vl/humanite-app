@@ -55,8 +55,19 @@ export const FILM = z.object({
  * item, and it was set on none of 514.
  *
  * `byline` is who signed the piece, written out as the journal writes it — one name, or `La rédaction` — with nobody
- * behind it to look up. `standfirst` is absent from an item filed without one, and from an article whose body opens on
- * the words that stood in for it.
+ * behind it to look up.
+ *
+ * `standfirst` and `excerpt` are two things and were one. The standfirst is the sentence the journal wrote to stand
+ * under the headline, and it is absent from an item filed without one — two columns in three. The excerpt is the
+ * opening of the body, which the service sends beside it and which a card may print where there is no standfirst,
+ * a card having no body under it to repeat.
+ *
+ * They were one field holding whichever of the two the service had sent, and that cost a reader the head of the
+ * article they were opening. A list sends both; an article sends the standfirst alone, its body carrying the rest. So
+ * an article filed without a standfirst arrived with its head one sentence shorter than the head already on screen —
+ * measured on the journal's service on 24/09/2026, 8 items of 33, and 6 of the 10 answers to a search — and the page
+ * a reader was reading lost nine lines and everything under them jumped up. Kept apart, the head prints the standfirst
+ * and only ever the standfirst, so what opens is what stays.
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
@@ -64,6 +75,7 @@ export const ARTICLE_SUMMARY = z.object({
   access: ACCESS,
   title: DISPLAY_TEXT,
   standfirst: DISPLAY_TEXT.optional(),
+  excerpt: DISPLAY_TEXT.optional(),
   byline: DISPLAY_TEXT.optional(),
   publishedAt: INSTANT,
   hero: HERO.optional(),

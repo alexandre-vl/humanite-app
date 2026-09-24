@@ -292,19 +292,22 @@ test.each([
 });
 
 /**
- * An item filed with no standfirst stands in the opening of its body. Beside the body the reader was given, that is the
- * same words twice, and the article carries none; kept back, the opening is all the reader has, and it stays.
+ * The head of an article is drawn twice — once from what a list knew, once from the article itself — and a reader
+ * sees one head, so the two must be the same. An article filed with no standfirst of its own is where that broke: the
+ * list stood the opening of the body in its place and the article did not, so the head lost a sentence under the
+ * reader's eyes and everything below it jumped up. The two fields are kept apart so that neither reading can invent a
+ * standfirst the other does not have — whether the body comes or is kept back.
  */
-test('an open article carries no standfirst its body already opens on, and a withheld one keeps it', () => {
-  const excerpted = { ...RECORDED.articles.opinion.answer, description: '' };
-  const open = readArticle(excerpted);
+test('un article sans standfirst n’en porte pas, corps donné ou retenu, et garde le début du corps à part', () => {
+  const filedWithout = { ...RECORDED.articles.opinion.answer, description: '' };
+  const open = readArticle(filedWithout);
   const withheld = readArticle({ ...BODILESS, description: '', right: false });
   if (!('item' in open) || !('item' in withheld)) {
     throw new Error('l’article enregistré n’a pas été lu');
   }
   expect(open.item.standfirst).toBeUndefined();
-  expect(withheld.item.standfirst).toBe(readPlain(RECORDED.articles.opinion.answer.excerpt));
-  expect(withheld.item.standfirst).toBeDefined();
+  expect(withheld.item.standfirst).toBeUndefined();
+  expect(open.item.excerpt).toBe(readPlain(RECORDED.articles.opinion.answer.excerpt));
 });
 
 /** A speaker of a debate is introduced in one line — the name in bold, then what she does — as the journal writes it. */

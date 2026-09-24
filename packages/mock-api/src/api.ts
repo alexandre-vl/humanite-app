@@ -90,12 +90,13 @@ const fold = (text: string): string => text.toLowerCase().split('œ').join('oe')
 type Indexed = Readonly<{ summary: ArticleSummary; searchable: string }>;
 
 /**
- * What search looks through: the title and the standfirst of every article, and nothing of the body. The body is not
- * in a summary at all, so searching it would mean holding the whole corpus a second time.
+ * What search looks through: the title of every article and what is printed under it — the journal's standfirst, or
+ * the opening of the body where it filed none — and nothing more of the body. The body is not in a summary at all, so
+ * searching it would mean holding the whole corpus a second time.
  */
 const INDEXED: readonly Indexed[] = CHRONOLOGICAL.map((summary) => ({
   summary,
-  searchable: fold([summary.title, summary.standfirst].filter((part) => part !== undefined).join(' ')),
+  searchable: fold([summary.title, summary.standfirst, summary.excerpt].filter((part) => part !== undefined).join(' ')),
 }));
 
 /** The page of `items` a cursor opens — an offset, minted here and nowhere else — `size` items long. */

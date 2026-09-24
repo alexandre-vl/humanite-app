@@ -159,10 +159,14 @@ function Words({
   standfirst,
 }: Readonly<{ summary: ArticleSummary; size: TitleSize; standfirst: boolean }>): ReactNode {
   const styles = useStyles();
+  const sentence = summary.standfirst ?? summary.excerpt;
   return (
     <Box style={styles.words}>
       <Text variant={size}>{summary.title}</Text>
-      {standfirst && summary.standfirst !== undefined ? <Text variant="summary">{summary.standfirst}</Text> : null}
+      {/* The standfirst where the journal filed one, and otherwise the opening of the body, which is what it files
+          instead on two columns in three. A card may print either: it has no body under it to say them again. The
+          head of an article may not, and prints only the standfirst — which is why the two are separate fields. */}
+      {standfirst && sentence !== undefined ? <Text variant="summary">{sentence}</Text> : null}
     </Box>
   );
 }

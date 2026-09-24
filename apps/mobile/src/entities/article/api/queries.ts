@@ -173,10 +173,15 @@ export const prefetchArticle = (cache: QueryClient, id: ArticleId): void => {
 
 /**
  * The words of a summary a question could be looking for, folded so that a question written without its accents and
- * in any case still finds them: the title, and what is printed under it when there is any.
+ * in any case still finds them: the title, and what is printed under it when there is any — the journal's standfirst
+ * or, where it filed none, the opening of the body a card prints instead. Both, because a reader searching for words
+ * they have read on a card must find that card, whichever of the two it was drawing.
  */
 const wordsOf = (summary: ArticleSummary): string =>
-  `${summary.title} ${summary.standfirst ?? ''}`.normalize('NFD').replace(DIACRITICS, '').toLowerCase();
+  `${summary.title} ${summary.standfirst ?? ''} ${summary.excerpt ?? ''}`
+    .normalize('NFD')
+    .replace(DIACRITICS, '')
+    .toLowerCase();
 
 /** Everything the combining marks of a decomposed string are, so `ecologie` reaches « écologie ». */
 const DIACRITICS = /\p{Diacritic}/gu;
