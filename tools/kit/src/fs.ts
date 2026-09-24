@@ -6,9 +6,16 @@ import { errnoCode } from './errors.ts';
 
 export type TemporaryDirectory = AsyncDisposable & Readonly<{ path: string }>;
 
-/** An empty directory under the OS temporary directory, removed with its content on `await using` disposal. */
+/**
+ * An empty directory under the OS temporary directory, removed with its content on `await using` disposal.
+ *
+ * The path is the one `realpath` gives, not the one `mkdtemp` returns: on macOS `tmpdir()` sits under `/var`, a
+ * symlink to `/private/var`, so an unresolved temporary root and a file resolved beneath it disagree on their common
+ * ancestor. A repo-relative path taken between the two then escapes with `..`, which `repoPath` rejects — every proof
+ * that judges a filled temporary workspace crashed here on macOS, and nowhere else.
+ */
 export async function temporaryDirectory(prefix: string): Promise<TemporaryDirectory> {
-  const path = await mkdtemp(join(tmpdir(), `${prefix}-`));
+  const path = await realpath(await mkdtemp(join(tmpdir(), `${prefix}-`)));
   return {
     path,
     [Symbol.asyncDispose]: async () => {

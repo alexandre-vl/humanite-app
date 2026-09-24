@@ -15,9 +15,16 @@ export const testTimeoutMs = (fixtures: readonly Fixture<string, string>[]): num
 /**
  * Runs each fixture of `fixtures` as its own test, named by its id: it must report exactly the codes it expects. Each
  * one brings the budget and the concurrency it declares, so a list never repeats what its fixtures already say.
+ *
+ * `skipIf` skips the whole group — for a bench that only means something on a platform the run is not on, so it is
+ * reported skipped rather than failed. The judging it skips still runs where that platform is, on the server.
  */
-export function testFixtures(title: string, fixtures: readonly Fixture<string, string>[]): void {
-  describe(title, () => {
+export function testFixtures(
+  title: string,
+  fixtures: readonly Fixture<string, string>[],
+  options: Readonly<{ skipIf?: boolean }> = {},
+): void {
+  describe.skipIf(options.skipIf ?? false)(title, () => {
     for (const fixture of fixtures) {
       // Vitest runs consecutive tests of the same concurrency together, so a serial fixture ends the group before it.
       const one = fixture.concurrency === 'serial' ? test : test.concurrent;

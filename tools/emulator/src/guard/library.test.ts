@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { writeTree } from '@huma/fixtures';
@@ -8,6 +9,10 @@ import { LIBRARY, records } from '../proofs/root.ts';
 
 /** Every snippet of the library these tests run answers at once. */
 const TIMEOUT_MS = 30_000;
+
+// `proc_records` and `mount_records` read a file's mode the way GNU stat gives it, and the kernel's own filesystems;
+// off Linux (no `/proc`) they read nothing, so those two are skipped here and run on the server (ADR-0010).
+const OFF_LINUX = !existsSync('/proc');
 
 /** Runs `body` in dash after the library, its table moved to `directory/tracked.tsv`; resolves its output. */
 const library = async (directory: string, body: string): Promise<string> =>
@@ -43,29 +48,32 @@ test('sysctl records join lines, turn tabs into spaces, mark what cannot be read
   ]);
 });
 
-test('procfs records key each entry as a /proc path, without the process directories and the namespace views', async () => {
-  await using directory = await temporaryDirectory('emulator-proc');
-  await writeTree(directory.path, {
-    'proc/sysrq-trigger': '',
-    'proc/pressure/memory': '',
-    'proc/1234/status': '',
-    'proc/self/status': '',
-    'proc/sys/kernel/sysrq': '',
-    'proc/net/dev': '',
-    'tracked.tsv': '',
-  });
-  await chmod(join(directory.path, 'proc/sysrq-trigger'), 0o200);
-  await chmod(join(directory.path, 'proc/pressure'), 0o755);
-  await chmod(join(directory.path, 'proc/pressure/memory'), 0o644);
-  const output = await library(directory.path, 'proc_records "$DIRECTORY/proc" | sort');
-  const uid = String(process.getuid?.() ?? 0);
-  const gid = String(process.getgid?.() ?? 0);
-  expect(output.split('\n').filter((line) => line !== '')).toEqual([
-    `procattr\t/proc/pressure\t755 ${uid} ${gid}`,
-    `procattr\t/proc/pressure/memory\t644 ${uid} ${gid}`,
-    `procattr\t/proc/sysrq-trigger\t200 ${uid} ${gid}`,
-  ]);
-});
+test.skipIf(OFF_LINUX)(
+  'procfs records key each entry as a /proc path, without the process directories and the namespace views',
+  async () => {
+    await using directory = await temporaryDirectory('emulator-proc');
+    await writeTree(directory.path, {
+      'proc/sysrq-trigger': '',
+      'proc/pressure/memory': '',
+      'proc/1234/status': '',
+      'proc/self/status': '',
+      'proc/sys/kernel/sysrq': '',
+      'proc/net/dev': '',
+      'tracked.tsv': '',
+    });
+    await chmod(join(directory.path, 'proc/sysrq-trigger'), 0o200);
+    await chmod(join(directory.path, 'proc/pressure'), 0o755);
+    await chmod(join(directory.path, 'proc/pressure/memory'), 0o644);
+    const output = await library(directory.path, 'proc_records "$DIRECTORY/proc" | sort');
+    const uid = String(process.getuid?.() ?? 0);
+    const gid = String(process.getgid?.() ?? 0);
+    expect(output.split('\n').filter((line) => line !== '')).toEqual([
+      `procattr\t/proc/pressure\t755 ${uid} ${gid}`,
+      `procattr\t/proc/pressure/memory\t644 ${uid} ${gid}`,
+      `procattr\t/proc/sysrq-trigger\t200 ${uid} ${gid}`,
+    ]);
+  },
+);
 
 test.skipIf(process.getuid?.() === 0)('every command of the guard refuses a user that is not root', async () => {
   await using directory = await temporaryDirectory('emulator-root');
@@ -110,37 +118,40 @@ test('residue is every entry whose value differs from its clean row, with the va
   );
 });
 
-test('mount records read the options of the visible debugfs and tracefs filesystems and their mount points', async () => {
-  await using directory = await temporaryDirectory('emulator-mounts');
-  await mkdir(join(directory.path, 'debug'));
-  await mkdir(join(directory.path, 'tracing'), { mode: 0o700 });
-  await chmod(join(directory.path, 'debug'), 0o755);
-  await chmod(join(directory.path, 'tracing'), 0o700);
-  const debug = join(directory.path, 'debug');
-  const tracing = join(directory.path, 'tracing');
-  await writeFile(
-    join(directory.path, 'mountinfo'),
-    [
-      `37 24 0:8 / ${debug} rw,nosuid,nodev,noexec,relatime shared:14 - debugfs debugfs rw,mode=755`,
-      `40 24 0:13 / ${tracing} rw,nosuid shared:16 - tracefs tracefs rw`,
-      `41 24 0:13 / ${tracing} rw,nosuid - tracefs tracefs rw,gid=3012`,
-      '',
-    ].join('\n'),
-  );
-  await writeFile(join(directory.path, 'tracked.tsv'), '');
-  const output = await library(
-    directory.path,
-    'DEBUGFS=$DIRECTORY/debug\nTRACEFS=$DIRECTORY/tracing\nMOUNTINFO=$DIRECTORY/mountinfo\nmount_records | sort',
-  );
-  const uid = String(process.getuid?.() ?? 0);
-  const gid = String(process.getgid?.() ?? 0);
-  expect(output.split('\n').filter((line) => line !== '')).toEqual([
-    `mountroot\t${debug}\t755 ${uid} ${gid}`,
-    `mountroot\t${tracing}\t700 ${uid} ${gid}`,
-    `superopts\t${debug}\trw,mode=755`,
-    `superopts\t${tracing}\trw,gid=3012`,
-  ]);
-});
+test.skipIf(OFF_LINUX)(
+  'mount records read the options of the visible debugfs and tracefs filesystems and their mount points',
+  async () => {
+    await using directory = await temporaryDirectory('emulator-mounts');
+    await mkdir(join(directory.path, 'debug'));
+    await mkdir(join(directory.path, 'tracing'), { mode: 0o700 });
+    await chmod(join(directory.path, 'debug'), 0o755);
+    await chmod(join(directory.path, 'tracing'), 0o700);
+    const debug = join(directory.path, 'debug');
+    const tracing = join(directory.path, 'tracing');
+    await writeFile(
+      join(directory.path, 'mountinfo'),
+      [
+        `37 24 0:8 / ${debug} rw,nosuid,nodev,noexec,relatime shared:14 - debugfs debugfs rw,mode=755`,
+        `40 24 0:13 / ${tracing} rw,nosuid shared:16 - tracefs tracefs rw`,
+        `41 24 0:13 / ${tracing} rw,nosuid - tracefs tracefs rw,gid=3012`,
+        '',
+      ].join('\n'),
+    );
+    await writeFile(join(directory.path, 'tracked.tsv'), '');
+    const output = await library(
+      directory.path,
+      'DEBUGFS=$DIRECTORY/debug\nTRACEFS=$DIRECTORY/tracing\nMOUNTINFO=$DIRECTORY/mountinfo\nmount_records | sort',
+    );
+    const uid = String(process.getuid?.() ?? 0);
+    const gid = String(process.getgid?.() ?? 0);
+    expect(output.split('\n').filter((line) => line !== '')).toEqual([
+      `mountroot\t${debug}\t755 ${uid} ${gid}`,
+      `mountroot\t${tracing}\t700 ${uid} ${gid}`,
+      `superopts\t${debug}\trw,mode=755`,
+      `superopts\t${tracing}\trw,gid=3012`,
+    ]);
+  },
+);
 
 test('a remount gives back the uid, gid and mode the reference recorded, root and 0700 by default', async () => {
   await using directory = await temporaryDirectory('emulator-remount');
