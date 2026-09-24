@@ -3,6 +3,7 @@ import type { ContentApi, ContentErrorCode, Finding } from '@huma/contracts';
 import type { Client } from './api.ts';
 import { RECORDINGS, replayed, reply } from './bench.ts';
 import { routeAt } from './routes.ts';
+import type { RouteName } from './routes.ts';
 import { isSendable } from './transport.ts';
 import type { Reply } from './transport.ts';
 
@@ -27,11 +28,21 @@ type Asked = Readonly<{ address: string; headers: Readonly<Record<string, string
 /** What a request gets from the bench: a reply, or nothing at all until its way out is used. */
 type Answer = (address: string) => Promise<Reply> | 'hang';
 
-/** Ports the judging drives, with what they saw: every request, every deadline set, every request let go. */
-type Bench = Readonly<{ client: Client<Token>; asked: Asked[]; timers: (() => void)[]; aborted: Set<Token> }>;
+/**
+ * Ports the judging drives, with what they saw: every request, the requests left without an answer, every deadline
+ * set, every request let go.
+ */
+type Bench = Readonly<{
+  client: Client<Token>;
+  asked: Asked[];
+  hung: Token[];
+  timers: (() => void)[];
+  aborted: Set<Token>;
+}>;
 
 const benchOf = (answer: Answer): Bench => {
   const asked: Asked[] = [];
+  const hung: Token[] = [];
   const timers: (() => void)[] = [];
   const aborted = new Set<Token>();
   const letGo = new Map<Token, () => void>();
@@ -43,6 +54,7 @@ const benchOf = (answer: Answer): Bench => {
       if (answered !== 'hang') {
         return answered;
       }
+      hung.push(init.signal);
       return new Promise<Reply>((...[, reject]) => {
         letGo.set(init.signal, () => {
           reject(new Error('requête lâchée'));
@@ -71,7 +83,7 @@ const benchOf = (answer: Answer): Bench => {
     },
     setAside: () => undefined,
   };
-  return { client, asked, timers, aborted };
+  return { client, asked, hung, timers, aborted };
 };
 
 /** Enough turns of the microtask queue for a request under way to take every step it can take without a timer. */
@@ -100,31 +112,84 @@ const watch = (read: Promise<unknown>): (() => Outcome) => {
   return () => outcome;
 };
 
-/** A list of the service holding nothing: what the wire answers when it is asked and all goes well. */
-const EMPTY_LIST = JSON.stringify({ posts: [] });
+/** The article the judging asks for: the first one the capture recorded, under the id its path files it under. */
+const ASKED_ARTICLE = ARTICLE_ID.parse(RECORDINGS.article[0]?.path.split('/').at(-1));
+
+/**
+ * How the judging makes a client ask each route of the service: the way the app does, a section's list through the
+ * menu that files it.
+ *
+ * Every check reads every route, and not the one it was first written against: a client bent only where it asks for
+ * an article — a second client built for it without a deadline, a failure named alike, a header of its own — passed a
+ * judging that read the wire alone. The record takes a route the client comes to ask as one more reading to write
+ * here, or the judging does not compile.
+ */
+const READINGS: Readonly<Record<RouteName, (api: ContentApi) => Promise<unknown>>> = {
+  front: async (api) => api.getFeed({}),
+  wire: async (api) => api.getLiveFeed({}),
+  menu: async (api) => api.getSections(),
+  section: async (api) => {
+    const [first] = await api.getSections();
+    if (first === undefined) {
+      throw new Error('le menu que le banc rejoue ne tient aucune rubrique');
+    }
+    return api.getFeed({ section: first.id });
+  },
+  article: async (api) => api.getArticle(ASKED_ARTICLE),
+  search: async (api) => api.search({ text: QUESTION.parse('climat') }),
+};
+
+/** The routes, each with the reading that asks it. */
+const EVERY_ROUTE = Object.entries(READINGS);
+
+/**
+ * The service answering one route as `answer` says, and every other as the capture recorded: a section's list is
+ * asked through a menu that has to answer first, so a route is judged on its own request and nothing else. An address
+ * of no route at all is the judged route's too — a client that bends its address is still held to its deadline and
+ * its causes, and the addresses have their own check.
+ */
+const only =
+  (route: string, answer: Answer): Answer =>
+  (address): Promise<Reply> | 'hang' => {
+    const at = routeAt(address);
+    return at !== undefined && at.route !== route ? replayed(address) : answer(address);
+  };
+
+/** A list of what went wrong on which route, as a finding says it — or no finding at all when nothing did. */
+const saying = (code: TransportCode, what: string, where: readonly string[]): readonly Finding<TransportCode>[] =>
+  where.length === 0 ? [] : [{ code, says: `${what} : ${where.join(' ; ')}` }];
 
 /**
  * A request the service never answers must end, and let its connection go. The platform gives a request no limit of
  * its own, and a connection held is one of the five a host allows the app at once.
  */
 const deadline = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
-  const { client, asked, timers, aborted } = benchOf(() => 'hang');
-  const outcome = watch(make(client).getLiveFeed({}));
-  await settle();
-  if (timers.length === 0) {
-    return [{ code: 'transport/no-deadline', says: 'une requête sans réponse est partie sans délai' }];
+  const unbounded: string[] = [];
+  const hanging: string[] = [];
+  const held: string[] = [];
+  for (const [route, read] of EVERY_ROUTE) {
+    const { client, hung, timers, aborted } = benchOf(only(route, () => 'hang'));
+    const outcome = watch(read(make(client)));
+    await settle();
+    if (timers.length === 0) {
+      unbounded.push(route);
+      continue;
+    }
+    for (const fire of [...timers]) {
+      fire();
+    }
+    await settle();
+    if (outcome().kind === 'pending') {
+      hanging.push(route);
+    }
+    if (!hung.every((signal) => aborted.has(signal))) {
+      held.push(route);
+    }
   }
-  for (const fire of [...timers]) {
-    fire();
-  }
-  await settle();
   return [
-    ...(outcome().kind === 'pending'
-      ? [{ code: 'transport/hangs' as const, says: 'le délai passé, la lecture attend encore' }]
-      : []),
-    ...(asked.every((each) => aborted.has(each.signal))
-      ? []
-      : [{ code: 'transport/connection-held' as const, says: 'le délai passé, la requête n’a pas été lâchée' }]),
+    ...saying('transport/no-deadline', 'une requête sans réponse est partie sans délai', unbounded),
+    ...saying('transport/hangs', 'le délai passé, la lecture attend encore', hanging),
+    ...saying('transport/connection-held', 'le délai passé, la requête n’a pas été lâchée', held),
   ];
 };
 
@@ -148,22 +213,32 @@ const CAUSES: readonly Readonly<{ says: string; answer: Answer; cause: ContentEr
  */
 const causes = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
   const misnamed: string[] = [];
-  for (const { says, answer, cause } of CAUSES) {
-    const { client, timers } = benchOf(answer);
-    const outcome = watch(make(client).getLiveFeed({}));
-    await settle();
-    for (const fire of [...timers]) {
-      fire();
-    }
-    await settle();
-    const ended = outcome();
-    if (ended.kind === 'answered' || (ended.kind === 'failed' && ended.cause !== cause)) {
-      misnamed.push(
-        `${says} : ${ended.kind === 'failed' ? String(ended.cause) : 'lu comme une réponse'} au lieu de ${cause}`,
-      );
+  for (const [route, read] of EVERY_ROUTE) {
+    for (const { says, answer, cause } of CAUSES) {
+      const { client, timers } = benchOf(only(route, answer));
+      const outcome = watch(read(make(client)));
+      await settle();
+      for (const fire of [...timers]) {
+        fire();
+      }
+      await settle();
+      const ended = outcome();
+      if (ended.kind === 'answered' || (ended.kind === 'failed' && ended.cause !== cause)) {
+        misnamed.push(
+          `${route}, ${says} : ${ended.kind === 'failed' ? String(ended.cause) : 'lu comme une réponse'} au lieu de ${cause}`,
+        );
+      }
     }
   }
-  return misnamed.length === 0 ? [] : [{ code: 'transport/cause-misnamed', says: misnamed.join(' ; ') }];
+  return saying('transport/cause-misnamed', 'des échecs sous le nom d’une autre cause', misnamed);
+};
+
+/** Every request the client makes when each of its routes is read once, the service answering as the capture did. */
+const askedOfEveryRoute = async (make: Make): Promise<readonly Asked[]> => {
+  const { client, asked } = benchOf(replayed);
+  const api = make(client);
+  await Promise.allSettled(EVERY_ROUTE.map(async ([, read]) => read(api)));
+  return asked;
 };
 
 /** What the official client's name is made of, which no request of this one may carry. */
@@ -173,23 +248,23 @@ const OFFICIAL = /immanens|hybride/iu;
 const SPEAKING = ['origin', 'cookie', 'x-user-token', 'x-anonymous-token', 'customer-hash', 'customer-data'];
 
 /** A request says which client it comes from, under a name of its own, and carries no one's credentials. */
-const honesty = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
-  const { client, asked } = benchOf(async () => reply(200, EMPTY_LIST));
-  await make(client).getLiveFeed({});
-  const found = asked.flatMap(({ address, headers }) => {
-    const agent = Object.entries(headers).find(([name]) => name.toLowerCase() === 'user-agent')?.[1];
-    const problems = [
-      ...(agent === undefined ? ['aucun nom'] : []),
-      ...(agent !== undefined && OFFICIAL.test(agent) ? [`le nom du client officiel (« ${agent} »)`] : []),
-      ...(agent !== undefined && !isSendable(agent) ? ['un nom qu’OkHttp refuse, hors ASCII'] : []),
-      ...Object.keys(headers)
-        .filter((name) => SPEAKING.includes(name.toLowerCase()))
-        .map((name) => `l’en-tête « ${name} »`),
-    ];
-    return problems.length === 0 ? [] : [`${address} porte ${problems.join(', ')}`];
-  });
-  return found.length === 0 ? [] : [{ code: 'transport/impersonates', says: found.join(' ; ') }];
-};
+const honesty = (asked: readonly Asked[]): readonly Finding<TransportCode>[] =>
+  saying(
+    'transport/impersonates',
+    'des requêtes qui parlent pour un autre',
+    asked.flatMap(({ address, headers }) => {
+      const agent = Object.entries(headers).find(([name]) => name.toLowerCase() === 'user-agent')?.[1];
+      const problems = [
+        ...(agent === undefined ? ['aucun nom'] : []),
+        ...(agent !== undefined && OFFICIAL.test(agent) ? [`le nom du client officiel (« ${agent} »)`] : []),
+        ...(agent !== undefined && !isSendable(agent) ? ['un nom qu’OkHttp refuse, hors ASCII'] : []),
+        ...Object.keys(headers)
+          .filter((name) => SPEAKING.includes(name.toLowerCase()))
+          .map((name) => `l’en-tête « ${name} »`),
+      ];
+      return problems.length === 0 ? [] : [`${address} porte ${problems.join(', ')}`];
+    }),
+  );
 
 /** The names a query carries, in any order and without the empty one a leading `&` leaves. */
 const namesOf = (query: string): ReadonlySet<string> =>
@@ -216,43 +291,30 @@ const besidesAno = (names: ReadonlySet<string>): string =>
  * A request goes where the official client's went: a route the service was seen to answer, with the query it was seen
  * to answer it with. An address of any other shape is one no capture holds an answer for, and a guess.
  */
-const addresses = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
-  const { client, asked } = benchOf(replayed);
-  const api = make(client);
-  const [first] = await api.getSections().catch(() => []);
-  const [recorded] = RECORDINGS.article;
-  const filed = recorded?.path.split('/').at(-1) ?? '';
-  await Promise.allSettled([
-    api.getFeed({}),
-    ...(first === undefined ? [] : [api.getFeed({ section: first.id })]),
-    api.getLiveFeed({}),
-    api.search({ text: QUESTION.parse('climat') }),
-    ...(ARTICLE_ID.safeParse(filed).success ? [api.getArticle(ARTICLE_ID.parse(filed))] : []),
-  ]);
-  const unknown = asked.flatMap(({ address }) => {
-    const at = routeAt(address);
-    if (at === undefined) {
-      return [address];
-    }
-    const heard = RECORDINGS[at.route].map((each) => besidesAno(namesOf(each.query)));
-    return heard.includes(besidesAno(namesOf(at.query))) ? [] : [address];
-  });
-  return unknown.length === 0
-    ? []
-    : [{ code: 'transport/address-unknown', says: `adresses qu’aucune capture ne connaît : ${unknown.join(' ; ')}` }];
-};
+const addresses = (asked: readonly Asked[]): readonly Finding<TransportCode>[] =>
+  saying(
+    'transport/address-unknown',
+    'adresses qu’aucune capture ne connaît',
+    asked.flatMap(({ address }) => {
+      const at = routeAt(address);
+      if (at === undefined) {
+        return [address];
+      }
+      const heard = RECORDINGS[at.route].map((each) => besidesAno(namesOf(each.query)));
+      return heard.includes(besidesAno(namesOf(at.query))) ? [] : [address];
+    }),
+  );
 
 /**
  * Whether a client of the service ends every request, names every failure by its cause, speaks for itself alone, and
- * asks only the addresses the official client was seen to ask.
+ * asks only the addresses the official client was seen to ask — on every route it reads.
  *
  * The client is handed in rather than reached for, so a fixture can hand in one that sets no deadline, or lets its
  * deadline pass doing nothing, or keeps a connection it gave up on, or names every failure alike, or borrows the
- * official client's name, or asks an address of its own making — and read the code that comes back.
+ * official client's name, or asks an address of its own making — or does any of it on one route alone — and read the
+ * code that comes back.
  */
-export const judgeTransport = async (make: Make): Promise<readonly Finding<TransportCode>[]> => [
-  ...(await deadline(make)),
-  ...(await causes(make)),
-  ...(await honesty(make)),
-  ...(await addresses(make)),
-];
+export const judgeTransport = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
+  const asked = await askedOfEveryRoute(make);
+  return [...(await deadline(make)), ...(await causes(make)), ...honesty(asked), ...addresses(asked)];
+};

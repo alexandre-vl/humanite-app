@@ -1000,7 +1000,17 @@ export const BINDINGS = {
         'prose/nothing-read',
         'prose/nothing-read-plain',
       ],
-      R3: ['secret/recorded-clean', 'secret/token', 'secret/password', 'secret/address', 'secret/cookie', 'secret/key'],
+      R3: [
+        'secret/recorded-clean',
+        'secret/token',
+        'secret/password',
+        'secret/address',
+        'secret/cookie',
+        'secret/cookie-session',
+        'secret/key',
+        'secret/key-official',
+        'secret/key-hash',
+      ],
       R4: ['artwork/generator', 'artwork/not-deterministic', 'artwork/key-ignored', 'artwork/section-ignored'],
       R5: ['picture/resizer', 'picture/width-ignored', 'picture/address-changed', 'picture/query-lost'],
     },
@@ -1020,9 +1030,15 @@ export const BINDINGS = {
     },
     rules: {
       R1: ['guardrail/module-huma-remote-api'],
-      R2: ['transport/client', 'transport/no-deadline', 'transport/hangs', 'transport/connection-held'],
-      R3: ['transport/cause-misnamed'],
-      R4: ['transport/impersonates'],
+      R2: [
+        'transport/client',
+        'transport/no-deadline',
+        'transport/no-deadline-article',
+        'transport/hangs',
+        'transport/connection-held',
+      ],
+      R3: ['transport/cause-misnamed', 'transport/cause-misnamed-article'],
+      R4: ['transport/impersonates', 'transport/impersonates-article'],
       R5: ['transport/address-unknown'],
       R6: {
         convention:

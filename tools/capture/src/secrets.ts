@@ -38,6 +38,16 @@ type Hunt = Readonly<{ code: SecretCode; pattern: RegExp; what: string }>;
 const MANY = 100;
 
 /**
+ * A field named one of `names` whose value is a text, however the two are quoted.
+ *
+ * A capture's own JSON writes `"password": "…"`, and the module a reading writes is formatted, which writes
+ * `password: '…'` and `'customer-hash': '…'`. The formatted module is the only text the reading is ever handed, so a
+ * pattern that knew the first form alone found nothing where it was needed — measured on the fixtures, which were
+ * then written in the first form and passed.
+ */
+const field = (names: string): string => String.raw`["']?\b(?:${names})\b["']?\s*:\s*(?:"[^"]+"|'[^']+')`;
+
+/**
  * The shapes a secret takes in this journal's own capture, each measured on one.
  *
  * `token` is a JSON Web Token: three parts joined by dots, the first of which is a base64 of `{"` and so always
@@ -52,7 +62,7 @@ const HUNTS: readonly Hunt[] = [
   },
   {
     code: 'secret/password',
-    pattern: /"(?:password|passwd|pwd|mot_de_passe)"\s*:\s*"[^"]+"/giu,
+    pattern: new RegExp(field('password|passwd|pwd|mot_de_passe'), 'giu'),
     what: 'un mot de passe',
   },
   // Every quantifier here is bounded, and the first is anchored on a word boundary. Unbounded, `[\w.%+-]+` walks the
@@ -65,13 +75,18 @@ const HUNTS: readonly Hunt[] = [
   },
   {
     code: 'secret/cookie',
-    pattern: /"(?:cookie|set-cookie)"\s*:\s*"[^"]+"|\b(?:PHPSESSID|JSESSIONID|sessionid)=[^;"\s]+/giu,
+    pattern: new RegExp(
+      String.raw`${field('cookie|set-cookie')}|\b(?:PHPSESSID|JSESSIONID|sessionid)=[^;"'\s]+`,
+      'giu',
+    ),
     what: 'un témoin de connexion',
   },
   {
     code: 'secret/key',
-    pattern:
-      /"(?:app_secret|api[_-]?key|client_secret|customer-hash|customer-data)"\s*:\s*"[^"]+"|\b[0-9a-f]{64}\b|\b[0-9a-f]{4}(?:-[0-9a-f]{4}){3}\b/giu,
+    pattern: new RegExp(
+      String.raw`${field('app_secret|api[_-]?key|client_secret|customer-hash|customer-data')}|\b[0-9a-f]{64}\b|\b[0-9a-f]{4}(?:-[0-9a-f]{4}){3}\b`,
+      'giu',
+    ),
     what: 'une clé',
   },
 ];

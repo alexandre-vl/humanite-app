@@ -37,6 +37,9 @@ const sayingOneThing = (api: ContentApi): ContentApi => ({
   search: async (query) => mislabelled(api.search(query)),
 });
 
+/** Whether an address asks the service for one article: the one route a bent client below is bent on alone. */
+const isArticle = (address: string): boolean => address.includes('/wordpress/post/');
+
 export const TRANSPORT_FIXTURES = [
   define('transport/client', 'le client du service, tel qu’il demande', [], judged(createRemoteApi)),
   define(
@@ -91,6 +94,39 @@ export const TRANSPORT_FIXTURES = [
       createRemoteApi({
         ...client,
         fetch: async (address, init) => client.fetch(address.replace('/posts/', '/posts'), init),
+      }),
+    ),
+  ),
+  define(
+    'transport/no-deadline-article',
+    'un client qui demande un article par un second client, bâti sans délai',
+    ['transport/no-deadline'],
+    judged((client) => ({
+      ...createRemoteApi(client),
+      getArticle: createRemoteApi({ ...client, after: () => () => undefined }).getArticle,
+    })),
+  ),
+  define(
+    'transport/cause-misnamed-article',
+    'un client qui dit « indisponible » de tout échec d’un article',
+    ['transport/cause-misnamed'],
+    judged((client) => {
+      const api = createRemoteApi(client);
+      return { ...api, getArticle: async (id) => mislabelled(api.getArticle(id)) };
+    }),
+  ),
+  define(
+    'transport/impersonates-article',
+    'un client qui ne pose un témoin de connexion que sur la demande d’un article',
+    ['transport/impersonates'],
+    judged((client) =>
+      createRemoteApi({
+        ...client,
+        fetch: async (address, init) =>
+          client.fetch(
+            address,
+            isArticle(address) ? { ...init, headers: { ...init.headers, cookie: 'session=inventee' } } : init,
+          ),
       }),
     ),
   ),
