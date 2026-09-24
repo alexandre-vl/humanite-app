@@ -1,5 +1,6 @@
 import { PICTURE } from '@huma/contracts';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import { READER } from './reader';
 import { SOURCE as CORPUS } from './source';
 import { SOURCE } from './source.service';
 
@@ -37,5 +38,19 @@ describe('SOURCE, variante de service', () => {
     expect(CORPUS.corpusPicture(picture.key, 320)).not.toBeNull();
     expect(SOURCE.corpusPicture(picture.key, 320)).toBeNull();
     expect(SOURCE.name).toBe('service');
+  });
+  /**
+   * The reader's token goes out with the request and `ano` comes off it: the two halves of asking the service as the
+   * subscriber rather than as nobody. The port is asked at every request, the client being built long before a login.
+   */
+  it('demande le service sous le jeton de l’abonné, sans le drapeau « ano »', async () => {
+    jest.spyOn(READER, 'token').mockReturnValue('jeton-de-labonne');
+    const asked = jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(JSON.stringify({ posts: [] }), { status: 200 }));
+    await SOURCE.content.getLiveFeed({});
+    const [address, init] = asked.mock.calls[0] ?? [];
+    expect(address).toBe('https://phenix2.immanens.com/api/v1/app/300/wordpress/homepage?language=fr');
+    expect(init).toMatchObject({ headers: { 'x-user-token': 'jeton-de-labonne' } });
   });
 });

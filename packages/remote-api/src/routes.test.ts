@@ -1,7 +1,7 @@
 import { FILED_ID, SECTION_NUMBER } from '@huma/contracts';
 import { expect, test } from 'vitest';
 import { RECORDED } from './recorded.ts';
-import { addressOf, ROUTES, routeOf } from './routes.ts';
+import { addressOf, ROUTES, routeOf, SERVICE_APP, SERVICE_ROOT } from './routes.ts';
 
 test('a list of a reader nobody signed in asks in French, and says no one did', () => {
   expect(addressOf(ROUTES.front.request())).toBe(
@@ -35,4 +35,9 @@ test('every recorded answer is answered by the route it is filed under', () => {
     expect(routeOf(kept.path)).toBe('article');
   }
   expect(routeOf('/wordpress/19565/posts')).toBeUndefined();
+});
+
+/** The application's number is written once: the root every route lives under is built on the same number. */
+test('the root of the service carries the application the login names', () => {
+  expect(SERVICE_ROOT.endsWith(`/${String(SERVICE_APP)}`)).toBe(true);
 });

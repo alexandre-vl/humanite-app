@@ -16,12 +16,14 @@ const json = async (status: number, body: unknown): Promise<Reply> => reply(stat
  * A client over a replay of the capture, which `answer` may take a route of over; every address asked and every item
  * set aside is kept for the test to read.
  */
-const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> | undefined) => {
+const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> | undefined, reader?: string) => {
   const asked: string[] = [];
+  const carried: Readonly<Record<string, string>>[] = [];
   const setAside: (readonly [RouteName, readonly SetAside[]])[] = [];
   const client: Client<number> = {
-    fetch: async (address) => {
+    fetch: async (address, init) => {
       asked.push(address);
+      carried.push(init.headers);
       const at = routeAt(address);
       return (at === undefined ? undefined : answer?.(at.route, at.query)) ?? replayed(address);
     },
@@ -30,8 +32,9 @@ const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> 
     setAside: (route, items) => {
       setAside.push([route, items]);
     },
+    token: () => reader,
   };
-  return { api: createRemoteApi(client), asked, setAside };
+  return { api: createRemoteApi(client), asked, carried, setAside };
 };
 
 /** The cause a read failed with, or `null` when it answered or failed with no cause of the contract's. */
@@ -168,4 +171,25 @@ test('an answer that holds no list is refused as unreadable', async () => {
     route === 'wire' ? json(200, { error: true }) : undefined,
   );
   expect(await failedWith(api.getLiveFeed({}))).toBe('malformed');
+});
+
+/**
+ * The two halves of reading as a subscriber: the token their login earned goes out with every request, and `ano` —
+ * the flag that says nobody signed in — comes off it. The service grants the right; the client only asks as itself.
+ */
+test('a reader who signed in is asked for as themselves, on every route', async () => {
+  const { api, asked, carried } = replaying(undefined, 'jeton-de-labonne');
+  await api.getFeed({});
+  await api.getSections();
+  await api.search({ text: QUESTION.parse('école') });
+  expect(asked.filter((address) => address.includes('ano='))).toEqual([]);
+  expect(carried.map((headers) => headers['x-user-token'])).toEqual(asked.map(() => 'jeton-de-labonne'));
+  expect(asked[0]).toBe(`${SERVICE}${SERVICE_ROOT}/wordpress/home?language=fr`);
+});
+
+test('nobody signed in carries no token at all, and says so with ano', async () => {
+  const { api, asked, carried } = replaying();
+  await api.getFeed({});
+  expect(carried.map((headers) => headers['x-user-token'])).toEqual([undefined]);
+  expect(asked[0]).toBe(`${SERVICE}${SERVICE_ROOT}/wordpress/home?language=fr&ano=1`);
 });

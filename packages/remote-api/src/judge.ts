@@ -14,6 +14,7 @@ export type TransportCode =
   | 'transport/connection-held'
   | 'transport/cause-misnamed'
   | 'transport/impersonates'
+  | 'transport/reader-unnamed'
   | 'transport/address-unknown';
 
 /** The signal the judging hands a client: a number, which is all it takes to tell one request's way out from another. */
@@ -40,7 +41,7 @@ type Bench = Readonly<{
   aborted: Set<Token>;
 }>;
 
-const benchOf = (answer: Answer): Bench => {
+const benchOf = (answer: Answer, reader?: string): Bench => {
   const asked: Asked[] = [];
   const hung: Token[] = [];
   const timers: (() => void)[] = [];
@@ -82,6 +83,7 @@ const benchOf = (answer: Answer): Bench => {
       };
     },
     setAside: () => undefined,
+    token: () => reader,
   };
   return { client, asked, hung, timers, aborted };
 };
@@ -234,37 +236,26 @@ const causes = async (make: Make): Promise<readonly Finding<TransportCode>[]> =>
 };
 
 /** Every request the client makes when each of its routes is read once, the service answering as the capture did. */
-const askedOfEveryRoute = async (make: Make): Promise<readonly Asked[]> => {
-  const { client, asked } = benchOf(replayed);
+const askedOfEveryRoute = async (make: Make, reader?: string): Promise<readonly Asked[]> => {
+  const { client, asked } = benchOf(replayed, reader);
   const api = make(client);
   await Promise.allSettled(EVERY_ROUTE.map(async ([, read]) => read(api)));
   return asked;
 };
 
-/** What the official client's name is made of, which no request of this one may carry. */
-const OFFICIAL = /immanens|hybride/iu;
+/**
+ * The token the judging hands a client as one a reader's own login earned. Nothing of the official client's is in it:
+ * what the judging is looking for is whether the client carries the token it was given, and only that one.
+ */
+const READER = 'jeton-de-labonne';
 
-/** The headers that would speak for someone: a browser's origin, a session, a reader's account. */
-const SPEAKING = ['origin', 'cookie', 'x-user-token', 'x-anonymous-token', 'customer-hash', 'customer-data'];
+/** Every request the client makes, asked twice over: once with nobody signed in, once with a reader who has. */
+type Round = Readonly<{ asked: readonly Asked[]; reader: string | undefined }>;
 
-/** A request says which client it comes from, under a name of its own, and carries no one's credentials. */
-const honesty = (asked: readonly Asked[]): readonly Finding<TransportCode>[] =>
-  saying(
-    'transport/impersonates',
-    'des requêtes qui parlent pour un autre',
-    asked.flatMap(({ address, headers }) => {
-      const agent = Object.entries(headers).find(([name]) => name.toLowerCase() === 'user-agent')?.[1];
-      const problems = [
-        ...(agent === undefined ? ['aucun nom'] : []),
-        ...(agent !== undefined && OFFICIAL.test(agent) ? [`le nom du client officiel (« ${agent} »)`] : []),
-        ...(agent !== undefined && !isSendable(agent) ? ['un nom qu’OkHttp refuse, hors ASCII'] : []),
-        ...Object.keys(headers)
-          .filter((name) => SPEAKING.includes(name.toLowerCase()))
-          .map((name) => `l’en-tête « ${name} »`),
-      ];
-      return problems.length === 0 ? [] : [`${address} porte ${problems.join(', ')}`];
-    }),
-  );
+const askedBothWays = async (make: Make): Promise<readonly Round[]> => [
+  { asked: await askedOfEveryRoute(make), reader: undefined },
+  { asked: await askedOfEveryRoute(make, READER), reader: READER },
+];
 
 /** The names a query carries, in any order and without the empty one a leading `&` leaves. */
 const namesOf = (query: string): ReadonlySet<string> =>
@@ -274,6 +265,75 @@ const namesOf = (query: string): ReadonlySet<string> =>
       .split('&')
       .filter((pair) => pair !== '')
       .map((pair) => pair.split('=')[0] ?? ''),
+  );
+
+/** What the official client's name is made of, which no request of this one may carry. */
+const OFFICIAL = /immanens|hybride/iu;
+
+/** The headers that would speak for someone: a browser's origin, a session, the official client's own way in. */
+const SPEAKING = ['origin', 'cookie', 'x-anonymous-token', 'customer-hash', 'customer-data'];
+
+/** The one header a request may carry for a reader, and only ever the token that reader's own login earned. */
+const READER_HEADER = 'x-user-token';
+
+/** What `headers` holds under `name`, whatever case it was written in, or `undefined` for a header it does not hold. */
+const valueOf = (headers: Readonly<Record<string, string>>, name: string): string | undefined =>
+  Object.entries(headers).find(([held]) => held.toLowerCase() === name)?.[1];
+
+/**
+ * A request says which client it comes from, under a name of its own, and carries no credentials but the ones this
+ * reader's own login earned.
+ *
+ * The user token is the one header the client may add, and what makes it honest is where it came from: the judging
+ * hands the client a token and looks for that token and no other. A client carrying one while nobody has signed in
+ * minted it from somewhere — the official client's key being the only somewhere there is — which is the thing
+ * ADR-0032 keeps out of a delivered client, whatever a subscriber may ask it to fetch for them.
+ */
+const honesty = (rounds: readonly Round[]): readonly Finding<TransportCode>[] =>
+  saying(
+    'transport/impersonates',
+    'des requêtes qui parlent pour un autre',
+    rounds.flatMap(({ asked, reader }) =>
+      asked.flatMap(({ address, headers }) => {
+        const agent = valueOf(headers, 'user-agent');
+        const carried = valueOf(headers, READER_HEADER);
+        const problems = [
+          ...(agent === undefined ? ['aucun nom'] : []),
+          ...(agent !== undefined && OFFICIAL.test(agent) ? [`le nom du client officiel (« ${agent} »)`] : []),
+          ...(agent !== undefined && !isSendable(agent) ? ['un nom qu’OkHttp refuse, hors ASCII'] : []),
+          ...Object.keys(headers)
+            .filter((name) => SPEAKING.includes(name.toLowerCase()))
+            .map((name) => `l’en-tête « ${name} »`),
+          ...(carried !== undefined && carried !== reader ? ['un jeton d’usager qu’aucune connexion n’a gagné'] : []),
+        ];
+        return problems.length === 0 ? [] : [`${address} porte ${problems.join(', ')}`];
+      }),
+    ),
+  );
+
+/**
+ * A reader who signed in is asked for as themselves, on every route.
+ *
+ * Their token goes out with the request, and `ano` — the flag that says nobody signed in — comes off it. A request
+ * that drops either asks the service for what a subscription pays for while telling it there is no subscriber, and
+ * the service answers what it was asked: `right` false, the article withheld, the reader paying for nothing. It is
+ * the quiet half of the same rule the honesty above keeps: the loud half is carrying a token nobody earned.
+ */
+const named = (rounds: readonly Round[]): readonly Finding<TransportCode>[] =>
+  saying(
+    'transport/reader-unnamed',
+    'des requêtes d’un abonné connecté qui ne le disent pas',
+    rounds.flatMap(({ asked, reader }) =>
+      reader === undefined
+        ? []
+        : asked.flatMap(({ address, headers }) => {
+            const problems = [
+              ...(valueOf(headers, READER_HEADER) === undefined ? ['le jeton de l’abonné manque'] : []),
+              ...(namesOf(routeAt(address)?.query ?? '').has('ano') ? ['le drapeau « ano » y est resté'] : []),
+            ];
+            return problems.length === 0 ? [] : [`${address} : ${problems.join(', ')}`];
+          }),
+    ),
   );
 
 /**
@@ -291,30 +351,39 @@ const besidesAno = (names: ReadonlySet<string>): string =>
  * A request goes where the official client's went: a route the service was seen to answer, with the query it was seen
  * to answer it with. An address of any other shape is one no capture holds an answer for, and a guess.
  */
-const addresses = (asked: readonly Asked[]): readonly Finding<TransportCode>[] =>
+const addresses = (rounds: readonly Round[]): readonly Finding<TransportCode>[] =>
   saying(
     'transport/address-unknown',
     'adresses qu’aucune capture ne connaît',
-    asked.flatMap(({ address }) => {
-      const at = routeAt(address);
-      if (at === undefined) {
-        return [address];
-      }
-      const heard = RECORDINGS[at.route].map((each) => besidesAno(namesOf(each.query)));
-      return heard.includes(besidesAno(namesOf(at.query))) ? [] : [address];
-    }),
+    rounds.flatMap(({ asked }) =>
+      asked.flatMap(({ address }) => {
+        const at = routeAt(address);
+        if (at === undefined) {
+          return [address];
+        }
+        const heard = RECORDINGS[at.route].map((each) => besidesAno(namesOf(each.query)));
+        return heard.includes(besidesAno(namesOf(at.query))) ? [] : [address];
+      }),
+    ),
   );
 
 /**
- * Whether a client of the service ends every request, names every failure by its cause, speaks for itself alone, and
- * asks only the addresses the official client was seen to ask — on every route it reads.
+ * Whether a client of the service ends every request, names every failure by its cause, speaks for itself alone,
+ * speaks for a reader who signed in, and asks only the addresses the official client was seen to ask — on every route
+ * it reads, with nobody signed in and with a reader who is.
  *
  * The client is handed in rather than reached for, so a fixture can hand in one that sets no deadline, or lets its
  * deadline pass doing nothing, or keeps a connection it gave up on, or names every failure alike, or borrows the
- * official client's name, or asks an address of its own making — or does any of it on one route alone — and read the
- * code that comes back.
+ * official client's name, or carries a token no login earned, or leaves a signed-in reader's token behind, or asks an
+ * address of its own making — or does any of it on one route alone — and read the code that comes back.
  */
 export const judgeTransport = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
-  const asked = await askedOfEveryRoute(make);
-  return [...(await deadline(make)), ...(await causes(make)), ...honesty(asked), ...addresses(asked)];
+  const rounds = await askedBothWays(make);
+  return [
+    ...(await deadline(make)),
+    ...(await causes(make)),
+    ...honesty(rounds),
+    ...named(rounds),
+    ...addresses(rounds),
+  ];
 };

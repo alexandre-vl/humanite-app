@@ -21,6 +21,13 @@ export type Ports<Signal> = Readonly<{
   abortable: () => Readonly<{ signal: Signal; abort: () => void }>;
   /** Runs `then` once `delay` milliseconds have passed, and answers with what cancels it. */
   after: (delay: number, then: () => void) => () => void;
+  /**
+   * The token a reader's own login earned, or none while nobody has signed in.
+   *
+   * It is asked anew at every request, and never held: the client is built once, when the app starts, and a reader
+   * signs in and out long after — a token read at build time would be the one there was then, which is none.
+   */
+  token: () => string | undefined;
 }>;
 
 /** What the client reads of a reply: its status, and its body as the text it arrived as. */
@@ -34,14 +41,29 @@ const DEADLINE = 15_000;
 
 /**
  * What every request says of itself: that it wants JSON, in French, and which client asks — this one, under a name of
- * its own and never the official client's. Nothing else: no origin, no token, no cookie. ASCII only, OkHttp failing a
- * request whose header carries any other byte.
+ * its own and never the official client's. Nothing else: no origin, no cookie, and none of the official client's own
+ * tokens. ASCII only, OkHttp failing a request whose header carries any other byte.
  */
 export const HEADERS = {
   accept: 'application/json',
   'accept-language': 'fr-FR',
   'user-agent': 'humanite-lecteur (client non officiel)',
 } as const;
+
+/** The one header a request adds to those, and only for a token a reader's own login earned (ADR-0032). */
+const READER_HEADER = 'x-user-token';
+
+/**
+ * The same request, as a reader who signed in asks it: without `ano`, the flag that says nobody had.
+ *
+ * The official client sends `ano` exactly when it sends no token — 74 requests of 74 in its capture — so the two go
+ * together the other way round too. A request carrying both would hold a reader out and present them in one breath,
+ * and the service is under no obligation to prefer either.
+ */
+const signedIn = (request: Request): Request => ({
+  path: request.path,
+  query: request.query.filter(([name]) => name !== 'ano'),
+});
 
 /** Whether a header's value is one OkHttp will send: printable ASCII, and nothing else — an accent fails the request. */
 export const isSendable = (value: string): boolean => /^[\x20-\x7e]*$/u.test(value);
@@ -74,10 +96,17 @@ type Answered = Readonly<{ status: number; text: string }>;
  * deadline is the client's, raced against the request rather than left to the platform to honour; a failure before it
  * is `offline`; a status names the rest; and a body that does not parse, from a service that only answers JSON, was
  * cut on the way — which the platform can hand over under a 200 — and is `unavailable`, which another try can mend.
+ *
+ * A reader who signed in is asked for as themselves: their token goes out with the request and the flag that says
+ * nobody signed in comes off it. The service decides the rest — what a subscription pays for is granted there and
+ * read off `right`, never inferred here from the fact that a token was sent.
  */
 export const ask = async <Signal>(ports: Ports<Signal>, request: Request): Promise<unknown> => {
   const control = ports.abortable();
   const where = request.path;
+  const reader = ports.token();
+  const asked = reader === undefined ? request : signedIn(request);
+  const headers = reader === undefined ? HEADERS : { ...HEADERS, [READER_HEADER]: reader };
   let cancel = (): void => undefined;
   const deadline = new Promise<never>((...[, reject]) => {
     cancel = ports.after(DEADLINE, () => {
@@ -87,7 +116,7 @@ export const ask = async <Signal>(ports: Ports<Signal>, request: Request): Promi
   });
   const attempt = (async (): Promise<Answered> => {
     try {
-      const reply = await ports.fetch(addressOf(request), { headers: HEADERS, signal: control.signal });
+      const reply = await ports.fetch(addressOf(asked), { headers, signal: control.signal });
       return { status: reply.status, text: await reply.text() };
     } catch {
       throw new ContentApiError('offline', `${where} : le service n’a pas été atteint`);

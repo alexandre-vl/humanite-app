@@ -10,6 +10,9 @@ import type { FiledId, SectionNumber } from '@huma/contracts';
 /** Where the service answers: its host, and the application the official client is filed under. */
 export const SERVICE = 'https://phenix2.immanens.com';
 
+/** The number the journal's application is filed under at the service, which every route and every login carries. */
+export const SERVICE_APP = 300;
+
 /** The path every route of the service lives under: the version of its interface, and the application's number. */
 export const SERVICE_ROOT = '/api/v1/app/300';
 

@@ -118,6 +118,31 @@ export const TRANSPORT_FIXTURES = [
     ),
   ),
   define(
+    'transport/reader-unnamed',
+    'un client qui laisse au vestiaire le jeton que la connexion de l’abonné a gagné',
+    ['transport/reader-unnamed'],
+    judged((client) => createRemoteApi({ ...client, token: () => undefined })),
+  ),
+  define(
+    'transport/ano-kept',
+    'un client qui porte le jeton de l’abonné et dit dans la même requête que personne n’est connecté',
+    ['transport/reader-unnamed'],
+    judged((client) =>
+      createRemoteApi({
+        ...client,
+        // The shape a change that only added the header would leave: the token goes out, and `ano` — the flag the
+        // official client sends exactly when it sends no token — goes out with it. The service is told both.
+        fetch: async (address, init) => client.fetch(address.includes('ano=') ? address : `${address}&ano=1`, init),
+      }),
+    ),
+  ),
+  define(
+    'transport/invents-token',
+    'un client qui porte un jeton d’usager qu’aucune connexion n’a gagné',
+    ['transport/impersonates'],
+    judged((client) => createRemoteApi({ ...client, token: () => 'jeton-invente' })),
+  ),
+  define(
     'transport/no-deadline-article',
     'un client qui demande un article par un second client, bâti sans délai',
     ['transport/no-deadline'],

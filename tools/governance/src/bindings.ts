@@ -1092,8 +1092,11 @@ export const BINDINGS = {
     scope: {
       // The reading that honours the right the service grants, with the judging that holds it both ways, and the
       // bench of clients bent one port at a time — where the delivered client that borrowed the official key is named.
+      // The connection itself, the one place the borrowed key is ever written, with the shapes its two exchanges take.
       paths: [
         'packages/contracts/src/intake.ts',
+        'packages/contracts/src/session.ts',
+        'packages/remote-api/src/session.ts',
         'tools/guardrails/src/proofs/right.ts',
         'tools/guardrails/src/proofs/transport.ts',
       ],
@@ -1105,6 +1108,38 @@ export const BINDINGS = {
         convention:
           'L’app PEUT demander à l’abonné les identifiants de son abonnement et les porter à POST /user/login pour obtenir un jeton d’usager. La clé du client officiel est injectée au démarrage d’un build de développement ; aucun fichier suivi ne la porte, qu’une lecture de tools/capture/src/secrets.ts arrête.',
       },
+    },
+  },
+  'ADR-0033': {
+    scope: {
+      // What ADR-0028 governed, unchanged: the client of the service with its judging, the door that hands it the
+      // platform's ports and the build's choice of source, the signal that tells the query library the app is back in
+      // front, and the bench that bends the client one port at a time — a reader's token now among the ports handed.
+      paths: [
+        'packages/remote-api/**',
+        'apps/mobile/src/_app/model/focus.ts',
+        'apps/mobile/src/shared/api/**',
+        'apps/mobile/src/shared/config/source.ts',
+        'tools/guardrails/src/proofs/transport.ts',
+      ],
+    },
+    rules: {
+      R1: ['guardrail/module-huma-remote-api'],
+      R2: [
+        'transport/client',
+        'transport/no-deadline',
+        'transport/no-deadline-article',
+        'transport/hangs',
+        'transport/connection-held',
+      ],
+      R3: ['transport/cause-misnamed', 'transport/cause-misnamed-article'],
+      R4: ['transport/impersonates', 'transport/impersonates-article', 'transport/invents-token'],
+      R5: ['transport/address-unknown'],
+      R6: {
+        convention:
+          'La source se nomme dans apps/mobile/src/shared/config/source.ts : sans EXPO_PUBLIC_CONTENT_SOURCE la build lit le mock, un mot que la liste ne tient pas arrête l’app à sa première ligne, et la mise en place des tests nomme le mock quoi que le shell ait exporté. Metro lit la même variable pour résoudre les variantes de service (ADR-0029), et la porte du contenu arrête une build dont le module lié nomme une autre source que la variable.',
+      },
+      R7: ['transport/reader-unnamed', 'transport/ano-kept'],
     },
   },
 } as const satisfies Bindings<ProofId>;
