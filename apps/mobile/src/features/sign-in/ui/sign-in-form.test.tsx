@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { READER } from '#api';
 import { t } from '#i18n';
-import { renderWithCache } from '#lib/testing';
+import { renderWithCache, styleOf } from '#lib/testing';
 import type { Opening } from '../model/store';
 import { useConnection } from '../model/store';
 import { SignInForm } from './sign-in-form';
@@ -114,5 +114,17 @@ describe('SignInForm', () => {
   it('nomme où l’abonnement se souscrit, sans rien qui réponde à une pression', async () => {
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
     expect(screen.getByText(t('signIn.where'))).toBeTruthy();
+  });
+
+  /**
+   * The paper is printed at four steps of type, the reader choosing which. A field measured in points is measured for
+   * one of them: at thirty-two it cut the tops off the letters at the smallest step already, the platform's own
+   * padding having pushed the line down onto the rule under it, and nothing would have caught it but looking.
+   */
+  it('ne mesure aucun de ses champs en points, la taille du texte étant au lecteur', async () => {
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    for (const placeholder of ['signIn.login.placeholder', 'signIn.password.placeholder'] as const) {
+      expect(styleOf(screen.getByPlaceholderText(t(placeholder)))['height']).toBeUndefined();
+    }
   });
 });

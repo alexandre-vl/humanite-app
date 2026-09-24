@@ -20,8 +20,14 @@ const useStyles = createStyles((theme) => ({
   field: { gap: SPACING.xs },
   // Underlined and not boxed, as the paper's only other field is drawn: the line is the paper's own colour, so a
   // reader's eye finds where to type without a frame around it.
+  //
+  // No height. The field is as tall as what is typed in it, which is a thing the reader sets: the paper is printed at
+  // four steps of type, and a box measured for one of them cuts the tops off the letters at the next. It was measured
+  // for one — thirty-two points — and cut them at the first, where the platform's own vertical padding pushed the
+  // line down onto the rule under it. What gives the letters room is padding, which grows with nothing and is asked
+  // to.
   line: {
-    height: SPACING.xxl,
+    paddingVertical: SPACING.xs,
     borderBottomWidth: SIZES.stroke,
     borderColor: theme.primary,
   },
