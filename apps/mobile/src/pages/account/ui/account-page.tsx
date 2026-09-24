@@ -3,9 +3,10 @@ import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { hasShelf, useSetAsideCount } from '#api';
+import { useReaderSession } from '#features/sign-in';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { NEWSSTAND_HREF, SETTINGS_HREF } from '#lib/routing';
+import { NEWSSTAND_HREF, SETTINGS_HREF, SIGN_IN_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -65,6 +66,46 @@ function OpenRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: () 
   );
 }
 
+/** A row that does something here rather than opening a screen, and so carries no mark that one opens. */
+function ActionRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: () => void }>): ReactNode {
+  const styles = useStyles();
+  return (
+    <Pressable style={styles.row} onPress={onPress} role="button">
+      <Box style={styles.words}>
+        <Text variant="body">{label}</Text>
+      </Box>
+    </Pressable>
+  );
+}
+
+/**
+ * Where the reader stands with their subscription, and the one thing to do about it.
+ *
+ * A build that was not given the journal's key can open no connection at all, so it draws nothing here rather than a
+ * row that would refuse — ADR-0032 keeps that key out of anything published, and a button leading to a refusal is
+ * the same broken promise as a button leading nowhere.
+ */
+function Subscription(): ReactNode {
+  const { offered, connection, signOut } = useReaderSession();
+  if (!offered) {
+    return null;
+  }
+  return (
+    <Group label={t('account.subscription')}>
+      {connection === 'in' ? (
+        <ActionRow label={t('signIn.out')} onPress={signOut} />
+      ) : (
+        <OpenRow
+          label={t('signIn.title')}
+          onPress={() => {
+            router.push(SIGN_IN_HREF);
+          }}
+        />
+      )}
+    </Group>
+  );
+}
+
 /** A group of rows under a heading, as the current app lays its own out. */
 function Group({ label, children }: Readonly<{ label: DisplayText; children: ReactNode }>): ReactNode {
   const styles = useStyles();
@@ -81,11 +122,11 @@ function Group({ label, children }: Readonly<{ label: DisplayText; children: Rea
 /**
  * The reader's own corner of the paper.
  *
- * It holds what this app actually has, and nothing else. There is no account to sign into, nothing to buy and no
- * library to open, so the screen does not draw rows that would lead nowhere — the current one lists eight, five of
- * which cannot mean anything here, and puts deleting an account in the same type as everything around it. What is
- * left is true: where the reader sets how the paper is printed for them, where the numéros stand, and how to reach
- * the newsroom, which the current app only shows once one is signed out.
+ * It holds what this app actually has, and nothing else. There is nothing to buy and no library to open, so the
+ * screen does not draw rows that would lead nowhere — the current one lists eight, four of which cannot mean anything
+ * here, and puts deleting an account in the same type as everything around it. What is left is true: where a
+ * subscriber signs in, where the reader sets how the paper is printed for them, where the numéros stand, and how to
+ * reach the newsroom, which the current app only shows once one is signed out.
  *
  * What the reader kept is no longer a row here. It was, and it was also a mark on the front page's masthead, because
  * it was in the bar at the bottom nowhere — which made this screen the only way to it from the wire, the search and
@@ -101,6 +142,7 @@ export function AccountPage(): ReactNode {
         <Text variant="display" heading>
           {t('nav.account')}
         </Text>
+        <Subscription />
         <Group label={t('account.reading')}>
           <OpenRow
             label={t('settings.title')}

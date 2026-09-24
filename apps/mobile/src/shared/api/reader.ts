@@ -19,10 +19,31 @@ import type { StateStorage } from '../lib/storage';
 
 /** A reader as the app holds them: the token the client carries, and the two ways it changes. */
 export type Reader = Readonly<{
+  /**
+   * Whether this build can open a connection at all — whether it was started with the key the service asks for.
+   *
+   * A screen reads it to know whether to offer signing in. A published build has no key, so it offers nothing, and
+   * that is not a screen being careful: it is the only truthful thing it could show, there being no connection on
+   * the other side of the button.
+   */
+  offered: () => boolean;
   token: () => string | undefined;
   signIn: (credentials: Credentials) => Promise<void>;
   signOut: () => void;
 }>;
+
+/** Why a connection did not open, as the two things a screen has to say about it. */
+export type Refusal = 'refused' | 'unavailable';
+
+/**
+ * What a screen says of a connection that did not open.
+ *
+ * The service tells a wrong password apart from a service that would not answer, and a reader is owed that difference:
+ * one is something to correct, the other something to wait out. Everything else — a reply no reading understands, a
+ * network that never left the phone — reads as the service not answering, which is what it amounts to from here.
+ */
+export const refusalOf = (reason: unknown): Refusal =>
+  reason instanceof SessionError && reason.code === 'refused' ? 'refused' : 'unavailable';
 
 /** How the service takes a device's attestation: the one mode its own client mints, and the only one it reads. */
 const CRYPT_MODE = 'jdly';
@@ -69,6 +90,7 @@ export const createReader = (identity: Identity | undefined, ports: Posting, dis
     }
   };
   return {
+    offered: () => identity !== undefined,
     token: () => held,
     /**
      * Signs the reader in with what they typed, and holds what their login earned. A build with no identity cannot

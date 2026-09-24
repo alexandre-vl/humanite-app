@@ -24,6 +24,12 @@ export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/articl
 export const SETTINGS_HREF = '/settings' as const;
 
 /**
+ * Where a subscriber signs in. A screen and not a sheet: the two fields want the whole width a keyboard leaves, and
+ * a reader whose password manager takes over the screen should come back to the form, not to whatever was under it.
+ */
+export const SIGN_IN_HREF = '/sign-in' as const;
+
+/**
  * Where the numéros stand: a screen pushed from the account, and not a tab. Everything a reader does on that shelf
  * leaves the app for humanite.fr, and a door out is not a destination one comes back to.
  */

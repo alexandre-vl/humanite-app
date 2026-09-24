@@ -14,6 +14,7 @@ export const FR = {
   'account.contact.phone.hint': 'Par téléphone',
   'account.setAside.one': '{count} élément illisible écarté',
   'account.setAside.many': '{count} éléments illisibles écartés',
+  'account.subscription': 'Mon abonnement',
   'account.setAside.hint': 'Servis par le journal dans une forme que l’app ne sait pas lire.',
   'action.back': 'Revenir',
   'action.retry': 'Réessayer',
@@ -82,4 +83,19 @@ export const FR = {
   'settings.preview.text':
     'Les grévistes de la raffinerie ont voté la reconduction du mouvement jusqu’à lundi, au terme d’une assemblée générale qui a réuni près de six cents salariés.',
   'settings.reset': 'Réinitialiser',
+  'signIn.screen': 'Connexion',
+  'signIn.title': 'Se connecter',
+  'signIn.message':
+    'Connectez-vous avec les identifiants de votre abonnement numérique pour lire les articles qui lui sont réservés.',
+  'signIn.login': 'Identifiant',
+  'signIn.login.placeholder': 'Votre adresse électronique',
+  'signIn.password': 'Mot de passe',
+  'signIn.password.placeholder': 'Votre mot de passe',
+  'signIn.submit': 'Se connecter',
+  'signIn.opening': 'Connexion en cours …',
+  'signIn.refused': 'Identifiant ou mot de passe refusé par le journal.',
+  'signIn.unavailable': 'Le journal n’a pas répondu. Réessayez dans un instant.',
+  'signIn.where': 'L’abonnement se souscrit sur humanite.fr.',
+  'signIn.done': 'Abonné connecté',
+  'signIn.out': 'Se déconnecter',
 } as const satisfies Readonly<Record<string, string>>;

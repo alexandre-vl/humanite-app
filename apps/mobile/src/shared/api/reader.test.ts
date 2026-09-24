@@ -2,7 +2,7 @@ import { SessionError } from '@huma/remote-api';
 import type { Identity, Posting } from '@huma/remote-api';
 import { describe, expect, it } from '@jest/globals';
 import type { StateStorage } from '../lib/storage';
-import { createReader, identityOf } from './reader';
+import { createReader, identityOf, refusalOf } from './reader';
 
 /** An identity as a development build is given one: fake through and through, no value of the shape of a secret. */
 const IDENTITY: Identity = {
@@ -115,5 +115,22 @@ describe('createReader', () => {
     await expect(reader.signIn({ login: 'lecteur@example.org', password: 'x' })).rejects.toMatchObject({
       code: 'unavailable',
     });
+  });
+
+  /** A published build has no key, so it has nothing to offer and a screen shows no way in. */
+  it('n’offre la connexion que si la build a été démarrée avec une clé', () => {
+    expect(createReader(IDENTITY, posting([]), disk()).offered()).toBe(true);
+    expect(createReader(undefined, posting([]), disk()).offered()).toBe(false);
+  });
+});
+
+describe('refusalOf', () => {
+  /** A wrong password is something to correct; everything else is something to wait out. */
+  it('distingue le refus du service de son silence, et range le reste avec le silence', () => {
+    expect(refusalOf(new SessionError('refused', 'Customer login failed'))).toBe('refused');
+    expect(refusalOf(new SessionError('unavailable', 'le service a répondu 503'))).toBe('unavailable');
+    expect(refusalOf(new SessionError('malformed', 'forme inattendue'))).toBe('unavailable');
+    expect(refusalOf(new Error('la requête n’est jamais partie'))).toBe('unavailable');
+    expect(refusalOf('rien du tout')).toBe('unavailable');
   });
 });

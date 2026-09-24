@@ -53,4 +53,56 @@ describe('TextField', () => {
     expect(dismiss).toHaveBeenCalledTimes(1);
     dismiss.mockRestore();
   });
+
+  /** A field that names nothing is offered nothing: the keychain has no business in a search box. */
+  it('n’offre rien au trousseau du téléphone tant qu’un champ ne dit pas ce qu’il tient', async () => {
+    await render(<TextField value="" onChange={() => undefined} placeholder={asDisplayText(PLACEHOLDER)} />);
+    const field = screen.getByPlaceholderText(PLACEHOLDER);
+    expect(field.props['autoComplete']).toBe('off');
+    expect(field.props['secureTextEntry']).toBe(false);
+    expect(field.props['returnKeyType']).toBeUndefined();
+  });
+
+  it('dit au trousseau qu’il tient un identifiant, et ouvre le clavier des adresses', async () => {
+    await render(
+      <TextField
+        value=""
+        onChange={() => undefined}
+        placeholder={asDisplayText(PLACEHOLDER)}
+        fills="login"
+        keyboard="email"
+      />,
+    );
+    const field = screen.getByPlaceholderText(PLACEHOLDER);
+    expect(field.props['autoComplete']).toBe('username');
+    expect(field.props['textContentType']).toBe('username');
+    expect(field.props['keyboardType']).toBe('email-address');
+  });
+
+  /** A password is hidden and offered as the saved one, never as a new one the phone would propose inventing. */
+  it('cache un mot de passe et demande au trousseau celui qui est enregistré', async () => {
+    await render(
+      <TextField
+        value=""
+        onChange={() => undefined}
+        placeholder={asDisplayText(PLACEHOLDER)}
+        fills="password"
+        secret
+      />,
+    );
+    const field = screen.getByPlaceholderText(PLACEHOLDER);
+    expect(field.props['secureTextEntry']).toBe(true);
+    expect(field.props['autoComplete']).toBe('current-password');
+  });
+
+  it('porte la touche qui valide quand l’écran a quelque chose à faire d’elle', async () => {
+    const submit = jest.fn();
+    await render(
+      <TextField value="" onChange={() => undefined} placeholder={asDisplayText(PLACEHOLDER)} onSubmit={submit} />,
+    );
+    const field = screen.getByPlaceholderText(PLACEHOLDER);
+    expect(field.props['returnKeyType']).toBe('go');
+    await fireEvent(field, 'submitEditing');
+    expect(submit).toHaveBeenCalledTimes(1);
+  });
 });
