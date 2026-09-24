@@ -3924,6 +3924,113 @@
                 },
                 {
                   "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-secure-store"
+                  }
+                }
+              },
+              "message": "[module/expo-secure-store] expo-secure-store ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "page"
                   }
                 },
@@ -5286,6 +5393,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-image'] > ImportNamespaceSpecifier",
           "message": "[module/expo-image] expo-image ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-secure-store'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-secure-store] expo-secure-store ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='expo-splash-screen'] > ImportNamespaceSpecifier",
@@ -7721,6 +7832,113 @@
                 },
                 {
                   "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-secure-store"
+                  }
+                }
+              },
+              "message": "[module/expo-secure-store] expo-secure-store ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "page"
                   }
                 },
@@ -9086,6 +9304,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-image'] > ImportNamespaceSpecifier",
           "message": "[module/expo-image] expo-image ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-secure-store'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-secure-store] expo-secure-store ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='expo-splash-screen'] > ImportNamespaceSpecifier",
@@ -11517,6 +11739,113 @@
                 },
                 {
                   "element": {
+                    "type": "app"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "app-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "page"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "page-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "feature"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "feature-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "entity"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "entity-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "component"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "component-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "primitive"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "primitive-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "i18n"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "i18n-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "config"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "config-entry"
+                  }
+                },
+                {
+                  "element": {
+                    "type": "api"
+                  }
+                },
+                {
+                  "file": {
+                    "categories": "api-entry"
+                  }
+                }
+              ],
+              "disallow": {
+                "to": {
+                  "module": {
+                    "source": "expo-secure-store"
+                  }
+                }
+              },
+              "message": "[module/expo-secure-store] expo-secure-store ne s’importe que depuis : lib"
+            },
+            {
+              "from": [
+                {
+                  "element": {
+                    "type": "route"
+                  }
+                },
+                {
+                  "element": {
                     "type": "page"
                   }
                 },
@@ -12882,6 +13211,10 @@
         {
           "selector": "ImportDeclaration[source.value='expo-image'] > ImportNamespaceSpecifier",
           "message": "[module/expo-image] expo-image ne s’importe que depuis : primitive"
+        },
+        {
+          "selector": "ImportDeclaration[source.value='expo-secure-store'] > ImportNamespaceSpecifier",
+          "message": "[module/expo-secure-store] expo-secure-store ne s’importe que depuis : lib"
         },
         {
           "selector": "ImportDeclaration[source.value='expo-splash-screen'] > ImportNamespaceSpecifier",

@@ -1116,4 +1116,27 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0034': {
+    scope: {
+      // Where the token is kept and where the keystore is opened, with the reader that holds it and the registry that
+      // names every place the app writes on a phone.
+      paths: [
+        'apps/mobile/src/shared/lib/storage/keychain.ts',
+        'apps/mobile/src/shared/lib/storage/keychain.test.ts',
+        'apps/mobile/src/shared/lib/storage/keys.ts',
+        'apps/mobile/src/shared/api/reader.ts',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'Le lecteur de l’app est bâti sur le trousseau et sur rien d’autre : apps/mobile/src/shared/api/reader.ts passe keychain à createReader, et apps/mobile/src/shared/lib/storage/keychain.ts est la seule place qui parle à expo-secure-store. Aucun banc hors ligne ne lit ce qu’un téléphone garde ; les tests de l’app relisent l’aller-retour et la reprise de l’ancien magasin.',
+      },
+      R2: ['guardrail/module-expo-secure-store'],
+      R3: {
+        convention:
+          'keychain.removeItem écrit une chaîne vide, ce que la plateforme fait de façon synchrone, avant de demander l’effacement, qui ne l’est pas ; une lecture rend l’entrée vide comme une absence. Le test de keychain relit le secret juste après la suppression, sans rien attendre.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

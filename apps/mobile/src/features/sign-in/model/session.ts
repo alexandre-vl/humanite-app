@@ -1,7 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
-import type { QueryClient } from '@tanstack/react-query';
 import { READER } from '#api';
-import { STORAGE_KEYS, storage } from '#lib/storage';
 import { useConnection } from './store';
 import type { Connection, Opening } from './store';
 
@@ -15,48 +12,17 @@ export type ReaderSession = Readonly<{
 }>;
 
 /**
- * Everything the app is holding of the paper, forgotten — in memory and on the disk both.
+ * The reader's connection, for the screens that show it and the two that change it.
  *
- * It was all read as whoever was signed in when it was read: an article the service withheld from nobody is kept as
- * withheld, and a list carries that on every card. So the paper is dropped whenever the reader changes, and what is
- * on screen is asked again under whoever is signed in now.
- *
- * The disk is emptied by name rather than left to follow the memory. The cache is written through a door that holds a
- * write for a second, so an app killed inside that second would restart on the pages of the reader who has just gone;
- * and a cache that was already empty in memory emits nothing for that door to carry, so nothing would have been
- * written at all. Removing the one key the registry declares for it closes both, and costs a call.
+ * What happens to the paper when the connection changes is not here. It was, and that was the mistake: a screen is
+ * not the only thing that changes the reader — a reading the service refuses under a dead token forgets that token
+ * with nobody having pressed anything — and the paper read under the old one stayed in the cache, and on the disk,
+ * of a phone whose session had ended. It is done once now, where the cache lives, on every change of the token
+ * whatever caused it.
  */
-const forgetThePaper = (cache: QueryClient): void => {
-  void cache.resetQueries();
-  storage.remove(STORAGE_KEYS.queryCache);
-};
-
-/**
- * The connection, with what has to happen to the paper each time it changes.
- *
- * The clearing lives here rather than in the store because the cache is the app's, handed down through its provider,
- * and a store of a feature has no business reaching for it. Queries are reset rather than dropped: the screens behind
- * this one keep their observers and ask again, where dropping the queries outright would leave them pointing at
- * nothing until something else made them render.
- */
-export const useReaderSession = (): ReaderSession => {
-  const cache = useQueryClient();
-  const connection = useConnection((session) => session.connection);
-  const open = useConnection((session) => session.open);
-  const close = useConnection((session) => session.close);
-  return {
-    offered: READER.offered(),
-    connection,
-    signIn: async (login: string, password: string): Promise<Opening> => {
-      const opening = await open(login, password);
-      if (opening.kind === 'opened') {
-        forgetThePaper(cache);
-      }
-      return opening;
-    },
-    signOut: (): void => {
-      close();
-      forgetThePaper(cache);
-    },
-  };
-};
+export const useReaderSession = (): ReaderSession => ({
+  offered: READER.offered(),
+  connection: useConnection((session) => session.connection),
+  signIn: useConnection((session) => session.open),
+  signOut: useConnection((session) => session.close),
+});

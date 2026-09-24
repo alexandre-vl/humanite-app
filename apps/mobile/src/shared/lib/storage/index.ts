@@ -1,4 +1,5 @@
-export { STORAGE_KEYS } from './keys';
+export { KEYCHAIN_KEYS, STORAGE_KEYS } from './keys';
+export { keychain } from './keychain';
 export { field } from './restored';
 export { stateStorage } from './state-storage';
 export type { StateStorage } from './state-storage';

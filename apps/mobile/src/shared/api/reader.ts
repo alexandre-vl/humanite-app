@@ -2,7 +2,7 @@ import { ContentApiError } from '@huma/contracts';
 import type { ContentApi } from '@huma/contracts';
 import { createSession, SERVICE_APP, SessionError } from '@huma/remote-api';
 import type { Credentials, Identity, Posting } from '@huma/remote-api';
-import { STORAGE_KEYS, stateStorage } from '../lib/storage';
+import { keychain, KEYCHAIN_KEYS } from '../lib/storage';
 import type { StateStorage } from '../lib/storage';
 
 /**
@@ -90,7 +90,7 @@ export const createReader = <Signal>(
   ports: Posting<Signal>,
   disk: StateStorage,
 ): Reader => {
-  let held = disk.getItem(STORAGE_KEYS.readerToken) ?? undefined;
+  let held = disk.getItem(KEYCHAIN_KEYS.readerToken) ?? undefined;
   const watchers = new Set<() => void>();
   const hold = (token: string | undefined): void => {
     if (token === held) {
@@ -98,9 +98,9 @@ export const createReader = <Signal>(
     }
     held = token;
     if (token === undefined) {
-      disk.removeItem(STORAGE_KEYS.readerToken);
+      disk.removeItem(KEYCHAIN_KEYS.readerToken);
     } else {
-      disk.setItem(STORAGE_KEYS.readerToken, token);
+      disk.setItem(KEYCHAIN_KEYS.readerToken, token);
     }
     for (const watcher of [...watchers]) {
       watcher();
@@ -202,5 +202,11 @@ declare const process: Readonly<{
   }>;
 }>;
 
-/** The reader of this build: the identity it was started with, the platform's network, and the phone's own disk. */
-export const READER: Reader = createReader(identityOf(process.env), POSTING, stateStorage(STORAGE_KEYS.readerToken));
+/**
+ * The reader of this build: the identity it was started with, the platform's network, and the phone's own keystore.
+ *
+ * The token goes to the keystore and not to the store the rest of the app writes to. The rest is a preference or a
+ * page of the paper, and a phone that loses either loses nothing anyone wanted; this is what proves a subscription
+ * belongs to whoever is holding the phone.
+ */
+export const READER: Reader = createReader(identityOf(process.env), POSTING, keychain);

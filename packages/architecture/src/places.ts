@@ -231,6 +231,7 @@ export const MODULES = {
   'expo-linking': { places: ['lib'], except: [] },
   'expo-router': { places: ['app', 'lib', 'page'], except: [] },
   'expo-image': { places: ['primitive'], except: [] },
+  'expo-secure-store': { places: ['lib'], except: [] },
   'expo-splash-screen': { places: ['app'], except: [] },
   'expo-symbols': { places: ['primitive'], except: [] },
   'expo-system-ui': { places: ['primitive'], except: [] },

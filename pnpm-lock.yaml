@@ -123,6 +123,9 @@ catalogs:
     expo-router:
       specifier: 57.0.21
       version: 57.0.21
+    expo-secure-store:
+      specifier: 57.0.4
+      version: 57.0.4
     expo-splash-screen:
       specifier: 57.0.9
       version: 57.0.9
@@ -335,6 +338,9 @@ importers:
       expo-router:
         specifier: 'catalog:'
         version: 57.0.21(c0e00562d98a4dcdc57912c9c69d1b7c)
+      expo-secure-store:
+        specifier: 'catalog:'
+        version: 57.0.4(expo@57.0.22)
       expo-splash-screen:
         specifier: 'catalog:'
         version: 57.0.9(expo@57.0.22)(supports-color@8.1.1)(typescript@6.0.3)
@@ -4390,6 +4396,11 @@ packages:
         optional: true
       react-server-dom-webpack:
         optional: true
+
+  expo-secure-store@57.0.4:
+    resolution: {integrity: sha512-7zBA1RThURTXdP4w65kBzZNbcSsfArqVd+p+ETAnPRWXO8J296Qd0YaCVyRpJ0HSwlCnGdvOnqO+NgSreHsOhA==}
+    peerDependencies:
+      expo: '*'
 
   expo-server@57.0.3:
     resolution: {integrity: sha512-aK+LdKzauHSGmsOStZtyxdzv0zWssCkxTw3m4QuOhfDSJsZaMRTd9O41d8ixU/QfELTbaJ0oRNcF7JFV/7O9YQ==}
@@ -10690,6 +10701,10 @@ snapshots:
       - expo-font
       - react-native-worklets
       - supports-color
+
+  expo-secure-store@57.0.4(expo@57.0.22):
+    dependencies:
+      expo: 57.0.22(5cf7f2d96aa15f3368c537af58c59e98)
 
   expo-server@57.0.3: {}
 

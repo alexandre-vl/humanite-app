@@ -39,6 +39,7 @@
     "expo-image": "catalog:",
     "expo-linking": "catalog:",
     "expo-router": "catalog:",
+    "expo-secure-store": "catalog:",
     "expo-splash-screen": "catalog:",
     "expo-symbols": "catalog:",
     "expo-system-ui": "catalog:",

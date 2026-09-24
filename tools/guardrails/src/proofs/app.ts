@@ -228,6 +228,12 @@ export function useOpacity(): number {
       linted({ 'src/pages/home/model/image.ts': "export { Image } from 'expo-image';\n" }),
     ),
     define(
+      'guardrail/module-expo-secure-store',
+      'une page qui ouvre elle-même le trousseau du téléphone',
+      ['module/expo-secure-store'],
+      linted({ 'src/pages/home/model/keychain.ts': "export { getItem } from 'expo-secure-store';\n" }),
+    ),
+    define(
       'guardrail/module-expo-symbols',
       'une page qui rend un symbole natif',
       ['module/expo-symbols'],

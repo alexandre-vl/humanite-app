@@ -36,6 +36,24 @@ jest.mock('react-native-mmkv', () => {
   };
 });
 
+// expo-secure-store reaches the platform's keystore, which no headless runner has. An in-memory map stands in, with
+// the same synchronous reads and writes and the same asynchronous delete — so the move across from the old store and
+// the overwrite that precedes a delete are exercised here exactly as they run on a phone.
+jest.mock('expo-secure-store', () => {
+  const kept = new Map<string, string>();
+  return {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'whenUnlockedThisDeviceOnly',
+    getItem: (key: string): string | null => kept.get(key) ?? null,
+    setItem: (key: string, value: string): void => {
+      kept.set(key, value);
+    },
+    deleteItemAsync: async (key: string): Promise<void> => {
+      kept.delete(key);
+      return Promise.resolve();
+    },
+  };
+});
+
 // expo-splash-screen and expo-font reach native modules absent from a headless runner; the startup-gate test drives them.
 jest.mock('expo-splash-screen', () => ({ preventAutoHideAsync: jest.fn(), hideAsync: jest.fn() }));
 

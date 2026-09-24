@@ -76,6 +76,7 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     'expo-image': '57.0.5',
     'expo-linking': '57.0.10',
     'expo-router': '57.0.21',
+    'expo-secure-store': '57.0.4',
     'expo-splash-screen': '57.0.9',
     'expo-symbols': '57.0.3',
     'expo-system-ui': '57.0.4',
