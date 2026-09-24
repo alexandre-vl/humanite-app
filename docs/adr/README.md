@@ -39,6 +39,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0029](0029-une-build-de-service-sans-le-corpus-par-variantes.md)           | Une build de service sans le corpus, par variantes          | accepté                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0030](0030-une-valeur-inconnue-se-lit-par-un-seul-paquet.md)               | Une valeur inconnue se lit par un seul paquet               | accepté                                                                  | `dependency`, `guarded-config`, `boundary`                                 |
 | [ADR-0031](0031-aucune-connexion-et-le-droit-que-le-service-accorde.md)         | Aucune connexion, et le droit que le service accorde        | accepté                                                                  | `guarded-config`, `boundary`                                               |
+| [ADR-0032](0032-la-connexion-de-l-abonne-sous-une-cle-pretee.md)                | La connexion de l’abonné, sous une clé prêtée               | proposé                                                                  | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -378,6 +379,16 @@ Statut : accepté. Périmètre : `packages/contracts/src/intake.ts`, `tools/guar
 | R1    | NE DOIT PAS | `right/reader`, `right/withheld-opened`, `right/granted-withheld`                                                                                                                                                                                                                                                                                                                                                        |
 | R2    | NE DOIT PAS | `transport/borrows-key`                                                                                                                                                                                                                                                                                                                                                                                                  |
 | R3    | NE DOIT PAS | convention : Aucune place de l’app ne demande au lecteur les identifiants de son abonnement : le contrat du contenu ne nomme aucune connexion (packages/contracts/src/api.ts), la porte n’en tend aucune (apps/mobile/src/shared/api/content.ts), et aucun champ de saisie de l’app n’est masqué ni annoncé comme un mot de passe. Le service les refuserait : il ne connecte que le client qui porte son jeton anonyme. |
+
+### ADR-0032 · La connexion de l’abonné, sous une clé prêtée
+
+Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `tools/guardrails/src/proofs/right.ts`, `tools/guardrails/src/proofs/transport.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                   |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | NE DOIT PAS | `right/reader`, `right/withheld-opened`, `right/granted-withheld`                                                                                                                                                                                                                                                         |
+| R2    | NE DOIT PAS | `transport/borrows-key`                                                                                                                                                                                                                                                                                                   |
+| R3    | PEUT        | convention : L’app PEUT demander à l’abonné les identifiants de son abonnement et les porter à POST /user/login pour obtenir un jeton d’usager. La clé du client officiel est injectée au démarrage d’un build de développement ; aucun fichier suivi ne la porte, qu’une lecture de tools/capture/src/secrets.ts arrête. |
 
 ## Référentiel
 
