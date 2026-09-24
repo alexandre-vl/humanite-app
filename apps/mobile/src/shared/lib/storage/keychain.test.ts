@@ -11,7 +11,7 @@ const inKeystore = (): string | null => getItem(KEYCHAIN_KEYS.readerToken);
 
 beforeEach(async () => {
   await deleteItemAsync(KEYCHAIN_KEYS.readerToken);
-  storage.remove(STORAGE_KEYS.readerTokenWas);
+  storage.forget(STORAGE_KEYS.readerTokenWas);
 });
 
 describe('keychain', () => {

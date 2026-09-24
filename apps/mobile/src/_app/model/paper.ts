@@ -1,6 +1,6 @@
-import { READER } from '#api';
+import type { QueryClient } from '@tanstack/react-query';
+import type { Reader } from '#api';
 import { STORAGE_KEYS, storage } from '#lib/storage';
-import { queryClient } from './query-client';
 
 /**
  * Drops everything the app is holding of the paper whenever the reader changes — whoever changed it.
@@ -22,11 +22,18 @@ import { queryClient } from './query-client';
  * so a phone killed inside that second would restart on the pages of the reader who has just gone; and a cache that
  * was already empty in memory emits nothing for that door to carry, so nothing would have been written at all.
  *
+ * On the disk the name is forgotten and not merely removed. The store appends, so removing the key would leave the
+ * bodies a subscription paid for exactly where they were written, in a file the next person to hold the phone can
+ * read — which is the whole of what this function is for.
+ *
+ * The reader and the cache are handed in rather than reached for, as every port of this app is: a test drives a
+ * reader whose token it can move and a cache it can read, where the app's own two are a keystore and a file.
+ *
  * Nothing unsubscribes. The reader and the cache both live as long as the app does, and so does this.
  */
-export const forgetThePaperWhenTheReaderChanges = (): void => {
-  READER.watch(() => {
-    void queryClient.resetQueries();
-    storage.remove(STORAGE_KEYS.queryCache);
+export const forgetThePaperWhenTheReaderChanges = (reader: Reader, cache: QueryClient): void => {
+  reader.watch(() => {
+    void cache.resetQueries();
+    storage.forget(STORAGE_KEYS.queryCache);
   });
 };

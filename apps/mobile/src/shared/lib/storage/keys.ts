@@ -26,6 +26,27 @@ export const STORAGE_KEYS = {
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
 
 /**
+ * The names under which the store holds something the next person to pick up the phone must not read.
+ *
+ * The paper is one of them: a body the service only sends to a subscription is written there whole, and stays the
+ * reader's alone. The token is the other, for as long as a phone upgraded from a build without a keystore still has
+ * one to hand over. What is left — how the paper is printed, which articles were kept — is the reader's own and
+ * harms nobody by outliving its own removal.
+ *
+ * The list is split here, at the registry, rather than recalled at each call: MMKV appends, so taking a key out and
+ * erasing what was under it are two different operations, and the store offers one of each. Naming which keys are
+ * which makes the compiler refuse the wrong one — three call sites had it wrong on 24/09/2026, and a convention
+ * would have had to be remembered at the fourth.
+ */
+type Secret = 'queryCache' | 'readerTokenWas';
+
+/** A key whose value must not survive its own removal. */
+export type SecretKey = (typeof STORAGE_KEYS)[Secret];
+
+/** A key holding nothing anyone else is kept from: taking it out is enough. */
+export type PlainKey = (typeof STORAGE_KEYS)[Exclude<keyof typeof STORAGE_KEYS, Secret>];
+
+/**
  * The names the app keeps in the phone's own keystore, which is not the same disk as the one above.
  *
  * One name, and it is the only secret the app holds. It is kept under its source for the reason the pages are: a

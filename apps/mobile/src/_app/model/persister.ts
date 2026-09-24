@@ -86,6 +86,6 @@ export const mmkvPersister: Persister = {
       clearTimeout(door);
       door = undefined;
     }
-    storage.remove(STORAGE_KEYS.queryCache);
+    storage.forget(STORAGE_KEYS.queryCache);
   },
 };

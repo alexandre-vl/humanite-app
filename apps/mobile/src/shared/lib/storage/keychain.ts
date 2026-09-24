@@ -32,8 +32,13 @@ const OPTIONS = { keychainAccessible: WHEN_UNLOCKED_THIS_DEVICE_ONLY } as const;
  *
  * A reader who had signed in under the old build would otherwise be signed out by the upgrade, and — worse — would
  * leave their token behind in a file that is no longer read and no longer cleared by anything, for as long as the app
- * stays installed. It is read once, written to the keystore, and removed from the store it came from; the second run
+ * stays installed. It is read once, written to the keystore, and forgotten in the store it came from; the second run
  * finds nothing to move.
+ *
+ * Forgotten rather than removed: the old store appends, so removing the key would have left the token's bytes in the
+ * file for anyone able to read it, which is exactly the reader this move exists to shut out. The empty entry a
+ * sign-out under the old build left behind is forgotten the same way — it holds no secret, but leaving it would mean
+ * this ran again at every launch for the life of the install.
  */
 const broughtForward = (): void => {
   const kept = storage.getString(STORAGE_KEYS.readerTokenWas);
@@ -41,7 +46,7 @@ const broughtForward = (): void => {
     if (kept !== '') {
       setItem(KEYCHAIN_KEYS.readerToken, kept, OPTIONS);
     }
-    storage.remove(STORAGE_KEYS.readerTokenWas);
+    storage.forget(STORAGE_KEYS.readerTokenWas);
   }
 };
 

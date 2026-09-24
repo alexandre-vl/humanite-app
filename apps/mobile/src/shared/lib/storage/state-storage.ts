@@ -1,4 +1,4 @@
-import type { StorageKey } from './keys';
+import type { PlainKey } from './keys';
 import { storage } from './storage';
 
 /**
@@ -21,7 +21,7 @@ export type StateStorage = Readonly<{
  * the app writes to disk, and a name travelling down from a store would be a second one. Absence is returned as the
  * null a middleware expects, the storage answering with `undefined`.
  */
-export const stateStorage = (key: StorageKey): StateStorage => ({
+export const stateStorage = (key: PlainKey): StateStorage => ({
   getItem: () => storage.getString(key) ?? null,
   setItem: (name, value) => {
     storage.set(key, value);

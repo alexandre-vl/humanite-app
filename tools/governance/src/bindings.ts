@@ -1118,13 +1118,19 @@ export const BINDINGS = {
   },
   'ADR-0034': {
     scope: {
-      // Where the token is kept and where the keystore is opened, with the reader that holds it and the registry that
-      // names every place the app writes on a phone.
+      // Where the token is kept and where the keystore is opened, with the reader that holds it, the registry that
+      // names every place the app writes on a phone, the store that takes those places back, the two callers that
+      // take a secret one back, and the config that decides whether the phone's own directory travels.
       paths: [
         'apps/mobile/src/shared/lib/storage/keychain.ts',
         'apps/mobile/src/shared/lib/storage/keychain.test.ts',
         'apps/mobile/src/shared/lib/storage/keys.ts',
+        'apps/mobile/src/shared/lib/storage/storage.ts',
+        'apps/mobile/src/shared/lib/storage/state-storage.ts',
         'apps/mobile/src/shared/api/reader.ts',
+        'apps/mobile/src/_app/model/paper.ts',
+        'apps/mobile/src/_app/model/persister.ts',
+        'apps/mobile/app.config.ts',
       ],
     },
     rules: {
@@ -1136,6 +1142,14 @@ export const BINDINGS = {
       R3: {
         convention:
           'keychain.removeItem écrit une chaîne vide, ce que la plateforme fait de façon synchrone, avant de demander l’effacement, qui ne l’est pas ; une lecture rend l’entrée vide comme une absence. Le test de keychain relit le secret juste après la suppression, sans rien attendre.',
+      },
+      R4: {
+        convention:
+          'Le registre des clés sépare les noms secrets des autres (apps/mobile/src/shared/lib/storage/keys.ts, SecretKey et PlainKey), et le magasin donne à chaque famille sa propre porte : storage.remove ne prend qu’une clé simple, storage.forget ne prend qu’une clé secrète et réécrit le fichier. Un retrait de secret ne compile pas. Aucun banc hors ligne ne le mesure : la bibliothèque simulée des tests ne rejoue pas l’écriture en ajout d’un vrai MMKV.',
+      },
+      R5: {
+        convention:
+          'apps/mobile/app.config.ts pose android.allowBackup à false, ce que le greffon de configuration d’Expo porte à l’attribut android:allowBackup de l’application principale au prebuild. Le dossier android/ étant régénéré et non suivi, la configuration est la seule place où cela se décide.',
       },
     },
   },

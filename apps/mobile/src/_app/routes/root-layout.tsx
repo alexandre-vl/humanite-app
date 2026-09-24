@@ -2,6 +2,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { Stack } from 'expo-router';
 import { preventAutoHideAsync } from 'expo-splash-screen';
 import type { ReactNode } from 'react';
+import { READER } from '#api';
 import { StartupProvider } from '#lib/startup';
 import { chromeOptions, useTheme } from '#lib/styles';
 import { SafeAreaRoot } from '#primitives/safe-area';
@@ -13,7 +14,7 @@ import { StartupGate } from './startup-gate';
 
 void preventAutoHideAsync();
 followTheApp();
-forgetThePaperWhenTheReaderChanges();
+forgetThePaperWhenTheReaderChanges(READER, queryClient);
 
 /**
  * The stack of pushed screens, in the colours in force.

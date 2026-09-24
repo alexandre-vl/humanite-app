@@ -20,7 +20,12 @@ globalThis.requestAnimationFrame = (callback: (time: number) => void): number =>
 };
 
 // react-native-mmkv reaches its native NitroModules TurboModule at import, which no headless runner provides. The
-// storage lib only calls getString/set/remove, so an in-memory map stands in and lets the persister round-trip.
+// storage lib only calls getString/set/remove/trim, so an in-memory map stands in and lets the persister round-trip.
+//
+// `trim` does nothing here, and that is the whole truth of this double rather than a shortcut. On a phone MMKV keeps
+// an append-only log, so a removed key's value stays in the file until the log is rewritten, and `trim` is what
+// rewrites it; a map deletes what it deletes. Nothing offline can tell the two apart, which is why the erasure is
+// proved on a device and recorded in ADR-0034 instead.
 jest.mock('react-native-mmkv', () => {
   const store = new Map<string, string>();
   return {
@@ -32,6 +37,7 @@ jest.mock('react-native-mmkv', () => {
       remove: (key: string): void => {
         store.delete(key);
       },
+      trim: (): void => undefined,
     }),
   };
 });
