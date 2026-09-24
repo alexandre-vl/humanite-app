@@ -1,5 +1,5 @@
 {
   "extends": "@huma/tsconfig/node.json",
-  "include": ["app.config.ts", "jest.setup.ts", "metro.config.ts"],
+  "include": ["app.config.ts", "jest.network.ts", "jest.setup.ts", "metro.config.ts"],
   "references": [{ "path": "../../packages/architecture" }]
 }

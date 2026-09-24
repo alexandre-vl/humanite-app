@@ -15,6 +15,16 @@ export const RESOLUTION = {
  */
 export const SERVICE_VARIANT = 'service';
 
+/**
+ * The variable a build names the source it reads by. Metro reads it to resolve the service variants, and the tests
+ * and the emulator's Metro set it to the corpus, whatever the shell exported. The app reads it too, spelled out in
+ * full: the one form of a public variable Expo writes into a bundle (`apps/mobile/src/shared/config/source.ts`).
+ */
+export const SOURCE_VARIABLE = 'EXPO_PUBLIC_CONTENT_SOURCE';
+
+/** The name of the source that reads the simulated paper: what a build naming none reads, and every test does. */
+export const CORPUS_SOURCE = 'mock';
+
 /** An extension as a service build tries it first: `.ts` becomes `.service.ts`, and Metro's dotless `ts` `service.ts`. */
 const serviceVariantOf = (extension: string): string =>
   extension.startsWith('.') ? `.${SERVICE_VARIANT}${extension}` : `${SERVICE_VARIANT}.${extension}`;

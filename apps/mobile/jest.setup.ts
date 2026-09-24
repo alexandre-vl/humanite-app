@@ -1,3 +1,4 @@
+import { CORPUS_SOURCE, SOURCE_VARIABLE } from '@huma/architecture';
 import { jest } from '@jest/globals';
 import type { ReactNode } from 'react';
 import type { AccessibilityRole, StyleProp, ViewStyle } from 'react-native';
@@ -6,7 +7,7 @@ import type { AccessibilityRole, StyleProp, ViewStyle } from 'react-native';
 // shell that runs them has exported. The variable is made to say the same, since the door refuses a build whose source
 // and variable disagree — a service chosen for a phone's build would otherwise stop every test at its first import.
 // Expo reads the variable when a module asks for it, which is after this.
-process.env['EXPO_PUBLIC_CONTENT_SOURCE'] = 'mock';
+process.env[SOURCE_VARIABLE] = CORPUS_SOURCE;
 
 // A frame never arrives without a screen, so the runner's requestAnimationFrame fires on a timer of its own, after the
 // test that scheduled it has ended. @shopify/flash-list schedules the end of its first layout that way, and the state

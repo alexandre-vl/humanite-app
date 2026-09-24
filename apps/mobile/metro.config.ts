@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { FileStore } from '@expo/metro-config/file-store';
-import { SERVICE_VARIANT, withServiceVariants } from '@huma/architecture';
+import { SERVICE_VARIANT, SOURCE_VARIABLE, withServiceVariants } from '@huma/architecture';
 import type { MetroConfig } from 'expo/metro-config.js';
 import { getDefaultConfig } from 'expo/metro-config.js';
 
@@ -18,7 +18,7 @@ const defaults = getDefaultConfig(import.meta.dirname);
  * reached and never bundled. The app reads the same variable for its own name of the source it reads; a value neither
  * source answers to stops it at its first line.
  */
-const readsService = process.env['EXPO_PUBLIC_CONTENT_SOURCE'] === SERVICE_VARIANT;
+const readsService = process.env[SOURCE_VARIABLE] === SERVICE_VARIANT;
 
 const config: MetroConfig = {
   ...defaults,

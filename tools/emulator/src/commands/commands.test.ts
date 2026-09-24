@@ -147,13 +147,21 @@ test('the CPU cap of the scope says what the affinity says: one list of CPUs, tw
   );
 });
 
-test('Metro serves the loopback over IPv4, never in CI mode, without network requests', () => {
+test('Metro serves the corpus on the loopback over IPv4, never in CI mode, without network requests', () => {
   expect(metroArguments(EMULATOR)).toEqual(['start', '--dev-client', '--localhost', '--port', '8081']);
-  expect(metroEnvironment({ CI: '1', NODE_OPTIONS: '--max-old-space-size=4096', HOME: '/home/user' })).toEqual({
+  expect(
+    metroEnvironment({
+      CI: '1',
+      NODE_OPTIONS: '--max-old-space-size=4096',
+      HOME: '/home/user',
+      EXPO_PUBLIC_CONTENT_SOURCE: 'service',
+    }),
+  ).toEqual({
     HOME: '/home/user',
     EXPO_NO_TELEMETRY: '1',
     EXPO_OFFLINE: '1',
     NODE_OPTIONS: '--max-old-space-size=4096 --dns-result-order=ipv4first',
+    EXPO_PUBLIC_CONTENT_SOURCE: 'mock',
   });
 });
 

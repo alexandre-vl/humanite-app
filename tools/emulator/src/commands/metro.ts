@@ -1,3 +1,4 @@
+import { CORPUS_SOURCE, SOURCE_VARIABLE } from '@huma/architecture';
 import type { ExitCode } from '@huma/kit/cli';
 import type { Environment } from '@huma/kit/process';
 import { describeExit, runAttached } from '@huma/kit/process';
@@ -35,6 +36,10 @@ export const metroArguments = (config: EmulatorConfig): readonly string[] => [
 /**
  * The environment Metro runs with: without `CI`, which freezes the bundle Metro serves, without network requests, and
  * with IPv4 first, since `--localhost` would otherwise listen on `::1` alone while `adb reverse` reaches 127.0.0.1.
+ *
+ * And the corpus, whatever the shell exported. The emulator runs on the shared host, and its flows are written for
+ * the simulated paper: a shell left exporting the service would have them read the journal's service from here, and
+ * type what they type into it. Only a phone's own app asks the service.
  */
 export function metroEnvironment(environment: Environment): Environment {
   const options = [environment['NODE_OPTIONS'], '--dns-result-order=ipv4first'].filter(
@@ -44,6 +49,7 @@ export function metroEnvironment(environment: Environment): Environment {
     ...expoEnvironment(Object.fromEntries(Object.entries(environment).filter(([name]) => name !== 'CI'))),
     EXPO_OFFLINE: '1',
     NODE_OPTIONS: options.join(' '),
+    [SOURCE_VARIABLE]: CORPUS_SOURCE,
   };
 }
 

@@ -1,5 +1,7 @@
 /**
- * The app's bench: jest-expo over the sources, with the stand-ins the runner needs loaded before anything imports.
+ * The app's bench: jest-expo over the sources, with the stand-ins the runner needs loaded before anything imports, and
+ * the network closed once the runner is in place: a test that asks it without standing in for it fails, naming the
+ * address (`jest.network.ts`).
  *
  * `testTimeout` is the app's and not jest's. Jest holds a test to five seconds by default, and a case here renders a
  * screen — the React Native transform, a virtualised list, a query client and the corpus behind it — on a machine that
@@ -16,5 +18,6 @@ module.exports = {
   preset: 'jest-expo',
   roots: ['<rootDir>/src'],
   setupFiles: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.network.ts'],
   testTimeout: 30_000,
 };
