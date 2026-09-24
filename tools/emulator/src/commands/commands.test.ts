@@ -192,6 +192,8 @@ test('the dev client link skips the launcher, and Maestro gets the app and its l
     '--format=JUNIT',
     '--output=/out/report.xml',
     '--test-output-dir=/out',
+    // The bench has no subscriber and no key to open a connection with, so the flow that needs both is left out.
+    '--exclude-tags=abonne',
     '-e',
     'APP_ID=dev.humanite.app',
     '-e',

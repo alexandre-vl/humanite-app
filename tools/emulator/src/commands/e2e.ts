@@ -21,6 +21,16 @@ export const devClientLink = (scheme: string, config: EmulatorConfig): string =>
     ...config.devClientFlags,
   }).toString()}`;
 
+/**
+ * The flows this bench does not run: the ones needing a subscriber.
+ *
+ * Signing in takes an account at the journal and the key its service opens a connection under, and the emulator has
+ * neither — nothing tracked here carries them, which is the point (ADR-0032). A flow that asked for them would fail
+ * for want of a way to begin, and a red that says nothing about the app is worse than a flow not run: it teaches
+ * whoever reads the bench to expect red, and the next real one goes unread.
+ */
+const WITHOUT = 'abonne';
+
 /** The arguments of Maestro that run every flow on the emulator, the app and its link given as variables of the flows. */
 export const maestroArguments = (
   session: Session,
@@ -33,6 +43,7 @@ export const maestroArguments = (
   '--format=JUNIT',
   `--output=${join(flows.output, 'report.xml')}`,
   `--test-output-dir=${flows.output}`,
+  `--exclude-tags=${WITHOUT}`,
   '-e',
   `APP_ID=${flows.appId}`,
   '-e',

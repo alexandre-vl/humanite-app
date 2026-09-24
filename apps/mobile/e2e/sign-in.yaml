@@ -1,0 +1,66 @@
+# L’abonné se connecte, et le mur tombe sur l’article même qui le portait.
+#
+# C’est le seul parcours qui demande quelque chose que le dépôt n’a pas : les identifiants d’un abonnement, et la clé
+# sous laquelle la connexion s’ouvre. Ni l’un ni l’autre n’est écrit ici — ils arrivent en variables, d’un shell qui
+# les tient hors de l’arbre — et c’est pourquoi le parcours porte une étiquette que le banc de l’émulateur écarte :
+# un banc sans abonné ne saurait pas le jouer, et un parcours qui échoue faute d’avoir de quoi commencer ne dit rien
+# de l’app.
+#
+# L’article est ouvert par son lien plutôt que par une carte de la une. Une carte ne dit pas si ce qu’elle ouvre est
+# réservé — la pastille d’accès libre vient de « premium », que le journal met sur l’article, et non de « right », que
+# le service accorde au lecteur — donc toucher une carte au hasard ouvrirait une fois sur cinq un article libre, et le
+# mur qu’on est venu voir tomber ne serait jamais monté. Le lien nomme un article dont on sait qu’il est réservé, et
+# il le nomme depuis le shell pour la même raison qu’un titre ne se recopie pas ici : ce qui vient du journal n’a pas
+# à être écrit deux fois.
+#
+# Le mur est cherché en déroulant la page : il est sous le chapô et sous la photo, et une page qu’on n’a pas déroulée
+# ne l’a pas encore posé. Les deux moitiés déroulent donc autant l’une que l’autre, et attendent d’abord que l’article
+# soit là : le marque-page de l’en-tête n’est monté qu’avec lui, et c’est à ce mot qu’on sait qu’on ne regarde plus le
+# squelette. Sans cette attente la seconde moitié passait au vert sur un écran vide — le mur n’y était pas, mais rien
+# n’y était, et une absence sur une page qui n’a pas fini de se charger ne prouve rien. Les deux captures sont prises
+# de part et d’autre de la connexion, sur la même adresse et à la même profondeur.
+#
+# La dernière ligne repose l’app comme elle l’a trouvée. Le jeton d’un abonné survit à la fermeture — c’est tout
+# l’objet de ce qu’on éprouve ici — donc un parcours qui partirait en le laissant derrière lui ferait passer le
+# suivant pour vert alors qu’il n’aurait rien ouvert du tout.
+appId: ${APP_ID}
+tags:
+  - abonne
+---
+- runFlow: parts/launch.yaml
+- openLink: ${ARTICLE_LINK}
+- extendedWaitUntil:
+    visible: 'Ajouter à mes lectures'
+    timeout: 30000
+- scrollUntilVisible:
+    element: 'Réservé aux abonnés'
+    direction: DOWN
+    timeout: 20000
+- takeScreenshot: mur-debout
+- back
+- tapOn: 'Mon compte'
+- tapOn: 'Se connecter'
+- assertVisible: 'Connexion'
+- tapOn: 'Votre adresse électronique'
+- inputText: ${LOGIN}
+- tapOn: 'Votre mot de passe'
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn: 'Se connecter'
+- extendedWaitUntil:
+    visible: 'Se déconnecter'
+    timeout: 30000
+- takeScreenshot: abonne-connecte
+- openLink: ${ARTICLE_LINK}
+- extendedWaitUntil:
+    visible: 'Ajouter à mes lectures'
+    timeout: 30000
+- repeat:
+    times: 12
+    commands:
+      - scroll
+- assertNotVisible: 'Réservé aux abonnés'
+- takeScreenshot: mur-tombe
+- back
+- tapOn: 'Se déconnecter'
+- assertVisible: 'Se connecter'
