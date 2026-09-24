@@ -98,6 +98,26 @@ export const TRANSPORT_FIXTURES = [
     ),
   ),
   define(
+    'transport/borrows-key',
+    'un client qui se fait reconnaître en frappant le jeton anonyme du client officiel',
+    ['transport/impersonates', 'transport/address-unknown'],
+    judged((client) =>
+      createRemoteApi({
+        ...client,
+        fetch: async (address, init) => {
+          // The shape the gate tempts a hurried change into: mint the anonymous token the official client mints from
+          // its own key, then carry it. Two things go wrong at once, and the judging names both — an address no
+          // capture holds an answer for, and a request speaking under someone else's token.
+          await client.fetch(address.replace(/\/wordpress\/.*$/u, '/anonymous-token'), init);
+          return client.fetch(address, {
+            ...init,
+            headers: { ...init.headers, 'x-anonymous-token': 'jeton-emprunte' },
+          });
+        },
+      }),
+    ),
+  ),
+  define(
     'transport/no-deadline-article',
     'un client qui demande un article par un second client, bâti sans délai',
     ['transport/no-deadline'],

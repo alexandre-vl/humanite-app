@@ -361,3 +361,65 @@ export const judgeIntake = (take: Take): readonly Finding<IntakeCode>[] => {
       : [{ code: 'intake/order-lost' as const, says: 'les items servis ne sont plus dans l’ordre de la rédaction' }]),
   ];
 };
+
+/** The name of one thing a reading of one article can get wrong about the right the service grants. */
+export type RightCode = 'right/withheld-opened' | 'right/granted-withheld';
+
+/** A way of reading one article of the service, which is what the judging below is handed rather than reaching for. */
+export type Opening = (answer: unknown) => Read<Article>;
+
+/** A body as the service sends one: prose enough to be read as a block, and to be seen where it should not be. */
+const CONTENT = ['<p>Le corps de l’article.</p>'];
+
+/** The item every answer below carries, reserved: what the service says of an article it sells. */
+const RESERVED = {
+  ...POST,
+  id: '3900004',
+  date: '2026-09-21T11:00:00',
+  title: 'Quatre',
+  description: '<p class="chapo">Quatre.</p>',
+  premium: true,
+} as const;
+
+/**
+ * The three answers the service gives for one reserved article, and what a reading owes each.
+ *
+ * `right` is the service's word and the only one: it alone says whether this reader may read this article, and it is
+ * not `premium`, which says the journal sells it to someone. A reserved article asked for without the right comes
+ * back whole but bodiless, measured on the phone on 23/09 — and nothing promises it always will, so the same answer
+ * is judged again with a body beside `right: false`, which is the shape a reading must not be tempted by.
+ */
+const WITHHELD: readonly unknown[] = [
+  { ...RESERVED, right: false },
+  { ...RESERVED, right: false, content_array: CONTENT },
+];
+
+/** The same article, to a reader the service grants it to: the body is theirs, and a reading owes them all of it. */
+const GRANTED = { ...RESERVED, right: true, content_array: CONTENT };
+
+/**
+ * Whether a way of reading one article gives the reader the body the service opened, and none of a body it kept back.
+ *
+ * Both ways, because either alone is passed by a reading that does nothing: one that withheld every article would
+ * never unlock anything, and one that opened every article would never refuse anyone. The reading is handed in
+ * rather than reached for, so a fixture can hand in one that reads a body whenever one arrives, or one that decides
+ * by `premium` what only `right` decides — and read the code that comes back.
+ */
+export const judgeRight = (opening: Opening): readonly Finding<RightCode>[] => {
+  const bodyOf = (answer: unknown): string => {
+    const read = opening(answer);
+    return 'refused' in read ? 'refused' : read.item.body.kind;
+  };
+  const granted = opening(GRANTED);
+  const whole = 'refused' in granted ? false : granted.item.body.kind === 'open' && granted.item.body.blocks.length > 0;
+  return [
+    ...(WITHHELD.every((answer) => bodyOf(answer) !== 'open')
+      ? []
+      : [{ code: 'right/withheld-opened' as const, says: 'un corps que le service retient a été ouvert au lecteur' }]),
+    ...(whole
+      ? []
+      : [
+          { code: 'right/granted-withheld' as const, says: 'un corps que le service accorde n’a pas été rendu entier' },
+        ]),
+  ];
+};

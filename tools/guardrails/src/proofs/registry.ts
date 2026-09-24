@@ -4,6 +4,7 @@ import { LEGIBILITY_FIXTURES } from './legibility.ts';
 import { PICTURE_FIXTURES } from './picture.ts';
 import { POLICY_FIXTURES } from './policies.ts';
 import { PROSE_FIXTURES } from './prose.ts';
+import { RIGHT_FIXTURES } from './right.ts';
 import { TRANSPORT_FIXTURES } from './transport.ts';
 
 /** Every guardrail fixture that can prove a rule; bindings point at their ids. */
@@ -14,5 +15,6 @@ export const GUARDRAIL_PROOFS = [
   ...PROSE_FIXTURES,
   ...PICTURE_FIXTURES,
   ...INTAKE_FIXTURES,
+  ...RIGHT_FIXTURES,
   ...TRANSPORT_FIXTURES,
 ] as const;

@@ -1088,4 +1088,23 @@ export const BINDINGS = {
       ],
     },
   },
+  'ADR-0031': {
+    scope: {
+      // The reading that honours the right the service grants, with the judging that holds it both ways, and the
+      // bench of clients bent one port at a time — where a client that borrowed the official key would be named.
+      paths: [
+        'packages/contracts/src/intake.ts',
+        'tools/guardrails/src/proofs/right.ts',
+        'tools/guardrails/src/proofs/transport.ts',
+      ],
+    },
+    rules: {
+      R1: ['right/reader', 'right/withheld-opened', 'right/granted-withheld'],
+      R2: ['transport/borrows-key'],
+      R3: {
+        convention:
+          'Aucune place de l’app ne demande au lecteur les identifiants de son abonnement : le contrat du contenu ne nomme aucune connexion (packages/contracts/src/api.ts), la porte n’en tend aucune (apps/mobile/src/shared/api/content.ts), et aucun champ de saisie de l’app n’est masqué ni annoncé comme un mot de passe. Le service les refuserait : il ne connecte que le client qui porte son jeton anonyme.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

@@ -141,7 +141,7 @@ const AWAITING_FOUNDATION_ADRS = [
   'claude-hook/stop-unverifiable-once',
 ];
 
-/** Whether a proof answers for something other than the ADR process: the colours the paper is read at, the visuals it draws, dependencies, Expo, git hooks, guardrails, the answers it admits, lint, performance budgets, the pictures it asks for, the prose it reads, the root guard, the secrets a capture must not carry, the structure and the way it asks the service, plus the agent proofs above. */
+/** Whether a proof answers for something other than the ADR process: the colours the paper is read at, the visuals it draws, dependencies, Expo, git hooks, guardrails, the answers it admits, lint, performance budgets, the pictures it asks for, the prose it reads, the right the service grants, the root guard, the secrets a capture must not carry, the structure and the way it asks the service, plus the agent proofs above. */
 const answersForTheRest = (id: string): boolean =>
   [
     'artwork/',
@@ -156,6 +156,7 @@ const answersForTheRest = (id: string): boolean =>
     'perf/',
     'picture/',
     'prose/',
+    'right/',
     'root/',
     'secret/',
     'structure/',

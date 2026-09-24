@@ -38,6 +38,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | accepté                                                                  | `guarded-config`, `boundary`, `data-format`                                |
 | [ADR-0029](0029-une-build-de-service-sans-le-corpus-par-variantes.md)           | Une build de service sans le corpus, par variantes          | accepté                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0030](0030-une-valeur-inconnue-se-lit-par-un-seul-paquet.md)               | Une valeur inconnue se lit par un seul paquet               | accepté                                                                  | `dependency`, `guarded-config`, `boundary`                                 |
+| [ADR-0031](0031-aucune-connexion-et-le-droit-que-le-service-accorde.md)         | Aucune connexion, et le droit que le service accorde        | proposé                                                                  | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -367,6 +368,16 @@ Statut : accepté. Périmètre : `packages/unknown/**`, `tools/guardrails/src/pr
 | ----- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1    | NE DOIT PAS | `guardrail/unknown-record`, `guardrail/unknown-record-reversed`, `guardrail/unknown-record-switch`, `guardrail/unknown-record-app`, `guardrail/unknown-exempt`                                                                                  |
 | R2    | NE DOIT PAS | `guardrail/unknown-list`, `guardrail/unknown-list-destructured`, `guardrail/unknown-list-global-this`, `guardrail/unknown-list-instanceof`, `guardrail/unknown-list-bundled`, `guardrail/unknown-list-package-test`, `guardrail/unknown-exempt` |
+
+### ADR-0031 · Aucune connexion, et le droit que le service accorde
+
+Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `tools/guardrails/src/proofs/right.ts`, `tools/guardrails/src/proofs/transport.ts`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1    | NE DOIT PAS | `right/reader`, `right/withheld-opened`, `right/granted-withheld`                                                                                                                                                                                                                                                                                                                                                        |
+| R2    | NE DOIT PAS | `transport/borrows-key`                                                                                                                                                                                                                                                                                                                                                                                                  |
+| R3    | NE DOIT PAS | convention : Aucune place de l’app ne demande au lecteur les identifiants de son abonnement : le contrat du contenu ne nomme aucune connexion (packages/contracts/src/api.ts), la porte n’en tend aucune (apps/mobile/src/shared/api/content.ts), et aucun champ de saisie de l’app n’est masqué ni annoncé comme un mot de passe. Le service les refuserait : il ne connecte que le client qui porte son jeton anonyme. |
 
 ## Référentiel
 
