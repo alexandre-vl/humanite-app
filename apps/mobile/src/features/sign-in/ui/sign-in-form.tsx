@@ -31,6 +31,21 @@ const useStyles = createStyles((theme) => ({
     borderBottomWidth: SIZES.stroke,
     borderColor: theme.primary,
   },
+  /*
+   * What the paper does with a passage a reader must not skip: a bar down its left margin.
+   *
+   * Not a rule above it, which is the wall's device: the two fields over it already draw rules, and a third across
+   * the column would read as a third field. Not the ink either — the journal's red is proven as text at twenty-four
+   * points and at no step below (ADR-0026 R3, `PRINTINGS.mark`), so a refusal set in it would be a refusal a reader
+   * with tired eyes cannot read. The red is in the bar, where nothing has to be read out of it, and the words stay
+   * in the ink of the page.
+   */
+  refusal: {
+    gap: SPACING.xs,
+    paddingLeft: SPACING.md,
+    borderLeftWidth: SIZES.stroke,
+    borderColor: theme.primary,
+  },
 }));
 
 /**
@@ -44,6 +59,11 @@ const useStyles = createStyles((theme) => ({
  *
  * The refusal goes at the first keystroke, on either field. A reader correcting a typo has already understood, and
  * the line telling them about it is from that moment in the way.
+ *
+ * It stands between the last field and the button, which is where a reader who has just pressed is looking, and the
+ * order on the page is then the order of the thought: what you typed, what went wrong with it, what to do about it.
+ * It was under the button, where it read as a third paragraph of the page and ran straight into the line saying
+ * where a subscription is bought — telling a subscriber who had mistyped their password to go and buy one.
  *
  * The phone's own keychain fills the pair, each field saying which of the two it holds, which is the only part of
  * signing in a reader should not have to do by hand. The button keeps its promise while a connection is opening: it
@@ -113,12 +133,15 @@ export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
           onSubmit={submit}
         />
       </Box>
-      <Button label={opening ? t('signIn.opening') : t('signIn.submit')} onPress={submit} />
       {refusal === null ? null : (
-        <Text variant="body" alert>
-          {t(refusal === 'refused' ? 'signIn.refused' : 'signIn.unavailable')}
-        </Text>
+        <Box style={styles.refusal}>
+          <Text variant="label" alert>
+            {t(`signIn.${refusal}.title`)}
+          </Text>
+          <Text variant="body">{t(`signIn.${refusal}.message`)}</Text>
+        </Box>
       )}
+      <Button label={opening ? t('signIn.opening') : t('signIn.submit')} onPress={submit} />
       <Text variant="caption">{t('signIn.where')}</Text>
     </Box>
   );

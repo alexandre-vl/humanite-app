@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, screen } from '@testing-library/react-native';
+import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { READER } from '#api';
 import { useConnection } from '#features/sign-in';
@@ -39,7 +39,8 @@ describe('SignInPage', () => {
     await fireEvent.changeText(screen.getByPlaceholderText(t('signIn.login.placeholder')), 'lecteur@example.org');
     await fireEvent.changeText(screen.getByPlaceholderText(t('signIn.password.placeholder')), 'faux');
     await fireEvent.press(screen.getByText(t('signIn.submit')));
+    await act(async () => Promise.resolve());
     expect(jest.mocked(router.back)).not.toHaveBeenCalled();
-    expect(screen.getByText(t('signIn.unavailable'))).toBeTruthy();
+    expect(screen.getByText(t('signIn.unavailable.title'))).toBeTruthy();
   });
 });

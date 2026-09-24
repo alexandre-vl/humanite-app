@@ -1,3 +1,4 @@
+import { isList, isRecord } from '@huma/unknown';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { READER } from '#api';
@@ -19,6 +20,24 @@ const fill = async (login: string, password: string): Promise<void> => {
 /** The store's own action, answering what the test wants to see the screen do with it. */
 const answering = (opening: Opening): void => {
   useConnection.setState({ open: async () => Promise.resolve(opening) });
+};
+
+/** Every word the screen prints, in the order it prints them — which is the order a reader meets them in. */
+const wordsInOrder = (): readonly string[] => {
+  const seen: string[] = [];
+  const walk = (node: unknown): void => {
+    if (typeof node === 'string') {
+      seen.push(node);
+    } else if (isList(node)) {
+      for (const child of node) {
+        walk(child);
+      }
+    } else if (isRecord(node)) {
+      walk(node['children']);
+    }
+  };
+  walk(screen.toJSON());
+  return seen;
 };
 
 /** Types the pair and presses, then lets the press settle. */
@@ -56,16 +75,16 @@ describe('SignInForm', () => {
   it('dit que le journal a refusé les identifiants, dans ses mots', async () => {
     answering({ kind: 'refused', why: 'refused' });
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
-    expect(screen.queryByText(t('signIn.refused'))).toBeNull();
+    expect(screen.queryByText(t('signIn.refused.title'))).toBeNull();
     await attempt();
-    expect(screen.getByText(t('signIn.refused'))).toBeTruthy();
+    expect(screen.getByText(t('signIn.refused.title'))).toBeTruthy();
   });
 
   it('dit que le journal n’a pas répondu, quand c’est cela qui s’est passé', async () => {
     answering({ kind: 'refused', why: 'unavailable' });
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
     await attempt();
-    expect(screen.getByText(t('signIn.unavailable'))).toBeTruthy();
+    expect(screen.getByText(t('signIn.unavailable.title'))).toBeTruthy();
   });
 
   /**
@@ -76,9 +95,9 @@ describe('SignInForm', () => {
     answering({ kind: 'refused', why: 'refused' });
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
     await attempt();
-    expect(screen.getByText(t('signIn.refused'))).toBeTruthy();
+    expect(screen.getByText(t('signIn.refused.title'))).toBeTruthy();
     await fireEvent.changeText(screen.getByPlaceholderText(t('signIn.login.placeholder')), 'l');
-    expect(screen.queryByText(t('signIn.refused'))).toBeNull();
+    expect(screen.queryByText(t('signIn.refused.title'))).toBeNull();
   });
 
   /** A reader who is listening has their focus on the button they pressed; the line says itself out loud. */
@@ -86,7 +105,7 @@ describe('SignInForm', () => {
     answering({ kind: 'refused', why: 'refused' });
     await renderWithCache(<SignInForm onOpened={() => undefined} />);
     await attempt();
-    expect(screen.getByText(t('signIn.refused')).props['accessibilityLiveRegion']).toBe('assertive');
+    expect(screen.getByText(t('signIn.refused.title')).props['accessibilityLiveRegion']).toBe('assertive');
   });
 
   /** The button keeps its promise while a connection is opening: it says so rather than looking pressable and idle. */
@@ -126,5 +145,33 @@ describe('SignInForm', () => {
     for (const placeholder of ['signIn.login.placeholder', 'signIn.password.placeholder'] as const) {
       expect(styleOf(screen.getByPlaceholderText(t(placeholder)))['height']).toBeUndefined();
     }
+  });
+
+  /**
+   * The order on the page is the order of the thought: what you typed, what went wrong with it, what to do about it.
+   * The refusal was under the button, where it read as one more paragraph and ran straight into the line saying where
+   * a subscription is bought — which told a subscriber who had mistyped their password to go and buy one.
+   */
+  it('met le refus entre le dernier champ et le bouton, et non sous lui', async () => {
+    answering({ kind: 'refused', why: 'refused' });
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await attempt();
+    const order = wordsInOrder();
+    expect(order.indexOf(t('signIn.password'))).toBeLessThan(order.indexOf(t('signIn.refused.title')));
+    expect(order.indexOf(t('signIn.refused.title'))).toBeLessThan(order.indexOf(t('signIn.submit')));
+    expect(order.indexOf(t('signIn.submit'))).toBeLessThan(order.indexOf(t('signIn.where')));
+  });
+
+  /**
+   * The journal's red is proven as text at twenty-four points and at no step below, so a refusal set in it would be
+   * one a reader who has asked for smaller type cannot read. The red belongs to the bar beside the words.
+   */
+  it('n’écrit pas le refus dans le rouge du journal, qu’aucun petit corps ne porte', async () => {
+    answering({ kind: 'refused', why: 'refused' });
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await attempt();
+    expect(styleOf(screen.getByText(t('signIn.refused.message')))['color']).toBe(
+      styleOf(screen.getByText(t('signIn.message')))['color'],
+    );
   });
 });
