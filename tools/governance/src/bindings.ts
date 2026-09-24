@@ -1015,37 +1015,6 @@ export const BINDINGS = {
       R5: ['picture/resizer', 'picture/width-ignored', 'picture/address-changed', 'picture/query-lost'],
     },
   },
-  'ADR-0028': {
-    scope: {
-      // The client of the service with its judging, the door that hands it the platform's ports and the build's choice
-      // of source, the signal that tells the query library the app is back in front, and the bench that bends the
-      // client one port at a time.
-      paths: [
-        'packages/remote-api/**',
-        'apps/mobile/src/_app/model/focus.ts',
-        'apps/mobile/src/shared/api/**',
-        'apps/mobile/src/shared/config/source.ts',
-        'tools/guardrails/src/proofs/transport.ts',
-      ],
-    },
-    rules: {
-      R1: ['guardrail/module-huma-remote-api'],
-      R2: [
-        'transport/client',
-        'transport/no-deadline',
-        'transport/no-deadline-article',
-        'transport/hangs',
-        'transport/connection-held',
-      ],
-      R3: ['transport/cause-misnamed', 'transport/cause-misnamed-article'],
-      R4: ['transport/impersonates', 'transport/impersonates-article'],
-      R5: ['transport/address-unknown'],
-      R6: {
-        convention:
-          'La source se nomme dans apps/mobile/src/shared/config/source.ts : sans EXPO_PUBLIC_CONTENT_SOURCE la build lit le mock, un mot que la liste ne tient pas arrête l’app à sa première ligne, et la mise en place des tests nomme le mock quoi que le shell ait exporté. Metro lit la même variable pour résoudre les variantes de service (ADR-0029), et la porte du contenu arrête une build dont le module lié nomme une autre source que la variable.',
-      },
-    },
-  },
   'ADR-0029': {
     scope: {
       // What a build reading the service resolves: the one definition of the variant, the bundler that applies it,
