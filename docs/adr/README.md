@@ -38,7 +38,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0028](0028-un-client-du-service-du-journal-borne-et-honnete.md)            | Un client du service du journal, borné et honnête           | accepté                                                                  | `guarded-config`, `boundary`, `data-format`                                |
 | [ADR-0029](0029-une-build-de-service-sans-le-corpus-par-variantes.md)           | Une build de service sans le corpus, par variantes          | accepté                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0030](0030-une-valeur-inconnue-se-lit-par-un-seul-paquet.md)               | Une valeur inconnue se lit par un seul paquet               | accepté                                                                  | `dependency`, `guarded-config`, `boundary`                                 |
-| [ADR-0031](0031-aucune-connexion-et-le-droit-que-le-service-accorde.md)         | Aucune connexion, et le droit que le service accorde        | proposé                                                                  | `guarded-config`, `boundary`                                               |
+| [ADR-0031](0031-aucune-connexion-et-le-droit-que-le-service-accorde.md)         | Aucune connexion, et le droit que le service accorde        | accepté                                                                  | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -371,7 +371,7 @@ Statut : accepté. Périmètre : `packages/unknown/**`, `tools/guardrails/src/pr
 
 ### ADR-0031 · Aucune connexion, et le droit que le service accorde
 
-Statut : proposé. Périmètre : `packages/contracts/src/intake.ts`, `tools/guardrails/src/proofs/right.ts`, `tools/guardrails/src/proofs/transport.ts`.
+Statut : accepté. Périmètre : `packages/contracts/src/intake.ts`, `tools/guardrails/src/proofs/right.ts`, `tools/guardrails/src/proofs/transport.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ----- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
