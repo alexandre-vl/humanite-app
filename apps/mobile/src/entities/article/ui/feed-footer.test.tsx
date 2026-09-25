@@ -1,10 +1,21 @@
 import { CONTENT_ERROR_CODE, instantAt } from '@huma/contracts';
-import { describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { canRetry } from '#api';
 import { t } from '#i18n';
 import { FeedFooter } from './feed-footer';
 import { failureWords } from './feed-stand-in';
+
+/** The instant the tests read the footer at: an evening on the newsroom's clock, the day after the one on its way. */
+const NOW = '2026-09-25T19:00:00.000Z';
+
+beforeEach(() => {
+  jest.spyOn(Date, 'now').mockReturnValue(Date.parse(NOW));
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 describe('FeedFooter', () => {
   it('ne pose rien sous un fil qui n’attend rien', async () => {
@@ -14,8 +25,16 @@ describe('FeedFooter', () => {
 
   /** The wire is read a day at a time: the foot names the day on its way, as a sentence says it, weekday first. */
   it('nomme la journée en route, dans le corps de la phrase', async () => {
+    await render(<FeedFooter foot={{ kind: 'coming', day: instantAt('2026-09-23 00:00') }} onRetry={jest.fn()} />);
+    expect(screen.getByText('Chargement du mercredi 23\u00A0septembre\u00A0…')).toBeTruthy();
+  });
+
+  /** The heads over it say « Aujourd’hui » and « Hier »: the foot may not call either by a date the heads do not use. */
+  it('dit la journée du lecteur et la veille comme les en-têtes du fil les disent', async () => {
+    await render(<FeedFooter foot={{ kind: 'coming', day: instantAt('2026-09-25 06:00') }} onRetry={jest.fn()} />);
+    expect(screen.getByText(t('feed.more.today'))).toBeTruthy();
     await render(<FeedFooter foot={{ kind: 'coming', day: instantAt('2026-09-24 00:00') }} onRetry={jest.fn()} />);
-    expect(screen.getByText('Chargement du jeudi 24\u00A0septembre\u00A0…')).toBeTruthy();
+    expect(screen.getByText(t('feed.more.yesterday'))).toBeTruthy();
   });
 
   it('dit que la suite vient quand le fil n’a pas de journée à nommer', async () => {

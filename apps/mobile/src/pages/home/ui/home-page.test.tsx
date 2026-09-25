@@ -57,7 +57,7 @@ beforeEach(async () => {
   jest.mocked(router.navigate).mockClear();
   await act(() => {
     useBookmarks.setState({ kept: [] });
-    useVisits.setState({ seen: null, since: null, leftAt: null });
+    useVisits.setState({ seen: null });
   });
 });
 

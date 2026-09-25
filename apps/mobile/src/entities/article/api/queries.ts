@@ -274,13 +274,23 @@ export const prefetchArticle = (cache: QueryClient, id: ArticleId): void => {
  * they have read on a card must find that card, whichever of the two it was drawing.
  */
 const wordsOf = (summary: ArticleSummary): string =>
-  `${summary.title} ${summary.standfirst ?? ''} ${summary.excerpt ?? ''}`
-    .normalize('NFD')
-    .replace(DIACRITICS, '')
-    .toLowerCase();
+  folded(`${summary.title} ${summary.standfirst ?? ''} ${summary.excerpt ?? ''}`);
+
+/** A text without its accents and in one case, which is how a question and the words it looks for are compared. */
+const folded = (text: string): string => text.normalize('NFD').replace(DIACRITICS, '').toLowerCase();
 
 /** Everything the combining marks of a decomposed string are, so `ecologie` reaches « écologie ». */
 const DIACRITICS = /\p{Diacritic}/gu;
+
+/** Every sign that means something to a pattern, and nothing more to a reader than itself. */
+const PATTERN_SIGNS = /[\\^$.*+?()[\]{}|/]/gu;
+
+/**
+ * A question as a pattern found only where a word starts: at the start of the text, or after anything that is neither
+ * a letter nor a figure — a space, an apostrophe, a hyphen, a quotation mark.
+ */
+const atWordStart = (question: Question): RegExp =>
+  new RegExp(`(?:^|[^\\p{L}\\p{N}])${folded(question).replace(PATTERN_SIGNS, '\\$&')}`, 'u');
 
 /**
  * The articles already in hand whose words hold the question, newest read first.
@@ -295,9 +305,12 @@ const DIACRITICS = /\p{Diacritic}/gu;
  * and drops the moment the journal's own arrives.
  *
  * Matching is on the words a reader can see — the title and the standfirst — and not on the body, which is not here
- * to be matched. Accents and case are folded, so a question typed in a hurry reaches what was printed properly.
+ * to be matched. Accents and case are folded, so a question typed in a hurry reaches what was printed properly. And
+ * a question is looked for where a word starts, as a reader looks for one: looked for anywhere, « mn » — what was
+ * left of « macron » typed too fast — found « Amnesty International » in a title and stood it in for the answer
+ * (iPhone simulator, 25/09/2026).
  */
 export const summariesMatching = (cache: QueryClient, question: Question): readonly ArticleSummary[] => {
-  const asked = question.normalize('NFD').replace(DIACRITICS, '').toLowerCase();
-  return summariesRead(cache).filter((summary) => wordsOf(summary).includes(asked));
+  const asked = atWordStart(question);
+  return summariesRead(cache).filter((summary) => asked.test(wordsOf(summary)));
 };

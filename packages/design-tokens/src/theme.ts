@@ -39,11 +39,19 @@ import { PALETTE } from './palette.ts';
  * light theme writes its links in the deeper `inkRed`, and the dark theme in `darkInkRed`, lifted just enough.
  *
  * `rule` is the line the paper actually draws — between two cards, under what an article says about itself, between the
- * rows of a group — and `border` is not it: that is the grey an empty picture shows until it lands, and the flash of a
- * press. The first rule in the app was painted in `border`, 1.13 to one against the page, a separator nobody has ever
- * seen; the rows of the account were ruled in it until later still, 1.04 to one against their card. A rule is not a
- * ground and owes nothing to WCAG, which asks nothing of a line carrying no meaning of its own; it owes only to be
- * there, and to be there as much on either page: 13.2 steps of lightness from the light page, 12.6 from the dark one.
+ * rows of a group — and `border` is not it: that is the flash of a press, and was the grey an empty picture showed
+ * until it landed. The first rule in the app was painted in `border`, 1.13 to one against the page, a separator nobody
+ * has ever seen; the rows of the account were ruled in it until later still, 1.04 to one against their card. A rule is
+ * not a ground and owes nothing to WCAG, which asks nothing of a line carrying no meaning of its own; it owes only to
+ * be there, and to be there as much on either page: 13.2 steps of lightness from the light page, 12.6 from the dark
+ * one.
+ *
+ * `standIn` is what a thing on its way is drawn in: the bars of a ghost standing where words will be, and the block
+ * of a picture that has not landed. Both were drawn in grounds — the ghost in `card`, the picture in `border` — and a
+ * ground is chosen to be barely told from the page, which is the one thing a stand-in must not be: the ghost of a
+ * search, breathing down to under half its strength, went as faint as 1.3 steps from the page, and a reader saw a
+ * blank screen where an answer was on its way. One role for both, so that the ghost of a card and the card it gives
+ * way to show the same grey where the picture will be, and nothing flashes when one replaces the other.
  *
  * `control` is the track of a switch when it is off, and it is one value in both themes although the light theme
  * paints muted text the same. A muted word owes one thing: to be read on the page. A track owes three — to be found
@@ -66,6 +74,7 @@ export type Theme = Readonly<{
   primary: Color;
   border: Color;
   rule: Color;
+  standIn: Color;
   control: Color;
 }>;
 
@@ -84,6 +93,7 @@ export const LIGHT_THEME = {
   primary: PALETTE.uiRed,
   border: PALETTE.blueGrey,
   rule: PALETTE.ruleGrey,
+  standIn: PALETTE.standInGrey,
   control: PALETTE.dateGrey,
 } as const satisfies Theme;
 
@@ -102,6 +112,7 @@ const DARK_THEME = {
   primary: PALETTE.uiRed,
   border: PALETTE.darkBorder,
   rule: PALETTE.darkRule,
+  standIn: PALETTE.darkStandIn,
   control: PALETTE.dateGrey,
 } as const satisfies Theme;
 

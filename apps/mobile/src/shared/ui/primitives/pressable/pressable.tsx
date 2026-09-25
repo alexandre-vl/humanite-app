@@ -32,6 +32,15 @@ export type PressableProps = Readonly<{
   role?: 'radio' | 'button' | 'link' | undefined;
   selected?: boolean | undefined;
   /**
+   * What the target is to the reader just now, said after what it is called: an item of the wire that came out since
+   * they last looked is « Nouveau ».
+   *
+   * The eye is told that by a mark, and a mark says nothing out loud. This is the platform's own place for it — iOS
+   * reads a value after the name, as it reads that a message is unread — and it leaves the name alone, which is the
+   * target's own words whenever the target has any.
+   */
+  status?: DisplayText | undefined;
+  /**
    * How far past its own edges the target answers a finger.
    *
    * A finger needs more room than a mark needs, and until now the only way to give it any was to draw the mark inside
@@ -89,6 +98,7 @@ export function Pressable({
   label,
   role,
   selected,
+  status,
   hitSlop,
   onMeasure,
   announces,
@@ -129,6 +139,7 @@ export function Pressable({
         accessibilityLabel={lends ? undefined : label}
         accessibilityRole={role}
         accessibilityState={selected === undefined ? undefined : { selected }}
+        accessibilityValue={status === undefined ? undefined : { text: status }}
         accessibilityActions={
           borrowed.length === 0
             ? undefined

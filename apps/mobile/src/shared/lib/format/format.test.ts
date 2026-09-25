@@ -3,9 +3,11 @@ import { INSTANT, issueIdAt } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { asDisplayText } from '../display-text';
 import {
+  daysAgo,
   formatAge,
   formatByline,
   formatDayDate,
+  formatDayHead,
   formatDayLabel,
   formatFiled,
   formatHour,
@@ -106,6 +108,43 @@ describe('formatDayLabel', () => {
       'Dimanche 15\u00A0novembre',
       'Mardi 15\u00A0décembre',
     ]);
+  });
+});
+
+describe('formatDayHead', () => {
+  /** The day the reader reads on, as the phone's clock gives it: a Paris calendar date. */
+  const on = (day: string): IssueId => issueIdAt(at(`${day}T12:00:00.000Z`));
+
+  /** A reader does not always know the date: the head of the day they are on says it is theirs. */
+  it('nomme « Aujourd’hui » la journée du lecteur et « Hier » la veille', () => {
+    expect(formatDayHead(at('2026-09-25T07:00:00.000Z'), on('2026-09-25'))).toBe('Aujourd\u2019hui');
+    expect(formatDayHead(at('2026-09-24T07:00:00.000Z'), on('2026-09-25'))).toBe('Hier');
+  });
+
+  it('nomme les jours d’avant par leur date, comme l’en-tête d’une série', () => {
+    expect(formatDayHead(at('2026-09-23T07:00:00.000Z'), on('2026-09-25'))).toBe('Mercredi 23\u00A0septembre');
+  });
+
+  it('compte à l’heure de Paris, donc une fin de soirée ouvre déjà la journée du lecteur', () => {
+    expect(formatDayHead(at('2026-09-24T22:30:00.000Z'), on('2026-09-25'))).toBe('Aujourd\u2019hui');
+    expect(formatDayHead(at('2026-09-24T21:30:00.000Z'), on('2026-09-25'))).toBe('Hier');
+  });
+
+  /** A phone whose clock runs behind the newsroom's is handed a day from its future: it is the reader's day. */
+  it('tient pour la journée du lecteur une journée d’après la sienne', () => {
+    expect(formatDayHead(at('2026-09-26T07:00:00.000Z'), on('2026-09-25'))).toBe('Aujourd\u2019hui');
+  });
+});
+
+describe('daysAgo', () => {
+  const on = (day: string): IssueId => issueIdAt(at(`${day}T12:00:00.000Z`));
+
+  it('compte les jours du calendrier de Paris, quelle que soit l’heure', () => {
+    expect(daysAgo(at('2026-09-25T00:30:00.000Z'), on('2026-09-25'))).toBe(0);
+    expect(daysAgo(at('2026-09-24T21:59:00.000Z'), on('2026-09-25'))).toBe(1);
+    expect(daysAgo(at('2026-12-31T09:00:00.000Z'), on('2027-01-02'))).toBe(2);
+    expect(daysAgo(at('2026-10-24T22:30:00.000Z'), on('2026-10-26'))).toBe(1);
+    expect(daysAgo(at('2026-09-26T09:00:00.000Z'), on('2026-09-25'))).toBe(-1);
   });
 });
 

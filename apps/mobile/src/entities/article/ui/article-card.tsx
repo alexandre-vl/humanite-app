@@ -41,14 +41,14 @@ const useStyles = createStyles((theme) => ({
     aspectRatio: FRAMES.photo,
     borderRadius: RADII.sm,
     overflow: 'hidden',
-    backgroundColor: theme.border,
+    backgroundColor: theme.standIn,
   },
   film: {
     alignSelf: 'stretch',
     aspectRatio: FRAMES.film,
     borderRadius: RADII.sm,
     overflow: 'hidden',
-    backgroundColor: theme.border,
+    backgroundColor: theme.standIn,
   },
   fill: { position: 'absolute', top: SPACING.none, bottom: SPACING.none, left: SPACING.none, right: SPACING.none },
   // The mark a film is played from sits on its still, in the corner a thumb reaches, on the paper's red.
@@ -65,7 +65,7 @@ const useStyles = createStyles((theme) => ({
     width: SIZES.thumbnail,
     aspectRatio: THUMBNAIL_RATIO,
     borderRadius: RADII.sm,
-    backgroundColor: theme.border,
+    backgroundColor: theme.standIn,
   },
   rest: { flex: 1 },
   // A column is marked by the rule the app already marks a quoted voice with, and not by a filled block of the

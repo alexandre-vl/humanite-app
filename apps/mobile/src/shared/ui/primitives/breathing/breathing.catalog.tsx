@@ -8,9 +8,9 @@ import { Breathing } from './breathing';
 
 const useStyles = createStyles((theme) => ({
   demo: { gap: SPACING.sm },
-  line: { height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.card },
+  line: { height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.standIn },
   row: { flexDirection: 'row' },
-  tail: { flex: 3, height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.card },
+  tail: { flex: 3, height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.standIn },
   rest: { flex: 2 },
 }));
 

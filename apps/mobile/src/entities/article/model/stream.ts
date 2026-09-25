@@ -2,7 +2,7 @@ import type { ArticleId, ArticleSummary, SectionId } from '@huma/contracts';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { streamQuery } from '../api/queries';
 import type { ReadFeed } from './paged-feed';
-import { footOf, stateOf } from './paged-feed';
+import { footOf, stateOf, useReadAgain } from './paged-feed';
 import { floorOf, reachOf, targetOf } from './reach';
 
 /**
@@ -42,17 +42,9 @@ const inOrder = (items: readonly ArticleSummary[]): readonly ArticleSummary[] =>
  * The foot names the day the step on its way completes, which is the day the next head of the run will print.
  */
 export function useArticleStream(sections: readonly SectionId[]): ReadFeed {
-  const {
-    data,
-    status,
-    error,
-    refetch,
-    isRefetching,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isFetchNextPageError,
-  } = useInfiniteQuery(streamQuery(sections));
+  const { data, status, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useInfiniteQuery(streamQuery(sections));
+  const { readAgain, refreshing } = useReadAgain(refetch);
   const steps = data?.pages ?? [];
   const floor = floorOf(reachOf(steps));
   const read = inOrder(steps.flatMap((step) => step.read));
@@ -61,10 +53,8 @@ export function useArticleStream(sections: readonly SectionId[]): ReadFeed {
     // A menu that has not answered yet leaves the reading idle rather than failed, and an idle reading is one that
     // has not answered: the screen waits, which is what it is in fact doing.
     state: sections.length === 0 ? { kind: 'pending' } : stateOf(status, error),
-    readAgain: () => {
-      void refetch();
-    },
-    refreshing: isRefetching && !isFetchingNextPage,
+    readAgain,
+    refreshing,
     onEndReached: () => {
       if (hasNextPage && !isFetchingNextPage) {
         void fetchNextPage();

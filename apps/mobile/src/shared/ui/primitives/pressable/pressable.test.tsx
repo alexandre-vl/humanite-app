@@ -46,6 +46,23 @@ describe('Pressable', () => {
     expect(target.props['accessibilityState']).toEqual({ selected: true });
   });
 
+  /** A mark says nothing out loud: what the target is to the reader just now is said after its name, as iOS says it. */
+  it('dit après son nom ce qu’il est au lecteur, et rien quand il n’a rien à en dire', async () => {
+    await render(
+      <Pressable role="link" status={asDisplayText('Nouveau')} onPress={jest.fn()}>
+        <View testID="neuf" />
+      </Pressable>,
+    );
+    expect(screen.getByRole('link', { value: { text: 'Nouveau' } })).toBeTruthy();
+    await render(
+      <Pressable role="link" onPress={jest.fn()}>
+        <View testID="lu" />
+      </Pressable>,
+    );
+    expect(screen.getByRole('link')).toBeTruthy();
+    expect(screen.queryByRole('link', { value: { text: 'Nouveau' } })).toBeNull();
+  });
+
   /**
    * Where a target came to rest is the only way a band wider than the screen can bring the chosen label into view:
    * what a label measures depends on its word, its face and the step the reader set, so nothing knows it in advance.

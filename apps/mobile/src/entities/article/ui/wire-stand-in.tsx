@@ -28,11 +28,11 @@ const useStyles = createStyles((theme) => ({
     marginTop: SPACING.lg,
     borderRadius: RADII.pill,
     borderWidth: SIZES.stroke,
-    borderColor: theme.card,
+    borderColor: theme.standIn,
     backgroundColor: theme.background,
   },
   words: { flex: 1, paddingLeft: SPACING.md, paddingVertical: SPACING.md, gap: SPACING.xs },
-  hour: { width: SPACING.xl, height: SPACING.sm, borderRadius: RADII.sm, backgroundColor: theme.card },
+  hour: { width: SPACING.xl, height: SPACING.sm, borderRadius: RADII.sm, backgroundColor: theme.standIn },
 }));
 
 /**

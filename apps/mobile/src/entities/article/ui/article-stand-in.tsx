@@ -13,7 +13,7 @@ const useStyles = createStyles((theme) => ({
   head: { paddingHorizontal: SPACING.lg, gap: SPACING.sm },
   // The picture runs edge to edge, as the article's does, and is held open at its own ratio so the body below it
   // does not climb the screen and get pushed back down when it lands.
-  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, backgroundColor: theme.card },
+  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, backgroundColor: theme.standIn },
 }));
 
 /**

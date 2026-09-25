@@ -1,4 +1,4 @@
-import type { ContentErrorCode, Instant } from '@huma/contracts';
+import type { ContentErrorCode, DisplayText, Instant, IssueId } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { canRetry } from '#api';
@@ -6,7 +6,7 @@ import { Button } from '#components/button';
 import { EmptyState } from '#components/empty-state';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { formatDayInText } from '#lib/format';
+import { daysAgo, formatDayInText, useToday } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Progress } from '#primitives/progress';
@@ -29,15 +29,32 @@ const useStyles = createStyles(() => ({
 }));
 
 /**
+ * What the foot says is on its way, against the day the reader is reading on: the rest of today, yesterday, or a day
+ * by its date — named as the heads of the wire name them, so the foot never calls « jeudi 24 » what the head above
+ * it calls « Hier ».
+ */
+const comingWords = (day: Instant | null, today: IssueId): DisplayText => {
+  if (day === null) {
+    return t('feed.more');
+  }
+  const before = daysAgo(day, today);
+  if (before <= 0) {
+    return t('feed.more.today');
+  }
+  return before === 1 ? t('feed.more.yesterday') : t('feed.more.day', { day: formatDayInText(day) });
+};
+
+/**
  * The next part of a feed on its way: what is coming — the day, on a feed read a day at a time — over the rule the app
  * draws for a wait nobody can measure. The words carry it: the rule is there for the eye, and a reader listening hears
  * the day.
  */
 export function FootComing({ day }: Readonly<{ day: Instant | null }>): ReactNode {
   const styles = useStyles();
+  const today = useToday();
   return (
     <Box style={styles.coming}>
-      <Text variant="caption">{day === null ? t('feed.more') : t('feed.more.day', { day: formatDayInText(day) })}</Text>
+      <Text variant="caption">{comingWords(day, today)}</Text>
       <Progress busy announces={DECORATIVE} />
     </Box>
   );

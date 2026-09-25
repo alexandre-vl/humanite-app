@@ -1,5 +1,6 @@
 import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
+import { useRef } from 'react';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
 import { createStyles, useTheme } from '#lib/styles';
@@ -8,6 +9,7 @@ import { Icon } from '#primitives/icon';
 import { Pressable } from '#primitives/pressable';
 import { Progress } from '#primitives/progress';
 import { TextField } from '#primitives/text-field';
+import type { FieldHandle } from '#primitives/text-field';
 
 export type SearchFieldProps = Readonly<{
   value: string;
@@ -50,15 +52,20 @@ const REACH = SPACING.lg;
  * nothing else on a blank screen says what the line is for once the tab bar is out of sight; the second because a
  * search that answers as you type is one a reader must be able to stop, and backspacing twenty times is not stopping.
  * The cross appears only when there is something to clear, and is announced by its label, having nothing to read out.
+ *
+ * Pressed, it empties the line and puts the caret back in it: clearing a question is making room for another. With the
+ * keyboard put away — a list scrolled puts it away — the cross left an empty line and a second press to make on it.
  */
 export function SearchField({ value, onChange, busy }: SearchFieldProps): ReactNode {
   const styles = useStyles();
   const theme = useTheme();
+  const field = useRef<FieldHandle>(null);
   return (
     <Box>
       <Box style={styles.bar}>
         <Icon name="search" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.primary} />
         <TextField
+          ref={field}
           value={value}
           onChange={onChange}
           label={t('search.field')}
@@ -72,15 +79,16 @@ export function SearchField({ value, onChange, busy }: SearchFieldProps): ReactN
             role="button"
             onPress={() => {
               onChange('');
+              field.current?.focus();
             }}
           >
             <Icon name="clear" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.textMuted} />
           </Pressable>
         )}
       </Box>
-      {/* Decorative: what the rule says is said in words by the heading under it, and a reader listening to the
-          screen is told by those. */}
-      <Progress busy={busy} announces={DECORATIVE} />
+      {/* While the journal looks, the rule is the one thing on the screen that says what is listed is not its answer
+          yet, and a reader listening is told so in words. At rest it has nothing to add to the list under it. */}
+      <Progress busy={busy} announces={busy ? t('search.asking') : DECORATIVE} />
     </Box>
   );
 }

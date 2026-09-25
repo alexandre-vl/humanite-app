@@ -18,7 +18,7 @@ const useStyles = createStyles((theme) => ({
     alignSelf: 'stretch',
     aspectRatio: FRAMES.photo,
     borderRadius: RADII.sm,
-    backgroundColor: theme.card,
+    backgroundColor: theme.standIn,
   },
   line: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md },
   rest: { flex: 1 },
@@ -26,16 +26,16 @@ const useStyles = createStyles((theme) => ({
     width: SIZES.thumbnail,
     aspectRatio: THUMBNAIL_RATIO,
     borderRadius: RADII.sm,
-    backgroundColor: theme.card,
+    backgroundColor: theme.standIn,
   },
   column: { flexDirection: 'row', gap: SPACING.md },
   // The rule down a column's side, in the grey of the ghost and not in the paper's red: the red is a mark that says
   // this piece is an opinion, and a ghost knows nothing about the piece it stands for.
-  mark: { width: SIZES.stroke, alignSelf: 'stretch', backgroundColor: theme.card },
+  mark: { width: SIZES.stroke, alignSelf: 'stretch', backgroundColor: theme.standIn },
   // What closes a card is a date and a word or two, never a full line, so the foot is a short bar and the room it
   // leaves — which is where the control a reader presses will be.
   foot: { flexDirection: 'row' },
-  when: { flex: 2, height: SPACING.sm, borderRadius: RADII.sm, backgroundColor: theme.card },
+  when: { flex: 2, height: SPACING.sm, borderRadius: RADII.sm, backgroundColor: theme.standIn },
   spare: { flex: 5 },
 }));
 

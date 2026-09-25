@@ -5114,16 +5114,6 @@
                 },
                 {
                   "element": {
-                    "type": "page"
-                  }
-                },
-                {
-                  "file": {
-                    "categories": "page-entry"
-                  }
-                },
-                {
-                  "element": {
                     "type": "entity"
                   }
                 },
@@ -5200,7 +5190,7 @@
                   }
                 }
               },
-              "message": "[module/zustand] zustand ne s’importe que depuis : feature"
+              "message": "[module/zustand] zustand ne s’importe que depuis : feature, page"
             }
           ]
         }
@@ -5547,7 +5537,7 @@
         },
         {
           "selector": "ImportDeclaration[source.value='zustand'] > ImportNamespaceSpecifier",
-          "message": "[module/zustand] zustand ne s’importe que depuis : feature"
+          "message": "[module/zustand] zustand ne s’importe que depuis : feature, page"
         },
         {
           "selector": "JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression",
@@ -9137,16 +9127,6 @@
                 },
                 {
                   "element": {
-                    "type": "page"
-                  }
-                },
-                {
-                  "file": {
-                    "categories": "page-entry"
-                  }
-                },
-                {
-                  "element": {
                     "type": "entity"
                   }
                 },
@@ -9223,7 +9203,7 @@
                   }
                 }
               },
-              "message": "[module/zustand] zustand ne s’importe que depuis : feature"
+              "message": "[module/zustand] zustand ne s’importe que depuis : feature, page"
             }
           ]
         }
@@ -9573,7 +9553,7 @@
         },
         {
           "selector": "ImportDeclaration[source.value='zustand'] > ImportNamespaceSpecifier",
-          "message": "[module/zustand] zustand ne s’importe que depuis : feature"
+          "message": "[module/zustand] zustand ne s’importe que depuis : feature, page"
         },
         {
           "selector": "JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression",
@@ -13159,16 +13139,6 @@
                 },
                 {
                   "element": {
-                    "type": "page"
-                  }
-                },
-                {
-                  "file": {
-                    "categories": "page-entry"
-                  }
-                },
-                {
-                  "element": {
                     "type": "entity"
                   }
                 },
@@ -13245,7 +13215,7 @@
                   }
                 }
               },
-              "message": "[module/zustand] zustand ne s’importe que depuis : feature"
+              "message": "[module/zustand] zustand ne s’importe que depuis : feature, page"
             }
           ]
         }
@@ -13595,7 +13565,7 @@
         },
         {
           "selector": "ImportDeclaration[source.value='zustand'] > ImportNamespaceSpecifier",
-          "message": "[module/zustand] zustand ne s’importe que depuis : feature"
+          "message": "[module/zustand] zustand ne s’importe que depuis : feature, page"
         },
         {
           "selector": "JSXAttribute[name.name=/[Ss]tyle$/] > JSXExpressionContainer ObjectExpression",

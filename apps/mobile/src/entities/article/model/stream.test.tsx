@@ -1,6 +1,7 @@
 import type { ArticleSummary, FeedQuery, Instant, Page, SectionId } from '@huma/contracts';
 import { ARTICLE_ID, ContentApiError, instantAt, instantOf, SECTION_ID, SERVICE_PAGES } from '@huma/contracts';
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { focusManager } from '@tanstack/react-query';
 import { act, waitFor } from '@testing-library/react-native';
 import { content } from '#api';
 import { everyArticle, renderHookWithCache } from '#lib/testing';
@@ -108,6 +109,28 @@ const reachEnd = async (onEndReached: (() => void) | undefined): Promise<void> =
 };
 
 describe('useArticleStream', () => {
+  /**
+   * Every page the wire holds is read again when the app comes back to the front with them stale, and the platform's
+   * spinner turned at the top of the wire the whole time, for a reader who had pulled nothing (25/09/2026).
+   */
+  it('ne fait tourner l’indicateur que pour la relecture que le lecteur a demandée', async () => {
+    const { result } = await firstStepRead();
+    jest.mocked(content.getFeed).mockImplementation(never);
+    await act(async () => {
+      focusManager.setFocused(false);
+      focusManager.setFocused(true);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(jest.mocked(content.getFeed).mock.calls.length).toBeGreaterThan(SECTIONS.length);
+    expect(result.current.refreshing).toBe(false);
+    focusManager.setFocused(undefined);
+    await act(async () => {
+      result.current.readAgain();
+      await Promise.resolve();
+    });
+    expect(result.current.refreshing).toBe(true);
+  });
+
   it('lit au premier pas la première page de chaque rubrique, et la route du fil avec elles', async () => {
     await firstStepRead();
     expect(content.getLiveFeed).toHaveBeenCalledTimes(1);

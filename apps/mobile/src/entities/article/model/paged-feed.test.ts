@@ -1,5 +1,6 @@
 import { ContentApiError, instantAt } from '@huma/contracts';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import { focusManager } from '@tanstack/react-query';
 import { act, waitFor } from '@testing-library/react-native';
 import { content } from '#api';
 import { renderHookWithCache } from '#lib/testing';
@@ -50,7 +51,73 @@ describe('footOf', () => {
   });
 });
 
+/** A reading of the feed held open until the test lets it answer, with what it answers. */
+const heldOpen = (): Readonly<{ answer: () => Promise<void>; asked: () => number }> => {
+  let release: (() => void) | undefined;
+  let asked = 0;
+  const original = content.getFeed.bind(content);
+  jest.spyOn(content, 'getFeed').mockImplementation(async (query) => {
+    asked += 1;
+    await new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    return original(query);
+  });
+  return {
+    answer: async () => {
+      await act(async () => {
+        release?.();
+        await Promise.resolve();
+      });
+    },
+    asked: () => asked,
+  };
+};
+
 describe('usePagedFeed', () => {
+  /**
+   * The library reads a stale page again by itself when the app comes back to the front, on every list the app holds.
+   * The platform's spinner was told to turn for those too: it turned at the top of the wire for a reader who had
+   * pulled nothing, for as long as every page took to read again (iPhone simulator, 25/09/2026).
+   */
+  it('ne fait pas tourner l’indicateur de rafraîchissement quand la bibliothèque relit d’elle-même', async () => {
+    const { result } = await renderHookWithCache(() => usePagedFeed(feedQuery));
+    await waitFor(() => {
+      expect(result.current.items.length).toBeGreaterThan(0);
+    });
+    const reading = heldOpen();
+    await act(async () => {
+      focusManager.setFocused(false);
+      focusManager.setFocused(true);
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(reading.asked()).toBe(1);
+    });
+    // The render that follows the reading setting off, which is the one that would turn the spinner.
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 50)));
+    expect(result.current.refreshing).toBe(false);
+    await reading.answer();
+    focusManager.setFocused(undefined);
+  });
+
+  it('fait tourner l’indicateur tant que la relecture demandée n’a pas répondu, et l’arrête ensuite', async () => {
+    const { result } = await renderHookWithCache(() => usePagedFeed(feedQuery));
+    await waitFor(() => {
+      expect(result.current.items.length).toBeGreaterThan(0);
+    });
+    const reading = heldOpen();
+    await act(async () => {
+      result.current.readAgain();
+      await Promise.resolve();
+    });
+    expect(result.current.refreshing).toBe(true);
+    await reading.answer();
+    await waitFor(() => {
+      expect(result.current.refreshing).toBe(false);
+    });
+  });
+
   /** Every feed read page by page says under its last item what became of the next page, and asks for it again. */
   it('dit au pied pourquoi la page suivante n’est pas venue, et qu’elle vient quand on la redemande', async () => {
     const { items } = await content.getFeed({});

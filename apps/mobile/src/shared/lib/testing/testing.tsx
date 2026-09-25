@@ -151,6 +151,25 @@ export function nearestAbove<Found>(
 export const scrollViewAbove = (node: Rendered, missing: string): Rendered =>
   nearestAbove(node, (each) => (each.type === 'RCTScrollView' ? each : undefined), missing);
 
+/** Whether `value` can be called as a handler with nothing to hand it. */
+const isHandler = (value: unknown): value is () => void => typeof value === 'function';
+
+/**
+ * Pulls down the list `node` is drawn in, as a thumb does to read it again. The spinner a list pulls is the platform's
+ * own control, which the renderer under test draws without its handlers, so the refresh is called where the scroll
+ * view holds it; a list that offers none fails the test rather than refreshing nothing.
+ */
+export const pullDown = async (node: Rendered): Promise<void> => {
+  const control: unknown = scrollViewAbove(node, 'la ligne n’est dans aucune liste').props['refreshControl'];
+  const refresh = isRecord(control) && isRecord(control['props']) ? control['props']['onRefresh'] : undefined;
+  if (!isHandler(refresh)) {
+    throw new Error('la liste ne se tire pas pour être relue : le test ne vérifierait rien');
+  }
+  await act(() => {
+    refresh();
+  });
+};
+
 /** The name under which `target` offers a reader listening the action they hear as `label`, if it offers one. */
 export const actionNamed = (target: Rendered, label: string): string | undefined => {
   const actions: unknown = target.props['accessibilityActions'];

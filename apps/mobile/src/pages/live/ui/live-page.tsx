@@ -7,8 +7,8 @@ import { articleHref } from '#lib/routing';
 import { Surface } from '#primitives/surface';
 
 /**
- * The En continu screen: the whole paper in the order the newsroom filed it, under the head of each day, with a line
- * under what came out since the reader's last visit.
+ * The En continu screen: the whole paper in the order the newsroom filed it, under the head of each day, with a mark on
+ * each item that came out since the reader last looked.
  *
  * It used to read the wire's own route and nothing else, and that route is two and a half hours long: it answers ten
  * items and pages no further — asked for a second page on 25/09/2026 it served the same ten, and asked for a larger
@@ -36,17 +36,23 @@ import { Surface } from '#primitives/surface';
  * nothing, so the day the run belongs to, the item the newsroom picked out and the item one has already read all had
  * to be said some other way, and none of them was. And every picture the corpus draws was being laid on a ground it
  * was never drawn for. The red is still here, on the band that heads each day, which is the one thing on a list
- * ordered by time that is worth marking — and on the line of the last visit, which is another.
+ * ordered by time that is worth marking — and on the bead of an item new to the reader, which is another.
  */
 export function LivePage(): ReactNode {
   const sections = useSections();
   const ids = useMemo(() => sections.map((section) => section.id), [sections]);
   const feed = useArticleStream(ids);
-  const since = useLastVisit(feed.items[0]?.publishedAt ?? null, useIsFocused());
+  const { since, lookAgain } = useLastVisit(feed.items[0]?.publishedAt ?? null, useIsFocused());
+  // Pulling the wire down is looking at it afresh: what it had shown the reader is new no longer, and what the
+  // reading brings is.
+  const readAgain = (): void => {
+    lookAgain();
+    feed.readAgain();
+  };
   return (
     <Surface>
       <ArticleWire
-        feed={feed}
+        feed={{ ...feed, readAgain }}
         since={since}
         onOpen={(id) => {
           router.push(articleHref(id));

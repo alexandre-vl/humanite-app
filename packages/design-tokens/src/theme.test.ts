@@ -73,6 +73,19 @@ describe.each(themes)('%s theme', (name, theme) => {
     expect(contrastRatio(theme.rule, theme[ground])).toBeGreaterThan(1.3);
   });
 
+  /**
+   * A thing on its way has to be seen, at the faintest of its breath too, which takes it to a little over half its
+   * strength. Drawn in the grey of a card, the ghost of a search stood 1.3 steps from the page at its faintest, and a
+   * reader waiting on the journal saw a blank screen (iPhone simulator, 25/09/2026). It stays under the rule, so what
+   * is coming never draws harder than the lines the paper draws.
+   */
+  test(`${name}: a stand-in is seen on the page, and less than the rule`, () => {
+    for (const ground of ['background', 'surface'] as const) {
+      expect(lightnessStep(theme.standIn, theme[ground])).toBeGreaterThan(9);
+    }
+    expect(lightnessStep(theme.standIn, theme.background)).toBeLessThan(lightnessStep(theme.rule, theme.background));
+  });
+
   test(`${name}: every colour it paints with is named in the palette`, () => {
     const named = new Set<Color>(Object.values(PALETTE));
     for (const [role, value] of Object.entries(theme)) {

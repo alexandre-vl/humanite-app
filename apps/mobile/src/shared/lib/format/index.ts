@@ -1,7 +1,9 @@
 export {
+  daysAgo,
   formatAge,
   formatByline,
   formatDayDate,
+  formatDayHead,
   formatDayInText,
   formatDayLabel,
   formatFiled,

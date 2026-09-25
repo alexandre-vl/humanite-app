@@ -13,7 +13,7 @@ const useStyles = createStyles((theme) => ({
   // The shelf's own measures, newsstand-page.tsx's and issue-cover.tsx's: the covers land where the ghosts stood.
   shelf: { flexDirection: 'row', gap: SPACING.lg, paddingBottom: SPACING.sm },
   shelved: { width: SIZES.cover, gap: SPACING.xs },
-  cover: { width: SIZES.cover, aspectRatio: COVER_RATIO, borderRadius: RADII.sm, backgroundColor: theme.card },
+  cover: { width: SIZES.cover, aspectRatio: COVER_RATIO, borderRadius: RADII.sm, backgroundColor: theme.standIn },
 }));
 
 /**

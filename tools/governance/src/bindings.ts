@@ -1186,7 +1186,7 @@ export const BINDINGS = {
       paths: ['apps/mobile/src/features/**', 'apps/mobile/src/pages/**', 'apps/mobile/src/shared/lib/storage/**'],
     },
     rules: {
-      R1: ['guardrail/module-zustand'],
+      R1: ['guardrail/module-zustand', 'guardrail/module-zustand-page-exempt'],
       R2: {
         convention:
           'La façade du stockage n’accepte qu’une clé du registre : son paramètre est typé sur les valeurs de la table, si bien qu’une clé écrite à la main ne compile pas, et le registre reste le seul endroit où lire ce que l’app pose sur le disque.',
@@ -1199,9 +1199,10 @@ export const BINDINGS = {
         convention:
           'Ce qui revient du disque est une chaîne quelconque, qu’un fichier modifié à la main peut avoir remplacée : chaque magasin la relit valeur par valeur avant de rien servir — par l’analyseur marqué des contrats quand la valeur est un identifiant, contre la liste close des valeurs admises quand c’est un réglage — et ce qui n’en ressort pas est laissé pour la valeur du journal, si bien qu’un disque modifié ne peut pas placer dans un magasin une valeur que le reste de l’app croirait validée.',
       },
-      // By elimination: R1 leaves a store a feature or a page, a feature that one slice alone references is refused,
-      // and a page imports no other page — so the one screen that reads a store is the one whose page holds it.
-      R5: ['structure/insignificant-slice'],
+      // By elimination: R1 leaves a store a feature or a page, a feature that one slice alone references is refused, a
+      // page may declare one, and a page imports no other page — so the one screen that reads a store is the one whose
+      // page holds it.
+      R5: ['structure/insignificant-slice', 'guardrail/module-zustand-page-exempt'],
     },
   },
 } as const satisfies Bindings<ProofId>;

@@ -1,13 +1,12 @@
 import type { ArticleSummary } from '@huma/contracts';
-import { ContentApiError } from '@huma/contracts';
-import { isList, isRecord } from '@huma/unknown';
+import { ContentApiError, instantOf, issueIdAt } from '@huma/contracts';
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { screen } from '@testing-library/react-native';
+import { screen, within } from '@testing-library/react-native';
 import { content } from '#api';
 import { useVisits } from '#features/last-visit';
 import { t } from '#i18n';
-import { formatDayLabel } from '#lib/format';
-import { renderWithCache, settle } from '#lib/testing';
+import { formatDayHead } from '#lib/format';
+import { pullDown, renderWithCache, settle } from '#lib/testing';
 import { LivePage } from './live-page';
 
 /** Whether the navigator shows the screen: En continu is the tab in front unless a test puts another there. */
@@ -40,27 +39,15 @@ const newest = async (): Promise<ArticleSummary> => {
   return first;
 };
 
-/** Every word the screen prints, in the order it prints them — which is the order a reader meets them in. */
-const wordsInOrder = (): readonly string[] => {
-  const seen: string[] = [];
-  const walk = (node: unknown): void => {
-    if (typeof node === 'string') {
-      seen.push(node);
-    } else if (isList(node)) {
-      for (const child of node) {
-        walk(child);
-      }
-    } else if (isRecord(node)) {
-      walk(node['children']);
-    }
-  };
-  walk(screen.toJSON());
-  return seen;
-};
+/** The titles of the items the wire says are new, as a reader listening hears them: the item, then « Nouveau ». */
+const freshTitles = (order: readonly ArticleSummary[]): readonly string[] =>
+  screen
+    .queryAllByRole('link', { value: { text: t('live.fresh') } })
+    .map((line) => order.find((item) => within(line).queryByText(item.title) !== null)?.title ?? '');
 
 beforeEach(() => {
   mockShown = true;
-  useVisits.setState({ seen: null, since: null, leftAt: null });
+  useVisits.setState({ seen: null });
 });
 
 afterEach(() => {
@@ -83,9 +70,17 @@ describe('LivePage', () => {
   it('coiffe le fil de la journée que ses items portent, et l’y retient', async () => {
     const first = await newest();
     await renderPage();
-    const day = formatDayLabel(first.publishedAt);
+    const day = formatDayHead(first.publishedAt, issueIdAt(instantOf(Date.now())));
     expect(await screen.findAllByText(day, { includeHiddenElements: true })).toHaveLength(2);
     expect(screen.getAllByText(day)).toHaveLength(1);
+  });
+
+  /** Read on the day its newest item came out, the wire opens under « Aujourd’hui »: the reader is at its top. */
+  it('ouvre sous « Aujourd’hui » le jour où paraît ce qu’il a de plus récent', async () => {
+    const first = await newest();
+    jest.spyOn(Date, 'now').mockReturnValue(Date.parse(first.publishedAt));
+    await renderPage();
+    expect(await screen.findAllByText('Aujourd\u2019hui', { includeHiddenElements: true })).toHaveLength(2);
   });
 
   /** The one claim this screen makes: nothing stands above something filed after it. */
@@ -126,28 +121,44 @@ describe('LivePage', () => {
     }
   });
 
-  /** What came out since the last visit stands over the line, and what was already out stands under it. */
-  it('trace la ligne de la dernière visite sous ce qui est paru depuis', async () => {
+  /**
+   * Each item filed since the reader last looked says so of itself. The wire drew one line across the run instead,
+   * under the words « Déjà paru à votre dernière visite », and a reader could not tell whether they spoke of the item
+   * under them or of the whole run (25/09/2026).
+   */
+  it('dit nouveau chaque article paru depuis le dernier regard, et nul autre', async () => {
     const order = await merged();
-    const [first, , third] = order;
-    const since = order[2];
-    if (first === undefined || third === undefined || since === undefined) {
-      throw new Error('le contenu sert moins de trois articles : le test ne vérifierait rien');
+    const [first, second, third] = order;
+    if (first === undefined || second === undefined || third === undefined || second.publishedAt <= third.publishedAt) {
+      throw new Error('le contenu ne sert pas trois articles d’heures distinctes : le test ne vérifierait rien');
     }
-    useVisits.setState({ seen: since.publishedAt, since: since.publishedAt });
+    useVisits.setState({ seen: third.publishedAt });
     await renderPage();
     await screen.findByText(first.title);
-    const words = wordsInOrder();
-    const line = words.indexOf(t('live.visit'));
-    expect(line).toBeGreaterThan(words.indexOf(first.title));
-    expect(line).toBeLessThan(words.indexOf(third.title));
+    expect(freshTitles(order)).toEqual([first.title, second.title]);
   });
 
-  it('ne trace aucune ligne à la première visite', async () => {
-    const first = await newest();
+  it('ne dit rien de nouveau à la première visite', async () => {
+    const order = await merged();
+    await renderPage();
+    await screen.findByText(order[0]?.title ?? '');
+    expect(freshTitles(order)).toEqual([]);
+  });
+
+  /** The mark stayed after the reader pulled the wire down, on 25/09/2026: pulling is looking afresh. */
+  it('ne dit plus nouveau ce qu’il montrait une fois le fil tiré pour le relire', async () => {
+    const order = await merged();
+    const [first, , third] = order;
+    if (first === undefined || third === undefined) {
+      throw new Error('le contenu sert moins de trois articles : le test ne vérifierait rien');
+    }
+    useVisits.setState({ seen: third.publishedAt });
     await renderPage();
     await screen.findByText(first.title);
-    expect(screen.queryByText(t('live.visit'))).toBeNull();
+    expect(freshTitles(order)).not.toEqual([]);
+    await pullDown(screen.getByText(first.title));
+    await settle();
+    expect(freshTitles(order)).toEqual([]);
   });
 
   /** The next visit draws its line under what this one showed: the newest item on the wire while it is on screen. */

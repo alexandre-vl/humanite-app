@@ -10,12 +10,12 @@ const useStyles = createStyles((theme) => ({
   column: { paddingHorizontal: SPACING.lg, gap: SPACING.lg },
   // Lines of a paragraph sit closer to each other than paragraphs do, as they do when they are words.
   paragraph: { gap: SPACING.sm },
-  line: { height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.card },
+  line: { height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.standIn },
   row: { flexDirection: 'row' },
   // A paragraph's last line stops short, which is the one thing that makes a block of bars read as prose rather than
   // as a form. Two lengths, so three paragraphs do not all stop in the same place.
-  nearly: { flex: 4, height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.card },
-  halfway: { flex: 5, height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.card },
+  nearly: { flex: 4, height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.standIn },
+  halfway: { flex: 5, height: SPACING.md, borderRadius: RADII.sm, backgroundColor: theme.standIn },
   rest: { flex: 3 },
 }));
 

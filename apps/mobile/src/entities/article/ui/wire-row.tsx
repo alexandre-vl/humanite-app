@@ -12,6 +12,8 @@ import { WireRail } from './wire-rail';
 
 export type WireRowProps = Readonly<{
   summary: ArticleSummary;
+  /** Whether the item came out since the reader last looked at the wire, which its bead says by being filled. */
+  fresh: boolean;
   /**
    * The moment it is now, which is what an age is counted against.
    *
@@ -34,6 +36,15 @@ const useStyles = createStyles((theme) => ({
     borderColor: theme.textMuted,
     backgroundColor: theme.background,
   },
+  // The bead of an item new to the reader: the same bead, filled with the paper's red, the one colour the wire keeps
+  // for a place in time. Filled as well as red, so that a reader who sees no red still tells it from an empty ring.
+  fresh: {
+    width: SPACING.sm,
+    height: SPACING.sm,
+    marginTop: SPACING.lg,
+    borderRadius: RADII.pill,
+    backgroundColor: theme.primary,
+  },
   words: { flex: 1, paddingLeft: SPACING.md, paddingVertical: SPACING.md, gap: SPACING.xs },
   said: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
 }));
@@ -54,13 +65,18 @@ const useStyles = createStyles((theme) => ({
  * The title is set in the type the paper reads in, at one size for every row, and whole: it was cut at four lines,
  * and a headline is cut on no list of the paper. A wire has no desk behind it — what is at the top is at the top
  * because it is the newest — so nothing on this screen is printed larger than anything else.
+ *
+ * An item that came out since the reader last looked hangs from a filled bead, which is the mark a list of new things
+ * is read by everywhere else on the phone: the unread message, the episode not yet heard. It is said of each new item
+ * and of no other, so the question the line across the wire raised — this item, or all of them? — has nothing to
+ * stand on.
  */
-export function WireRow({ summary, now }: WireRowProps): ReactNode {
+export function WireRow({ summary, fresh, now }: WireRowProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.row}>
       <WireRail>
-        <Box style={styles.ring} />
+        <Box style={fresh ? styles.fresh : styles.ring} />
       </WireRail>
       <Box style={styles.words}>
         <Box style={styles.said}>

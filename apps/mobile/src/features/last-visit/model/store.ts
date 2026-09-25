@@ -1,6 +1,6 @@
 import type { Instant } from '@huma/contracts';
 import { INSTANT } from '@huma/contracts';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -13,36 +13,19 @@ import { STORAGE_KEYS, field, stateStorage } from '#lib/storage';
  */
 const VERSION = 1;
 
-/**
- * How long the app has to have been put away for its next opening to be another visit: half an hour.
- *
- * A reader who leaves to answer a message and comes back a minute later is still reading, and the line they were
- * shown should still be where it was; a reader who comes back after lunch is on another visit, and the line moves
- * down to what they have not seen. Half an hour is where the web has drawn that line for twenty years — a session of
- * Google Analytics ends after thirty minutes of nothing.
- */
-export const VISIT_GAP = 30 * 60 * 1000;
-
 type Visits = Readonly<{
-  /** The newest item En continu has shown the reader, on this visit or an earlier one. Written to disk. */
+  /** The newest item En continu has shown the reader, the last time they looked or any time before. Written to disk. */
   seen: Instant | null;
-  /** What `seen` was when this visit began: the line this visit draws on the wire. Never written. */
-  since: Instant | null;
-  /** When the app was last put away, until it comes back. */
-  leftAt: number | null;
   /** The wire, on screen, shows `newest` at its top. */
   saw: (newest: Instant) => void;
-  /** The app is put away, at `at`. */
-  left: (at: number) => void;
-  /** The app comes back, at `at`: another visit, if it was away long enough. */
-  came: (at: number) => void;
 }>;
 
 /**
  * The instant a disk holds as the newest item seen, or nothing when it holds none.
  *
  * What comes back is a string the app wrote and anything at all could have replaced, so it is read through the
- * contract's own parser; anything else leaves the reader on a first visit, which draws no line rather than a wrong one.
+ * contract's own parser; anything else leaves the reader on a first visit, which marks nothing new rather than the
+ * wrong items.
  */
 const seenOf = (persisted: unknown): Instant | null => {
   const read = INSTANT.safeParse(field(persisted, 'seen'));
@@ -50,31 +33,17 @@ const seenOf = (persisted: unknown): Instant | null => {
 };
 
 /**
- * The reader's visits to En continu: what the wire showed them last, and what it had shown them when this visit
- * began.
+ * What En continu has shown the reader: the newest item it had at its top while it was in front of them.
  *
- * A visit is the app's time on the screen, not the screen's: opening an article from the wire and coming back to it
- * is still the same visit, and the line stays where it was. The line is read at the start of the visit and kept for
- * all of it, so the items that arrive while the reader is there are above it with the rest of what is new.
+ * Only that is kept, and on disk, because only that outlives a look at the wire; what a look marks as new is worked
+ * out from it by the one screen that looks, and is gone when the reader looks away.
  */
 export const useVisits = create<Visits>()(
   persist(
     (set) => ({
       seen: null,
-      since: null,
-      leftAt: null,
       saw: (newest: Instant): void => {
         set((state) => (state.seen !== null && state.seen >= newest ? state : { seen: newest }));
-      },
-      left: (at: number): void => {
-        set({ leftAt: at });
-      },
-      came: (at: number): void => {
-        set((state) =>
-          state.leftAt !== null && at - state.leftAt >= VISIT_GAP
-            ? { since: state.seen, leftAt: null }
-            : { leftAt: null },
-        );
       },
     }),
     {
@@ -82,44 +51,71 @@ export const useVisits = create<Visits>()(
       version: VERSION,
       storage: createJSONStorage(() => stateStorage(STORAGE_KEYS.wireVisit)),
       partialize: (state) => ({ seen: state.seen }),
-      // The app starts a visit when it starts: the line of this one is what the last one saw.
-      merge: (persisted, current) => {
-        const seen = seenOf(persisted);
-        return { ...current, seen, since: seen };
-      },
+      merge: (persisted, current) => ({ ...current, seen: seenOf(persisted) }),
     },
   ),
 );
 
+/** What the wire is told of the reader's looks at it: what is new to them, and how to look at it afresh. */
+export type LastVisit = Readonly<{
+  /** The newest item the wire had shown when the reader last looked: every item filed after it is new to them. */
+  since: Instant | null;
+  /** Looking at the wire afresh while on it, which is what pulling it down for more is. */
+  lookAgain: () => void;
+}>;
+
+/** A look at the wire: whether it is in front of the reader, and what it had shown them when they last looked. */
+type Look = Readonly<{ shown: boolean; since: Instant | null }>;
+
 /**
- * The newest item the wire had shown at the reader's last visit, while noting what it shows at this one.
+ * What is new to the reader on the wire, while noting what the wire shows them.
+ *
+ * New is new since the reader last looked, and they look again whenever they come back to the wire — from another
+ * tab, from an article, from another app — and whenever they pull it down for more. The line this replaced held for a
+ * whole visit, the app's time in front of the reader with half an hour away to make another, and it stayed where it
+ * was after the reader turned to another tab and back, pulled the wire down, left and came back (25/09/2026): what
+ * they had just read past was still being called new. It now lasts as long as the reader stays, which is the time it
+ * takes to read what it marks, and what arrives while they are there is new with the rest.
  *
  * The wire is only seen while it is `shown`, which the screen says: a tab keeps its screen mounted once opened, and a
- * wire refreshed behind another tab would otherwise count as read items nobody saw. What the app does when it is put
- * away and brought back is heard here too, which is enough: a visit that never opened the wire saw nothing of it and
- * moved nothing.
+ * wire refreshed behind another tab would otherwise count as read items nobody saw. Coming back to the app counts
+ * once it was put away, not when a call or the notification centre only covered it for a moment.
  */
-export const useLastVisit = (newest: Instant | null, shown: boolean): Instant | null => {
-  const since = useVisits((state) => state.since);
+export const useLastVisit = (newest: Instant | null, shown: boolean): LastVisit => {
+  const seen = useVisits((state) => state.seen);
   const saw = useVisits((state) => state.saw);
-  const left = useVisits((state) => state.left);
-  const came = useVisits((state) => state.came);
+  const [look, setLook] = useState<Look>(() => ({ shown, since: seen }));
+  // Coming to the wire is read while rendering, where `seen` is still what the wire had shown before it came back
+  // into view: the effect below writes down what it shows now, and a look taken after it would find nothing new. An
+  // effect for the look would also be taken twice where React mounts a screen twice to test it, the second time after
+  // the first had been written down.
+  if (look.shown !== shown) {
+    setLook({ shown, since: shown ? seen : look.since });
+  }
+  const lookAgain = useCallback((): void => {
+    const shownLast = useVisits.getState().seen;
+    setLook((current) => ({ ...current, since: shownLast }));
+  }, []);
   useEffect(() => {
     if (shown && newest !== null) {
       saw(newest);
     }
   }, [shown, newest, saw]);
+  // Listened to whether the wire is in front of the reader or not: behind another tab, what a look takes is taken
+  // again when they turn to it.
   useEffect(() => {
+    let away = false;
     const watching = AppState.addEventListener('change', (state) => {
-      if (state === 'active') {
-        came(Date.now());
-      } else if (state === 'background') {
-        left(Date.now());
+      if (state === 'background') {
+        away = true;
+      } else if (state === 'active' && away) {
+        away = false;
+        lookAgain();
       }
     });
     return () => {
       watching.remove();
     };
-  }, [came, left]);
-  return since;
+  }, [lookAgain]);
+  return { since: look.since, lookAgain };
 };

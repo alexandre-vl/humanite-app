@@ -6,6 +6,7 @@ export {
   layersOf,
   nearestAbove,
   perform,
+  pullDown,
   renderHookWithCache,
   renderWithCache,
   scrollViewAbove,

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { View } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useReducedMotion,
@@ -73,11 +74,19 @@ export function Progress({ busy, announces }: ProgressProps): ReactNode {
   const crossing = busy && !still && width > UNMEASURED;
   useEffect(() => {
     if (!crossing) {
-      return;
+      return undefined;
     }
     // Set going once the rule has a width to cross: a sweep started before the measure arrives travels nought points,
     // and nothing would set it going again afterwards.
     crossed.set(withRepeat(withTiming(END, { duration: SWEEP, easing: Easing.inOut(Easing.ease) }), FOREVER, true));
+    // Stopped when the wait is over, and put back at the start of the rule, which is where the next wait sets off. A
+    // sweep goes back and forth between where it sets off and the end of the rule: left running, it set each wait off
+    // from wherever the last had got to, further along every time. On the iPhone simulator on 25/09/2026 a second
+    // search set off from 56 % of the way, and a later one from 98 %, a segment standing still at the end of its rule.
+    return () => {
+      cancelAnimation(crossed);
+      crossed.set(START);
+    };
   }, [crossing, crossed]);
   const slide = useAnimatedStyle(() => ({
     width: width * SEGMENT,

@@ -35,18 +35,21 @@ describe('LabelBar', () => {
   });
 
   /**
-   * Ce que la rangée doit à la bande où elle est posée : l’endroit où chaque étiquette s’est arrêtée. Sans eux la
-   * bande n’a ni règle à promener ni offset à viser — ce qu’une étiquette mesure dépend de son mot, de sa fonte et
-   * du pas que le lecteur a réglé, et personne ne peut le calculer d’avance.
+   * Ce que la rangée doit à la bande où elle est posée : l’endroit où le mot de chaque étiquette s’est arrêté. Sans
+   * eux la bande n’a ni règle à promener ni offset à viser — ce qu’une étiquette mesure dépend de son mot, de sa fonte
+   * et du pas que le lecteur a réglé, et personne ne peut le calculer d’avance.
+   *
+   * Le mot, pas la cible autour : une étiquette déborde de son mot de douze points de chaque côté pour le doigt, et la
+   * règle posée sous toute la cible partait du bord de l’écran sous « À la une » (simulateur iPhone, 25/09/2026).
    */
-  it('rapporte où ses étiquettes se sont posées, dans leur ordre, une fois toutes mesurées', async () => {
+  it('rapporte où ses mots se sont posés, sans la marge du doigt, dans leur ordre, une fois tous mesurés', async () => {
     const places = jest.fn();
     await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} onPlaces={places} />);
-    await fireEvent(screen.getByLabelText('À la une'), 'layout', { nativeEvent: { layout: { x: 0, width: 100 } } });
-    await fireEvent(screen.getByLabelText('Politique'), 'layout', { nativeEvent: { layout: { x: 100, width: 60 } } });
+    await fireEvent(screen.getByLabelText('À la une'), 'layout', { nativeEvent: { layout: { x: 4, width: 100 } } });
+    await fireEvent(screen.getByLabelText('Politique'), 'layout', { nativeEvent: { layout: { x: 104, width: 60 } } });
     expect(places).toHaveBeenLastCalledWith([
-      { x: 0, width: 100 },
-      { x: 100, width: 60 },
+      { x: 16, width: 76 },
+      { x: 116, width: 36 },
     ]);
   });
 

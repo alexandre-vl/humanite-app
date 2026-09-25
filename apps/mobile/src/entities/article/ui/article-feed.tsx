@@ -25,11 +25,6 @@ export type ArticleFeedProps = Readonly<{
   onOpen: (id: ArticleId) => void;
   action?: ((summary: ArticleSummary) => ReactNode) | undefined;
   header?: ReactNode;
-  /**
-   * What stands where the cards will be, for a screen whose answer is not a page of cards. A search answers with
-   * anything of any length, so the shapes below would be a guess; every other screen takes the feed's own.
-   */
-  awaited?: ReactNode | undefined;
   empty?: EmptyWords | undefined;
   /**
    * What the screen sets above the first card, in the run of the cards: a word it has for the reader, such as how
@@ -47,9 +42,6 @@ const NOTICE: Line = { kind: 'notice' };
 /** What the list keys a line by, and which tree it mounts: the notice has its own, never a card's. */
 const lineKey = (line: Line): string => (line.kind === 'notice' ? NOTICE.kind : rowName(line.row));
 const lineType = (line: Line): string => (line.kind === 'notice' ? NOTICE.kind : rowShape(line.row));
-
-/** What the foot asks again with when the feed has no next part to ask for: nothing. */
-const nothing = (): void => undefined;
 
 const useStyles = createStyles((theme) => ({
   feed: { paddingBottom: SPACING.xxxl },
@@ -78,16 +70,7 @@ const useStyles = createStyles((theme) => ({
  * A column announces its writer and nothing else does, which is why the signature is read here and not by the card:
  * a card is handed what it draws.
  */
-export function ArticleFeed({
-  feed,
-  rhythm,
-  onOpen,
-  action,
-  header,
-  awaited,
-  empty,
-  notice,
-}: ArticleFeedProps): ReactNode {
+export function ArticleFeed({ feed, rhythm, onOpen, action, header, empty, notice }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
   // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
   // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
@@ -135,11 +118,13 @@ export function ArticleFeed({
         <FeedStandIn
           state={feed.state}
           onRetry={feed.readAgain}
-          awaited={awaited ?? <FeedCardsStandIn rhythm={rhythm} />}
+          awaited={<FeedCardsStandIn rhythm={rhythm} />}
           empty={empty}
         />
       }
-      footer={<FeedFooter foot={feed.foot} onRetry={feed.onEndReached ?? nothing} />}
+      // A feed with no next part to ask for is asked again whole: what failed under articles standing in for an answer
+      // is the answer itself.
+      footer={<FeedFooter foot={feed.foot} onRetry={feed.onEndReached ?? feed.readAgain} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}

@@ -24,7 +24,7 @@ const useStyles = createStyles((theme) => ({
     aspectRatio: FRAMES.film,
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
-    backgroundColor: theme.border,
+    backgroundColor: theme.standIn,
   },
   poster: { position: 'absolute', top: SPACING.none, bottom: SPACING.none, left: SPACING.none, right: SPACING.none },
   badge: {

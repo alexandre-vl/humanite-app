@@ -21,8 +21,8 @@ export type ArticleFigureProps = Readonly<{
 
 const useStyles = createStyles((theme) => ({
   figure: { gap: SPACING.sm },
-  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, backgroundColor: theme.border },
-  film: { alignSelf: 'stretch', aspectRatio: FRAMES.film, backgroundColor: theme.border },
+  photo: { alignSelf: 'stretch', aspectRatio: FRAMES.photo, backgroundColor: theme.standIn },
+  film: { alignSelf: 'stretch', aspectRatio: FRAMES.film, backgroundColor: theme.standIn },
   words: { gap: SPACING.xs, paddingHorizontal: SPACING.lg },
 }));
 

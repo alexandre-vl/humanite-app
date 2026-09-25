@@ -35,6 +35,14 @@ import { color } from './brand.ts';
  * at which it is nowhere fainter than the light rule is at its faintest — CIE L* 32, 12.6 steps from the page, 11.1
  * from the sheet and 10.0 from a card. Captures of L* 23, 28, 32 and 36 side by side agreed.
  *
+ * `standInGrey` and `darkStandIn` are what a thing still on its way is drawn in. It was drawn in the grey of a card,
+ * which stands 3.3 steps of lightness from the light page and 2.6 from the dark one — and a stand-in breathes, down
+ * to under half its strength, where those became 1.3 and 1.0: nothing a reader sees. A search waiting on the journal
+ * showed a blank page under the field on the iPhone simulator on 25/09/2026, the ghost of its answer being there all
+ * along. Both are greys of the rule's violet, and take the lightness that puts them 10.4 steps from the light page
+ * and 11.0 from the dark one: under the rule, 13.2 and 12.6, so that what is coming is never drawn harder than the
+ * lines the paper draws, and 6.3 and 5.6 at the faintest of their breath.
+ *
  * `inkGrey` and `darkSecondary` are the middle step of an ink that had only two. A card sets a title and the summary
  * under it, and both were printed in the same colour at the same weight — so the summary read as a second title
  * rather than as what answers one. The two new values sit between the ink and the muted grey at roughly half the
@@ -51,6 +59,7 @@ export const PALETTE = {
   blueGrey: color('#ecf2f2'),
   paleGrey: color('#f5f5f5'),
   ruleGrey: color('#dcd5e0'),
+  standInGrey: color('#e3dee6'),
   darkBackground: color('#141414'),
   darkSurface: color('#1e1e1e'),
   darkCard: color('#242424'),
@@ -58,6 +67,7 @@ export const PALETTE = {
   darkSecondary: color('#cfc7d5'),
   darkBorder: color('#333333'),
   darkRule: color('#504956'),
+  darkStandIn: color('#48454c'),
   dateGrey: color('#74677a'),
   white: color('#ffffff'),
   black: color('#000000'),

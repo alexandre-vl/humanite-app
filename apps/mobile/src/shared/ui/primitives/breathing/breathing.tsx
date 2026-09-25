@@ -12,9 +12,16 @@ import type { StyleRef } from '../../../lib/styles';
 
 export type BreathingProps = Readonly<{ children?: ReactNode; style?: StyleRef }>;
 
-/** Full, and as faint as it goes. The floor is high enough that the shape never reads as having left the page. */
+/**
+ * Full, and as faint as it goes. The floor is high enough that the shape never reads as having left the page.
+ *
+ * It was 0.45, and a ghost in the grey of a card went down to 1.3 steps of lightness from the page, under anything a
+ * reader tells apart: a search waiting on the journal showed a blank screen (iPhone simulator, 25/09/2026). A ghost
+ * is drawn in `standIn` now, which the tokens hold to be seen, and the breath takes two fifths of its strength
+ * rather than more than half: at this floor it stays 6.3 steps from the light page and 5.6 from the dark one.
+ */
 const CALM = 1;
-const FAINT = 0.45;
+const FAINT = 0.6;
 
 /**
  * One way of the breath, in milliseconds. Slow on purpose: at half a second it reads as a blink and asks to be

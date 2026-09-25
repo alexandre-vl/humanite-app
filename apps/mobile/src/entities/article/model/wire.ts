@@ -1,16 +1,15 @@
 import type { ArticleSummary, DisplayText, Instant, IssueId } from '@huma/contracts';
 import { issueIdAt } from '@huma/contracts';
-import { formatDayLabel } from '#lib/format';
+import { formatDayHead } from '#lib/format';
 
 /**
- * One line of the wire: the head of a day, an item filed on that day, the line under which everything was already out
- * at the reader's last visit, or the line that stands where the items would be when there are none.
+ * One line of the wire: the head of a day, an item filed on that day and whether it is new to the reader, or the line
+ * that stands where the items would be when there are none.
  */
 export type WireRow =
   | Readonly<{ kind: 'standIn' }>
   | Readonly<{ kind: 'day'; day: IssueId; label: DisplayText }>
-  | Readonly<{ kind: 'item'; summary: ArticleSummary }>
-  | Readonly<{ kind: 'visit' }>;
+  | Readonly<{ kind: 'item'; summary: ArticleSummary; fresh: boolean }>;
 
 /**
  * The lines the wire shows, in order: every item under the head of the day it was published on, newest first.
@@ -30,31 +29,33 @@ export type WireRow =
  * A run that holds nothing still shows one line. The screen is no longer empty when a reading fails — the menu may be
  * late — and the list has no other line to say so on.
  *
- * `since` is the newest item the wire had shown at the reader's last visit, and a line goes above the first item
- * filed no later than it: what stands over the line came out since, and what stands under it was already out. It goes
- * above the head of that item's day when the item opens one, so a day's head stays with its items. There is no line
- * on a first visit, none when nothing has come out since, and none until the reading reaches that far down.
+ * A day's head is named against `today`, the day the reader is reading on: today and the day before by those words,
+ * every day past them by its date.
+ *
+ * `since` is the newest item the wire had shown when the reader last came to it, and every item filed after it is
+ * fresh: new to the reader, and marked so on its own line. The wire drew one line across the run instead, over the
+ * first item already out, captioned « Déjà paru à votre dernière visite » — and a reader could not tell whether the
+ * words spoke of the item under them or of every item down the rest of the wire (25/09/2026). A mark on each new item
+ * says it of that item, and a run of them ends where the new ends. Nothing is fresh on a first visit, when there is no
+ * last time to be new since.
  */
-export const wireRows = (summaries: readonly ArticleSummary[], since: Instant | null = null): readonly WireRow[] => {
+export const wireRows = (
+  summaries: readonly ArticleSummary[],
+  today: IssueId,
+  since: Instant | null = null,
+): readonly WireRow[] => {
   if (summaries.length === 0) {
     return [{ kind: 'standIn' }];
   }
   const rows: WireRow[] = [];
   let heading = '';
-  let marked = since === null;
   for (const summary of summaries) {
-    if (!marked && since !== null && summary.publishedAt <= since) {
-      marked = true;
-      if (rows.length > 0) {
-        rows.push({ kind: 'visit' });
-      }
-    }
     const day = issueIdAt(summary.publishedAt);
     if (day !== heading) {
       heading = day;
-      rows.push({ kind: 'day', day, label: formatDayLabel(summary.publishedAt) });
+      rows.push({ kind: 'day', day, label: formatDayHead(summary.publishedAt, today) });
     }
-    rows.push({ kind: 'item', summary });
+    rows.push({ kind: 'item', summary, fresh: since !== null && summary.publishedAt > since });
   }
   return rows;
 };
@@ -71,8 +72,6 @@ export const rowKey = (row: WireRow): string => {
       return `day:${row.day}`;
     case 'item':
       return `item:${row.summary.id}`;
-    case 'visit':
-      return 'visit';
   }
 };
 

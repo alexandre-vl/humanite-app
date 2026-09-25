@@ -1,6 +1,7 @@
 import type { ArticleId, ArticleSummary, ContentErrorCode, Instant } from '@huma/contracts';
 import type { QueryStatus } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { failureOf } from '#api';
 import type { PagedFeed } from '../api/queries';
 
@@ -70,12 +71,44 @@ export type ReadFeed = Readonly<{
    * failure offers to try again. The two are one reading, and a feed that named them apart could make them differ.
    */
   readAgain: () => void;
-  /** Whether that reading is under way, and only that one: asking for the next page is not a refresh. */
+  /**
+   * Whether a reading the reader asked for is under way, and only such a reading: asking for the next page is not a
+   * refresh, and neither is the reading the library makes by itself of a page gone stale.
+   */
   refreshing: boolean;
   onEndReached?: (() => void) | undefined;
   /** What stands under the last item it shows. */
   foot: FeedFoot;
 }>;
+
+/**
+ * Reading a feed again because the reader asked — by pulling the list down, or by trying again after a failure — and
+ * whether any such reading is still under way.
+ *
+ * The spinner a pulled list shows is the platform's own, and it was told to turn whenever the feed was being read
+ * again for any reason. The library reads a page again by itself whenever the app comes back to the front with a page
+ * older than a minute, on every list the app holds, the tabs behind the one in front included: the reader who had
+ * pulled nothing found the spinner turning at the top of the wire on coming back to the app, for as long as every page
+ * the wire held took to read again, and on a wire read deep it stayed there minutes on end (iPhone simulator,
+ * 25/09/2026). It turns now for what the reader asked for, and for as long as that takes.
+ *
+ * Counted rather than flagged: a second pull before the first is answered sets a second reading going and ends the
+ * first, and the spinner stops with the last of them, not the first.
+ */
+export function useReadAgain(
+  refetch: () => Promise<unknown>,
+): Readonly<{ readAgain: () => void; refreshing: boolean }> {
+  const [asked, setAsked] = useState(0);
+  return {
+    readAgain: () => {
+      setAsked((under) => under + 1);
+      void refetch().finally(() => {
+        setAsked((under) => under - 1);
+      });
+    },
+    refreshing: asked > 0,
+  };
+}
 
 /**
  * The items of the pages read so far, each once, where it was first read.
@@ -105,27 +138,14 @@ const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
  * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
 export function usePagedFeed(query: PagedFeed): ReadFeed {
-  const {
-    data,
-    status,
-    error,
-    refetch,
-    isRefetching,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isFetchNextPageError,
-  } = useInfiniteQuery(query);
+  const { data, status, error, refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } =
+    useInfiniteQuery(query);
+  const { readAgain, refreshing } = useReadAgain(refetch);
   return {
     items: once(data?.pages.flatMap((page) => page.items) ?? []),
     state: stateOf(status, error),
-    readAgain: () => {
-      void refetch();
-    },
-    // An infinite query calls itself refetching while it reaches for the next page too, and a spinner at the top of a
-    // list the reader has scrolled to the bottom of says nothing true. The page being asked for is what tells the two
-    // apart.
-    refreshing: isRefetching && !isFetchingNextPage,
+    readAgain,
+    refreshing,
     onEndReached: () => {
       if (hasNextPage && !isFetchingNextPage) {
         void fetchNextPage();
@@ -148,4 +168,17 @@ export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
   readAgain: nothing,
   refreshing: false,
   foot: NO_FOOT,
+});
+
+/**
+ * Articles a screen already holds, standing in for a feed that has shown none: while the feed is asked, and after it
+ * answered, when it answered nothing or failed. A failure is said under them by its cause, with the try again that
+ * asks the feed once more; a pull down the list asks the feed too, what stands in having nothing of its own to fetch.
+ */
+export const feedInPlaceOf = (items: readonly ArticleSummary[], asked: ReadFeed): ReadFeed => ({
+  items,
+  state: { kind: 'empty' },
+  readAgain: asked.readAgain,
+  refreshing: asked.refreshing,
+  foot: asked.state.kind === 'failed' ? { kind: 'failed', failure: asked.state.failure } : NO_FOOT,
 });

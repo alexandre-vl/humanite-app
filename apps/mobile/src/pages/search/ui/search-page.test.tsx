@@ -1,12 +1,14 @@
-import { QUESTION } from '@huma/contracts';
+import type { ArticleSummary } from '@huma/contracts';
+import { ContentApiError, QUESTION } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { isRecord } from '@huma/unknown';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { act, fireEvent, screen, within } from '@testing-library/react-native';
+import { act, fireEvent, renderHook, screen, within } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { t } from '#i18n';
-import { nearestAbove, renderWithCache, settle, styleOf } from '#lib/testing';
+import { useTheme } from '#lib/styles';
+import { nearestAbove, renderWithCache, scrollViewAbove, settle, styleOf } from '#lib/testing';
 import type { Rendered } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { dismissKeyboard } from '#primitives/text-field';
@@ -49,8 +51,11 @@ const type = async (text: string): Promise<void> => {
 };
 
 // A list unmounted between two tests finishes its own work on the next turn: letting that turn run here keeps the
-// update inside act, where React can account for it.
-afterEach(settle);
+// update inside act, where React can account for it. A search held unanswered by one test is let go before the next.
+afterEach(async () => {
+  jest.restoreAllMocks();
+  await settle();
+});
 
 /**
  * Whether a style is one record with a width. A list of layers is passed over on purpose: the icon's stand-in lays
@@ -70,6 +75,23 @@ const sideOf = (glyph: Rendered): number =>
     },
     'rien autour du signe ne dit sa taille : le test ne vérifierait pas la cible',
   );
+
+/** What the rule under the field says to a reader listening to the screen, while the journal is looking. */
+const ASKING = t('search.asking');
+
+/**
+ * An article the journal answers `text` with whose title or standfirst — the words a card prints, and the only ones
+ * the app matches on its own — hold `word`: once that answer is read, the app can answer `word` by itself.
+ */
+const readFor = async (text: string, word: RegExp): Promise<ArticleSummary> => {
+  const found = (await content.search({ text: QUESTION.parse(text) })).items.find((item) =>
+    word.test(`${item.title} ${item.standfirst ?? ''}`),
+  );
+  if (found === undefined) {
+    throw new Error(`aucune carte de la réponse à « ${text} » ne porte ce mot : le test ne vérifierait rien`);
+  }
+  return found;
+};
 
 describe('SearchPage', () => {
   /**
@@ -183,13 +205,122 @@ describe('SearchPage', () => {
     await settle();
   });
 
-  it('rend la question au lecteur quand il efface, et revient à ce qu’elle cherche', async () => {
+  /**
+   * The line is answered at once when it is emptied: the pause is there for a word being typed, and a line just
+   * emptied is not being typed in. Waited out, it left the last answer under an empty field.
+   */
+  it('revient à ce qu’elle cherche dès que le lecteur efface, sans attendre', async () => {
     await renderPage();
     await type('jeunes');
     await fireEvent.press(screen.getByLabelText('Effacer la recherche'));
-    await afterTyping();
     expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
     await settle();
+  });
+
+  /**
+   * An emptied line is taken at once, and for good. Typed into again before the pause was out, it answered the new
+   * question with the old one's answer until the typing stopped.
+   */
+  it('ne rend pas à la question suivante la réponse d’une question effacée', async () => {
+    const [first] = (await content.search({ text: QUESTION.parse('jeunes') })).items;
+    if (first === undefined) {
+      throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
+    }
+    await renderPage();
+    await type('jeunes');
+    expect(await screen.findByText(first.title)).toBeTruthy();
+    await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), '');
+    await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), 'zz');
+    expect(screen.queryByText(first.title)).toBeNull();
+    expect(screen.getByText('Cherchez dans le journal')).toBeTruthy();
+    await afterTyping();
+    await settle();
+  });
+
+  /**
+   * One list for each answer. A list kept from one question to the next kept how far down the reader had scrolled,
+   * and the next answer opened as far down — past its own end, on a blank page, when it was shorter.
+   */
+  it('ouvre chaque réponse dans une liste à elle, prise à son début', async () => {
+    const titleOf = async (text: string): Promise<string> => {
+      const [first] = (await content.search({ text: QUESTION.parse(text) })).items;
+      if (first === undefined) {
+        throw new Error(`le corpus ne répond pas à « ${text} » : le test ne vérifierait rien`);
+      }
+      return first.title;
+    };
+    const [one, other] = await Promise.all([titleOf('jeunes'), titleOf('ecole')]);
+    await renderPage();
+    await type('jeunes');
+    const first = scrollViewAbove(await screen.findByText(one), 'la réponse n’est dans aucune liste');
+    await type('ecole');
+    expect(scrollViewAbove(await screen.findByText(other), 'la réponse n’est dans aucune liste')).not.toBe(first);
+    await settle();
+  });
+
+  /**
+   * While the journal looks and the app has read nothing that answers, cards stand where the answer will be. The
+   * screen was meant to show nothing there, drew them too faint to be seen, and a reader saw a blank page.
+   */
+  it('dresse des cartes à la place de la réponse tant que le journal cherche', async () => {
+    jest.spyOn(content, 'search').mockReturnValue(new Promise(() => undefined));
+    const grey = (await renderHook(() => useTheme())).result.current.standIn;
+    await renderPage();
+    await type('jeunes');
+    const ghost = (screen.root?.queryAll(() => true) ?? []).filter((node) => styleOf(node)['backgroundColor'] === grey);
+    expect(ghost.length).toBeGreaterThan(5);
+  });
+
+  /**
+   * The rule is the only thing on the screen that says what is listed is not the journal's answer yet, and it said it
+   * to the eye alone: a reader listening to the screen heard articles read out as the answer to their question.
+   */
+  it('dit à qui écoute l’écran que le journal cherche, tant qu’il cherche', async () => {
+    await renderPage();
+    await fireEvent.changeText(screen.getByPlaceholderText(PLACEHOLDER), 'jeunes');
+    expect(screen.queryByLabelText(ASKING)).toBeNull();
+    await afterTyping();
+    expect(screen.getByLabelText(ASKING)).toBeTruthy();
+    await settle();
+    expect(screen.queryByLabelText(ASKING)).toBeNull();
+  });
+
+  /**
+   * What the app finds by itself stands in while the journal looks. When the journal found nothing, the looking is
+   * over all the same: the rule went on saying « still looking » for good, over articles that were by then the whole
+   * of the answer, and the list under it was never taken back — so it stays, as the answer it has become.
+   */
+  it('cesse de chercher quand le journal ne trouve rien, et garde ce que l’app avait trouvé', async () => {
+    const known = await readFor('jeunes', /\bjeune/iu);
+    await renderPage();
+    await type('jeunes');
+    expect(await screen.findByText(known.title)).toBeTruthy();
+    jest.spyOn(content, 'search').mockResolvedValue({ items: [], nextCursor: null });
+    await type('jeune');
+    expect(screen.getByText(known.title)).toBeTruthy();
+    expect(screen.queryByLabelText(ASKING)).toBeNull();
+    expect(screen.queryByText(t('search.none.title', { query: 'jeune' }))).toBeNull();
+  });
+
+  /**
+   * A journal that cannot be reached is not one still looking. The failure went unsaid under what the app had found,
+   * and the rule went on saying « still looking » for good: it is said now by its cause, under the articles the app
+   * found, with the try again that asks the journal once more.
+   */
+  it('dit pourquoi le journal n’a pas répondu, sous ce que l’app avait trouvé, et offre de le redemander', async () => {
+    const known = await readFor('jeunes', /\bjeune/iu);
+    await renderPage();
+    await type('jeunes');
+    expect(await screen.findByText(known.title)).toBeTruthy();
+    const asking = jest.spyOn(content, 'search').mockRejectedValue(new ContentApiError('offline', 'hors ligne'));
+    await type('jeune');
+    expect(await screen.findByText(t('failure.offline.title'))).toBeTruthy();
+    expect(screen.getByText(known.title)).toBeTruthy();
+    expect(screen.queryByLabelText(ASKING)).toBeNull();
+    const before = asking.mock.calls.length;
+    await fireEvent.press(screen.getByText(t('action.retry')));
+    await settle();
+    expect(asking.mock.calls.length).toBeGreaterThan(before);
   });
 
   /**

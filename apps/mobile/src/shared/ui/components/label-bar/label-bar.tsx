@@ -3,6 +3,7 @@ import { SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 import { createStyles } from '../../../lib/styles';
+import { Box } from '../../primitives/box';
 import type { NamePlace } from '../../primitives/pager';
 import { Pressable } from '../../primitives/pressable';
 import { Text } from '../../primitives/text';
@@ -15,11 +16,15 @@ export type LabelBarProps<Id extends string> = Readonly<{
   active?: Id | undefined;
   onSelect: (id: Id) => void;
   /**
-   * Where each label came to rest, reported in the order they are drawn, once they have all been laid out.
+   * Where each label's word came to rest, reported in the order they are drawn, once they have all been laid out.
    *
    * What a label measures depends on its word, on the face it is set in and on the step the reader asked for, so
    * nobody can work it out in advance. The band this row is laid in travels a rule under the label in force and
    * brings the one ahead into view, and these are the only numbers it has to do either with.
+   *
+   * The word and not the target around it. A label reaches past its word so that a finger lands on it, and that reach
+   * is the finger's business: a rule as wide as the target stood twelve points past the word on either side, and under
+   * the first label it ran from the very edge of the screen (iPhone simulator, 25/09/2026).
    */
   onPlaces?: ((places: readonly NamePlace[]) => void) | undefined;
 }>;
@@ -27,10 +32,16 @@ export type LabelBarProps<Id extends string> = Readonly<{
 /** Where a label stands before it has been laid out, which is nowhere and no width. */
 const NOWHERE: NamePlace = { x: 0, width: 0 };
 
+/** The room a label keeps either side of its word, inside its own target. */
+const INSET = SPACING.md;
+
 const useStyles = createStyles(() => ({
   // The label carries the band's inset, the row having none to give: the rule under it is laid against the row's own
   // edge, and a padded row would set the two a padding apart.
-  label: { paddingHorizontal: SPACING.md, paddingTop: SPACING.sm, paddingBottom: SPACING.xs },
+  label: { paddingHorizontal: INSET, paddingTop: SPACING.sm, paddingBottom: SPACING.xs },
+  // What the row keeps before its first label and after its last, which is the page's margin less a label's inset:
+  // the first word then starts where every card's words start. It started four points short of them.
+  edge: { width: SPACING.xs },
 }));
 
 type LabelProps = Readonly<{
@@ -87,17 +98,19 @@ function Label({ label, chosen, onPress, onMeasure }: LabelProps): ReactNode {
  * What this owes the band is where its labels came to rest, which it measures and reports.
  */
 export function LabelBar<Id extends string>({ items, active, onSelect, onPlaces }: LabelBarProps<Id>): ReactNode {
+  const styles = useStyles();
   // Kept in a ref because the labels report one at a time, across as many layouts as there are of them: a map built
   // while rendering would be a different map for each report, and the row would never come to hold them all.
   const places = useRef(new Map<Id, NamePlace>());
   const settle = (id: Id, frame: NamePlace): void => {
-    places.current.set(id, frame);
+    places.current.set(id, { x: frame.x + INSET, width: frame.width - 2 * INSET });
     if (items.every((item) => places.current.has(item.id))) {
       onPlaces?.(items.map((item) => places.current.get(item.id) ?? NOWHERE));
     }
   };
   return (
     <>
+      <Box style={styles.edge} />
       {items.map((item) => (
         <Label
           key={item.id}
@@ -111,6 +124,7 @@ export function LabelBar<Id extends string>({ items, active, onSelect, onPlaces 
           }}
         />
       ))}
+      <Box style={styles.edge} />
     </>
   );
 }

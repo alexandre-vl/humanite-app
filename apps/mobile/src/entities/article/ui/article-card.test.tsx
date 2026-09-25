@@ -1,11 +1,12 @@
 import type { ArticleSummary, DisplayText } from '@huma/contracts';
 import { typographyAt } from '@huma/design-tokens';
 import { describe, expect, it, jest } from '@jest/globals';
-import { render, screen } from '@testing-library/react-native';
+import { render, renderHook, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { asDisplayText } from '#lib/display-text';
 import { formatHour, formatLongDate } from '#lib/format';
+import { useTheme } from '#lib/styles';
 import { ancestorsOf, everyArticle, standfirstOf, styleOf } from '#lib/testing';
 import type { Rendered } from '#lib/testing';
 import { Text } from '#primitives/text';
@@ -164,6 +165,25 @@ describe('ArticleCard', () => {
     const picture = screen.getByTestId('picture', { includeHiddenElements: true });
     expect(styleOf(holdingBoth(screen.getByText(summary.title), picture))).toMatchObject({ flexDirection: 'row' });
   });
+
+  /**
+   * The ghost of a card and the card that takes its place show one grey where the picture will be. The frame was drawn
+   * in another, and flashed from the one to the other as the cards landed with their pictures still on the way.
+   */
+  it.each(['opening', 'lead', 'line'] as const)(
+    'tient le cadre de la photo d’une carte %s dans le gris de ce qui arrive',
+    async (shape) => {
+      const summary = illustrated(await everything());
+      const grey = (await renderHook(() => useTheme())).result.current.standIn;
+      await render(<ArticleCard shape={shape} summary={summary} />);
+      // The ground is the picture's own on a card in a line, and the frame's that holds it to a ratio on the others.
+      const picture = screen.getByTestId('picture', { includeHiddenElements: true });
+      const ground = [picture, picture.parent]
+        .map((node) => (node === null ? undefined : styleOf(node)['backgroundColor']))
+        .find((painted) => painted !== undefined);
+      expect(ground).toBe(grey);
+    },
+  );
 
   /**
    * A picture held to a ratio carries no margin of its own, and what it costs is not obvious enough to leave to

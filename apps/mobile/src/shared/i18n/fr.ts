@@ -51,6 +51,9 @@ export const FR = {
   'feed.empty.message': 'Aucun article n’est encore paru.',
   'feed.more': 'Chargement de la suite\u00A0…',
   'feed.more.day': 'Chargement du {day}\u00A0…',
+  // Le pied d’En continu quand la journée en route est celle du lecteur, ou la veille : « du hier » ne se dit pas.
+  'feed.more.today': 'Chargement de la suite d’aujourd’hui\u00A0…',
+  'feed.more.yesterday': 'Chargement d’hier\u00A0…',
   'format.column': 'Opinion',
   'format.live': 'En direct',
   'format.series': 'Série',
@@ -58,8 +61,9 @@ export const FR = {
   'issue.count.one': '{count} article',
   'issue.count.many': '{count} articles',
   'issue.cover': 'Numéro du {date}\u00A0: {opener}. {count}.',
-  // La ligne qui sépare, dans En continu, ce qui est paru depuis la dernière visite de ce qui l’était déjà.
-  'live.visit': 'Déjà paru à votre dernière visite',
+  // Ce qu’une ligne d’En continu est au lecteur quand elle est parue depuis son dernier passage, dit après son titre
+  // à qui écoute l’écran ; l’œil le lit à la perle pleine.
+  'live.fresh': 'Nouveau',
   // La pastille d’Accueil qui mène au fil quand il tient ce qu’il n’a pas encore montré ; « au moins » quand tout ce
   // qu’il a lu jusque-là est neuf, et que la suite en tient peut-être davantage.
   'live.unseen.one': '{count} nouvel article en continu',
@@ -79,12 +83,14 @@ export const FR = {
   'newsstand.empty.title': 'Le kiosque est vide',
   'newsstand.empty.message': 'Aucun numéro n’est encore paru.',
   'search.placeholder': 'Saisissez ici le sujet',
+  // Ce que dit le trait sous le champ à qui écoute l'écran, tant que le journal cherche : ce qui est listé en
+  // attendant est ce que l'app a déjà lu, une réponse plus petite que celle qui arrive, et l'oreille doit l'apprendre
+  // comme l'œil.
+  'search.asking': 'Le journal cherche\u00A0…',
   'search.clear': 'Effacer la recherche',
   'search.field': 'Rechercher dans le journal',
   'search.rest.title': 'Cherchez dans le journal',
   'search.rest.message': 'Un mot, un nom ou un lieu.',
-  // Ce que l'app trouve elle-même pendant que le journal cherche : des articles déjà chargés, donc vrais, mais une
-  // réponse plus petite que celle qui arrive. Le titre le dit, pour qu'on ne la prenne pas pour l'autre.
   'search.none.title': 'Aucun résultat pour «\u00A0{query}\u00A0»',
   'search.none.message': 'Essayez un autre mot, ou un sujet plus large.',
   'settings.title': 'Préférences d’affichage',

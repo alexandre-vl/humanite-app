@@ -197,6 +197,33 @@ const DAY_MILLIS = 86_400_000;
 const dayNumber = (year: number, month: number, day: number): number => Date.UTC(year, month - 1, day) / DAY_MILLIS;
 
 /**
+ * How many days before `today` an instant falls on the newsroom's calendar: none for an item of that day, one for an
+ * item of the day before, whatever the hours between the two.
+ */
+export const daysAgo = (instant: Instant, today: IssueId): number => {
+  const clock = clockOf(instant);
+  const [year = 0, month = 0, day = 0] = today.split('-').map(Number);
+  return dayNumber(year, month, day) - dayNumber(clock.year, clock.month, clock.day);
+};
+
+/**
+ * The head of a day's run, against the day the reader is reading on: `Aujourd’hui`, `Hier`, and past those the
+ * weekday and its date, `Mercredi 23\u00A0septembre`.
+ *
+ * A date says which day it is only to a reader who knows what today's date is, and that is not every reader, nor every
+ * morning. The wire opened on « Vendredi 25 septembre », and a reader who did not have the date in mind could not
+ * tell from it whether they stood at the top of the paper or a day down it. The two nearest days are named for what
+ * they are to the reader; every day past them keeps its date, which is how the platform's own lists count back.
+ */
+export const formatDayHead = (instant: Instant, today: IssueId): DisplayText => {
+  const before = daysAgo(instant, today);
+  if (before <= 0) {
+    return asDisplayText('Aujourd\u2019hui');
+  }
+  return before === 1 ? asDisplayText('Hier') : formatDayLabel(instant);
+};
+
+/**
  * When an item was published, as a card says it, against the day the reader is reading on: `12\u00A0h\u00A001` for an
  * item of that day, `Hier à 18\u00A0h\u00A030` for one of the day before, `Lundi 21\u00A0septembre` within the week,
  * `4\u00A0juillet` earlier in the year and `4\u00A0juillet 2025` before it.
@@ -212,8 +239,8 @@ const dayNumber = (year: number, month: number, day: number): number => Date.UTC
  */
 export const formatWhen = (instant: Instant, today: IssueId): DisplayText => {
   const clock = clockOf(instant);
-  const [year = 0, month = 0, day = 0] = today.split('-').map(Number);
-  const before = dayNumber(year, month, day) - dayNumber(clock.year, clock.month, clock.day);
+  const [year = 0] = today.split('-').map(Number);
+  const before = daysAgo(instant, today);
   if (before <= 0) {
     return formatHour(instant);
   }

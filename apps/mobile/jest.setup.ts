@@ -86,21 +86,29 @@ jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
 // change of theme, and a test that mounts one would otherwise fail before rendering anything.
 jest.mock('expo-system-ui', () => ({ setBackgroundColorAsync: jest.fn() }));
 
-// react-native-reanimated (and its own mock) eagerly loads the worklets native module a headless runner lacks. This stand-in
-// gives Animated views the plain react-native ones, a shared value backed by a closure, and an animated style that runs its
-// updater once — enough for the collapsible header to render and its geometry to be exercised on the JS thread.
+// react-native-reanimated (and its own mock) eagerly loads the worklets native module a headless runner lacks. This
+// stand-in gives Animated views the plain react-native ones, a shared value held from one render to the next, and an
+// animated style that runs its updater at each render — enough for the collapsible header to render and its geometry
+// to be exercised on the JS thread.
 jest.mock('react-native-reanimated', () => {
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
-  const useSharedValue = (initial: number): { get: () => number; set: (next: number) => void } => {
-    let current = initial;
-    return {
-      get: (): number => current,
-      set: (next: number): void => {
-        current = next;
-      },
-    };
-  };
   const react = jest.requireActual<typeof import('react')>('react');
+  // Held from one render to the next, as a phone holds it: what a render sets is what the next one reads. A value
+  // made anew at every render forgot everything between two, and a segment set off from wherever the last wait had
+  // left it could not be told from one set off from the start.
+  const useSharedValue = (initial: number): { get: () => number; set: (next: number) => void } => {
+    const held = react.useRef<{ get: () => number; set: (next: number) => void } | null>(null);
+    if (held.current === null) {
+      let current = initial;
+      held.current = {
+        get: (): number => current,
+        set: (next: number): void => {
+          current = next;
+        },
+      };
+    }
+    return held.current;
+  };
   return {
     __esModule: true,
     default: reactNative,
@@ -143,6 +151,8 @@ jest.mock('react-native-reanimated', () => {
       return toValue;
     },
     withRepeat: (animation: number): number => animation,
+    // Stopping a value where it is. Nothing runs here, so there is nothing to stop and the value stays where it is.
+    cancelAnimation: (): void => undefined,
     // Each of these shapes how a value travels, and nothing travels here: the shaping is the identity and the two
     // that take an easing hand it straight back. A curve missing from this list is not caught until a test reaches
     // the animation that asks for it, which is how `out` went missing — so they are kept complete rather than as
