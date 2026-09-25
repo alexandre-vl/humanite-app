@@ -52,6 +52,9 @@ const firstLink = (article: Article): Readonly<{ text: string; url: string }> | 
 beforeEach(() => {
   jest.mocked(openExternal).mockClear();
   useBookmarks.setState({ kept: [] });
+  // A screen held on a reading that never answers is one test's setting and no other's: left standing, it hands the
+  // next screen a service that says nothing and the failure lands on a test that never asked for it.
+  jest.restoreAllMocks();
 });
 
 describe('ArticlePage', () => {
@@ -84,6 +87,21 @@ describe('ArticlePage', () => {
     const written = await firstArticle(content, 'un article', (each) => each.format === 'article');
     await open(written);
     expect(styleOf(await screen.findByText(written.title))).toMatchObject({ color: PALETTE.uiRed });
+  });
+
+  /**
+   * The ground a video is read on comes with the card that opened it, not with the article. What an item is — a video,
+   * a column, a piece of running coverage — is a field of every summary, so the app holds it before it has asked the
+   * service anything. Read from the article alone, the page opened white and turned black under the reader when the
+   * body landed: measured on the phone on 25/09/2026, 850 ms of a video read on the wrong ground, its head, its
+   * standfirst and its signature already printed on it.
+   */
+  it('pose une vidéo sur le thème sombre dès l’ouverture, avant que le journal ait répondu', async () => {
+    const video = await firstArticle(content, 'une vidéo', (each) => each.format === 'video');
+    useBookmarks.setState({ kept: [video] });
+    jest.spyOn(content, 'getArticle').mockReturnValue(new Promise<Article>(() => undefined));
+    await open(video);
+    expect(styleOf(await screen.findByText(video.title))).toMatchObject({ color: PALETTE.white });
   });
 
   /** The mark keeps what the shelf will show — the article's card, read off the article the screen opened. */

@@ -34,6 +34,12 @@ import { ThemeScope } from '#primitives/theme';
  * is read, as the current app prints its videos. The whole screen is scoped — its bar and the inset over it included —
  * where only the reading was, which left a white bar over a black page. The scope stands whether or not it names a
  * theme, so the screen is not built again when the article arrives and turns out to be a film.
+ *
+ * Which theme it names is read from everything the app holds and not from the article alone. What an item is comes
+ * with the card the reader touched — the format is a field of a summary — so the page can open dark. Read from the
+ * article, it could only turn dark once the service had answered: measured on the phone on 25/09/2026, a video opened
+ * white, was read on white for 850 ms with its head, its standfirst and its signature already printed, and went black
+ * under the reader at the moment its body landed.
  */
 export function ArticlePage(): ReactNode {
   const id = useRouteParams((raw) => ARTICLE_ID.parse(raw['id']));
@@ -49,7 +55,7 @@ export function ArticlePage(): ReactNode {
   // already signed in — for whom a wall is the journal withholding this piece, and not a connection to open.
   const { offered, connection } = useReaderSession();
   return (
-    <ThemeScope name={article !== undefined && readsDark(article.format) ? 'dark' : null} screen>
+    <ThemeScope name={known !== null && readsDark(known.format) ? 'dark' : null} screen>
       <Surface>
         <TopBar
           onBack={() => {
