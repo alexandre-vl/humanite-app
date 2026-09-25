@@ -1,7 +1,7 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { formatHour } from '#lib/format';
+import { formatFiled } from '#lib/format';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Text } from '#primitives/text';
@@ -9,7 +9,16 @@ import { accessWord } from '../model/access';
 import { formatWord } from '../model/format';
 import { ItemWord } from './item-word';
 
-export type WireRowProps = Readonly<{ summary: ArticleSummary }>;
+export type WireRowProps = Readonly<{
+  summary: ArticleSummary;
+  /**
+   * The moment it is now, which is what an age is counted against.
+   *
+   * It is handed down rather than read here: every row of a list would otherwise hold its own subscription to the
+   * same clock, and the list would wake a hundred of them a minute to redraw the six a reader can see.
+   */
+  now: number;
+}>;
 
 const useStyles = createStyles((theme) => ({
   row: { flexDirection: 'row', paddingHorizontal: SPACING.lg },
@@ -57,7 +66,7 @@ const useStyles = createStyles((theme) => ({
  * and a headline is cut on no list of the paper. A wire has no desk behind it — what is at the top is at the top
  * because it is the newest — so nothing on this screen is printed larger than anything else.
  */
-export function WireRow({ summary }: WireRowProps): ReactNode {
+export function WireRow({ summary, now }: WireRowProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.row}>
@@ -67,7 +76,7 @@ export function WireRow({ summary }: WireRowProps): ReactNode {
       </Box>
       <Box style={styles.words}>
         <Box style={styles.said}>
-          <Text variant="caption">{formatHour(summary.publishedAt)}</Text>
+          <Text variant="caption">{formatFiled(summary.publishedAt, now)}</Text>
           <ItemWord word={formatWord(summary.format)} />
         </Box>
         <Text variant="body">{summary.title}</Text>

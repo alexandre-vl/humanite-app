@@ -2,9 +2,14 @@ import type { ArticleSummary, DisplayText, IssueId } from '@huma/contracts';
 import { issueIdAt } from '@huma/contracts';
 import { formatDayLabel } from '#lib/format';
 
-/** One line of the wire: the head of a day, or an item filed on that day. */
+/**
+ * One line of the wire: the head of a day, an item filed on that day, or the line that stands where the items would
+ * be when there are none.
+ */
 export type WireRow =
-  Readonly<{ kind: 'day'; day: IssueId; label: DisplayText }> | Readonly<{ kind: 'item'; summary: ArticleSummary }>;
+  | Readonly<{ kind: 'standIn' }>
+  | Readonly<{ kind: 'day'; day: IssueId; label: DisplayText }>
+  | Readonly<{ kind: 'item'; summary: ArticleSummary }>;
 
 /**
  * The lines the wire shows, in order: every item under the head of the day it was published on, newest first.
@@ -16,12 +21,18 @@ export type WireRow =
  * document lists that treatment among the frictions of the screen this replaces, for a third reason again: a white
  * title is legible over a picture or it is not, depending on the picture.
  *
- * The wire arrives newest first, so a day ends exactly where the next begins and a single pass finds every run —
+ * The items arrive newest first, so a day ends exactly where the next begins and a single pass finds every run —
  * which is as well, Hermes having no `Object.groupBy`. Days are told apart by the newsroom's calendar, not by the
  * reader's: an item filed at half past eleven on a Paris evening belongs to the day the newsroom filed it under. That
  * day is the numéro it would have been printed in, and it is named by the same reading the newsstand uses.
+ *
+ * A run that holds nothing still shows one line. The screen is no longer empty when a reading fails — the reader may
+ * be filtering, or the menu may be late — and the list has no other line to say so on.
  */
 export const wireRows = (summaries: readonly ArticleSummary[]): readonly WireRow[] => {
+  if (summaries.length === 0) {
+    return [{ kind: 'standIn' }];
+  }
   const rows: WireRow[] = [];
   let heading = '';
   for (const summary of summaries) {
@@ -39,8 +50,16 @@ export const wireRows = (summaries: readonly ArticleSummary[]): readonly WireRow
 export const rowKind = (row: WireRow): string => row.kind;
 
 /** The name a line keeps for as long as it is on the wire. */
-export const rowKey = (row: WireRow): string =>
-  row.kind === 'day' ? `day:${row.day}` : `${row.kind}:${row.summary.id}`;
+export const rowKey = (row: WireRow): string => {
+  switch (row.kind) {
+    case 'standIn':
+      return 'standIn';
+    case 'day':
+      return `day:${row.day}`;
+    case 'item':
+      return `item:${row.summary.id}`;
+  }
+};
 
 /** Whether a line stays at the top while the run it opens scrolls past: the head of a day does, nothing else. */
 export const rowPins = (row: WireRow): boolean => row.kind === 'day';

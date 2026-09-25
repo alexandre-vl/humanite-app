@@ -16,9 +16,10 @@ export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly
  */
 export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
 
-// Neither a section nor a numéro has an address here. A section is a page of the front screen, turned by a swipe or by
-// its name in the band, so there is only a page to turn to; a numéro is not read in the app, and taking one off the
-// shelf opens the paper on the web, at an address the newsroom owns and `NEWSROOM` names.
+// Neither a section nor a numéro has an address here. A section is a page of the front screen, turned by a swipe or
+// by its name in the band, and on the wire it is a filter over the run already on the screen — neither is somewhere a
+// reader is sent. A numéro is not read in the app, and taking one off the shelf opens the paper on the web, at an
+// address the newsroom owns and `NEWSROOM` names.
 
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;

@@ -1,10 +1,12 @@
 export {
+  formatAge,
   formatByline,
   formatDayDate,
   formatDayLabel,
+  formatFiled,
   formatHour,
   formatLongDate,
   formatPublished,
   formatWhen,
 } from './format';
-export { useToday } from './today';
+export { useNow, useToday } from './today';

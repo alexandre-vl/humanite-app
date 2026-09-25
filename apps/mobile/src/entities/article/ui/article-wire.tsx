@@ -3,7 +3,11 @@ import { SPACING } from '@huma/design-tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { createStyles } from '#lib/styles';
+import { DECORATIVE } from '#lib/announce';
+import { t } from '#i18n';
+import { useNow } from '#lib/format';
+import { createStyles, useTheme } from '#lib/styles';
+import { Icon } from '#primitives/icon';
 import { List } from '#primitives/list';
 import { prefetchPicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
@@ -40,6 +44,10 @@ const useStyles = createStyles(() => ({
  */
 export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
   const styles = useStyles();
+  const theme = useTheme();
+  // One clock for the whole list, ticking once a minute, so the ages on the rows a reader can see stay true while
+  // they read. Read here and not in the row: a hundred rows would be a hundred subscriptions to the same minute.
+  const now = useNow();
   const rows = wireRows(feed.items);
   // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
   // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
@@ -51,6 +59,8 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
   };
   const render = (row: Row): ReactNode => {
     switch (row.kind) {
+      case 'standIn':
+        return <FeedStandIn state={feed.state} onRetry={feed.readAgain} awaited={<WireStandIn />} />;
       case 'day':
         return <WireDay label={row.label} />;
       case 'item':
@@ -65,7 +75,7 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
               prefetchPicture(head?.source ?? null);
             }}
           >
-            <WireRow summary={row.summary} />
+            <WireRow summary={row.summary} now={now} />
           </Pressable>
         );
     }
@@ -78,10 +88,13 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
       pinned={rowPins}
       renderItem={render}
       contentStyle={styles.wire}
-      empty={<FeedStandIn state={feed.state} onRetry={feed.readAgain} awaited={<WireStandIn />} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}
+      toTop={{
+        mark: <Icon name="top" announces={DECORATIVE} tintColor={theme.onPrimary} />,
+        label: t('action.toTop'),
+      }}
     />
   );
 }

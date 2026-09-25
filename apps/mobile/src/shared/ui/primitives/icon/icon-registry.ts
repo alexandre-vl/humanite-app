@@ -36,6 +36,9 @@ export const ICONS = {
   // lies behind it is the size, the faces and the light or the dark, and none of those is a setting of the machine.
   reading: { ios: 'textformat.size', android: 'format_size' },
   search: { ios: 'magnifyingglass', android: 'search' },
+  // The way back to the top of a long list. It points the way the list travels when it is pressed, which is the one
+  // thing about it a reader has to guess right the first time.
+  top: { ios: 'chevron.up', android: 'keyboard_arrow_up' },
 } as const satisfies Readonly<Record<string, IconSymbol>>;
 
 /**

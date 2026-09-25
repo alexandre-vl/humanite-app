@@ -3,8 +3,11 @@ import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { createStyles } from '#lib/styles';
+import { DECORATIVE } from '#lib/announce';
+import { t } from '#i18n';
+import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
+import { Icon } from '#primitives/icon';
 import { List } from '#primitives/list';
 import { prefetchPicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
@@ -61,6 +64,7 @@ const useStyles = createStyles((theme) => ({
  */
 export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, empty }: ArticleFeedProps): ReactNode {
   const styles = useStyles();
+  const theme = useTheme();
   // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
   // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
   // list rather than handed down from a screen because the list and the reading share one slice — the card knows
@@ -110,6 +114,10 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, emp
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}
+      toTop={{
+        mark: <Icon name="top" announces={DECORATIVE} tintColor={theme.onPrimary} />,
+        label: t('action.toTop'),
+      }}
     />
   );
 }

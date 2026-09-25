@@ -1,10 +1,11 @@
+import type { ArticleSummary } from '@huma/contracts';
 import { ContentApiError } from '@huma/contracts';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { screen } from '@testing-library/react-native';
+import { fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
-import { formatDayLabel, formatHour } from '#lib/format';
-import { everyArticle, renderWithCache, settle } from '#lib/testing';
+import { formatDayLabel } from '#lib/format';
+import { renderWithCache, settle } from '#lib/testing';
 import { LivePage } from './live-page';
 
 const renderPage = async (): Promise<void> => {
@@ -12,13 +13,33 @@ const renderPage = async (): Promise<void> => {
   await settle();
 };
 
-/** The newest item of the wire, which every case below reads something of. */
-const newest = async () => {
-  const [item] = (await content.getLiveFeed({})).items;
-  if (item === undefined) {
-    throw new Error('le contenu ne sert aucun item : le test ne vérifierait rien');
+/** The first page of every section, merged and newest first — what the screen reads when nothing is filtered out. */
+const merged = async (): Promise<readonly ArticleSummary[]> => {
+  const sections = await content.getSections();
+  const pages = await Promise.all(sections.map(async (section) => content.getFeed({ section: section.id })));
+  const seen = new Map<string, ArticleSummary>();
+  for (const item of pages.flatMap((page) => page.items)) {
+    seen.set(item.id, item);
   }
-  return item;
+  return [...seen.values()].sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
+};
+
+/** The newest article of the whole paper, which the screen opens on whatever section filed it. */
+const newest = async (): Promise<ArticleSummary> => {
+  const [first] = await merged();
+  if (first === undefined) {
+    throw new Error('le contenu ne sert aucun article : le test ne vérifierait rien');
+  }
+  return first;
+};
+
+/** The first section of the menu, which the band offers straight after the whole paper. */
+const firstSection = async () => {
+  const [section] = await content.getSections();
+  if (section === undefined) {
+    throw new Error('le contenu ne sert aucune rubrique : le test ne vérifierait rien');
+  }
+  return section;
 };
 
 afterEach(() => {
@@ -26,28 +47,88 @@ afterEach(() => {
 });
 
 describe('LivePage', () => {
-  /** What the reader is told of a wire that did not come is its cause, read off the failure the door raised. */
-  it('dit pourquoi le fil n’est pas venu, et offre un nouvel essai qui peut aboutir', async () => {
-    jest.spyOn(content, 'getLiveFeed').mockRejectedValue(new ContentApiError('offline', 'hors ligne'));
+  /**
+   * The screen used to read the wire's own route and nothing else, which answers ten items and pages no further: two
+   * and a half hours of one morning, measured on 25/09/2026. It reads every section together now and merges them.
+   */
+  it('ouvre sur l’article le plus récent du journal, toutes rubriques confondues', async () => {
+    const first = await newest();
+    await renderPage();
+    expect(await screen.findByText(first.title)).toBeTruthy();
+  });
+
+  // Twice over: the list mounts the head of a run where the run begins, and again pinned at the top of its frame.
+  it('coiffe le fil de la journée que ses items portent, et l’y retient', async () => {
+    const first = await newest();
+    await renderPage();
+    expect(await screen.findAllByText(formatDayLabel(first.publishedAt))).toHaveLength(2);
+  });
+
+  /** The one claim this screen makes: nothing stands above something filed after it. */
+  it('range les articles du plus récent au plus ancien, quelle que soit leur rubrique', async () => {
+    const order = await merged();
+    await renderPage();
+    await screen.findByText(order[0]?.title ?? '');
+    const drawn = order.filter((item) => screen.queryAllByText(item.title).length > 0);
+    expect(drawn.length).toBeGreaterThan(1);
+    expect(drawn.map((item) => item.publishedAt)).toEqual(
+      [...drawn]
+        .sort((left, right) => right.publishedAt.localeCompare(left.publishedAt))
+        .map((item) => item.publishedAt),
+    );
+  });
+
+  /** An article is filed under one section, and the screen reads eleven lists: it may not print it eleven times. */
+  it('ne montre jamais deux fois le même article', async () => {
+    const order = await merged();
+    await renderPage();
+    await screen.findByText(order[0]?.title ?? '');
+    for (const item of order.slice(0, 6)) {
+      expect(screen.queryAllByText(item.title).length).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('nomme dans sa bande le journal entier, puis chaque rubrique dans l’ordre du journal', async () => {
+    const sections = await content.getSections();
+    await renderPage();
+    expect(await screen.findByText(t('live.whole'))).toBeTruthy();
+    for (const section of sections) {
+      expect(screen.getByText(section.label)).toBeTruthy();
+    }
+  });
+
+  /**
+   * The band filters and never leads anywhere: the run narrows under the reader rather than a screen being pushed
+   * over them. So what proves it is that an article of another section has gone, not that anything was navigated to.
+   */
+  it('réduit le fil à une rubrique quand on presse son nom, sans quitter l’écran', async () => {
+    const section = await firstSection();
+    const its = new Set((await content.getFeed({ section: section.id })).items.map((item) => item.id));
+    const other = (await merged()).find((item) => !its.has(item.id));
+    if (other === undefined) {
+      throw new Error('le contenu ne sert aucun article d’une autre rubrique : le test ne vérifierait rien');
+    }
+    await renderPage();
+    await screen.findByText(other.title);
+    await fireEvent.press(screen.getByText(section.label));
+    await settle();
+    expect(screen.queryByText(other.title)).toBeNull();
+    expect(screen.getByText(t('live.whole'))).toBeTruthy();
+  });
+
+  /** What the reader is told of a paper that did not come is its cause, read off the failure the door raised. */
+  it('dit pourquoi le journal n’est pas venu, et offre un nouvel essai qui peut aboutir', async () => {
+    jest.spyOn(content, 'getFeed').mockRejectedValue(new ContentApiError('offline', 'hors ligne'));
     await renderPage();
     expect(await screen.findByText('Pas de connexion')).toBeTruthy();
     expect(screen.getByText(t('action.retry'))).toBeTruthy();
   });
 
-  // Twice over: the list mounts the head of a run where the run begins, and again pinned at the top of its frame.
-  it('coiffe le fil de la journée que ses items portent, et l’y retient', async () => {
-    const item = await newest();
+  /** A headline cut is a headline lost, on the wire as on a card: the row cut its title at four lines. */
+  it('ne coupe jamais le titre d’un item', async () => {
+    const first = await newest();
     await renderPage();
-    expect(await screen.findAllByText(formatDayLabel(item.publishedAt))).toHaveLength(2);
-  });
-
-  // The wire opened on the newest illustrated item, laid across the screen with its title over the picture, and left
-  // it out of the list below. A wire has no front page: the item at the top is at the top because it is the newest.
-  it('donne à chaque item son heure et son titre, le plus récent compris', async () => {
-    const item = await newest();
-    await renderPage();
-    expect(await screen.findByText(item.title)).toBeTruthy();
-    expect(await screen.findAllByText(formatHour(item.publishedAt))).not.toHaveLength(0);
+    expect((await screen.findByText(first.title)).props['numberOfLines']).toBeUndefined();
   });
 
   /**
@@ -56,49 +137,9 @@ describe('LivePage', () => {
    * second printing can be caught by.
    */
   it('n’écrit la date nulle part sous la journée qui la porte déjà', async () => {
-    const item = await newest();
+    const first = await newest();
     await renderPage();
-    await screen.findByText(item.title);
+    await screen.findByText(first.title);
     expect(screen.queryByText(/\d{2}\/\d{2}/)).toBeNull();
-  });
-
-  /** A headline cut is a headline lost, on the wire as on a card: the row cut its title at four lines. */
-  it('ne coupe jamais le titre d’un item', async () => {
-    const item = await newest();
-    await renderPage();
-    expect((await screen.findByText(item.title)).props['numberOfLines']).toBeUndefined();
-  });
-
-  /**
-   * The mark a card prints at its foot is printed under the row of the same item, and only for an item any reader may
-   * open: four in five are reserved, and a mark on those would be a mark on nearly every row.
-   */
-  it.each([
-    { access: 'free', marks: 1 },
-    { access: 'premium', marks: 0 },
-  ] as const)(
-    'marque sous son titre un item $access autant de fois qu’il est ouvert à tous : $marks',
-    async ({ access, marks }) => {
-      const item = (await everyArticle(content)).find((summary) => summary.access === access);
-      if (item === undefined) {
-        throw new Error(`le contenu ne sert aucun item ${access} : le test ne vérifierait rien`);
-      }
-      jest.spyOn(content, 'getLiveFeed').mockResolvedValue({ items: [item], nextCursor: null });
-      await renderPage();
-      expect(await screen.findByText(item.title)).toBeTruthy();
-      expect(screen.queryAllByText(t('article.free'))).toHaveLength(marks);
-    },
-  );
-
-  /** Every section runs down this one column: what sets a row apart is what the item is, when it is not an article. */
-  it('dit sur la ligne d’une vidéo qu’elle en est une', async () => {
-    const video = (await everyArticle(content)).find((summary) => summary.format === 'video');
-    if (video === undefined) {
-      throw new Error('le contenu ne sert aucune vidéo : le test ne vérifierait rien');
-    }
-    jest.spyOn(content, 'getLiveFeed').mockResolvedValue({ items: [video], nextCursor: null });
-    await renderPage();
-    expect(await screen.findByText(video.title)).toBeTruthy();
-    expect(screen.getByText(t('format.video'))).toBeTruthy();
   });
 });

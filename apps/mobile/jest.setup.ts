@@ -112,8 +112,14 @@ jest.mock('react-native-reanimated', () => {
     // On a phone this watches a value and calls back whenever it changes, on the thread that draws. Here nothing
     // changes without a render, so it answers once with what the value reads at mount — which is what the band's
     // first offset is worked out from, and the only reading a headless runner can be honest about.
-    useAnimatedReaction: (read: () => unknown, answer: (current: unknown) => void): void => {
-      answer(read());
+    //
+    // What it read is handed over as the previous reading too, which is to say: nothing has changed. A caller that
+    // acts only on a change is then quiet, and a caller that acts every time still runs. Handed no previous at all,
+    // the first sort read `undefined`, called every reading a change, set state on every render, and the renderer
+    // stopped the component for looping.
+    useAnimatedReaction: (read: () => unknown, answer: (current: unknown, previous: unknown) => void): void => {
+      const reading = read();
+      answer(reading, reading);
     },
     // Scrolling a native region from the UI thread. No region here has an offset to move.
     scrollTo: (): void => undefined,

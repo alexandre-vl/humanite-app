@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import type { LabelBarItem } from '#components/label-bar';
 import { LabelBar } from '#components/label-bar';
 import { TopBar, TopBarButton } from '#components/top-bar';
-import { ArticleFeed, feedQuery, sectionFeedQuery, usePagedFeed } from '#entities/article';
+import { ArticleFeed, feedQuery, sectionFeedQuery, usePagedFeed, useSections } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref, SETTINGS_HREF } from '#lib/routing';
@@ -13,7 +13,6 @@ import { createStyles } from '#lib/styles';
 import { Pager } from '#primitives/pager';
 import type { NamePlace } from '#primitives/pager';
 import { Surface } from '#primitives/surface';
-import { useSections } from '../model/sections';
 
 /** The identifier the band reports for the front page itself, which is no section and has none. */
 const FRONT = 'front';

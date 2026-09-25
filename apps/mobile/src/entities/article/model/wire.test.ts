@@ -48,8 +48,9 @@ describe('wireRows', () => {
     expect(filed).toBeGreaterThan(1);
   });
 
-  it('ne rend rien d’un fil vide', () => {
-    expect(wireRows([])).toEqual([]);
+  /** A wire that holds nothing is a screen that has to say so, and the list has no other line to say it on. */
+  it('tient lieu du fil lui-même quand le fil ne rend rien', () => {
+    expect(wireRows([])).toEqual([{ kind: 'standIn' }]);
   });
 });
 
@@ -68,7 +69,7 @@ describe('les lignes du fil', () => {
     expect([...pinned]).toEqual(['day']);
   });
 
-  it('nomment deux arbres, un par sorte de ligne', async () => {
+  it('nomment un arbre par sorte de ligne', async () => {
     const kinds = [...new Set(wireRows(await deepWire()).map(rowKind))];
     expect(kinds.sort((left, right) => left.localeCompare(right))).toEqual(['day', 'item']);
   });

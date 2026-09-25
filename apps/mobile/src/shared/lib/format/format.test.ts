@@ -3,9 +3,11 @@ import { INSTANT, issueIdAt } from '@huma/contracts';
 import { describe, expect, it } from '@jest/globals';
 import { asDisplayText } from '../display-text';
 import {
+  formatAge,
   formatByline,
   formatDayDate,
   formatDayLabel,
+  formatFiled,
   formatHour,
   formatLongDate,
   formatPublished,
@@ -162,5 +164,41 @@ describe('formatByline', () => {
   it('signe au nom d’une personne, et au nom de la rédaction en minuscule', () => {
     expect(formatByline(asDisplayText('Lisa Guillemin'))).toBe('Par Lisa Guillemin');
     expect(formatByline(asDisplayText('La rédaction'))).toBe('Par la rédaction');
+  });
+});
+
+describe('formatAge', () => {
+  /** The clock a running list is read against: a fixed moment, so the test reads the same thing on any machine. */
+  const now = Date.parse('2026-09-25T10:00:00.000Z');
+  const ago = (millis: number): Instant => at(new Date(now - millis).toISOString());
+
+  it.each([
+    { title: 'à la seconde', millis: 12_000, reads: 'À l’instant' },
+    { title: 'à la minute', millis: 60_000, reads: 'Il y a 1\u00A0minute' },
+    { title: 'à plusieurs minutes', millis: 7 * 60_000, reads: 'Il y a 7\u00A0minutes' },
+    { title: 'à l’heure', millis: 3_600_000, reads: 'Il y a 1\u00A0heure' },
+    { title: 'à plusieurs heures', millis: 3 * 3_600_000, reads: 'Il y a 3\u00A0heures' },
+  ])('dit $title ce qui vient de tomber', ({ millis, reads }) => {
+    expect(formatAge(ago(millis), now)).toBe(asDisplayText(reads));
+  });
+
+  /** Past six hours a count stops measuring recency and becomes arithmetic the reader has to do backwards. */
+  it('ne compte plus rien au-delà de six heures', () => {
+    expect(formatAge(ago(6 * 3_600_000), now)).toBeNull();
+    expect(formatAge(ago(30 * 3_600_000), now)).toBeNull();
+  });
+
+  /** A clock a little behind the newsroom's would otherwise read « Il y a -1 minute ». */
+  it('ne compte rien d’un instant qui n’est pas encore arrivé', () => {
+    expect(formatAge(ago(-60_000), now)).toBeNull();
+  });
+});
+
+describe('formatFiled', () => {
+  const now = Date.parse('2026-09-25T10:00:00.000Z');
+
+  it('dit l’âge tant qu’il est vrai, puis l’heure de la rédaction', () => {
+    expect(formatFiled(at('2026-09-25T09:45:00.000Z'), now)).toBe(asDisplayText('Il y a 15\u00A0minutes'));
+    expect(formatFiled(at('2026-09-24T19:52:00.000Z'), now)).toBe(formatHour(at('2026-09-24T19:52:00.000Z')));
   });
 });

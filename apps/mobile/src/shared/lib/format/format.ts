@@ -77,6 +77,54 @@ export const formatHour = (instant: Instant): DisplayText => {
   return asDisplayText(`${String(clock.hour)}\u00A0h\u00A0${pad(clock.minute)}`);
 };
 
+/** How long an item stays young enough to be said in minutes, and then in hours, in milliseconds. */
+const AN_HOUR = 3_600_000;
+const SIX_HOURS = 6 * AN_HOUR;
+
+/** Under a minute old, there is no number worth printing. */
+const A_MINUTE = 60_000;
+
+/**
+ * How long ago an item was filed, for an item filed a moment ago: `À l\u2019instant`, `Il y a 7\u00A0minutes`,
+ * `Il y a 3\u00A0heures` — and nothing at all once it is older than six hours, where the hour it was filed at says
+ * more than a count does.
+ *
+ * An age was refused here once, and the reason was good: « Il y a 2 h » is true when it is drawn and false an hour
+ * later in a list a reader left open, where an hour of the day stays true for ever. What answers it is a clock — the
+ * screens that print an age read `useNow`, which ticks, so the line is redrawn while it is on the screen rather than
+ * going quietly wrong. What is left of the objection is the cost of that tick, and it is one render a minute over the
+ * rows a reader can actually see.
+ *
+ * Six hours is where it stops, and it is not a round number picked for being round: the journal files between seven
+ * in the morning and eleven at night, so six hours is about a third of a working day. Past it a count stops being a
+ * measure of recency and starts being arithmetic the reader has to do backwards to place the piece in their own day.
+ */
+export const formatAge = (instant: Instant, now: number): DisplayText | null => {
+  const old = now - Date.parse(instant);
+  if (old < 0 || old >= SIX_HOURS) {
+    return null;
+  }
+  if (old < A_MINUTE) {
+    return asDisplayText('\u00C0 l\u2019instant');
+  }
+  if (old < AN_HOUR) {
+    const minutes = Math.floor(old / A_MINUTE);
+    return asDisplayText(`Il y a ${String(minutes)}\u00A0minute${minutes > 1 ? 's' : ''}`);
+  }
+  const hours = Math.floor(old / AN_HOUR);
+  return asDisplayText(`Il y a ${String(hours)}\u00A0heure${hours > 1 ? 's' : ''}`);
+};
+
+/**
+ * When an item was filed, as a running list says it: how long ago while that is still the truest thing to say, and
+ * the hour of the newsroom's clock once it is not.
+ *
+ * The day is not here. A list that prints this pins the head of each day over its run, so every row under that head
+ * already carries its day; printing it again on each row is the fault this screen was corrected for.
+ */
+export const formatFiled = (instant: Instant, now: number): DisplayText =>
+  formatAge(instant, now) ?? formatHour(instant);
+
 // The calendar day an instant falls on is the contracts' `issueIdAt`: one key, which a numéro is named by, a wire
 // groups its runs under and a card is dated against.
 

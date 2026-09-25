@@ -3,6 +3,7 @@ import type {
   ArticleId,
   ArticleSummary,
   FeedQuery,
+  Instant,
   Page,
   PageQuery,
   Question,
@@ -29,6 +30,17 @@ const SEARCH = 'search';
 const ONE = 'one';
 
 /**
+ * The branch the whole paper in the order it was filed is put under: every section read to the same depth, merged.
+ *
+ * Apart from `section` and not under it because it holds something none of those holds — a run over all of them at
+ * once, with a floor saying how far down that run may be trusted.
+ */
+const STREAM = 'stream';
+
+/** The root the menu of sections is filed under: one namespace in the cache the app persists. */
+const SECTIONS = 'sections';
+
+/**
  * No cursor at all: the content serves the first page to a query that asks for none. It is an empty string rather than
  * `null` because the cursor type is read off this value — `null` would fix it to `null` and the cursors the content
  * mints would no longer fit.
@@ -45,7 +57,7 @@ const at = (cursor: string): PageQuery => (cursor === FIRST ? {} : { cursor });
 const KEYS = {
   feed: (): readonly string[] => [ARTICLES, 'feed'],
   section: (section: SectionId): readonly string[] => [ARTICLES, 'section', section],
-  live: (): readonly string[] => [ARTICLES, 'live'],
+  stream: (sections: readonly SectionId[]): readonly string[] => [ARTICLES, STREAM, sections.join(' ')],
   search: (text: string): readonly string[] => [ARTICLES, SEARCH, text],
   one: (id: ArticleId): readonly string[] => [ARTICLES, ONE, id],
 } as const;
@@ -88,11 +100,97 @@ export const sectionFeedQuery = (section: SectionId): PagedFeed =>
     return content.getFeed(filtered);
   });
 
-/** The running wire, the newest first: what the En continu screen reads. */
-export const liveFeedQuery = paged(KEYS.live(), async (query) => content.getLiveFeed(query));
+/**
+ * Every section the newsroom publishes, which the bar shows in the order they carry. It is drawn from the cache at
+ * once and read again once stale, like any other reading.
+ *
+ * It was kept for good, in a cache that lasts a day. A menu the newsroom changed overnight was still the bar's the
+ * next morning, while the client finds a section's list through the menu it has read itself since the app started: a
+ * section dropped from one and kept in the other opened on a failure that said it was not there.
+ *
+ * It is filed beside the articles rather than under the front screen that first asked for it. Two screens read the
+ * menu now — the front turns a page per section, the wire prints a block per section — and a reading a page owns is
+ * a reading no other page may ask for.
+ */
+export const sectionsQuery = queryOptions({
+  queryKey: [SECTIONS],
+  queryFn: async () => content.getSections(),
+});
 
-/** What a search that asks nothing holds: no page, and none after it. */
-const UNASKED: Page<ArticleSummary> = { items: [], nextCursor: null };
+/** A page holding nothing, and nothing after it: what a reading that was not asked for answers with. */
+const NOTHING: Page<ArticleSummary> = { items: [], nextCursor: null };
+
+/**
+ * One step of the whole paper in the order the newsroom filed it: every section read one page deeper, and the line
+ * under which that reading may not yet be trusted.
+ *
+ * `read` is everything the step brought back, section by section and unsorted — the merge is the model's, because it
+ * has every step and this has one. `floor` is the instant at and above which the merge is complete: the newest of the
+ * oldest items of the sections that still have a page left. Below it, a page nobody has asked for could still hold
+ * something belonging there, so a screen that drew it would be drawing an order it cannot answer for. A section that
+ * has run out constrains nothing — there is no page left for it to surprise anyone with.
+ */
+export type StreamPage = Readonly<{
+  read: readonly ArticleSummary[];
+  floor: Instant | null;
+  nextCursor: string | null;
+}>;
+
+/** The options of one run over the whole paper: the type is read off the factory, where the library writes it. */
+export type ArticleStream = ReturnType<typeof stream>;
+
+/** The oldest instant among `items`, or nothing when there are none. */
+const oldestOf = (items: readonly ArticleSummary[]): Instant | null =>
+  items.reduce<Instant | null>(
+    (oldest, item) => (oldest === null || item.publishedAt < oldest ? item.publishedAt : oldest),
+    null,
+  );
+
+/**
+ * The whole paper, page by page across every section at once: what the En continu screen reads below its last hours.
+ *
+ * The wire's own route answers ten items and pages no further — asked for a second page on 25/09/2026 it served the
+ * same ten — so a screen that read only it held two hours and a half of one morning. Every section's list does page,
+ * thirty at a time, and eleven of them read together are the paper. One step of eleven readings brought back 308
+ * articles and could vouch for 102 of them over three days; a second step, 214 over five.
+ *
+ * The eleven go one page deeper together and under one cursor, which is what lets the floor mean anything: read to
+ * different depths, the sections would each stop somewhere else and there would be no single line under which the
+ * merge is whole.
+ */
+const stream = (sections: readonly SectionId[]) =>
+  infiniteQueryOptions({
+    queryKey: KEYS.stream(sections),
+    queryFn: async ({ pageParam }): Promise<StreamPage> => {
+      // The wire's own route goes with the first step and with no other: it answers the newsroom's last few whatever
+      // section filed them, it pages no further, and one of its ten was in no section's first page on 25/09/2026.
+      // Read here, nothing just filed can fall through the sections' own lists. It constrains no floor — everything
+      // on it is of today, which is above any floor eleven sections can set.
+      const [justFiled, ...pages] = await Promise.all([
+        pageParam === FIRST ? content.getLiveFeed({}) : Promise.resolve(NOTHING),
+        ...sections.map(async (section) => content.getFeed({ ...at(pageParam), section })),
+      ]);
+      const floors = pages.flatMap((page) => {
+        const oldest = page.nextCursor === null ? null : oldestOf(page.items);
+        return oldest === null ? [] : [oldest];
+      });
+      const read = [...justFiled.items, ...pages.flatMap((page) => [...page.items])];
+      return {
+        read,
+        // Nothing left to read anywhere: the merge is whole to its last item, and nothing is held back.
+        floor: floors.length === 0 ? oldestOf(read) : floors.reduce((low, one) => (one > low ? one : low)),
+        // Whichever section still has one: they were all asked for the same page, so they all mint the same next.
+        nextCursor: pages.map((page) => page.nextCursor).find((cursor) => cursor !== null) ?? null,
+      };
+    },
+    initialPageParam: FIRST,
+    getNextPageParam: (page) => page.nextCursor,
+    // A menu that has not answered names no section, and eleven readings of nothing are still eleven readings.
+    enabled: sections.length > 0,
+  });
+
+/** The run itself, as a screen composes it. */
+export const streamQuery = (sections: readonly SectionId[]): ArticleStream => stream(sections);
 
 /**
  * The articles a reader's question reaches, in the order the source ranks them, by pages. The content is asked only
@@ -101,7 +199,7 @@ const UNASKED: Page<ArticleSummary> = { items: [], nextCursor: null };
  */
 export const searchQuery = (question: Question | null): PagedFeed =>
   question === null
-    ? paged(KEYS.search(''), async () => Promise.resolve(UNASKED), false)
+    ? paged(KEYS.search(''), async () => Promise.resolve(NOTHING), false)
     : paged(
         KEYS.search(question),
         async (query) => {
@@ -133,13 +231,18 @@ export const articleQuery = (id: ArticleId): ReturnType<typeof one> => one(id);
  * rather than flattened past: the predicate is the one place that says so, and the type that follows it would be a
  * lie for that branch.
  */
-const summariesRead = (cache: QueryClient): readonly ArticleSummary[] =>
-  cache
+const summariesRead = (cache: QueryClient): readonly ArticleSummary[] => [
+  ...cache
     .getQueriesData<InfiniteData<Page<ArticleSummary>>>({
       queryKey: [ARTICLES],
-      predicate: ({ queryKey }) => queryKey[1] !== ONE,
+      predicate: ({ queryKey }) => queryKey[1] !== ONE && queryKey[1] !== STREAM,
     })
-    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.items]) ?? []);
+    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.items]) ?? []),
+  // The merged run of the whole paper, whose pages carry a floor beside their items and are therefore shaped apart.
+  ...cache
+    .getQueriesData<InfiniteData<StreamPage>>({ queryKey: [ARTICLES, STREAM] })
+    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.read]) ?? []),
+];
 
 /**
  * What the app already knows of one article, from the lists it has read, or nothing when it knows none of it.

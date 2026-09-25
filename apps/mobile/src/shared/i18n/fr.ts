@@ -18,6 +18,7 @@ export const FR = {
   'account.setAside.hint': 'Servis par le journal dans une forme que l’app ne sait pas lire.',
   'action.back': 'Revenir',
   'action.retry': 'Réessayer',
+  'action.toTop': 'Revenir en haut',
   'app.name': 'L’Humanité',
   'article.free': 'Accès libre',
   'article.withheld.title': 'Réservé aux abonnés',
@@ -55,6 +56,8 @@ export const FR = {
   'issue.count.one': '{count} article',
   'issue.count.many': '{count} articles',
   'issue.cover': 'Numéro du {date}\u00A0: {opener}. {count}.',
+  // Le premier nom de la bande d'En continu : le fil sans filtre, c'est-à-dire le journal entier.
+  'live.whole': 'Tout le journal',
   'nav.headline': 'À la une',
   'nav.live': 'En continu',
   'nav.search': 'Recherche',
