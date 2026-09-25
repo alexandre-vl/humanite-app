@@ -1,7 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
-import { scrollViewAbove, styleOf } from '../../../lib/testing';
 import { LabelBar } from './label-bar';
 
 const ITEMS = [
@@ -36,18 +35,26 @@ describe('LabelBar', () => {
   });
 
   /**
-   * The band measures its labels and takes nothing more. It used to fill a band a list laid out for it, at a height
-   * the list had already decided, and `flex: 1` meant « fill that band »; standing on the screen itself it meant
-   * « take half the screen », and the front page opened on two hundred and eighty points of nothing between the
-   * masthead and the sections. No bench saw it — a headless runner lays nothing out and every word was findable on a
-   * blank screen — so what is held here is the share itself.
+   * Ce que la rangée doit à la bande où elle est posée : l’endroit où chaque étiquette s’est arrêtée. Sans eux la
+   * bande n’a ni règle à promener ni offset à viser — ce qu’une étiquette mesure dépend de son mot, de sa fonte et
+   * du pas que le lecteur a réglé, et personne ne peut le calculer d’avance.
    */
-  it('ne prend aucune part de la hauteur qu’on lui offre', async () => {
-    await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} />);
-    const bar = scrollViewAbove(
-      screen.getByLabelText('Politique'),
-      'la bande ne défile pas : le test ne vérifierait rien',
-    );
-    expect(styleOf(bar)['flexGrow']).toBe(0);
+  it('rapporte où ses étiquettes se sont posées, dans leur ordre, une fois toutes mesurées', async () => {
+    const places = jest.fn();
+    await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} onPlaces={places} />);
+    await fireEvent(screen.getByLabelText('À la une'), 'layout', { nativeEvent: { layout: { x: 0, width: 100 } } });
+    await fireEvent(screen.getByLabelText('Politique'), 'layout', { nativeEvent: { layout: { x: 100, width: 60 } } });
+    expect(places).toHaveBeenLastCalledWith([
+      { x: 0, width: 100 },
+      { x: 100, width: 60 },
+    ]);
+  });
+
+  /** Une seule mesure ne dit rien de la rangée : la bande viserait une place et en trouverait une autre à côté. */
+  it('ne rapporte rien tant qu’une étiquette n’est pas mesurée', async () => {
+    const places = jest.fn();
+    await render(<LabelBar items={ITEMS} active="front" onSelect={jest.fn()} onPlaces={places} />);
+    await fireEvent(screen.getByLabelText('À la une'), 'layout', { nativeEvent: { layout: { x: 0, width: 100 } } });
+    expect(places).not.toHaveBeenCalled();
   });
 });

@@ -100,11 +100,31 @@ jest.mock('react-native-reanimated', () => {
       },
     };
   };
+  const react = jest.requireActual<typeof import('react')>('react');
   return {
     __esModule: true,
     default: reactNative,
     useSharedValue,
     useAnimatedStyle: (updater: () => unknown): unknown => updater(),
+    // A ref to a native view, which off a phone is a ref and nothing more: what the phone adds is the UI thread's
+    // own handle on the view, and there is no UI thread here.
+    useAnimatedRef: (): { current: unknown } => react.createRef<unknown>(),
+    // On a phone this watches a value and calls back whenever it changes, on the thread that draws. Here nothing
+    // changes without a render, so it answers once with what the value reads at mount — which is what the band's
+    // first offset is worked out from, and the only reading a headless runner can be honest about.
+    useAnimatedReaction: (read: () => unknown, answer: (current: unknown) => void): void => {
+      answer(read());
+    },
+    // Scrolling a native region from the UI thread. No region here has an offset to move.
+    scrollTo: (): void => undefined,
+    // A scroll handler the phone runs as a worklet, handed the native event itself. A test fires the React Native
+    // event, which wraps that event in one — so the wrapper is undone here rather than in the caller, which would
+    // otherwise be written for the bench instead of for the phone.
+    useAnimatedScrollHandler:
+      (handler: (event: unknown) => void) =>
+      (event: { nativeEvent?: unknown }): void => {
+        handler(event.nativeEvent ?? event);
+      },
     // A breath is a value going somewhere and back, forever. Off the phone there is no clock to run it on, so each
     // of these answers the value it was asked to go to: what a test reads is where the animation was headed, which
     // is the only thing about it a headless runner can be honest about.

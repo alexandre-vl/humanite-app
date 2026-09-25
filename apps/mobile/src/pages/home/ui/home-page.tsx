@@ -1,7 +1,7 @@
 import type { DisplayText, SectionId } from '@huma/contracts';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { LabelBarItem } from '#components/label-bar';
 import { LabelBar } from '#components/label-bar';
 import { TopBar, TopBarButton } from '#components/top-bar';
@@ -10,8 +10,8 @@ import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref, SETTINGS_HREF } from '#lib/routing';
 import { createStyles } from '#lib/styles';
-import { Box } from '#primitives/box';
 import { Pager } from '#primitives/pager';
+import type { NamePlace } from '#primitives/pager';
 import { Surface } from '#primitives/surface';
 import { useSections } from '../model/sections';
 
@@ -24,7 +24,7 @@ type LeafId = typeof FRONT | SectionId;
 /** One page of the paper: the whole of it, or one section of it. */
 type Leaf = Readonly<{ id: LeafId; label: DisplayText }>;
 
-const useStyles = createStyles(() => ({ page: { flex: 1 } }));
+const useStyles = createStyles((theme) => ({ band: { backgroundColor: theme.surface } }));
 
 type SheetProps = Readonly<{ leaf: Leaf }>;
 
@@ -67,12 +67,21 @@ export function HomePage(): ReactNode {
   const styles = useStyles();
   const sections = useSections();
   const [at, setAt] = useState(0);
-  const leaves: readonly Leaf[] = [
-    { id: FRONT, label: t('nav.headline') },
-    ...sections.map((section) => ({ id: section.id, label: section.label })),
-  ];
+  // Held between renders because the band measures its labels: handed a new row of items, it takes every label's
+  // frame again, and a row rebuilt on every render would have it measuring for ever.
+  const leaves: readonly Leaf[] = useMemo(
+    () => [
+      { id: FRONT, label: t('nav.headline') },
+      ...sections.map((section) => ({ id: section.id, label: section.label })),
+    ],
+    [sections],
+  );
   const items: readonly LabelBarItem<LeafId>[] = leaves;
   const shown = Math.min(at, leaves.length - 1);
+  // Where the names came to rest. The band travels a rule under the one in force and brings the one ahead into view,
+  // and it can do neither without them; the row that draws the names is the only thing that can measure them. They
+  // meet here because the band belongs to the pager and the names do not.
+  const [places, setPlaces] = useState<readonly NamePlace[]>([]);
   return (
     <Surface>
       <TopBar
@@ -88,27 +97,30 @@ export function HomePage(): ReactNode {
           />
         }
       />
-      <LabelBar
-        items={items}
-        active={leaves[shown]?.id}
-        onSelect={(id) => {
-          const chosen = leaves.findIndex((leaf) => leaf.id === id);
-          if (chosen >= 0) {
-            setAt(chosen);
-          }
+      <Pager
+        count={leaves.length}
+        active={shown}
+        onActive={setAt}
+        places={places}
+        namesStyle={styles.band}
+        names={
+          <LabelBar
+            items={items}
+            active={leaves[shown]?.id}
+            onPlaces={setPlaces}
+            onSelect={(id) => {
+              const chosen = leaves.findIndex((leaf) => leaf.id === id);
+              if (chosen >= 0) {
+                setAt(chosen);
+              }
+            }}
+          />
+        }
+        renderPage={(index) => {
+          const leaf = leaves[index];
+          return leaf === undefined ? null : <Sheet leaf={leaf} />;
         }}
       />
-      <Box style={styles.page}>
-        <Pager
-          count={leaves.length}
-          active={shown}
-          onActive={setAt}
-          renderPage={(index) => {
-            const leaf = leaves[index];
-            return leaf === undefined ? null : <Sheet leaf={leaf} />;
-          }}
-        />
-      </Box>
     </Surface>
   );
 }
