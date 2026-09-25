@@ -1,15 +1,16 @@
 <div align="center">
 
-# L'Humanité, en natif
-
-**Le quotidien fondé par Jaurès en 1904, dans une app où le lecteur ne regarde jamais le journal se charger.**
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/showcase/banner-dark.webp">
+  <img src="docs/showcase/banner-light.webp" width="100%" alt="L'Humanité, en natif : le quotidien fondé par Jaurès en 1904, dans une app où le lecteur ne regarde jamais le journal se charger. Trois écrans de l'app sur iPhone : une recherche, la une, un article.">
+</picture>
 
 ![Expo SDK 57](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)
 ![React Native 0.86](https://img.shields.io/badge/React%20Native-0.86%20%C2%B7%20New%20Architecture-61DAFB?logo=react&logoColor=black)
 ![TypeScript 6](https://img.shields.io/badge/TypeScript-6%20ultra--strict-3178C6?logo=typescript&logoColor=white)
 ![ADR](https://img.shields.io/badge/ADR-36%20%C2%B7%20141%20r%C3%A8gles-f13c47)
 ![Preuves](https://img.shields.io/badge/preuves-633-4c3f57)
-![Tests](https://img.shields.io/badge/tests-1879-2ea44f)
+![Tests](https://img.shields.io/badge/tests-1885-2ea44f)
 ![Lint](https://img.shields.io/badge/lint-0%20d%C3%A9sactivation-4c3f57)
 
 </div>
@@ -46,12 +47,19 @@ Relevé le 25/09/2026 sur `main`.
 | ----------------- | ---------------------------------------------------------------------------------------------- |
 | **36** ADR        | 32 en vigueur, 4 remplacés, 141 règles                                                         |
 | **633** preuves   | exécutables, qui tiennent 107 de ces règles ; les 34 autres tiennent par une convention écrite |
-| **1 879** tests   | 1 348 pour l'outillage (Vitest), 531 pour l'app (jest-expo et React Native Testing Library)    |
+| **1 885** tests   | 1 348 pour l'outillage (Vitest), 537 pour l'app (jest-expo et React Native Testing Library)    |
 | **12** étapes     | `pnpm verify` en 2 minutes ; le pre-commit rejoue sur l'index celles que le commit concerne    |
 | **0**             | désactivation de lint                                                                          |
 | **68 000** lignes | de TypeScript : 18 000 pour l'app, 32 000 pour l'outillage qui la tient                        |
 
 ## Ce que le lecteur tient en main
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/showcase/screens-dark.webp">
+  <img src="docs/showcase/screens-light.webp" width="100%" alt="Quatre écrans de l'app sur iPhone : À la une, En continu, un article, une recherche sur « climat ».">
+</picture>
+
+_Simulateur iPhone, service du journal, le 25/09/2026._
 
 | Écran                       | Ce qu'il fait                                                                                                                     |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
