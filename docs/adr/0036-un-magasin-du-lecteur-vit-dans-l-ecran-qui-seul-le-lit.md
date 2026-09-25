@@ -1,6 +1,6 @@
 ---
 format: 1
-status: proposed
+status: accepted
 significance: [guarded-config, boundary]
 supersedes: [ADR-0024]
 ---

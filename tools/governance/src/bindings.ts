@@ -907,26 +907,6 @@ export const BINDINGS = {
       },
     },
   },
-  'ADR-0024': {
-    scope: {
-      paths: ['apps/mobile/src/features/**', 'apps/mobile/src/shared/lib/storage/**'],
-    },
-    rules: {
-      R1: ['guardrail/module-zustand'],
-      R2: {
-        convention:
-          'La façade du stockage n’accepte qu’une clé du registre : son paramètre est typé sur les valeurs de la table, si bien qu’une clé écrite à la main ne compile pas, et le registre reste le seul endroit où lire ce que l’app pose sur le disque.',
-      },
-      R3: {
-        convention:
-          'Chaque magasin nomme la version du format qu’il écrit et le middleware de persistance l’inscrit dans l’enveloppe posée sur le disque ; elle est relue à la restauration, et un format d’une autre version passe par la migration ou est écarté. Un test par magasin relit l’enveloppe écrite et y vérifie la version, le middleware laissant par défaut une version nulle à qui ne la nomme pas.',
-      },
-      R4: {
-        convention:
-          'Ce qui revient du disque est une chaîne quelconque, qu’un fichier modifié à la main peut avoir remplacée : chaque magasin la relit valeur par valeur avant de rien servir — par l’analyseur marqué des contrats quand la valeur est un identifiant, contre la liste close des valeurs admises quand c’est un réglage — et ce qui n’en ressort pas est laissé pour la valeur du journal, si bien qu’un disque modifié ne peut pas placer dans un magasin une valeur que le reste de l’app croirait validée.',
-      },
-    },
-  },
   'ADR-0026': {
     scope: {
       paths: [
