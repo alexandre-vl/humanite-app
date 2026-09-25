@@ -1,4 +1,4 @@
-import type { ArticleId, ArticleSummary, ContentErrorCode } from '@huma/contracts';
+import type { ArticleId, ArticleSummary, ContentErrorCode, Instant } from '@huma/contracts';
 import type { QueryStatus } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { failureOf } from '#api';
@@ -26,6 +26,38 @@ const STAND_IN = {
 export const stateOf = (status: QueryStatus, error: Error | null): FeedState => STAND_IN[status](error);
 
 /**
+ * What stands under the last item a feed shows: the next part while it is on its way — named by the day it completes,
+ * for a feed read a day at a time — the failure to fetch it, or nothing.
+ *
+ * It is what a reader who reaches the end is owed, and was owed nothing. The next part was asked for without a word
+ * at the foot of the list, and its failure went unsaid: on the iPhone simulator on 25/09/2026 the second step of the
+ * wire took 11.3 seconds, and a reader flicking down met the last item with nothing under it for all of them. A part
+ * that failed left the reader there for good, the list asking again only once it had grown.
+ */
+export type FeedFoot =
+  | Readonly<{ kind: 'none' }>
+  | Readonly<{ kind: 'coming'; day: Instant | null }>
+  | Readonly<{ kind: 'failed'; failure: ContentErrorCode }>;
+
+/** Nothing under the last item: there is no next part, or it is not being fetched. */
+const NO_FOOT: FeedFoot = { kind: 'none' };
+
+/**
+ * What stands under a feed's last item, read off its query: the next part while it is on its way, the failure to
+ * fetch it once it has failed, and nothing otherwise. A part the reader is not near yet is not announced: the list
+ * asks for it well before its end, so by the time the foot is in view the part is on its way.
+ */
+export const footOf = (
+  next: Readonly<{ fetching: boolean; failed: boolean; error: Error | null }>,
+  day: Instant | null,
+): FeedFoot => {
+  if (next.fetching) {
+    return { kind: 'coming', day };
+  }
+  return next.failed ? { kind: 'failed', failure: failureOf(next.error) } : NO_FOOT;
+};
+
+/**
  * A feed as the view that draws it reads it: what has arrived, what stands in while nothing has, and — when there is
  * more than one page — how to ask for the rest. A feed read in one call answers the first three and leaves the last
  * alone, which is why the view asks for no more than it draws.
@@ -41,6 +73,8 @@ export type ReadFeed = Readonly<{
   /** Whether that reading is under way, and only that one: asking for the next page is not a refresh. */
   refreshing: boolean;
   onEndReached?: (() => void) | undefined;
+  /** What stands under the last item it shows. */
+  foot: FeedFoot;
 }>;
 
 /**
@@ -71,8 +105,17 @@ const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
  * it holds, and a screen with something of its own to say about what it shows would have nothing to ask.
  */
 export function usePagedFeed(query: PagedFeed): ReadFeed {
-  const { data, status, error, refetch, isRefetching, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(query);
+  const {
+    data,
+    status,
+    error,
+    refetch,
+    isRefetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useInfiniteQuery(query);
   return {
     items: once(data?.pages.flatMap((page) => page.items) ?? []),
     state: stateOf(status, error),
@@ -88,6 +131,7 @@ export function usePagedFeed(query: PagedFeed): ReadFeed {
         void fetchNextPage();
       }
     },
+    foot: footOf({ fetching: isFetchingNextPage, failed: isFetchNextPageError, error }, null),
   };
 }
 
@@ -103,4 +147,5 @@ export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
   state: { kind: 'empty' },
   readAgain: nothing,
   refreshing: false,
+  foot: NO_FOOT,
 });

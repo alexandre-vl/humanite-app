@@ -23,7 +23,13 @@ function TextFieldDemo(): ReactNode {
   const styles = useStyles();
   const [text, setText] = useState('');
   return (
-    <TextField value={text} onChange={setText} placeholder={asDisplayText('Un champ où écrire')} style={styles.demo} />
+    <TextField
+      value={text}
+      onChange={setText}
+      label={asDisplayText('Démonstration')}
+      placeholder={asDisplayText('Un champ où écrire')}
+      style={styles.demo}
+    />
   );
 }
 

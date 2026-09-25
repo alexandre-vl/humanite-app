@@ -17,11 +17,11 @@ appId: ${APP_ID}
 - runFlow: parts/launch.yaml
 - tapOn: 'Ajouter à mes lectures'
 - assertVisible: 'Retirer de mes lectures'
-- tapOn: 'Mes lectures'
+- tapOn: 'Lectures'
 - assertNotVisible: 'Aucune lecture pour l’instant'
 - takeScreenshot: bookmarks-kept
 - runFlow: parts/launch.yaml
-- tapOn: 'Mes lectures'
+- tapOn: 'Lectures'
 - assertNotVisible: 'Aucune lecture pour l’instant'
 - takeScreenshot: bookmarks-survived
 - tapOn: 'Retirer de mes lectures'

@@ -92,16 +92,23 @@ type Adjacency = Readonly<{ part: keyof Theme; against: keyof Theme; says: strin
  *
  * A control is not a word, and the bar is not the same one: three to one, of everything that says where the control
  * is and which way it is set. It is listed rather than inferred because the platform draws the control and only this
- * file knows which of its parts take which role — and because the last line below is the one that was missing. The
- * knob had the page's own colour; the platform paints it wider than the track, so where it sat there was a hole and
- * where it did not there was a crescent. Nothing said so: every other pair held.
+ * file knows which of its parts take which role — and because the fifth line below is the one that was missing. The
+ * knob had the page's own colour; Android paints it wider than the track, so where it sat there was a hole and where
+ * it did not there was a crescent. Nothing said so: every other pair held.
+ *
+ * iOS draws the knob inside the track and paints it white, as every switch on the phone is painted, so that knob owes
+ * the two tracks and nothing else. It never touches the page at rest, and it would vanish there: 1.00 on the light one.
+ * These are the colours handed to the platform, and iOS does not draw the track set off in the one it is handed: the
+ * package's test reads that track as iOS was measured drawing it.
  */
 const SHAPES = [
   { part: 'control', against: 'background', says: 'where the switch is, set off' },
   { part: 'primary', against: 'background', says: 'where the switch is, set on' },
-  { part: 'textPrimary', against: 'control', says: 'which side the knob rests on, set off' },
-  { part: 'textPrimary', against: 'primary', says: 'which side the knob rests on, set on' },
-  { part: 'textPrimary', against: 'background', says: 'that the knob is a knob, and not a hole in the page' },
+  { part: 'textPrimary', against: 'control', says: 'which side the Android knob rests on, set off' },
+  { part: 'textPrimary', against: 'primary', says: 'which side the Android knob rests on, set on' },
+  { part: 'textPrimary', against: 'background', says: 'that the Android knob is a knob, and not a hole in the page' },
+  { part: 'onPrimary', against: 'control', says: 'which side the iOS knob rests on, set off' },
+  { part: 'onPrimary', against: 'primary', says: 'which side the iOS knob rests on, set on' },
 ] as const satisfies readonly Adjacency[];
 
 /** A pairing the paper prints knowing it is under the bar, with the reading that says how far under. */

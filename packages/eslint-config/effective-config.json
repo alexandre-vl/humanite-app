@@ -1995,7 +1995,7 @@
       "boundaries/legacy-warnings": false,
       "boundaries/root-path": "<racine>/apps/mobile",
       "import/resolver": {
-        "<racine>/node_modules/.pnpm/eslint-import-resolver-typescript@4.4.5_eslint@10.10.0_jiti@2.7.0_supports-color@8.1.1__supports-color@8.1.1/node_modules/eslint-import-resolver-typescript/lib/index.js": {
+        "<racine>/node_modules/.pnpm/eslint-import-resolver-typescript@4.4.5_eslint@10.11.0_jiti@2.7.0_supports-color@8.1.1__supports-color@8.1.1/node_modules/eslint-import-resolver-typescript/lib/index.js": {
           "tsconfig": {
             "configFile": "<racine>/apps/mobile/tsconfig.json"
           },
@@ -6018,7 +6018,7 @@
       "boundaries/legacy-warnings": false,
       "boundaries/root-path": "<racine>/apps/mobile",
       "import/resolver": {
-        "<racine>/node_modules/.pnpm/eslint-import-resolver-typescript@4.4.5_eslint@10.10.0_jiti@2.7.0_supports-color@8.1.1__supports-color@8.1.1/node_modules/eslint-import-resolver-typescript/lib/index.js": {
+        "<racine>/node_modules/.pnpm/eslint-import-resolver-typescript@4.4.5_eslint@10.11.0_jiti@2.7.0_supports-color@8.1.1__supports-color@8.1.1/node_modules/eslint-import-resolver-typescript/lib/index.js": {
           "tsconfig": {
             "configFile": "<racine>/apps/mobile/tsconfig.json"
           },
@@ -10040,7 +10040,7 @@
       "boundaries/legacy-warnings": false,
       "boundaries/root-path": "<racine>/apps/mobile",
       "import/resolver": {
-        "<racine>/node_modules/.pnpm/eslint-import-resolver-typescript@4.4.5_eslint@10.10.0_jiti@2.7.0_supports-color@8.1.1__supports-color@8.1.1/node_modules/eslint-import-resolver-typescript/lib/index.js": {
+        "<racine>/node_modules/.pnpm/eslint-import-resolver-typescript@4.4.5_eslint@10.11.0_jiti@2.7.0_supports-color@8.1.1__supports-color@8.1.1/node_modules/eslint-import-resolver-typescript/lib/index.js": {
           "tsconfig": {
             "configFile": "<racine>/apps/mobile/tsconfig.json"
           },

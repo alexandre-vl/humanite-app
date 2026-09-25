@@ -1,18 +1,12 @@
-import type { DisplayText } from '@huma/contracts';
-import { RADII, SIZES, SPACING } from '@huma/design-tokens';
+import { SIZES, SPACING } from '@huma/design-tokens';
 import { FlashList } from '@shopify/flash-list';
-import type { FlashListRef } from '@shopify/flash-list';
 import type { ReactNode } from 'react';
-import { useMemo, useRef, useState } from 'react';
-import { Pressable } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  useAnimatedReaction,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
-import { scheduleOnRN } from 'react-native-worklets';
+import { useMemo, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import type { ScrollViewProps } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { ScrollViewMarker } from 'react-native-screens/experimental';
+import { announcedAs, DECORATIVE } from '../../../lib/announce';
 import { createStyles } from '../../../lib/styles';
 import type { StyleRef } from '../../../lib/styles';
 import { collapseProgress, lerp } from './geometry';
@@ -24,6 +18,8 @@ type ListCore<Item> = Readonly<{
   typeOf: (item: Item) => string;
   renderItem: (item: Item) => ReactNode;
   empty?: ReactNode;
+  /** What stands under the last item: the next part on its way, or the failure to fetch it. */
+  footer?: ReactNode;
   // Spelt with `undefined` because it is forwarded: a feed read in one call has no next page to ask for, and under
   // `exactOptionalPropertyTypes` handing that absence over is not the same as leaving the prop out.
   onEndReached?: (() => void) | undefined;
@@ -35,19 +31,6 @@ type ListCore<Item> = Readonly<{
   onRefresh?: (() => void) | undefined;
   refreshing?: boolean | undefined;
   contentStyle?: StyleRef;
-  /**
-   * The way back to the top of a long list: the mark a reader presses, and the name they hear if they are listening.
-   *
-   * It is shown only once the top has gone off the screen, and that is two things at once. It carries the reader back
-   * in one press, which a list of sixty rows owes them; and by being there at all it says they are no longer at the
-   * top — a thing this list otherwise has no way of saying, since a pinned row looks the same at the first item as at
-   * the fortieth. A list given none of it shows nothing and says nothing.
-   *
-   * The mark is the caller's because a primitive may not reach the dictionary or another primitive, and both the word
-   * and the symbol come from there. Where it sits, when it appears and what pressing it does are this list's, because
-   * only this list knows how far down the reader is.
-   */
-  toTop?: Readonly<{ mark: ReactNode; label: DisplayText }> | undefined;
 }>;
 
 /** A masthead the list draws over its own content, which slides away as the list scrolls. */
@@ -63,14 +46,19 @@ type WithPinned<Item> = Readonly<{ header?: undefined; pinned: (item: Item) => b
  */
 export type ListProps<Item> = ListCore<Item> & (WithHeader | WithPinned<Item>);
 
-/** How near the end the scroll gets, as a share of the visible height, before the list asks for the next page. */
-const END_THRESHOLD = 0.5;
+/**
+ * How near the end the scroll gets, in heights of the list's own frame, before it asks for the next page: four.
+ *
+ * Half a height was the reader's last flick. The next part of the wire took 11.3 seconds to come on the iPhone
+ * simulator on 25/09/2026, and asked for with half a screen left, all of it was spent looking at the last item. A page
+ * the journal's service has not served lately still takes five to seven seconds to come — 5.3 to 7.2 measured on the
+ * wire the same day, one to four sections a step. Four heights ahead, a reader running down the headlines at a height
+ * every two seconds meets the next part already there, and one flicking meets the foot saying it is on its way.
+ */
+const END_THRESHOLD = 4;
 
 /** How often the native scroll reports its offset, in milliseconds: one report per frame at 60 Hz. */
 const SCROLL_PERIOD = 16;
-
-/** How far the list scrolls while its masthead goes: the whole of the masthead's height, which it gives back. */
-const DISTANCE: number = SIZES.headerExpanded;
 
 /**
  * What the list does when items arrive above the one a reader is looking at: it keeps that one where it was, unless the
@@ -86,29 +74,55 @@ const DISTANCE: number = SIZES.headerExpanded;
  */
 const KEEP_PLACE = { autoscrollToTopThreshold: 0 } as const;
 
-const useStyles = createStyles((theme) => ({
+/**
+ * What the list lets the platform add around its content: on iOS, whatever of the screen's bars lies over its frame.
+ *
+ * From iOS 26 the tab bar floats over the screen instead of standing below it, so a list reaching the foot of the
+ * screen runs under it. Measured on the iPhone simulator on 25/09/2026, the last card of the front page ended with
+ * its time and its bookmark behind the bar, out of reach. The system knows how much of the frame the bar covers, and
+ * lends the list that much at the end — the bar raised or shrunk, a pushed screen with no bar at all but the home
+ * indicator, all of it — and moves the scroll indicator out from under the bar with it. Android has no such bar over
+ * content and ignores the setting.
+ */
+const INSETS = 'automatic';
+
+/**
+ * The frame the scroll view fills. It is written here and not in the style table because the scroll view has to keep
+ * its identity for as long as the list lives: the table is built again whenever the theme changes, and a scroll view
+ * built from a new style would be a new scroll view, with the reader's place in the old one thrown away.
+ */
+const FILL = { flex: 1 } as const;
+
+/**
+ * The scroll view under every list, marked as the one the screen's bars follow.
+ *
+ * A bar that floats over content does three things with one scroll view: it shrinks as the reader goes down it, it
+ * blurs what passes under it, and it pads its end. Left to find that scroll view, the screen takes the first one
+ * down the chain of first children — on the wire, the band of sections then across its top; on the front page, none.
+ * Measured on the iPhone simulator on 25/09/2026, the bar never shrank on either, and headlines ran sharp under its
+ * labels. The marker names this one, wherever the list sits in the screen, and does nothing where no bar looks for it.
+ *
+ * It is a function rather than a component because that is what the list under this one takes. It is written once,
+ * here, because the list rebuilds its scroll view whenever it is handed a different one.
+ */
+const markedScroll = (props: ScrollViewProps): ReactNode => (
+  <ScrollViewMarker style={FILL}>
+    <ScrollView {...props} />
+  </ScrollViewMarker>
+);
+
+const useStyles = createStyles(() => ({
   frame: { flex: 1 },
   fill: { flex: 1 },
   flush: { paddingTop: SPACING.none },
-  underHeader: { paddingTop: SIZES.headerExpanded },
-  // Over the foot of the list and against the edge the thumb already rests on, out of the column the words are set
-  // in: a list is read down its middle, and a mark in the middle would be over a headline at every stop.
-  toTop: { position: 'absolute', right: SPACING.lg, bottom: SPACING.lg },
-  disc: {
-    width: SPACING.xxl,
-    height: SPACING.xxl,
-    borderRadius: RADII.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.primary,
-  },
+  // As tall as what it holds, and never less than the height the tokens give it, which is what one line of a screen's
+  // name measures at the phone's default text size.
   masthead: {
     position: 'absolute',
     top: SPACING.none,
     left: SPACING.none,
     right: SPACING.none,
-    height: SIZES.headerExpanded,
-    overflow: 'hidden',
+    minHeight: SIZES.headerExpanded,
   },
 }));
 
@@ -118,9 +132,14 @@ const useStyles = createStyles((theme) => ({
  * for the gesture and neither would recycle — and because a primitive may not import another primitive, so whoever
  * owns the scroll must also own what reacts to it.
  *
- * What goes in the band is the screen's, its height is not: the list insets its own content by exactly what the band
- * hides, and a band it measured for itself would be a band it had to render before it could lay anything out. There was
- * a second band as well, a strip that stayed under the first, of one row or two; no screen laid one, and it went.
+ * What goes in the band is the screen's, and so is its height, which the list measures: it insets its own content by
+ * exactly what the band hides, and slides the band away over exactly that distance. The height was the tokens' once,
+ * worked out for one line of a screen's name at the reader's largest step; at the phone's largest text size the name
+ * stood seventy points tall and ran to two lines, and the band cut it to « Mes lectur » with the bottom of every letter
+ * gone (iPhone simulator, 25/09/2026). The tokens' height is still where the band starts, being what it measures at the
+ * phone's default size, so a first render lays the content where it stays unless the phone's text is set larger.
+ * There was a second band as well, a strip that stayed under the first, of one row or two; no screen laid one, and it
+ * went.
  *
  * The scroll offset arrives on the JavaScript thread: the list replaces the scroll handler of the view it renders with
  * its own (`@shopify/flash-list/dist/recyclerview/RecyclerView.js`, the `CompatScrollView` element), and calls ours back
@@ -150,12 +169,12 @@ export function List<Item>({
   renderItem,
   pinned,
   empty,
+  footer,
   header,
   onEndReached,
   onRefresh,
   refreshing,
   contentStyle,
-  toTop,
 }: ListProps<Item>): ReactNode {
   const styles = useStyles();
   const pinnedPlaces = useMemo(
@@ -163,79 +182,70 @@ export function List<Item>({
     [items, pinned],
   );
   const scrollY = useSharedValue(0);
+  // How tall the band stands, in both places it is needed: on the thread that draws, for the distance it slides away
+  // over, and in a render, for the inset of the content under it, which the list under this one must be told of.
+  const distance = useSharedValue<number>(SIZES.headerExpanded);
+  const [band, setBand] = useState<number>(SIZES.headerExpanded);
+  // The inset is the band's measured height, a length no token holds: it is carried the way a measurement is, and
+  // not through the style table.
+  const underBand = useMemo(() => ({ paddingTop: band }), [band]);
   const mastheadStyle = useAnimatedStyle(() => {
-    const progress = collapseProgress(scrollY.get(), DISTANCE);
-    return { opacity: lerp(1, 0, progress), transform: [{ translateY: lerp(0, -DISTANCE, progress) }] };
+    const progress = collapseProgress(scrollY.get(), distance.get());
+    return { opacity: lerp(1, 0, progress), transform: [{ translateY: lerp(0, -distance.get(), progress) }] };
   });
-  const rows = useRef<FlashListRef<Item>>(null);
-  // How tall the list is, measured rather than guessed: what says the reader has left the top is that the top is off
-  // the screen, and only the frame knows how much screen there is.
-  const height = useSharedValue(0);
-  const [away, setAway] = useState(false);
-  // One render when the reader crosses, and none while they scroll: the comparison runs on the thread that draws, and
-  // only a change of answer is carried back.
-  //
-  // Mounting and unmounting it is what costs least, which is not what was expected. Kept mounted and carried in and
-  // out of the frame by a worklet — no render at all — the press that jumps to the top froze the screen for 628 ms on
-  // the A065 on 25/09/2026, against 330 ms this way, five jumps each. The extra view over a list that is itself
-  // recycling costs more than the render it saves.
-  useAnimatedReaction(
-    () => height.get() > 0 && scrollY.get() > height.get(),
-    (gone, before) => {
-      if (gone !== before) {
-        scheduleOnRN(setAway, gone);
-      }
-    },
-  );
   return (
-    <Animated.View
-      style={styles.frame}
-      onLayout={(event) => {
-        height.set(event.nativeEvent.layout.height);
-      }}
-    >
+    <View style={styles.frame}>
       <FlashList
-        ref={rows}
         style={styles.fill}
         data={items}
         keyExtractor={keyOf}
         getItemType={typeOf}
-        renderItem={(info) => <>{renderItem(info.item)}</>}
+        renderItem={(info) =>
+          // The pinned copy of a row is for the eye. The row itself stands in the list, in the order a reader
+          // listening walks it, and the copy made it heard twice: at the top of the wire on the iPhone simulator on
+          // 25/09/2026, the day was read out once pinned over the rows and once in them.
+          info.target === 'StickyHeader' ? (
+            <View {...announcedAs(DECORATIVE)}>{renderItem(info.item)}</View>
+          ) : (
+            <>{renderItem(info.item)}</>
+          )
+        }
         stickyHeaderIndices={pinnedPlaces}
         ListEmptyComponent={<>{empty}</>}
-        contentContainerStyle={[header === undefined ? styles.flush : styles.underHeader, contentStyle]}
+        ListFooterComponent={<>{footer}</>}
+        contentContainerStyle={[header === undefined ? styles.flush : underBand, contentStyle]}
         onEndReached={onEndReached}
         onEndReachedThreshold={END_THRESHOLD}
         onRefresh={onRefresh}
         refreshing={refreshing}
-        onScroll={(event) => {
-          scrollY.set(event.nativeEvent.contentOffset.y);
-        }}
+        // Only a band has anything to do with where the list is: a list without one is not told, and is spared a
+        // report on the JavaScript thread at every frame of a scroll.
+        onScroll={
+          header === undefined
+            ? undefined
+            : (event) => {
+                scrollY.set(event.nativeEvent.contentOffset.y);
+              }
+        }
         scrollEventThrottle={SCROLL_PERIOD}
         maintainVisibleContentPosition={KEEP_PLACE}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        renderScrollComponent={markedScroll}
+        contentInsetAdjustmentBehavior={INSETS}
       />
-      {header === undefined ? null : <Animated.View style={[styles.masthead, mastheadStyle]}>{header}</Animated.View>}
-      {toTop === undefined || !away ? null : (
-        <Animated.View style={styles.toTop} entering={FadeIn} exiting={FadeOut}>
-          {/* The platform's own press target and not the app's: a primitive may not import another primitive, and the
-              one thing this needs of a press is that it answers one. */}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={toTop.label}
-            style={styles.disc}
-            onPress={() => {
-              // Not animated. A reader at the foot of sixty rows is asking to be back, and an animated scroll has to
-              // draw every row between here and there to get them there; it is the one place a jump is the kind
-              // answer. The list is virtualised, so what it draws on arrival is the top and nothing else.
-              rows.current?.scrollToOffset({ offset: 0, animated: false });
-            }}
-          >
-            {toTop.mark}
-          </Pressable>
+      {header === undefined ? null : (
+        <Animated.View
+          style={[styles.masthead, mastheadStyle]}
+          onLayout={(event) => {
+            const measured = event.nativeEvent.layout.height;
+            distance.set(measured);
+            setBand(measured);
+          }}
+        >
+          {header}
         </Animated.View>
       )}
-    </Animated.View>
+    </View>
   );
 }

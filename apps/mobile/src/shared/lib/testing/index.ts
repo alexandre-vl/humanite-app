@@ -1,9 +1,12 @@
 export {
+  actionNamed,
   ancestorsOf,
   everyArticle,
   firstArticle,
   layersOf,
   nearestAbove,
+  perform,
+  renderHookWithCache,
   renderWithCache,
   scrollViewAbove,
   settle,

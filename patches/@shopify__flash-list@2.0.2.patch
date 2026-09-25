@@ -1,0 +1,33 @@
+diff --git a/dist/recyclerview/components/StickyHeaders.js b/dist/recyclerview/components/StickyHeaders.js
+index ebd8e0d26f6aada513a1d5b852fc9e4f626d5ca7..76f0178751ce7e1ea99382a935ebc246f9e18910 100644
+--- a/dist/recyclerview/components/StickyHeaders.js
++++ b/dist/recyclerview/components/StickyHeaders.js
+@@ -88,6 +88,11 @@ var StickyHeaders = function (_a) {
+                 transform: [{ translateY: translateY }],
+             } }, currentStickyIndex !== -1 && currentStickyIndex < data.length ? (react_1.default.createElement(ViewHolder_1.ViewHolder, { index: currentStickyIndex, item: data[currentStickyIndex], renderItem: renderItem, layout: { x: 0, y: 0, width: 0, height: 0 }, refHolder: refHolder, extraData: extraData, trailingItem: null, target: "StickyHeader" })) : null));
+     }, [translateY, currentStickyIndex, data, renderItem, refHolder, extraData]);
++    // Backported from 2.2.1 (Shopify/flash-list#2069). With no header pinned, the interpolation above has an empty
++    // input range, which the native driver on iOS divides by: the NaN transform it yields hides the whole list.
++    if (currentStickyIndex === -1) {
++        return null;
++    }
+     return headerContent;
+ };
+ exports.StickyHeaders = StickyHeaders;
+diff --git a/src/recyclerview/components/StickyHeaders.tsx b/src/recyclerview/components/StickyHeaders.tsx
+index 1a90dfabaefc7063a759d3a0ca76532f7eb0dcc2..aabdf38c428a6330633772e72cdc6cef9da9abba 100644
+--- a/src/recyclerview/components/StickyHeaders.tsx
++++ b/src/recyclerview/components/StickyHeaders.tsx
+@@ -187,6 +187,12 @@ export const StickyHeaders = <TItem,>({
+     );
+   }, [translateY, currentStickyIndex, data, renderItem, refHolder, extraData]);
+ 
++  // Backported from 2.2.1 (Shopify/flash-list#2069). With no header pinned, the interpolation above has an empty
++  // input range, which the native driver on iOS divides by: the NaN transform it yields hides the whole list.
++  if (currentStickyIndex === -1) {
++    return null;
++  }
++
+   return headerContent;
+ };
+ 

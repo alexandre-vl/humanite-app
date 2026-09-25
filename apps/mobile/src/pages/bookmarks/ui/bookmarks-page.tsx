@@ -15,6 +15,9 @@ import { Text } from '#primitives/text';
  * in is the height the list insets its content by. Measured at the step the paper is set at: sixteen points of air,
  * twenty-three of type, twenty-five left under — which is the sixteen, twenty-three and twenty-four of the account
  * screen to within a point. At the largest step a reader can choose the type stands 28.75 and the band still holds it.
+ *
+ * Past that the band grows with the name, which is set at the phone's text size as well, and the name runs on to a
+ * second line as the account's does. Held to one, it ended « Mes lectur… » at the phone's largest size.
  */
 const useStyles = createStyles(() => ({
   masthead: { paddingTop: SPACING.lg, paddingHorizontal: SPACING.lg },
@@ -54,7 +57,7 @@ export function BookmarksPage(): ReactNode {
         action={(summary) => <BookmarkToggle summary={summary} />}
         header={
           <Box style={styles.masthead}>
-            <Text variant="display" numberOfLines={1} heading>
+            <Text variant="display" heading>
               {t('bookmark.title')}
             </Text>
           </Box>

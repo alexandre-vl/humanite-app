@@ -1,5 +1,5 @@
-import type { TextScale } from '@huma/design-tokens';
-import { FONT_FAMILIES } from '@huma/design-tokens';
+import type { PhoneText, TextScale } from '@huma/design-tokens';
+import { FONT_FAMILIES, UNMOVED_PHONE } from '@huma/design-tokens';
 import { describe, expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { asDisplayText } from '../../../lib/display-text';
@@ -21,7 +21,7 @@ const setAs = async (typesetting: Typesetting): Promise<Readonly<Record<string, 
 };
 
 const paperAt = async (scale: TextScale): Promise<Readonly<Record<string, unknown>>> =>
-  setAs({ scale, faces: 'paper' });
+  setAs({ scale, faces: 'paper', phone: UNMOVED_PHONE });
 
 describe('Text', () => {
   it('se règle sur le cran que le lecteur a posé, jusqu’à la fonte', async () => {
@@ -40,11 +40,30 @@ describe('Text', () => {
   });
 
   it('se met dans le jeu de faces demandé, sans toucher à la taille', async () => {
-    const own = await setAs({ scale: 'large', faces: 'paper' });
-    const legible = await setAs({ scale: 'large', faces: 'legible' });
+    const own = await setAs({ scale: 'large', faces: 'paper', phone: UNMOVED_PHONE });
+    const legible = await setAs({ scale: 'large', faces: 'legible', phone: UNMOVED_PHONE });
     expect(own['fontFamily']).toBe(FONT_FAMILIES.paper.regular);
     expect(legible['fontFamily']).toBe(FONT_FAMILIES.legible.regular);
     expect(legible['fontSize']).toBe(own['fontSize']);
+  });
+
+  /**
+   * The phone's own text size grows the reader's step, in the style itself; the platform is told not to apply it again,
+   * or every word would print at the square of it. The paper's name is the one role it does not reach.
+   */
+  it('prend la taille de texte du téléphone, sans la laisser appliquer une seconde fois', async () => {
+    const largest: PhoneText = { system: 'ios', category: 'ax5' };
+    expect((await setAs({ scale: 'normal', faces: 'paper', phone: largest }))['fontSize']).toBe(51);
+    expect(screen.getByText(WORDS).props['allowFontScaling']).toBe(false);
+  });
+
+  it('garde au nom du journal sa taille, quelle que soit celle du téléphone', async () => {
+    await render(
+      <TypesettingProvider typesetting={{ scale: 'normal', faces: 'paper', phone: { system: 'ios', category: 'ax5' } }}>
+        <Text variant="masthead">{asDisplayText('L’Humanité')}</Text>
+      </TypesettingProvider>,
+    );
+    expect(styleOf(screen.getByText('L’Humanité'))['fontSize']).toBe(28);
   });
 
   /**

@@ -3,7 +3,6 @@ import type {
   ArticleId,
   ArticleSummary,
   FeedQuery,
-  Instant,
   Page,
   PageQuery,
   Question,
@@ -13,6 +12,8 @@ import type {
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
+import type { Reach, StreamPage, StreamStep } from '../model/reach';
+import { nextStepOf, oldestOf } from '../model/reach';
 
 /** The root every article key starts with: one entity, one namespace in the cache the app persists. */
 const ARTICLES = 'articles';
@@ -30,12 +31,22 @@ const SEARCH = 'search';
 const ONE = 'one';
 
 /**
- * The branch the whole paper in the order it was filed is put under: every section read to the same depth, merged.
+ * The branch the whole paper in the order it was filed is put under: every section read down to the same day, merged.
  *
  * Apart from `section` and not under it because it holds something none of those holds — a run over all of them at
  * once, with a floor saying how far down that run may be trusted.
  */
 const STREAM = 'stream';
+
+/**
+ * The shape of the steps that run is read in, named in its key.
+ *
+ * A step carried one floor and one cursor for all eleven sections until 25/09/2026, and a phone that ran that build
+ * holds steps of that shape in the cache it wrote to disk, which the contracts' hash does not see change: nothing in
+ * the contracts did. Filed under a key that names the new shape, they are never read as steps of this one, and go
+ * when the cache lets them.
+ */
+const STEPS = 'par-rubrique';
 
 /** The root the menu of sections is filed under: one namespace in the cache the app persists. */
 const SECTIONS = 'sections';
@@ -57,7 +68,7 @@ const at = (cursor: string): PageQuery => (cursor === FIRST ? {} : { cursor });
 const KEYS = {
   feed: (): readonly string[] => [ARTICLES, 'feed'],
   section: (section: SectionId): readonly string[] => [ARTICLES, 'section', section],
-  stream: (sections: readonly SectionId[]): readonly string[] => [ARTICLES, STREAM, sections.join(' ')],
+  stream: (sections: readonly SectionId[]): readonly string[] => [ARTICLES, STREAM, STEPS, sections.join(' ')],
   search: (text: string): readonly string[] => [ARTICLES, SEARCH, text],
   one: (id: ArticleId): readonly string[] => [ARTICLES, ONE, id],
 } as const;
@@ -120,43 +131,30 @@ export const sectionsQuery = queryOptions({
 /** A page holding nothing, and nothing after it: what a reading that was not asked for answers with. */
 const NOTHING: Page<ArticleSummary> = { items: [], nextCursor: null };
 
-/**
- * One step of the whole paper in the order the newsroom filed it: every section read one page deeper, and the line
- * under which that reading may not yet be trusted.
- *
- * `read` is everything the step brought back, section by section and unsorted — the merge is the model's, because it
- * has every step and this has one. `floor` is the instant at and above which the merge is complete: the newest of the
- * oldest items of the sections that still have a page left. Below it, a page nobody has asked for could still hold
- * something belonging there, so a screen that drew it would be drawing an order it cannot answer for. A section that
- * has run out constrains nothing — there is no page left for it to surprise anyone with.
- */
-export type StreamPage = Readonly<{
-  read: readonly ArticleSummary[];
-  floor: Instant | null;
-  nextCursor: string | null;
-}>;
-
 /** The options of one run over the whole paper: the type is read off the factory, where the library writes it. */
 export type ArticleStream = ReturnType<typeof stream>;
 
-/** The oldest instant among `items`, or nothing when there are none. */
-const oldestOf = (items: readonly ArticleSummary[]): Instant | null =>
-  items.reduce<Instant | null>(
-    (oldest, item) => (oldest === null || item.publishedAt < oldest ? item.publishedAt : oldest),
-    null,
-  );
+/** The first step: every section from its first page, and the wire's own route with them. */
+const firstStep = (sections: readonly SectionId[]): StreamStep => ({
+  wire: true,
+  reads: sections.map((section) => ({ section, cursor: FIRST })),
+});
 
 /**
- * The whole paper, page by page across every section at once: what the En continu screen reads below its last hours.
+ * The whole paper, step by step across its sections: what the En continu screen reads below its last hours.
  *
  * The wire's own route answers ten items and pages no further — asked for a second page on 25/09/2026 it served the
  * same ten — so a screen that read only it held two hours and a half of one morning. Every section's list does page,
  * thirty at a time, and eleven of them read together are the paper. One step of eleven readings brought back 308
- * articles and could vouch for 102 of them over three days; a second step, 214 over five.
+ * articles and could vouch for 102 of them over three days.
  *
- * The eleven go one page deeper together and under one cursor, which is what lets the floor mean anything: read to
- * different depths, the sections would each stop somewhere else and there would be no single line under which the
- * merge is whole.
+ * Each section keeps a cursor of its own after that first step, and the next step reads only the sections that
+ * stand above the day it completes (`nextStepOf`). The floor means the same thing whatever depth each section was
+ * read to — the newest of the oldest items of those with a page left — so nothing is gained by reading them all to
+ * the same depth, and the rarely-run ones cost the most: their deeper pages are the ones the service has to build.
+ *
+ * `read` is everything a step brought back, section by section and unsorted: the merge is the model's, because it
+ * has every step and a step has one.
  */
 const stream = (sections: readonly SectionId[]) =>
   infiniteQueryOptions({
@@ -167,24 +165,19 @@ const stream = (sections: readonly SectionId[]) =>
       // Read here, nothing just filed can fall through the sections' own lists. It constrains no floor — everything
       // on it is of today, which is above any floor eleven sections can set.
       const [justFiled, ...pages] = await Promise.all([
-        pageParam === FIRST ? content.getLiveFeed({}) : Promise.resolve(NOTHING),
-        ...sections.map(async (section) => content.getFeed({ ...at(pageParam), section })),
+        pageParam.wire ? content.getLiveFeed({}) : Promise.resolve(NOTHING),
+        ...pageParam.reads.map(async ({ section, cursor }) => content.getFeed({ ...at(cursor), section })),
       ]);
-      const floors = pages.flatMap((page) => {
-        const oldest = page.nextCursor === null ? null : oldestOf(page.items);
-        return oldest === null ? [] : [oldest];
-      });
-      const read = [...justFiled.items, ...pages.flatMap((page) => [...page.items])];
       return {
-        read,
-        // Nothing left to read anywhere: the merge is whole to its last item, and nothing is held back.
-        floor: floors.length === 0 ? oldestOf(read) : floors.reduce((low, one) => (one > low ? one : low)),
-        // Whichever section still has one: they were all asked for the same page, so they all mint the same next.
-        nextCursor: pages.map((page) => page.nextCursor).find((cursor) => cursor !== null) ?? null,
+        read: [...justFiled.items, ...pages.flatMap((page) => [...page.items])],
+        reached: pageParam.reads.map(({ section }, index): Reach => {
+          const page = pages[index] ?? NOTHING;
+          return { section, next: page.nextCursor, oldest: oldestOf(page.items) };
+        }),
       };
     },
-    initialPageParam: FIRST,
-    getNextPageParam: (page) => page.nextCursor,
+    initialPageParam: firstStep(sections),
+    getNextPageParam: (last, steps) => nextStepOf(steps),
     // A menu that has not answered names no section, and eleven readings of nothing are still eleven readings.
     enabled: sections.length > 0,
   });

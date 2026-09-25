@@ -6,7 +6,7 @@ import { act, fireEvent, screen, within } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { t } from '#i18n';
-import { nearestAbove, renderWithCache, settle } from '#lib/testing';
+import { nearestAbove, renderWithCache, settle, styleOf } from '#lib/testing';
 import type { Rendered } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { dismissKeyboard } from '#primitives/text-field';
@@ -95,6 +95,29 @@ describe('SearchPage', () => {
     const reach: unknown = cross.props['hitSlop'];
     const glyph = within(cross).getByTestId(`symbol:${ICONS.clear.android}`, { includeHiddenElements: true });
     expect(sideOf(glyph) + 2 * (typeof reach === 'number' ? reach : 0)).toBeGreaterThanOrEqual(SPACING.xxxl);
+  });
+
+  /**
+   * The line the question is typed on is a grid step tall, and the field was only as tall as its letters: set at
+   * twenty points, they were the whole of the target (iPhone simulator, 25/09/2026). The field fills its line, and
+   * the line keeps no room of its own above or below it, which would be room a thumb lands on and types nothing.
+   */
+  it('donne au champ toute la hauteur de sa ligne sous le doigt', async () => {
+    await renderPage();
+    const field = screen.getByPlaceholderText(PLACEHOLDER);
+    expect(styleOf(field)['alignSelf']).toBe('stretch');
+    const line = nearestAbove(
+      field,
+      (node) => {
+        const style = styleOf(node);
+        return typeof style['minHeight'] === 'number' ? style : undefined;
+      },
+      'rien autour du champ ne dit la hauteur de sa ligne : le test ne vérifierait pas la cible',
+    );
+    expect(line['minHeight']).toBeGreaterThanOrEqual(SPACING.xxxl);
+    for (const side of ['padding', 'paddingVertical', 'paddingTop', 'paddingBottom']) {
+      expect(line[side] ?? SPACING.none).toBe(SPACING.none);
+    }
   });
 
   it('laisse le lecteur finir de taper avant d’interroger le journal', async () => {

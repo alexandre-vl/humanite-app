@@ -2,6 +2,7 @@ import type { DisplayText } from '@huma/contracts';
 import type { ReactNode } from 'react';
 import { Switch as NativeSwitch } from 'react-native';
 import { useTheme } from '../../../lib/styles';
+import { KNOB_WIDER_THAN_TRACK, knobRole } from './knob';
 
 export type SwitchProps = Readonly<{
   value: boolean;
@@ -27,11 +28,13 @@ export type SwitchProps = Readonly<{
  * page leaves a hole where it sits and a crescent where it does not. Both themes showed it; three of the four states
  * were a shape nobody would name a switch.
  *
- * So the knob takes the colour the paper writes in, and the track a value both pages are far from — the same one in
- * either theme, a muted grey being too pale to be told from a pale knob on a dark page. The five adjacencies a reader
- * needs are then held together by the tokens: the track against the page in each state, the knob against each track,
- * and the knob against the page, which is the one that had vanished. What tells the states apart is the knob's side
- * as much as the colour, which keeps them apart for a reader who sees no red.
+ * So the track takes a value both pages are far from — the same one in either theme, a muted grey being too pale to be
+ * told from a pale knob on a dark page — and the knob, where it is wider than the track, the colour the paper writes
+ * in. Where it rides inside the track, as iOS draws it, it takes the white of every other switch on the phone:
+ * `knob` says why, and which platform draws which. The adjacencies a reader needs are then held together by the
+ * tokens: the track against the page in each state, the knob against each track, and the wide knob against the page,
+ * which is the one that had vanished. What tells the states apart is the knob's side as much as the colour, which
+ * keeps them apart for a reader who sees no red.
  */
 export function Switch({ value, onChange, label }: SwitchProps): ReactNode {
   const theme = useTheme();
@@ -41,7 +44,7 @@ export function Switch({ value, onChange, label }: SwitchProps): ReactNode {
       onValueChange={onChange}
       accessibilityLabel={label}
       trackColor={{ false: theme.control, true: theme.primary }}
-      thumbColor={theme.textPrimary}
+      thumbColor={theme[knobRole(KNOB_WIDER_THAN_TRACK)]}
       ios_backgroundColor={theme.control}
     />
   );

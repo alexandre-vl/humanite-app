@@ -1,12 +1,19 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { ContentApiError } from '@huma/contracts';
-import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, screen } from '@testing-library/react-native';
+import { isList, isRecord } from '@huma/unknown';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { screen } from '@testing-library/react-native';
 import { content } from '#api';
+import { useVisits } from '#features/last-visit';
 import { t } from '#i18n';
 import { formatDayLabel } from '#lib/format';
 import { renderWithCache, settle } from '#lib/testing';
 import { LivePage } from './live-page';
+
+/** Whether the navigator shows the screen: En continu is the tab in front unless a test puts another there. */
+let mockShown = true;
+
+jest.mock('expo-router', () => ({ __esModule: true, router: { push: jest.fn() }, useIsFocused: () => mockShown }));
 
 const renderPage = async (): Promise<void> => {
   await renderWithCache(<LivePage />);
@@ -33,14 +40,28 @@ const newest = async (): Promise<ArticleSummary> => {
   return first;
 };
 
-/** The first section of the menu, which the band offers straight after the whole paper. */
-const firstSection = async () => {
-  const [section] = await content.getSections();
-  if (section === undefined) {
-    throw new Error('le contenu ne sert aucune rubrique : le test ne vérifierait rien');
-  }
-  return section;
+/** Every word the screen prints, in the order it prints them — which is the order a reader meets them in. */
+const wordsInOrder = (): readonly string[] => {
+  const seen: string[] = [];
+  const walk = (node: unknown): void => {
+    if (typeof node === 'string') {
+      seen.push(node);
+    } else if (isList(node)) {
+      for (const child of node) {
+        walk(child);
+      }
+    } else if (isRecord(node)) {
+      walk(node['children']);
+    }
+  };
+  walk(screen.toJSON());
+  return seen;
 };
+
+beforeEach(() => {
+  mockShown = true;
+  useVisits.setState({ seen: null, since: null, leftAt: null });
+});
 
 afterEach(() => {
   jest.restoreAllMocks();
@@ -57,11 +78,14 @@ describe('LivePage', () => {
     expect(await screen.findByText(first.title)).toBeTruthy();
   });
 
-  // Twice over: the list mounts the head of a run where the run begins, and again pinned at the top of its frame.
+  // Twice over: the list mounts the head of a run where the run begins, and again pinned at the top of its frame —
+  // and says it once, the pinned copy being for the eye: on the iPhone simulator the day was read out twice.
   it('coiffe le fil de la journée que ses items portent, et l’y retient', async () => {
     const first = await newest();
     await renderPage();
-    expect(await screen.findAllByText(formatDayLabel(first.publishedAt))).toHaveLength(2);
+    const day = formatDayLabel(first.publishedAt);
+    expect(await screen.findAllByText(day, { includeHiddenElements: true })).toHaveLength(2);
+    expect(screen.getAllByText(day)).toHaveLength(1);
   });
 
   /** The one claim this screen makes: nothing stands above something filed after it. */
@@ -88,32 +112,58 @@ describe('LivePage', () => {
     }
   });
 
-  it('nomme dans sa bande le journal entier, puis chaque rubrique dans l’ordre du journal', async () => {
+  /**
+   * The band narrowed the run to one section, which is the page of that section on Accueil under the same key: a
+   * second door to pages the front already turns. The row it held is the wire's.
+   */
+  it('ne porte plus de bande de rubriques', async () => {
     const sections = await content.getSections();
+    const first = await newest();
     await renderPage();
-    expect(await screen.findByText(t('live.whole'))).toBeTruthy();
+    await screen.findByText(first.title);
     for (const section of sections) {
-      expect(screen.getByText(section.label)).toBeTruthy();
+      expect(screen.queryByText(section.label)).toBeNull();
     }
   });
 
-  /**
-   * The band filters and never leads anywhere: the run narrows under the reader rather than a screen being pushed
-   * over them. So what proves it is that an article of another section has gone, not that anything was navigated to.
-   */
-  it('réduit le fil à une rubrique quand on presse son nom, sans quitter l’écran', async () => {
-    const section = await firstSection();
-    const its = new Set((await content.getFeed({ section: section.id })).items.map((item) => item.id));
-    const other = (await merged()).find((item) => !its.has(item.id));
-    if (other === undefined) {
-      throw new Error('le contenu ne sert aucun article d’une autre rubrique : le test ne vérifierait rien');
+  /** What came out since the last visit stands over the line, and what was already out stands under it. */
+  it('trace la ligne de la dernière visite sous ce qui est paru depuis', async () => {
+    const order = await merged();
+    const [first, , third] = order;
+    const since = order[2];
+    if (first === undefined || third === undefined || since === undefined) {
+      throw new Error('le contenu sert moins de trois articles : le test ne vérifierait rien');
     }
+    useVisits.setState({ seen: since.publishedAt, since: since.publishedAt });
     await renderPage();
-    await screen.findByText(other.title);
-    await fireEvent.press(screen.getByText(section.label));
-    await settle();
-    expect(screen.queryByText(other.title)).toBeNull();
-    expect(screen.getByText(t('live.whole'))).toBeTruthy();
+    await screen.findByText(first.title);
+    const words = wordsInOrder();
+    const line = words.indexOf(t('live.visit'));
+    expect(line).toBeGreaterThan(words.indexOf(first.title));
+    expect(line).toBeLessThan(words.indexOf(third.title));
+  });
+
+  it('ne trace aucune ligne à la première visite', async () => {
+    const first = await newest();
+    await renderPage();
+    await screen.findByText(first.title);
+    expect(screen.queryByText(t('live.visit'))).toBeNull();
+  });
+
+  /** The next visit draws its line under what this one showed: the newest item on the wire while it is on screen. */
+  it('retient le plus récent article montré, pour la visite suivante', async () => {
+    const first = await newest();
+    await renderPage();
+    await screen.findByText(first.title);
+    expect(useVisits.getState().seen).toBe(first.publishedAt);
+  });
+
+  it('ne retient rien de ce qu’il a lu derrière un autre onglet', async () => {
+    mockShown = false;
+    const first = await newest();
+    await renderPage();
+    await screen.findByText(first.title);
+    expect(useVisits.getState().seen).toBeNull();
   });
 
   /** What the reader is told of a paper that did not come is its cause, read off the failure the door raised. */

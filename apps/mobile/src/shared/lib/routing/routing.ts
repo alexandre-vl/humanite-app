@@ -17,9 +17,8 @@ export type ArticleHref = Readonly<{ pathname: '/article/[id]'; params: Readonly
 export const articleHref = (id: ArticleId): ArticleHref => ({ pathname: '/article/[id]', params: { id } });
 
 // Neither a section nor a numéro has an address here. A section is a page of the front screen, turned by a swipe or
-// by its name in the band, and on the wire it is a filter over the run already on the screen — neither is somewhere a
-// reader is sent. A numéro is not read in the app, and taking one off the shelf opens the paper on the web, at an
-// address the newsroom owns and `NEWSROOM` names.
+// by its name in the band — nowhere a reader is sent. A numéro is not read in the app, and taking one off the shelf
+// opens the paper on the web, at an address the newsroom owns and `NEWSROOM` names.
 
 /** Where the reader sets how the paper is printed for them. */
 export const SETTINGS_HREF = '/settings' as const;
@@ -35,6 +34,12 @@ export const SIGN_IN_HREF = '/sign-in' as const;
  * leaves the app for humanite.fr, and a door out is not a destination one comes back to.
  */
 export const NEWSSTAND_HREF = '/newsstand' as const;
+
+/**
+ * Where the wire stands: a tab, which the bar at the bottom stands on directly, and which the front page also sends a
+ * reader to when the wire holds what it has not shown them yet.
+ */
+export const LIVE_HREF = '/live' as const;
 
 // What the reader kept has no address written here: it is a tab, which the bar at the bottom stands on directly, so
 // nothing in the app pushes a reader there. The route file holds the address, and a deep link finds it; this module

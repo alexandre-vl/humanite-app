@@ -2,8 +2,11 @@ import type { DisplayText } from '@huma/contracts';
 import type { TextTone, TextVariant } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { Text as NativeText } from 'react-native';
+import { announcedAs } from '../../../lib/announce';
+import type { DECORATIVE } from '../../../lib/announce';
 import type { TextAlign } from '../../../lib/styles';
 import { textStyle, useTheme, useTypesetting } from '../../../lib/styles';
+import { cutsAWord } from './word-cut';
 
 export type TextProps = Readonly<{
   children: DisplayText;
@@ -22,6 +25,17 @@ export type TextProps = Readonly<{
    * that.
    */
   alert?: boolean;
+  /**
+   * That the words are for the eye alone, because a reader listening hears them where they act: the name drawn over a
+   * field, which the field says itself as the reader reaches it. Read out on its own line as well, it was heard twice,
+   * once before the field and once on it. Left out, the line is read where it stands.
+   */
+  announces?: typeof DECORATIVE;
+  /**
+   * Told, each time the platform lays the text out, whether it had to cut a word across two lines to fit it. A row of
+   * choices asks, because a choice that reads « Syst » over « ème » is no longer named, and it can take another shape.
+   */
+  onWordCut?: ((cut: boolean) => void) | undefined;
 }>;
 
 /**
@@ -40,6 +54,10 @@ export type TextProps = Readonly<{
  * and is clipped, so a cut standfirst ended « est c.. » on the A065. Nothing written in JavaScript reaches the face the
  * view measures with; the feed's cards stopped cutting their standfirsts rather than live with it.
  *
+ * The phone's own text size is in the style, where `TypesettingRoot` put it, and not left to the platform: the
+ * platform multiplies out of React's sight, and a size changed while the app ran was drawn in boxes laid out for the
+ * old one. A platform told to scale as well would scale twice.
+ *
  * `alert` says the line was not there a moment ago, and a reader listening should hear it without going to look.
  *
  * `heading` says the line opens what follows it, which is how a reader listening to the paper skips through it: a
@@ -47,16 +65,35 @@ export type TextProps = Readonly<{
  * word by word. It is not read off the variant, because the same type serves a headline and the title of a card in a
  * feed, and only one of those opens anything — the screen that lays them out is what knows which.
  */
-export function Text({ children, variant = 'body', tone, align, numberOfLines, heading, alert }: TextProps): ReactNode {
+export function Text({
+  children,
+  variant = 'body',
+  tone,
+  align,
+  numberOfLines,
+  heading,
+  alert,
+  announces,
+  onWordCut,
+}: TextProps): ReactNode {
   const theme = useTheme();
   const typesetting = useTypesetting();
   return (
     <NativeText
+      allowFontScaling={false}
       numberOfLines={numberOfLines}
       textBreakStrategy={numberOfLines === undefined ? 'highQuality' : 'simple'}
       accessibilityRole={alert === true ? 'alert' : heading === true ? 'header' : undefined}
       accessibilityLiveRegion={alert === true ? 'assertive' : undefined}
       style={textStyle(variant, theme, typesetting, tone, align)}
+      onTextLayout={
+        onWordCut === undefined
+          ? undefined
+          : (event) => {
+              onWordCut(cutsAWord(event.nativeEvent.lines));
+            }
+      }
+      {...(announces === undefined ? {} : announcedAs(announces))}
     >
       {children}
     </NativeText>

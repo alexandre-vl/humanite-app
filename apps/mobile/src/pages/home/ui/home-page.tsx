@@ -5,10 +5,18 @@ import { useMemo, useState } from 'react';
 import type { LabelBarItem } from '#components/label-bar';
 import { LabelBar } from '#components/label-bar';
 import { TopBar, TopBarButton } from '#components/top-bar';
-import { ArticleFeed, feedQuery, sectionFeedQuery, usePagedFeed, useSections } from '#entities/article';
+import {
+  ArticleFeed,
+  feedQuery,
+  sectionFeedQuery,
+  useArticleStream,
+  usePagedFeed,
+  useSections,
+} from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
+import { UnseenNotice, useUnseen } from '#features/last-visit';
 import { t } from '#i18n';
-import { articleHref, SETTINGS_HREF } from '#lib/routing';
+import { articleHref, LIVE_HREF, SETTINGS_HREF } from '#lib/routing';
 import { createStyles } from '#lib/styles';
 import { Pager } from '#primitives/pager';
 import type { NamePlace } from '#primitives/pager';
@@ -25,7 +33,11 @@ type Leaf = Readonly<{ id: LeafId; label: DisplayText }>;
 
 const useStyles = createStyles((theme) => ({ band: { backgroundColor: theme.surface } }));
 
-type SheetProps = Readonly<{ leaf: Leaf }>;
+type SheetProps = Readonly<{
+  leaf: Leaf;
+  /** What the page sets above its first card: the wire's news, on the front alone. */
+  notice?: ReactNode;
+}>;
 
 /**
  * One page's feed: the whole paper, or one section of it.
@@ -33,7 +45,7 @@ type SheetProps = Readonly<{ leaf: Leaf }>;
  * A page is a component of its own because each asks for its own feed, and a hook cannot be called in a loop over a
  * list whose length arrives from the newsroom.
  */
-function Sheet({ leaf }: SheetProps): ReactNode {
+function Sheet({ leaf, notice }: SheetProps): ReactNode {
   const feed = usePagedFeed(leaf.id === FRONT ? feedQuery : sectionFeedQuery(leaf.id));
   return (
     <ArticleFeed
@@ -43,6 +55,7 @@ function Sheet({ leaf }: SheetProps): ReactNode {
         router.push(articleHref(id));
       }}
       action={(summary) => <BookmarkToggle summary={summary} />}
+      notice={notice}
     />
   );
 }
@@ -61,10 +74,18 @@ function Sheet({ leaf }: SheetProps): ReactNode {
  *
  * It carries one control. What the reader keeps is a tab, and a mark for it on this bar would be a second door to the
  * destination standing directly under it.
+ *
+ * The wire is a tab too, and the front opens on a door to it all the same — only while the wire holds what it has not
+ * shown the reader, and saying how much. That is what the door is for: the tab says where the wire is, and not that
+ * twelve articles came out there since the reader last looked. Once they have looked, it goes.
  */
 export function HomePage(): ReactNode {
   const styles = useStyles();
   const sections = useSections();
+  // The wire's own run, under the key the wire reads it by: one reading for both screens, and what it holds that the
+  // wire has not shown the reader is said on the front, which is where a reader opens the paper.
+  const ids = useMemo(() => sections.map((section) => section.id), [sections]);
+  const unseen = useUnseen(useArticleStream(ids).items);
   const [at, setAt] = useState(0);
   // Held between renders because the band measures its labels: handed a new row of items, it takes every label's
   // frame again, and a row rebuilt on every render would have it measuring for ever.
@@ -117,7 +138,21 @@ export function HomePage(): ReactNode {
         }
         renderPage={(index) => {
           const leaf = leaves[index];
-          return leaf === undefined ? null : <Sheet leaf={leaf} />;
+          return leaf === undefined ? null : (
+            <Sheet
+              leaf={leaf}
+              notice={
+                leaf.id !== FRONT || unseen === null ? undefined : (
+                  <UnseenNotice
+                    unseen={unseen}
+                    onPress={() => {
+                      router.navigate(LIVE_HREF);
+                    }}
+                  />
+                )
+              }
+            />
+          );
         }}
       />
     </Surface>

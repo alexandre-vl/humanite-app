@@ -31,14 +31,15 @@ export const ICONS = {
   live: { ios: 'bolt', android: 'bolt' },
   // The mark a row carries when touching it opens another screen.
   next: { ios: 'chevron.right', android: 'chevron_right' },
+  // The two states of a password field's eye: pressed on the open eye, the letters show; on the struck-out one, they
+  // hide again. Each draws what pressing it leads to.
+  reveal: { ios: 'eye', android: 'visibility' },
+  conceal: { ios: 'eye.slash', android: 'visibility_off' },
   play: { ios: 'play.fill', android: 'play_arrow' },
   // How the reader sets the paper's own type. The letters are the signifier on both platforms, not a cogwheel: what
   // lies behind it is the size, the faces and the light or the dark, and none of those is a setting of the machine.
   reading: { ios: 'textformat.size', android: 'format_size' },
   search: { ios: 'magnifyingglass', android: 'search' },
-  // The way back to the top of a long list. It points the way the list travels when it is pressed, which is the one
-  // thing about it a reader has to guess right the first time.
-  top: { ios: 'chevron.up', android: 'keyboard_arrow_up' },
 } as const satisfies Readonly<Record<string, IconSymbol>>;
 
 /**

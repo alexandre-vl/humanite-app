@@ -1,5 +1,5 @@
 import { SPACING } from '@huma/design-tokens';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
 import { asDisplayText } from '#lib/display-text';
@@ -29,7 +29,7 @@ const useStyles = createStyles(() => ({
 }));
 
 /** A running gallery of every catalogued primitive and component, grouped by level. */
-export function CataloguePage(): ReactNode {
+function Gallery(): ReactNode {
   const styles = useStyles();
   return (
     <Surface>
@@ -53,4 +53,15 @@ export function CataloguePage(): ReactNode {
       </Scroll>
     </Surface>
   );
+}
+
+/**
+ * The gallery, in a build made for development, and the front page in any other.
+ *
+ * Nothing in the app leads here: the gallery is the workshop's, reached by typing its address. A build made for
+ * readers answered that address all the same — `humanite://catalogue` opened a wall of sample components, stand-in
+ * words and test pictures, with nothing to say what it was — so the address now leads a reader back to the paper.
+ */
+export function CataloguePage(): ReactNode {
+  return __DEV__ ? <Gallery /> : <Redirect href="/" />;
 }

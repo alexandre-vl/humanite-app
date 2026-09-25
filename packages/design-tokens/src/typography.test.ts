@@ -1,4 +1,5 @@
 import { expect, expectTypeOf, test } from 'vitest';
+import type { PhoneText } from './phone-text.ts';
 import type { TextVariant, Typography } from './typography.ts';
 import { TEXT_SCALES, TEXT_VARIANTS, typographyAt } from './typography.ts';
 
@@ -71,6 +72,23 @@ test('a card the page raises titles itself a fourth above a card in a line, in t
   expect(paper('lead').size / paper('title').size).toBeGreaterThanOrEqual(4 / 3);
   expect(paper('lead').family).toBe(paper('title').family);
   expect(paper('lead').size).toBeLessThan(paper('headline').size);
+});
+
+/**
+ * The phone's own text size grows the reader's step the way the phone grows its own text, and the result is rounded to
+ * the point as the steps are. At iOS's largest size a line of body text prints at 51 points and the paper's headline
+ * at 58, which is where the phone's own titles stand; one multiple of 3,571 for both had set the headline at a
+ * hundred. The paper's name is the one role it does not reach: at that size it was set at a hundred points in a bar
+ * of fifty-six and cut to « L'Hu ».
+ */
+test('the phone’s text size grows every role as the phone grows its own text, but the paper’s own name', () => {
+  const largest: PhoneText = { system: 'ios', category: 'ax5' };
+  expect(typographyAt('body', 'normal', 'paper', largest).size).toBe(51);
+  expect(typographyAt('headline', 'normal', 'paper', largest).size).toBe(58);
+  expect(typographyAt('body', 'normal', 'paper', { system: 'android', scale: 2 }).size).toBe(28);
+  expect(typographyAt('body', 'normal', 'paper', { system: 'linear', scale: 2 }).size).toBe(32);
+  expect(typographyAt('masthead', 'normal', 'paper', largest).size).toBe(paper('masthead').size);
+  expect(typographyAt('masthead', 'huge', 'paper', largest).size).toBe(typographyAt('masthead', 'huge', 'paper').size);
 });
 
 /** The four stops the body text reads at, which is the range the current app's own slider covers. */

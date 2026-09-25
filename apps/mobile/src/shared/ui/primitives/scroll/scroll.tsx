@@ -52,6 +52,16 @@ export function Scroll({ children, axis, style, contentStyle, at }: ScrollProps)
       showsHorizontalScrollIndicator={false}
       style={across ? style : [styles.fill, style]}
       contentContainerStyle={contentStyle}
+      // A press on a control answers the first time, keyboard up or not, and a drag puts the keyboard away. Left to the
+      // platform, the first press was spent closing the keyboard: on the iPhone simulator on 25/09/2026, the sign-in
+      // button pressed with an identifier typed closed the keyboard and said nothing, and answered the second press.
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      // On iOS the region makes room under its content for the keyboard, and brings the field being typed in above
+      // it. Without it, at a large text size, the password was typed blind: on the iPhone simulator on 25/09/2026 its
+      // field stayed at 578 points with the keyboard's first row of keys at 597, and rose to 490 with it. Android
+      // shrinks the window around the keyboard instead, and ignores it.
+      automaticallyAdjustKeyboardInsets
     >
       {children}
     </ScrollView>

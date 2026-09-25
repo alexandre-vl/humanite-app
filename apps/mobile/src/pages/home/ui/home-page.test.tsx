@@ -4,15 +4,16 @@ import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
+import { useVisits } from '#features/last-visit';
 import { StartupProvider } from '#lib/startup';
-import { renderWithCache, settle } from '#lib/testing';
+import { actionNamed, perform, renderWithCache, settle } from '#lib/testing';
 import { HomePage } from './home-page';
 
 // The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
 // declared outside would still be undefined when the screen first reaches for it.
 jest.mock('expo-router', () => ({
   __esModule: true,
-  router: { push: jest.fn() },
+  router: { push: jest.fn(), navigate: jest.fn() },
   useLocalSearchParams: (): Readonly<Record<string, string>> => ({}),
 }));
 
@@ -53,10 +54,23 @@ const firstSection = async (): Promise<Section> => {
 // awaited — React 19 hands one back to be waited on, and one left unawaited holds its scope open over what follows.
 beforeEach(async () => {
   jest.mocked(router.push).mockClear();
+  jest.mocked(router.navigate).mockClear();
   await act(() => {
     useBookmarks.setState({ kept: [] });
+    useVisits.setState({ seen: null, since: null, leftAt: null });
   });
 });
+
+/** The paper in the order the newsroom filed it, as the wire merges it: every section's first page, each once. */
+const merged = async (): Promise<readonly ArticleSummary[]> => {
+  const sections = await content.getSections();
+  const pages = await Promise.all(sections.map(async (section) => content.getFeed({ section: section.id })));
+  const once = new Map<string, ArticleSummary>();
+  for (const item of pages.flatMap((page) => page.items)) {
+    once.set(item.id, item);
+  }
+  return [...once.values()].sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
+};
 
 describe('HomePage', () => {
   it('sert le journal sous le nom du journal et la bande des rubriques', async () => {
@@ -108,16 +122,51 @@ describe('HomePage', () => {
     expect(screen.getByText('L’Humanité')).toBeTruthy();
   });
 
-  it('annonce par son étiquette qu’un article gardé peut être rendu', async () => {
+  /**
+   * A reader listening lands on the card, which reads out everything drawn on it: the bookmark was part of its name
+   * and nothing let them press it. The card now offers it as an action, under the bookmark's own name.
+   */
+  it('offre, depuis la carte, de garder un article puis de le rendre', async () => {
     const article = await frontArticle();
     await renderPage();
     expect(await screen.findByText(article.title)).toBeTruthy();
-    const [mark] = screen.getAllByLabelText('Ajouter à mes lectures');
-    if (mark === undefined) {
-      throw new Error('aucune carte ne porte de marque-page : le test ne vérifierait rien');
+    const offering = (label: string) =>
+      screen.getAllByRole('link').filter((card) => actionNamed(card, label) !== undefined);
+    const [card] = offering('Ajouter à mes lectures');
+    if (card === undefined) {
+      throw new Error('aucune carte n’offre de garder son article : le test ne vérifierait rien');
     }
-    await fireEvent.press(mark);
+    await perform(card, 'Ajouter à mes lectures');
     await settle();
-    expect(screen.getAllByLabelText('Retirer de mes lectures')).toHaveLength(1);
+    expect(offering('Retirer de mes lectures')).toHaveLength(1);
+  });
+
+  /**
+   * The wire had shown the reader up to its third article: the front says how many came out since, where a reader
+   * opens the paper, and takes them to the wire.
+   */
+  it('dit sur la une ce que le fil n’a pas encore montré, et y mène', async () => {
+    const order = await merged();
+    const shown = order[2];
+    if (shown === undefined) {
+      throw new Error('le contenu sert moins de trois articles : le test ne vérifierait rien');
+    }
+    const count = order.filter((item) => item.publishedAt > shown.publishedAt).length;
+    const words =
+      count > 1 ? `${String(count)} nouveaux articles en continu` : `${String(count)} nouvel article en continu`;
+    await act(() => {
+      useVisits.setState({ seen: shown.publishedAt });
+    });
+    await renderPage();
+    // The front alone says it: a section's page is one section, and the wire is the whole paper.
+    expect(await screen.findAllByRole('link', { name: words })).toHaveLength(1);
+    await fireEvent.press(screen.getByRole('link', { name: words }));
+    expect(jest.mocked(router.navigate)).toHaveBeenCalledWith('/live');
+  });
+
+  /** On a first visit everything is new, and a count of the whole paper tells a reader nothing. */
+  it('ne dit rien du fil à la première visite', async () => {
+    await renderPage();
+    expect(screen.queryByText(/en continu$/u)).toBeNull();
   });
 });

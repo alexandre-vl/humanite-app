@@ -74,3 +74,67 @@ describe('les lignes du fil', () => {
     expect(kinds.sort((left, right) => left.localeCompare(right))).toEqual(['day', 'item']);
   });
 });
+
+describe('la ligne de la dernière visite', () => {
+  /** The newest item the wire had shown at the last visit: the fourth of the paper, so three came out since. */
+  const lastSeen = async (): Promise<Readonly<{ items: readonly ArticleSummary[]; since: ArticleSummary }>> => {
+    const items = await deepWire();
+    const since = items[3];
+    if (since === undefined) {
+      throw new Error('le fil tient moins de quatre articles : le test ne vérifierait rien');
+    }
+    return { items, since };
+  };
+
+  /** Split around the line: what stands over it, and what stands under it. */
+  const aroundLine = (rows: readonly ReturnType<typeof wireRows>[number][]) => {
+    const line = rows.findIndex((row) => row.kind === 'visit');
+    const summaries = (part: typeof rows) => part.flatMap((row) => (row.kind === 'item' ? [row.summary] : []));
+    return { line, over: summaries(rows.slice(0, line)), under: summaries(rows.slice(line + 1)) };
+  };
+
+  it('sépare ce qui est paru depuis la dernière visite de ce qui l’était déjà, une seule fois', async () => {
+    const { items, since } = await lastSeen();
+    const rows = wireRows(items, since.publishedAt);
+    const { over, under } = aroundLine(rows);
+    expect(rows.filter((row) => row.kind === 'visit')).toHaveLength(1);
+    expect(over.length).toBeGreaterThan(0);
+    expect(over.every((item) => item.publishedAt > since.publishedAt)).toBe(true);
+    expect(under.every((item) => item.publishedAt <= since.publishedAt)).toBe(true);
+    expect(under[0]?.id).toBe(items.find((item) => item.publishedAt <= since.publishedAt)?.id);
+    const keys = rows.map(rowKey);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  /** A day's head stays with its items: the line goes above it, not between it and the first of them. */
+  it('passe au-dessus de l’en-tête de la journée qu’ouvre le premier article déjà paru', async () => {
+    const items = await deepWire();
+    const opener = items.find(
+      (item) => issueIdAt(item.publishedAt) !== issueIdAt(items[0]?.publishedAt ?? item.publishedAt),
+    );
+    if (opener === undefined) {
+      throw new Error('le fil tient une seule journée : le test ne vérifierait rien');
+    }
+    const rows = wireRows(items, opener.publishedAt);
+    const { line } = aroundLine(rows);
+    expect(rows[line + 1]).toEqual({
+      kind: 'day',
+      day: issueIdAt(opener.publishedAt),
+      label: formatDayLabel(opener.publishedAt),
+    });
+  });
+
+  it('ne trace rien à la première visite, ni quand rien n’est paru depuis, ni avant d’être lu jusque-là', async () => {
+    const items = await deepWire();
+    const newest = items[0];
+    const oldest = items.at(-1);
+    if (newest === undefined || oldest === undefined) {
+      throw new Error('le fil ne tient aucun article : le test ne vérifierait rien');
+    }
+    const lines = (since: ArticleSummary['publishedAt'] | null): number =>
+      wireRows(items, since).filter((row) => row.kind === 'visit').length;
+    expect(lines(null)).toBe(0);
+    expect(lines(newest.publishedAt)).toBe(0);
+    expect(lines(INSTANT.parse(new Date(Date.parse(oldest.publishedAt) - 60_000).toISOString()))).toBe(0);
+  });
+});

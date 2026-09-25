@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { usePreferences } from '#features/preferences';
-import { TypesettingProvider } from '#lib/styles';
+import { TypesettingRoot } from '#primitives/text';
 import { ThemeRoot } from '#primitives/theme';
 
 /**
@@ -18,7 +18,9 @@ export function ReaderSettings({ children }: Readonly<{ children: ReactNode }>):
   const faces = usePreferences((settings) => settings.faces);
   return (
     <ThemeRoot choice={choice}>
-      <TypesettingProvider typesetting={{ scale, faces }}>{children}</TypesettingProvider>
+      <TypesettingRoot scale={scale} faces={faces}>
+        {children}
+      </TypesettingRoot>
     </ThemeRoot>
   );
 }

@@ -10,7 +10,7 @@
 appId: ${APP_ID}
 ---
 - runFlow: launch.yaml
-- tapOn: 'Mon compte'
+- tapOn: 'Compte'
 - tapOn:
     text: 'Se déconnecter'
     optional: true

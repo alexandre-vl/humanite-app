@@ -1,13 +1,10 @@
-import type { ArticleId } from '@huma/contracts';
+import type { ArticleId, Instant } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { DECORATIVE } from '#lib/announce';
-import { t } from '#i18n';
 import { useNow } from '#lib/format';
-import { createStyles, useTheme } from '#lib/styles';
-import { Icon } from '#primitives/icon';
+import { createStyles } from '#lib/styles';
 import { List } from '#primitives/list';
 import { prefetchPicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
@@ -17,13 +14,23 @@ import type { WireRow as Row } from '../model/wire';
 import { rowKey, rowKind, rowPins, wireRows } from '../model/wire';
 import { FeedStandIn } from './feed-stand-in';
 import { WireDay } from './wire-day';
+import { WireFooter } from './wire-footer';
 import { WireStandIn } from './wire-stand-in';
 import { WireRow } from './wire-row';
+import { WireVisit } from './wire-visit';
 
 export type ArticleWireProps = Readonly<{
   feed: ReadFeed;
   onOpen: (id: ArticleId) => void;
+  /**
+   * The newest item the wire had shown at the reader's last visit, which the rows draw a line above: what stands over
+   * it came out since. Nothing on a first visit, and nothing on a screen that keeps no visits.
+   */
+  since?: Instant | null;
 }>;
+
+/** What the foot asks again with when the feed has no next part to ask for: nothing. */
+const nothing = (): void => undefined;
 
 const useStyles = createStyles(() => ({
   wire: { paddingBottom: SPACING.xl },
@@ -41,14 +48,15 @@ const useStyles = createStyles(() => ({
  * Pulling to refresh is the one gesture a screen called En continu owes a reader, and the screen it replaces has it.
  * It reads every page the wire holds again, from the first, so the newest item is back at the top wherever the reader
  * had scrolled to.
+ *
+ * Under the last item stands the foot: the next part on its way, named by its day, or the failure to fetch it.
  */
-export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
+export function ArticleWire({ feed, onOpen, since = null }: ArticleWireProps): ReactNode {
   const styles = useStyles();
-  const theme = useTheme();
   // One clock for the whole list, ticking once a minute, so the ages on the rows a reader can see stay true while
   // they read. Read here and not in the row: a hundred rows would be a hundred subscriptions to the same minute.
   const now = useNow();
-  const rows = wireRows(feed.items);
+  const rows = wireRows(feed.items, since);
   // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
   // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
   // list rather than handed down from a screen because the list and the reading share one slice — the card knows
@@ -63,6 +71,8 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
         return <FeedStandIn state={feed.state} onRetry={feed.readAgain} awaited={<WireStandIn />} />;
       case 'day':
         return <WireDay label={row.label} />;
+      case 'visit':
+        return <WireVisit />;
       case 'item':
         return (
           <Pressable
@@ -88,13 +98,10 @@ export function ArticleWire({ feed, onOpen }: ArticleWireProps): ReactNode {
       pinned={rowPins}
       renderItem={render}
       contentStyle={styles.wire}
+      footer={<WireFooter foot={feed.foot} onRetry={feed.onEndReached ?? nothing} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}
-      toTop={{
-        mark: <Icon name="top" announces={DECORATIVE} tintColor={theme.onPrimary} />,
-        label: t('action.toTop'),
-      }}
     />
   );
 }

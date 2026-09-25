@@ -2,6 +2,7 @@ export {
   formatAge,
   formatByline,
   formatDayDate,
+  formatDayInText,
   formatDayLabel,
   formatFiled,
   formatHour,

@@ -11,7 +11,7 @@
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
-- tapOn: 'Mon compte'
+- tapOn: 'Compte'
 - tapOn: 'Préférences d’affichage'
 - extendedWaitUntil:
     visible: 'Apparence'
@@ -19,5 +19,5 @@ appId: ${APP_ID}
 - back
 - assertVisible: 'Mon compte'
 - assertNotVisible: 'Apparence'
-- tapOn: 'À la une'
+- tapOn: 'Accueil'
 - assertVisible: 'L’Humanité'

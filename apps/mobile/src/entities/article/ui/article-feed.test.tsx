@@ -1,12 +1,15 @@
 import type { ArticleSummary } from '@huma/contracts';
+import { isList, isRecord } from '@huma/unknown';
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { content } from '#api';
+import { t } from '#i18n';
 import { renderWithCache, settle, standfirstOf } from '#lib/testing';
 import { feedQuery } from '../api/queries';
-import { usePagedFeed } from '../model/paged-feed';
+import { feedOf, usePagedFeed } from '../model/paged-feed';
 import type { FeedRhythm } from '../model/rhythm';
+import { Text } from '#primitives/text';
 import { ArticleFeed } from './article-feed';
 
 type ScreenProps = Readonly<{ rhythm: FeedRhythm; onOpen: (id: string) => void }>;
@@ -30,6 +33,24 @@ const firstOf = (items: readonly ArticleSummary[]): ArticleSummary => {
     throw new Error('le contenu ne sert aucun article : le test ne vérifierait rien');
   }
   return first;
+};
+
+/** The words the screen lays out, in the order a reader meets them. */
+const inOrder = (): readonly string[] => {
+  const met: string[] = [];
+  const walk = (node: unknown): void => {
+    if (typeof node === 'string') {
+      met.push(node);
+    } else if (isList(node)) {
+      for (const child of node) {
+        walk(child);
+      }
+    } else if (isRecord(node)) {
+      walk(node['children']);
+    }
+  };
+  walk(screen.toJSON());
+  return met;
 };
 
 describe('ArticleFeed', () => {
@@ -59,5 +80,57 @@ describe('ArticleFeed', () => {
     await screen.unmount();
     await mounted('list', () => undefined);
     expect(await screen.findByText(first.title)).toBeTruthy();
+  });
+
+  /**
+   * A next page that failed left the reader at the last item: the list asks again only once it has grown, and a failed
+   * page grows nothing. The feed says why under that item, and asking again from there asks for the page again.
+   */
+  it('dit sous le dernier article pourquoi la suite n’est pas venue, et la redemande', async () => {
+    const items = await served();
+    const onEndReached = jest.fn();
+    const feed = { ...feedOf(items), onEndReached, foot: { kind: 'failed', failure: 'offline' } } as const;
+    await renderWithCache(<ArticleFeed feed={feed} rhythm="list" onOpen={() => undefined} />);
+    await settle();
+    expect(screen.getByText('Pas de connexion')).toBeTruthy();
+    // The list itself asks as it lays out a page shorter than four of its frames: the press is what is counted.
+    onEndReached.mockClear();
+    await fireEvent.press(screen.getByText(t('action.retry')));
+    expect(onEndReached).toHaveBeenCalledTimes(1);
+  });
+
+  /**
+   * The notice is a row of the list, above the first card: laid over the list, it pushed every card down under a
+   * reader already reading the moment it arrived.
+   */
+  it('pose la notice de l’écran au-dessus de sa première carte', async () => {
+    const items = await served();
+    const first = firstOf(items);
+    await renderWithCache(
+      <ArticleFeed
+        feed={feedOf(items)}
+        rhythm="paper"
+        onOpen={() => undefined}
+        notice={<Text>{t('feed.more')}</Text>}
+      />,
+    );
+    await settle();
+    const met = inOrder();
+    expect(met.indexOf(t('feed.more'))).toBeGreaterThanOrEqual(0);
+    expect(met.indexOf(t('feed.more'))).toBeLessThan(met.indexOf(first.title));
+  });
+
+  /** A feed with no card shows what stands in for them, and a notice over nothing would stand in its way. */
+  it('ne pose aucune notice sur un fil qui n’a pas encore de carte', async () => {
+    await renderWithCache(
+      <ArticleFeed
+        feed={{ ...feedOf([]), state: { kind: 'pending' } }}
+        rhythm="paper"
+        onOpen={() => undefined}
+        notice={<Text>{t('feed.more')}</Text>}
+      />,
+    );
+    await settle();
+    expect(screen.queryByText(t('feed.more'))).toBeNull();
   });
 });

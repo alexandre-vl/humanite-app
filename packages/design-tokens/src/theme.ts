@@ -6,7 +6,8 @@ import { PALETTE } from './palette.ts';
  *
  * `onPrimary` is the text a screen lays on `primary`: the head of each day of En continu paints its band in it, and a
  * button its pill. Both themes give it the same value, because `primary` itself is the same red in both — a surface
- * that does not change between themes cannot ask for two different texts on it.
+ * that does not change between themes cannot ask for two different texts on it. It is also the knob of a switch where
+ * iOS draws one, riding inside the red track or the grey one, white as every other switch on the phone.
  *
  * `headline` is the colour an article's own title takes on its page: red on the light one and white on the dark one,
  * as the current app prints them (captures 11, 13).
@@ -42,7 +43,7 @@ import { PALETTE } from './palette.ts';
  * press. The first rule in the app was painted in `border`, 1.13 to one against the page, a separator nobody has ever
  * seen; the rows of the account were ruled in it until later still, 1.04 to one against their card. A rule is not a
  * ground and owes nothing to WCAG, which asks nothing of a line carrying no meaning of its own; it owes only to be
- * there, and at 1.43 on the light page and 1.56 on the dark one it is.
+ * there, and to be there as much on either page: 13.2 steps of lightness from the light page, 12.6 from the dark one.
  *
  * `control` is the track of a switch when it is off, and it is one value in both themes although the light theme
  * paints muted text the same. A muted word owes one thing: to be read on the page. A track owes three — to be found

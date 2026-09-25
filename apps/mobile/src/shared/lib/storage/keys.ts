@@ -11,6 +11,8 @@ import { CONTENT_SOURCE } from '../../config';
 export const STORAGE_KEYS = {
   queryCache: `query-cache.${CONTENT_SOURCE}`,
   bookmarks: `bookmarks.${CONTENT_SOURCE}`,
+  /** The newest item En continu showed the reader, which the next visit marks what came out after. */
+  wireVisit: `wire-visit.${CONTENT_SOURCE}`,
   preferences: 'preferences',
   /**
    * Where the reader's token was kept before the keystore, and is kept no longer.

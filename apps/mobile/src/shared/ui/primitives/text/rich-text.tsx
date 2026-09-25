@@ -37,7 +37,8 @@ export function RichText({ runs, variant = 'prose', tone, align }: RichTextProps
   const theme = useTheme();
   const typesetting = useTypesetting();
   return (
-    <NativeText style={textStyle(variant, theme, typesetting, tone, align)}>
+    // Set at the phone's text size already, as a Text is; the runs inherit it and the refusal to scale again.
+    <NativeText allowFontScaling={false} style={textStyle(variant, theme, typesetting, tone, align)}>
       {place(runs).map(({ at, run }) => (
         <NativeText
           key={at}

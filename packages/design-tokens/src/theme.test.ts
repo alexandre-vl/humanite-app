@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { lightnessStep } from './contrast.ts';
 import { contrastRatio, PALETTE, THEME_CHOICES, THEME_NAMES, THEMES } from './index.ts';
 import type { Color, Theme } from './index.ts';
 
@@ -25,6 +26,17 @@ test('every theme is named, every name has a theme, and every name can be chosen
 test('the paper’s name is one red, whichever page it is printed on', () => {
   expect(THEMES.dark.mark).toBe(THEMES.light.mark);
   expect(THEMES.light.mark).toBe(PALETTE.uiRed);
+});
+
+/**
+ * A rule is as much there on one page as on the other. The ratio below ranked the dark theme's rule above the light
+ * one's, 1.56 to one on its page against 1.43, and it all but vanished: through a phone's glass it stood 4.5 steps of
+ * lightness from a card, where the light rule stands 9.9 from its own at its faintest.
+ */
+test('the dark theme’s rule is nowhere fainter than the light theme’s at its faintest', () => {
+  const faintest = (theme: Theme): number =>
+    Math.min(...RULED.map((ground) => lightnessStep(theme.rule, theme[ground])));
+  expect(faintest(THEMES.dark)).toBeGreaterThanOrEqual(faintest(THEMES.light));
 });
 
 /**

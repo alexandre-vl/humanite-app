@@ -229,6 +229,8 @@ type PnpmSettings = Readonly<{
   /** Packages whose install scripts run (`true`) or are skipped (`false`); any other script fails the install. */
   allowBuilds: Readonly<Record<string, boolean>>;
   strictPeerDependencies: boolean;
+  /** Whether pnpm installs, at the newest version it finds, a required peer that no package declares. */
+  autoInstallPeers: boolean;
   pmOnFail: 'download' | 'error' | 'warn' | 'ignore';
   verifyDepsBeforeRun: 'install' | 'warn' | 'error' | 'prompt' | false;
   /** Minutes since publication before a version can be installed. */
@@ -238,6 +240,12 @@ type PnpmSettings = Readonly<{
     /** Peers an instance may lack without pnpm warning or failing. */
     ignoreMissing: readonly string[];
   }>;
+  /**
+   * Fixes laid over installed packages: the patch file for each exact `name@version` it was written against. pnpm
+   * fails the install when a patch no longer applies, and when no installed package is the version it names — so a
+   * fix goes with the release it was written for instead of silently outliving it.
+   */
+  patchedDependencies: Readonly<Record<string, string>>;
 }>;
 
 /** What `pnpm-workspace.yaml` holds: package globs, pnpm settings and the default catalog. */

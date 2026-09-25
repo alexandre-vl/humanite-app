@@ -43,7 +43,8 @@ const faceOf = (role: Typography, theme: Theme, tone: TextTone | undefined): Tex
 /**
  * The style a named variant paints with: in the theme in force and at the step the reader set, with the tone and the
  * alignment a caller may override. The step reaches every letter of the app through here, and the line height with
- * them, being a multiple of a size rather than a length of its own.
+ * them, being a multiple of a size rather than a length of its own — and so does the phone's own text size, which is
+ * in the size already: a text drawn in this style is drawn at it, and the platform must not multiply it a second time.
  */
 export function textStyle(
   variant: TextVariant,
@@ -52,7 +53,7 @@ export function textStyle(
   tone: TextTone | undefined,
   align: TextAlign | undefined,
 ): TextStyle {
-  const role = typographyAt(variant, typesetting.scale, typesetting.faces);
+  const role = typographyAt(variant, typesetting.scale, typesetting.faces, typesetting.phone);
   return {
     ...faceOf(role, theme, tone),
     lineHeight: role.size * role.leading,
@@ -69,7 +70,7 @@ export function textStyle(
  * paragraph's, so a field and the text around it are set in the same type.
  */
 export const inputStyle = (variant: TextVariant, theme: Theme, typesetting: Typesetting): TextStyle =>
-  faceOf(typographyAt(variant, typesetting.scale, typesetting.faces), theme, undefined);
+  faceOf(typographyAt(variant, typesetting.scale, typesetting.faces, typesetting.phone), theme, undefined);
 
 /**
  * The style one run inside a paragraph departs by: a face when it is set apart, the link colour and a line under it

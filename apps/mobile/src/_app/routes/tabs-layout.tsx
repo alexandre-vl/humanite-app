@@ -26,6 +26,18 @@ import { ICONS } from '#primitives/icon';
  * lists an unlabelled control among the frictions of the app this one replaces. Material's own accessibility note on
  * the component says to set the labels on, which is what this does.
  *
+ * Each name is a word where a word will do, which is Apple's rule for a tab bar (« Use single words whenever
+ * possible », Human Interface Guidelines, Tab bars) and what the bar measured. It lays its five items twenty points
+ * over one another and draws the pill of the one in force as wide as that item, so long names ran under their
+ * neighbours' pills: under « À la une », « En continu », « Recherche », « Mes lectures » and « Mon compte », the pill of
+ * « Recherche » covered the end of « En continu » and the start of « Mes lectures » (iPhone simulator, 25/09/2026).
+ * With « Accueil », « Lectures » and « Compte », every pill but that of « En continu » clears both neighbours, and that
+ * one grazes the first letter of « Recherche ». The screens keep their longer names in their own bars. Setting the
+ * search tab's `role` to `search`, which Apple's guidelines draw apart at the end of the bar, changed nothing here.
+ *
+ * The first tab is « Accueil » and not the front page's name: it holds every section of the paper, and read
+ * « À la une » over Politique once a reader had swiped there. « À la une » names the first of its pages.
+ *
  * `minimizeBehavior` is the one place the bar is allowed to get out of the way, and it is the platform's own doing:
  * from iOS 26 the tab bar shrinks to a pill as the reader goes down a screen and comes back as they go up. It is
  * ignored everywhere else, and nothing here hides the bar by hand — Material's navigation bar is persistent, and a
@@ -36,7 +48,7 @@ export function TabsLayout(): ReactNode {
     <NativeTabs {...tabBarColors(useTheme())} labelVisibilityMode="labeled" minimizeBehavior="onScrollDown">
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf={ICONS.headline.ios} md={ICONS.headline.android} />
-        <NativeTabs.Trigger.Label>{t('nav.headline')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('nav.home')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="live">
         <NativeTabs.Trigger.Icon sf={ICONS.live.ios} md={ICONS.live.android} />
@@ -46,11 +58,9 @@ export function TabsLayout(): ReactNode {
         <NativeTabs.Trigger.Icon sf={ICONS.search.ios} md={ICONS.search.android} />
         <NativeTabs.Trigger.Label>{t('nav.search')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      {/* Named from the screen's own title rather than from a `nav.` key of its own: every other tab names a screen
-          that is called nothing anywhere else, and this one has a bar across its top already saying what it is. */}
       <NativeTabs.Trigger name="bookmarks">
         <NativeTabs.Trigger.Icon sf={ICONS.bookmark.ios} md={ICONS.bookmark.android} />
-        <NativeTabs.Trigger.Label>{t('bookmark.title')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('nav.bookmarks')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="account">
         <NativeTabs.Trigger.Icon sf={ICONS.account.ios} md={ICONS.account.android} />

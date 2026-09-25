@@ -15,7 +15,7 @@
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
-- tapOn: 'Mon compte'
+- tapOn: 'Compte'
 - tapOn: 'Kiosque'
 - assertVisible: 'L’Humanité'
 - assertVisible: 'Chaque numéro s’ouvre sur humanite.fr.'

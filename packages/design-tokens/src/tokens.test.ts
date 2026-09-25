@@ -34,9 +34,9 @@ test('a list’s masthead holds its name at the largest step a reader can choose
   expectTypeOf(SIZES.headerExpanded).toEqualTypeOf<Space>();
 });
 
-test('a bar keeps both its ends free for the square each of them holds', () => {
+test('a bar is at least as tall as the square each of its ends holds, with air around it', () => {
   expect(SIZES.bar).toBe(56);
-  // The bar's margin and one touch target of the 48 points the grid keeps for one, at either end.
-  expect(SIZES.barSide).toBe(SPACING.sm + SPACING.xxxl);
+  // One touch target of the 48 points the grid keeps for one, and four points of air above and below it.
+  expect(SIZES.bar).toBeGreaterThan(SPACING.xxxl);
   expectTypeOf(SIZES.bar).toEqualTypeOf<Space>();
 });

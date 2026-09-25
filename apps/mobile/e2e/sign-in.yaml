@@ -40,7 +40,7 @@ onFlowComplete:
     timeout: 20000
 - takeScreenshot: mur-debout
 - back
-- tapOn: 'Mon compte'
+- tapOn: 'Compte'
 - tapOn: 'Se connecter'
 - assertVisible: 'Connexion'
 - tapOn: 'Votre adresse électronique'

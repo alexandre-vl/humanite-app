@@ -6,7 +6,7 @@
 appId: ${APP_ID}
 ---
 - runFlow: parts/launch.yaml
-- tapOn: 'Mon compte'
+- tapOn: 'Compte'
 - tapOn: 'Préférences d’affichage'
 - extendedWaitUntil:
     visible: 'Apparence'

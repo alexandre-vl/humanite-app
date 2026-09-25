@@ -1,12 +1,12 @@
 import type { ArticleSummary } from '@huma/contracts';
 import { typographyAt } from '@huma/design-tokens';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { act, fireEvent, screen } from '@testing-library/react-native';
+import { act, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { StartupProvider } from '#lib/startup';
-import { renderWithCache, settle, styleOf } from '#lib/testing';
+import { perform, renderWithCache, settle, styleOf } from '#lib/testing';
 import { BookmarksPage } from './bookmarks-page';
 
 // The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
@@ -71,7 +71,7 @@ describe('BookmarksPage', () => {
       useBookmarks.setState({ kept: [article] });
     });
     await renderPage();
-    await fireEvent.press(await screen.findByLabelText('Retirer de mes lectures'));
+    await perform(await screen.findByRole('link'), 'Retirer de mes lectures');
     await settle();
     expect(await screen.findByText('Aucune lecture pour l’instant')).toBeTruthy();
   });

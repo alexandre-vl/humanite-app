@@ -67,6 +67,18 @@ describe('AccountPage', () => {
   });
 
   /**
+   * A heading centred under a screen's name set at the left edge, over rows set at the left edge, was the one thing on
+   * the screen that started from nowhere; the reading settings, one press away, set the same headings at that edge.
+   */
+  it('part du bord d’où partent le nom de l’écran et ses lignes pour nommer chaque groupe', async () => {
+    await renderWithCache(<AccountPage />);
+    const edge = styleOf(screen.getByText('Mon compte'))['textAlign'];
+    for (const group of ['Réglages', 'Nous contacter']) {
+      expect(styleOf(screen.getByText(group))['textAlign']).toBe(edge);
+    }
+  });
+
+  /**
    * Five of the eight rows the current app lists cannot mean anything here — there is no account to sign into, nothing
    * to buy and no library to open — so the screen holds what is true and draws nothing that would lead nowhere.
    *

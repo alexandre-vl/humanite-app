@@ -1,5 +1,5 @@
-import { SIZES, SPACING } from '@huma/design-tokens';
-import { isRecord } from '@huma/unknown';
+import { SPACING } from '@huma/design-tokens';
+import { isList, isRecord } from '@huma/unknown';
 import { describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { t } from '../../../i18n';
@@ -11,21 +11,30 @@ import { TopBar } from './top-bar';
 
 const NAME = 'Rubrique';
 
-type Margins = Readonly<{ left: number; right: number }>;
-
-const isCentred = (value: unknown): value is Margins =>
-  isRecord(value) && typeof value['left'] === 'number' && typeof value['right'] === 'number';
-
-/** Where the bar laid the name, read back from the layer that carries it. */
-const margins = (): Margins =>
+/** How the box the name is placed in holds itself: the one that takes whatever room the ends of the row leave. */
+const placing = (): Readonly<Record<string, unknown>> =>
   nearestAbove(
     screen.getByText(NAME),
     (node) => {
       const style = styleOf(node);
-      return isCentred(style) ? style : undefined;
+      return style['flex'] === 1 ? style : undefined;
     },
-    'le nom n’est posé sur rien qui dise où il est : le test ne vérifierait pas qu’il est centré',
+    'le nom n’est posé dans rien qui prenne la place que les bouts laissent : le test ne vérifierait pas où il est',
   );
+
+/** How many boxes of the rendered tree are held to the square an end of the bar keeps, whatever they carry. */
+const squaresIn = (node: unknown): number => {
+  if (isList(node)) {
+    return node.reduce<number>((count, each) => count + squaresIn(each), 0);
+  }
+  if (!isRecord(node)) {
+    return 0;
+  }
+  const props = node['props'];
+  const style = isRecord(props) ? styleOf({ props }) : {};
+  const own = style['width'] === SPACING.xxxl && style['height'] === SPACING.xxxl ? 1 : 0;
+  return own + squaresIn(node['children']);
+};
 
 type Square = Readonly<{ width: number; height: number }>;
 
@@ -49,12 +58,16 @@ describe('TopBar', () => {
     expect(screen.getByText(NAME).props['accessibilityRole']).toBe('header');
   });
 
-  it('pose le nom sur la rangée, avec la même marge à chaque bout', async () => {
-    await render(<TopBar title={asDisplayText(NAME)} />);
-    const { left, right } = margins();
-    expect(left).toBe(SIZES.barSide);
-    // Equal margins are the whole claim: a name placed between the controls would be centred on what they left over.
-    expect(right).toBe(left);
+  /**
+   * The name is placed in the row, so the bar grows with it: laid over the row, as it was, it could not, and a name
+   * taller than the bar was cut to it — the paper's own was, at the phone's largest text size (capture 22). Both ends
+   * keep their square with nothing in them, which is what keeps the name in the middle of the screen: an empty end
+   * that took no room would leave it centred on what the control at the other end left over.
+   */
+  it('pose le nom dans la rangée, entre deux bouts qui gardent leur carré même vides', async () => {
+    await render(<TopBar title={asDisplayText(NAME)} onBack={jest.fn()} />);
+    expect(placing()['position']).toBeUndefined();
+    expect(squaresIn(screen.toJSON())).toBe(2);
   });
 
   it('signale l’appui qui fait sortir, sous un mot plutôt que sous un symbole', async () => {

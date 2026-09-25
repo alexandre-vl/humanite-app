@@ -1,5 +1,7 @@
 import type { FontFamily, FontSize, LineHeight, Tracking } from './brand.ts';
 import { fontSize } from './brand.ts';
+import type { PhoneText } from './phone-text.ts';
+import { phoneSize, UNMOVED_PHONE } from './phone-text.ts';
 import type { Theme } from './theme.ts';
 import type { Face, FaceSet } from './tokens.ts';
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, TRACKING } from './tokens.ts';
@@ -39,6 +41,8 @@ type Role = Readonly<{
   tone: TextTone;
   caps?: true;
   tracking?: Tracking;
+  /** That the role keeps its size whatever text size the phone is set to: see the note on `masthead`. */
+  followsPhone?: false;
 }>;
 
 /** A role resolved for a reader: everything a run of text is actually set in, with nothing left to decide. */
@@ -112,6 +116,12 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  * is the paper. It measures what a headline measures and is a role of its own all the same: one is a line that never
  * wraps and the other is four that do, and what they may be asked to do next is not the same thing.
  *
+ * It is also the one role the phone's text size does not reach. The name is a mark and not a line of text: nobody
+ * reads it to learn which paper they are holding, and the room the phone's setting asks for is room for the words. At
+ * the largest size the phone offers it was set at a hundred points in a bar of fifty-six and cut to « L'Hu », top and
+ * bottom sheared off (capture 22, iPhone simulator, 25/09/2026). The reader's own step still reaches it, being the
+ * paper's.
+ *
  * `headline` sets an article's own title and nothing else. It used to set three more things — the crossheads inside a
  * body, the label over a linked article, the title of a call for support — so an article printed its own title four
  * times over in the same red at the same size, each shouting as loud as the piece it belonged to. A headline is the
@@ -131,7 +141,7 @@ export type TextVariant = (typeof TEXT_VARIANTS)[number];
  */
 const TYPOGRAPHY = {
   headline: { face: 'display', size: FONT_SIZES.xxxl, leading: LINE_HEIGHTS.tight, tone: 'headline' },
-  masthead: { face: 'display', size: FONT_SIZES.xxxl, leading: LINE_HEIGHTS.tight, tone: 'mark' },
+  masthead: { face: 'display', size: FONT_SIZES.xxxl, leading: LINE_HEIGHTS.tight, tone: 'mark', followsPhone: false },
   lead: { face: 'bold', size: FONT_SIZES.xxl, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   display: { face: 'display', size: FONT_SIZES.xl, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
   title: { face: 'bold', size: FONT_SIZES.lg, leading: LINE_HEIGHTS.tight, tone: 'textPrimary' },
@@ -193,17 +203,32 @@ const FACTORS = {
  * app that could multiply a size could write any number into a style. The line height follows for nothing, being a
  * multiple of the size rather than a length.
  *
- * This is the app's own step, not the system's. A phone already scales every text by the setting its owner chose, and
- * this app has always obeyed it; what a reader sets here multiplies that, for the one reading they do in this paper.
+ * Two settings grow a size, and both are the reader's: the step they set in the paper, and the text size they set on
+ * the phone for every app at once, which the paper has always obeyed. The step multiplies. The phone's size grows the
+ * result the way the phone's own system grows its own text — `phoneSize` says how, and why that is not a multiple.
+ *
+ * It is applied here rather than left to the platform, which used to apply it itself. The platform grows a size out
+ * of React's sight, so a text size changed while the app ran was drawn at the new size in boxes laid out for the old
+ * one — measured on the iPhone simulator on 25/09/2026, a heading of two lines at the largest size kept its 140 points
+ * of height back at the default one, its words floating in the middle, until the app was started again. Set here, the
+ * size is a prop like any other, and a text whose size moves is laid out again.
+ *
+ * The result is rounded to the point, as the steps are: a face is hinted at whole sizes.
  */
-export const typographyAt = (variant: TextVariant, scale: TextScale, faces: FaceSet): Typography => {
+export const typographyAt = (
+  variant: TextVariant,
+  scale: TextScale,
+  faces: FaceSet,
+  phone: PhoneText = UNMOVED_PHONE,
+): Typography => {
   // Widened to the role type on the way out: the table is written `as const`, so a row that sets neither capitals nor
   // tracking has no such property at all, and asking a literal for a field it does not carry is an error rather than
   // an absence. Read as a `Role`, the two are optional and answer `undefined`, which is what they mean.
   const role: Role = TYPOGRAPHY[variant];
+  const stepped = role.size * FACTORS[scale];
   return {
     family: FONT_FAMILIES[faces][role.face],
-    size: fontSize(Math.round(role.size * FACTORS[scale])),
+    size: fontSize(Math.round(role.followsPhone === false ? stepped : phoneSize(stepped, phone))),
     leading: role.leading,
     tone: role.tone,
     caps: role.caps ?? false,

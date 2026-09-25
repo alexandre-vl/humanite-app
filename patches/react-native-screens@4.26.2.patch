@@ -1,0 +1,164 @@
+diff --git a/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm b/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm
+index f0a72ccece723748ba57e9b54174a5f999bf6173..1a95b6a19a5a46bb15ed217f5982150955881018 100644
+--- a/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm
++++ b/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm
+@@ -15,7 +15,7 @@
+ 
+ namespace react = facebook::react;
+ 
+-@interface RNSScrollViewMarkerComponentView () <RNSScrollEdgeEffectProviding>
++@interface RNSScrollViewMarkerComponentView () <RNSScrollEdgeEffectProviding, UIScrollViewDelegate>
+ @end
+ 
+ @implementation RNSScrollViewMarkerComponentView {
+@@ -26,6 +26,11 @@ @implementation RNSScrollViewMarkerComponentView {
+   RNSScrollEdgeEffect _topScrollEdgeEffect;
+   RNSScrollEdgeEffect _rightScrollEdgeEffect;
+   RNSScrollEdgeEffect _bottomScrollEdgeEffect;
++
++  // Patched by humanite-app: the scroll views whose events tell this marker to claim the bars again — its own, and
++  // the one it is laid in, when it is laid in one. See -findEnclosingScrollView.
++  __weak RCTScrollViewComponentView *_ownScrollView;
++  __weak RCTScrollViewComponentView *_enclosingScrollView;
+ }
+ 
+ - (instancetype)initWithFrame:(CGRect)frame
+@@ -145,12 +150,106 @@ - (nullable UIScrollView *)resolveScrollViewFromChildView:(nullable UIView *)chi
+   return nil;
+ }
+ 
++#pragma mark - Claiming the bars again (patched by humanite-app)
++
++/**
++ * The nearest scroll view this marker is laid in, if any: a pager whose pages each hold a marked list.
++ *
++ * Upstream registers a marker once, as it reaches the window, and the last to register owns the bars. In a pager
++ * every page it has built reaches the window at once, so the bars follow whichever page came last, not the one on the
++ * screen: on the iPhone simulator on 25/09/2026, the front page's tab bar followed the list of the section beside it,
++ * off the screen, and never shrank under the one being read. A marker laid in another scroll view therefore registers
++ * only when its page is on the screen — as it reaches the window, and whenever the scroll view it is laid in comes to
++ * rest — and any marker registers again when the reader starts dragging its list, which is the one they are reading.
++ */
++- (nullable RCTScrollViewComponentView *)findEnclosingScrollView
++{
++  UIView *ancestor = self.superview;
++  while (ancestor != nil) {
++    if ([ancestor isKindOfClass:RCTScrollViewComponentView.class]) {
++      return static_cast<RCTScrollViewComponentView *>(ancestor);
++    }
++    ancestor = ancestor.superview;
++  }
++  return nil;
++}
++
++/** Whether most of this marker's width is on the screen: the page of a pager at rest, and none of its neighbours. */
++- (BOOL)isOnScreen
++{
++  UIWindow *window = self.window;
++  if (window == nil) {
++    return NO;
++  }
++  const CGRect frame = [self convertRect:self.bounds toView:nil];
++  const CGRect shown = CGRectIntersection(frame, window.bounds);
++  return !CGRectIsNull(shown) && CGRectGetWidth(shown) * 2 > CGRectGetWidth(frame);
++}
++
++- (void)registerIfOnScreen
++{
++  if ([self isOnScreen]) {
++    [self registerWithSeekingAncestor];
++  }
++}
++
++- (void)startListening
++{
++  [self stopListening];
++  UIView *child = self.subviews.firstObject;
++  if ([child isKindOfClass:RCTScrollViewComponentView.class]) {
++    _ownScrollView = static_cast<RCTScrollViewComponentView *>(child);
++    [_ownScrollView addScrollListener:self];
++  }
++  _enclosingScrollView = [self findEnclosingScrollView];
++  [_enclosingScrollView addScrollListener:self];
++}
++
++- (void)stopListening
++{
++  [_ownScrollView removeScrollListener:self];
++  [_enclosingScrollView removeScrollListener:self];
++  _ownScrollView = nil;
++  _enclosingScrollView = nil;
++}
++
++#pragma mark - UIScrollViewDelegate
++
++- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
++{
++  if (scrollView == _ownScrollView.scrollView) {
++    [self registerWithSeekingAncestor];
++  }
++}
++
++- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
++{
++  if (!decelerate && scrollView == _enclosingScrollView.scrollView) {
++    [self registerIfOnScreen];
++  }
++}
++
++- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
++{
++  if (scrollView == _enclosingScrollView.scrollView) {
++    [self registerIfOnScreen];
++  }
++}
++
++- (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView
++{
++  if (scrollView == _enclosingScrollView.scrollView) {
++    [self registerIfOnScreen];
++  }
++}
++
+ #pragma mark - Override
+ 
+ - (void)willMoveToWindow:(UIWindow *)newWindow
+ {
+   [super willMoveToWindow:newWindow];
+-  if (newWindow != nil) {
++  // A marker laid in another scroll view registers in -didMoveToWindow instead, where its place can be read.
++  if (newWindow != nil && [self findEnclosingScrollView] == nil) {
+     [self maybeRegisterWithSeekingAncestor];
+   }
+ }
+@@ -160,6 +259,12 @@ - (void)didMoveToWindow
+   [super didMoveToWindow];
+   if (self.window == nil) {
+     _hasAttemptedRegistration = NO;
++    [self stopListening];
++    return;
++  }
++  [self startListening];
++  if (_enclosingScrollView != nil) {
++    [self registerIfOnScreen];
+   }
+ }
+ 
+@@ -240,10 +345,17 @@ - (void)finalizeUpdates:(RNComponentViewUpdateMask)updateMask
+ - (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
+ {
+   [super mountChildComponentView:childComponentView index:index];
++  if (self.window != nil) {
++    [self startListening];
++  }
+ }
+ 
+ - (void)unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
+ {
++  if (childComponentView == _ownScrollView) {
++    [_ownScrollView removeScrollListener:self];
++    _ownScrollView = nil;
++  }
+   [super unmountChildComponentView:childComponentView index:index];
+ }
+ 

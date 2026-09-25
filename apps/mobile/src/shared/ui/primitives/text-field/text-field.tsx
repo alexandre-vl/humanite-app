@@ -1,7 +1,8 @@
 import type { DisplayText } from '@huma/contracts';
 import type { TextVariant } from '@huma/design-tokens';
-import type { ReactNode } from 'react';
-import { Keyboard, TextInput as NativeTextInput } from 'react-native';
+import type { ReactNode, Ref } from 'react';
+import { useEffect, useImperativeHandle, useRef } from 'react';
+import { Keyboard, Platform, TextInput as NativeTextInput } from 'react-native';
 import type { TextInputProps as NativeTextFieldProps } from 'react-native';
 import type { StyleRef } from '../../../lib/styles';
 import { inputStyle, useTheme, useTypesetting } from '../../../lib/styles';
@@ -23,9 +24,31 @@ const FILLS = {
 /** What a field says it holds, so the keychain offers the right thing and nothing else. */
 type Fill = keyof typeof FILLS;
 
+/** What a screen may do to a field from outside it: put the caret in it. */
+export type FieldHandle = Readonly<{ focus: () => void }>;
+
+/** Whether the platform empties a secret field at the first key after its letters are hidden again: iOS does. */
+const CLEARS_ON_HIDING = Platform.OS === 'ios';
+
+/**
+ * What a reader meant by the first key pressed in a secret field hidden again, given what the field held when it was
+ * hidden. iOS empties a secure field at that key — « abcd », hidden, then « e », left « e » on the iPhone simulator on
+ * 25/09/2026 — and the key was meant for the end of what was there. A field that kept its letters is taken as it is.
+ */
+const repairedAfterHiding = (held: string, typed: string): string =>
+  typed.startsWith(held) || (held.startsWith(typed) && typed.length === held.length - 1) ? typed : held + typed;
+
 export type TextFieldProps = Readonly<{
   value: string;
   onChange: (text: string) => void;
+  /**
+   * The field's name, as a reader listening to the screen hears it on the field, whatever has been typed there.
+   *
+   * The placeholder is no name. It is gone at the first letter, and then the field said only what it held: on the
+   * iPhone simulator on 25/09/2026, both fields of the sign-in screen and the search line were read as a value and
+   * « champ de texte », with nothing to say which was which.
+   */
+  label: DisplayText;
   placeholder: DisplayText;
   variant?: TextVariant;
   style?: StyleRef;
@@ -37,6 +60,13 @@ export type TextFieldProps = Readonly<{
   keyboard?: 'email';
   /** What the key that closes the keyboard does, and the word it carries; no key at all when it is left out. */
   onSubmit?: () => void;
+  /**
+   * What the key does on a field a reader leaves for another: it carries the word for the next one, and the keyboard
+   * stays up for it. It is the key of every field of a form but the last, whose key sends the form.
+   */
+  onNext?: () => void;
+  /** Where a screen puts the caret in the field from: a field's name pressed, a field found empty on sending. */
+  ref?: Ref<FieldHandle>;
 }>;
 
 /**
@@ -56,6 +86,7 @@ export type TextFieldProps = Readonly<{
 export function TextField({
   value,
   onChange,
+  label,
   placeholder,
   variant = 'body',
   style,
@@ -63,13 +94,58 @@ export function TextField({
   secret = false,
   keyboard,
   onSubmit,
+  onNext,
+  ref,
 }: TextFieldProps): ReactNode {
   const theme = useTheme();
   const typesetting = useTypesetting();
+  const input = useRef<NativeTextInput>(null);
+  // What the field held when its letters were last hidden, until the next key says whether iOS kept them — and
+  // whether the empty report hiding sends has come in yet.
+  const hidden = useRef<Readonly<{ held: string; echoed: boolean }> | null>(null);
+  const held = useRef(value);
+  useEffect(() => {
+    held.current = value;
+    // A field set from outside since — a refused password emptied — no longer holds what was hidden, and the next key
+    // is only a key: mended, it brought the refused password back.
+    if (hidden.current !== null && hidden.current.held !== value) {
+      hidden.current = null;
+    }
+  });
+  useEffect(() => {
+    hidden.current = secret && CLEARS_ON_HIDING && held.current !== '' ? { held: held.current, echoed: false } : null;
+  }, [secret]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => {
+        input.current?.focus();
+      },
+    }),
+    [],
+  );
   return (
     <NativeTextInput
+      ref={input}
       value={value}
-      onChangeText={onChange}
+      onChangeText={(typed) => {
+        const before = hidden.current;
+        if (before === null || typed === before.held) {
+          onChange(typed);
+          return;
+        }
+        // Hiding the letters reports the field emptied once, and says nothing of the text it puts back (measured,
+        // with every change logged): that report is not a key, and the field keeps what it held. An empty field after
+        // it is the key that deletes, which iOS turned into emptying the field.
+        if (typed === '' && !before.echoed) {
+          hidden.current = { held: before.held, echoed: true };
+          onChange(before.held);
+          return;
+        }
+        hidden.current = null;
+        onChange(typed === '' ? before.held.slice(0, -1) : repairedAfterHiding(before.held, typed));
+      }}
+      accessibilityLabel={label}
       placeholder={placeholder}
       placeholderTextColor={theme.textMuted}
       cursorColor={theme.primary}
@@ -81,8 +157,14 @@ export function TextField({
       autoComplete={fills === undefined ? 'off' : FILLS[fills].autoComplete}
       textContentType={fills === undefined ? 'none' : FILLS[fills].textContentType}
       keyboardType={keyboard === 'email' ? 'email-address' : 'default'}
-      returnKeyType={onSubmit === undefined ? undefined : 'go'}
-      onSubmitEditing={onSubmit}
+      returnKeyType={onNext === undefined ? (onSubmit === undefined ? undefined : 'go') : 'next'}
+      // A field left for the next keeps the keyboard up for it: closed and opened again between two fields, it would
+      // slide down and back up under the reader's thumbs.
+      submitBehavior={onNext === undefined ? undefined : 'submit'}
+      onSubmitEditing={onNext ?? onSubmit}
+      // The phone's text size is in the style already, as it is in a Text's: scaled again, typing would print larger
+      // than the words around the field.
+      allowFontScaling={false}
       style={[style, inputStyle(variant, theme, typesetting)]}
     />
   );

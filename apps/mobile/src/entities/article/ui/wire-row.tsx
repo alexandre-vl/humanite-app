@@ -8,6 +8,7 @@ import { Text } from '#primitives/text';
 import { accessWord } from '../model/access';
 import { formatWord } from '../model/format';
 import { ItemWord } from './item-word';
+import { WireRail } from './wire-rail';
 
 export type WireRowProps = Readonly<{
   summary: ArticleSummary;
@@ -22,18 +23,6 @@ export type WireRowProps = Readonly<{
 
 const useStyles = createStyles((theme) => ({
   row: { flexDirection: 'row', paddingHorizontal: SPACING.lg },
-  // The rail is a column the width of a bead, not a column the width of a date. It held the hour beside it — the day
-  // and the hour, under a band naming the day — and between the two the words began 140 points into a 411-point
-  // screen. They begin 40 points in now, which is 40 % more line for the same title.
-  rail: { width: SPACING.md, alignSelf: 'stretch', alignItems: 'center' },
-  rule: {
-    position: 'absolute',
-    top: SPACING.none,
-    bottom: SPACING.none,
-    borderLeftWidth: SIZES.stroke,
-    borderStyle: 'dashed',
-    borderColor: theme.rule,
-  },
   // The bead hangs level with the line that names the item, not with the title under it: a row is read from its hour,
   // and the thread runs through the hours.
   ring: {
@@ -70,10 +59,9 @@ export function WireRow({ summary, now }: WireRowProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.row}>
-      <Box style={styles.rail}>
-        <Box style={styles.rule} />
+      <WireRail>
         <Box style={styles.ring} />
-      </Box>
+      </WireRail>
       <Box style={styles.words}>
         <Box style={styles.said}>
           <Text variant="caption">{formatFiled(summary.publishedAt, now)}</Text>

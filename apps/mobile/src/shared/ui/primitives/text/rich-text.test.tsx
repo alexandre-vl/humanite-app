@@ -34,6 +34,8 @@ describe('RichText', () => {
       fontSize: prose.size,
       lineHeight: prose.size * prose.leading,
     });
+    // The phone's text size is in that size already; scaled again by the platform, prose would print at its square.
+    expect(sentence?.props['allowFontScaling']).toBe(false);
   });
 
   it('répond à la pression sur le fragment qui en porte une, et sur lui seul', async () => {

@@ -3,11 +3,8 @@ import { SIZES, SPACING } from '@huma/design-tokens';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { pictureOf } from '#api';
-import { DECORATIVE } from '#lib/announce';
-import { t } from '#i18n';
-import { createStyles, useTheme } from '#lib/styles';
+import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
-import { Icon } from '#primitives/icon';
 import { List } from '#primitives/list';
 import { prefetchPicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
@@ -19,6 +16,7 @@ import { feedRows, rowName, rowShape } from '../model/rhythm';
 import { ArticleCard } from './article-card';
 import type { EmptyWords } from './feed-stand-in';
 import { FeedCardsStandIn } from './feed-cards-stand-in';
+import { FeedFooter } from './feed-footer';
 import { FeedStandIn } from './feed-stand-in';
 
 export type ArticleFeedProps = Readonly<{
@@ -33,7 +31,25 @@ export type ArticleFeedProps = Readonly<{
    */
   awaited?: ReactNode | undefined;
   empty?: EmptyWords | undefined;
+  /**
+   * What the screen sets above the first card, in the run of the cards: a word it has for the reader, such as how
+   * much the wire holds that it has not shown them. It is a row of the list and not a band over it, so it arrives the
+   * way a card arrives — a reader who has scrolled keeps their place, and a reader at the top is shown it.
+   */
+  notice?: ReactNode | undefined;
 }>;
+
+/** A line of the list: a card, or the notice the screen sets above the first one. */
+type Line = Readonly<{ kind: 'card'; row: FeedRow }> | Readonly<{ kind: 'notice' }>;
+
+const NOTICE: Line = { kind: 'notice' };
+
+/** What the list keys a line by, and which tree it mounts: the notice has its own, never a card's. */
+const lineKey = (line: Line): string => (line.kind === 'notice' ? NOTICE.kind : rowName(line.row));
+const lineType = (line: Line): string => (line.kind === 'notice' ? NOTICE.kind : rowShape(line.row));
+
+/** What the foot asks again with when the feed has no next part to ask for: nothing. */
+const nothing = (): void => undefined;
 
 const useStyles = createStyles((theme) => ({
   feed: { paddingBottom: SPACING.xxxl },
@@ -62,9 +78,17 @@ const useStyles = createStyles((theme) => ({
  * A column announces its writer and nothing else does, which is why the signature is read here and not by the card:
  * a card is handed what it draws.
  */
-export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, empty }: ArticleFeedProps): ReactNode {
+export function ArticleFeed({
+  feed,
+  rhythm,
+  onOpen,
+  action,
+  header,
+  awaited,
+  empty,
+  notice,
+}: ArticleFeedProps): ReactNode {
   const styles = useStyles();
-  const theme = useTheme();
   // Asked for the moment a finger lands, not when the screen it opens mounts: the press, the lift and the slide are
   // together a few hundred milliseconds, and so is an article the service has not served lately. It is done in the
   // list rather than handed down from a screen because the list and the reading share one slice — the card knows
@@ -95,12 +119,16 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, emp
       </Pressable>
     </Box>
   );
+  const cards = feedRows(feed.items, rhythm).map((row): Line => ({ kind: 'card', row }));
+  // Over cards only: a feed with none shows what stands in for them, and a notice over nothing would hide it.
+  const lines = notice === undefined || cards.length === 0 ? cards : [NOTICE, ...cards];
+  const renderLine = (line: Line): ReactNode => (line.kind === 'notice' ? <>{notice}</> : render(line.row));
   return (
     <List
-      items={feedRows(feed.items, rhythm)}
-      keyOf={rowName}
-      typeOf={rowShape}
-      renderItem={render}
+      items={lines}
+      keyOf={lineKey}
+      typeOf={lineType}
+      renderItem={renderLine}
       contentStyle={styles.feed}
       header={header}
       empty={
@@ -111,13 +139,10 @@ export function ArticleFeed({ feed, rhythm, onOpen, action, header, awaited, emp
           empty={empty}
         />
       }
+      footer={<FeedFooter foot={feed.foot} onRetry={feed.onEndReached ?? nothing} />}
       onEndReached={feed.onEndReached}
       refreshing={feed.refreshing}
       onRefresh={feed.readAgain}
-      toTop={{
-        mark: <Icon name="top" announces={DECORATIVE} tintColor={theme.onPrimary} />,
-        label: t('action.toTop'),
-      }}
     />
   );
 }

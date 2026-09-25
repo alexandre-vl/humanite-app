@@ -24,9 +24,10 @@ const pad = (value: number): string => String(value).padStart(2, '0');
  * the printed forms do not follow the device's own data, and a heading that did would read differently from one phone
  * to the next while the rest of the screen did not.
  *
- * A weekday is only ever printed at the head of what it dates — a band over a run of the wire, the date that closes a
- * card — so it is written with the capital a French line opens on. The band read `samedi 12 septembre` in the lower
- * case, the one heading on its screen that began without one.
+ * A weekday is printed at the head of what it dates — a band over a run of the wire, the date that closes a card — so
+ * it is written with the capital a French line opens on. The band read `samedi 12 septembre` in the lower case, the
+ * one heading on its screen that began without one. Inside a sentence French writes it in the lower case, and the
+ * one sentence that names a day takes it down there.
  */
 const WEEKDAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'] as const;
 const MONTHS = [
@@ -128,16 +129,28 @@ export const formatFiled = (instant: Instant, now: number): DisplayText =>
 // The calendar day an instant falls on is the contracts' `issueIdAt`: one key, which a numéro is named by, a wire
 // groups its runs under and a card is dated against.
 
+/** The day an instant falls on, weekday first, read off the Paris calendar date: `Samedi 13\u00A0septembre`. */
+const dayWithWeekday = (instant: Instant): string => {
+  const clock = clockOf(instant);
+  const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
+  return `${nameAt(WEEKDAYS, weekday)} ${dayAndMonth(clock.day, clock.month)}`;
+};
+
 /**
  * That same day as a timeline heads the run it opens, and as a card names a day of the week before: `Samedi
  * 13\u00A0septembre`. The year is left out, a wire reaching back weeks at most; the weekday is read from the Paris
  * calendar date rather than from the instant, so a publication just before Paris midnight heads the day the newsroom
  * filed it under, not the one UTC was already on.
  */
-export const formatDayLabel = (instant: Instant): DisplayText => {
-  const clock = clockOf(instant);
-  const weekday = new Date(Date.UTC(clock.year, clock.month - 1, clock.day)).getUTCDay();
-  return asDisplayText(`${nameAt(WEEKDAYS, weekday)} ${dayAndMonth(clock.day, clock.month)}`);
+export const formatDayLabel = (instant: Instant): DisplayText => asDisplayText(dayWithWeekday(instant));
+
+/**
+ * That same day inside a sentence, its weekday in the lower case: `jeudi 24\u00A0septembre`. The foot of the wire says
+ * it while the day is on its way — « Chargement du jeudi 24\u00A0septembre ».
+ */
+export const formatDayInText = (instant: Instant): DisplayText => {
+  const day = dayWithWeekday(instant);
+  return asDisplayText(`${day.charAt(0).toLowerCase()}${day.slice(1)}`);
 };
 
 /**

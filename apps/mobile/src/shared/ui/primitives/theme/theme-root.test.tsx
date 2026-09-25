@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 import { setBackgroundColorAsync } from 'expo-system-ui';
 import type { ReactNode } from 'react';
-import { Text } from 'react-native';
+import { Appearance, Text } from 'react-native';
 import { useTheme } from '../../../lib/styles';
 import { ThemeRoot } from './theme-root';
 
@@ -50,5 +50,26 @@ describe('ThemeRoot', () => {
   it('peint la fenêtre du système de la même couleur que le papier', async () => {
     await groundUnder('dark');
     expect(jest.mocked(setBackgroundColorAsync)).toHaveBeenCalledWith(PALETTE.darkBackground);
+  });
+
+  /**
+   * What the platform draws itself — a switch, the keyboard, an alert — takes the phone's appearance until it is told
+   * the paper's. Left to a light phone, the track of a switch set off was darkened to 2,81 to 1 against the dark page
+   * the reader had chosen; and a reader who chose nothing is left to the phone, which the page follows too.
+   */
+  it('dit au système le thème que le lecteur a choisi, et rien quand il n’en a choisi aucun', async () => {
+    const told = jest.spyOn(Appearance, 'setColorScheme');
+    const view = await render(
+      <ThemeRoot choice="dark">
+        <GroundProbe />
+      </ThemeRoot>,
+    );
+    expect(told).toHaveBeenLastCalledWith('dark');
+    await view.rerender(
+      <ThemeRoot choice="system">
+        <GroundProbe />
+      </ThemeRoot>,
+    );
+    expect(told).toHaveBeenLastCalledWith('unspecified');
   });
 });

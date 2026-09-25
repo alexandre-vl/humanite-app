@@ -1,13 +1,17 @@
 import { SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Refusal } from '#api';
 import { Button } from '#components/button';
 import { t } from '#i18n';
-import { createStyles } from '#lib/styles';
+import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
+import { Icon } from '#primitives/icon';
+import { Pressable } from '#primitives/pressable';
 import { Text } from '#primitives/text';
+import type { FieldHandle } from '#primitives/text-field';
 import { TextField } from '#primitives/text-field';
+import { DECORATIVE } from '#lib/announce';
 import { useReaderSession } from '../model/session';
 
 export type SignInFormProps = Readonly<{
@@ -15,21 +19,51 @@ export type SignInFormProps = Readonly<{
   onOpened: () => void;
 }>;
 
+/**
+ * What stands between the fields and the button: what the service said of an attempt, or which field a press found
+ * empty — the same place, because it is the same thought: what you typed, what is wrong with it, what to do about it.
+ */
+type Said = Refusal | 'missing.login' | 'missing.password' | 'missing.both';
+
+/**
+ * Which of the two fields is still empty, if one is. An identifier of spaces is empty: it is the one thing a reader
+ * pasting an address from a message brings with it, and it is never part of the address.
+ */
+const missingOf = (login: string, password: string): Said | null => {
+  if (login.trim() === '') {
+    return password === '' ? 'missing.both' : 'missing.login';
+  }
+  return password === '' ? 'missing.password' : null;
+};
+
 const useStyles = createStyles((theme) => ({
   form: { gap: SPACING.xl },
-  field: { gap: SPACING.xs },
+  // The name stands on its line with no gap between them, so a press anywhere from the name down to the rule lands on
+  // the field.
+  name: { paddingBottom: SPACING.xs },
   // Underlined and not boxed, as the paper's only other field is drawn: the line is the paper's own colour, so a
   // reader's eye finds where to type without a frame around it.
   //
-  // No height. The field is as tall as what is typed in it, which is a thing the reader sets: the paper is printed at
-  // four steps of type, and a box measured for one of them cuts the tops off the letters at the next. It was measured
-  // for one — thirty-two points — and cut them at the first, where the platform's own vertical padding pushed the
-  // line down onto the rule under it. What gives the letters room is padding, which grows with nothing and is asked
-  // to.
+  // A floor and not a height, as on the search line. The field is as tall as what is typed in it, which is a thing the
+  // reader sets: a box measured for one step of type — thirty-two points — cut the tops off the letters at the first.
+  // And never less than a finger's grid step: grown only by its padding, the field was 28,3 points tall, and that was
+  // the whole of what a thumb could land on (iPhone simulator, 25/09/2026).
   line: {
-    paddingVertical: SPACING.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: SPACING.xxxl,
     borderBottomWidth: SIZES.stroke,
     borderColor: theme.primary,
+  },
+  // The field is the whole line, and the room that keeps its letters off the rule is its own, inside the target.
+  input: { flex: 1, alignSelf: 'stretch', paddingVertical: SPACING.xs },
+  // The eye takes a finger's width at the end of the line, and the line's whole height: held to a square of its own, it
+  // stood the password's line two points taller than the identifier's, the rule under it counted in.
+  eye: {
+    width: SPACING.xxxl,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   /*
    * What the paper does with a passage a reader must not skip: a bar down its left margin.
@@ -60,6 +94,9 @@ const useStyles = createStyles((theme) => ({
  * The refusal goes at the first keystroke, on either field. A reader correcting a typo has already understood, and
  * the line telling them about it is from that moment in the way.
  *
+ * A press with a field left empty is answered there too, naming the field. It used to be answered by nothing at all:
+ * the one button of the screen, pressed, did not move, which is the thing the handler of a failed attempt takes care never to do.
+ *
  * It stands between the last field and the button, which is where a reader who has just pressed is looking, and the
  * order on the page is then the order of the thought: what you typed, what went wrong with it, what to do about it.
  * It was under the button, where it read as a third paragraph of the page and ran straight into the line saying
@@ -76,20 +113,35 @@ const useStyles = createStyles((theme) => ({
  */
 export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
   const styles = useStyles();
+  const theme = useTheme();
   const { connection, signIn } = useReaderSession();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [refusal, setRefusal] = useState<Refusal | null>(null);
+  const [refusal, setRefusal] = useState<Said | null>(null);
+  const [shown, setShown] = useState(false);
+  const loginField = useRef<FieldHandle>(null);
+  const passwordField = useRef<FieldHandle>(null);
   const opening = connection === 'opening';
   const submit = (): void => {
-    if (opening || login === '' || password === '') {
+    if (opening) {
+      return;
+    }
+    const missing = missingOf(login, password);
+    if (missing !== null) {
+      setRefusal(missing);
+      // The caret goes where the typing is wanted: the reader is told what is missing and is already in it.
+      (missing === 'missing.password' ? passwordField : loginField).current?.focus();
       return;
     }
     void (async (): Promise<void> => {
-      const opened = await signIn(login, password);
+      const opened = await signIn(login.trim(), password);
       if (opened.kind === 'opened') {
         onOpened();
       } else if (opened.kind === 'refused') {
+        // The pair stays as it was typed, the password with it: the eye shows what was refused, and one wrong letter is
+        // mended rather than the whole typed again blind. Nor does the caret go back into a field. The keyboard it
+        // raises covered the whole refusal at a large text size (iPhone simulator, 25/09/2026), and the reader is owed
+        // the reason before the next try.
         setRefusal(opened.why);
       }
     })().catch(() => {
@@ -103,35 +155,77 @@ export function SignInForm({ onOpened }: SignInFormProps): ReactNode {
       {/* No heading here: the screen holding this form already carries the same words in its bar, and a page that
           says its own name twice reads it out twice to anyone listening to it. */}
       <Text variant="prose">{t('signIn.message')}</Text>
-      <Box style={styles.field}>
-        <Text variant="label">{t('signIn.login')}</Text>
-        <TextField
-          value={login}
-          onChange={(text) => {
-            setRefusal(null);
-            setLogin(text);
+      <Box>
+        {/* Heard on the field itself, where a reader listening is when they type, and not on a line of its own: the
+            name answers a finger and nobody listening, the field being a stop of its own. */}
+        <Pressable
+          style={styles.name}
+          announces={DECORATIVE}
+          onPress={() => {
+            loginField.current?.focus();
           }}
-          placeholder={t('signIn.login.placeholder')}
-          style={styles.line}
-          fills="login"
-          keyboard="email"
-          onSubmit={submit}
-        />
+        >
+          <Text variant="label" announces={DECORATIVE}>
+            {t('signIn.login')}
+          </Text>
+        </Pressable>
+        <Box style={styles.line}>
+          <TextField
+            ref={loginField}
+            value={login}
+            onChange={(text) => {
+              setRefusal(null);
+              setLogin(text);
+            }}
+            label={t('signIn.login')}
+            placeholder={t('signIn.login.placeholder')}
+            style={styles.input}
+            fills="login"
+            keyboard="email"
+            onNext={() => {
+              passwordField.current?.focus();
+            }}
+          />
+        </Box>
       </Box>
-      <Box style={styles.field}>
-        <Text variant="label">{t('signIn.password')}</Text>
-        <TextField
-          value={password}
-          onChange={(text) => {
-            setRefusal(null);
-            setPassword(text);
+      <Box>
+        <Pressable
+          style={styles.name}
+          announces={DECORATIVE}
+          onPress={() => {
+            passwordField.current?.focus();
           }}
-          placeholder={t('signIn.password.placeholder')}
-          style={styles.line}
-          fills="password"
-          secret
-          onSubmit={submit}
-        />
+        >
+          <Text variant="label" announces={DECORATIVE}>
+            {t('signIn.password')}
+          </Text>
+        </Pressable>
+        <Box style={styles.line}>
+          <TextField
+            ref={passwordField}
+            value={password}
+            onChange={(text) => {
+              setRefusal(null);
+              setPassword(text);
+            }}
+            label={t('signIn.password')}
+            placeholder={t('signIn.password.placeholder')}
+            style={styles.input}
+            fills="password"
+            secret={!shown}
+            onSubmit={submit}
+          />
+          <Pressable
+            style={styles.eye}
+            label={t(shown ? 'signIn.password.hide' : 'signIn.password.show')}
+            role="button"
+            onPress={() => {
+              setShown(!shown);
+            }}
+          >
+            <Icon name={shown ? 'conceal' : 'reveal'} announces={DECORATIVE} tintColor={theme.textMuted} />
+          </Pressable>
+        </Box>
       </Box>
       {refusal === null ? null : (
         <Box style={styles.refusal}>

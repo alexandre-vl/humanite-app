@@ -248,9 +248,13 @@ jest.mock('react-native-safe-area-context', () => {
   const insets = { top: 0, bottom: 0, left: 0, right: 0 };
   const safeAreaProvider = ({ children }: { children: ReactNode }): unknown =>
     react.createElement(reactNative.View, null, children);
+  // A view that pads itself by the bars over it pads by nothing where there are no bars.
+  const safeAreaView = ({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }): unknown =>
+    react.createElement(reactNative.View, { style }, children);
   return {
     __esModule: true,
     SafeAreaProvider: safeAreaProvider,
+    SafeAreaView: safeAreaView,
     useSafeAreaInsets: (): typeof insets => insets,
   };
 });

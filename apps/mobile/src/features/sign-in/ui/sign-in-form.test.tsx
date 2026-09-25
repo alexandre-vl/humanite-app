@@ -1,9 +1,10 @@
+import { SPACING } from '@huma/design-tokens';
 import { isList, isRecord } from '@huma/unknown';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { READER } from '#api';
 import { t } from '#i18n';
-import { renderWithCache, styleOf } from '#lib/testing';
+import { nearestAbove, renderWithCache, styleOf } from '#lib/testing';
 import type { Opening } from '../model/store';
 import { useConnection } from '../model/store';
 import { SignInForm } from './sign-in-form';
@@ -40,6 +41,19 @@ const wordsInOrder = (): readonly string[] => {
   return seen;
 };
 
+/** The store's own action, opening every connection and noting what it was handed. */
+const watchingOpen = (): jest.Mock<(login: string, password: string) => Promise<Opening>> => {
+  const open = jest.fn<(login: string, password: string) => Promise<Opening>>(async () =>
+    Promise.resolve({ kind: 'opened' }),
+  );
+  useConnection.setState({ open });
+  return open;
+};
+
+/** What a field holds, found by the words it stands under. */
+const typed = (placeholder: 'signIn.login.placeholder' | 'signIn.password.placeholder'): unknown =>
+  screen.getByPlaceholderText(t(placeholder)).props['value'];
+
 /** Types the pair and presses, then lets the press settle. */
 const attempt = async (): Promise<void> => {
   await fill(LOGIN, PASSWORD);
@@ -70,6 +84,35 @@ describe('SignInForm', () => {
     await fill(LOGIN, '');
     await fireEvent.press(screen.getByText(t('signIn.submit')));
     expect(opening).not.toHaveBeenCalled();
+  });
+
+  /** The one button of the screen, pressed, did nothing at all: it now says which field it found empty. */
+  it('dit quel champ il manque quand on appuie avant de les avoir remplis', async () => {
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await fireEvent.press(screen.getByText(t('signIn.submit')));
+    expect(screen.getByText(t('signIn.missing.both.title'))).toBeTruthy();
+    await fill(LOGIN, '');
+    expect(screen.queryByText(t('signIn.missing.both.title'))).toBeNull();
+    await fireEvent.press(screen.getByText(t('signIn.submit')));
+    expect(screen.getByText(t('signIn.missing.password.title'))).toBeTruthy();
+    await fill('', PASSWORD);
+    await fireEvent.press(screen.getByText(t('signIn.submit')));
+    expect(screen.getByText(t('signIn.missing.login.title'))).toBeTruthy();
+  });
+
+  /**
+   * A placeholder is gone at the first letter, and the field then said only what it held. The name is heard on the
+   * field, and the word drawn over it is not read a second time on a line of its own.
+   */
+  it('nomme chaque champ à qui écoute l’écran, et une seule fois', async () => {
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await fill(LOGIN, PASSWORD);
+    expect(screen.getByLabelText(t('signIn.login')).props['value']).toBe(LOGIN);
+    expect(screen.getByLabelText(t('signIn.password')).props['value']).toBe(PASSWORD);
+    for (const label of ['signIn.login', 'signIn.password'] as const) {
+      expect(screen.getByText(t(label), { includeHiddenElements: true })).toBeTruthy();
+      expect(screen.queryByText(t(label))).toBeNull();
+    }
   });
 
   it('dit que le journal a refusé les identifiants, dans ses mots', async () => {
@@ -173,5 +216,95 @@ describe('SignInForm', () => {
     expect(styleOf(screen.getByText(t('signIn.refused.message')))['color']).toBe(
       styleOf(screen.getByText(t('signIn.message')))['color'],
     );
+  });
+
+  /**
+   * Grown only by its padding, a field was 28,3 points tall and that was the whole of what a thumb could land on
+   * (iPhone simulator, 25/09/2026). Each fills a line a grid step tall, as the search field does.
+   */
+  it('donne à chaque champ toute une ligne sous le doigt', async () => {
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    for (const placeholder of ['signIn.login.placeholder', 'signIn.password.placeholder'] as const) {
+      const field = screen.getByPlaceholderText(t(placeholder));
+      expect(styleOf(field)['alignSelf']).toBe('stretch');
+      const floor = nearestAbove(
+        field,
+        (node) => {
+          const style = styleOf(node);
+          return typeof style['minHeight'] === 'number' ? style['minHeight'] : undefined;
+        },
+        'rien autour du champ ne dit la hauteur de sa ligne',
+      );
+      expect(floor).toBeGreaterThanOrEqual(SPACING.xxxl);
+    }
+  });
+
+  /** The identifier hands the reader on to the password, and its key sends nothing: the pair is not whole yet. */
+  it('passe de l’identifiant au mot de passe par la touche du clavier, sans rien envoyer', async () => {
+    const opening = watchingOpen();
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    const login = screen.getByPlaceholderText(t('signIn.login.placeholder'));
+    expect(login.props['returnKeyType']).toBe('next');
+    await fireEvent.changeText(login, LOGIN);
+    await fireEvent(login, 'submitEditing');
+    expect(opening).not.toHaveBeenCalled();
+    expect(screen.queryByText(t('signIn.missing.password.title'))).toBeNull();
+    expect(screen.getByPlaceholderText(t('signIn.password.placeholder')).props['returnKeyType']).toBe('go');
+  });
+
+  /** A refused password stays, for the eye to show it and one wrong letter to be mended rather than all of it typed. */
+  it('garde le mot de passe refusé, pour qu’on le relise', async () => {
+    answering({ kind: 'refused', why: 'refused' });
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await attempt();
+    expect(typed('signIn.login.placeholder')).toBe(LOGIN);
+    expect(typed('signIn.password.placeholder')).toBe(PASSWORD);
+  });
+
+  /** A journal that did not answer refused nothing: the pair stays for the next try. */
+  it('garde toute la paire quand le journal n’a pas répondu', async () => {
+    answering({ kind: 'refused', why: 'unavailable' });
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await attempt();
+    expect(typed('signIn.login.placeholder')).toBe(LOGIN);
+    expect(typed('signIn.password.placeholder')).toBe(PASSWORD);
+  });
+
+  /** A password typed blind is one mistyped blind: the eye shows it, and hides it again. */
+  it('montre le mot de passe à qui le demande, et le cache de nouveau', async () => {
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    const secret = (): unknown =>
+      screen.getByPlaceholderText(t('signIn.password.placeholder')).props['secureTextEntry'];
+    expect(secret()).toBe(true);
+    await fireEvent.press(screen.getByRole('button', { name: t('signIn.password.show') }));
+    expect(secret()).toBe(false);
+    await fireEvent.press(screen.getByRole('button', { name: t('signIn.password.hide') }));
+    expect(secret()).toBe(true);
+  });
+
+  /** An address pasted from a message brings its spaces with it, and the service refuses an address with spaces. */
+  it('porte l’identifiant au service sans les espaces qu’un collage emporte', async () => {
+    const opening = watchingOpen();
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    await fill(`  ${LOGIN} `, PASSWORD);
+    await fireEvent.press(screen.getByText(t('signIn.submit')));
+    await act(async () => Promise.resolve());
+    expect(opening).toHaveBeenCalledWith(LOGIN, PASSWORD);
+  });
+
+  /**
+   * A field's name answers a finger, as a form's label does: pressed, it puts the caret in the field. A reader
+   * listening reaches the field itself and hears it named there, so the name is no stop of its own.
+   */
+  it('rend le nom de chaque champ sensible au doigt, sans en faire un arrêt de plus', async () => {
+    await renderWithCache(<SignInForm onOpened={() => undefined} />);
+    for (const label of ['signIn.login', 'signIn.password'] as const) {
+      const name = nearestAbove(
+        screen.getByText(t(label), { includeHiddenElements: true }),
+        (node) => (node.props['onStartShouldSetResponder'] === undefined ? undefined : node),
+        'rien autour du nom ne répond au doigt',
+      );
+      expect(name.props['accessible']).toBe(false);
+    }
   });
 });

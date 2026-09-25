@@ -7,6 +7,13 @@ import { Text } from '../../primitives/text';
 
 export type ButtonProps = Readonly<{ label: DisplayText; onPress: () => void }>;
 
+/**
+ * What the pill answers past its own edges. At the paper's step it is 35,7 points tall (iPhone simulator, 25/09/2026),
+ * short of the forty-four a finger is owed; eight more on every side reach past it without drawing a larger pill, and
+ * every screen that lays one leaves at least that much page around it, so the reach takes no press from its neighbours.
+ */
+const REACH = SPACING.sm;
+
 const useStyles = createStyles((theme) => ({
   button: {
     alignItems: 'center',
@@ -27,7 +34,7 @@ const useStyles = createStyles((theme) => ({
 export function Button({ label, onPress }: ButtonProps): ReactNode {
   const styles = useStyles();
   return (
-    <Pressable style={styles.button} onPress={onPress} label={label} role="button">
+    <Pressable style={styles.button} onPress={onPress} label={label} role="button" hitSlop={REACH}>
       <Text variant="label" tone="onPrimary">
         {label}
       </Text>

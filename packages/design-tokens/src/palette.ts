@@ -26,9 +26,14 @@ import { color } from './brand.ts';
  * theme's bar. The tab a reader is on is named there in it, and the red itself measured 4.35 on that bar; lifted, it
  * measures 4.53 there, and 5.01 on the dark page where the red measured 4.81.
  *
- * `darkRule` is the dark theme's rule, lifted two steps on each channel from where it was derived: at `#3a3340` it
- * measured 1.28 to one against the card whose rows it divides, under what the themes' test asks of a rule on every
- * ground it cuts. It now measures 1.32 there, 1.41 on the sheet and 1.56 on the page.
+ * `darkRule` is the dark theme's rule. Derived at `#3a3340`, it measured 1.28 to one against the card whose rows it
+ * divides, and was lifted two steps on each channel to clear the ratio the themes' test asks of a rule. At `#3c3542` it
+ * cleared it, and could not be seen: the thread of En continu all but vanished on the dark page on the iPhone simulator
+ * on 25/09/2026, where the light rule drew one. The ratio flatters two dark colours, and the step of lightness a
+ * phone's glass lets through does not (`lightnessStep`): the light rule stands 13.2 steps from its page and 9.9 from a
+ * card, and the dark one stood 7.0 and 4.5 from its own. It keeps its hue and its chroma, and takes the least lightness
+ * at which it is nowhere fainter than the light rule is at its faintest — CIE L* 32, 12.6 steps from the page, 11.1
+ * from the sheet and 10.0 from a card. Captures of L* 23, 28, 32 and 36 side by side agreed.
  *
  * `inkGrey` and `darkSecondary` are the middle step of an ink that had only two. A card sets a title and the summary
  * under it, and both were printed in the same colour at the same weight — so the summary read as a second title
@@ -52,7 +57,7 @@ export const PALETTE = {
   darkMuted: color('#b0a8b6'),
   darkSecondary: color('#cfc7d5'),
   darkBorder: color('#333333'),
-  darkRule: color('#3c3542'),
+  darkRule: color('#504956'),
   dateGrey: color('#74677a'),
   white: color('#ffffff'),
   black: color('#000000'),

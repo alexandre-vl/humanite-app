@@ -1,9 +1,9 @@
 import type { Article, ArticleSummary, ContentApi, DisplayText, Page, PageQuery } from '@huma/contracts';
 import { isList, isRecord } from '@huma/unknown';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render } from '@testing-library/react-native';
-import type { screen } from '@testing-library/react-native';
-import type { ReactElement } from 'react';
+import { act, fireEvent, render, renderHook } from '@testing-library/react-native';
+import type { RenderHookResult, screen } from '@testing-library/react-native';
+import type { ReactElement, ReactNode } from 'react';
 
 /**
  * A cache of its own for one rendering: nothing is kept once the test is done, and a failure shows at once rather than
@@ -14,6 +14,25 @@ const freshCache = (): QueryClient => new QueryClient({ defaultOptions: { querie
 /** Renders `ui` over a cache of its own, as the app's own root would with nothing restored. */
 export const renderWithCache = async (ui: ReactElement): Promise<void> => {
   await render(<QueryClientProvider client={freshCache()}>{ui}</QueryClientProvider>);
+};
+
+/**
+ * Runs `hook` over a cache of its own, as `renderWithCache` renders a screen: what a model's reading is tested by.
+ * `restored` is what that cache holds before the hook runs, entry by entry, as a phone restores what it wrote to disk.
+ */
+export const renderHookWithCache = async <Result,>(
+  hook: () => Result,
+  restored: readonly (readonly [key: readonly unknown[], data: unknown])[] = [],
+): Promise<RenderHookResult<Result, unknown>> => {
+  const client = freshCache();
+  for (const [key, data] of restored) {
+    client.setQueryData(key, data);
+  }
+  return renderHook(hook, {
+    wrapper: ({ children }: Readonly<{ children: ReactNode }>) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    ),
+  });
 };
 
 /**
@@ -131,3 +150,22 @@ export function nearestAbove<Found>(
 /** The native view `node` scrolls in. */
 export const scrollViewAbove = (node: Rendered, missing: string): Rendered =>
   nearestAbove(node, (each) => (each.type === 'RCTScrollView' ? each : undefined), missing);
+
+/** The name under which `target` offers a reader listening the action they hear as `label`, if it offers one. */
+export const actionNamed = (target: Rendered, label: string): string | undefined => {
+  const actions: unknown = target.props['accessibilityActions'];
+  const found = isList(actions) ? actions.find((action) => isRecord(action) && action['label'] === label) : undefined;
+  return isRecord(found) && typeof found['name'] === 'string' ? found['name'] : undefined;
+};
+
+/**
+ * Performs on `target` the action a reader listening picks by the name `label`, the way the platform hands it over.
+ * An action the target does not offer fails the test rather than performing nothing.
+ */
+export const perform = async (target: Rendered, label: string): Promise<void> => {
+  const name = actionNamed(target, label);
+  if (name === undefined) {
+    throw new Error(`« ${label} » n’est pas une action offerte ici : le test ne vérifierait rien`);
+  }
+  await fireEvent(target, 'accessibilityAction', { nativeEvent: { actionName: name } });
+};

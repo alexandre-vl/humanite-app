@@ -1,5 +1,9 @@
 import { expect, test } from 'vitest';
+import { color } from './brand.ts';
+import { contrastRatio } from './contrast.ts';
 import { judgeLegibility, requiredRatio, THE_PAPER } from './legibility.ts';
+import { PALETTE } from './palette.ts';
+import { THEME_NAMES, THEMES } from './theme.ts';
 import type { TextVariant } from './typography.ts';
 import { TEXT_SCALES, TEXT_VARIANTS, typographyAt } from './typography.ts';
 
@@ -37,4 +41,30 @@ test('two roles are large text, and every other variant owes the full bar', () =
  */
 test('the paper’s own colours are read at what their size owes', () => {
   expect(judgeLegibility(THE_PAPER)).toEqual([]);
+});
+
+/**
+ * What iOS drew for the track of a switch set off, which is not the grey it was handed: it lays a veil of its own over
+ * the track, darker under a light appearance and lighter under a dark one, and the app has iOS draw in the reader's
+ * theme. Handed `dateGrey`, it drew these on the iPhone simulator on 25/09/2026.
+ */
+const IOS_TRACK_SET_OFF = {
+  handed: PALETTE.dateGrey,
+  drawn: { light: color('#635a6a'), dark: color('#978e9f') },
+} as const;
+
+/**
+ * The reading above knows only the colours handed to the platform. Against the lighter track iOS drew, the white knob
+ * measured 3.14 to 1 where the grey handed in says 5.30, so a reading of the handed grey would pass a lighter one that
+ * iOS then takes under the three to one a control owes. The grey is therefore held to the one measured: another is a
+ * track nobody has looked at, and this fails until somebody has, and has written down here what iOS drew.
+ */
+test('the switch set off is read as iOS draws it, on the grey it was measured drawing', () => {
+  for (const name of THEME_NAMES) {
+    const theme = THEMES[name];
+    const drawn = IOS_TRACK_SET_OFF.drawn[name];
+    expect(theme.control).toBe(IOS_TRACK_SET_OFF.handed);
+    expect(contrastRatio(theme.onPrimary, drawn)).toBeGreaterThanOrEqual(3);
+    expect(contrastRatio(drawn, theme.background)).toBeGreaterThanOrEqual(3);
+  }
 });

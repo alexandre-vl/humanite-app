@@ -18,5 +18,5 @@ appId: ${APP_ID}
 - scroll
 - scroll
 - takeScreenshot: live-scrolled
-- tapOn: 'À la une'
+- tapOn: 'Accueil'
 - assertVisible: 'L’Humanité'

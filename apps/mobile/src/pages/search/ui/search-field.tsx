@@ -24,12 +24,14 @@ const useStyles = createStyles(() => ({
     paddingHorizontal: SPACING.lg,
     // A floor and not a height. Forty-eight points is what a thumb is owed and what the line looks right at, but the
     // reader sets how large the paper prints and the question they type grows with it: a fixed height cropped the
-    // ascenders and descenders off their own words at the largest setting. The padding keeps the line breathing at
-    // the smallest, where the floor alone would have the text touching the rule underneath it.
+    // ascenders and descenders off their own words at the largest setting.
     minHeight: SPACING.xxxl,
-    paddingVertical: SPACING.xs,
   },
-  input: { flex: 1 },
+  // The field is the whole line, and not only its letters: set at twenty points, the letters were the whole of the
+  // target (iPhone simulator, 25/09/2026). So it stretches to the line's height, and the room that keeps the line
+  // breathing at the smallest step — where the floor alone would have the text touching the rule underneath it — is
+  // the field's own, inside the target rather than around it: left on the line, it held the field to forty points.
+  input: { flex: 1, alignSelf: 'stretch', paddingVertical: SPACING.xs },
 }));
 
 /**
@@ -56,7 +58,13 @@ export function SearchField({ value, onChange, busy }: SearchFieldProps): ReactN
     <Box>
       <Box style={styles.bar}>
         <Icon name="search" announces={DECORATIVE} size={SPACING.lg} tintColor={theme.primary} />
-        <TextField value={value} onChange={onChange} placeholder={t('search.placeholder')} style={styles.input} />
+        <TextField
+          value={value}
+          onChange={onChange}
+          label={t('search.field')}
+          placeholder={t('search.placeholder')}
+          style={styles.input}
+        />
         {value === '' ? null : (
           <Pressable
             hitSlop={REACH}

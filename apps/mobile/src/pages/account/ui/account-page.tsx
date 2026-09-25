@@ -118,12 +118,18 @@ function Subscription(): ReactNode {
   );
 }
 
-/** A group of rows under a heading, as the current app lays its own out. */
+/**
+ * A group of rows on one card under a heading, as the current app lays its own out.
+ *
+ * The heading starts from the edge the screen's name and every row start from, as the reading settings set theirs.
+ * The current app centred it, under a paper's name that was centred too; here the screen names itself at that edge,
+ * and a centred heading was the one thing on the screen that did not start from it (iPhone simulator, 25/09/2026).
+ */
 function Group({ label, children }: Readonly<{ label: DisplayText; children: ReactNode }>): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.group}>
-      <Text variant="label" align="center" heading>
+      <Text variant="label" heading>
         {label}
       </Text>
       <Box style={styles.card}>{children}</Box>
@@ -152,7 +158,7 @@ export function AccountPage(): ReactNode {
     <Surface>
       <Scroll axis="vertical" contentStyle={styles.page}>
         <Text variant="display" heading>
-          {t('nav.account')}
+          {t('account.title')}
         </Text>
         <Subscription />
         <Group label={t('account.reading')}>

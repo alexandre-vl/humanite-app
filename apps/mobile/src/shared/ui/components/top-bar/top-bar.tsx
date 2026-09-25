@@ -27,28 +27,19 @@ export type TopBarProps = Readonly<{
 }>;
 
 const useStyles = createStyles((theme) => ({
-  // The bar grows past its height rather than clipping: the name is set in the reader's own step, and at the largest
-  // one a fixed slab would cut the letters it exists to carry.
+  // The bar grows past its height rather than clipping: a screen's name is set at the reader's step and at the
+  // phone's text size, and at the largest of both a fixed slab would cut the letters it exists to carry.
   bar: {
     minHeight: SIZES.bar,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: SPACING.sm,
     backgroundColor: theme.background,
   },
-  // Laid over the row, not in it: the name stays in the middle of the screen whether the bar carries a control at one
-  // end, at both or at neither. Both ends are kept free by the same margin, so the name is centred on the screen and
-  // not on what is left of it.
-  middle: {
-    position: 'absolute',
-    top: SPACING.none,
-    bottom: SPACING.none,
-    left: SIZES.barSide,
-    right: SIZES.barSide,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  // Placed in the row, between its ends, so that the bar knows how tall the name stands. It was laid over the row, and
+  // a name taller than the bar was cut to the bar: the paper's own was, at the phone's largest text size (capture 22).
+  // It stays in the middle of the screen because both ends hold their square whether they carry a control or not.
+  middle: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   // Each end of the bar is one grid step square, whatever it holds or whether it holds anything. A control hung there
   // used to take its own size: on an A065 the article's marque-page, once kept, drew its disc 22 pixels from the edge
   // of the screen, where the front page's control stood 58 from it — the same corner, a thumb's width apart.
@@ -88,25 +79,26 @@ export function TopBarButton({ icon, label, onPress }: TopBarButtonProps): React
  * bar the platform lays out takes none of the style table, so neither the paper's own letters nor a second control
  * could be put in one. Drawn here, the same bar serves every screen, pushed or not.
  *
- * The name is laid over the row rather than placed in it. Placed in it, a bar with a way back and nothing at the other
- * end would centre its name on what the control left over, which is not the middle of anything.
+ * The name is placed in the row, between two ends that hold the same square whether they carry anything or not. An
+ * end that took no room when empty would leave a bar with a way back and nothing at the other end centring its name
+ * on what the control left over, which is not the middle of anything.
  */
 export function TopBar({ title, names = 'screen', onBack, action }: TopBarProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.bar}>
-      {title === undefined ? null : (
-        <Box style={styles.middle}>
-          <Text variant={names === 'paper' ? 'masthead' : 'label'} align="center" numberOfLines={1} heading>
-            {title}
-          </Text>
-        </Box>
-      )}
       <Box style={styles.end}>
         {onBack === undefined ? null : (
           <Pressable style={styles.target} label={t('action.back')} role="button" onPress={onBack}>
             <Icon name="back" announces={DECORATIVE} />
           </Pressable>
+        )}
+      </Box>
+      <Box style={styles.middle}>
+        {title === undefined ? null : (
+          <Text variant={names === 'paper' ? 'masthead' : 'label'} align="center" numberOfLines={1} heading>
+            {title}
+          </Text>
         )}
       </Box>
       <Box style={styles.end}>{action}</Box>
