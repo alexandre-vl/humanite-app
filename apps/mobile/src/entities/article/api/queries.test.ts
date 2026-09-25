@@ -5,6 +5,7 @@ import { content } from '#api';
 import { everyArticle } from '#lib/testing';
 import { questionOf } from '../model/search';
 import { articleQuery, feedQuery, isReaderKey, searchQuery, summariesMatching } from './queries';
+import type { PagedFeed } from './queries';
 
 describe('questionOf', () => {
   /** The blank at either end is the reader's typing, not their question, and is read off once, here. */
@@ -36,7 +37,7 @@ describe('isReaderKey', () => {
 });
 
 /** A cache that has read one list, of articles printed under these titles and with nothing under them. */
-const holding = async (titles: readonly string[]): Promise<QueryClient> => {
+const holding = async (titles: readonly string[], lists: readonly PagedFeed[] = [feedQuery]): Promise<QueryClient> => {
   const corpus = await everyArticle(content);
   const items = titles.map((title, at) => {
     const real = corpus[at];
@@ -48,7 +49,9 @@ const holding = async (titles: readonly string[]): Promise<QueryClient> => {
   // Kept for good: a cache that collects what nobody watches holds a timer for it, which outlives the test and keeps
   // the run from ending.
   const cache = new QueryClient({ defaultOptions: { queries: { gcTime: Infinity } } });
-  cache.setQueryData(feedQuery.queryKey, { pages: [{ items, nextCursor: null }], pageParams: [null] });
+  for (const list of lists) {
+    cache.setQueryData(list.queryKey, { pages: [{ items, nextCursor: null }], pageParams: [null] });
+  }
   return cache;
 };
 
@@ -78,5 +81,18 @@ describe('summariesMatching', () => {
     const cache = await holding(['Qui paie (vraiment) la dette ?', 'La dette, vraiment']);
     expect(titlesMatching(cache, '(vraiment')).toEqual(['Qui paie (vraiment) la dette ?']);
     expect(titlesMatching(cache, 'dette ?')).toEqual(['Qui paie (vraiment) la dette ?']);
+  });
+
+  /**
+   * An article is filed in more than one list the app reads — the front, its section, the wire, every answer that has
+   * reached it — and the app answered from all of them at once. What it answered « volksw » with was seven lines for
+   * two articles (iPhone simulator, 25/09/2026).
+   */
+  it('ne donne qu’une fois un article que l’app tient dans plusieurs listes', async () => {
+    const cache = await holding(
+      ['Saignée de 100 000 emplois chez Volkswagen'],
+      [feedQuery, searchQuery(QUESTION.parse('volk')), searchQuery(QUESTION.parse('volks'))],
+    );
+    expect(titlesMatching(cache, 'volksw')).toEqual(['Saignée de 100 000 emplois chez Volkswagen']);
   });
 });

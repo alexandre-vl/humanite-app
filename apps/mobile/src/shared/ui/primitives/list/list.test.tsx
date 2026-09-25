@@ -34,6 +34,17 @@ const namedInOrder = (): readonly string[] => {
 const FRAME = 900;
 const CELL = 100;
 
+/** How far down its content the list lays the cell an item is drawn in, in points. */
+const placeOf = (id: string): number =>
+  nearestAbove(
+    screen.getByTestId(id),
+    (each) => {
+      const top = styleOf(each)['top'];
+      return typeof top === 'number' ? top : undefined;
+    },
+    'l’élément n’est posé dans aucune cellule : le test ne vérifierait rien',
+  );
+
 /** The native scroll view the list renders, found from the item `un` up. */
 const scrollView = (): Rendered => scrollViewAbove(screen.getByTestId('un'), 'la liste ne rend aucune vue défilante');
 
@@ -141,6 +152,26 @@ describe('List', () => {
     );
     await settle();
     expect(scrollView().props['maintainVisibleContentPosition']).toHaveProperty('autoscrollToTopThreshold', 0);
+  });
+
+  /**
+   * The list under this one gives a key one cell, at the last place it is handed that key, and leaves the places
+   * before it empty. On the iPhone simulator on 25/09/2026, what the app answered « volksw » with was seven lines for
+   * two articles, and nothing was drawn in the first 950 points of the list: the screen stood white.
+   */
+  it('dessine chaque élément une fois, là où il vient d’abord, sans laisser de trou au-dessus', async () => {
+    await render(
+      <List
+        items={['un', 'deux', 'un']}
+        keyOf={(item) => item}
+        typeOf={() => 'row'}
+        renderItem={(item) => <View testID={item} />}
+      />,
+    );
+    await settle();
+    expect(screen.getAllByTestId('un')).toHaveLength(1);
+    expect(placeOf('un')).toBe(0);
+    expect(placeOf('deux')).toBe(CELL);
   });
 
   it('montre ce qui en tient lieu quand elle ne contient rien', async () => {

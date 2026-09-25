@@ -118,6 +118,34 @@ describe('usePagedFeed', () => {
     });
   });
 
+  /**
+   * A list paged by number shifts by one whenever an article is filed between two reads, and the article at the foot
+   * of one page comes back at the head of the next. The feed holds it once, where it was first read.
+   */
+  it('ne tient qu’une fois un article revenu en tête de la page suivante', async () => {
+    const run = (await content.getFeed({})).items.slice(0, 5);
+    const [last] = run.slice(-1);
+    if (run.length < 5 || last === undefined) {
+      throw new Error('la une a moins de cinq articles : le test ne vérifierait rien');
+    }
+    jest
+      .spyOn(content, 'getFeed')
+      .mockResolvedValueOnce({ items: run.slice(0, 3), nextCursor: 'suite' })
+      .mockResolvedValueOnce({ items: run.slice(2), nextCursor: null });
+    const { result } = await renderHookWithCache(() => usePagedFeed(feedQuery));
+    await waitFor(() => {
+      expect(result.current.items.length).toBeGreaterThan(0);
+    });
+    await act(async () => {
+      result.current.onEndReached?.();
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.items.at(-1)?.id).toBe(last.id);
+    });
+    expect(result.current.items.map((item) => item.id)).toEqual(run.map((item) => item.id));
+  });
+
   /** Every feed read page by page says under its last item what became of the next page, and asks for it again. */
   it('dit au pied pourquoi la page suivante n’est pas venue, et qu’elle vient quand on la redemande', async () => {
     const { items } = await content.getFeed({});

@@ -1,8 +1,9 @@
-import type { ArticleId, ArticleSummary, ContentErrorCode, Instant } from '@huma/contracts';
+import type { ArticleSummary, ContentErrorCode, Instant } from '@huma/contracts';
 import type { QueryStatus } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { failureOf } from '#api';
+import { onceEach } from '#lib/once';
 import type { PagedFeed } from '../api/queries';
 
 /**
@@ -117,17 +118,7 @@ export function useReadAgain(
  * page comes back at the head of the next. A list drawing the same key twice draws one of them wrong, so the second
  * reading is dropped rather than shown.
  */
-const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
-  const seen = new Set<ArticleId>();
-  const kept: ArticleSummary[] = [];
-  for (const item of items) {
-    if (!seen.has(item.id)) {
-      seen.add(item.id);
-      kept.push(item);
-    }
-  }
-  return kept;
-};
+const once = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => onceEach(items, (item) => item.id);
 
 /**
  * Reads a paged feed. Every screen that shows one reads it this way: the pages already fetched, flattened, each item

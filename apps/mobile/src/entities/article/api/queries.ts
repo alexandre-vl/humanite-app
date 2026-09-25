@@ -12,6 +12,7 @@ import type {
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
+import { onceEach } from '#lib/once';
 import type { Reach, StreamPage, StreamStep } from '../model/reach';
 import { nextStepOf, oldestOf } from '../model/reach';
 
@@ -220,22 +221,30 @@ export const articleQuery = (id: ArticleId): ReturnType<typeof one> => one(id);
  * Every summary the app is already holding, from every list it has read — the front, each section, the wire, and
  * whatever a question turned up, whether they are on screen now or came off the disk at the last start.
  *
+ * Each article once, where it was first read. An article is filed in more than one of those lists — its section and
+ * the front, the wire, every answer that has reached it — and read off all of them it came back as often: what the
+ * app answered « volksw » with was seven lines for two articles (iPhone simulator, 25/09/2026).
+ *
  * Only the lists. An article read whole is filed under its own key and is not a list of anything, so it is left out
  * rather than flattened past: the predicate is the one place that says so, and the type that follows it would be a
  * lie for that branch.
  */
-const summariesRead = (cache: QueryClient): readonly ArticleSummary[] => [
-  ...cache
-    .getQueriesData<InfiniteData<Page<ArticleSummary>>>({
-      queryKey: [ARTICLES],
-      predicate: ({ queryKey }) => queryKey[1] !== ONE && queryKey[1] !== STREAM,
-    })
-    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.items]) ?? []),
-  // The merged run of the whole paper, whose pages carry a floor beside their items and are therefore shaped apart.
-  ...cache
-    .getQueriesData<InfiniteData<StreamPage>>({ queryKey: [ARTICLES, STREAM] })
-    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.read]) ?? []),
-];
+const summariesRead = (cache: QueryClient): readonly ArticleSummary[] =>
+  onceEach(
+    [
+      ...cache
+        .getQueriesData<InfiniteData<Page<ArticleSummary>>>({
+          queryKey: [ARTICLES],
+          predicate: ({ queryKey }) => queryKey[1] !== ONE && queryKey[1] !== STREAM,
+        })
+        .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.items]) ?? []),
+      // The merged run of the whole paper, whose pages carry a floor beside their items and are therefore shaped apart.
+      ...cache
+        .getQueriesData<InfiniteData<StreamPage>>({ queryKey: [ARTICLES, STREAM] })
+        .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.read]) ?? []),
+    ],
+    (summary) => summary.id,
+  );
 
 /**
  * What the app already knows of one article, from the lists it has read, or nothing when it knows none of it.

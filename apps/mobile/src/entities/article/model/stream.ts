@@ -1,5 +1,6 @@
-import type { ArticleId, ArticleSummary, SectionId } from '@huma/contracts';
+import type { ArticleSummary, SectionId } from '@huma/contracts';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { onceEach } from '#lib/once';
 import { streamQuery } from '../api/queries';
 import type { ReadFeed } from './paged-feed';
 import { footOf, stateOf, useReadAgain } from './paged-feed';
@@ -12,17 +13,9 @@ import { floorOf, reachOf, targetOf } from './reach';
  * read a step twice. Newest first, because that is the whole claim this screen makes: the paper in the order the
  * newsroom filed it, with nothing standing above something filed after it.
  */
-const inOrder = (items: readonly ArticleSummary[]): readonly ArticleSummary[] => {
-  const seen = new Set<ArticleId>();
-  const kept: ArticleSummary[] = [];
-  for (const item of items) {
-    if (!seen.has(item.id)) {
-      seen.add(item.id);
-      kept.push(item);
-    }
-  }
-  return kept.sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
-};
+const inOrder = (items: readonly ArticleSummary[]): readonly ArticleSummary[] =>
+  // A copy is sorted: a run in which nothing came twice is the one read from the cache, which a sort would reorder.
+  [...onceEach(items, (item) => item.id)].sort((left, right) => right.publishedAt.localeCompare(left.publishedAt));
 
 /**
  * The whole paper as one running order: every section read down to the same day, merged, each article once, and cut

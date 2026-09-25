@@ -7,6 +7,7 @@ import type { ScrollViewProps } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { ScrollViewMarker } from 'react-native-screens/experimental';
 import { announcedAs, DECORATIVE } from '../../../lib/announce';
+import { onceEach } from '../../../lib/once';
 import { createStyles } from '../../../lib/styles';
 import type { StyleRef } from '../../../lib/styles';
 import { collapseProgress, lerp } from './geometry';
@@ -145,6 +146,12 @@ const useStyles = createStyles(() => ({
  * its own (`@shopify/flash-list/dist/recyclerview/RecyclerView.js`, the `CompatScrollView` element), and calls ours back
  * as a plain listener, so a worklet handler has nowhere to attach.
  *
+ * `keyOf` names an item, and the list draws each name once, where it first comes. The list under this one gives a name
+ * one cell, at the last place it is handed that name, and leaves every place before it empty, a card's height each: on
+ * the iPhone simulator on 25/09/2026, what the app answered « volksw » with was seven lines for two articles, and the
+ * first of them was drawn 950 points down the list, under the bottom of the screen, which stood white. Two items under
+ * one name are one item read twice, so the second is not drawn, whichever screen handed it over.
+ *
  * `typeOf` names the tree an item mounts. A cell is only ever handed to an item of the same type, and measured heights
  * are averaged type by type, so two items sharing a type must mount the same components in the same order, and two
  * items of visibly different heights must not share one. It is required rather than optional because the list cannot
@@ -177,9 +184,10 @@ export function List<Item>({
   contentStyle,
 }: ListProps<Item>): ReactNode {
   const styles = useStyles();
+  const drawn = useMemo(() => onceEach(items, keyOf), [items, keyOf]);
   const pinnedPlaces = useMemo(
-    () => (pinned === undefined ? undefined : items.flatMap((item, index) => (pinned(item) ? [index] : []))),
-    [items, pinned],
+    () => (pinned === undefined ? undefined : drawn.flatMap((item, index) => (pinned(item) ? [index] : []))),
+    [drawn, pinned],
   );
   const scrollY = useSharedValue(0);
   // How tall the band stands, in both places it is needed: on the thread that draws, for the distance it slides away
@@ -197,7 +205,7 @@ export function List<Item>({
     <View style={styles.frame}>
       <FlashList
         style={styles.fill}
-        data={items}
+        data={drawn}
         keyExtractor={keyOf}
         getItemType={typeOf}
         renderItem={(info) =>
