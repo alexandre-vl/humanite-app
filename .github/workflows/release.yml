@@ -121,8 +121,11 @@ jobs:
             "${RUNNER_TEMP}/aligned.apk"
           mkdir -p dist
           apk="dist/humanite-${VERSION}-android-arm64.apk"
+          # Sans signature v4 : son fichier .idsig ne sert qu'à adb install --incremental, et sortirait en troisième
+          # binaire, qu'aucune note n'annonce.
           "${tools}/apksigner" sign --ks "${keystore}" --ks-type PKCS12 --ks-key-alias humanite \
-            --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEYSTORE_PASSWORD --out "${apk}" "${RUNNER_TEMP}/aligned.apk"
+            --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEYSTORE_PASSWORD --v4-signing-enabled false \
+            --out "${apk}" "${RUNNER_TEMP}/aligned.apk"
           rm -f "${keystore}"
           "${tools}/apksigner" verify --print-certs "${apk}" | tee "${RUNNER_TEMP}/certificates.txt"
           grep -q "certificate SHA-256 digest: ${RELEASE_CERT_SHA256}" "${RUNNER_TEMP}/certificates.txt"
@@ -208,6 +211,15 @@ jobs:
           pattern: release-*
           path: dist
           merge-multiple: true
+      - name: Rien d'autre que les deux binaires que les notes annoncent
+        working-directory: dist
+        run: |
+          expected="$(printf '%s\n' "humanite-${VERSION}-android-arm64.apk" "humanite-${VERSION}-ios-simulator.tar.gz")"
+          found="$(find . -mindepth 1 -maxdepth 1 -exec basename {} \; | sort)"
+          if [ "${found}" != "${expected}" ]; then
+            echo "::error::dist/ porte « ${found//$'\n'/, } » au lieu de « ${expected//$'\n'/, } »"
+            exit 1
+          fi
       - name: Sommes SHA-256
         working-directory: dist
         run: |
