@@ -28,6 +28,8 @@ Seules `main` et la dernière release sont maintenues. L'app n'est sur aucun sto
   (`tools/capture/src/secrets.ts`).
 - À chaque push et à chaque pull request, la CI cherche les secrets dans tout l'historique avec gitleaks ; GitHub
   bloque au push les secrets qu'il reconnaît.
+- CodeQL relit le code à chaque push et à chaque pull request, et une pull request qui ouvre une alerte n'entre pas
+  dans `main` ([ADR-0038](docs/adr/0038-le-depot-public-se-verifie-et-se-publie-sur-le-serveur.md)).
 - Les actions de la CI sont épinglées par SHA, et son jeton ne fait que lire.
 - Un APK de release est signé par une clé privée, que seul le job de release lit, depuis un tag `v*`. Le certificat a
   pour empreinte SHA-256 `b58a1ae9db2379bea06357aa187bed8ffd3b9f6c879ad8e522d6a4058879971e` : un APK signé par une
