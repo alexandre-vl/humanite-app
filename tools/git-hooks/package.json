@@ -9,11 +9,14 @@
     "./installation": "./src/installation.ts",
     "./message": "./src/message.ts",
     "./proofs": "./src/proofs/registry.ts",
-    "./shims": "./src/shims.ts"
+    "./shims": "./src/shims.ts",
+    "./workflow": "./src/workflow.ts"
   },
   "dependencies": {
     "@huma/fixtures": "workspace:*",
-    "@huma/kit": "workspace:*"
+    "@huma/kit": "workspace:*",
+    "yaml": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@huma/tsconfig": "workspace:*",

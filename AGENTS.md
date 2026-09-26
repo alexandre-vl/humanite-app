@@ -33,7 +33,7 @@ Chaque règle structurante du dépôt vit dans un ADR (`docs/adr`) et un outil l
 | `pnpm format:check`     | vérifie le formatage des fichiers du dépôt                                                                                            |
 | `pnpm gen`              | régénère les fichiers dérivés                                                                                                         |
 | `pnpm gen:check`        | vérifie que les fichiers dérivés sont à jour                                                                                          |
-| `pnpm hooks:check`      | vérifie les hooks git et Claude Code installés, et l’historique des messages                                                          |
+| `pnpm hooks:check`      | vérifie les hooks git et Claude Code installés, les workflows qui les rejouent, et l’historique des messages                          |
 | `pnpm hooks:install`    | installe les hooks git du dépôt                                                                                                       |
 | `pnpm knip`             | cherche les fichiers, exports et dépendances que rien n’emploie                                                                       |
 | `pnpm lint`             | ESLint sur les fichiers du dépôt, sans cache ni suppressions : aucun message toléré                                                   |

@@ -19,6 +19,7 @@ import { checkStaging } from '../staging.ts';
 import { checkVerifiedTree, recordVerifiedTree } from '../tripwire.ts';
 import type { Verification } from '../flows.ts';
 import { applyPatchMessage, commitMessage, preCommit } from '../flows.ts';
+import { WORKFLOW_FIXTURES } from './workflow.ts';
 
 const define = fixtureFactory<GitHookCode>();
 
@@ -616,4 +617,5 @@ export const GIT_HOOK_FIXTURES = [
   ...MESSAGE_FIXTURES,
   ...INSTALLATION_FIXTURES,
   ...HISTORY_FIXTURES,
+  ...WORKFLOW_FIXTURES,
 ] as const;

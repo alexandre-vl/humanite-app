@@ -1211,4 +1211,44 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0038': {
+    scope: {
+      // The two workflows the server runs, the configuration of the scan one of them runs, and the reading that holds
+      // both to the rules. The rules GitHub holds on its side — branches, tags, environments — live outside the tree.
+      paths: ['.github/workflows/**', '.gitleaks.toml', 'tools/git-hooks/src/workflow.ts'],
+    },
+    rules: {
+      R1: [
+        'git/valid-workflows',
+        'git/valid-workflow-plans',
+        'git/ci-missing',
+        'git/ci-unreadable',
+        'git/ci-trigger',
+        'git/ci-verify',
+        'git/ci-shallow',
+        'git/ci-merge-ref',
+      ],
+      R2: ['git/ci-secrets'],
+      R3: ['git/ci-unpinned'],
+      R4: ['git/ci-permissions'],
+      R5: ['git/ci-identity', 'git/ci-foreign-secret', 'git/ci-variant'],
+      R6: ['git/ci-release-trigger'],
+      R7: {
+        convention:
+          'Le job android de .github/workflows/release.yml signe l’APK par apksigner avec la clé des secrets ANDROID_RELEASE_KEYSTORE et ANDROID_RELEASE_KEYSTORE_PASSWORD, que seul l’environnement release expose, à un tag v* seulement, puis refuse l’APK dont le certificat n’a pas l’empreinte RELEASE_CERT_SHA256 épinglée dans le même fichier.',
+      },
+      R8: {
+        convention:
+          'La règle « main : historique intouchable » du dépôt sur GitHub interdit la suppression, le force-push et un historique non linéaire sur la branche par défaut, sans personne pour la contourner (gh api repos/alexandre-vl/humanite-app/rulesets).',
+      },
+      R9: {
+        convention:
+          'La règle « main : contributions vérifiées » exige une pull request, fusionnée par rebase seulement, et les contrôles pnpm verify, secrets (gitleaks), build Android et build iOS verts ; le dépôt n’autorise ni fusion par commit de fusion ni par écrasement (gh api repos/alexandre-vl/humanite-app).',
+      },
+      R10: {
+        convention:
+          'Le rôle d’administrateur du dépôt contourne « main : contributions vérifiées », et lui seul : un push direct du mainteneur passe sous ses hooks locaux, puis la CI le rejoue.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

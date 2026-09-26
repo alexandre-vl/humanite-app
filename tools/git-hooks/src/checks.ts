@@ -135,6 +135,52 @@ const TABLE = {
     summary: 'la branche descend du commit d’ancrage',
     message: 'HEAD ne descend pas du commit d’ancrage {anchor} : historique réécrit ?',
   },
+  'git/ci-missing': {
+    summary: 'les workflows qui rejouent les contrôles et publient les versions sont écrits',
+    message: 'workflow {path} absent : la CI et la release en dépendent',
+  },
+  'git/ci-unreadable': {
+    summary: 'chaque workflow se lit',
+    message: 'workflow {path} illisible : {reason}',
+  },
+  'git/ci-trigger': {
+    summary: 'la CI tourne à chaque push sur main et à chaque pull request, la release sur un tag seulement',
+    message: 'workflow {path} : {expected} attendu',
+  },
+  'git/ci-verify': {
+    summary: 'un job de la CI installe les hooks puis lance pnpm verify',
+    message: 'aucun job de {path} ne lance pnpm hooks:install puis pnpm verify',
+  },
+  'git/ci-shallow': {
+    summary: 'la CI vérifie et cherche les secrets sur un clone complet',
+    message: 'le job {job} clone sans fetch-depth: 0 : l’historique qu’il relit y manque',
+  },
+  'git/ci-merge-ref': {
+    summary: 'une pull request se vérifie sur sa tête',
+    message:
+      'le job {job} vérifie le commit de fusion d’une pull request, au message « Merge … » refusé : ref sur github.event.pull_request.head.sha attendue',
+  },
+  'git/ci-secrets': {
+    summary: 'la CI cherche un secret dans tout l’historique',
+    message: 'aucun job de {path} ne lance gitleaks git',
+  },
+  'git/ci-unpinned': {
+    summary: 'chaque action d’un workflow est épinglée par un SHA complet',
+    message: 'action {action} de {path} : l’épingler par un SHA de 40 caractères',
+  },
+  'git/ci-permissions': {
+    summary: 'le jeton d’un workflow ne fait que lire, et la CI n’en demande pas davantage',
+    message: 'permissions {scope} de {path} : read ou none seulement',
+  },
+  'git/ci-identity': {
+    summary: 'un workflow ne lit que la clé de release, jamais l’identité prêtée aux tests',
+    message: '{path} nomme {name} : un binaire construit ici ne porte ni la clé prêtée ni un autre secret',
+  },
+  'git/ci-variant': {
+    summary: 'chaque binaire construit par un workflow est la variante de service',
+    message:
+      'le job {job} de {path} construit sans EXPO_PUBLIC_CONTENT_SOURCE: service : il montrerait le corpus fictif',
+  },
 } as const;
 
 const GIT_HOOK_CHECKS = defineChecks(TABLE);

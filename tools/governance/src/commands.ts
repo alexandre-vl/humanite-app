@@ -209,7 +209,8 @@ export const COMMANDS = {
     program: cli('hooks-check'),
     arguments: [],
     audience: 'everyone',
-    summary: 'vérifie les hooks git et Claude Code installés, et l’historique des messages',
+    summary:
+      'vérifie les hooks git et Claude Code installés, les workflows qui les rejouent, et l’historique des messages',
   },
   'hooks:install': {
     program: cli('hooks-install'),
