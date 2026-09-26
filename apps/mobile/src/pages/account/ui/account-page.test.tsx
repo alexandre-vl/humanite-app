@@ -3,7 +3,9 @@ import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { noteSetAside, READER } from '#api';
+import { NEWSROOM } from '#config';
 import { useConnection } from '#features/sign-in';
+import { openExternal } from '#lib/routing';
 import { renderWithCache, styleOf } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { AccountPage } from './account-page';
@@ -12,6 +14,13 @@ import { AccountPage } from './account-page';
 const OPENS = `symbol:${ICONS.next.android}`;
 
 jest.mock('expo-router', () => ({ __esModule: true, router: { push: jest.fn() } }));
+// Only the door out is replaced: the screen reads its own routes from the same module, and a whole mock would take
+// them with it.
+jest.mock('#lib/routing', () => ({
+  __esModule: true,
+  ...jest.requireActual<object>('#lib/routing'),
+  openExternal: jest.fn(),
+}));
 
 /** A build started with the journal's key, which is what makes the screen offer a connection at all. */
 const withKey = (): void => {
@@ -113,8 +122,8 @@ describe('AccountPage', () => {
 
   /**
    * Signing out is done here and opens nothing, so its row carries no mark that a row opens something — and, having
-   * no mark, is set in the colour the paper gives what one may press, or it would read as inert as the newsroom's
-   * address two groups below.
+   * no mark, is set in the colour the paper gives what one may press, or it would read as inert as the line saying
+   * the reader is connected, right above it.
    */
   it('propose de se déconnecter, sans marque d’ouverture mais dans l’encre des choses qu’on presse', async () => {
     withKey();
@@ -124,11 +133,23 @@ describe('AccountPage', () => {
     await renderWithCache(<AccountPage />);
     expect(screen.queryByText('Se connecter')).toBeNull();
     expect(screen.getAllByTestId(OPENS, { includeHiddenElements: true })).toHaveLength(2);
-    // Held against a row that answers nothing, on the same card and in the same type: whichever of the two drifts,
-    // the pair stops differing and this fails. Naming a colour here would only repeat the theme.
+    // Held against a row that truly answers nothing, on the same card and in the same type: whichever of the two
+    // drifts, the pair stops differing and this fails. Naming a colour here would only repeat the theme.
     expect(styleOf(screen.getByText('Se déconnecter'))['color']).not.toBe(
-      styleOf(screen.getByText('relationlecteur@humanite.fr'))['color'],
+      styleOf(screen.getByText('Abonné connecté'))['color'],
     );
+  });
+
+  /**
+   * The two ways to reach the newsroom are handed to the phone, which is the only thing that can act on either: a
+   * printed address is one a reader has to type out again somewhere else.
+   */
+  it('confie l’adresse et le numéro du journal au téléphone', async () => {
+    await renderWithCache(<AccountPage />);
+    await fireEvent.press(screen.getByText('relationlecteur@humanite.fr'));
+    expect(jest.mocked(openExternal)).toHaveBeenCalledWith(NEWSROOM.mail);
+    await fireEvent.press(screen.getByText('01 55 84 40 30'));
+    expect(jest.mocked(openExternal)).toHaveBeenCalledWith(NEWSROOM.phone);
   });
 
   /** The screen says the reader is connected, rather than leaving them to infer it from a way out being offered. */

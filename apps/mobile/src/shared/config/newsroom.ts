@@ -14,4 +14,13 @@ export const NEWSROOM = {
    * a reader reads before it happens rather than after.
    */
   site: 'https://www.humanite.fr/',
+  /**
+   * Writing to the desk that answers readers, and calling it.
+   *
+   * Both are the same two the account screen prints, written here as the phone takes them rather than as the screen
+   * reads them: a number is dialled from its digits and an international prefix, never from the spaces a French
+   * number is read in. The screen keeps the reading; this keeps the address.
+   */
+  mail: 'mailto:relationlecteur@humanite.fr',
+  phone: 'tel:+33155844030',
 } as const satisfies Readonly<Record<string, string>>;

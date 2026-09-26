@@ -3,10 +3,11 @@ import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { hasShelf, useSetAsideCount } from '#api';
+import { NEWSROOM } from '#config';
 import { useReaderSession } from '#features/sign-in';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { NEWSSTAND_HREF, SETTINGS_HREF, SIGN_IN_HREF } from '#lib/routing';
+import { NEWSSTAND_HREF, openExternal, SETTINGS_HREF, SIGN_IN_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
@@ -39,7 +40,7 @@ const useStyles = createStyles((theme) => ({
 
 type RowProps = Readonly<{ line: DisplayText; hint: DisplayText }>;
 
-/** A row that says something and goes nowhere: the paper's own address, which the app has no way to dial. */
+/** A row that says something and goes nowhere: what the service sent that the app could not read, a connection open. */
 function InfoRow({ line, hint }: RowProps): ReactNode {
   const styles = useStyles();
   return (
@@ -49,6 +50,35 @@ function InfoRow({ line, hint }: RowProps): ReactNode {
         <Text variant="caption">{hint}</Text>
       </Box>
     </Box>
+  );
+}
+
+/**
+ * A row that hands the reader to what the phone does with it: the newsroom's address opened in their mail, its number
+ * carried to their dialler.
+ *
+ * It was printed and nothing more — the two ways to reach the paper, set out to be copied out by hand, which on a
+ * phone means typed again somewhere else. They keep the shape they had, the thing itself over what it is, and say
+ * that they lead somewhere in the colour the paper gives what one may press, as the row that signs a reader out does.
+ * No mark at the end: a chevron on this card means a screen of the app opens, and neither of these opens one.
+ */
+function ReachRow({ line, hint, url }: RowProps & Readonly<{ url: string }>): ReactNode {
+  const styles = useStyles();
+  return (
+    <Pressable
+      style={styles.row}
+      role="link"
+      onPress={() => {
+        openExternal(url);
+      }}
+    >
+      <Box style={styles.words}>
+        <Text variant="body" tone="link">
+          {line}
+        </Text>
+        <Text variant="caption">{hint}</Text>
+      </Box>
+    </Pressable>
   );
 }
 
@@ -90,9 +120,9 @@ function ActionRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: (
 /**
  * Where the reader stands with their subscription, and the one thing to do about it.
  *
- * A build that was not given the journal's key can open no connection at all, so it draws nothing here rather than a
- * row that would refuse — ADR-0032 keeps that key out of anything published, and a button leading to a refusal is
- * the same broken promise as a button leading nowhere.
+ * A build that reads the simulated corpus opens no connection at all, so it draws nothing here rather than a row that
+ * would refuse: a button leading to a refusal is the same broken promise as a button leading nowhere. Every build
+ * that reads the service carries what it takes to open one and offers it (ADR-0040).
  */
 function Subscription(): ReactNode {
   const { offered, connection, signOut } = useReaderSession();
@@ -188,9 +218,14 @@ export function AccountPage(): ReactNode {
           </Group>
         ) : null}
         <Group label={t('account.contact')}>
-          <InfoRow line={t('account.contact.mail')} hint={t('account.contact.mail.hint')} />
-          <InfoRow line={t('account.contact.phone')} hint={t('account.contact.phone.hint')} />
+          <ReachRow line={t('account.contact.mail')} hint={t('account.contact.mail.hint')} url={NEWSROOM.mail} />
+          <ReachRow line={t('account.contact.phone')} hint={t('account.contact.phone.hint')} url={NEWSROOM.phone} />
         </Group>
+        {/* Said to the reader, and not only to the service in the name this app calls itself by: the screen where
+            one signs in with a subscription is the screen where mistaking this app for the journal's own would cost
+            something. In the smallest type of the paper, at the foot, where a colophon goes — it is a fact to have
+            read once, not a warning to be met with every time. */}
+        <Text variant="caption">{t('account.unofficial')}</Text>
       </Scroll>
     </Surface>
   );

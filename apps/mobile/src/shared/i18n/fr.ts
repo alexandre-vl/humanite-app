@@ -17,6 +17,8 @@ export const FR = {
   'account.subscription': 'Mon abonnement',
   'account.title': 'Mon compte',
   'account.setAside.hint': 'Servis par le journal dans une forme que l’app ne sait pas lire.',
+  'account.unofficial':
+    'Application non officielle, sans lien avec L’Humanité ni approbation du journal. Les articles, les images et la marque lui appartiennent, ainsi qu’à leurs auteurs.',
   'action.back': 'Revenir',
   'action.retry': 'Réessayer',
   'app.name': 'L’Humanité',
