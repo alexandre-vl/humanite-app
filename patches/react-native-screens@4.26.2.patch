@@ -1,3 +1,55 @@
+diff --git a/android/src/main/java/com/swmansion/rnscreens/Screen.kt b/android/src/main/java/com/swmansion/rnscreens/Screen.kt
+index 76bb694854b29d7f779f38244cd48113b429ea1f..c89dfca99ffd9a4116177ef4aff5047157eef9cc 100644
+--- a/android/src/main/java/com/swmansion/rnscreens/Screen.kt
++++ b/android/src/main/java/com/swmansion/rnscreens/Screen.kt
+@@ -9,6 +9,7 @@ import android.util.SparseArray
+ import android.view.MotionEvent
+ import android.view.View
+ import android.view.ViewGroup
++import android.view.ViewTreeObserver
+ import android.view.WindowManager
+ import android.webkit.WebView
+ import android.widget.ImageView
+@@ -547,9 +548,39 @@ class Screen(
+         updateShadowNodeScreenSize(width, height, top + translationY.toInt())
+     }
+ 
++    /**
++     * Tells autofill about a field the reader has just put the caret in, on a screen this library mounted.
++     *
++     * Android holds the notification back when the focused view reports itself not laid out, and sends it at that
++     * view's next `layout()` (`View.java`). Attaching a screen's fragment clears the laid-out flag on every view under
++     * it — `View.onAttachedToWindow` does — and React Native lays a view out only when its frame changes, which on a
++     * screen already mounted never happens again. So the notification is never sent, no `FillRequest` ever goes out,
++     * and no password manager is ever asked: measured on a Nothing A065 (Android 16), 0 sessions in 6 tries on a
++     * screen reached by a push, against 6 in 6 on the same screen opened as the first of its stack.
++     *
++     * Laying the view out again with the bounds it already holds costs nothing — `setFrame` reports no change, so
++     * neither `onLayout` nor any layout listener runs — while the flag and the held-back notification are both flushed
++     * outside that test. It is done on the focus change rather than on the attach because the view to repair is the
++     * one being focused, and because either order then works: a view laid out before the notification would be held
++     * back is never held back at all.
++     */
++    private val layingOutTheFocusedView =
++        ViewTreeObserver.OnGlobalFocusChangeListener { _, gained ->
++            if (gained != null && !gained.isLaidOut) {
++                gained.layout(gained.left, gained.top, gained.right, gained.bottom)
++            }
++        }
++
++    override fun onDetachedFromWindow() {
++        viewTreeObserver.removeOnGlobalFocusChangeListener(layingOutTheFocusedView)
++        super.onDetachedFromWindow()
++    }
++
+     override fun onAttachedToWindow() {
+         super.onAttachedToWindow()
+ 
++        viewTreeObserver.addOnGlobalFocusChangeListener(layingOutTheFocusedView)
++
+         // Insets handler for formSheet is added onResume but it is often too late if we use input
+         // with autofocus - onResume is called after finishing animator animation.
+         // onAttachedToWindow is called before onApplyWindowInsets so we use it to set the handler
 diff --git a/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt b/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt
 index 09164900ea5b5c7dd6e330aa6cd35d5b5edaacd7..406672fadbcb97df83770a4500007d155fc0f0a6 100644
 --- a/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt

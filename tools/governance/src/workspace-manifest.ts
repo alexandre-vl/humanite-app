@@ -46,10 +46,16 @@ export const WORKSPACE_FILE: WorkspaceFile = {
       // driver on iOS divides by: on the iPhone simulator on 25/09/2026, the wire went blank and stayed so, its rows
       // still answering touches. The SDK 58 preview still tests 2.0.2.
       '@shopify/flash-list@2.0.2': 'patches/@shopify__flash-list@2.0.2.patch',
-      // Ours, not upstream's, which is unchanged in 4.28: a marked list laid in a pager registers with the tab bar
-      // when its page comes to rest on the screen, and any marked list when the reader starts dragging it. Upstream
-      // registers every marker as it reaches the window, so the front page's bar followed the section beside the one
-      // on the screen, and never shrank under it.
+      // Ours, not upstream's, which is unchanged in 4.28, and two things. A marked list laid in a pager registers
+      // with the tab bar when its page comes to rest on the screen, and any marked list when the reader starts
+      // dragging it. Upstream registers every marker as it reaches the window, so the front page's bar followed the
+      // section beside the one on the screen, and never shrank under it.
+      // And a field on a screen the reader was taken to is offered to their password manager. Attaching a screen's
+      // fragment tells every view under it that it is no longer laid out, and Android holds back the autofill
+      // notification for a focused view in that state until its next layout — which React Native never runs again,
+      // the frame not having moved. So no request ever reached the manager: measured on a Nothing A065 (Android 16),
+      // 0 sessions in 6 goes to the sign-in screen through the account, 6 in 6 with the patch, 0 in 6 again with it
+      // taken out and the same build made again (26/09/2026). Upstream has it open as #4612, unfixed on main.
       'react-native-screens@4.26.2': 'patches/react-native-screens@4.26.2.patch',
     },
   },
