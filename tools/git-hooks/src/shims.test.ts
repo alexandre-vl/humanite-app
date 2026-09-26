@@ -32,7 +32,8 @@ test('a shim without its entry exits 1 with the reason on stderr', async () => {
   await using directory = await temporaryDirectory('hooks-shim');
   const shim = join(directory.path, 'pre-commit');
   await writeFile(shim, renderShim('pre-commit', COMMAND), { mode: 0o755 });
-  const result = await capture('sh', [shim], { cwd: directory.path, timeoutMs: SHIM_TIMEOUT_MS });
+  // Started as git starts a hook: by its own path, its first line naming the shell.
+  const result = await capture(shim, [], { cwd: directory.path, timeoutMs: SHIM_TIMEOUT_MS });
   expect(result.exit).toEqual({ kind: 'exited', code: 1 });
   expect(result.stderr.toString('utf8')).toBe(
     `Hook git pre-commit refusé : node_modules/.bin/node ou tools/x/hook.ts introuvable dans ${directory.path}. Lancer pnpm install dans ce worktree.\n`,

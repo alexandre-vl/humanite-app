@@ -1,3 +1,4 @@
+import type { ChildProcess, SpawnOptions } from 'node:child_process';
 import { spawn } from 'node:child_process';
 import { decodeUtf8 } from './text.ts';
 
@@ -102,12 +103,30 @@ export const describeExit = (exit: Exit): string => {
 type OutputMode = 'captured' | 'attached';
 
 /**
- * Runs `command` without a shell and resolves how it ended; never rejects. Every child leads its own process group, so
+ * How a child starts, and the name an error gives it. A program and a script each start by their own call to `spawn`,
+ * and nothing crosses from one to the other: what a program is given never reaches the call that starts a shell, where
+ * a reader of this code, or an analyser, would have to prove it is not read as a script.
+ */
+type Launch = Readonly<{ name: string; start: (options: SpawnOptions) => ChildProcess }>;
+
+/** `command` started directly, with `args` as its arguments: no shell ever reads them. */
+const program = (command: string, args: readonly string[]): Launch => ({
+  name: [command, ...args].join(' '),
+  start: (options) => spawn(command, args, options),
+});
+
+/** `script` given to `/bin/sh` with no argument: what it works on reaches it through its environment. */
+const shellScript = (script: string): Launch => ({
+  name: `sh -c ${script}`,
+  start: (options) => spawn('/bin/sh', ['-c', script], options),
+});
+
+/**
+ * Starts what `launch` names and resolves how it ended; never rejects. Every child leads its own process group, so
  * stopping it also stops what it started: SIGTERM, then SIGKILL.
  */
 async function supervise(
-  command: string,
-  args: readonly string[],
+  launch: Launch,
   options: ChildBase & Readonly<{ input?: string | Uint8Array; timeoutMs?: number; signal?: AbortSignal }>,
   mode: OutputMode,
   started: (pid: number) => void = () => undefined,
@@ -118,7 +137,7 @@ async function supervise(
   }
   const graceMs = options.killGraceMs ?? KILL_GRACE_MS;
   return new Promise<Captured>((resolve) => {
-    const child = spawn(command, args, {
+    const child = launch.start({
       cwd: options.cwd,
       env: options.env ?? process.env,
       // An attached child in its own process group must not read the terminal, which would stop it.
@@ -208,7 +227,7 @@ async function supervise(
 
 /** Runs `command` without a shell, feeds it `input` and collects both outputs; never rejects. */
 export const capture = async (command: string, args: readonly string[], options: ProcessOptions): Promise<Captured> =>
-  supervise(command, args, options, 'captured');
+  supervise(program(command, args), options, 'captured');
 
 export type RunOptions = ProcessOptions &
   Readonly<{
@@ -236,26 +255,43 @@ export class ProcessError extends Error {
   }
 }
 
-const describeCommand = (command: string, args: readonly string[]): string => [command, ...args].join(' ');
-
-/** Runs `command` like `capture` and resolves only when it exited with a success code. */
-export async function run(command: string, args: readonly string[], options: RunOptions): Promise<RunResult> {
-  const captured = await capture(command, args, options);
+/** Starts what `launch` names like `capture`, and resolves only when it exited with a success code. */
+async function runLaunch(launch: Launch, options: RunOptions): Promise<RunResult> {
+  const captured = await supervise(launch, options, 'captured');
   const successCodes = options.successCodes ?? [0];
   if (captured.exit.kind === 'exited' && successCodes.includes(captured.exit.code)) {
     return { exitCode: captured.exit.code, stdout: captured.stdout, stderr: captured.stderr };
   }
-  throw new ProcessError(describeCommand(command, args), captured);
+  throw new ProcessError(launch.name, captured);
+}
+
+/** Standard output of a successful run as text; output that is not valid UTF-8 is an error, never a guess. */
+async function launchText(launch: Launch, options: RunOptions): Promise<string> {
+  const { stdout } = await runLaunch(launch, options);
+  const text = decodeUtf8(stdout);
+  if (text === null) {
+    throw new Error(`${launch.name} : sortie qui n’est pas de l’UTF-8 valide`);
+  }
+  return text;
+}
+
+/** Runs `command` like `capture` and resolves only when it exited with a success code. */
+export async function run(command: string, args: readonly string[], options: RunOptions): Promise<RunResult> {
+  return runLaunch(program(command, args), options);
 }
 
 /** Standard output of a successful run as text; output that is not valid UTF-8 is an error, never a guess. */
 export async function runText(command: string, args: readonly string[], options: RunOptions): Promise<string> {
-  const { stdout } = await run(command, args, options);
-  const text = decodeUtf8(stdout);
-  if (text === null) {
-    throw new Error(`${describeCommand(command, args)} : sortie qui n’est pas de l’UTF-8 valide`);
-  }
-  return text;
+  return launchText(program(command, args), options);
+}
+
+/**
+ * `runText` for a script of `/bin/sh`: the one way a child runs through a shell, for a command line written for one —
+ * a hook command of the settings, run as Claude Code runs it. The script takes no argument: what it works on reaches
+ * it through its environment, never through its text.
+ */
+export async function runScriptText(script: string, options: RunOptions): Promise<string> {
+  return launchText(shellScript(script), options);
 }
 
 /**
@@ -263,7 +299,7 @@ export async function runText(command: string, args: readonly string[], options:
  * budget or an abort stops it as `capture` would.
  */
 export async function runAttached(command: string, args: readonly string[], options: AttachedOptions): Promise<Exit> {
-  return (await supervise(command, args, options, 'attached')).exit;
+  return (await supervise(program(command, args), options, 'attached')).exit;
 }
 
 /** A child that runs beside its caller, for as long as the caller needs its process: disposing it stops it. */
@@ -284,8 +320,9 @@ export type Helper = AsyncDisposable &
 export async function startHelper(command: string, args: readonly string[], options: HelperOptions): Promise<Helper> {
   const controller = new AbortController();
   const { promise: spawned, resolve } = Promise.withResolvers<number | null>();
-  const ended = supervise(command, args, { ...options, signal: controller.signal }, 'captured', resolve);
-  const name = describeCommand(command, args);
+  const launch = program(command, args);
+  const ended = supervise(launch, { ...options, signal: controller.signal }, 'captured', resolve);
+  const { name } = launch;
   const pid = await Promise.race([spawned, ended.then(() => null)]);
   if (pid === null) {
     throw new ProcessError(name, await ended);

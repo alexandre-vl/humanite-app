@@ -7,7 +7,7 @@ import type { FileTree } from '@huma/fixtures';
 import { createRepository, fixtureFactory } from '@huma/fixtures';
 import { temporaryDirectory } from '@huma/kit/fs';
 import { arrayField, objectField, parseJson, stringField } from '@huma/kit/json';
-import { runText } from '@huma/kit/process';
+import { runScriptText } from '@huma/kit/process';
 import { isRecord } from '@huma/unknown';
 import { ADR_INDEX_ARTIFACT, checkArtifacts } from '../artifacts.ts';
 import type { GovernanceCode } from '../checks.ts';
@@ -52,7 +52,7 @@ async function hookCommand(
   input: Readonly<Record<string, unknown>>,
   signal: AbortSignal,
 ): Promise<readonly GovernanceProofCode[]> {
-  const output = await runText('sh', ['-c', settingsCommand(event)], {
+  const output = await runScriptText(settingsCommand(event), {
     cwd: REPOSITORY_ROOT,
     env: { ...process.env, CLAUDE_PROJECT_DIR: REPOSITORY_ROOT.replace(/\/$/u, '') },
     input: JSON.stringify({ hook_event_name: event, cwd: REPOSITORY_ROOT, ...input }),
