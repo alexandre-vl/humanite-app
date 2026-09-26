@@ -1205,4 +1205,54 @@ export const BINDINGS = {
       R5: ['structure/insignificant-slice', 'guardrail/module-zustand-page-exempt'],
     },
   },
+  'ADR-0037': {
+    scope: {
+      // What ADR-0035 governed, which this ADR supersedes, less the local answer to a question that it retires: the
+      // queries and the head-first page of an article, the lists that ask when a finger lands, the press that reports
+      // the landing, and the app's own opening. And what a search now waits with: the stand-in of a feed, the field
+      // whose rule says the journal is looking, and the rule itself.
+      paths: [
+        'apps/mobile/src/entities/article/api/queries.ts',
+        'apps/mobile/src/entities/article/model/known.ts',
+        'apps/mobile/src/entities/article/model/paged-feed.ts',
+        'apps/mobile/src/entities/article/ui/article-reader.tsx',
+        'apps/mobile/src/entities/article/ui/prose-stand-in.tsx',
+        'apps/mobile/src/entities/article/ui/article-feed.tsx',
+        'apps/mobile/src/entities/article/ui/article-wire.tsx',
+        'apps/mobile/src/entities/article/ui/feed-stand-in.tsx',
+        'apps/mobile/src/pages/article/ui/article-page.tsx',
+        'apps/mobile/src/pages/search/ui/search-page.tsx',
+        'apps/mobile/src/pages/search/ui/search-field.tsx',
+        'apps/mobile/src/shared/ui/primitives/progress/progress.tsx',
+        'apps/mobile/src/shared/ui/primitives/pressable/pressable.tsx',
+        'apps/mobile/src/shared/ui/primitives/curtain/curtain.tsx',
+        'apps/mobile/src/shared/ui/primitives/breathing/breathing.tsx',
+        'apps/mobile/src/_app/routes/opening.tsx',
+        'apps/mobile/src/_app/routes/startup-gate.tsx',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'L’écran d’un article montre ce que l’app en sait avant que le journal ne réponde : le résumé lu dans une liste du cache, que rend useReadSummary (apps/mobile/src/entities/article/model/known.ts) par summaryAmongRead, ou l’article gardé dans les Lectures, passés au lecteur comme sa tête. Un test d’article-page.test.tsx tient la réponse du journal en suspens et trouve déjà le titre de l’article gardé.',
+      },
+      R2: {
+        convention:
+          'La page de recherche lit une seule requête, searchQuery, et ne tend à sa liste que ce qu’elle rend (apps/mobile/src/pages/search/ui/search-page.tsx) : rien d’autre ne tient lieu de réponse. search-page.test.tsx garnit le cache d’articles qui portent la question et vérifie qu’aucun ne s’affiche tant que le journal cherche, quand il ne trouve rien, ni quand il ne répond pas, et qu’une réponse revenue en retard ne s’affiche pas sous la question suivante.',
+      },
+      R3: {
+        convention:
+          'Tant que le journal n’a pas répondu, FeedStandIn dresse les silhouettes que la liste lui donne, et le trait sous le champ fait courir son segment et se dit « Le journal cherche … » à VoiceOver (clé search.asking d’apps/mobile/src/shared/i18n/fr.ts) ; un échec se dit par sa cause, une réponse vide par la question posée. search-page.test.tsx écoute l’annonce et compte les silhouettes.',
+      },
+      R4: {
+        convention:
+          'Une relecture garde les pages lues : TanStack Query ne rend le statut pending qu’à une lecture sans aucune donnée, et stateOf (apps/mobile/src/entities/article/model/paged-feed.ts) n’en tire l’attente que dans ce cas ; l’indicateur de la plateforme tourne pendant la relecture demandée, la liste restant dessous. Une question nouvelle est une autre lecture, que des silhouettes attendent.',
+      },
+      R5: ['guardrail/reading-press', 'guardrail/reading-press-exempt'],
+      R6: {
+        convention:
+          'L’ouverture ne compte son plancher qu’une fois le téléphone dessaisi : le portail attend la réponse de hideAsync avant de dire shown, et apps/mobile/src/_app/routes/opening.tsx part de là pour ses 650 ms — un quart de seconde dû au lecteur, plus les 350 ms au pire que le téléphone met à retirer son champ après avoir répondu. Deux tests de startup-gate.test.tsx tiennent les deux bouts : un téléphone qui ne répond jamais garde l’ouverture, un téléphone qui répond la voit partir.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;
