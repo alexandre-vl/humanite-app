@@ -6,7 +6,7 @@ import type { ConfigPlugin } from 'expo/config-plugins.js';
  * The version of the app, and of the release that ships it: a tag `vX.Y.Z` publishes `X.Y.Z`, and the release workflow
  * refuses a tag this line does not name (`.github/workflows/release.yml`).
  */
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 
 /**
  * The integer Android orders two builds of one app by, and refuses to install a lower one over: each part of the
