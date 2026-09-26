@@ -1,7 +1,7 @@
 # Une release sort d'un tag vX.Y.Z posé sur un commit de main dont la CI est verte, et dont l'app porte la même
-# version (apps/mobile/app.config.ts). Elle publie ce que la CI construit — la variante de service, qui lit le journal
-# comme un passant, sans clé ni connexion d'abonné — : l'APK Android signé par la clé de release, l'app pour le
-# simulateur iOS, leurs sommes SHA-256 et une attestation de provenance.
+# version (apps/mobile/app.config.ts). Elle publie ce que la CI construit — la variante de service, qui ouvre la
+# connexion de l'abonné sous la clé publique du client (ADR-0040) — : l'APK Android signé par la clé de release, l'app
+# pour le simulateur iOS, leurs sommes SHA-256 et une attestation de provenance.
 name: Release
 
 on:
@@ -244,9 +244,9 @@ jobs:
           range="${previous:+${previous}..}${tag}"
           notes="${RUNNER_TEMP}/notes.md"
           cat > "${notes}" <<'EOF'
-          > **Client non officiel** de _L'Humanité_, ni affilié au journal ni approuvé par lui. Cette version lit le
-          > service du journal comme un passant : les articles libres s'ouvrent, les articles réservés restent fermés, et
-          > la connexion de l'abonné n'y est pas.
+          > **Client non officiel**, sans lien avec _L'Humanité_ ni approbation du journal. Les articles, les images et
+          > la marque appartiennent au journal, ainsi qu'à leurs auteurs. Pour lire un article réservé aux abonnés, il
+          > faut se connecter avec son compte.
 
           EOF
           git tag -l --format='%(contents:body)' "${tag}" >> "${notes}"

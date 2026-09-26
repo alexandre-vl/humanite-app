@@ -1,6 +1,7 @@
 # La CI rejoue sur le serveur ce que les hooks font en local, et ce qu'ils ne font pas : chercher un secret dans tout
 # l'historique, et construire l'app en natif depuis un clone propre, sans aucun secret. Les builds sont celles qu'une
-# release publie : la variante de service, qui lit le journal comme un passant — sans clé ni connexion d'abonné.
+# release publie : la variante de service, qui ouvre la connexion de l'abonné sous la clé publique du client
+# (ADR-0040).
 name: CI
 
 on:
