@@ -77,10 +77,10 @@ Les listes déjà lues sont écrites sur le disque et relues au démarrage : ell
 annonces de VoiceOver, sort d'un dictionnaire français typé et composé à la française
 ([ADR-0013](docs/adr/0013-textes-ui-en-dictionnaire-francais-type.md)).
 
-## Le lecteur ne regarde jamais le journal se charger
+## Le lecteur n'attend devant rien de vide ni de faux
 
 C'est la décision qui donne son caractère à l'app
-([ADR-0035](docs/adr/0035-le-lecteur-ne-regarde-jamais-le-journal-se-charger.md)). Mesuré le 24/09/2026 contre le
+([ADR-0037](docs/adr/0037-le-lecteur-n-attend-devant-rien-de-vide-ni-de-faux.md)). Mesuré le 24/09/2026 contre le
 service : la recherche du journal répond en 1 552 à 1 923 ms et ne se sert jamais d'un cache, et l'ouverture de l'app
 prend 1 203 à 1 765 ms pour un budget de 1 500. Aucune app ne rend ce service plus rapide ; elle peut, en revanche,
 ne jamais laisser le lecteur face au vide :
