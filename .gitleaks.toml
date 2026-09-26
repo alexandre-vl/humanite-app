@@ -1,0 +1,15 @@
+# La recherche de secrets de la CI : les règles de gitleaks, et les seuls faux positifs que l'historique leur montre,
+# chacun nommé et borné à sa forme. Rien d'autre ne s'y ajoute sans avoir été lu.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Les secrets inventés des preuves de la capture : chacun y est faux par construction, pour prouver que la lecture l'arrête."
+paths = ['''^tools/capture/src/proofs/secrets\.ts$''']
+
+[[allowlists]]
+description = "Les clés des visuels du corpus fictif, rubrique-article-nom : des noms, que la règle générique prend pour des clés."
+targetRules = ["generic-api-key"]
+regexTarget = "line"
+regexes = ['''^\s*key: '[a-z]{3}-[ab][0-9]+(?:-[a-z0-9]+)+',$''']
