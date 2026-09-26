@@ -17,7 +17,8 @@ astreinte ni prime : chaque signalement privé est lu, et une faille confirmée 
   service ; une faille du service se signale au journal, pas ici.
 - **Un secret trouvé** dans un fichier ou dans l'historique se signale en privé, même s'il semble expiré.
 
-Seule la branche `main` est maintenue. L'app n'est publiée sur aucun store.
+Seules `main` et la dernière release sont maintenues. L'app n'est sur aucun store : ses versions sortent en
+[releases](https://github.com/alexandre-vl/humanite-app/releases), sans clé ni connexion d'abonné.
 
 ## Ce que le dépôt fait déjà
 
@@ -28,6 +29,10 @@ Seule la branche `main` est maintenue. L'app n'est publiée sur aucun store.
 - À chaque push et à chaque pull request, la CI cherche les secrets dans tout l'historique avec gitleaks ; GitHub
   bloque au push les secrets qu'il reconnaît.
 - Les actions de la CI sont épinglées par SHA, et son jeton ne fait que lire.
+- Un APK de release est signé par une clé privée, que seul le job de release lit, depuis un tag `v*`. Le certificat a
+  pour empreinte SHA-256 `b58a1ae9db2379bea06357aa187bed8ffd3b9f6c879ad8e522d6a4058879971e` : un APK signé par une
+  autre clé n'est pas l'un des nôtres. Chaque binaire porte une attestation de provenance
+  (`gh attestation verify <fichier> -R alexandre-vl/humanite-app`).
 - Le jeton de l'abonné vit dans le trousseau du téléphone
   ([ADR-0034](docs/adr/0034-le-jeton-de-l-abonne-dans-le-trousseau-du-telephone.md)).
 - Un article réservé ne s'ouvre que sur le droit que le service accorde : le serveur n'envoie aucun corps sans ce

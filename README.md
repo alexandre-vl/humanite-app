@@ -6,6 +6,7 @@
 </picture>
 
 [![CI](https://github.com/alexandre-vl/humanite-app/actions/workflows/ci.yml/badge.svg)](https://github.com/alexandre-vl/humanite-app/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/alexandre-vl/humanite-app?label=release&color=f13c47)](https://github.com/alexandre-vl/humanite-app/releases/latest)
 [![Licence](https://img.shields.io/badge/licence-PolyForm%20Noncommercial%201.0.0-4c3f57)](LICENSE)
 ![Expo SDK 57](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)
 ![React Native 0.86](https://img.shields.io/badge/React%20Native-0.86%20%C2%B7%20New%20Architecture-61DAFB?logo=react&logoColor=black)
@@ -27,7 +28,8 @@ l'app sait déjà, et chaque règle du dépôt écrite dans une décision puis p
 Ce n'est pas seulement une app. C'est une manière de la construire : **un dépôt qui se défend tout seul.**
 
 > Client non officiel du service du journal ([ADR-0027](docs/adr/0027-client-non-officiel-de-l-api-l-humanite.md)),
-> en développement, non publié.
+> ni affilié au journal ni approuvé par lui. Ses versions sortent en
+> [releases](https://github.com/alexandre-vl/humanite-app/releases), hors de tout store.
 
 ## Cinq refus
 
@@ -129,9 +131,10 @@ flowchart LR
   qu'il enfreint — pas de décision d'ADR, pas de contournement des hooks, pas d'écriture directe dans `.git`
   ([ADR-0009](docs/adr/0009-permissions-des-agents.md), [AGENTS.md](AGENTS.md)).
 - **Le serveur rejoue tout** : chaque push et chaque pull request repassent `pnpm verify` sur un clone complet,
-  cherchent un secret dans tout l'historique et construisent l'app pour Android et iOS sans aucune variable
+  cherchent un secret dans tout l'historique et construisent l'app pour Android et iOS sans aucun secret
   ([CI](.github/workflows/ci.yml)) ; `main` refuse la réécriture et la suppression, et une pull request ne s'y fusionne
-  que verte, par rebase.
+  que verte, par rebase. Une version sort d'un tag posé sur un commit vert, à la version que l'app porte : APK signé par
+  une clé privée, sommes SHA-256 et attestation de provenance ([Release](.github/workflows/release.yml)).
 
 ## Architecture
 
@@ -205,6 +208,10 @@ docs/app-actuelle/        l'app officielle 6.2.0, en 20 captures annotées
 
 ## Démarrer
 
+**Essayer l'app sans rien construire** : la [dernière release](https://github.com/alexandre-vl/humanite-app/releases/latest)
+porte un APK Android signé et l'app pour le simulateur iOS. Elles lisent le journal comme un passant : articles libres,
+sans connexion d'abonné.
+
 ```bash
 pnpm install          # pnpm 11.27.1 ; Node 24.21.0, que pnpm télécharge au besoin
 pnpm hooks:install    # les hooks git du dépôt
@@ -244,11 +251,12 @@ Les commandes du dépôt, chacune avec son rôle, sont dans [AGENTS.md](AGENTS.m
 
 ## Le cap
 
-L'app n'est pas publiée. Elle le sera sans dette — chaque décision écrite, chaque règle prouvée. D'ici là :
+L'app n'est sur aucun store : ses versions sortent en releases GitHub, qui lisent le journal comme un passant. Elle
+avance sans dette — chaque décision écrite, chaque règle prouvée. D'ici là :
 
 - [ ] **Une clé à elle.** La connexion de l'abonné passe aujourd'hui sous une clé prêtée, pour les tests
-      ([ADR-0032](docs/adr/0032-la-connexion-de-l-abonne-sous-une-cle-pretee.md)) : rien ne sort avant qu'une clé
-      dédiée la remplace.
+      ([ADR-0032](docs/adr/0032-la-connexion-de-l-abonne-sous-une-cle-pretee.md)) : aucune release ne la porte, et la
+      connexion n'y entrera qu'avec une clé dédiée.
 - [ ] **Tout le service de l'abonné.** Les routes `store/*` et `drm/*`, qui portent le jeton de l'abonné, restent à
       lire ; le kiosque, qui ouvre aujourd'hui chaque numéro sur humanite.fr, pourrait alors les ouvrir dans l'app.
 - [ ] **Des budgets tenus sur de vrais téléphones**, en build de production, relevés dans le journal de la session qui

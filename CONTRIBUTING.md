@@ -47,6 +47,20 @@ garde qu'en local.
 - Pas de commit de fusion : la PR est fusionnée par rebase et l'historique reste linéaire. Mettez votre branche à jour
   par `git rebase`, jamais par un merge ni par le bouton « Update branch » en mode merge.
 
+## Publier une version
+
+Réservé au mainteneur, seul à pouvoir poser un tag `v*`.
+
+1. Monter `VERSION` dans `apps/mobile/app.config.ts` — le code de version Android en découle —, commiter, pousser.
+2. Attendre que la CI soit verte sur ce commit de `main`.
+3. Poser et pousser le tag : `git tag -a vX.Y.Z -m "vX.Y.Z" -m "Ce que la version apporte."`, puis
+   `git push origin vX.Y.Z`.
+
+Le workflow [Release](.github/workflows/release.yml) refuse un tag qui ne nomme pas la version de l'app, qui n'est pas
+sur `main`, ou dont la CI n'est pas verte. Il construit l'APK, le signe par la clé de release, construit l'app pour le
+simulateur iOS, puis publie la release avec leurs sommes SHA-256, une attestation de provenance, et les commits `feat`,
+`fix` et `perf` depuis la version précédente.
+
 ## Ce qui n'entre jamais dans le dépôt
 
 - **Un secret** : clé, jeton, identifiant, mot de passe, même expiré. L'identité que l'app présente au service passe au

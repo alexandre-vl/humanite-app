@@ -2,6 +2,20 @@ import type { ExpoConfig } from 'expo/config/index.js';
 import { CodeGenerator, IOSConfig, withAppDelegate, withInfoPlist, withMainActivity } from 'expo/config-plugins.js';
 import type { ConfigPlugin } from 'expo/config-plugins.js';
 
+/**
+ * The version of the app, and of the release that ships it: a tag `vX.Y.Z` publishes `X.Y.Z`, and the release workflow
+ * refuses a tag this line does not name (`.github/workflows/release.yml`).
+ */
+const VERSION = '0.1.0';
+
+/**
+ * The integer Android orders two builds of one app by, and refuses to install a lower one over: each part of the
+ * version on two digits, so 0.1.0 is 100 and 1.2.3 is 10203. Written by hand, it would be one more line to forget at
+ * every release, and a phone that got 0.2.0 at the same number as 0.1.0 could not tell the two apart.
+ */
+const versionCode = (version: string): number =>
+  version.split('.').reduce((code, part) => code * 100 + Number.parseInt(part, 10), 0);
+
 /** How the block merged into the generated activity is named, so a later prebuild replaces it rather than doubling it. */
 const FAST_FRAMES = 'humanite-fast-frames';
 
@@ -170,7 +184,7 @@ const config: ExpoConfig = {
   name: 'L’Humanité',
   slug: 'humanite',
   scheme: 'humanite',
-  version: '0.0.0',
+  version: VERSION,
   platforms: ['ios', 'android'],
   orientation: 'portrait',
   // The paper's own mark, as the journal draws it: a red square with the H of its masthead in white. It is taken from
@@ -185,6 +199,7 @@ const config: ExpoConfig = {
   ios: { bundleIdentifier: 'dev.humanite.app' },
   android: {
     package: 'dev.humanite.app',
+    versionCode: versionCode(VERSION),
     // The mark again, as the two pieces Android asks for since Oreo: the foreground it masks to whatever shape the
     // launcher uses, and the ground behind it. The foreground already carries the red square, so the ground is only
     // seen where the mask cuts past its corners, and it is the same red.

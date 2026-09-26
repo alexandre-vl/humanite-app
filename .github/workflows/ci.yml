@@ -1,6 +1,6 @@
 # La CI rejoue sur le serveur ce que les hooks font en local, et ce qu'ils ne font pas : chercher un secret dans tout
-# l'historique, et construire l'app en natif depuis un clone propre, sans aucune variable. Une build sans variable lit
-# le corpus fictif, et ne porte ni clé ni contenu du journal.
+# l'historique, et construire l'app en natif depuis un clone propre, sans aucun secret. Les builds sont celles qu'une
+# release publie : la variante de service, qui lit le journal comme un passant — sans clé ni connexion d'abonné.
 name: CI
 
 on:
@@ -69,6 +69,8 @@ jobs:
     name: build Android
     runs-on: ubuntu-24.04
     timeout-minutes: 75
+    env:
+      EXPO_PUBLIC_CONTENT_SOURCE: service
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -120,6 +122,8 @@ jobs:
     name: build iOS
     runs-on: macos-26
     timeout-minutes: 90
+    env:
+      EXPO_PUBLIC_CONTENT_SOURCE: service
     defaults:
       run:
         shell: bash
