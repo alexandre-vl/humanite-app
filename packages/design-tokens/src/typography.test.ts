@@ -1,6 +1,7 @@
 import { expect, expectTypeOf, test } from 'vitest';
 import type { PhoneText } from './phone-text.ts';
 import type { TextVariant, Typography } from './typography.ts';
+import { FACE_METRICS, FACE_SETS, LINE_HEIGHTS } from './tokens.ts';
 import { TEXT_SCALES, TEXT_VARIANTS, typographyAt } from './typography.ts';
 
 /** A role as the paper sets it, at the step nobody has moved: the table as it stood before a reader could touch it. */
@@ -61,6 +62,39 @@ test('a headline is set at the size a phone sets a headline, and led as one', ()
   expect(paper('headline').size).toBe(28);
   expect(paper('headline').size).toBe(paper('masthead').size);
   expect(paper('headline').leading).toBeLessThanOrEqual(1.25); // Guardian 1,15 · BBC 34/28 = 1,21
+});
+
+/**
+ * A headline is led tighter than its face is tall, and iOS keeps the whole of the descent under its first line and
+ * draws nothing of what rises above the box left over it. Measured on the iPhone simulator on 26/09/2026, Anton at 28
+ * points set at 1.15 kept 69 px at 3 px a point over its first baseline — 23.0 points, what its metrics leave — where
+ * its capitals rise 24.3 and its Å 34.4. The room it keeps is what lies between, so that the tallest letter is whole.
+ */
+test('a headline keeps room over its first line for the tallest letter of its face', () => {
+  const anton = FACE_METRICS.paper.display;
+  const headline = paper('headline');
+  const kept = headline.size * (headline.leading - anton.descent / anton.unitsPerEm);
+  expect(kept).toBeCloseTo(23, 1);
+  expect(kept + headline.size * headline.overhang).toBeCloseTo((headline.size * anton.peak) / anton.unitsPerEm);
+});
+
+/**
+ * Only a title is led tighter than its face is tall: every other role holds the tallest letter of its face in the line
+ * it is given, and must keep no room over it. Yoga centres an item of a wrapping row by its box without its margins
+ * (`CalculateLayout.cpp:2003`), so small print given room there dropped by half of it — a card's kicker and date a
+ * point lower than they stood, on the iPhone simulator on 26/09/2026.
+ */
+test('no role but a title keeps room over its first line', () => {
+  for (const faces of FACE_SETS) {
+    for (const variant of TEXT_VARIANTS) {
+      const role = typographyAt(variant, 'normal', faces);
+      expect({ variant, faces, room: role.leading > LINE_HEIGHTS.tight ? role.overhang : 0 }).toEqual({
+        variant,
+        faces,
+        room: 0,
+      });
+    }
+  }
 });
 
 /**

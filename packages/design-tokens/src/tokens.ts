@@ -109,6 +109,35 @@ export const FONT_FAMILIES = {
 } as const satisfies Readonly<Record<FaceSet, Readonly<Record<Face, FontFamily>>>>;
 
 /**
+ * How a face stands on its line, in the units of its own file: how far it reaches above its baseline and below it in
+ * the metrics a phone lays a line out with (the `hhea` table), and how high its tallest letter from Basic Latin to
+ * Latin-1 rises — every letter of French, and of the Western languages whose names the paper quotes, with the marks
+ * over them. The numbers are the vendored files' own, and the app's font test reads them there again.
+ */
+export type FaceMetrics = Readonly<{ unitsPerEm: number; ascent: number; descent: number; peak: number }>;
+
+// Anton rises highest in its Å; the upright weights of Overpass in their Ý, its italic a hair above; Atkinson
+// Hyperlegible in its Û, its Á and its Ý.
+const ANTON = { unitsPerEm: 2048, ascent: 2409, descent: 674, peak: 2516 } as const satisfies FaceMetrics;
+const OVERPASS = { unitsPerEm: 2000, ascent: 1766, descent: 766, peak: 1842 } as const satisfies FaceMetrics;
+const OVERPASS_ITALIC = { unitsPerEm: 2000, ascent: 1766, descent: 766, peak: 1844 } as const satisfies FaceMetrics;
+const ATKINSON_REGULAR = { unitsPerEm: 1000, ascent: 950, descent: 290, peak: 867 } as const satisfies FaceMetrics;
+const ATKINSON_ITALIC = { unitsPerEm: 1000, ascent: 950, descent: 290, peak: 879 } as const satisfies FaceMetrics;
+const ATKINSON_BOLD = { unitsPerEm: 1000, ascent: 950, descent: 290, peak: 885 } as const satisfies FaceMetrics;
+
+/** The metrics of each face, by set: the file `FONT_FAMILIES` names at the same place. */
+export const FACE_METRICS = {
+  paper: { light: OVERPASS, lightItalic: OVERPASS_ITALIC, regular: OVERPASS, bold: OVERPASS, display: ANTON },
+  legible: {
+    light: ATKINSON_REGULAR,
+    lightItalic: ATKINSON_ITALIC,
+    regular: ATKINSON_REGULAR,
+    bold: ATKINSON_BOLD,
+    display: ATKINSON_BOLD,
+  },
+} as const satisfies Readonly<Record<FaceSet, Readonly<Record<Face, FaceMetrics>>>>;
+
+/**
  * How far a role opens its letters, as a share of its own size rather than a length.
  *
  * It is a ratio for the same reason a line height is: a role is set at four sizes, one per reader step, and a spacing

@@ -3,8 +3,8 @@ import { fontSize } from './brand.ts';
 import type { PhoneText } from './phone-text.ts';
 import { phoneSize, UNMOVED_PHONE } from './phone-text.ts';
 import type { Theme } from './theme.ts';
-import type { Face, FaceSet } from './tokens.ts';
-import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, TRACKING } from './tokens.ts';
+import type { Face, FaceMetrics, FaceSet } from './tokens.ts';
+import { FACE_METRICS, FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, TRACKING } from './tokens.ts';
 
 /**
  * The colours a run of text paints with: the subset of the theme's roles a text style may name.
@@ -53,6 +53,8 @@ export type Typography = Readonly<{
   tone: TextTone;
   caps: boolean;
   tracking: Tracking;
+  /** How far the tallest character of the face rises above the box its first line is given, as a share of the size. */
+  overhang: number;
 }>;
 
 /**
@@ -197,6 +199,27 @@ const FACTORS = {
 } as const satisfies Readonly<Record<TextScale, number>>;
 
 /**
+ * How far the tallest character of a face rises above the box its first line is given, as a share of its size: nothing
+ * when the box holds it.
+ *
+ * A line set shorter than its face — every title of the paper, at 1.15 — is laid out on iOS with the whole of the
+ * face's descent kept under the baseline and the ascent cut to what is left, React Native centring only a line taller
+ * than its face (`RCTAttributedTextUtils.mm:334`); and a text draws nothing outside its own box. On the iPhone
+ * simulator on 26/09/2026, an article's headline in Anton at 28 points kept 23.0 points over its first baseline where
+ * its capitals rise 24.3 and an É 30.8: the top of every capital was cut flat, « Saignée » kept a stub of its accent,
+ * and a card's title in Overpass Bold printed « États-Unis » as « Etats-Unis ». Android shares the difference out above
+ * and below the letters as the web does (`CustomLineHeightSpan.kt:41`), which leaves more above them: what iOS needs is
+ * enough on both.
+ */
+const overhangOf = (face: FaceMetrics, leading: LineHeight): number => {
+  const ascent = face.ascent / face.unitsPerEm;
+  const descent = face.descent / face.unitsPerEm;
+  const natural = ascent + descent;
+  const above = leading < natural ? leading - descent : (leading - natural) / 2 + ascent;
+  return Math.max(0, face.peak / face.unitsPerEm - above);
+};
+
+/**
  * A variant as it is set at a chosen step: its own face, tone and line-height multiple, at the size the step gives.
  *
  * The arithmetic is here and not in the app because a size is a branded token, and only this package mints one; an
@@ -233,5 +256,6 @@ export const typographyAt = (
     tone: role.tone,
     caps: role.caps ?? false,
     tracking: role.tracking ?? TRACKING.none,
+    overhang: overhangOf(FACE_METRICS[faces][role.face], role.leading),
   };
 };

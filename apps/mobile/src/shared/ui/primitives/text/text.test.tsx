@@ -39,6 +39,30 @@ describe('Text', () => {
     expect((await paperAt('huge'))['lineHeight']).toBeCloseTo(32); // 20 × 1.6
   });
 
+  /**
+   * A headline is led tighter than its face is tall, and the letters of its first line rose above the box they were
+   * given, which a text draws nothing outside of: on the iPhone simulator on 26/09/2026, « Saignée » kept a stub of its
+   * accent and every capital lost its top. The box reaches up by what the tallest letter of Anton needs over the line —
+   * its Å, 34.4 points over the baseline where the line keeps 23.0, so 11.4 rounded up to the point — and is drawn
+   * back up by as much.
+   */
+  it('laisse à la première ligne d’un titre la place de sa plus haute lettre, sans rien déplacer autour', async () => {
+    await render(
+      <TypesettingProvider typesetting={{ scale: 'normal', faces: 'paper', phone: UNMOVED_PHONE }}>
+        <Text variant="headline">{asDisplayText(WORDS)}</Text>
+      </TypesettingProvider>,
+    );
+    const style = styleOf(screen.getByText(WORDS));
+    expect(style['paddingTop']).toBe(12);
+    expect(style['marginTop']).toBe(-12);
+  });
+
+  it('ne garde rien au-dessus d’une ligne qui tient déjà toutes ses lettres', async () => {
+    const style = await setAs({ scale: 'normal', faces: 'legible', phone: UNMOVED_PHONE });
+    expect(style).not.toHaveProperty('paddingTop');
+    expect(style).not.toHaveProperty('marginTop');
+  });
+
   it('se met dans le jeu de faces demandé, sans toucher à la taille', async () => {
     const own = await setAs({ scale: 'large', faces: 'paper', phone: UNMOVED_PHONE });
     const legible = await setAs({ scale: 'large', faces: 'legible', phone: UNMOVED_PHONE });

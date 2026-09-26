@@ -17,17 +17,19 @@ export type TextAlign = 'left' | 'center';
 
 /**
  * A style a run of text carries. It is the other half of what `createStyles` builds: that one dresses views and holds
- * no typography, this one holds nothing else. Two plain numbers are allowed here and nowhere else — the line height
- * and the letter spacing — because neither is a token: each is a size times a ratio the table holds, derived here so
- * that a role set at four reader steps opens its lines and its letters by the same share at every one of them. The
- * style needs no opaque handle the way a `StyleRef` does: no prop takes one, so the only styles that reach a native
- * text are the two this module returns.
+ * no typography, this one holds nothing else. Plain numbers are allowed here and nowhere else — the line height, the
+ * letter spacing and the room kept over the first line — because none of them is a token: each is a size times a
+ * ratio the table holds, derived here so that a role set at four reader steps opens its lines and its letters by the
+ * same share at every one of them. The style needs no opaque handle the way a `StyleRef` does: no prop takes one, so
+ * the only styles that reach a native text are the two this module returns.
  */
 export type TextStyle = Readonly<{
   fontFamily?: FontFamily;
   fontSize?: FontSize;
   lineHeight?: number;
   letterSpacing?: number;
+  paddingTop?: number;
+  marginTop?: number;
   textTransform?: 'uppercase';
   color?: Color;
   textAlign?: TextAlign;
@@ -54,10 +56,18 @@ export function textStyle(
   align: TextAlign | undefined,
 ): TextStyle {
   const role = typographyAt(variant, typesetting.scale, typesetting.faces, typesetting.phone);
+  // Rounded up to the point, as sizes are: a fraction of one moved what lay under a text by a pixel as the platform
+  // rounded it (iPhone simulator, 26/09/2026), and rounded down it would cut a sliver of the letter again.
+  const overhang = Math.ceil(role.size * role.overhang);
   return {
     ...faceOf(role, theme, tone),
     lineHeight: role.size * role.leading,
     letterSpacing: role.size * role.tracking,
+    // The tallest letters of the first line rise above the box the line is given, and a text draws nothing outside its
+    // own: the box reaches up by what they need and is drawn back up by as much, so that every letter is drawn whole
+    // and nothing around the text moves. Only a title takes any, and none is set in a wrapping row, which Yoga centres
+    // its items in by their box without their margins (`CalculateLayout.cpp:2003`).
+    ...(overhang > 0 ? { paddingTop: overhang, marginTop: -overhang } : {}),
     ...(role.caps ? { textTransform: 'uppercase' } : {}),
     ...(align === undefined ? {} : { textAlign: align }),
   };
