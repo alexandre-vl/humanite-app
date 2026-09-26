@@ -208,5 +208,20 @@ declare const process: Readonly<{
  * The token goes to the keystore and not to the store the rest of the app writes to. The rest is a preference or a
  * page of the paper, and a phone that loses either loses nothing anyone wanted; this is what proves a subscription
  * belongs to whoever is holding the phone.
+ *
+ * Each variable is written out in full: Expo replaces `process.env.EXPO_PUBLIC_…` by its value only where it reads
+ * that way, in dot notation (https://docs.expo.dev/guides/environment-variables/). Handed over whole, `process.env`
+ * kept the key in a development bundle, which Metro fills, and lost it in a release-mode one: exported on 26/09/2026
+ * with a stand-in key, the first bundle held it and the second did not, so a phone build started with the key
+ * offered no connection.
  */
-export const READER: Reader = createReader(identityOf(process.env), POSTING, keychain);
+export const READER: Reader = createReader(
+  identityOf({
+    EXPO_PUBLIC_APP_SECRET: process.env.EXPO_PUBLIC_APP_SECRET,
+    EXPO_PUBLIC_DEVICE_TOKEN: process.env.EXPO_PUBLIC_DEVICE_TOKEN,
+    EXPO_PUBLIC_DEVICE_NAME: process.env.EXPO_PUBLIC_DEVICE_NAME,
+    EXPO_PUBLIC_DEVICE_OS: process.env.EXPO_PUBLIC_DEVICE_OS,
+  }),
+  POSTING,
+  keychain,
+);
