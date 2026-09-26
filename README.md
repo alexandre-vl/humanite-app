@@ -29,8 +29,8 @@ Ce n'est pas seulement une app. C'est une manière de la construire : **un dép�
 
 ## Cinq refus
 
-- **Aucun écran vide.** Pendant que le journal répond, l'app montre ce qu'elle sait déjà du sujet, et dit que c'est
-  provisoire.
+- **Aucun écran vide, aucune fausse réponse.** Un article s'ouvre sur ce que sa carte savait déjà ; une recherche dresse
+  la forme de sa réponse pendant que le journal cherche, puis ne montre que la sienne.
 - **Aucune règle orale.** Une décision structurante est un ADR ; chacune de ses règles, une preuve qui s'exécute ou une
   convention écrite.
 - **Aucune exception.** Pas une règle de lint désactivée, pas un avertissement toléré.
@@ -65,7 +65,7 @@ _Simulateur iPhone, service du journal, le 25/09/2026._
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **À la une**                | la une et ses rubriques, qu'on fait tourner sous le doigt                                                                         |
 | **En continu**              | tout le journal dans l'ordre où il est tombé, jour après jour ; ce qui a paru depuis votre dernier passage porte une perle pleine |
-| **Recherche**               | la réponse de l'app sur-le-champ, celle du journal ensuite, et sous le champ un trait qui court tant que le journal cherche       |
+| **Recherche**               | la réponse du journal, page après page ; tant qu'il cherche, la forme de ses cartes, et sous le champ un trait qui court          |
 | **Article**                 | la tête s'affiche avec ce que la carte savait déjà — titre, chapô, signature, heure — pendant que le corps arrive                 |
 | **Lectures**                | les articles mis de côté, gardés sur le téléphone                                                                                 |
 | **Kiosque**                 | les numéros du journal                                                                                                            |
@@ -85,15 +85,16 @@ service : la recherche du journal répond en 1 552 à 1 923 ms et ne se sert jam
 prend 1 203 à 1 765 ms pour un budget de 1 500. Aucune app ne rend ce service plus rapide ; elle peut, en revanche,
 ne jamais laisser le lecteur face au vide :
 
-- **Montrer ce que l'app sait déjà.** Une question trouve sur-le-champ les articles déjà lus dont un mot commence par
-  elle ; mesuré sur « climat », trois secondes d'écran vide remplacées par deux articles déjà lus. Un article s'ouvre sur
-  la tête que sa carte portait déjà, lisible 200 ms après le doigt.
+- **Montrer ce que l'app sait déjà, et seulement ce qui est vrai.** Un article s'ouvre sur la tête que sa carte portait
+  déjà, lisible 200 ms après le doigt. Une recherche, elle, ne montre que la réponse du journal : les articles déjà lus
+  qu'elle dressait à sa place — 27 à 48 sur « climat », remplacés une à deux secondes plus tard par dix autres — se
+  lisaient comme la réponse.
 - **Le nommer comme tel.** Un segment rouge court sur le trait sous le champ tant que le journal cherche, et VoiceOver
   entend « Le journal cherche … ».
 - **Partir quand le doigt se pose.** La lecture d'un article est demandée dès que le doigt touche la carte, et court
   pendant l'animation de l'écran au lieu de s'y ajouter.
-- **Des silhouettes qui respirent**, là où l'app ne sait rien, dessinées dans un gris que les tokens tiennent visible à
-  10,4 pas de clarté de la page.
+- **Des silhouettes qui respirent**, là où l'app ne sait rien et tant qu'une question attend sa réponse, dessinées dans
+  un gris que les tokens tiennent visible à 10,4 pas de clarté de la page.
 - **Une ouverture immobile un quart de seconde au moins**, le nom du journal posé sur le champ que le téléphone peignait
   déjà.
 

@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { EmptyState } from '#components/empty-state';
-import { ArticleFeed, feedInPlaceOf, questionOf, searchQuery, usePagedFeed, useReadMatches } from '#entities/article';
+import { ArticleFeed, questionOf, searchQuery, usePagedFeed } from '#entities/article';
 import { BookmarkToggle } from '#features/bookmark';
 import { t } from '#i18n';
 import { articleHref } from '#lib/routing';
@@ -18,46 +18,30 @@ import { SearchField } from './search-field';
  * The field is not a band of the list. A band either scrolls away or is pinned to a height the list fixes, and a
  * field a reader is typing in must do neither — so the screen holds it itself, above the one scrolling region it has.
  *
- * There is one list and it always answers the question in the field. It had three: the journal's answer to this
- * question, the journal's answer to the question before while this one was fetched, and the articles the app had
- * already read — each under a heading of its own naming which it was. Three answers and three headings is a screen
- * a reader has to read before they can read the paper, and one of the three was an answer to a question they had
- * already finished typing over. What is left is the true, smaller answer the app can give at once — the articles it
- * has read whose title or standfirst hold the word — until the journal's own arrives and takes its place. When the
- * journal's own is nothing, or never comes, the app's stays: it is all the answer there is, and a journal that could
- * not be reached says so under it.
+ * The list holds the journal's answer and nothing else. While the journal looked, it held the articles the app had
+ * already read whose title or standfirst held the question: a truer and smaller answer, given at once. Typing
+ * « climat » on the iPhone simulator on 26/09/2026, that was 27 to 48 articles for one to two seconds and a third,
+ * which the journal's answer then replaced with ten others — a reader took them for the answer, and the answer, when
+ * it came, for a smaller one. Nothing on the screen told the two apart, and nothing could: both were articles of the
+ * paper, listed under the same question.
  *
- * Nothing names which of the two is on screen. The rule under the field does it, and does it continuously: while a
- * segment of red is crossing it the journal is still looking, and what is listed is provisional; when the rule is
- * whole again the looking is over. One signal, always visible, in the one place a reader is already looking — instead
- * of a caption that appears, a heading that changes its words, and a second heading under it — and said in words to
- * a reader listening to the screen.
+ * So while the journal looks, cards stand where its answer will be, drawn as it will be drawn, breathing, and the
+ * rule under the field says the journal is looking — in words too, to a reader listening to the screen. The answer
+ * takes their place when it comes, and its next pages as the reader goes down it. A journal that finds nothing says so
+ * for the question typed, and one that cannot be reached says why, with a try again.
  *
  * The journal's search takes between a second and a half and two seconds and is never served from a cache, a
  * question never being twice the same (mesuré le 24/09/2026 : 1 552 à 1 923 ms sur huit questions jamais posées).
- * That is the whole reason any of this exists.
- *
- * While the journal looks and the app has nothing of its own, the list stands in cards drawn as its answer will be
- * drawn, breathing. It used to be meant to show nothing there, a search being answered with anything of any length —
- * but every answer is laid out as a list of the same line, so the ghost of one is no guess; and it was showing the
- * ghost all along, too faint to be seen. A reader who had scrolled down one answer and typed another question saw a
- * page of white under the field for the time the journal took (iPhone simulator, 25/09/2026).
  */
 export function SearchPage(): ReactNode {
   const [typed, setTyped] = useState('');
   // A line that holds no question is taken at once. The wait is there so that a word being typed is asked once, and a
   // line emptied is not being typed in.
   const question = questionOf(useDebounced(typed, (text) => questionOf(text) === null));
-  const asked = usePagedFeed(searchQuery(question));
-  const read = useReadMatches(question);
-  // What the app can answer by itself stands in for as long as the journal has shown nothing for this question. The
-  // moment it shows something, that is the answer — a second list under it would be the same articles twice.
-  const standingIn = asked.items.length === 0 && read.length > 0;
-  const feed = standingIn ? feedInPlaceOf(read, asked) : asked;
-  // The journal is looking until it answers, and no longer: what stands in for its answer does not keep it looking.
-  // Read off the list instead, the rule went on saying « still looking » for good whenever the journal found nothing,
-  // or could not be reached, and the app had something of its own to show.
-  const searching = question !== null && asked.state.kind === 'pending';
+  const answer = usePagedFeed(searchQuery(question));
+  // The journal is looking until it has answered for the first page — with articles, with none, or with a failure —
+  // and no longer: the pages after it are said at the foot of the list, where the reader who reaches the end looks.
+  const searching = question !== null && answer.state.kind === 'pending';
   return (
     <Surface>
       <SearchField value={typed} onChange={setTyped} busy={searching} />
@@ -68,8 +52,8 @@ export function SearchPage(): ReactNode {
           // One list for each answer, opening at its top. A list kept from one answer to the next kept how far down the
           // reader had scrolled, and the next answer opened as far down — past its own end, on a blank page, when it
           // was shorter.
-          key={standingIn ? `read:${question}` : question}
-          feed={feed}
+          key={question}
+          feed={answer}
           rhythm="list"
           onOpen={(id) => {
             dismissKeyboard();

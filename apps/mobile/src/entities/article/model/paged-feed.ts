@@ -160,16 +160,3 @@ export const feedOf = (items: readonly ArticleSummary[]): ReadFeed => ({
   refreshing: false,
   foot: NO_FOOT,
 });
-
-/**
- * Articles a screen already holds, standing in for a feed that has shown none: while the feed is asked, and after it
- * answered, when it answered nothing or failed. A failure is said under them by its cause, with the try again that
- * asks the feed once more; a pull down the list asks the feed too, what stands in having nothing of its own to fetch.
- */
-export const feedInPlaceOf = (items: readonly ArticleSummary[], asked: ReadFeed): ReadFeed => ({
-  items,
-  state: { kind: 'empty' },
-  readAgain: asked.readAgain,
-  refreshing: asked.refreshing,
-  foot: asked.state.kind === 'failed' ? { kind: 'failed', failure: asked.state.failure } : NO_FOOT,
-});

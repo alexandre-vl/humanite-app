@@ -3,7 +3,7 @@ import { ContentApiError, QUESTION } from '@huma/contracts';
 import { SPACING } from '@huma/design-tokens';
 import { isRecord } from '@huma/unknown';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-import { act, fireEvent, renderHook, screen, within } from '@testing-library/react-native';
+import { act, fireEvent, renderHook, screen, waitFor, within } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import { content } from '#api';
 import { t } from '#i18n';
@@ -78,6 +78,24 @@ const sideOf = (glyph: Rendered): number =>
 
 /** What the rule under the field says to a reader listening to the screen, while the journal is looking. */
 const ASKING = t('search.asking');
+
+/** The grey the shapes standing in for an answer are painted in, read before the page renders over the hook. */
+const standInGrey = async (): Promise<unknown> => (await renderHook(() => useTheme())).result.current.standIn;
+
+/** How many nodes on screen are painted in `grey`: the shapes standing where the answer will be. */
+const ghostsIn = (grey: unknown): number =>
+  (screen.root?.queryAll(() => true) ?? []).filter((node) => styleOf(node)['backgroundColor'] === grey).length;
+
+/** How far down its list the card holding `text` is laid, in points: the order a reader meets the answer in. */
+const placeOf = (text: string): number =>
+  nearestAbove(
+    screen.getByText(text),
+    (node) => {
+      const top = styleOf(node)['top'];
+      return typeof top === 'number' ? top : undefined;
+    },
+    'la carte n’est posée dans aucune liste : le test ne vérifierait rien',
+  );
 
 /**
  * An article the journal answers `text` with whose title or standfirst — the words a card prints, and the only ones
@@ -264,11 +282,92 @@ describe('SearchPage', () => {
    */
   it('dresse des cartes à la place de la réponse tant que le journal cherche', async () => {
     jest.spyOn(content, 'search').mockReturnValue(new Promise(() => undefined));
-    const grey = (await renderHook(() => useTheme())).result.current.standIn;
+    const grey = await standInGrey();
     await renderPage();
     await type('jeunes');
-    const ghost = (screen.root?.queryAll(() => true) ?? []).filter((node) => styleOf(node)['backgroundColor'] === grey);
-    expect(ghost.length).toBeGreaterThan(5);
+    expect(ghostsIn(grey)).toBeGreaterThan(5);
+  });
+
+  /**
+   * The app used to stand in for the journal with the articles it had read whose words held the question. Typing
+   * « climat » on the iPhone simulator on 26/09/2026, it listed 27 to 48 of them for one to two seconds and a third,
+   * which the journal's answer then replaced with ten others: a reader took them for the answer, and the answer for a
+   * smaller one. While the journal looks, only cards drawn as its answer will be drawn stand where it will be.
+   */
+  it('ne montre aucun article tant que le journal cherche, pas même ceux que l’app a déjà lus', async () => {
+    const known = await readFor('jeunes', /\bjeune/iu);
+    const grey = await standInGrey();
+    await renderPage();
+    await type('jeunes');
+    expect(await screen.findByText(known.title)).toBeTruthy();
+    jest.spyOn(content, 'search').mockReturnValue(new Promise(() => undefined));
+    await type('jeune');
+    expect(screen.queryByText(known.title)).toBeNull();
+    expect(ghostsIn(grey)).toBeGreaterThan(5);
+    expect(screen.getByLabelText(ASKING)).toBeTruthy();
+  });
+
+  /**
+   * The journal answers ten articles at a time, and the list asks for the next ten before the reader reaches the end
+   * of the first: on 26/09/2026 the answer to « climat » stood at ten, then twenty, then thirty. What the reader is
+   * shown is that answer, all of it, in the journal's order, and nothing else.
+   */
+  it('montre toute la réponse du journal, page après page, dans son ordre, et rien d’autre', async () => {
+    const answer = (await content.getFeed({})).items.slice(0, 6);
+    const [last] = answer.slice(-1);
+    if (answer.length < 6 || last === undefined) {
+      throw new Error('la une a moins de six articles : le test ne vérifierait rien');
+    }
+    jest
+      .spyOn(content, 'search')
+      .mockImplementation(async (query) =>
+        Promise.resolve(
+          query.cursor === undefined
+            ? { items: answer.slice(0, 3), nextCursor: 'suite' }
+            : { items: answer.slice(3), nextCursor: null },
+        ),
+      );
+    await renderPage();
+    await type('jeunes');
+    await waitFor(() => {
+      expect(screen.getByText(last.title)).toBeTruthy();
+    });
+    // Laid in the journal's order, each at a place of its own: sorted, and none shared.
+    const places = answer.map((summary) => placeOf(summary.title));
+    expect(places).toEqual([...places].sort((left, right) => left - right));
+    expect(new Set(places).size).toBe(answer.length);
+    expect(screen.getAllByRole('link')).toHaveLength(answer.length);
+  });
+
+  /**
+   * Each question is asked on its own, and an answer that comes back after the reader has typed on is never drawn
+   * under the question that replaced it: until that one is answered, cards stand in for it.
+   */
+  it('ne montre jamais sous une question la réponse d’une autre, même revenue après elle', async () => {
+    const late = await content.search({ text: QUESTION.parse('jeunes') });
+    const [first] = late.items;
+    if (first === undefined) {
+      throw new Error('le corpus ne répond pas à cette question : le test ne vérifierait rien');
+    }
+    let answer: (page: typeof late) => void = () => undefined;
+    jest.spyOn(content, 'search').mockImplementation(async (query) =>
+      query.text === 'jeunes'
+        ? new Promise((resolve) => {
+            answer = resolve;
+          })
+        : new Promise(() => undefined),
+    );
+    const grey = await standInGrey();
+    await renderPage();
+    await type('jeunes');
+    await type('ecole');
+    await act(async () => {
+      answer(late);
+      await Promise.resolve();
+    });
+    await settle();
+    expect(screen.queryByText(first.title)).toBeNull();
+    expect(ghostsIn(grey)).toBeGreaterThan(5);
   });
 
   /**
@@ -286,28 +385,27 @@ describe('SearchPage', () => {
   });
 
   /**
-   * What the app finds by itself stands in while the journal looks. When the journal found nothing, the looking is
-   * over all the same: the rule went on saying « still looking » for good, over articles that were by then the whole
-   * of the answer, and the list under it was never taken back — so it stays, as the answer it has become.
+   * When the journal finds nothing, the screen says so, for the question typed. It used to keep what the app had found
+   * by itself instead, as the answer it had become: a smaller answer to the same question, from another source, that
+   * nothing told apart from the journal's.
    */
-  it('cesse de chercher quand le journal ne trouve rien, et garde ce que l’app avait trouvé', async () => {
+  it('dit qu’aucun article ne répond quand le journal ne trouve rien, même si l’app en a lu qui portent le mot', async () => {
     const known = await readFor('jeunes', /\bjeune/iu);
     await renderPage();
     await type('jeunes');
     expect(await screen.findByText(known.title)).toBeTruthy();
     jest.spyOn(content, 'search').mockResolvedValue({ items: [], nextCursor: null });
     await type('jeune');
-    expect(screen.getByText(known.title)).toBeTruthy();
+    expect(await screen.findByText(t('search.none.title', { query: 'jeune' }))).toBeTruthy();
+    expect(screen.queryByText(known.title)).toBeNull();
     expect(screen.queryByLabelText(ASKING)).toBeNull();
-    expect(screen.queryByText(t('search.none.title', { query: 'jeune' }))).toBeNull();
   });
 
   /**
-   * A journal that cannot be reached is not one still looking. The failure went unsaid under what the app had found,
-   * and the rule went on saying « still looking » for good: it is said now by its cause, under the articles the app
-   * found, with the try again that asks the journal once more.
+   * A journal that cannot be reached is said by its cause, with the try again that asks it once more, and nothing is
+   * listed in place of its answer: the articles the app had found by itself stood there, and read as that answer.
    */
-  it('dit pourquoi le journal n’a pas répondu, sous ce que l’app avait trouvé, et offre de le redemander', async () => {
+  it('dit pourquoi le journal n’a pas répondu et offre de le redemander, sans rien lister à sa place', async () => {
     const known = await readFor('jeunes', /\bjeune/iu);
     await renderPage();
     await type('jeunes');
@@ -315,7 +413,7 @@ describe('SearchPage', () => {
     const asking = jest.spyOn(content, 'search').mockRejectedValue(new ContentApiError('offline', 'hors ligne'));
     await type('jeune');
     expect(await screen.findByText(t('failure.offline.title'))).toBeTruthy();
-    expect(screen.getByText(known.title)).toBeTruthy();
+    expect(screen.queryByText(known.title)).toBeNull();
     expect(screen.queryByLabelText(ASKING)).toBeNull();
     const before = asking.mock.calls.length;
     await fireEvent.press(screen.getByText(t('action.retry')));

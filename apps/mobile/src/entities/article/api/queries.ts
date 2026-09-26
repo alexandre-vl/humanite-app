@@ -12,7 +12,6 @@ import type {
 import type { InfiniteData, QueryClient } from '@tanstack/react-query';
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query';
 import { content } from '#api';
-import { onceEach } from '#lib/once';
 import type { Reach, StreamPage, StreamStep } from '../model/reach';
 import { nextStepOf, oldestOf } from '../model/reach';
 
@@ -221,30 +220,22 @@ export const articleQuery = (id: ArticleId): ReturnType<typeof one> => one(id);
  * Every summary the app is already holding, from every list it has read — the front, each section, the wire, and
  * whatever a question turned up, whether they are on screen now or came off the disk at the last start.
  *
- * Each article once, where it was first read. An article is filed in more than one of those lists — its section and
- * the front, the wire, every answer that has reached it — and read off all of them it came back as often: what the
- * app answered « volksw » with was seven lines for two articles (iPhone simulator, 25/09/2026).
- *
  * Only the lists. An article read whole is filed under its own key and is not a list of anything, so it is left out
  * rather than flattened past: the predicate is the one place that says so, and the type that follows it would be a
  * lie for that branch.
  */
-const summariesRead = (cache: QueryClient): readonly ArticleSummary[] =>
-  onceEach(
-    [
-      ...cache
-        .getQueriesData<InfiniteData<Page<ArticleSummary>>>({
-          queryKey: [ARTICLES],
-          predicate: ({ queryKey }) => queryKey[1] !== ONE && queryKey[1] !== STREAM,
-        })
-        .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.items]) ?? []),
-      // The merged run of the whole paper, whose pages carry a floor beside their items and are therefore shaped apart.
-      ...cache
-        .getQueriesData<InfiniteData<StreamPage>>({ queryKey: [ARTICLES, STREAM] })
-        .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.read]) ?? []),
-    ],
-    (summary) => summary.id,
-  );
+const summariesRead = (cache: QueryClient): readonly ArticleSummary[] => [
+  ...cache
+    .getQueriesData<InfiniteData<Page<ArticleSummary>>>({
+      queryKey: [ARTICLES],
+      predicate: ({ queryKey }) => queryKey[1] !== ONE && queryKey[1] !== STREAM,
+    })
+    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.items]) ?? []),
+  // The merged run of the whole paper, whose pages carry a floor beside their items and are therefore shaped apart.
+  ...cache
+    .getQueriesData<InfiniteData<StreamPage>>({ queryKey: [ARTICLES, STREAM] })
+    .flatMap(([, read]) => read?.pages.flatMap((page) => [...page.read]) ?? []),
+];
 
 /**
  * What the app already knows of one article, from the lists it has read, or nothing when it knows none of it.
@@ -274,52 +265,4 @@ export const summaryAmongRead = (cache: QueryClient, id: ArticleId): ArticleSumm
  */
 export const prefetchArticle = (cache: QueryClient, id: ArticleId): void => {
   cache.query(articleQuery(id)).catch(() => undefined);
-};
-
-/**
- * The words of a summary a question could be looking for, folded so that a question written without its accents and
- * in any case still finds them: the title, and what is printed under it when there is any — the journal's standfirst
- * or, where it filed none, the opening of the body a card prints instead. Both, because a reader searching for words
- * they have read on a card must find that card, whichever of the two it was drawing.
- */
-const wordsOf = (summary: ArticleSummary): string =>
-  folded(`${summary.title} ${summary.standfirst ?? ''} ${summary.excerpt ?? ''}`);
-
-/** A text without its accents and in one case, which is how a question and the words it looks for are compared. */
-const folded = (text: string): string => text.normalize('NFD').replace(DIACRITICS, '').toLowerCase();
-
-/** Everything the combining marks of a decomposed string are, so `ecologie` reaches « écologie ». */
-const DIACRITICS = /\p{Diacritic}/gu;
-
-/** Every sign that means something to a pattern, and nothing more to a reader than itself. */
-const PATTERN_SIGNS = /[\\^$.*+?()[\]{}|/]/gu;
-
-/**
- * A question as a pattern found only where a word starts: at the start of the text, or after anything that is neither
- * a letter nor a figure — a space, an apostrophe, a hyphen, a quotation mark.
- */
-const atWordStart = (question: Question): RegExp =>
-  new RegExp(`(?:^|[^\\p{L}\\p{N}])${folded(question).replace(PATTERN_SIGNS, '\\$&')}`, 'u');
-
-/**
- * The articles already in hand whose words hold the question, newest read first.
- *
- * The journal's own search takes between a second and a half and two seconds and is never served from a cache — a
- * question is never twice the same, so there is nothing to have kept (mesuré le 24/09/2026 : 1 552 à 1 923 ms on
- * eight words never asked before). For all that time the screen had nothing at all to show on a first question.
- *
- * It has something. Every list the app has read is a few dozen summaries in memory, and a reader asking about Gaza
- * has very often just scrolled past three pieces on it. This finds them at once, and it is not a guess at what the
- * journal would answer: it is a true and smaller answer to the same question, which the screen names as what it is
- * and drops the moment the journal's own arrives.
- *
- * Matching is on the words a reader can see — the title and the standfirst — and not on the body, which is not here
- * to be matched. Accents and case are folded, so a question typed in a hurry reaches what was printed properly. And
- * a question is looked for where a word starts, as a reader looks for one: looked for anywhere, « mn » — what was
- * left of « macron » typed too fast — found « Amnesty International » in a title and stood it in for the answer
- * (iPhone simulator, 25/09/2026).
- */
-export const summariesMatching = (cache: QueryClient, question: Question): readonly ArticleSummary[] => {
-  const asked = atWordStart(question);
-  return summariesRead(cache).filter((summary) => asked.test(wordsOf(summary)));
 };
