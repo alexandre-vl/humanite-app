@@ -1,8 +1,17 @@
 import { ContentApiError } from '@huma/contracts';
 import type { ContentApi } from '@huma/contracts';
-import { createSession, SERVICE_APP, SessionError } from '@huma/remote-api';
+import {
+  CLIENT_SECRET,
+  createSession,
+  DEVICE_CRYPT_MODE,
+  mintDeviceToken,
+  SERVICE_APP,
+  SessionError,
+} from '@huma/remote-api';
 import type { Credentials, Identity, Posting } from '@huma/remote-api';
-import { keychain, KEYCHAIN_KEYS } from '../lib/storage';
+import { randomUUID } from 'expo-crypto';
+import { CONTENT_SOURCE } from '../config';
+import { keychain, KEYCHAIN_KEYS, storage, STORAGE_KEYS } from '../lib/storage';
 import type { StateStorage } from '../lib/storage';
 
 /**
@@ -14,20 +23,21 @@ import type { StateStorage } from '../lib/storage';
  * the same to everyone. A store that wants to follow it watches it, rather than taking a copy at its first line: the
  * token can go without anyone having pressed anything, when the service stops honouring it.
  *
- * Opening the connection needs the official client's key, which no tracked file of this repository carries: it
- * reaches the bundle through `EXPO_PUBLIC_…`, written by whoever starts the build, and a build given none has no
- * identity to open a connection with — signing in refuses, and the app reads what the service gives to nobody. That
- * is the shape ADR-0032 asks for, and it is the shape a published build has.
+ * Opening the connection needs the official client's credential and a device attested to the service. The credential
+ * is a client one, the same in every install, carried in the app (`CLIENT_SECRET`); the device is one this install
+ * mints for itself, from a random identifier it keeps (`mintDeviceToken`). So every build that reads the service can
+ * offer to sign in — no build-time key, nothing borrowed — and what a reader adds is only their own login, typed and
+ * never kept. A build that reads the simulated corpus opens no connection and offers none (ADR-0040).
  */
 
 /** A reader as the app holds them: the token the client carries, the ways it changes, and a way to follow it. */
 export type Reader = Readonly<{
   /**
-   * Whether this build can open a connection at all — whether it was started with the key the service asks for.
+   * Whether this build opens a connection to the journal's service at all.
    *
-   * A screen reads it to know whether to offer signing in. A published build has no key, so it offers nothing, and
-   * that is not a screen being careful: it is the only truthful thing it could show, there being no connection on
-   * the other side of the button.
+   * A screen reads it to know whether to offer signing in. Every build that reads the service does — it carries the
+   * client credential and mints its own device — so the offer stands; a build reading the simulated corpus opens no
+   * connection, and offering one would be a button with nothing behind it.
    */
   offered: () => boolean;
   token: () => string | undefined;
@@ -50,32 +60,52 @@ export type Refusal = 'refused' | 'unavailable';
 export const refusalOf = (reason: unknown): Refusal =>
   reason instanceof SessionError && reason.code === 'refused' ? 'refused' : 'unavailable';
 
-/** How the service takes a device's attestation: the one mode its own client mints, and the only one it reads. */
-const CRYPT_MODE = 'jdly';
+/** How this app names itself as a device to the service: a reader's app, on Android, as the attestation carries it. */
+const DEVICE_DESCRIPTION = 'humanite-lecteur';
+const DEVICE_OS = 'Android';
 
 /**
- * The identity `env` was started with, or none when it was started without one.
+ * The identity that opens a connection for a device known by `deviceId`.
  *
- * Both the key and the attested device have to be there: the service reads the pair, and one without the other is a
- * request it refuses. Anything missing leaves this `undefined`, which is what a published build has, and what a
- * screen reads to know there is no connection to offer.
+ * The credential is the client one every install carries (`CLIENT_SECRET`); the device is this install's own,
+ * `deviceId` minted into the attestation the service reads. The same identifier always builds the same identity, so
+ * the service is met by one steady device.
  */
-export const identityOf = (env: Readonly<Record<string, string | undefined>>): Identity | undefined => {
-  const appSecret = env['EXPO_PUBLIC_APP_SECRET'] ?? '';
-  const cryptValue = env['EXPO_PUBLIC_DEVICE_TOKEN'] ?? '';
-  if (appSecret === '' || cryptValue === '') {
-    return undefined;
+export const identityFor = (deviceId: string): Identity => ({
+  appId: SERVICE_APP,
+  appSecret: CLIENT_SECRET,
+  device: {
+    description: DEVICE_DESCRIPTION,
+    os: DEVICE_OS,
+    token: { crypt_mode: DEVICE_CRYPT_MODE, crypt_value: mintDeviceToken(deviceId) },
+  },
+});
+
+/**
+ * The identifier this install attests as its device: the one it kept, or a fresh one it keeps now.
+ *
+ * It is generated once, the first time a connection is opened, and read from the disk every time after, so the
+ * service sees the same device across launches. A random UUID and no secret — the whole attestation is rebuilt from
+ * it — so it lives on the ordinary disk, not the keystore.
+ */
+const deviceIdKept = (): string => {
+  const kept = storage.getString(STORAGE_KEYS.deviceId);
+  if (kept !== undefined) {
+    return kept;
   }
-  return {
-    appId: SERVICE_APP,
-    appSecret,
-    device: {
-      description: env['EXPO_PUBLIC_DEVICE_NAME'] ?? 'humanite-lecteur',
-      os: env['EXPO_PUBLIC_DEVICE_OS'] ?? 'Android',
-      token: { crypt_mode: CRYPT_MODE, crypt_value: cryptValue },
-    },
-  };
+  const fresh = randomUUID().toUpperCase();
+  storage.set(STORAGE_KEYS.deviceId, fresh);
+  return fresh;
 };
+
+/**
+ * The identity a build opens the connection with, or none for a build that reads the simulated corpus.
+ *
+ * A build that reads the service carries the client credential and mints its own device, so it always has one; a
+ * build on the corpus opens nothing, and holds no identity to offer.
+ */
+const identityOfBuild = (): Identity | undefined =>
+  CONTENT_SOURCE === 'service' ? identityFor(deviceIdKept()) : undefined;
 
 /**
  * A reader over one identity, one way of posting to the service, and one place on the disk.
@@ -189,39 +219,11 @@ const POSTING: Posting<AbortSignal> = {
 };
 
 /**
- * The one variable set this module reads, declared as the app reads it rather than with all of Node's `process`:
- * Expo writes `process.env.EXPO_PUBLIC_…` into the bundle when it is built, and nothing else of `process` reaches
- * Hermes.
- */
-declare const process: Readonly<{
-  env: Readonly<{
-    EXPO_PUBLIC_APP_SECRET?: string;
-    EXPO_PUBLIC_DEVICE_TOKEN?: string;
-    EXPO_PUBLIC_DEVICE_NAME?: string;
-    EXPO_PUBLIC_DEVICE_OS?: string;
-  }>;
-}>;
-
-/**
- * The reader of this build: the identity it was started with, the platform's network, and the phone's own keystore.
+ * The reader of this build: the identity it opens the connection with, the platform's network, and the phone's own
+ * keystore.
  *
  * The token goes to the keystore and not to the store the rest of the app writes to. The rest is a preference or a
  * page of the paper, and a phone that loses either loses nothing anyone wanted; this is what proves a subscription
  * belongs to whoever is holding the phone.
- *
- * Each variable is written out in full: Expo replaces `process.env.EXPO_PUBLIC_…` by its value only where it reads
- * that way, in dot notation (https://docs.expo.dev/guides/environment-variables/). Handed over whole, `process.env`
- * kept the key in a development bundle, which Metro fills, and lost it in a release-mode one: exported on 26/09/2026
- * with a stand-in key, the first bundle held it and the second did not, so a phone build started with the key
- * offered no connection.
  */
-export const READER: Reader = createReader(
-  identityOf({
-    EXPO_PUBLIC_APP_SECRET: process.env.EXPO_PUBLIC_APP_SECRET,
-    EXPO_PUBLIC_DEVICE_TOKEN: process.env.EXPO_PUBLIC_DEVICE_TOKEN,
-    EXPO_PUBLIC_DEVICE_NAME: process.env.EXPO_PUBLIC_DEVICE_NAME,
-    EXPO_PUBLIC_DEVICE_OS: process.env.EXPO_PUBLIC_DEVICE_OS,
-  }),
-  POSTING,
-  keychain,
-);
+export const READER: Reader = createReader(identityOfBuild(), POSTING, keychain);

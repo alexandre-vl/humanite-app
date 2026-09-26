@@ -82,6 +82,11 @@ jest.mock('expo-splash-screen', () => ({
 
 jest.mock('expo-font', () => ({ useFonts: jest.fn(() => [true, null]) }));
 
+// expo-crypto loads its native module at import to reach the platform's secure random, which a headless runner lacks.
+// The reader mints a device identifier from a UUID; a test that reaches that path gets a fixed one, enough to prove
+// the identifier is kept and reused.
+jest.mock('expo-crypto', () => ({ randomUUID: jest.fn(() => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee') }));
+
 // expo-system-ui paints the window through a native module a headless runner lacks; the theme root calls it on every
 // change of theme, and a test that mounts one would otherwise fail before rendering anything.
 jest.mock('expo-system-ui', () => ({ setBackgroundColorAsync: jest.fn() }));

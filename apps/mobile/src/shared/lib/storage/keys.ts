@@ -15,6 +15,15 @@ export const STORAGE_KEYS = {
   wireVisit: `wire-visit.${CONTENT_SOURCE}`,
   preferences: 'preferences',
   /**
+   * The random identifier this install attests to the service as its device, kept for the life of the install.
+   *
+   * It is not kept under a source: it names the phone to the journal's service, which a build reading the simulated
+   * corpus never opens, so the one build that writes it is the one that connects. Generated once and never again, so
+   * the service sees one steady device rather than a new one each launch. It is no secret — a random UUID, and the
+   * whole attestation it feeds is reconstructible from it and a key the app carries — so it sits here, not the keystore.
+   */
+  deviceId: 'device-id',
+  /**
    * Where the reader's token was kept before the keystore, and is kept no longer.
    *
    * It stays declared because the app still touches it: the first run of a build that has the keystore reads it, puts

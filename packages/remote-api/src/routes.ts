@@ -13,6 +13,18 @@ export const SERVICE = 'https://phenix2.immanens.com';
 /** The number the journal's application is filed under at the service, which every route and every login carries. */
 export const SERVICE_APP = 300;
 
+/**
+ * The secret the official client identifies application 300 with, opening the door the anonymous token unlocks.
+ *
+ * It is a client credential, not a private key: the same nineteen characters ship in every install of the official
+ * app and go up its wire on every launch, so any subscriber recovers it from their own device's traffic — which is
+ * where this copy came from. The journal keeps it obfuscated in its client rather than in the clear; carrying it here
+ * is what lets this app open a subscriber's connection at all, and the day the journal rotates it, signing in stops
+ * until this constant is refreshed. No subscriber's own secret is here: a reader's login and password are typed into
+ * the app and never leave the phone but for the login request itself.
+ */
+export const CLIENT_SECRET = 'b8a4-e8ef-19b4-307a';
+
 /** The path every route of the service lives under: the version of its interface, and the application's number. */
 export const SERVICE_ROOT = '/api/v1/app/300';
 

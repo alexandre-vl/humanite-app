@@ -1273,4 +1273,38 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0040': {
+    scope: {
+      // The reading that honours the right, and the bench where the delivered read client is judged, as under 0032;
+      // and the connection this ADR reshapes — the client credential written in the open, the device the app mints
+      // for itself, and the reader that carries a subscriber's token no further than the keystore.
+      paths: [
+        'packages/contracts/src/intake.ts',
+        'packages/contracts/src/session.ts',
+        'packages/remote-api/src/session.ts',
+        'packages/remote-api/src/routes.ts',
+        'packages/remote-api/src/device.ts',
+        'packages/remote-api/src/aes.ts',
+        'apps/mobile/src/shared/api/reader.ts',
+        'tools/guardrails/src/proofs/right.ts',
+        'tools/guardrails/src/proofs/transport.ts',
+      ],
+    },
+    rules: {
+      R1: ['right/reader', 'right/withheld-opened', 'right/granted-withheld'],
+      R2: ['transport/borrows-key'],
+      R3: {
+        convention:
+          'L’app PEUT demander à l’abonné les identifiants de son abonnement et les porter à POST /user/login pour obtenir un jeton d’usager ; le client de lecture livré (packages/remote-api/src/api.ts) ne porte aucun secret, que la fixture transport/borrows-key tient.',
+      },
+      R4: {
+        convention:
+          'packages/remote-api/src/routes.ts porte CLIENT_SECRET, la clé publique du client, et device.ts frappe l’attestation jdly d’un UUID (AES-128-CBC, aes.ts) ; apps/mobile/src/shared/api/reader.ts garde cet UUID et n’offre la connexion qu’aux builds du service. device.test.ts, aes.test.ts et reader.test.ts les tiennent.',
+      },
+      R5: {
+        convention:
+          'Aucun fichier suivi ne porte l’identifiant, le mot de passe ou le jeton d’usager d’un abonné : reader.ts ne confie le jeton qu’au trousseau (ADR-0034), une lecture de tools/capture/src/secrets.ts arrête toute capture qui en écrirait un, et le client de lecture n’en porte aucun.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

@@ -1,10 +1,10 @@
 import { ContentApiError, QUESTION } from '@huma/contracts';
 import type { ContentApi } from '@huma/contracts';
-import { SessionError } from '@huma/remote-api';
+import { CLIENT_SECRET, SessionError } from '@huma/remote-api';
 import type { Identity, Posting } from '@huma/remote-api';
 import { describe, expect, it } from '@jest/globals';
 import type { StateStorage } from '../lib/storage';
-import { createReader, forgettingDeadTokens, identityOf, refusalOf } from './reader';
+import { createReader, forgettingDeadTokens, identityFor, refusalOf } from './reader';
 
 /** An identity as a development build is given one: fake through and through, no value of the shape of a secret. */
 const IDENTITY: Identity = {
@@ -49,20 +49,30 @@ const OPENED = [
   { status: 200, body: JSON.stringify({ x_user_token: 'jeton-de-labonne' }) },
 ];
 
-describe('identityOf', () => {
-  it('n’ouvre aucune connexion sans la clé ni sans l’appareil attesté', () => {
-    expect(identityOf({})).toBeUndefined();
-    expect(identityOf({ EXPO_PUBLIC_APP_SECRET: 'une-cle' })).toBeUndefined();
-    expect(identityOf({ EXPO_PUBLIC_DEVICE_TOKEN: 'cafe' })).toBeUndefined();
-    expect(identityOf({ EXPO_PUBLIC_APP_SECRET: '', EXPO_PUBLIC_DEVICE_TOKEN: 'cafe' })).toBeUndefined();
+describe('identityFor', () => {
+  it('nomme l’application du service, la clé cliente, et l’appareil frappé depuis l’identifiant', () => {
+    expect(identityFor('AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE')).toEqual({
+      appId: 300,
+      appSecret: CLIENT_SECRET,
+      device: {
+        description: 'humanite-lecteur',
+        os: 'Android',
+        token: {
+          crypt_mode: 'jdly',
+          crypt_value:
+            '0eba45187f1623ea1602f03ecbc679ea7cab099ceec9621b158325ccb681ceef' +
+            '894adf11479d91401b6f481dbf92d95ea3a8ea89726ae2848ec00e661cda20f8' +
+            '76b249a10f8ec66c1bbb805d722ec639350f67d1cf87a0121f7dd621a9a16e49',
+        },
+      },
+    });
   });
 
-  it('nomme l’application du service et l’attestation que son client officiel frappe', () => {
-    expect(identityOf({ EXPO_PUBLIC_APP_SECRET: 'une-cle', EXPO_PUBLIC_DEVICE_TOKEN: 'cafe' })).toEqual({
-      appId: 300,
-      appSecret: 'une-cle',
-      device: { description: 'humanite-lecteur', os: 'Android', token: { crypt_mode: 'jdly', crypt_value: 'cafe' } },
-    });
+  it('frappe le même appareil pour le même identifiant, et un autre pour un autre', () => {
+    expect(identityFor('un-appareil')).toEqual(identityFor('un-appareil'));
+    expect(identityFor('un-appareil').device.token.crypt_value).not.toBe(
+      identityFor('un-autre').device.token.crypt_value,
+    );
   });
 });
 

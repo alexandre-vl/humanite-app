@@ -13,3 +13,9 @@ description = "Les clés des visuels du corpus fictif, rubrique-article-nom : de
 targetRules = ["generic-api-key"]
 regexTarget = "line"
 regexes = ['''^\s*key: '[a-z]{3}-[ab][0-9]+(?:-[a-z0-9]+)+',$''']
+
+[[allowlists]]
+description = "La clé publique du client officiel, portée en clair par l'app (ADR-0040) : un credential que tout abonné relève de son propre trafic, non une clé privée."
+paths = ['''^packages/remote-api/src/routes\.ts$''']
+regexTarget = "line"
+regexes = ['''export const CLIENT_SECRET = '[^']+';''']

@@ -31,6 +31,7 @@ const WORDS = [
   'gfxinfo',
   'ionice',
   'janky',
+  'jdly',
   'lerp',
   'lmkd',
   'ltrace',
@@ -50,9 +51,11 @@ const WORDS = [
   'procattr',
   'proxychains',
   'punct',
+  'rcon',
   'redirections',
   'reinit',
   'runuser',
+  'sbox',
   'setarch',
   'setpriv',
   'setsid',
@@ -71,6 +74,7 @@ const WORDS = [
   'worktree',
   'worktrees',
   'xdigit',
+  'xtime',
 ] as const;
 
 /**

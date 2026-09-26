@@ -88,6 +88,7 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     'eslint-plugin-react-x': '5.20.8',
     expo: '57.0.25',
     'expo-constants': '57.0.19',
+    'expo-crypto': '57.0.3',
     'expo-dev-client': '57.0.19',
     'expo-font': '57.0.4',
     'expo-image': '57.0.5',
