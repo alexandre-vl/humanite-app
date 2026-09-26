@@ -1249,6 +1249,10 @@ export const BINDINGS = {
         convention:
           'Le rôle d’administrateur du dépôt contourne « main : contributions vérifiées », et lui seul : un push direct du mainteneur passe sous ses hooks locaux, puis la CI le rejoue.',
       },
+      R11: {
+        convention:
+          'La règle « main : contributions vérifiées » exige aussi les résultats de CodeQL, réglé par défaut sur le dépôt, et refuse une pull request qui ouvre une alerte de sécurité moyenne ou plus, ou une erreur (gh api repos/alexandre-vl/humanite-app/rulesets/24038072).',
+      },
     },
   },
 } as const satisfies Bindings<ProofId>;

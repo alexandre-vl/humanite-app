@@ -8,15 +8,16 @@ significance: [guarded-config, boundary]
 
 ## Contexte et problème
 
-- Le dépôt est public depuis le 26/09/2026 (`gh api repos/alexandre-vl/humanite-app --jq .visibility`) : un contributeur propose du code depuis une copie où les hooks ne tournent pas avant `pnpm hooks:install`, et où `git commit --no-verify` les saute.
-- ADR-0008 a écarté une CI distante parce que le contrôle sortait de la machine locale, et nomme son adoption comme réévaluation.
-- `hooks:check` refuse un clone superficiel et un commit « Merge … » (`tools/git-hooks/src/history.ts`, `tools/git-hooks/src/message.ts`) : une CI qui vérifierait le commit de fusion qu’une pull request synthétise échouerait toujours.
-- Un clone neuf, sans aucune variable, passe `pnpm verify` en 139 s sur macOS, et en 230 s sur ubuntu-24.04 avec les 30 tests que macOS saute (run 36235550080).
+- Le dépôt est public depuis le 26/09/2026 (`gh api repos/alexandre-vl/humanite-app --jq .visibility`) : un contributeur propose du code depuis une copie où les hooks ne tournent qu’après `pnpm hooks:install`, et que `git commit --no-verify` saute.
+- ADR-0008 a écarté une CI distante, qui sortait le contrôle de la machine, et en fait une réévaluation.
+- `hooks:check` refuse un clone superficiel et un commit « Merge … » (`tools/git-hooks/src/history.ts`, `tools/git-hooks/src/message.ts`) : une CI qui vérifierait le commit de fusion synthétisé d’une pull request échouerait toujours.
+- Un clone neuf, sans variable, passe `pnpm verify` en 139 s sur macOS, en 230 s sur ubuntu-24.04 avec 30 tests de plus (run 36235550080).
 - gitleaks 8.30.1 relit tout l’historique : 14 alertes, toutes fausses — un JWT inventé des preuves de la capture, des clés de visuels du corpus fictif (`.gitleaks.toml`).
 - Les builds natives ne se faisaient que chez le mainteneur (ADR-0010).
-- Le template Expo signe un APK de release par sa clé de debug, publique : n’importe qui signerait une mise à jour à sa place (`tools/emulator/src/variant.ts`).
+- Le template Expo signe l’APK de release par sa clé de debug, publique : n’importe qui signerait une mise à jour (`tools/emulator/src/variant.ts`).
+- CodeQL, réglé par défaut, relit chaque push et pull request : 25 alertes au premier passage, corrigées ou closes comme fausses (`gh api repos/alexandre-vl/humanite-app/code-scanning/alerts`).
 
-Comment le dépôt, devenu public, garde-t-il ses contrôles quand d’autres y proposent du code, et que publie-t-il de l’app ?
+Comment le dépôt, devenu public, garde-t-il ses contrôles face au code d’autrui, et que publie-t-il de l’app ?
 
 ## Critères de décision
 
@@ -45,16 +46,17 @@ Option retenue : « Une CI qui rejoue les contrôles, des règles sur le serveur
 - **R8** — L’historique de `main` NE DOIT PAS pouvoir être réécrit ni supprimé sur le serveur.
 - **R9** — Une pull request DOIT entrer dans `main` par rebase, sa CI verte.
 - **R10** — Le mainteneur PEUT pousser directement sur `main`, ses hooks ayant passé.
+- **R11** — Une pull request NE DOIT PAS entrer dans `main` avec une alerte CodeQL nouvelle.
 
 ### Conséquences
 
-- Bien, parce qu’un commit fait hors des hooks échoue sur le serveur, messages compris, avant d’entrer dans `main` (C1).
+- Bien, parce qu’un commit fait hors des hooks échoue sur le serveur, messages compris, avant `main` (C1).
 - Bien, parce qu’une release se prouve : APK signé par une clé privée, sommes SHA-256, attestation de provenance (C2).
 - Bien, parce que `main` refuse le force-push et la suppression, même au mainteneur, ce que tient déjà ADR-0008 R6 en local (C3).
 - Bien, parce que le mainteneur commite et pousse comme avant (C4).
-- Mauvais, parce qu’une CI prend 25 minutes, qu’un contributeur attend avant sa fusion (C1).
-- Mauvais, parce que les règles du serveur vivent hors du dépôt : aucun outil d’ici ne prouve R8 ni R9 (C3).
-- Mauvais, parce que chaque SHA d’action se monte à la main : Dependabot signe ses commits d’un `Signed-off-by` que la règle des messages refuse (C1).
+- Mauvais, parce qu’un contributeur attend 25 minutes de CI avant sa fusion (C1).
+- Mauvais, parce que les règles du serveur vivent hors du dépôt : aucun outil d’ici ne prouve R8 à R11 (C3).
+- Mauvais, parce que les SHA d’action se montent à la main : la règle des messages refuse le `Signed-off-by` de Dependabot (C1).
 
 ## Avantages et inconvénients des options
 
@@ -63,7 +65,7 @@ Option retenue : « Une CI qui rejoue les contrôles, des règles sur le serveur
 - Bien, parce que la CI juge chaque commit, d’où qu’il vienne (C1).
 - Bien, parce que le serveur refuse la réécriture de `main` (C3).
 - Bien, parce qu’une release ne sort que de la CI, signée et attestée (C2).
-- Mauvais, parce que le mainteneur peut contourner les règles de pull request, qui ne s’appliquent qu’aux autres (C1).
+- Mauvais, parce que les règles de pull request ne tiennent que les autres, pas le mainteneur (C1).
 
 ### Les hooks seuls
 
@@ -78,5 +80,5 @@ Option retenue : « Une CI qui rejoue les contrôles, des règles sur le serveur
 
 ## Informations complémentaires
 
-- Preuves : R1 à R5 et le déclencheur de R6 par les fixtures `git/ci-*` et `git/valid-workflows`, qui relisent les deux workflows (`tools/git-hooks/src/proofs/workflow.ts`). Le reste de R6, et R7, tiennent par le workflow de release ; R8 à R10 par les règles du dépôt sur GitHub (`gh api repos/alexandre-vl/humanite-app/rulesets`).
+- Preuves : les fixtures `git/ci-*` et `git/valid-workflows` relisent les deux workflows pour R1 à R5 et le déclencheur de R6 (`tools/git-hooks/src/proofs/workflow.ts`) ; le workflow de release tient le reste de R6 et R7, les règles du dépôt R8 à R11 (`gh api repos/alexandre-vl/humanite-app/rulesets`).
 - Réévaluation : GitHub change ce que ses règles de branche tiennent, ou la CI dépasse l’heure.
