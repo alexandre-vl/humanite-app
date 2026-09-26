@@ -31,7 +31,10 @@ type LeafId = typeof FRONT | SectionId;
 /** One page of the paper: the whole of it, or one section of it. */
 type Leaf = Readonly<{ id: LeafId; label: DisplayText }>;
 
-const useStyles = createStyles((theme) => ({ band: { backgroundColor: theme.surface } }));
+// The band lies on the page's own ground. It was painted as a surface raised over the page, which the light theme gives
+// the page's white and the dark one a lighter grey: on the iPhone simulator on 25/09/2026, a bar of #1e1e1e ran under
+// the paper's name across a page of #141414, as if it were not part of the page it names.
+const useStyles = createStyles((theme) => ({ band: { backgroundColor: theme.background } }));
 
 type SheetProps = Readonly<{
   leaf: Leaf;

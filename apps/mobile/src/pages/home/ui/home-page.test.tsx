@@ -1,4 +1,6 @@
 import type { ArticleSummary, Section } from '@huma/contracts';
+import { PALETTE } from '@huma/design-tokens';
+import type { Color, ThemeName } from '@huma/design-tokens';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
@@ -6,7 +8,8 @@ import { content } from '#api';
 import { useBookmarks } from '#features/bookmark';
 import { useVisits } from '#features/last-visit';
 import { StartupProvider } from '#lib/startup';
-import { actionNamed, perform, renderWithCache, settle } from '#lib/testing';
+import { actionNamed, nearestAbove, perform, renderWithCache, settle, styleOf } from '#lib/testing';
+import { ThemeRoot } from '#primitives/theme';
 import { HomePage } from './home-page';
 
 // The double is built inside its own factory: jest hoists the call above everything else in the file, so a function
@@ -16,6 +19,12 @@ jest.mock('expo-router', () => ({
   router: { push: jest.fn(), navigate: jest.fn() },
   useLocalSearchParams: (): Readonly<Record<string, string>> => ({}),
 }));
+
+/** Each theme a reader can choose, and the ground its pages lie on. */
+const GROUNDS: readonly (readonly [ThemeName, Color])[] = [
+  ['light', PALETTE.white],
+  ['dark', PALETTE.darkBackground],
+];
 
 const renderPage = async (): Promise<void> => {
   await renderWithCache(
@@ -87,6 +96,38 @@ describe('HomePage', () => {
    * One control, where there were two. The other opened what the reader kept, and it was here because that shelf was
    * reachable from nowhere else; it has a tab now, standing directly under this bar, so the mark was a second door.
    */
+  /**
+   * The band of sections lies on the page's own ground. It was painted in the ground of a surface raised over the page,
+   * which the light theme gives the same white and the dark one a lighter grey: on the iPhone simulator on 25/09/2026,
+   * a bar of #1e1e1e ran under the paper's name across a page of #141414. The swatches are read rather than the
+   * themes, which a file outside the theme's core may not import.
+   */
+  it.each(GROUNDS)('pose la bande des rubriques sur le fond de la page, en thème %s', async (choice, page) => {
+    const section = await firstSection();
+    await renderWithCache(
+      <ThemeRoot choice={choice}>
+        <StartupProvider>
+          <HomePage />
+        </StartupProvider>
+      </ThemeRoot>,
+    );
+    await settle();
+    await settle();
+    const [label] = await screen.findAllByText(section.label);
+    if (label === undefined) {
+      throw new Error('la bande ne nomme pas la rubrique : le test ne vérifierait rien');
+    }
+    const ground = nearestAbove(
+      label,
+      (each) => {
+        const paint: unknown = styleOf(each)['backgroundColor'];
+        return typeof paint === 'string' ? paint : undefined;
+      },
+      'rien ne peint le fond sous la bande : le test ne vérifierait rien',
+    );
+    expect(ground).toBe(page);
+  });
+
   it('offre depuis le fronton la façon dont le journal est composé, et rien d’autre', async () => {
     await renderPage();
     await fireEvent.press(screen.getByLabelText('Préférences d’affichage'));
