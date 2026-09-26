@@ -29,3 +29,11 @@ test('renderMessage fills each placeholder and names the owner of a missing valu
   expect(renderMessage('x/y', '{id} : {list}', { id: 'ADR-0001', list: ['a', 2] })).toBe('ADR-0001 : a, 2');
   expect(() => renderMessage('x/y', '{id} absent', {})).toThrow('x/y : valeur manquante pour {id}');
 });
+
+test('placeholders and renderMessage read a long template without a closing brace in linear time', () => {
+  const template = `${'{'.repeat(100_000)} sans fin`;
+  const started = performance.now();
+  expect(placeholders('x/y', template)).toEqual([]);
+  expect(renderMessage('x/y', template, {})).toBe(template);
+  expect(performance.now() - started).toBeLessThan(1_000);
+});

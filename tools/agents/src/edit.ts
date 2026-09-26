@@ -6,6 +6,8 @@
  * The call fails, writing nothing, when the text is absent, or found twice without `replace_all`.
  */
 
+import { trimEndOf } from '@huma/kit/text';
+
 export type FileEdit = Readonly<{ oldString: string; newString: string; replaceAll: boolean }>;
 
 const LEFT_SINGLE = '‘';
@@ -175,7 +177,7 @@ export function contentAfterMultiEdit(content: string | null, edits: readonly Fi
   let current = content?.replaceAll('\r\n', '\n') ?? null;
   const written: string[] = [];
   for (const edit of edits) {
-    const trimmed = edit.oldString.replace(/\n+$/u, '');
+    const trimmed = trimEndOf(edit.oldString, '\n');
     if (current === null || (trimmed !== '' && written.some((text) => text.includes(trimmed)))) {
       return null;
     }

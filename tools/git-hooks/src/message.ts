@@ -1,6 +1,7 @@
 import type { Diagnostic } from '@huma/kit/diagnostics';
 import type { Trailer } from '@huma/kit/git';
 import type { RepoPath } from '@huma/kit/paths';
+import { trimEndOf } from '@huma/kit/text';
 import type { GitHookCode } from './checks.ts';
 import { gitHookFinding } from './checks.ts';
 
@@ -32,7 +33,7 @@ export function stripspace(text: string, stripComments = false): string {
   const kept: string[] = [];
   let blank = false;
   for (const raw of text.split('\n')) {
-    const line = raw.replace(/[ \t\r]+$/u, '');
+    const line = trimEndOf(raw, ' \t\r');
     if (stripComments && line.startsWith('#')) {
       continue;
     }

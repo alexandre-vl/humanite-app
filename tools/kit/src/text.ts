@@ -22,3 +22,16 @@ export function decodeUtf8(bytes: Uint8Array): string | null {
     return null;
   }
 }
+
+/**
+ * `text` without the run of `characters` that ends it, found by walking back from its end. A pattern anchored at the
+ * end, such as `/\s+$/`, starts again at every character of each run that does not end the text: quadratic on a long
+ * one, where this stays linear.
+ */
+export function trimEndOf(text: string, characters: string): string {
+  let end = text.length;
+  while (end > 0 && characters.includes(text.charAt(end - 1))) {
+    end -= 1;
+  }
+  return text.slice(0, end);
+}

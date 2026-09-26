@@ -73,13 +73,18 @@ function messageFinding(path: RepoPath, message: Linter.LintMessage): Diagnostic
     : lintFinding('lint/rule', path, { rule: message.ruleId, text: message.message }, position);
 }
 
-/** The words of a path, lowercase: its folder names and its file name without extensions, split on separators. */
-const pathWords = (path: RepoPath): readonly string[] =>
-  path
+/**
+ * The words of a path, lowercase: its folder names and its file name without extensions, split on separators. The
+ * extensions start at the first dot of the file name, found by position: `/\.[^/]*$/` would scan the rest of the path
+ * again from every dot of a folder name.
+ */
+const pathWords = (path: RepoPath): readonly string[] => {
+  const extensions = path.indexOf('.', path.lastIndexOf('/') + 1);
+  return (extensions === -1 ? path : path.slice(0, extensions))
     .toLowerCase()
-    .replace(/\.[^/]*$/u, '')
     .split(/[/._-]+/u)
     .filter((word) => word !== '');
+};
 
 /** Findings for linted files whose path holds a term of the glossary: spelling checks identifiers, never file names. */
 const glossaryFindings = (paths: readonly RepoPath[], glossary: readonly GlossaryEntry[]): Diagnostic<LintCode>[] =>
