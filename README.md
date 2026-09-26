@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/showcase/banner-dark.webp">
-  <img src="docs/showcase/banner-light.webp" width="100%" alt="L'Humanité, en natif : le quotidien fondé par Jaurès en 1904, dans une app où le lecteur n'attend jamais devant un écran vide. Trois écrans de l'app sur iPhone : une recherche, la une, un article.">
+  <img src="docs/showcase/banner-light.webp" width="100%" alt="L'Humanité, en natif : le quotidien fondé par Jaurès en 1904, dans une app où le lecteur n'attend jamais devant un écran vide. Trois écrans de l'app sur iPhone : le fil En continu, la une, un article.">
 </picture>
 
 ![Expo SDK 57](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)
