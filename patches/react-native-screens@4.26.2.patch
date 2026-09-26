@@ -1,3 +1,58 @@
+diff --git a/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt b/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt
+index 09164900ea5b5c7dd6e330aa6cd35d5b5edaacd7..406672fadbcb97df83770a4500007d155fc0f0a6 100644
+--- a/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt
++++ b/android/src/main/java/com/swmansion/rnscreens/gamma/common/container/ContainerItemSupport.kt
+@@ -1,5 +1,6 @@
+ package com.swmansion.rnscreens.gamma.common.container
+ 
++import android.graphics.Rect
+ import android.view.ViewGroup
+ import com.swmansion.rnscreens.ext.refersToCompat
+ import com.swmansion.rnscreens.gamma.helpers.ViewFinder
+@@ -15,10 +16,17 @@ import java.lang.ref.WeakReference
+  */
+ internal class ContainerItemSupport {
+     private var nestedContainer: WeakReference<Container> = WeakReference(null)
+-    private var contentScrollView: WeakReference<ViewGroup> = WeakReference(null)
++
++    // Patched by humanite-app: every scroll view registered, the latest last, where upstream keeps the latest alone.
++    // A marker registers as it reaches the window, and a pager builds the pages beside the one being read, so the
++    // latest to register is a page off the screen: on Android 16 (A065, 26/09/2026), touching the front page's tab
++    // again left the list being read where it was. The content scroll view is therefore the latest registered that
++    // is on the screen, and upstream's latest only when none is.
++    private val contentScrollViews = ArrayList<WeakReference<ViewGroup>>()
+ 
+     fun registerScrollView(scrollView: ViewGroup) {
+-        contentScrollView = WeakReference(scrollView)
++        contentScrollViews.removeAll { it.get().let { view -> view == null || view === scrollView } }
++        contentScrollViews.add(WeakReference(scrollView))
+     }
+ 
+     fun registerNestedContainer(container: Container) {
+@@ -39,8 +47,9 @@ internal class ContainerItemSupport {
+      * heuristic search through [owner]'s first descendant chain.
+      */
+     fun findContentScrollView(owner: ViewGroup): ViewGroup? {
+-        // Cached one
+-        contentScrollView.get()?.let { return it }
++        // Cached one: the latest on the screen, else the latest (patched by humanite-app, see contentScrollViews)
++        val registered = contentScrollViews.mapNotNull { it.get() }
++        (registered.lastOrNull(::isOnScreen) ?: registered.lastOrNull())?.let { return it }
+ 
+         // Provided by nested container
+         resolveNestedContainer()?.resolveCurrentContentScrollView()?.let { scrollView ->
+@@ -51,4 +60,11 @@ internal class ContainerItemSupport {
+         ViewFinder.findScrollViewInFirstDescendantChain(owner)?.let { return it }
+         return null
+     }
++
++    // Patched by humanite-app: whether most of the view's width is on the screen — the page of a pager at rest, and
++    // none of its neighbours.
++    private fun isOnScreen(view: ViewGroup): Boolean {
++        val shown = Rect()
++        return view.isAttachedToWindow && view.getGlobalVisibleRect(shown) && shown.width() * 2 > view.width
++    }
+ }
 diff --git a/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt b/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt
 index 10c9efa4ed4ad4df1aab7832b1b3876a6bcd7f2a..ef36f007c4c5b2c86764dac87fc9003bd37cefd2 100644
 --- a/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt
