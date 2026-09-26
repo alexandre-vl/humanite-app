@@ -1,3 +1,40 @@
+diff --git a/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt b/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt
+index 10c9efa4ed4ad4df1aab7832b1b3876a6bcd7f2a..ef36f007c4c5b2c86764dac87fc9003bd37cefd2 100644
+--- a/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt
++++ b/android/src/main/java/com/swmansion/rnscreens/gamma/scrollviewmarker/ScrollViewMarker.kt
+@@ -1,6 +1,7 @@
+ package com.swmansion.rnscreens.gamma.scrollviewmarker
+ 
+ import android.annotation.SuppressLint
++import android.view.View
+ import android.view.ViewGroup
+ import android.widget.ScrollView
+ import androidx.core.view.children
+@@ -41,13 +42,23 @@ class ScrollViewMarker(
+      */
+     private fun findScrollView(): ViewGroup {
+         val childScrollView =
+-            checkNotNull(children.find { childView -> childView is ScrollView || childView is NestedScrollView }) {
++            checkNotNull(
++                children.find(::isSupportedScrollView)
++                    // Patched by humanite-app: on Android, React Native lays a ScrollView given a refreshControl
++                    // inside a SwipeRefreshLayout, so the marker's child is the refresh layout and the scroll view is
++                    // the refresh layout's child. Upstream looks among the children only, finds nothing and throws:
++                    // every screen with a list the reader can pull to refresh crashed the app as it opened (A065,
++                    // Android 16, v0.1.1, 26/09/2026). Upstream still does so in 4.28.0 and on main that day.
++                    ?: children.filterIsInstance<ViewGroup>().flatMap { it.children }.find(::isSupportedScrollView),
++            ) {
+                 "[RNScreens] Failed to find supported type of ScrollView in children of ScrollViewMarker"
+             }
+ 
+         return childScrollView as ViewGroup
+     }
+ 
++    private fun isSupportedScrollView(view: View): Boolean = view is ScrollView || view is NestedScrollView
++
+     private fun findFirstSeekingAncestor(): ScrollViewSeeking? {
+         var currentView = parent
+ 
 diff --git a/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm b/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm
 index f0a72ccece723748ba57e9b54174a5f999bf6173..1a95b6a19a5a46bb15ed217f5982150955881018 100644
 --- a/ios/gamma/scroll-view-marker/RNSScrollViewMarkerComponentView.mm
