@@ -1038,28 +1038,6 @@ export const BINDINGS = {
       ],
     },
   },
-  'ADR-0032': {
-    scope: {
-      // The reading that honours the right the service grants, with the judging that holds it both ways, and the
-      // bench of clients bent one port at a time — where the delivered client that borrowed the official key is named.
-      // The connection itself, the one place the borrowed key is ever written, with the shapes its two exchanges take.
-      paths: [
-        'packages/contracts/src/intake.ts',
-        'packages/contracts/src/session.ts',
-        'packages/remote-api/src/session.ts',
-        'tools/guardrails/src/proofs/right.ts',
-        'tools/guardrails/src/proofs/transport.ts',
-      ],
-    },
-    rules: {
-      R1: ['right/reader', 'right/withheld-opened', 'right/granted-withheld'],
-      R2: ['transport/borrows-key'],
-      R3: {
-        convention:
-          'L’app PEUT demander à l’abonné les identifiants de son abonnement et les porter à POST /user/login pour obtenir un jeton d’usager. La clé du client officiel est injectée au démarrage d’un build de développement ; aucun fichier suivi ne la porte, qu’une lecture de tools/capture/src/secrets.ts arrête.',
-      },
-    },
-  },
   'ADR-0033': {
     scope: {
       // What ADR-0028 governed, unchanged: the client of the service with its judging, the door that hands it the
