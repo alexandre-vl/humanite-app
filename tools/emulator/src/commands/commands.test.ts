@@ -184,7 +184,7 @@ test('the dev client link skips the launcher, and Maestro gets the app and its l
   expect(link).toBe(
     'exp+humanite://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081&disableOnboarding=1&disableAutoLaunch=1&disableFab=1',
   );
-  expect(maestroArguments(session, { appId: 'dev.humanite.app', link, output: '/out' })).toEqual([
+  expect(maestroArguments(session, { appId: 'alexandrevl.humanite.app.dev', link, output: '/out' })).toEqual([
     '--device',
     '127.0.0.1:5555',
     'test',
@@ -195,7 +195,7 @@ test('the dev client link skips the launcher, and Maestro gets the app and its l
     // The bench has no subscriber and no key to open a connection with, so the flow that needs both is left out.
     '--exclude-tags=abonne',
     '-e',
-    'APP_ID=dev.humanite.app',
+    'APP_ID=alexandrevl.humanite.app.dev',
     '-e',
     `DEV_CLIENT_LINK=${link}`,
     '/work/humanite/apps/mobile/e2e',

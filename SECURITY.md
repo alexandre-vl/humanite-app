@@ -35,6 +35,8 @@ Seules `main` et la dernière release sont maintenues. L'app n'est sur aucun sto
   pour empreinte SHA-256 `b58a1ae9db2379bea06357aa187bed8ffd3b9f6c879ad8e522d6a4058879971e` : un APK signé par une
   autre clé n'est pas l'un des nôtres. Chaque binaire porte une attestation de provenance
   (`gh attestation verify <fichier> -R alexandre-vl/humanite-app`).
+- Une release porte l'identifiant `alexandrevl.humanite.app`, que seule la clé de release signe ; toute autre build,
+  `alexandrevl.humanite.app.dev` ([ADR-0039](docs/adr/0039-l-identite-de-l-app-n-appartient-qu-aux-releases.md)).
 - Le jeton de l'abonné vit dans le trousseau du téléphone
   ([ADR-0034](docs/adr/0034-le-jeton-de-l-abonne-dans-le-trousseau-du-telephone.md)).
 - Un article réservé ne s'ouvre que sur le droit que le service accorde : le serveur n'envoie aucun corps sans ce

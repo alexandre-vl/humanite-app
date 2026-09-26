@@ -9,7 +9,8 @@ const USAGE = [
   '        pnpm perf:check --transcript --package <paquet> --serial <appareil> <dossier-de-session>',
 ].join('\n');
 
-const PACKAGE = 'dev.humanite.app';
+/** The package a session measures by default: a build of this machine, which carries the `.dev` identity (ADR-0039). */
+const PACKAGE = 'alexandrevl.humanite.app.dev';
 
 /** How a unit is written beside a number, which is not how it is named in the table. */
 const SYMBOL = { ms: 'ms', percent: '%' } as const satisfies Readonly<Record<Unit, string>>;

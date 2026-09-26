@@ -16,6 +16,36 @@ const VERSION = '0.1.0';
 const versionCode = (version: string): number =>
   version.split('.').reduce((code, part) => code * 100 + Number.parseInt(part, 10), 0);
 
+/**
+ * Who a build says it is: its package and bundle identifier, the name under its icon, and the scheme its links open.
+ *
+ * The plain identity belongs to the release key. Android refuses to install an app over one of the same identifier
+ * signed by another key, so a build of the debug key under that identifier — a dev client, a local build, a build of
+ * the CI — would stand, on a phone, between the reader and every release. Only the release workflow asks for it; every
+ * other build is the `.dev` one, beside the release rather than in its place, and its links open in it and not in the
+ * release (ADR-0039).
+ */
+const IDENTITIES = {
+  release: { id: 'alexandrevl.humanite.app', name: 'L’Humanité', scheme: 'humanite' },
+  development: { id: 'alexandrevl.humanite.app.dev', name: 'L’Humanité dev', scheme: 'humanite-dev' },
+} as const;
+
+/** The identity `APP_VARIANT` asks for: `release`, or none for the development one; any other value is a mistake. */
+function identityOf(variant: string | undefined): (typeof IDENTITIES)[keyof typeof IDENTITIES] {
+  switch (variant) {
+    case 'release':
+      return IDENTITIES.release;
+    case undefined:
+    case '':
+    case 'development':
+      return IDENTITIES.development;
+    default:
+      throw new Error(`APP_VARIANT=${variant} : release, development ou rien attendu`);
+  }
+}
+
+const IDENTITY = identityOf(process.env['APP_VARIANT']);
+
 /** How the block merged into the generated activity is named, so a later prebuild replaces it rather than doubling it. */
 const FAST_FRAMES = 'humanite-fast-frames';
 
@@ -180,10 +210,10 @@ const withScenes: ConfigPlugin = (expo) => {
 const config: ExpoConfig = {
   // The name the phone prints under the icon, and the one the paper is called: the store lists it as
   // « L'Humanité - Le Journal », published by la Société Nouvelle du Journal l'Humanité. The article is part of the
-  // name and the launcher had been dropping it.
-  name: 'L’Humanité',
+  // name and the launcher had been dropping it. A development build adds that it is one.
+  name: IDENTITY.name,
   slug: 'humanite',
-  scheme: 'humanite',
+  scheme: IDENTITY.scheme,
   version: VERSION,
   platforms: ['ios', 'android'],
   orientation: 'portrait',
@@ -196,9 +226,9 @@ const config: ExpoConfig = {
   // that field alike.
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
-  ios: { bundleIdentifier: 'dev.humanite.app' },
+  ios: { bundleIdentifier: IDENTITY.id },
   android: {
-    package: 'dev.humanite.app',
+    package: IDENTITY.id,
     versionCode: versionCode(VERSION),
     // The mark again, as the two pieces Android asks for since Oreo: the foreground it masks to whatever shape the
     // launcher uses, and the ground behind it. The foreground already carries the red square, so the ground is only

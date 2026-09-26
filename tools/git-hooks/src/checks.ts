@@ -181,6 +181,15 @@ const TABLE = {
     message:
       'le job {job} de {path} construit sans EXPO_PUBLIC_CONTENT_SOURCE: service : il montrerait le corpus fictif',
   },
+  'git/release-identity': {
+    summary: 'la release construit l’identité des releases, alexandrevl.humanite.app',
+    message: 'le job {job} de {path} construit sans APP_VARIANT: release : il publierait l’identité .dev',
+  },
+  'git/ci-release-identity': {
+    summary: 'la CI construit l’identité .dev, celle de la clé de debug',
+    message:
+      '{path} nomme APP_VARIANT : une build de la CI, signée par la clé de debug, ne demande jamais l’identité des releases',
+  },
 } as const;
 
 const GIT_HOOK_CHECKS = defineChecks(TABLE);

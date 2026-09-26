@@ -13,12 +13,12 @@ const define = fixtureFactory<PerfCode>();
 const LAUNCH = (totalMs: number): string => `Starting: Intent { act=android.intent.action.MAIN flg=0x10200000 }
 Status: ok
 LaunchState: COLD
-Activity: dev.humanite.app/.MainActivity
+Activity: alexandrevl.humanite.app.dev/.MainActivity
 TotalTime: ${String(totalMs)}
 WaitTime: ${String(totalMs + 18)}
 Complete`;
 
-const GFXINFO = (rendered: number, janky: number): string => `Graphics info for pid 9213 [dev.humanite.app]:
+const GFXINFO = (rendered: number, janky: number): string => `Graphics info for pid 9213 [alexandrevl.humanite.app.dev]:
 
 Total frames rendered: ${String(rendered)}
 Janky frames: ${String(janky)} (${(rendered === 0 ? 0 : (janky / rendered) * 100).toFixed(2)}%)
@@ -37,7 +37,7 @@ const PHONE = `[ro.product.model]: [A065]
 [ro.build.version.sdk]: [35]`;
 
 /** What `dumpsys package` prints of the shipped build: the flags a debuggable one would add are not there. */
-const SHIPPED = `Package [dev.humanite.app] (3f2a1b8):
+const SHIPPED = `Package [alexandrevl.humanite.app.dev] (3f2a1b8):
     userId=10412
     flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
     versionName=0.0.0`;
@@ -94,7 +94,7 @@ export const PERF_FIXTURES = [
     'perf/unreadable-frames',
     'un relevé d’images qu’aucune ligne connue ne porte',
     ['perf/unreadable-frames'],
-    judged({ ...WITHIN, frames: 'No process found for: dev.humanite.app' }),
+    judged({ ...WITHIN, frames: 'No process found for: alexandrevl.humanite.app.dev' }),
   ),
   define(
     'perf/no-frames-rendered',

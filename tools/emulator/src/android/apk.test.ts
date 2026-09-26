@@ -8,7 +8,7 @@ const tree = (schemes: readonly string[]): string =>
     `N: android=${ANDROID} (line=2)`,
     '  E: manifest (line=2)',
     `    A: ${ANDROID}:versionCode(0x0101021b)=1`,
-    '    A: package="dev.humanite.app" (Raw: "dev.humanite.app")',
+    '    A: package="alexandrevl.humanite.app.dev" (Raw: "alexandrevl.humanite.app.dev")',
     '      E: uses-sdk (line=7)',
     `        A: ${ANDROID}:targetSdkVersion(0x01010270)=36`,
     '      E: application (line=55)',
@@ -23,17 +23,17 @@ const tree = (schemes: readonly string[]): string =>
   ].join('\n');
 
 test('reads the package, the target SDK, the back callback and the schemes of a manifest tree', () => {
-  expect(parseManifestTree(tree(['humanite', 'exp+humanite']))).toEqual({
-    packageName: 'dev.humanite.app',
+  expect(parseManifestTree(tree(['humanite-dev', 'exp+humanite']))).toEqual({
+    packageName: 'alexandrevl.humanite.app.dev',
     targetSdk: 36,
     backInvokedCallback: false,
-    schemes: ['humanite', 'exp+humanite'],
+    schemes: ['humanite-dev', 'exp+humanite'],
   });
   expect(() => parseManifestTree('N: android\n')).toThrow('illisible');
 });
 
 test('the dev client scheme is the one scheme Expo prefixes', () => {
-  expect(devClientScheme(parseManifestTree(tree(['humanite', 'exp+humanite'])))).toBe('exp+humanite');
-  expect(() => devClientScheme(parseManifestTree(tree(['humanite'])))).toThrow('0 schéma');
+  expect(devClientScheme(parseManifestTree(tree(['humanite-dev', 'exp+humanite'])))).toBe('exp+humanite');
+  expect(() => devClientScheme(parseManifestTree(tree(['humanite-dev'])))).toThrow('0 schéma');
   expect(() => devClientScheme(parseManifestTree(tree(['exp+a', 'exp+b'])))).toThrow('2 schéma');
 });

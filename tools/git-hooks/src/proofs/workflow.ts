@@ -42,12 +42,18 @@ const ci = (jobs: Plan = {}, top: Plan = {}): string =>
     jobs: { ...CI_JOBS, ...jobs },
   });
 
-/** The smallest release the rules accept — a tag starts it, it builds the service and signs with its own key. */
+/** What every build of a release is given: the service, under the identity of the releases. */
+const RELEASE_ENV = { EXPO_PUBLIC_CONTENT_SOURCE: 'service', APP_VARIANT: 'release' };
+
+/**
+ * The smallest release the rules accept — a tag starts it, it builds the service under the identity of the releases,
+ * and signs with its own key.
+ */
 const release = (top: Plan = {}): string =>
   stringify({
     on: { push: { tags: ['v*.*.*'] } },
     permissions: { contents: 'read' },
-    env: { EXPO_PUBLIC_CONTENT_SOURCE: 'service' },
+    env: RELEASE_ENV,
     ...top,
     jobs: {
       android: {
@@ -158,7 +164,7 @@ export const WORKFLOW_FIXTURES = [
     ['git/ci-identity'],
     judged({
       ci: ci(),
-      release: release({ env: { EXPO_PUBLIC_CONTENT_SOURCE: 'service', EXPO_PUBLIC_APP_SECRET: 'prêtée' } }),
+      release: release({ env: { ...RELEASE_ENV, EXPO_PUBLIC_APP_SECRET: 'prêtée' } }),
     }),
   ),
   define(
@@ -181,6 +187,23 @@ export const WORKFLOW_FIXTURES = [
     'git/ci-variant',
     'une release qui construit l’app sur le corpus fictif',
     ['git/ci-variant'],
-    judged({ ci: ci(), release: release({ env: {} }) }),
+    judged({ ci: ci(), release: release({ env: { APP_VARIANT: 'release' } }) }),
+  ),
+  define(
+    'git/release-identity',
+    'une release qui publierait l’identité .dev',
+    ['git/release-identity'],
+    judged({ ci: ci(), release: release({ env: { EXPO_PUBLIC_CONTENT_SOURCE: 'service' } }) }),
+  ),
+  define(
+    'git/ci-release-identity',
+    'une CI qui construit sous l’identité des releases',
+    ['git/ci-release-identity'],
+    judged({
+      ci: ci({
+        android: { env: { EXPO_PUBLIC_CONTENT_SOURCE: 'service', APP_VARIANT: 'release' }, steps: [PREBUILD] },
+      }),
+      release: release(),
+    }),
   ),
 ] as const;

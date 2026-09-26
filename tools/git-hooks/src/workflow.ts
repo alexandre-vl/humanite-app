@@ -62,6 +62,9 @@ const HISTORY_SCAN = /gitleaks"?\s+git\b/u;
 /** A job that builds the app: it generates the native project first. */
 const PREBUILD = /\bexpo prebuild\b/u;
 
+/** The variable a build asks for the identity of the releases with (ADR-0039), which only the release may name. */
+const VARIANT = /\bAPP_VARIANT\b/u;
+
 type Reading = Readonly<{ workflow: Workflow }> | Readonly<{ finding: Diagnostic<GitHookCode> }>;
 
 /** The YAML `text` holds, or why the parser refused it. */
@@ -99,6 +102,11 @@ const checkoutOf = (job: Job): z.infer<typeof STEP> | undefined =>
 
 const cloneIsFull = (job: Job): boolean => checkoutOf(job)?.with?.['fetch-depth'] === 0;
 
+const buildsApp = (job: Job): boolean => job.steps.some((step) => PREBUILD.test(step.run ?? ''));
+
+/** What the steps of `job` read for `name`: the job's own value, or else the workflow's. */
+const envOf = (workflow: Workflow, job: Job, name: string): unknown => job.env?.[name] ?? workflow.env?.[name];
+
 const checksOutHead = (job: Job): boolean => {
   const ref = checkoutOf(job)?.with?.['ref'];
   return typeof ref === 'string' && ref.includes('github.event.pull_request.head.sha');
@@ -130,18 +138,23 @@ function checkCommon(
     findings.push(gitHookFinding('git/ci-identity', path, { path, name }));
   }
   for (const [name, job] of Object.entries(workflow.jobs)) {
-    const variant = job.env?.['EXPO_PUBLIC_CONTENT_SOURCE'] ?? workflow.env?.['EXPO_PUBLIC_CONTENT_SOURCE'];
-    if (job.steps.some((step) => PREBUILD.test(step.run ?? '')) && variant !== 'service') {
+    if (buildsApp(job) && envOf(workflow, job, 'EXPO_PUBLIC_CONTENT_SOURCE') !== 'service') {
       findings.push(gitHookFinding('git/ci-variant', path, { job: name, path }));
     }
   }
   return findings;
 }
 
-/** The CI: every push to main and every pull request, verified on a full clone at its head, and searched for secrets. */
+/**
+ * The CI: every push to main and every pull request, verified on a full clone at its head, and searched for secrets;
+ * what it builds keeps the `.dev` identity of the debug key.
+ */
 function checkIntegration(text: string, workflow: Workflow): readonly Diagnostic<GitHookCode>[] {
   const path = CI_WORKFLOW;
   const findings: Diagnostic<GitHookCode>[] = [...checkCommon(path, text, workflow, new Set())];
+  if (VARIANT.test(text)) {
+    findings.push(gitHookFinding('git/ci-release-identity', path, { path }));
+  }
   const push = PUSH.safeParse(workflow.on['push']);
   if (!(push.success && (push.data.branches ?? []).includes('main') && Object.hasOwn(workflow.on, 'pull_request'))) {
     findings.push(gitHookFinding('git/ci-trigger', path, { path, expected: 'push sur main et pull_request' }));
@@ -180,10 +193,18 @@ function checkIntegration(text: string, workflow: Workflow): readonly Diagnostic
   return findings;
 }
 
-/** The release: a tag and nothing else starts it, and it reads no secret but the key it signs with. */
+/**
+ * The release: a tag and nothing else starts it, it reads no secret but the key it signs with, and what it builds has
+ * the identity of the releases.
+ */
 function checkRelease(text: string, workflow: Workflow): readonly Diagnostic<GitHookCode>[] {
   const path = RELEASE_WORKFLOW;
   const findings: Diagnostic<GitHookCode>[] = [...checkCommon(path, text, workflow, SIGNING_KEY)];
+  for (const [name, job] of Object.entries(workflow.jobs)) {
+    if (buildsApp(job) && envOf(workflow, job, 'APP_VARIANT') !== 'release') {
+      findings.push(gitHookFinding('git/release-identity', path, { job: name, path }));
+    }
+  }
   const push = PUSH.safeParse(workflow.on['push']);
   const onTagsOnly =
     Object.keys(workflow.on).length === 1 &&

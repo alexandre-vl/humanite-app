@@ -46,6 +46,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0036](0036-un-magasin-du-lecteur-vit-dans-l-ecran-qui-seul-le-lit.md)      | Un magasin du lecteur vit dans l’écran qui seul le lit      | accepté                                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0037](0037-le-lecteur-n-attend-devant-rien-de-vide-ni-de-faux.md)          | Le lecteur n’attend devant rien de vide ni de faux          | accepté                                                                                  | `boundary`, `reversal-cost`                                                |
 | [ADR-0038](0038-le-depot-public-se-verifie-et-se-publie-sur-le-serveur.md)      | Le dépôt public se vérifie et se publie sur le serveur      | accepté                                                                                  | `guarded-config`, `boundary`                                               |
+| [ADR-0039](0039-l-identite-de-l-app-n-appartient-qu-aux-releases.md)            | L’identité de l’app n’appartient qu’aux releases            | proposé                                                                                  | `guarded-config`, `reversal-cost`                                          |
 
 ## Confirmation
 
@@ -432,6 +433,17 @@ Statut : accepté. Périmètre : `.github/workflows/**`, `.gitleaks.toml`, `tool
 | R9    | DOIT        | convention : La règle « main : contributions vérifiées » exige une pull request, fusionnée par rebase seulement, et les contrôles pnpm verify, secrets (gitleaks), build Android et build iOS verts ; le dépôt n’autorise ni fusion par commit de fusion ni par écrasement (gh api repos/alexandre-vl/humanite-app).                                      |
 | R10   | PEUT        | convention : Le rôle d’administrateur du dépôt contourne « main : contributions vérifiées », et lui seul : un push direct du mainteneur passe sous ses hooks locaux, puis la CI le rejoue.                                                                                                                                                                |
 | R11   | NE DOIT PAS | convention : La règle « main : contributions vérifiées » exige aussi les résultats de CodeQL, réglé par défaut sur le dépôt, et refuse une pull request qui ouvre une alerte de sécurité moyenne ou plus, ou une erreur (gh api repos/alexandre-vl/humanite-app/rulesets/24038072).                                                                       |
+
+### ADR-0039 · L’identité de l’app n’appartient qu’aux releases
+
+Statut : proposé. Périmètre : `apps/mobile/app.config.ts`, `.github/workflows/**`.
+
+| Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                |
+| ----- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R1    | DOIT        | convention : apps/mobile/app.config.ts lit APP_VARIANT : rien ou development donne alexandrevl.humanite.app.dev, « L’Humanité dev » et le schéma humanite-dev ; release donne alexandrevl.humanite.app, « L’Humanité » et humanite ; toute autre valeur arrête la configuration (APP_VARIANT=x pnpm exec expo config). |
+| R2    | NE DOIT PAS | `git/ci-release-identity`                                                                                                                                                                                                                                                                                              |
+| R3    | DOIT        | `git/release-identity`                                                                                                                                                                                                                                                                                                 |
+| R4    | NE DOIT PAS | convention : alexandrevl.humanite.app est l’identifiant des releases depuis v0.1.1 ; le gate de .github/workflows/release.yml le compare, écrit en toutes lettres, à celui que la release construit.                                                                                                                   |
 
 ## Référentiel
 

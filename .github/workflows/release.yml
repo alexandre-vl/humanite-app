@@ -17,6 +17,8 @@ concurrency:
 
 env:
   EXPO_PUBLIC_CONTENT_SOURCE: service
+  # L'identité des releases, alexandrevl.humanite.app : toute autre build porte la .dev (ADR-0039).
+  APP_VARIANT: release
   # L'empreinte du certificat de la clé de release : un APK signé par une autre clé ne sort pas.
   RELEASE_CERT_SHA256: b58a1ae9db2379bea06357aa187bed8ffd3b9f6c879ad8e522d6a4058879971e
 
@@ -41,13 +43,19 @@ jobs:
           node-version-file: package.json
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - run: pnpm install --frozen-lockfile
-      - name: L'app porte la version du tag
+      - name: L'app porte la version du tag, sous l'identité des releases
         id: version
         working-directory: apps/mobile
         run: |
-          version="$(pnpm exec expo config --type public --json | jq -r .version)"
+          config="$(pnpm exec expo config --type public --json)"
+          version="$(jq -r .version <<< "${config}")"
           if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
             echo "::error::le tag ${GITHUB_REF_NAME} ne nomme pas la version de l'app, ${version} (apps/mobile/app.config.ts)"
+            exit 1
+          fi
+          identity="$(jq -r '[.android.package, .ios.bundleIdentifier] | join(" ")' <<< "${config}")"
+          if [ "${identity}" != 'alexandrevl.humanite.app alexandrevl.humanite.app' ]; then
+            echo "::error::la release construirait ${identity}, et non alexandrevl.humanite.app (ADR-0039)"
             exit 1
           fi
           echo "version=${version}" >> "${GITHUB_OUTPUT}"

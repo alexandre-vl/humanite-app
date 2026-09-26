@@ -22,6 +22,10 @@ pnpm verify           # tous les contrôles, dans l'ordre
 Sans aucune variable d'environnement, l'app lit le corpus fictif de `packages/mock-content` : c'est ainsi qu'on la
 développe et qu'on la teste. Lancer l'app sur iOS ou Android : [README, « Démarrer »](README.md#démarrer).
 
+Une build de votre machine s'installe sous « L'Humanité dev », `alexandrevl.humanite.app.dev`, à côté d'une release :
+seule la release porte `alexandrevl.humanite.app`
+([ADR-0039](docs/adr/0039-l-identite-de-l-app-n-appartient-qu-aux-releases.md)).
+
 La connexion de l'abonné n'est pas ouverte aux contributions : elle passe sous une clé prêtée au mainteneur pour ses
 tests, qui ne se partage pas ([ADR-0032](docs/adr/0032-la-connexion-de-l-abonne-sous-une-cle-pretee.md)).
 

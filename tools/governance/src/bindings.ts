@@ -1255,4 +1255,22 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0039': {
+    scope: {
+      // Where a build's identity is chosen, and the workflows that ask for one: the CI never does, the release always.
+      paths: ['apps/mobile/app.config.ts', '.github/workflows/**'],
+    },
+    rules: {
+      R1: {
+        convention:
+          'apps/mobile/app.config.ts lit APP_VARIANT : rien ou development donne alexandrevl.humanite.app.dev, « L’Humanité dev » et le schéma humanite-dev ; release donne alexandrevl.humanite.app, « L’Humanité » et humanite ; toute autre valeur arrête la configuration (APP_VARIANT=x pnpm exec expo config).',
+      },
+      R2: ['git/ci-release-identity'],
+      R3: ['git/release-identity'],
+      R4: {
+        convention:
+          'alexandrevl.humanite.app est l’identifiant des releases depuis v0.1.1 ; le gate de .github/workflows/release.yml le compare, écrit en toutes lettres, à celui que la release construit.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;
