@@ -45,7 +45,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0035](0035-le-lecteur-ne-regarde-jamais-le-journal-se-charger.md)          | Le lecteur ne regarde jamais le journal se charger          | remplacé par [ADR-0037](0037-le-lecteur-n-attend-devant-rien-de-vide-ni-de-faux.md)      | `boundary`, `reversal-cost`                                                |
 | [ADR-0036](0036-un-magasin-du-lecteur-vit-dans-l-ecran-qui-seul-le-lit.md)      | Un magasin du lecteur vit dans l’écran qui seul le lit      | accepté                                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0037](0037-le-lecteur-n-attend-devant-rien-de-vide-ni-de-faux.md)          | Le lecteur n’attend devant rien de vide ni de faux          | accepté                                                                                  | `boundary`, `reversal-cost`                                                |
-| [ADR-0038](0038-le-depot-public-se-verifie-et-se-publie-sur-le-serveur.md)      | Le dépôt public se vérifie et se publie sur le serveur      | proposé                                                                                  | `guarded-config`, `boundary`                                               |
+| [ADR-0038](0038-le-depot-public-se-verifie-et-se-publie-sur-le-serveur.md)      | Le dépôt public se vérifie et se publie sur le serveur      | accepté                                                                                  | `guarded-config`, `boundary`                                               |
 
 ## Confirmation
 
@@ -417,7 +417,7 @@ Statut : accepté. Périmètre : `apps/mobile/src/entities/article/api/queries.t
 
 ### ADR-0038 · Le dépôt public se vérifie et se publie sur le serveur
 
-Statut : proposé. Périmètre : `.github/workflows/**`, `.gitleaks.toml`, `tools/git-hooks/src/workflow.ts`.
+Statut : accepté. Périmètre : `.github/workflows/**`, `.gitleaks.toml`, `tools/git-hooks/src/workflow.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                   |
 | ----- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
