@@ -1,0 +1,35 @@
+name: Bug
+description: Quelque chose ne fait pas ce qu'il devrait.
+labels: [bug]
+body:
+  - type: textarea
+    id: constat
+    attributes:
+      label: Ce qui se passe
+      description: Ce que vous voyez, avec une capture ou une vidéo si c'est un écran.
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Ce qui devrait se passer
+    validations:
+      required: true
+  - type: textarea
+    id: reproduire
+    attributes:
+      label: Pour le reproduire
+      description: Les étapes, depuis l'ouverture de l'app ou depuis un clone neuf du dépôt.
+      placeholder: |
+        1. pnpm install && pnpm hooks:install
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: environnement
+    attributes:
+      label: Où
+      description: Appareil ou simulateur, version d'iOS ou d'Android, commit de main.
+      placeholder: iPhone 17 (simulateur), iOS 27.0, 80eb1de
+    validations:
+      required: true

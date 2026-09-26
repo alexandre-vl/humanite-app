@@ -5,6 +5,8 @@
   <img src="docs/showcase/banner-light.webp" width="100%" alt="L'Humanité, en natif : le quotidien fondé par Jaurès en 1904, dans une app où le lecteur n'attend jamais devant un écran vide. Trois écrans de l'app sur iPhone : le fil En continu, la une, un article.">
 </picture>
 
+[![CI](https://github.com/alexandre-vl/humanite-app/actions/workflows/ci.yml/badge.svg)](https://github.com/alexandre-vl/humanite-app/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/badge/licence-PolyForm%20Noncommercial%201.0.0-4c3f57)](LICENSE)
 ![Expo SDK 57](https://img.shields.io/badge/Expo-SDK%2057-000020?logo=expo&logoColor=white)
 ![React Native 0.86](https://img.shields.io/badge/React%20Native-0.86%20%C2%B7%20New%20Architecture-61DAFB?logo=react&logoColor=black)
 ![TypeScript 6](https://img.shields.io/badge/TypeScript-6%20ultra--strict-3178C6?logo=typescript&logoColor=white)
@@ -126,6 +128,10 @@ flowchart LR
 - **Les agents travaillent sous une garde** : vingt et une règles, et un appel refusé nomme par son code chaque règle
   qu'il enfreint — pas de décision d'ADR, pas de contournement des hooks, pas d'écriture directe dans `.git`
   ([ADR-0009](docs/adr/0009-permissions-des-agents.md), [AGENTS.md](AGENTS.md)).
+- **Le serveur rejoue tout** : chaque push et chaque pull request repassent `pnpm verify` sur un clone complet,
+  cherchent un secret dans tout l'historique et construisent l'app pour Android et iOS sans aucune variable
+  ([CI](.github/workflows/ci.yml)) ; `main` refuse la réécriture et la suppression, et une pull request ne s'y fusionne
+  que verte, par rebase.
 
 ## Architecture
 
@@ -219,7 +225,8 @@ et l'identité que l'app présente au service, fournie au build par les variable
 > [!WARNING]
 > Ne lancez jamais Metro avec `CI=1` : son watcher s'éteint, et le dev client sert en silence le dernier bundle valide.
 
-Les commandes du dépôt, chacune avec son rôle, sont dans [AGENTS.md](AGENTS.md).
+Les commandes du dépôt, chacune avec son rôle, sont dans [AGENTS.md](AGENTS.md) ; pour proposer une modification :
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Mesurer, pas supposer
 
@@ -248,7 +255,15 @@ L'app n'est pas publiée. Elle le sera sans dette — chaque décision écrite, 
       les a pris.
 - [ ] **Expo SDK 58**, qui emportera le plugin de scène écrit pour iOS 27.
 
-## Droits
+## Licence et droits
 
-Les articles et les images que sert le service appartiennent à _L'Humanité_ et à leurs auteurs. Le corpus simulé est
-fictif, et chacun de ses visuels découle de sa seule clé et de la couleur de sa rubrique.
+Le code et la documentation de ce dépôt sont publiés sous la
+[PolyForm Noncommercial License 1.0.0](LICENSE) : libres pour tout usage non commercial — apprendre, tester, modifier,
+partager ; un usage commercial demande l'accord de l'auteur.
+
+Les articles et les images que sert le service appartiennent à _L'Humanité_ et à leurs auteurs, comme la marque du
+journal : la licence du dépôt ne s'étend à aucun d'eux. Ce projet indépendant n'est ni affilié au journal ni approuvé
+par lui. Le corpus simulé est fictif, et chacun de ses visuels découle de sa seule clé et de la couleur de sa rubrique.
+
+Contribuer : [CONTRIBUTING.md](CONTRIBUTING.md) · signaler une faille : [SECURITY.md](SECURITY.md) · conduite :
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

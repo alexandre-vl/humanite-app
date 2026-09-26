@@ -1,0 +1,22 @@
+name: Idée
+description: Une fonction, un écran ou une règle du dépôt à changer.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Le problème
+      description: Ce qui manque ou gêne aujourd'hui, pour le lecteur ou pour qui développe.
+    validations:
+      required: true
+  - type: textarea
+    id: piste
+    attributes:
+      label: La piste
+      description: Ce que vous proposez, et ce que vous avez écarté.
+  - type: checkboxes
+    id: adr
+    attributes:
+      label: Décisions
+      options:
+        - label: Cette idée change une règle d'un ADR en vigueur (docs/adr/README.md) — elle passera par un ADR proposé.
