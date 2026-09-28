@@ -1331,10 +1331,7 @@ export const BINDINGS = {
       ],
     },
     rules: {
-      R1: {
-        convention:
-          'createReader garde les identifiants dans le trousseau (keychainCredentials, KEYCHAIN_KEYS.readerCredentials) à la connexion réussie, et nulle part ailleurs : keychain.ts n’ouvre expo-secure-store que pour ses deux clés, et keys.ts les nomme. reader.test.ts relit que la connexion les écrit au disque des identifiants, keychain.test.ts que la seconde entrée du trousseau tient. Aucun banc hors ligne ne le juge, le trousseau étant celui de l’app.',
-      },
+      R1: ['guardrail/module-expo-secure-store'],
       R2: {
         convention:
           'createReader n’écrit les identifiants qu’après le jeton rendu par createSession(...).open, donc après un 200 du service : un login refusé lève avant l’écriture. reader.test.ts relit qu’un mot de passe refusé ne laisse rien au disque des identifiants.',
