@@ -1,5 +1,6 @@
 import { deleteItemAsync, getItem, setItem, WHEN_UNLOCKED_THIS_DEVICE_ONLY } from 'expo-secure-store';
 import { KEYCHAIN_KEYS, STORAGE_KEYS } from './keys';
+import type { KeychainKey } from './keys';
 import type { StateStorage } from './state-storage';
 import { storage } from './storage';
 
@@ -44,7 +45,7 @@ const broughtForward = (): void => {
   const kept = storage.getString(STORAGE_KEYS.readerTokenWas);
   if (kept !== undefined) {
     if (kept !== '') {
-      keep(kept);
+      keep(KEYCHAIN_KEYS.readerToken, kept);
     }
     storage.forget(STORAGE_KEYS.readerTokenWas);
   }
@@ -61,13 +62,13 @@ const broughtForward = (): void => {
  * Both halves are guarded because this is also what runs when the keystore has already refused to answer: a platform
  * that cannot open an entry may well refuse to write it too, and there would be nothing left to do about it.
  */
-const empty = (): void => {
+const empty = (key: KeychainKey): void => {
   try {
-    setItem(KEYCHAIN_KEYS.readerToken, '', OPTIONS);
+    setItem(key, '', OPTIONS);
   } catch {
     // Nothing to fall back on: the delete below is the only other thing that can take the entry away.
   }
-  void deleteItemAsync(KEYCHAIN_KEYS.readerToken, OPTIONS).catch(() => undefined);
+  void deleteItemAsync(key, OPTIONS).catch(() => undefined);
 };
 
 /**
@@ -78,9 +79,9 @@ const empty = (): void => {
  * would read it as a refusal and tell the reader their password was wrong — while the reader it had just built was,
  * in memory, signed in. A wrong answer about what happened is worse than a session that does not outlive the app.
  */
-const keep = (token: string): void => {
+const keep = (key: KeychainKey, value: string): void => {
   try {
-    setItem(KEYCHAIN_KEYS.readerToken, token, OPTIONS);
+    setItem(key, value, OPTIONS);
   } catch {
     // Kept in memory by the reader that asked for this; nothing here can make the platform hold it.
   }
@@ -102,32 +103,50 @@ const keep = (token: string): void => {
  * the way out as well: left in place it would be asked for again at the next launch, and at every launch after, and
  * the reader would have no way back in.
  */
-const readable = (): string | null => {
+const readable = (key: KeychainKey): string | null => {
   try {
-    return getItem(KEYCHAIN_KEYS.readerToken, OPTIONS);
+    return getItem(key, OPTIONS);
   } catch {
-    empty();
+    empty(key);
     return null;
   }
 };
 
 /**
- * The keystore as one place to keep one string.
+ * One keystore entry as a place to keep one string, under `key`, run through `migrate` before it is first read.
  *
  * None of the three raises. The shape they answer is three total functions — a string or its absence, and two that
  * return nothing — so a port that raised would be breaking the only contract its callers have: the reader reads it
- * on its first line, and that line is a module's, where nothing is left to catch anything.
+ * on its first line, and that line is a module's, where nothing is left to catch anything. An empty entry reads as an
+ * absence, which is what overwriting-before-deleting leaves behind (R3).
  */
-export const keychain: StateStorage = {
+const entry = (key: KeychainKey, migrate?: () => void): StateStorage => ({
   getItem: () => {
-    broughtForward();
-    const held = readable();
+    migrate?.();
+    const held = readable(key);
     return held === null || held === '' ? null : held;
   },
   setItem: (...[, value]) => {
-    keep(value);
+    keep(key, value);
   },
   removeItem: () => {
-    empty();
+    empty(key);
   },
-};
+});
+
+/**
+ * The reader's token, with the one-time move of a token an older build kept in the plain store.
+ *
+ * The migration runs only for the token: the credentials below are new to this build, so a phone that has one kept
+ * one under this build, and there is nothing older to bring forward.
+ */
+export const keychain: StateStorage = entry(KEYCHAIN_KEYS.readerToken, broughtForward);
+
+/**
+ * The reader's credentials, kept so a connection can be reopened when its token dies (ADR-0042).
+ *
+ * It is the same keystore as the token, one entry over — the same hardware-held key seals both, and neither travels
+ * in a backup. It is written as the reader signed in, read only to reopen a dead connection, and emptied the moment
+ * they sign out or the service refuses those credentials.
+ */
+export const keychainCredentials: StateStorage = entry(KEYCHAIN_KEYS.readerCredentials);

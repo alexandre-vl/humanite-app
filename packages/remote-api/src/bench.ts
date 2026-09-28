@@ -8,9 +8,20 @@ import type { Reply } from './transport.ts';
  * package's own tests, both reply from here, so the two cannot come to disagree about what the service answered.
  */
 
-/** A reply as the service would give it: a status, and a body read as the text it arrives as. */
-export const reply = async (status: number, text: string): Promise<Reply> =>
-  Promise.resolve({ status, text: async () => Promise.resolve(text) });
+/**
+ * A reply as the service would give it: a status, the headers it carries, and a body read as the text it arrives as.
+ * A header is found whatever case it is asked in, as the platform's own replies find it.
+ */
+export const reply = async (
+  status: number,
+  text: string,
+  headers: Readonly<Record<string, string>> = {},
+): Promise<Reply> =>
+  Promise.resolve({
+    status,
+    header: (name) => Object.entries(headers).find(([held]) => held.toLowerCase() === name.toLowerCase())?.[1] ?? null,
+    text: async () => Promise.resolve(text),
+  });
 
 /** What the capture recorded for each route: what a replay answers with, and what an address is held to. */
 export const RECORDINGS: Readonly<

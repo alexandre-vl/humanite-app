@@ -60,10 +60,16 @@ export type PlainKey = (typeof STORAGE_KEYS)[Exclude<keyof typeof STORAGE_KEYS, 
 /**
  * The names the app keeps in the phone's own keystore, which is not the same disk as the one above.
  *
- * One name, and it is the only secret the app holds. It is kept under its source for the reason the pages are: a
- * token earned at the journal's service proves nothing to a build that reads the simulated corpus, and a phone that
- * has run both should not offer one to the other.
+ * Two names, and they are the only secrets the app holds: the token a connection earned, and the credentials that
+ * reopen one when the service stops honouring the token — the connection lives two hours, and past that only a login
+ * mints a new one (ADR-0042). Both are kept under their source for the reason the pages are: a token or a login
+ * earned at the journal's service proves nothing to a build that reads the simulated corpus, and a phone that has run
+ * both should not offer one to the other.
  */
 export const KEYCHAIN_KEYS = {
   readerToken: `reader-token.${CONTENT_SOURCE}`,
+  readerCredentials: `reader-credentials.${CONTENT_SOURCE}`,
 } as const;
+
+/** A key the app keeps in the phone's keystore; the keychain accepts no other. */
+export type KeychainKey = (typeof KEYCHAIN_KEYS)[keyof typeof KEYCHAIN_KEYS];

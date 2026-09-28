@@ -1285,4 +1285,72 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0041': {
+    scope: {
+      // Where a reply's headers are read and the successor token passed on — the transport, its bench and its judging
+      // — and where the app decides whether that successor replaces the one it holds: the reader, the door that hands
+      // it the platform's network, and the cache that follows a change of reader but not a renewal.
+      paths: [
+        'packages/remote-api/src/transport.ts',
+        'packages/remote-api/src/judge.ts',
+        'packages/remote-api/src/bench.ts',
+        'apps/mobile/src/shared/api/reader.ts',
+        'apps/mobile/src/shared/api/source.service.ts',
+        'apps/mobile/src/_app/model/paper.ts',
+        'tools/guardrails/src/proofs/transport.ts',
+      ],
+    },
+    rules: {
+      R1: ['transport/renewal-dropped'],
+      R2: ['transport/renewal-unearned'],
+      R3: {
+        convention:
+          'Reader.renew écrit le jeton sans appeler aucun observateur, là où signIn et signOut passent par hold qui les appelle : apps/mobile/src/shared/api/reader.ts tient les deux chemins, et les tests de l’app relisent qu’un renouvellement laisse en place le cache et le disque que forgetThePaperWhenTheReaderChanges vide à un changement de lecteur (reader.test.ts, paper.test.ts). Aucun banc hors ligne ne le juge, le magasin du jeton étant celui de l’app et non du client.',
+      },
+      R4: {
+        convention:
+          'Reader.renew écrit au trousseau par la même fonction que hold (KEYCHAIN_KEYS.readerToken, ADR-0034), si bien qu’un téléphone redémarre sur le dernier jeton reçu et non sur celui du login. reader.test.ts relit l’aller-retour par le disque, source.service.test.ts celui depuis l’en-tête du service.',
+      },
+      R5: {
+        convention:
+          'Reader.renew n’écrit que si le jeton tenu est encore celui que la requête a porté, ce que le transport lui passe avec le jeton neuf : un jeton arrivé après une déconnexion ne reconnecte personne, et une réponse lente ne remet pas ce qu’une plus rapide a remplacé. reader.test.ts relit les deux cas.',
+      },
+    },
+  },
+  'ADR-0042': {
+    scope: {
+      // Where the credentials are kept and read back — the keychain and its keys registry, and the reader that stores
+      // them at sign-in, reopens from them on a dead token, and erases them on sign-out — and the cache that a reopen,
+      // being the same subscriber, must not drop.
+      paths: [
+        'apps/mobile/src/shared/lib/storage/keychain.ts',
+        'apps/mobile/src/shared/lib/storage/keychain.test.ts',
+        'apps/mobile/src/shared/lib/storage/keys.ts',
+        'apps/mobile/src/shared/api/reader.ts',
+        'apps/mobile/src/_app/model/paper.ts',
+      ],
+    },
+    rules: {
+      R1: {
+        convention:
+          'createReader garde les identifiants dans le trousseau (keychainCredentials, KEYCHAIN_KEYS.readerCredentials) à la connexion réussie, et nulle part ailleurs : keychain.ts n’ouvre expo-secure-store que pour ses deux clés, et keys.ts les nomme. reader.test.ts relit que la connexion les écrit au disque des identifiants, keychain.test.ts que la seconde entrée du trousseau tient. Aucun banc hors ligne ne le juge, le trousseau étant celui de l’app.',
+      },
+      R2: {
+        convention:
+          'createReader n’écrit les identifiants qu’après le jeton rendu par createSession(...).open, donc après un 200 du service : un login refusé lève avant l’écriture. reader.test.ts relit qu’un mot de passe refusé ne laisse rien au disque des identifiants.',
+      },
+      R3: {
+        convention:
+          'forgettingDeadTokens, sur la cause « expired » (ADR-0033 R8), appelle reader.reopen puis redemande une fois avant de signOut : reader.reopen rouvre depuis les identifiants gardés, une seule fois pour des lectures qui échouent ensemble. apps/mobile/src/shared/api/reader.ts le tient, reader.test.ts relit la reconnexion, son unicité, et l’oubli quand elle échoue.',
+      },
+      R4: {
+        convention:
+          'Reader.reopen écrit le jeton par write et non hold, donc sans appeler d’observateur, si bien que forgetThePaperWhenTheReaderChanges ne vide pas le cache d’un abonné rouvert. reader.test.ts relit qu’aucun observateur n’est prévenu, paper.test.ts que le journal survit à une reconnexion et qu’un jeton irrécupérable le vide.',
+      },
+      R5: {
+        convention:
+          'signOut efface les identifiants (credentialsDisk.removeItem) avant d’oublier le jeton, et reopen rend false sans rien garder quand le service refuse les identifiants, ce qui mène la porte à signOut. reader.test.ts relit l’effacement à la déconnexion et le refus à la reconnexion.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

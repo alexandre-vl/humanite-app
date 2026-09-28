@@ -27,10 +27,23 @@ export type Ports<Signal> = Deadline<Signal> &
      * signs in and out long after — a token read at build time would be the one there was then, which is none.
      */
     token: () => string | undefined;
+    /**
+     * Hands over the token the service answered in place of `sent`, the one the request carried.
+     *
+     * The client keeps no token, so it keeps no successor either: whoever answers `token` decides what the next
+     * request carries, and is told `sent` so that a reader who signed out while the request was on its way is not
+     * signed back in by its answer.
+     */
+    renew: (sent: string, fresh: string) => void;
   }>;
 
-/** What the client reads of a reply: its status, and its body as the text it arrived as. */
-export type Reply = Readonly<{ status: number; text: () => Promise<string> }>;
+/** What the client reads of a reply: its status, one of its headers by name, and its body as the text it arrived as. */
+export type Reply = Readonly<{
+  status: number;
+  /** The value of the header `name`, whatever case either is written in, or `null` for a header the reply lacks. */
+  header: (name: string) => string | null;
+  text: () => Promise<string>;
+}>;
 
 /**
  * What every request says of itself: that it wants JSON, in French, and which client asks — this one, under a name of
@@ -85,8 +98,22 @@ export const causeOf = (status: number, underToken: boolean): ContentErrorCode |
   return 'malformed';
 };
 
-/** A reply read to the end of its body. */
-type Answered = Readonly<{ status: number; text: string }>;
+/** A reply read to the end of its body, with the token it handed back if it handed one. */
+type Answered = Readonly<{ status: number; renewed: string | null; text: string }>;
+
+/**
+ * The token a reply hands back in place of `sent`, or `undefined` when it hands back none the client may take.
+ *
+ * The service slides a reader's token: a reply to a request made under one carries its successor, of the same reader
+ * and the same device, good for two hours from then — measured on 27/09/2026 on every route the app reads but the
+ * menu. Only a request that carried a token is answered with one the client takes: handed to a request that carried
+ * none, it would be a token no login of this reader earned (ADR-0033, R4). A value OkHttp would refuse to send back
+ * is not taken either, since every request after it would fail before leaving the phone.
+ */
+const successorOf = (sent: string | undefined, renewed: string | null): string | undefined =>
+  sent !== undefined && renewed !== null && renewed !== '' && renewed !== sent && isSendable(renewed)
+    ? renewed
+    : undefined;
 
 /**
  * Asks the service, and answers with what it said — or fails, naming the cause.
@@ -100,6 +127,10 @@ type Answered = Readonly<{ status: number; text: string }>;
  * A reader who signed in is asked for as themselves: their token goes out with the request and the flag that says
  * nobody signed in comes off it. The service decides the rest — what a subscription pays for is granted there and
  * read off `right`, never inferred here from the fact that a token was sent.
+ *
+ * A reply that answered hands back the token it slid the reader's to, and the client passes it on through `renew`,
+ * as the official client takes it from every reply that succeeds. Left behind, the token the login earned is the one
+ * every request carries until it dies, two hours after the login, however much the reader read in between.
  */
 export const ask = async <Signal>(ports: Ports<Signal>, request: Request): Promise<unknown> => {
   const where = request.path;
@@ -112,7 +143,7 @@ export const ask = async <Signal>(ports: Ports<Signal>, request: Request): Promi
     async (signal): Promise<Answered> => {
       try {
         const reply = await ports.fetch(addressOf(asked), { headers, signal });
-        return { status: reply.status, text: await reply.text() };
+        return { status: reply.status, renewed: reply.header(READER_HEADER), text: await reply.text() };
       } catch {
         throw new ContentApiError('offline', `${where} : le service n’a pas été atteint`);
       }
@@ -121,6 +152,10 @@ export const ask = async <Signal>(ports: Ports<Signal>, request: Request): Promi
   const cause = causeOf(answered.status, reader !== undefined);
   if (cause !== undefined) {
     throw new ContentApiError(cause, `${where} : statut ${String(answered.status)}`);
+  }
+  const successor = successorOf(reader, answered.renewed);
+  if (reader !== undefined && successor !== undefined) {
+    ports.renew(reader, successor);
   }
   try {
     const answer: unknown = JSON.parse(answered.text);
