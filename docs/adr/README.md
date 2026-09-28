@@ -50,7 +50,7 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0040](0040-la-connexion-de-l-abonne-sous-la-cle-publique-du-client.md)     | La connexion de l’abonné, sous la clé publique du client    | accepté                                                                                  | `guarded-config`, `boundary`, `reversal-cost`                              |
 | [ADR-0041](0041-le-jeton-de-l-abonne-glisse-a-chaque-reponse.md)                | Le jeton de l’abonné glisse à chaque réponse                | accepté                                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0042](0042-les-identifiants-de-l-abonne-au-trousseau.md)                   | Les identifiants de l’abonné au trousseau                   | accepté                                                                                  | `guarded-config`, `boundary`                                               |
-| [ADR-0043](0043-les-alertes-du-journal-par-son-propre-onesignal.md)             | Les alertes du journal par son propre OneSignal             | proposé                                                                                  | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
+| [ADR-0043](0043-les-alertes-du-journal-par-son-propre-onesignal.md)             | Les alertes du journal par son propre OneSignal             | accepté                                                                                  | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
 
 ## Confirmation
 
@@ -477,7 +477,7 @@ Statut : accepté. Périmètre : `apps/mobile/src/shared/lib/storage/keychain.ts
 
 ### ADR-0043 · Les alertes du journal par son propre OneSignal
 
-Statut : proposé. Périmètre : `apps/mobile/src/shared/api/alerts.ts`, `apps/mobile/src/shared/api/alerts.test.ts`, `apps/mobile/src/features/alerts/**`, `apps/mobile/src/_app/model/alerts.ts`, `apps/mobile/src/_app/model/alerts.test.ts`, `apps/mobile/src/_app/routes/alerts-follower.tsx`, `apps/mobile/app.config.ts`.
+Statut : accepté. Périmètre : `apps/mobile/src/shared/api/alerts.ts`, `apps/mobile/src/shared/api/alerts.test.ts`, `apps/mobile/src/features/alerts/**`, `apps/mobile/src/_app/model/alerts.ts`, `apps/mobile/src/_app/model/alerts.test.ts`, `apps/mobile/src/_app/routes/alerts-follower.tsx`, `apps/mobile/app.config.ts`.
 
 | Règle | Niveau      | Preuves                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ----- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
