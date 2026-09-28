@@ -42,7 +42,8 @@ export class SessionError extends Error {
 
 /**
  * One request out and its reply — a `POST` the read client's GET-only transport does not make — with the same two
- * ports every request of this package is held by: a way to call it off, and a way to run something later.
+ * ports every request of this package is held by: a way to call it off, and a way to run something later. The reply
+ * is the read client's, headers included, though opening a connection reads only its status and its body.
  */
 export type Posting<Signal> = Deadline<Signal> &
   Readonly<{

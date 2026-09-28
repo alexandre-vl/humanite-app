@@ -177,8 +177,9 @@ export const TRANSPORT_FIXTURES = [
     'transport/invents-token',
     'un client qui porte un jeton d’usager qu’aucune connexion n’a gagné',
     // Le jeton inventé part aussi quand personne n’est connecté, si bien qu’un refus fait à personne se lit comme une
-    // connexion expirée : le juge nomme les deux, l’emprunt d’identité et la cause qui s’en trouve fausse.
-    ['transport/impersonates', 'transport/cause-misnamed'],
+    // connexion expirée : le juge nomme les deux, l’emprunt d’identité et la cause qui s’en trouve fausse. Et le jeton
+    // neuf que le service rend à ce jeton inventé est pris à son tour, par un lecteur qu’aucune connexion n’a ouvert.
+    ['transport/impersonates', 'transport/cause-misnamed', 'transport/renewal-unearned'],
     judged((client) => createRemoteApi({ ...client, token: () => 'jeton-invente' })),
   ),
   define(
@@ -211,6 +212,32 @@ export const TRANSPORT_FIXTURES = [
             address,
             isArticle(address) ? { ...init, headers: { ...init.headers, cookie: 'session=inventee' } } : init,
           ),
+      }),
+    ),
+  ),
+  define(
+    'transport/renewal-dropped',
+    'un client qui laisse au service le jeton neuf qu’il rend à l’abonné',
+    ['transport/renewal-dropped'],
+    judged((client) => createRemoteApi({ ...client, renew: () => undefined })),
+  ),
+  define(
+    'transport/renewal-unearned',
+    'un client qui prend le jeton neuf d’une réponse, que la requête ait porté un jeton ou non',
+    ['transport/renewal-unearned'],
+    judged((client) =>
+      createRemoteApi({
+        ...client,
+        // The shape a change that read the header in the platform's port would leave: whatever a reply hands back is
+        // taken, whoever the request was asked as — nobody included, who is then signed in by no login at all.
+        fetch: async (address, init) => {
+          const answered = await client.fetch(address, init);
+          const handed = answered.header('x-user-token');
+          if (handed !== null) {
+            client.renew(init.headers['x-user-token'] ?? '', handed);
+          }
+          return answered;
+        },
       }),
     ),
   ),

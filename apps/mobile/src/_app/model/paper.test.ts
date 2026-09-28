@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from '@jest/globals';
 import { createReader, forgettingDeadTokens } from '#api';
 import type { Reader } from '#api';
 import { STORAGE_KEYS, storage } from '#lib/storage';
+import type { StateStorage } from '#lib/storage';
 import { forgetThePaperWhenTheReaderChanges } from './paper';
 
 const IDENTITY = {
@@ -22,6 +23,7 @@ const OPENED = {
   post: async (address: string) =>
     Promise.resolve({
       status: 200,
+      header: () => null,
       text: async (): Promise<string> =>
         Promise.resolve(
           address.endsWith('/user/login')
@@ -32,9 +34,9 @@ const OPENED = {
 };
 
 /** A reader whose token this test can move, over a disk it holds in memory. */
-const aReader = (): Reader => {
+const inMemory = (): StateStorage => {
   let kept: string | null = null;
-  return createReader(IDENTITY, OPENED, {
+  return {
     getItem: () => kept,
     setItem: (...[, value]) => {
       kept = value;
@@ -42,7 +44,41 @@ const aReader = (): Reader => {
     removeItem: () => {
       kept = null;
     },
-  });
+  };
+};
+
+const aReader = (): Reader => createReader(IDENTITY, OPENED, inMemory(), inMemory());
+
+/**
+ * A reader that signs in once, then whose service refuses every later login — a session that cannot be reopened, as
+ * after a password change. The first login earns a token; a reopen's login is refused, so the door forgets the token.
+ */
+const aReaderThatCannotReopen = (): Reader => {
+  let logins = 0;
+  const posting = {
+    abortable: () => ({ signal: 0, abort: () => undefined }),
+    after: () => () => undefined,
+    post: async (address: string) => {
+      const login = address.endsWith('/user/login');
+      if (login) {
+        logins += 1;
+      }
+      const refused = login && logins > 1;
+      return Promise.resolve({
+        status: refused ? 401 : 200,
+        header: () => null,
+        text: async (): Promise<string> =>
+          Promise.resolve(
+            login
+              ? refused
+                ? JSON.stringify({ error: { code: 10053, message: 'Customer login failed' } })
+                : JSON.stringify({ x_user_token: 'jeton-de-labonne' })
+              : JSON.stringify({ x_anonymous_token: 'anon-123' }),
+          ),
+      });
+    },
+  };
+  return createReader(IDENTITY, posting, inMemory(), inMemory());
 };
 
 /** A page of the paper, as a reading under one reader leaves it in the cache. */
@@ -80,11 +116,11 @@ describe('forgetThePaperWhenTheReaderChanges', () => {
 
   /**
    * The case that put this here. A screen is not the only thing that changes the reader: a reading the service
-   * refuses under a dead token makes the door forget that token, with nobody having pressed anything. The paid bodies
-   * stayed in the cache — and on the disk — of a phone whose session had ended, for whoever picked it up next.
+   * refuses under a dead token that cannot be reopened makes the door forget it, with nobody having pressed anything.
+   * The paid bodies stayed in the cache — and on the disk — of a phone whose session had ended, for whoever next.
    */
-  it('le vide quand c’est un jeton mort, et non un écran, qui a changé le lecteur', async () => {
-    const reader = aReader();
+  it('le vide quand un jeton mort, irrécupérable, a changé le lecteur sans qu’un écran l’ait fait', async () => {
+    const reader = aReaderThatCannotReopen();
     const cache = aCache();
     forgetThePaperWhenTheReaderChanges(reader, cache);
     await reader.signIn(CREDENTIALS);
@@ -103,9 +139,57 @@ describe('forgetThePaperWhenTheReaderChanges', () => {
     expect(storage.getString(STORAGE_KEYS.queryCache)).toBeUndefined();
   });
 
-  /** Several readings fail together on the same dead token; the paper is dropped once, not once per reading. */
-  it('ne vide qu’une fois quand plusieurs lectures échouent ensemble sur le même jeton', async () => {
+  /**
+   * The other side, and the reason the >2h fix is safe for the cache: a dead token the app reopens is the same
+   * subscriber, so the paper they were reading stays. Only a token the app cannot reopen drops it.
+   */
+  it('garde le journal quand un jeton mort est rouvert', async () => {
     const reader = aReader();
+    const cache = aCache();
+    forgetThePaperWhenTheReaderChanges(reader, cache);
+    await reader.signIn(CREDENTIALS);
+    cache.setQueryData(PAGE, { corps: 'payé' });
+    storage.set(STORAGE_KEYS.queryCache, 'les pages payées');
+    let calls = 0;
+    const dyingThenReopened: ContentApi = {
+      getSections: async () => Promise.resolve([]),
+      getFeed: async () => {
+        calls += 1;
+        return calls === 1
+          ? Promise.reject(new ContentApiError('expired', 'statut 403'))
+          : Promise.resolve({ items: [], nextCursor: null });
+      },
+      getLiveFeed: async () => Promise.resolve({ items: [], nextCursor: null }),
+      getArticle: async () => Promise.reject(new ContentApiError('not-found', 'rien')),
+      search: async () => Promise.resolve({ items: [], nextCursor: null }),
+    };
+    await forgettingDeadTokens(dyingThenReopened, reader).getFeed({});
+    expect(reader.token()).toBe('jeton-de-labonne');
+    expect(cache.getQueryData(PAGE)).toEqual({ corps: 'payé' });
+    expect(storage.getString(STORAGE_KEYS.queryCache)).toBe('les pages payées');
+  });
+
+  /**
+   * A token the service slid is the same reader one reply later, so the paper they were reading is still theirs. It
+   * is the reason a renewal tells no watcher: told as a change of reader, every request of a signed-in subscriber
+   * would empty the cache the request before it filled, and the app would re-read the page it was showing.
+   */
+  it('garde le journal quand le service a seulement renouvelé le jeton', async () => {
+    const reader = aReader();
+    const cache = aCache();
+    forgetThePaperWhenTheReaderChanges(reader, cache);
+    await reader.signIn(CREDENTIALS);
+    cache.setQueryData(PAGE, { corps: 'payé' });
+    storage.set(STORAGE_KEYS.queryCache, 'les pages payées');
+    reader.renew('jeton-de-labonne', 'jeton-suivant');
+    expect(reader.token()).toBe('jeton-suivant');
+    expect(cache.getQueryData(PAGE)).toEqual({ corps: 'payé' });
+    expect(storage.getString(STORAGE_KEYS.queryCache)).toBe('les pages payées');
+  });
+
+  /** Several readings fail together on the same dead, irrecoverable token; the paper is dropped once, not once each. */
+  it('ne vide qu’une fois quand plusieurs lectures échouent ensemble sur le même jeton', async () => {
+    const reader = aReaderThatCannotReopen();
     await reader.signIn(CREDENTIALS);
     let emptied = 0;
     reader.watch(() => {

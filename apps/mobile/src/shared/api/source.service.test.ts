@@ -53,4 +53,37 @@ describe('SOURCE, variante de service', () => {
     expect(address).toBe('https://phenix2.immanens.com/api/v1/app/300/wordpress/homepage?language=fr');
     expect(init).toMatchObject({ headers: { 'x-user-token': 'jeton-de-labonne' } });
   });
+
+  /**
+   * The whole of the fix, end to end: the service answers a request made under a reader's token with its successor,
+   * in a header whose case is its own, and the reader takes it in place of the one that went out. Dropped, the token
+   * a login earned is the one every request carries until it dies two hours later, and the subscriber is signed out
+   * in the middle of reading — measured against the live service on 27/09/2026.
+   */
+  it('confie à l’abonné le jeton neuf que le service rend, quelle que soit la casse de l’en-tête', async () => {
+    jest.spyOn(READER, 'token').mockReturnValue('jeton-de-labonne');
+    const renewing = jest.spyOn(READER, 'renew').mockReturnValue(undefined);
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ posts: [] }), {
+        status: 200,
+        headers: { 'X-User-Token': 'jeton-suivant' },
+      }),
+    );
+    await SOURCE.content.getLiveFeed({});
+    expect(renewing).toHaveBeenCalledWith('jeton-de-labonne', 'jeton-suivant');
+  });
+
+  /** A token handed to a request that carried none is a token no login of this reader earned (ADR-0033, R4). */
+  it('ne confie rien quand la requête ne portait aucun jeton', async () => {
+    jest.spyOn(READER, 'token').mockReturnValue(undefined);
+    const renewing = jest.spyOn(READER, 'renew').mockReturnValue(undefined);
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ posts: [] }), {
+        status: 200,
+        headers: { 'x-user-token': 'jeton-de-personne' },
+      }),
+    );
+    await SOURCE.content.getLiveFeed({});
+    expect(renewing).not.toHaveBeenCalled();
+  });
 });

@@ -13,13 +13,14 @@ import type { Reply } from './transport.ts';
 const json = async (status: number, body: unknown): Promise<Reply> => reply(status, JSON.stringify(body));
 
 /**
- * A client over a replay of the capture, which `answer` may take a route of over; every address asked and every item
- * set aside is kept for the test to read.
+ * A client over a replay of the capture, which `answer` may take a route of over; every address asked, every item set
+ * aside and every token handed on is kept for the test to read.
  */
 const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> | undefined, reader?: string) => {
   const asked: string[] = [];
   const carried: Readonly<Record<string, string>>[] = [];
   const setAside: (readonly [RouteName, readonly SetAside[]])[] = [];
+  const renewed: (readonly [string, string])[] = [];
   const client: Client<number> = {
     fetch: async (address, init) => {
       asked.push(address);
@@ -33,8 +34,11 @@ const replaying = (answer?: (route: RouteName, query: string) => Promise<Reply> 
       setAside.push([route, items]);
     },
     token: () => reader,
+    renew: (sent, fresh) => {
+      renewed.push([sent, fresh]);
+    },
   };
-  return { api: createRemoteApi(client), asked, carried, setAside };
+  return { api: createRemoteApi(client), asked, carried, setAside, renewed };
 };
 
 /** The cause a read failed with, or `null` when it answered or failed with no cause of the contract's. */
@@ -192,4 +196,42 @@ test('nobody signed in carries no token at all, and says so with ano', async () 
   await api.getFeed({});
   expect(carried.map((headers) => headers['x-user-token'])).toEqual([undefined]);
   expect(asked[0]).toBe(`${SERVICE}${SERVICE_ROOT}/wordpress/home?language=fr&ano=1`);
+});
+
+/** The capture's answer to the front page, handing back `renewed` as the service hands back a slid token. */
+const frontHanding =
+  (renewed: string, status = 200) =>
+  (route: RouteName): Promise<Reply> | undefined =>
+    route === 'front' ? reply(status, JSON.stringify(RECORDED.front.answer), { 'X-User-Token': renewed }) : undefined;
+
+/**
+ * The service slides a reader's token, measured on 27/09/2026: a reply to a request made under it carries its
+ * successor, for two hours from then. Dropped, the token the login earned is the one every request carries until it
+ * dies, two hours after the login however much the reader read.
+ */
+test('a reply that slides the reader’s token hands its successor on, in place of the token sent', async () => {
+  const { api, renewed } = replaying(frontHanding('jeton-suivant'), 'jeton-de-labonne');
+  await api.getFeed({});
+  expect(renewed).toEqual([['jeton-de-labonne', 'jeton-suivant']]);
+});
+
+test('a token handed back to a request that carried none is taken by nobody', async () => {
+  const { api, renewed } = replaying(frontHanding('jeton-suivant'));
+  await api.getFeed({});
+  expect(renewed).toEqual([]);
+});
+
+/** As the official client, which reads the header off the replies that succeed and off no other. */
+test('a refusal hands no token on, whatever it carries', async () => {
+  const { api, renewed } = replaying(frontHanding('jeton-suivant', 403), 'jeton-de-labonne');
+  expect(await failedWith(api.getFeed({}))).toBe('expired');
+  expect(renewed).toEqual([]);
+});
+
+test('the same token handed back, an empty one, or one OkHttp could not send, is no successor', async () => {
+  for (const handed of ['jeton-de-labonne', '', 'jeton-accentué']) {
+    const { api, renewed } = replaying(frontHanding(handed), 'jeton-de-labonne');
+    await api.getFeed({});
+    expect(renewed).toEqual([]);
+  }
 });

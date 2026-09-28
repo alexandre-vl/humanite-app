@@ -9,8 +9,9 @@ import type { Source } from './source';
  * It asks through the platform's own network — its `fetch`, its abort and its timers, which the client is handed
  * rather than reaching for. Cookies are left out: the service sets none the app needs, and a request that sent one
  * would speak for a session nobody opened. The one thing a request here ever speaks for is the reader themselves, by
- * the token their own login earned, handed in as a port and asked anew at every request. It draws no picture of the
- * corpus, which this build does not carry and which nothing the service sends can name.
+ * the token their own login earned, handed in as a port and asked anew at every request — and handed back to the
+ * reader whenever the service slides it to a later one, which is the same reader and not a new one (ADR-0041). It
+ * draws no picture of the corpus, which this build does not carry and which nothing the service sends can name.
  */
 export const SOURCE: Source = {
   name: 'service',
@@ -18,7 +19,9 @@ export const SOURCE: Source = {
     createRemoteApi<AbortSignal>({
       fetch: async (address, init) => {
         const reply = await fetch(address, { headers: init.headers, signal: init.signal, credentials: 'omit' });
-        return { status: reply.status, text: async () => reply.text() };
+        // The headers are read through the platform's own lookup, which finds a name in any case, as the service
+        // writes `X-User-Token` where the request sent `x-user-token`.
+        return { status: reply.status, header: (name) => reply.headers.get(name), text: async () => reply.text() };
       },
       abortable: () => new AbortController(),
       after: (delay, then) => {
@@ -29,6 +32,9 @@ export const SOURCE: Source = {
       },
       setAside: noteSetAside,
       token: () => READER.token(),
+      renew: (sent, fresh) => {
+        READER.renew(sent, fresh);
+      },
     }),
     READER,
   ),

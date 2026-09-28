@@ -16,7 +16,9 @@ export type TransportCode =
   | 'transport/impersonates'
   | 'transport/reader-unnamed'
   | 'transport/expiry-misread'
-  | 'transport/address-unknown';
+  | 'transport/address-unknown'
+  | 'transport/renewal-dropped'
+  | 'transport/renewal-unearned';
 
 /** The signal the judging hands a client: a number, which is all it takes to tell one request's way out from another. */
 type Token = number;
@@ -28,11 +30,11 @@ export type Make = (client: Client<Token>) => ContentApi;
 type Asked = Readonly<{ address: string; headers: Readonly<Record<string, string>>; signal: Token }>;
 
 /** What a request gets from the bench: a reply, or nothing at all until its way out is used. */
-type Answer = (address: string) => Promise<Reply> | 'hang';
+type Answer = (address: string, headers: Readonly<Record<string, string>>) => Promise<Reply> | 'hang';
 
 /**
  * Ports the judging drives, with what they saw: every request, the requests left without an answer, every deadline
- * set, every request let go.
+ * set, every request let go, and every token the client passed on in place of the one it sent.
  */
 type Bench = Readonly<{
   client: Client<Token>;
@@ -40,6 +42,7 @@ type Bench = Readonly<{
   hung: Token[];
   timers: (() => void)[];
   aborted: Set<Token>;
+  renewed: (readonly [string, string])[];
 }>;
 
 const benchOf = (answer: Answer, reader?: string): Bench => {
@@ -47,12 +50,13 @@ const benchOf = (answer: Answer, reader?: string): Bench => {
   const hung: Token[] = [];
   const timers: (() => void)[] = [];
   const aborted = new Set<Token>();
+  const renewed: (readonly [string, string])[] = [];
   const letGo = new Map<Token, () => void>();
   let next = 0;
   const client: Client<Token> = {
     fetch: async (address, init) => {
       asked.push({ address, headers: init.headers, signal: init.signal });
-      const answered = answer(address);
+      const answered = answer(address, init.headers);
       if (answered !== 'hang') {
         return answered;
       }
@@ -85,8 +89,11 @@ const benchOf = (answer: Answer, reader?: string): Bench => {
     },
     setAside: () => undefined,
     token: () => reader,
+    renew: (sent, fresh) => {
+      renewed.push([sent, fresh]);
+    },
   };
-  return { client, asked, hung, timers, aborted };
+  return { client, asked, hung, timers, aborted, renewed };
 };
 
 /** Enough turns of the microtask queue for a request under way to take every step it can take without a timer. */
@@ -153,9 +160,9 @@ const EVERY_ROUTE = Object.entries(READINGS);
  */
 const only =
   (route: string, answer: Answer): Answer =>
-  (address): Promise<Reply> | 'hang' => {
+  (address, headers): Promise<Reply> | 'hang' => {
     const at = routeAt(address);
-    return at !== undefined && at.route !== route ? replayed(address) : answer(address);
+    return at !== undefined && at.route !== route ? replayed(address) : answer(address, headers);
   };
 
 /** A list of what went wrong on which route, as a finding says it — or no finding at all when nothing did. */
@@ -400,16 +407,87 @@ const addresses = (rounds: readonly Round[]): readonly Finding<TransportCode>[] 
     ),
   );
 
+/** The token the judging's service slides a reader's to, in the header the service writes it in. */
+const SUCCESSOR = 'jeton-glisse';
+
+/**
+ * The capture's own answer to a request, carrying a successor token: to a request that carried `reader`'s token, as
+ * the service slides it; or to every request whatever it carried, when `reader` is nobody — what no service should
+ * send, and what a client must not believe.
+ */
+const sliding =
+  (reader: string | undefined): Answer =>
+  async (address, headers): Promise<Reply> => {
+    const recorded = await replayed(address);
+    return reader === undefined || valueOf(headers, READER_HEADER) === reader
+      ? { ...recorded, header: (name) => (name.toLowerCase() === READER_HEADER ? SUCCESSOR : recorded.header(name)) }
+      : recorded;
+  };
+
+/** Asks one route through `make`'s client over `answer`, and answers with the bench once every step it can take is taken. */
+const readOnce = async (
+  make: Make,
+  read: (api: ContentApi) => Promise<unknown>,
+  answer: Answer,
+  reader?: string,
+): Promise<Readonly<{ bench: Bench; outcome: Outcome }>> => {
+  const bench = benchOf(answer, reader);
+  const outcome = watch(read(make(bench.client)));
+  await settle();
+  for (const fire of [...bench.timers]) {
+    fire();
+  }
+  await settle();
+  return { bench, outcome: outcome() };
+};
+
+/**
+ * A reader's token slides, and only a reader's does.
+ *
+ * The service answers a request made under a reader's token with its successor, good for two hours from then, and a
+ * client that drops it leaves the reader on the token their login earned until that one dies — two hours after the
+ * login, however much they read in between. So the judging slides the reader's token on every route, and holds a
+ * read that answered under it to passing the successor on in place of the token sent. It then hands a successor to
+ * every request of a reader nobody signed in, and holds the client to taking none: handed to a request that carried
+ * no token, it is a token no login of this reader earned.
+ */
+const renewal = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
+  const dropped: string[] = [];
+  const unearned: string[] = [];
+  for (const [route, read] of EVERY_ROUTE) {
+    const under = await readOnce(make, read, only(route, sliding(READER)), READER);
+    const handed = under.bench.asked.some(
+      ({ address, headers }) => routeAt(address)?.route === route && valueOf(headers, READER_HEADER) === READER,
+    );
+    const passed = under.bench.renewed.some(([sent, fresh]) => sent === READER && fresh === SUCCESSOR);
+    if (under.outcome.kind === 'answered' && handed && !passed) {
+      dropped.push(route);
+    }
+    const nobody = await readOnce(make, read, only(route, sliding(undefined)));
+    if (nobody.bench.renewed.length > 0) {
+      unearned.push(route);
+    }
+  }
+  return [
+    ...saying('transport/renewal-dropped', 'des jetons neufs laissés au service', dropped),
+    ...saying(
+      'transport/renewal-unearned',
+      'des jetons neufs pris par des requêtes qui n’en portaient aucun',
+      unearned,
+    ),
+  ];
+};
+
 /**
  * Whether a client of the service ends every request, names every failure by its cause, speaks for itself alone,
- * speaks for a reader who signed in, and asks only the addresses the official client was seen to ask — on every route
- * it reads, with nobody signed in and with a reader who is.
+ * speaks for a reader who signed in, passes on the token the service slides theirs to, and asks only the addresses
+ * the official client was seen to ask — on every route it reads, with nobody signed in and with a reader who is.
  *
  * The client is handed in rather than reached for, so a fixture can hand in one that sets no deadline, or lets its
  * deadline pass doing nothing, or keeps a connection it gave up on, or names every failure alike, or reads a dead
  * token as a refusal, or borrows the official client's name, or carries a token no login earned, or leaves a
- * signed-in reader's token behind, or asks an address of its own making — or does any of it on one route alone — and
- * read the code that comes back.
+ * signed-in reader's token behind, or drops the token the service slides it to, or takes one handed to nobody, or
+ * asks an address of its own making — or does any of it on one route alone — and read the code that comes back.
  */
 export const judgeTransport = async (make: Make): Promise<readonly Finding<TransportCode>[]> => {
   const rounds = await askedBothWays(make);
@@ -419,6 +497,7 @@ export const judgeTransport = async (make: Make): Promise<readonly Finding<Trans
     ...(await staleness(make)),
     ...honesty(rounds),
     ...named(rounds),
+    ...(await renewal(make)),
     ...addresses(rounds),
   ];
 };

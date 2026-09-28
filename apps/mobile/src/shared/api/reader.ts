@@ -9,9 +9,10 @@ import {
   SessionError,
 } from '@huma/remote-api';
 import type { Credentials, Identity, Posting } from '@huma/remote-api';
+import { isRecord } from '@huma/unknown';
 import { randomUUID } from 'expo-crypto';
 import { CONTENT_SOURCE } from '../config';
-import { keychain, KEYCHAIN_KEYS, storage, STORAGE_KEYS } from '../lib/storage';
+import { keychain, keychainCredentials, KEYCHAIN_KEYS, storage, STORAGE_KEYS } from '../lib/storage';
 import type { StateStorage } from '../lib/storage';
 
 /**
@@ -43,6 +44,29 @@ export type Reader = Readonly<{
   token: () => string | undefined;
   signIn: (credentials: Credentials) => Promise<void>;
   signOut: () => void;
+  /**
+   * Takes `fresh` in place of `sent`, the token a request carried, and tells nobody.
+   *
+   * The service slides a reader's token: every reply to a request made under one carries its successor, good for two
+   * hours from then, so a reader who keeps reading keeps a living token and is never signed out mid-session. It is
+   * the same reader throughout — same subscriber, same device, only a later token — which is why this is not `hold`
+   * and notifies no watcher: what watches the token drops everything the app holds of the paper (ADR-0041, R3).
+   *
+   * `sent` is what makes it safe to take: it is applied only while the token held is still the one that went out, so
+   * a reply that lands after a sign-out does not sign the reader back in, and a slower reply cannot put back a token
+   * a newer one has already replaced.
+   */
+  renew: (sent: string, fresh: string) => void;
+  /**
+   * Reopens the connection from the credentials kept at sign-in, and answers whether it opened.
+   *
+   * A token lives two hours, and past that only a login mints a new one — no refresh route serves this application
+   * (ADR-0042). So when the service stops honouring the token, the app opens the connection again with the login it
+   * kept, rather than sign the subscriber out in the middle of reading. It answers `false`, and keeps nothing, when
+   * there are no credentials to try or the service refuses them — a password changed since — and the caller then
+   * signs out. It is the same subscriber throughout, so the token it earns is held without telling any watcher.
+   */
+  reopen: () => Promise<boolean>;
   /** Calls `whenChanged` whenever the token does, and answers with what stops watching. */
   watch: (whenChanged: () => void) => () => void;
 }>;
@@ -119,12 +143,39 @@ export const createReader = <Signal>(
   identity: Identity | undefined,
   ports: Posting<Signal>,
   disk: StateStorage,
+  credentialsDisk: StateStorage,
 ): Reader => {
   let held = disk.getItem(KEYCHAIN_KEYS.readerToken) ?? undefined;
   const watchers = new Set<() => void>();
-  const hold = (token: string | undefined): void => {
+
+  /** The credentials kept at sign-in, read back to reopen a dead connection, or none when none were kept. */
+  const keptCredentials = (): Credentials | null => {
+    const stored = credentialsDisk.getItem(KEYCHAIN_KEYS.readerCredentials);
+    if (stored === null) {
+      return null;
+    }
+    try {
+      const read: unknown = JSON.parse(stored);
+      const login = isRecord(read) ? read['login'] : undefined;
+      const password = isRecord(read) ? read['password'] : undefined;
+      return typeof login === 'string' && typeof password === 'string' ? { login, password } : null;
+    } catch {
+      return null;
+    }
+  };
+
+  /**
+   * Writes the token down, in memory and on the disk, and says whether it moved.
+   *
+   * The disk is written whenever it does, renewals included: what is in memory is gone when the process is, and a
+   * phone that restarts on the token a login earned rather than on the one the reading before it earned is a phone
+   * that can restart on a token two hours older than the app's last request. The write is synchronous and happens
+   * once per reply that slides the token — if that ever measures as a cost on a phone, holding the newest token for
+   * a few minutes before writing it is the answer, and the token stays valid for two hours either way.
+   */
+  const write = (token: string | undefined): boolean => {
     if (token === held) {
-      return;
+      return false;
     }
     held = token;
     if (token === undefined) {
@@ -132,27 +183,73 @@ export const createReader = <Signal>(
     } else {
       disk.setItem(KEYCHAIN_KEYS.readerToken, token);
     }
-    for (const watcher of [...watchers]) {
-      watcher();
+    return true;
+  };
+
+  /** Writes the token down and tells whoever is watching: this is a different reader from the one before. */
+  const hold = (token: string | undefined): void => {
+    if (write(token)) {
+      for (const watcher of [...watchers]) {
+        watcher();
+      }
     }
   };
+
+  /**
+   * The reopen under way, so several reads that failed on the same dead token reopen the connection once between them.
+   *
+   * Every route the app reads answers a dead token with `403`, so a screen showing three lists fails three times at
+   * once; without this each would open its own connection, three logins for one dead token. The promise is cleared
+   * when it settles, so the next expiry — two hours on — opens a fresh one.
+   */
+  let reopening: Promise<boolean> | undefined;
+
   return {
     offered: () => identity !== undefined,
     token: () => held,
     /**
-     * Signs the reader in with what they typed, and holds what their login earned. A build with no identity cannot
-     * open the connection at all, and says so as the service's own refusals are said, so a screen has one thing to
-     * read rather than two. Nothing else is kept of what was typed: the password goes to the service and is forgotten
-     * here, the token being what the reader is known by afterwards.
+     * Signs the reader in with what they typed, holds what their login earned, and keeps the credentials in the
+     * keystore so a connection can be reopened when the token dies. A build with no identity cannot open the
+     * connection at all, and says so as the service's own refusals are said, so a screen has one thing to read rather
+     * than two. The credentials are kept only once the service has accepted them, so a wrong password is never
+     * written; they go to the keystore and nowhere else, and are erased the moment the reader signs out (ADR-0042).
      */
     signIn: async (credentials: Credentials): Promise<void> => {
       if (identity === undefined) {
         throw new SessionError('unavailable', 'cette build n’a pas de quoi ouvrir une connexion au service');
       }
-      hold(await createSession(identity, ports).open(credentials));
+      const token = await createSession(identity, ports).open(credentials);
+      credentialsDisk.setItem(KEYCHAIN_KEYS.readerCredentials, JSON.stringify(credentials));
+      hold(token);
     },
     signOut: () => {
+      credentialsDisk.removeItem(KEYCHAIN_KEYS.readerCredentials);
       hold(undefined);
+    },
+    reopen: async (): Promise<boolean> => {
+      reopening ??= (async (): Promise<boolean> => {
+        const credentials = identity === undefined ? null : keptCredentials();
+        if (identity === undefined || credentials === null) {
+          return false;
+        }
+        try {
+          // The same subscriber, one token later: held without notifying a watcher, so the paper they were reading
+          // stays in the cache (ADR-0042). A wrong answer here — a service that will not answer — is a `false`, not a
+          // throw: the caller signs out and the reader is shown a way back in, rather than a screen that never ends.
+          write(await createSession(identity, ports).open(credentials));
+          return true;
+        } catch {
+          return false;
+        }
+      })().finally(() => {
+        reopening = undefined;
+      });
+      return reopening;
+    },
+    renew: (sent: string, fresh: string) => {
+      if (held === sent) {
+        write(fresh);
+      }
     },
     watch: (whenChanged: () => void) => {
       watchers.add(whenChanged);
@@ -164,36 +261,42 @@ export const createReader = <Signal>(
 };
 
 /**
- * The same content, with one thing more: a reading the service refused under this reader's own token forgets that
- * token (ADR-0033, R9).
+ * The same content, with one thing more: a reading the service refuses under this reader's dead token reopens the
+ * connection and asks again, or, failing that, forgets the token (ADR-0042, and ADR-0033 R9 before it).
  *
  * The service answers `403` to a dead token on every route it serves, not only the ones holding a body a subscription
- * pays for — the front page included. So a token the service has stopped honouring does not cost a subscriber their
- * premium articles: it costs them the paper. Left in place it would go out with the next request and be refused
- * again, for as long as the app ran, and the only way out would be for the reader to guess that signing out mends it.
+ * pays for — the front page included. A token lives two hours, and past that only a login mints a new one, so a
+ * subscriber who leaves the app overnight comes back to a dead token on every list. The connection is reopened from
+ * the credentials the keystore kept: it is the same subscriber, so the reading is asked again under the new token and
+ * they never see it happen. Reopened once between the readings that failed together, not once each.
  *
- * Forgetting it turns that into nothing at all. `expired` is a cause another try can answer differently — which is
- * the whole of what makes a cause retryable — because by the time the next try leaves, the token it failed under is
- * gone, and the same request goes out as anybody's. The reader sees a page load, not a wall, and the screens that ask
- * whether anyone is signed in say no, which by then is true.
+ * When there is nothing to reopen with, or the service refuses the credentials — a password changed since — the token
+ * is forgotten instead. `expired` is a cause another try can answer differently, because by then the token it failed
+ * under is gone and the request goes out as anybody's: the reader sees a page load, not a wall, and the screens that
+ * ask whether anyone is signed in say no, which by then is true.
  */
 export const forgettingDeadTokens = (api: ContentApi, reader: Reader): ContentApi => {
-  const watching = async <Value>(read: Promise<Value>): Promise<Value> => {
+  const throughExpiry = async <Value>(read: () => Promise<Value>): Promise<Value> => {
     try {
-      return await read;
+      return await read();
     } catch (reason: unknown) {
       if (reason instanceof ContentApiError && reason.code === 'expired') {
+        if (await reader.reopen()) {
+          // Reopened under the same subscriber: ask again, once. A second expiry is left to propagate rather than
+          // reopen anew — a fresh token cannot already be dead, so a second one is a loop, not a retry.
+          return read();
+        }
         reader.signOut();
       }
       throw reason;
     }
   };
   return {
-    getSections: async () => watching(api.getSections()),
-    getFeed: async (query) => watching(api.getFeed(query)),
-    getLiveFeed: async (query) => watching(api.getLiveFeed(query)),
-    getArticle: async (id) => watching(api.getArticle(id)),
-    search: async (query) => watching(api.search(query)),
+    getSections: async () => throughExpiry(async () => api.getSections()),
+    getFeed: async (query) => throughExpiry(async () => api.getFeed(query)),
+    getLiveFeed: async (query) => throughExpiry(async () => api.getLiveFeed(query)),
+    getArticle: async (id) => throughExpiry(async () => api.getArticle(id)),
+    search: async (query) => throughExpiry(async () => api.search(query)),
   };
 };
 
@@ -207,7 +310,11 @@ export const forgettingDeadTokens = (api: ContentApi, reader: Reader): ContentAp
 const POSTING: Posting<AbortSignal> = {
   post: async (address, headers, body, signal) => {
     const reply = await fetch(address, { method: 'POST', headers, body, signal, credentials: 'omit' });
-    return { status: reply.status, text: async (): Promise<string> => reply.text() };
+    return {
+      status: reply.status,
+      header: (name) => reply.headers.get(name),
+      text: async (): Promise<string> => reply.text(),
+    };
   },
   abortable: () => new AbortController(),
   after: (delay, then) => {
@@ -222,8 +329,8 @@ const POSTING: Posting<AbortSignal> = {
  * The reader of this build: the identity it opens the connection with, the platform's network, and the phone's own
  * keystore.
  *
- * The token goes to the keystore and not to the store the rest of the app writes to. The rest is a preference or a
- * page of the paper, and a phone that loses either loses nothing anyone wanted; this is what proves a subscription
- * belongs to whoever is holding the phone.
+ * The token and the credentials both go to the keystore and not to the store the rest of the app writes to. The rest
+ * is a preference or a page of the paper, and a phone that loses either loses nothing anyone wanted; these two are
+ * what prove a subscription belongs to whoever is holding the phone, and reopen it when its token dies.
  */
-export const READER: Reader = createReader(identityOfBuild(), POSTING, keychain);
+export const READER: Reader = createReader(identityOfBuild(), POSTING, keychain, keychainCredentials);
