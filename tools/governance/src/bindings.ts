@@ -1350,4 +1350,43 @@ export const BINDINGS = {
       },
     },
   },
+  'ADR-0043': {
+    scope: {
+      // The one place that loads OneSignal and the port the rest of the app sees, the setting that asks the reader and
+      // the store that keeps their answer, what takes a touched alert to its article, and the config that keeps the
+      // SDK's own launch of an alert's address and its location module out of the build.
+      paths: [
+        'apps/mobile/src/shared/api/alerts.ts',
+        'apps/mobile/src/shared/api/alerts.test.ts',
+        'apps/mobile/src/features/alerts/**',
+        'apps/mobile/src/_app/model/alerts.ts',
+        'apps/mobile/src/_app/model/alerts.test.ts',
+        'apps/mobile/src/_app/routes/alerts-follower.tsx',
+        'apps/mobile/app.config.ts',
+      ],
+    },
+    rules: {
+      R1: ['guardrail/module-react-native-onesignal'],
+      R2: {
+        convention:
+          'createAlerts (apps/mobile/src/shared/api/alerts.ts) ne charge react-native-onesignal, par un import dynamique, et n’appelle initialize qu’au premier subscribe, que le lecteur déclenche en poussant l’interrupteur, ou au resume d’un lancement où useAlerts garde son oui. alerts.test.ts relit que rien ne se charge avant une demande et qu’un démarrage est unique ; store.test.ts que resumeAlerts ne démarre rien pour un lecteur qui n’a pas dit oui.',
+      },
+      R3: {
+        convention:
+          'Au démarrage, createAlerts pose l’étiquette CLIENT_TAG (client) à CLIENT_NAME, le nom que packages/remote-api/src/transport.ts donne aussi à chaque requête du service (ADR-0033 R4). alerts.test.ts relit l’étiquette et sa valeur dans l’ordre du démarrage.',
+      },
+      R4: {
+        convention:
+          'ALERTS n’est offert qu’à une build dont CONTENT_SOURCE est service et qui tourne sur Android ; une build hors offre ne charge ni ne démarre rien, et la page du compte n’en montre pas le réglage. apps/mobile/package.json écarte react-native-onesignal de l’autoliaison iOS (expo.autolinking.ios.exclude). alerts.test.ts relit qu’une build hors offre ne s’inscrit pas et que le banc, qui lit le corpus, n’est pas offert ; account-page.test.tsx que le réglage manque.',
+      },
+      R5: {
+        convention:
+          'AlertsFollower (apps/mobile/src/_app/routes/alerts-follower.tsx) écoute ALERTS.onOpen une fois le cache restauré ; destinationOf lit le slug de l’adresse (slugOfPage), puis articleOfSlug cherche l’article dans les listes lues, puis dans le fil ; sans article, la page s’ouvre hors de l’app. app.config.ts écrit com.onesignal.suppressLaunchURLs au manifeste, pour que le SDK rende l’adresse à l’app au lieu d’ouvrir le navigateur. alerts.test.ts, queries.test.ts et ids.test.ts relisent chaque destination.',
+      },
+      R6: {
+        convention:
+          'createAlerts met en pause les messages de OneSignal (InAppMessages.setPaused) avant toute autre chose que initialize, et app.config.ts écrit onesignal.disableLocation dans gradle.properties, que react-native-onesignal lit pour écarter du build le module de position. alerts.test.ts relit la pause dans l’ordre du démarrage.',
+      },
+    },
+  },
 } as const satisfies Bindings<ProofId>;

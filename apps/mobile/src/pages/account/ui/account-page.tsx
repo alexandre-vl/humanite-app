@@ -4,16 +4,18 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { hasShelf, useSetAsideCount } from '#api';
 import { NEWSROOM } from '#config';
+import { useAlertsSetting } from '#features/alerts';
 import { useReaderSession } from '#features/sign-in';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
-import { NEWSSTAND_HREF, openExternal, SETTINGS_HREF, SIGN_IN_HREF } from '#lib/routing';
+import { NEWSSTAND_HREF, openAppSettings, openExternal, SETTINGS_HREF, SIGN_IN_HREF } from '#lib/routing';
 import { createStyles, useTheme } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
 import { Pressable } from '#primitives/pressable';
 import { Scroll } from '#primitives/scroll';
 import { Surface } from '#primitives/surface';
+import { Switch } from '#primitives/switch';
 import { Text } from '#primitives/text';
 import { setAsideLabel } from '../model/set-aside';
 
@@ -118,6 +120,36 @@ function ActionRow({ label, onPress }: Readonly<{ label: DisplayText; onPress: (
 }
 
 /**
+ * The journal's alerts: a switch, what turning it on sends and to whom, and a way out to the phone's settings when the
+ * phone will not let the app show them.
+ *
+ * A build that cannot receive them draws nothing here, as a build that cannot open a connection draws no subscription
+ * (ADR-0043). What the switch does is said under it rather than behind a link: it is the one control of the app that
+ * signs the phone up with someone other than the journal's service. When the phone refuses, the refusal takes that
+ * place, and the row under it is the only door that can change the answer — the platform asks a reader once, and
+ * after that only its settings screen does.
+ */
+function Alerts(): ReactNode {
+  const styles = useStyles();
+  const { offered, on, blocked, choose } = useAlertsSetting();
+  if (!offered) {
+    return null;
+  }
+  return (
+    <>
+      <Box style={styles.row}>
+        <Box style={styles.words}>
+          <Text variant="body">{t('alerts.label')}</Text>
+          <Text variant="caption">{blocked ? t('alerts.blocked') : t('alerts.hint')}</Text>
+        </Box>
+        <Switch value={on} label={t('alerts.label')} onChange={choose} />
+      </Box>
+      {blocked ? <ActionRow label={t('alerts.settings')} onPress={openAppSettings} /> : null}
+    </>
+  );
+}
+
+/**
  * Where the reader stands with their subscription, and the one thing to do about it.
  *
  * A build that reads the simulated corpus opens no connection at all, so it draws nothing here rather than a row that
@@ -198,6 +230,7 @@ export function AccountPage(): ReactNode {
               router.push(SETTINGS_HREF);
             }}
           />
+          <Alerts />
         </Group>
         {/* The shelf of numéros is a row and not a tab: every press on it ends in a browser, so it belongs where the
             rest of the paper's own business is. A source that shelves no numéros has no row to show. What the

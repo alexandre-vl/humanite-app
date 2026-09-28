@@ -60,6 +60,37 @@ export const ISSUE_ID = z
   .brand('IssueId');
 export type IssueId = z.infer<typeof ISSUE_ID>;
 
+/**
+ * The name the journal's site gives an article in its address, which the service sends beside every item as `slug` —
+ * `elections-en-allemagne-victoire-de-la-gauche-percee-de-lafd-et-crise-pour-merz`: lowercase words and numbers joined
+ * by single hyphens, as all 29 of a capture are. It is how a page of the journal names an article, and an alert of the
+ * journal points at such a page (ADR-0043); none of the service's routes takes it, so the app reaches the article by
+ * finding the item that carries it.
+ */
+export const ARTICLE_SLUG = z
+  .string()
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u)
+  .brand('ArticleSlug');
+export type ArticleSlug = z.infer<typeof ARTICLE_SLUG>;
+
+/**
+ * An article's page on the journal's site: `https://www.humanite.fr/`, the section and the subject it is filed under,
+ * then its slug — `/politique/clemence-guette/un-pacs-ameliore-…`, as the bodies of a capture link to one. What
+ * follows the slug, a query or a fragment, names nothing of the article and is left.
+ */
+const ARTICLE_PAGE = /^https:\/\/(?:www\.)?humanite\.fr\/(?:[a-z0-9-]+\/)+(?<slug>[^/?#]+)\/?(?:[?#].*)?$/u;
+
+/**
+ * The slug of the article an address of the journal's site names, or `null` for an address that names none: another
+ * site, the site's own front, or a page whose last segment is not a slug. It says which article an address names, not
+ * that the article exists: finding it is the reader of the service's lists' to do, and a page no list carries is still
+ * a page, opened where it lives.
+ */
+export const slugOfPage = (address: string): ArticleSlug | null => {
+  const slug = ARTICLE_SLUG.safeParse(ARTICLE_PAGE.exec(address)?.groups?.['slug']);
+  return slug.success ? slug.data : null;
+};
+
 /** A section id, its slug — `culture-et-savoir`: lowercase words joined by single hyphens. */
 export const SECTION_ID = z
   .string()

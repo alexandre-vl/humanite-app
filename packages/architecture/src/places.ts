@@ -223,6 +223,10 @@ type ModulePolicy = Readonly<{
  * the place that holds an action, or in the page of the one screen that reads it — a feature only one slice references
  * is no slice, and a page imports no other page, so a store kept in a page stays that screen's. Nothing below them can
  * start keeping state of its own on the side.
+ *
+ * The journal's alerts come through the `api` place too, for the reason its pages do: they are the journal's service,
+ * reached under the journal's own OneSignal, and whether a build subscribes to them at all is decided where the build's
+ * source is (ADR-0043).
  */
 export const MODULES = {
   '@huma/mock-api': { places: ['api'], except: [] },
@@ -240,6 +244,7 @@ export const MODULES = {
   'react-native': { places: ['primitive'], except: ['AppState', 'Platform'] },
   'react-native-gesture-handler': { places: ['primitive'], except: [] },
   'react-native-mmkv': { places: ['lib'], except: [] },
+  'react-native-onesignal': { places: ['api'], except: [] },
   'react-native-reanimated': { places: ['primitive'], except: [] },
   'react-native-safe-area-context': { places: ['primitive'], except: [] },
   'react-native-worklets': { places: ['primitive'], except: [] },

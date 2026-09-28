@@ -46,6 +46,13 @@ export type Reply = Readonly<{
 }>;
 
 /**
+ * The name this client goes by, wherever the journal's services are told who asks: this one's own, and never the
+ * official client's. The service reads it on every request; the journal's alerts read it on every subscription this
+ * app makes to them (ADR-0043).
+ */
+export const CLIENT_NAME = 'humanite-lecteur (client non officiel)';
+
+/**
  * What every request says of itself: that it wants JSON, in French, and which client asks — this one, under a name of
  * its own and never the official client's. Nothing else: no origin, no cookie, and none of the official client's own
  * tokens. ASCII only, OkHttp failing a request whose header carries any other byte.
@@ -53,7 +60,7 @@ export type Reply = Readonly<{
 export const HEADERS = {
   accept: 'application/json',
   'accept-language': 'fr-FR',
-  'user-agent': 'humanite-lecteur (client non officiel)',
+  'user-agent': CLIENT_NAME,
 } as const;
 
 /** The one header a request adds to those, and only for a token a reader's own login earned (ADR-0032). */

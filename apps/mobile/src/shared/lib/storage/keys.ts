@@ -15,6 +15,13 @@ export const STORAGE_KEYS = {
   wireVisit: `wire-visit.${CONTENT_SOURCE}`,
   preferences: 'preferences',
   /**
+   * Whether the reader turned the journal's alerts on, which the app reads at every start to resume them (ADR-0043).
+   *
+   * Not kept under a source: only a build of the service offers the alerts, and the subscription it made is the
+   * phone's, whichever build is installed next.
+   */
+  alerts: 'alerts',
+  /**
    * The random identifier this install attests to the service as its device, kept for the life of the install.
    *
    * It is not kept under a source: it names the phone to the journal's service, which a build reading the simulated

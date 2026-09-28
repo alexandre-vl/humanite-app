@@ -35,6 +35,7 @@ test('a summary carries these fields and no others', () => {
     'hero',
     'id',
     'publishedAt',
+    'slug',
     'standfirst',
     'title',
   ]);

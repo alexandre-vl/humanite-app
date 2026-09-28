@@ -1,6 +1,6 @@
 export type { Access, ArticleFormat } from './enums.ts';
-export { ARTICLE_ID, FILED_ID, FILED_PATTERN, SECTION_ID, SECTION_NUMBER } from './ids.ts';
-export type { ArticleId, FiledId, ImageKey, IssueId, SectionId, SectionNumber } from './ids.ts';
+export { ARTICLE_ID, ARTICLE_SLUG, FILED_ID, FILED_PATTERN, SECTION_ID, SECTION_NUMBER, slugOfPage } from './ids.ts';
+export type { ArticleId, ArticleSlug, FiledId, ImageKey, IssueId, SectionId, SectionNumber } from './ids.ts';
 export { clockOf, INSTANT, instantAt, instantOf, issueIdAt } from './clock.ts';
 export type { Instant } from './clock.ts';
 export type { DisplayText } from './display-text.ts';

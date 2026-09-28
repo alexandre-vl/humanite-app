@@ -1,6 +1,7 @@
 import type {
   Article,
   ArticleId,
+  ArticleSlug,
   ArticleSummary,
   FeedQuery,
   Page,
@@ -250,6 +251,26 @@ const summariesRead = (cache: QueryClient): readonly ArticleSummary[] => [
  */
 export const summaryAmongRead = (cache: QueryClient, id: ArticleId): ArticleSummary | null =>
   summariesRead(cache).find((summary) => summary.id === id) ?? null;
+
+/**
+ * The article the journal's site names by `slug`, from the lists the app has read or else from the newsroom's last
+ * few, or `null` when neither carries it.
+ *
+ * It is how an alert of the journal finds its article (ADR-0043). An alert points at the article's page, and the page
+ * names it by a slug that none of the service's routes takes; every item the service lists carries it, so the article
+ * is the item that carries this one. What the app has read is looked at first, and it answers at once when it can.
+ * An alert is news, and news is what the wire lists: its own route answers the newsroom's last ten, whatever section
+ * filed them, and is asked when nothing read yet carries the slug. Nothing is asked further back than that — an
+ * alert about an older article opens its page, where it lives.
+ */
+export const articleOfSlug = async (cache: QueryClient, slug: ArticleSlug): Promise<ArticleId | null> => {
+  const known = summariesRead(cache).find((summary) => summary.slug === slug);
+  if (known !== undefined) {
+    return known.id;
+  }
+  const justFiled = await content.getLiveFeed({});
+  return justFiled.items.find((summary) => summary.slug === slug)?.id ?? null;
+};
 
 /**
  * Asks for an article before anyone has asked to read it, and keeps quiet about how it goes.

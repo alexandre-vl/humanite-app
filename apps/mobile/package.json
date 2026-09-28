@@ -49,6 +49,7 @@
     "react-native-gesture-handler": "catalog:",
     "react-native-mmkv": "catalog:",
     "react-native-nitro-modules": "catalog:",
+    "react-native-onesignal": "catalog:",
     "react-native-reanimated": "catalog:",
     "react-native-safe-area-context": "catalog:",
     "react-native-screens": "catalog:",
@@ -72,5 +73,14 @@
     "react-refresh": "catalog:",
     "test-renderer": "catalog:",
     "typescript": "catalog:"
+  },
+  "expo": {
+    "autolinking": {
+      "ios": {
+        "exclude": [
+          "react-native-onesignal"
+        ]
+      }
+    }
   }
 }

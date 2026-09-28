@@ -21,6 +21,13 @@ export const FR = {
     'Application non officielle, sans lien avec L’Humanité ni approbation du journal. Les articles, les images et la marque lui appartiennent, ainsi qu’à leurs auteurs.',
   'action.back': 'Revenir',
   'action.retry': 'Réessayer',
+  // Ce que le bouton des alertes envoie, et à qui, se dit sous le bouton : c’est le seul réglage de l’écran qui
+  // inscrit le téléphone ailleurs que chez le journal.
+  'alerts.label': 'Alertes du journal',
+  'alerts.hint':
+    'Les alertes que la rédaction envoie à ses lecteurs. Pour les recevoir, ce téléphone s’inscrit auprès de OneSignal, qui les envoie pour le journal.',
+  'alerts.blocked': 'Le téléphone empêche l’app d’afficher des alertes\u00A0: autorisez-la dans ses réglages.',
+  'alerts.settings': 'Ouvrir les réglages du téléphone',
   'app.name': 'L’Humanité',
   'article.free': 'Accès libre',
   'article.withheld.title': 'Réservé aux abonnés',

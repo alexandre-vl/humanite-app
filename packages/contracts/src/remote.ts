@@ -30,11 +30,15 @@ export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
 /**
  * An item as any list of the service carries it.
  *
- * It holds the keys a reading reads, and no other. The service sends more — a slug, a type that is always `post`, an
- * audio flag never once set, a number for a video's cover that no route resolves, a flag for what the desk picked out
- * that was null on all 514 items of a capture — and a schema that held those to a type would let a change to a key
- * nobody reads cost the reader every item of a list: a `slug` sent as null tomorrow would set all thirty aside. An
- * object schema drops the keys it does not name, which is what they are owed.
+ * It holds the keys a reading reads, and no other. The service sends more — a type that is always `post`, an audio
+ * flag never once set, a number for a video's cover that no route resolves, a flag for what the desk picked out that
+ * was null on all 514 items of a capture — and a schema that held those to a type would let a change to a key nobody
+ * reads cost the reader every item of a list. An object schema drops the keys it does not name, which is what they
+ * are owed.
+ *
+ * `slug` is read now — it is how an alert of the journal finds its article (ADR-0043) — and read so that it can cost
+ * nothing: whatever the service sends under it, or does not, the item passes, and a slug that is not a string reads
+ * as none. A `slug` sent as null tomorrow would otherwise set all thirty aside.
  *
  * `author` and `image_caption` come as null, or not at all, on items of every route. `article_format` is left out only
  * by the sectioned front `a-la-une`, a route the app does not ask; it is read as optional all the same, and an item
@@ -42,6 +46,7 @@ export type RemoteFormat = z.infer<typeof REMOTE_FORMAT>;
  */
 export const REMOTE_POST = z.object({
   id: REMOTE_ID,
+  slug: z.string().nullish().catch(null),
   date: z.string(),
   title: z.string(),
   description: z.string(),

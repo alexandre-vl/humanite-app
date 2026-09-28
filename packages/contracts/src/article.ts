@@ -3,7 +3,7 @@ import { INSTANT } from './clock.ts';
 import { SPAN } from './content.ts';
 import { DISPLAY_TEXT } from './display-text.ts';
 import { ACCESS, ARTICLE_FORMAT } from './enums.ts';
-import { ARTICLE_ID } from './ids.ts';
+import { ARTICLE_ID, ARTICLE_SLUG } from './ids.ts';
 import { PICTURE } from './picture.ts';
 
 /**
@@ -68,9 +68,14 @@ export const FILM = z.object({
  * measured on the journal's service on 24/09/2026, 8 items of 33, and 6 of the 10 answers to a search — and the page
  * a reader was reading lost nine lines and everything under them jumped up. Kept apart, the head prints the standfirst
  * and only ever the standfirst, so what opens is what stays.
+ *
+ * `slug` is the name the journal's site gives the article in its address. Nothing prints it: it is how an alert of
+ * the journal, which points at that address, finds the article among those the app has read (ADR-0043). The corpus
+ * has no site and its items none; an item of the service whose slug the contract refuses loses its slug, not itself.
  */
 export const ARTICLE_SUMMARY = z.object({
   id: ARTICLE_ID,
+  slug: ARTICLE_SLUG.optional(),
   format: ARTICLE_FORMAT,
   access: ACCESS,
   title: DISPLAY_TEXT,

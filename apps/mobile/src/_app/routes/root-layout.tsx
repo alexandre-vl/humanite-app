@@ -3,18 +3,21 @@ import { Stack } from 'expo-router';
 import { preventAutoHideAsync } from 'expo-splash-screen';
 import type { ReactNode } from 'react';
 import { READER } from '#api';
+import { resumeAlerts } from '#features/alerts';
 import { StartupProvider } from '#lib/startup';
 import { chromeOptions, useTheme } from '#lib/styles';
 import { SafeAreaRoot } from '#primitives/safe-area';
 import { followTheApp } from '../model/focus';
 import { forgetThePaperWhenTheReaderChanges } from '../model/paper';
 import { persistOptions, queryClient } from '../model/query-client';
+import { AlertsFollower } from './alerts-follower';
 import { ReaderSettings } from './reader-settings';
 import { StartupGate } from './startup-gate';
 
 void preventAutoHideAsync();
 followTheApp();
 forgetThePaperWhenTheReaderChanges(READER, queryClient);
+resumeAlerts();
 
 /**
  * The stack of pushed screens, in the colours in force.
@@ -36,6 +39,7 @@ export function RootLayout(): ReactNode {
             <SafeAreaRoot>
               <ThemedStack />
             </SafeAreaRoot>
+            <AlertsFollower />
           </ReaderSettings>
         </StartupGate>
       </StartupProvider>

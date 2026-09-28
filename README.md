@@ -43,16 +43,16 @@ un schéma, et aucune règle du dépôt n'existe sans une décision écrite et u
 
 _Simulateur iPhone, service du journal, le 26/09/2026._
 
-| Écran                       | Ce qu'il fait                                                                                                               |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **À la une**                | la une et ses rubriques, qu'on fait tourner sous le doigt                                                                   |
-| **En continu**              | le journal dans l'ordre de publication, sous la date de chaque jour ; ce qui a paru depuis votre dernier passage est marqué |
-| **Recherche**               | les résultats du journal, page après page ; pendant la recherche, la forme des cartes et un indicateur sous le champ        |
-| **Article**                 | la tête s'affiche avec ce que la carte savait déjà — titre, chapô, signature, heure — pendant que le corps arrive           |
-| **Lectures**                | les articles mis de côté, gardés sur le téléphone                                                                           |
-| **Kiosque**                 | les numéros du journal                                                                                                      |
-| **Compte**                  | la connexion de l'abonné ; son jeton est gardé dans le trousseau du téléphone                                               |
-| **Préférences d'affichage** | clair, sombre ou comme le système ; une taille de texte qui suit les tables d'iOS et la courbe d'Android, sans relancer     |
+| Écran                       | Ce qu'il fait                                                                                                                                |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **À la une**                | la une et ses rubriques, qu'on fait tourner sous le doigt                                                                                    |
+| **En continu**              | le journal dans l'ordre de publication, sous la date de chaque jour ; ce qui a paru depuis votre dernier passage est marqué                  |
+| **Recherche**               | les résultats du journal, page après page ; pendant la recherche, la forme des cartes et un indicateur sous le champ                         |
+| **Article**                 | la tête s'affiche avec ce que la carte savait déjà — titre, chapô, signature, heure — pendant que le corps arrive                            |
+| **Lectures**                | les articles mis de côté, gardés sur le téléphone                                                                                            |
+| **Kiosque**                 | les numéros du journal                                                                                                                       |
+| **Compte**                  | la connexion de l'abonné, dont le jeton est gardé dans le trousseau du téléphone ; sur Android, les alertes du journal, pour qui les demande |
+| **Préférences d'affichage** | clair, sombre ou comme le système ; une taille de texte qui suit les tables d'iOS et la courbe d'Android, sans relancer                      |
 
 Les listes déjà lues sont écrites sur le disque et relues au démarrage : elles sont là avant la première requête
 ([ADR-0015](docs/adr/0015-cache-de-donnees-tanstack-query-persiste.md)). Chaque texte de l'interface, jusqu'aux

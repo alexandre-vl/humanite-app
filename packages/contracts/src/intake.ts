@@ -9,6 +9,7 @@ import { SECTION } from './content.ts';
 import type { ArticleFormat } from './enums.ts';
 import type { Finding } from './finding.ts';
 import type { SectionNumber } from './ids.ts';
+import { ARTICLE_SLUG } from './ids.ts';
 import { PICTURE } from './picture.ts';
 import { readLegend, readPlain, readProse } from './prose.ts';
 import type { RemoteFormat, RemotePost } from './remote.ts';
@@ -119,6 +120,16 @@ const filmOf = (post: RemotePost): Readonly<{ url: string }> | undefined => {
 };
 
 /**
+ * The name the journal's site gives an item, or nothing. A slug the contract refuses costs the item its slug and not
+ * the item, as a picture from elsewhere costs it its picture: nothing prints a slug, and an alert that cannot find the
+ * article by it opens its page instead.
+ */
+const slugOf = (post: RemotePost): string | undefined => {
+  const slug = ARTICLE_SLUG.safeParse(post.slug);
+  return slug.success ? slug.data : undefined;
+};
+
+/**
  * An item of the service as the contracts' schema is handed it. Every field of text is read as the line it is, the
  * date as the instant it names, and the flags as the words the domain uses for them.
  *
@@ -131,10 +142,12 @@ const inputOf = (post: RemotePost, publishedAt: Instant): SummaryInput => {
   const standfirst = readPlain(post.description);
   const excerpt = readPlain(post.excerpt);
   const byline = readPlain(post.author ?? '');
+  const slug = slugOf(post);
   const hero = heroOf(post);
   const film = filmOf(post);
   return {
     id: post.id,
+    ...(slug === undefined ? {} : ({ slug } satisfies Partial<SummaryInput>)),
     format: FORMATS[post.article_format ?? 'classic'],
     access: post.premium ? 'premium' : 'free',
     title: readPlain(post.title),

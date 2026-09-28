@@ -2,10 +2,11 @@ import { typographyAt } from '@huma/design-tokens';
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
-import { noteSetAside, READER } from '#api';
+import { ALERTS, noteSetAside, READER } from '#api';
 import { NEWSROOM } from '#config';
+import { useAlerts } from '#features/alerts';
 import { useConnection } from '#features/sign-in';
-import { openExternal } from '#lib/routing';
+import { openAppSettings, openExternal } from '#lib/routing';
 import { renderWithCache, styleOf } from '#lib/testing';
 import { ICONS } from '#primitives/icon';
 import { AccountPage } from './account-page';
@@ -20,6 +21,7 @@ jest.mock('#lib/routing', () => ({
   __esModule: true,
   ...jest.requireActual<object>('#lib/routing'),
   openExternal: jest.fn(),
+  openAppSettings: jest.fn(),
 }));
 
 /** A build started with the journal's key, which is what makes the screen offer a connection at all. */
@@ -27,9 +29,15 @@ const withKey = (): void => {
   jest.spyOn(READER, 'offered').mockReturnValue(true);
 };
 
+/** A build that receives the journal's alerts: one of the service, on Android, which the bench is neither. */
+const withAlerts = (): void => {
+  jest.spyOn(ALERTS, 'offered').mockReturnValue(true);
+};
+
 afterEach(() => {
   jest.restoreAllMocks();
   useConnection.setState({ connection: 'out' });
+  useAlerts.setState({ wanted: false, asking: false, blocked: false });
 });
 
 describe('AccountPage', () => {
@@ -161,5 +169,50 @@ describe('AccountPage', () => {
     await renderWithCache(<AccountPage />);
     expect(screen.getByText('Abonné connecté')).toBeTruthy();
     expect(screen.getByText('Les articles réservés à l’abonnement s’ouvrent.')).toBeTruthy();
+  });
+
+  /** A build that cannot receive the alerts draws no switch that would sign the phone up for nothing. */
+  it('n’offre pas les alertes à une build qui ne les reçoit pas', async () => {
+    await renderWithCache(<AccountPage />);
+    expect(screen.queryByText('Alertes du journal')).toBeNull();
+  });
+
+  /** What turning the alerts on sends, and to whom, is read beside the switch, before the switch is touched. */
+  it('abonne le téléphone aux alertes du journal quand on pousse l’interrupteur, en disant à qui', async () => {
+    withAlerts();
+    const subscribing = jest.spyOn(ALERTS, 'subscribe').mockResolvedValue(true);
+    await renderWithCache(<AccountPage />);
+    expect(screen.getByText(/s’inscrit auprès de OneSignal/u)).toBeTruthy();
+    await fireEvent(screen.getByLabelText('Alertes du journal'), 'valueChange', true);
+    expect(subscribing).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText('Alertes du journal').props['value']).toBe(true);
+  });
+
+  /**
+   * A platform that refused asks the reader no more: the refusal is said where the promise was, and the phone's own
+   * settings, the one place the answer can change, are a row away.
+   */
+  it('dit quand le téléphone refuse les alertes, et mène à ses réglages', async () => {
+    withAlerts();
+    jest.spyOn(ALERTS, 'subscribe').mockResolvedValue(false);
+    await renderWithCache(<AccountPage />);
+    await fireEvent(screen.getByLabelText('Alertes du journal'), 'valueChange', true);
+    expect(screen.getByLabelText('Alertes du journal').props['value']).toBe(false);
+    expect(screen.getByText(/empêche l’app d’afficher des alertes/u)).toBeTruthy();
+    await fireEvent.press(screen.getByText('Ouvrir les réglages du téléphone'));
+    expect(jest.mocked(openAppSettings)).toHaveBeenCalledTimes(1);
+  });
+
+  it('désabonne le téléphone quand on éteint les alertes', async () => {
+    withAlerts();
+    const unsubscribing = jest.spyOn(ALERTS, 'unsubscribe').mockResolvedValue(undefined);
+    jest.spyOn(ALERTS, 'permitted').mockResolvedValue(true);
+    await act(() => {
+      useAlerts.setState({ wanted: true });
+    });
+    await renderWithCache(<AccountPage />);
+    await fireEvent(screen.getByLabelText('Alertes du journal'), 'valueChange', false);
+    expect(unsubscribing).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText('Alertes du journal').props['value']).toBe(false);
   });
 });

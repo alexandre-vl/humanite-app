@@ -247,6 +247,12 @@ export function report(done: () => void): void {
       linted({ 'src/pages/home/model/keychain.ts': "export { getItem } from 'expo-secure-store';\n" }),
     ),
     define(
+      'guardrail/module-react-native-onesignal',
+      'une page qui abonne elle-même le téléphone aux alertes du journal',
+      ['module/react-native-onesignal'],
+      linted({ 'src/pages/home/model/alerts.ts': "export { OneSignal } from 'react-native-onesignal';\n" }),
+    ),
+    define(
       'guardrail/module-expo-symbols',
       'une page qui rend un symbole natif',
       ['module/expo-symbols'],

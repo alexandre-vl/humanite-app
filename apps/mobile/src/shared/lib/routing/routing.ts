@@ -1,5 +1,5 @@
 import type { ArticleId } from '@huma/contracts';
-import { openURL } from 'expo-linking';
+import { openSettings, openURL } from 'expo-linking';
 import { useLocalSearchParams } from 'expo-router';
 
 /** The parameters of a route as it hands them over: strings, one or several under a name, or none at all. */
@@ -54,6 +54,15 @@ export const LIVE_HREF = '/live' as const;
  */
 export function openExternal(url: string): void {
   void openURL(url);
+}
+
+/**
+ * Opens the phone's own settings for this app, where the reader decides whether it may notify: a platform that has
+ * refused once asks no more, and that screen is then the only place the answer can change. It sits beside the page
+ * the phone opens for the same reason — the reader is sent out of the app, and comes back on their own.
+ */
+export function openAppSettings(): void {
+  void openSettings();
 }
 
 /**

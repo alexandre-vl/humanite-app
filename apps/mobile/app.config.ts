@@ -1,5 +1,14 @@
 import type { ExpoConfig } from 'expo/config/index.js';
-import { CodeGenerator, IOSConfig, withAppDelegate, withInfoPlist, withMainActivity } from 'expo/config-plugins.js';
+import {
+  AndroidConfig,
+  CodeGenerator,
+  IOSConfig,
+  withAndroidManifest,
+  withAppDelegate,
+  withGradleProperties,
+  withInfoPlist,
+  withMainActivity,
+} from 'expo/config-plugins.js';
 import type { ConfigPlugin } from 'expo/config-plugins.js';
 
 /**
@@ -203,6 +212,49 @@ const withScenes: ConfigPlugin = (expo) => {
   });
 };
 
+/** The Gradle property `react-native-onesignal` reads to leave OneSignal's location module out of the build. */
+const NO_LOCATION = 'onesignal.disableLocation';
+
+/**
+ * The accent Android paints an alert's small mark and the app's name in, as a manifest takes a colour: opacity first,
+ * then the palette's `uiRed`, written out for the reason the splash's colours are — a config cannot import a token.
+ */
+const ALERT_ACCENT = 'FFF13C47';
+
+/**
+ * Hands a touched alert of the journal to the app rather than to the browser, and leaves out what the app does not use.
+ *
+ * An alert carries the address of what it announces, and OneSignal opens that address itself — in the browser, without
+ * bringing the app up — unless the manifest says the app will take it (`OSNotificationOpenBehaviorFromPushPayload`,
+ * read in the copy of OneSignal 5 the journal's app 6.2.0 ships). That app says so, and shows the address in a web view
+ * of its own; this one says so too, and opens the article in its own reader whenever it can tell which (ADR-0043).
+ *
+ * The location module is OneSignal's way of telling the journal where a phone is. Nothing here asks where the reader
+ * is, so the module is not built in at all, rather than built in and left unasked.
+ *
+ * Android alone: iOS subscribes to nothing — the journal's alerts reach only the journal's own iPhone app — and the
+ * app's `package.json` keeps OneSignal out of the iOS build altogether.
+ */
+const withJournalAlerts: ConfigPlugin = (expo) => {
+  const manifested = withAndroidManifest(expo, (manifest) => {
+    const application = AndroidConfig.Manifest.getMainApplicationOrThrow(manifest.modResults);
+    AndroidConfig.Manifest.addMetaDataItemToMainApplication(application, 'com.onesignal.suppressLaunchURLs', 'true');
+    AndroidConfig.Manifest.addMetaDataItemToMainApplication(
+      application,
+      'com.onesignal.NotificationAccentColor.DEFAULT',
+      ALERT_ACCENT,
+    );
+    return manifest;
+  });
+  return withGradleProperties(manifested, (gradle) => ({
+    ...gradle,
+    modResults: [
+      ...gradle.modResults.filter((item) => item.type !== 'property' || item.key !== NO_LOCATION),
+      { type: 'property', key: NO_LOCATION, value: 'true' },
+    ],
+  }));
+};
+
 /**
  * Configuration of the application, read by Expo in Node, synchronously and without the context it passes: tools such
  * as knip load it with another context.
@@ -276,7 +328,7 @@ const config: ExpoConfig = {
 };
 
 /**
- * The configuration, with the two things plugins have to do to it. They are applied to the object rather than named in
- * `plugins`, which takes the name of a package: these are written here.
+ * The configuration, with the three things plugins have to do to it. They are applied to the object rather than named
+ * in `plugins`, which takes the name of a package: these are written here.
  */
-export default withScenes(withFastFrames(config));
+export default withJournalAlerts(withScenes(withFastFrames(config)));

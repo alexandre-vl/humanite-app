@@ -1,4 +1,4 @@
-export { articleQuery, feedQuery, isReaderKey, searchQuery, sectionFeedQuery } from './api/queries';
+export { articleOfSlug, articleQuery, feedQuery, isReaderKey, searchQuery, sectionFeedQuery } from './api/queries';
 export { useReadSummary } from './model/known';
 export { feedOf, stateOf, usePagedFeed } from './model/paged-feed';
 export { useSections } from './model/sections';

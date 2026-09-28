@@ -251,6 +251,31 @@ test('an item the schemas cannot read is set aside where it sat, and the rest ar
   expect(intake.kept.map((summary) => summary.id)).toEqual([first.id, '3999999']);
 });
 
+/**
+ * The name the journal's site gives an article is how an alert finds it (ADR-0043): every item the capture recorded
+ * keeps its own, as the service sent it.
+ */
+test('every item the service listed keeps the slug the service gave it', () => {
+  for (const { answer } of LISTS) {
+    const sent = answer.posts.map((post) => post.slug);
+    expect(readSummaries(answer.posts).kept.map((summary) => summary.slug)).toEqual(sent);
+  }
+});
+
+/** A slug nothing prints costs nothing but itself: sent as null, as a number or as no slug at all, the item stays. */
+test('a slug the contracts cannot read costs the item its slug, and not the item', () => {
+  const [first] = RECORDED.front.answer.posts;
+  const unnamed = Object.fromEntries(Object.entries(first).filter(([field]) => field !== 'slug'));
+  const intake = readSummaries([
+    { ...first, slug: null },
+    { ...first, id: '3999997', slug: 3861029 },
+    { ...first, id: '3999998', slug: 'Élections en Allemagne' },
+    { ...unnamed, id: '3999999' },
+  ]);
+  expect(intake.setAside).toEqual([]);
+  expect(intake.kept.map((summary) => summary.slug)).toEqual([undefined, undefined, undefined, undefined]);
+});
+
 /** A reason names the value it refused: a shape nobody has seen is known by its name the first time it comes. */
 test('the reason an item is set aside names what the service sent, and not only where', () => {
   const [first] = RECORDED.front.answer.posts;
