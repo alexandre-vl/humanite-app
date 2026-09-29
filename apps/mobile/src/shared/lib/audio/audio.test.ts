@@ -7,11 +7,21 @@ type NativeStatus = Readonly<{
   playing: boolean;
   didJustFinish: boolean;
   isLoaded: boolean;
+  isBuffering: boolean;
+  error: string | null;
 }>;
 const listeners = new Set<(status: NativeStatus) => void>();
 const emit = (playing = false): void => {
   for (const listener of listeners) {
-    listener({ currentTime: 0, duration: 5, playing, didJustFinish: false, isLoaded: true });
+    listener({
+      currentTime: 0,
+      duration: 5,
+      playing,
+      didJustFinish: false,
+      isLoaded: true,
+      isBuffering: false,
+      error: null,
+    });
   }
 };
 const mockNative = {
@@ -62,7 +72,15 @@ describe('native article audio session', () => {
     expect(mockNative.replace).toHaveBeenNthCalledWith(2, { uri: 'next.wav' });
     expect(mockNative.setActiveForLockScreen).toHaveBeenCalledTimes(1);
     expect(old).toHaveBeenCalledTimes(calls);
-    expect(next).toHaveBeenLastCalledWith({ position: 0, duration: 5, playing: true, finished: false, loaded: true });
+    expect(next).toHaveBeenLastCalledWith({
+      position: 0,
+      duration: 5,
+      playing: true,
+      finished: false,
+      loaded: true,
+      buffering: false,
+      error: false,
+    });
     session.close();
     session.close();
     expect(mockNative.setActiveForLockScreen).toHaveBeenLastCalledWith(false);

@@ -6,17 +6,24 @@ Le bouton « Écouter l’article » ouvre un lecteur sombre consacré à Estell
 
 Le lecteur présente le titre, l’auteur, le passage en cours, un curseur pour naviguer entre les passages, les commandes précédent/suivant, les sauts de quinze secondes dans le passage et les vitesses 0,8 à 1,5. Réduire le lecteur conserve une barre compacte pendant la navigation. Les commandes natives permettent la pause depuis l’écran verrouillé. La position reprend seulement si les mots de l’article n’ont pas changé.
 
-La synthèse anticipe deux passages. Les fichiers WAV restent dans le cache temporaire de l’app, effacé à la fermeture ou au changement de compte. Ce mécanisme nécessite une connexion pour préparer les passages suivants et ne promet pas un article complet hors connexion.
+La version continue remplace les WAV successifs par une seule source HLS native. La position et les sauts de quinze secondes portent sur l’article entier. Les paragraphes sont des repères de navigation ; leur transition ne recharge jamais le lecteur. Pendant la génération, la durée affichée est celle déjà disponible, et la suite est annoncée comme en préparation.
+
+Le serveur prépare le texte dans l’ordre. Le lecteur natif maintient une réserve d’environ vingt secondes et continue de recevoir l’audio lorsque JavaScript est suspendu. Une connexion reste nécessaire. Les fragments privés ne constituent pas un téléchargement hors connexion géré par l’app.
 
 ## Service
 
 - Code : [k8s-alexvl/humanite-audio](https://github.com/k8s-alexvl/humanite-audio).
 - Origine : `https://audio-humanite.alexvl.fr`.
 - Pocket TTS 3.3.0, modèle français officiel à six couches, conditionnement officiel Estelle. Révisions des modèles épinglées dans le dépôt du service.
-- Chaque demande contient l’identifiant de l’article et un passage de son texte. Le service interroge le journal avec le jeton du lecteur, vérifie ses droits et que les mots appartiennent à l’article avant de consulter le cache.
-- Cache MinIO privé, empreinte modèle/article/texte, expiration à 30 jours. Tickets signés valables quinze minutes. Aucune clé de stockage ou de signature dans l’app.
-- File bornée, un travail de synthèse à la fois, déduplication des demandes identiques et plafond de longueur. Un redémarrage peut perdre une demande en attente ; l’app la soumet à nouveau une fois.
-- Une génération et son téléchargement sont bornés à deux minutes dans l’app. Le serveur attend jusqu’à vingt secondes avant de répondre sur l’avancement : le téléphone n’utilise pas de temporisation JavaScript pour surveiller les travaux en arrière-plan. Les indisponibilités temporaires sont réessayées dans ce même délai. Annulation et réponses tardives ne relancent pas une écoute arrêtée.
+- La session v2 contient l’identifiant de l’article et ses paragraphes. Le service interroge le journal une fois, vérifie les droits et l’appartenance des paragraphes dans leur ordre avant de consulter le cache. Une nouvelle session renouvelle cette vérification.
+- Cache MinIO privé, versionné par modèle, traitement du texte, article et paragraphes. Tickets HMAC valables une heure ; aucune clé dans l’app. Le manifeste final est écrit après les fragments et les repères, pour éviter un cache partiel présenté comme terminé.
+- Génération PCM progressive, un encodeur AAC pour l’article entier, fragments HLS fMP4 d’environ une seconde. Les petites frontières de transport ne réinitialisent pas l’encodeur.
+- Découpage serveur aux fins de phrases, puis aux propositions si nécessaire, sous la limite de tokens du modèle. Aucun second découpage côté app.
+- Un travail de synthèse à la fois ; ordonnanceur entre les fragments linguistiques des sessions. Limites sur les admissions, la longueur du document, sa durée et les sessions inactives.
+- Les métadonnées suivent la génération avec une attente côté serveur. Leur indisponibilité ne stoppe pas la lecture native déjà en cours.
+- Fermeture et changement de compte ferment le lecteur et invalident les réponses tardives. La position ne reprend que pour le même texte.
+- Un patch ciblé d’expo-audio applique la réserve explicite après remplacement de la source sur iOS et règle le seuil initial Android à 750 ms (1,5 s après une interruption). La réserve de lecture reste distincte de ce seuil.
+- L’API v1 reste disponible côté serveur pendant la migration de l’app.
 
 ## Livraison
 
@@ -40,3 +47,20 @@ Sur le Nothing A065 sous Android 16, le premier son d’une lecture sans cache a
 - Tests de l’API : renouvellement du jeton, une seule réouverture après expiration, reprise d’un travail perdu, refus des tickets malformés, absence d’écriture après annulation.
 - Tests du service : accès même en cache, déduplication, limites, expiration et falsification de tickets, redémarrage et renouvellement du jeton du journal.
 - `pnpm verify` reste le contrôle complet de l’app. Les mesures et essais sur le serveur et le téléphone sont consignés après leur exécution.
+
+## Qualification de la lecture continue
+
+Les tests précédents validaient le fonctionnement, sans prouver la fluidité perçue. La qualification v2 distingue le temps jusqu’au premier fragment, le démarrage natif, les interruptions de transport et la qualité de la parole.
+
+Premiers essais du 29 septembre 2026, à confirmer sur la version finale :
+
+- Serveur de développement sur Mac : premier manifeste disponible en 1,21 s, contrôle des droits compris.
+- Nothing A065, même serveur via USB : début de lecture native à 2,39 s sans cache ; 59,4 s lues jusqu’au bout sans erreur. Version native avant ajustement du seuil de départ.
+- Serveur Kubernetes CPU, image candidate isolée du Service : premier manifeste disponible en 2,00 s par tunnel. Cette mesure ne comprend pas le lecteur ni le chemin public Cloudflare.
+- Nothing A065, serveur Kubernetes CPU via tunnel et nouveau seuil natif : début de lecture à 3,218 s sans cache ; 61,962 s lues jusqu’au bout, aucune erreur et aucun retour en attente après le départ. Il s’agit des événements du lecteur, pas d’une mesure acoustique au haut-parleur.
+- GTX 1650, test de cohabitation : Jellyfin encode 90 s de vidéo synthétique H.264 1080p30 pendant que Pocket TTS français six couches produit 5,81 s d’audio par seconde ; médiane du premier PCM 40,6 ms. Modèle 24 couches : 2,36 fois le temps réel et 92,8 ms. Banc Torch 2.6/cu124 ; l’image destinée à la production utilise un environnement distinct à qualifier. Ces mesures ne comprennent ni réseau ni lecteur.
+- La RX 5600 XT dispose d’environ 6 Go de mémoire ; le pilote Mesa initialise VA-API et expose des profils de décodage/encodage. Aucun basculement de Jellyfin sur AMD n’a été fait.
+- Le texte brut « 12,5 % » tronquait une phrase de contrôle avec les deux modèles. Une normalisation déterministe des nombres, après vérification du texte original, rétablit la fin de phrase dans la transcription Whisper-small de contrôle. Ce diagnostic ne valide pas à lui seul le naturel de la voix.
+- Les métadonnées de progression reprennent après les erreurs réseau temporaires ; leur attente et leur annulation restent indépendantes du flux natif. Le délai de requête couvre aussi la lecture du corps de réponse.
+
+Critères de livraison visés : premier son médian inférieur à 1,5 s, 95e percentile inférieur à 3 s sur connexion stable et modèle chaud ; aucune rupture technique ajoutée entre paragraphes ; écoute prolongée et commandes système vérifiées sur téléphone. Ces seuils sont des objectifs, pas des résultats acquis.

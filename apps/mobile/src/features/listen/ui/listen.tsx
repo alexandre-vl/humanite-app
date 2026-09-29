@@ -249,16 +249,11 @@ function Expanded({ state }: Readonly<{ state: Listening }>): ReactNode {
               <>
                 <Box style={styles.timeline}>
                   <Scrubber
-                    value={
-                      state.stage === 'ended'
-                        ? 1
-                        : (state.index + (state.duration > 0 ? state.position / state.duration : 0)) /
-                          state.passages.length
-                    }
+                    value={state.duration > 0 ? state.position / state.duration : 0}
                     label={t('listen.progress')}
-                    step={1 / state.passages.length}
+                    step={0.01}
                     onChange={(fraction) => {
-                      listening.jump(Math.min(state.passages.length - 1, Math.floor(fraction * state.passages.length)));
+                      listening.seek(fraction * state.duration);
                     }}
                   />
                   <Box style={styles.between}>
@@ -269,7 +264,7 @@ function Expanded({ state }: Readonly<{ state: Listening }>): ReactNode {
                       {t('listen.passage', { current: state.index + 1, total: state.passages.length })}
                     </Text>
                     <Text variant="caption" tone="textMuted">
-                      {time(state.duration)}
+                      {state.complete ? time(state.duration) : t('listen.generating')}
                     </Text>
                   </Box>
                 </Box>

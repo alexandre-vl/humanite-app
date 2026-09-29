@@ -34,7 +34,7 @@ Option retenue : « Pocket TTS officiel sur un serveur avec cache privé », par
 
 - **R1** — Les requêtes de synthèse DOIVENT passer par `shared/api` vers l’origine HTTPS fixe du service audio.
 - **R2** — Avant la première écoute, l’interface DOIT expliquer que le texte et le jeton de lecture sont transmis au serveur pour vérifier les droits et préparer l’audio.
-- **R3** — Le serveur DOIT vérifier auprès du journal les droits du lecteur et l’appartenance du passage à l’article avant tout résultat, y compris en cache.
+- **R3** — Le serveur DOIT vérifier auprès du journal les droits du lecteur et l’appartenance du passage à l’article à l’ouverture de chaque session, y compris en cache. Cette vérification porte sur les paragraphes dans l’ordre du texte autorisé.
 - **R4** — La fermeture du lecteur ou le changement de compte DOIT annuler la session et effacer son audio temporaire.
 - **R5** — Un article au corps retenu NE DOIT PAS proposer la lecture audio.
 - **R6** — La position persistée DOIT être invalidée quand le texte change.
@@ -42,11 +42,11 @@ Option retenue : « Pocket TTS officiel sur un serveur avec cache privé », par
 ### Conséquences
 
 - Bien, parce que le téléphone ne télécharge plus les 354 Mo du modèle ONNX (C1).
-- Bien, parce qu’un lecteur natif unique gère les passages et les commandes de l’écran verrouillé, et ferme sa session au changement de compte (C2, C3).
+- Bien, parce qu’un lecteur natif unique lit un flux HLS continu et ses repères et les commandes de l’écran verrouillé, et ferme sa session au changement de compte (C2, C3).
 - Bien, parce que le cache MinIO est privé et les tickets audio signés ont une durée limitée (C4).
 - Mauvais, parce qu’une connexion est nécessaire pour préparer les passages suivants (C1).
 - Mauvais, parce que le serveur devient dépositaire temporaire du texte et du jeton du lecteur (C4).
-- Mauvais, parce que deux passages anticipés ne constituent pas un téléchargement intégral hors connexion (C2).
+- Mauvais, parce que la réserve native ne constitue pas un téléchargement intégral hors connexion (C2).
 
 ## Avantages et inconvénients des options
 
@@ -72,3 +72,5 @@ Option retenue : « Pocket TTS officiel sur un serveur avec cache privé », par
 - Le service démarre sur CPU pour ne pas retirer le GPU déjà alloué à Jellyfin. Un déploiement CUDA nécessite une image adaptée et une décision de partage des ressources.
 - Preuves : `controller.test.ts`, `speech.test.ts`, tests du service et mesures décrites dans `docs/article-audio.md`.
 - Réévaluation : attente mesurée trop longue sur le serveur, besoin d’écoute intégrale hors connexion ou modèle local français assez léger.
+
+- L’écoute sur téléphone a montré que les WAV successifs et deux découpages indépendants ne satisfaisaient pas C1 et C2. La version continue autorise un document, diffuse la sortie progressive du modèle dans un seul encodage AAC/HLS et fait suivre une timeline globale par le lecteur natif. Un seuil de départ court et une réserve plus longue répondent à deux besoins distincts. Le découpage respecte les frontières linguistiques sous la limite du modèle. La comparaison CPU/CUDA mesure séparément le premier bloc et le débit soutenu ; elle ne remplace pas l’écoute comparative.

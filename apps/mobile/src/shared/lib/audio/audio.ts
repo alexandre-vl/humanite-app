@@ -1,6 +1,14 @@
 import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
-type Status = Readonly<{ position: number; duration: number; playing: boolean; finished: boolean; loaded: boolean }>;
+type Status = Readonly<{
+  position: number;
+  duration: number;
+  playing: boolean;
+  finished: boolean;
+  loaded: boolean;
+  buffering: boolean;
+  error: boolean;
+}>;
 type Playback = Readonly<{
   play: () => void;
   pause: () => void;
@@ -9,7 +17,7 @@ type Playback = Readonly<{
   close: () => void;
 }>;
 
-/** One native player and Android foreground service for the whole article, including gaps between generated passages. */
+/** One native player and Android foreground service for the whole article, with native buffering across all generated passages. */
 export function createAudioSession(): Readonly<{
   open: (uri: string, title: string, update: (status: Status) => void) => Promise<Playback>;
   close: () => void;
@@ -30,7 +38,11 @@ export function createAudioSession(): Readonly<{
         throw new Error('Audio session closed');
       }
       detach?.();
-      player ??= createAudioPlayer(null, { updateInterval: 500, keepAudioSessionActive: true });
+      player ??= createAudioPlayer(null, {
+        updateInterval: 200,
+        keepAudioSessionActive: true,
+        preferredForwardBufferDuration: 20,
+      });
       const native = player;
       native.shouldCorrectPitch = true;
       let closed = false;
@@ -44,6 +56,8 @@ export function createAudioSession(): Readonly<{
             playing: status.playing,
             finished: status.didJustFinish,
             loaded: status.isLoaded,
+            buffering: status.isBuffering,
+            error: status.error !== null,
           });
         }
       });
@@ -59,7 +73,11 @@ export function createAudioSession(): Readonly<{
       try {
         await new Promise<void>((resolve, reject) => {
           const loaded = native.addListener('playbackStatusUpdate', (status) => {
-            if (status.isLoaded) {
+            if (status.error !== null) {
+              clearTimeout(timeout);
+              loaded.remove();
+              reject(new Error('Native audio failed'));
+            } else if (status.isLoaded) {
               finish();
             }
           });

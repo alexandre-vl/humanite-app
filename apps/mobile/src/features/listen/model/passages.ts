@@ -26,23 +26,5 @@ export function passagesOf(article: Article): readonly Passage[] {
     { text: article.title, heading: true },
     ...(article.standfirst === undefined ? [] : [{ text: article.standfirst, heading: false }]),
   ];
-  return [...head, ...body].flatMap((passage) => speechChunks(passage.text).map((text) => ({ ...passage, text })));
-}
-
-/** Small, contiguous pieces start quickly; the server verifies every word against the source. */
-function speechChunks(text: string): readonly string[] {
-  const chunks: string[] = [];
-  let rest = text.replace(/\s+/gu, ' ').trim();
-  while (rest.length > 320) {
-    const head = rest.slice(0, 320);
-    const sentence = [...head.matchAll(/[.!?;:]\s/gu)].at(-1)?.index;
-    const boundary = sentence !== undefined && sentence >= 80 ? sentence + 1 : head.lastIndexOf(' ');
-    const end = boundary > 0 ? boundary : 320;
-    chunks.push(rest.slice(0, end));
-    rest = rest.slice(end).trim();
-  }
-  if (rest.length > 0) {
-    chunks.push(rest);
-  }
-  return chunks;
+  return [...head, ...body].map((passage) => ({ ...passage, text: passage.text.replace(/\s+/gu, ' ').trim() }));
 }

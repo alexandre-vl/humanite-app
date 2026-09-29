@@ -76,6 +76,7 @@ export const FR = {
   'listen.eyebrow': 'LE JOURNAL À L’OREILLE',
   'listen.action': 'Écouter l’article',
   'listen.open': 'Ouvrir le lecteur audio',
+  'listen.generating': 'La suite se prépare',
   'listen.voice': 'Estelle · Français',
   'listen.remote': 'Voix de synthèse · Connexion nécessaire',
   'listen.intro.title': 'Votre journal prend la parole.',
