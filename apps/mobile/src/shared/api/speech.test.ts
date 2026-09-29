@@ -52,6 +52,17 @@ describe('server article audio', () => {
       .mockResolvedValueOnce(wave());
     await b.session.speak('Bonjour.', new AbortController().signal);
     expect(b.request).toHaveBeenCalledTimes(5);
+    expect(b.request.mock.calls[1]?.[0]).toContain('?wait=20');
+    expect(b.save).toHaveBeenCalledTimes(1);
+  });
+  it('waits through a brief deployment outage instead of interrupting the current passage', async () => {
+    const b = bench();
+    b.request
+      .mockResolvedValueOnce(new Response(null, { status: 503, headers: { 'retry-after': '0' } }))
+      .mockResolvedValueOnce(ready())
+      .mockResolvedValueOnce(wave());
+    await b.session.speak('Bonjour.', new AbortController().signal);
+    expect(b.request).toHaveBeenCalledTimes(3);
     expect(b.save).toHaveBeenCalledTimes(1);
   });
   it('does not persist a response received after cancellation', async () => {

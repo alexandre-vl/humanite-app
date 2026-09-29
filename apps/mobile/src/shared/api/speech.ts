@@ -37,7 +37,7 @@ function job(value: unknown): Readonly<{ ticket: string; duration: number | null
   };
 }
 
-async function pause(signal: AbortSignal): Promise<void> {
+async function pause(signal: AbortSignal, delay = 600): Promise<void> {
   return new Promise((resolve, reject) => {
     const abort = (): void => {
       clearTimeout(timer);
@@ -46,7 +46,7 @@ async function pause(signal: AbortSignal): Promise<void> {
     const timer = setTimeout(() => {
       signal.removeEventListener('abort', abort);
       resolve();
-    }, 600);
+    }, delay);
     signal.addEventListener('abort', abort, { once: true });
     if (signal.aborted) {
       abort();
@@ -72,16 +72,27 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
       };
       parent.addEventListener('abort', abort, { once: true });
       session.signal.addEventListener('abort', abort, { once: true });
+      const expires = Date.now() + 120_000;
       const timer = setTimeout(abort, 120_000);
       if (parent.aborted || session.signal.aborted) {
         abort();
       }
       const signal = controller.signal;
       const request = async (path: string, init: RequestInit = {}): Promise<Response> => {
-        if (signal.aborted) {
-          throw new Error('Audio cancelled');
+        while (!signal.aborted && Date.now() < expires) {
+          const response = await ports.request(ROOT + path, {
+            ...init,
+            signal,
+            credentials: 'omit',
+            redirect: 'error',
+          });
+          if (response.status !== 429 && response.status !== 502 && response.status !== 503) {
+            return response;
+          }
+          const seconds = Number(response.headers.get('retry-after') ?? '1');
+          await pause(signal, Number.isFinite(seconds) ? Math.min(5000, Math.max(600, seconds * 1000)) : 1000);
         }
-        return ports.request(ROOT + path, { ...init, signal, credentials: 'omit', redirect: 'error' });
+        throw new Error('Audio cancelled');
       };
       const submit = async (retry: boolean): Promise<ReturnType<typeof job>> => {
         const token = ports.reader.token();
@@ -112,8 +123,7 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
         let current = await submit(true);
         let restarted = false;
         while (current.duration === null) {
-          await pause(signal);
-          const response = await request(`/v1/jobs/${current.ticket}`);
+          const response = await request(`/v1/jobs/${current.ticket}?wait=20`);
           if (response.status === 410 && !restarted) {
             restarted = true;
             current = await submit(true);
@@ -130,7 +140,7 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
           throw new Error('Invalid audio response');
         }
         const bytes = new Uint8Array(await response.arrayBuffer());
-        if (signal.aborted || bytes.length < 44 || bytes.length > 5_000_000) {
+        if (signal.aborted || Date.now() >= expires || bytes.length < 44 || bytes.length > 5_000_000) {
           throw new Error('Invalid audio download');
         }
         return ports.save(bytes, current.duration);
