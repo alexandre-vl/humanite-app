@@ -2,13 +2,14 @@ import type { DisplayText } from '@huma/contracts';
 import { PALETTE, RADII, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { createContext, use, useState } from 'react';
+import { Platform } from 'react-native';
 import type { Visual } from '#api';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
 import { createStyles } from '#lib/styles';
 import { Box } from '#primitives/box';
 import { Icon } from '#primitives/icon';
-import { Image, ImageViewer } from '#primitives/image';
+import { Image, ImageViewer, NativePicture } from '#primitives/image';
 import { Pressable } from '#primitives/pressable';
 import { ThemeScope } from '#primitives/theme';
 import { Text } from '#primitives/text';
@@ -98,9 +99,28 @@ export function ArticleFigure({
   );
   return (
     <Box style={styles.figure}>
-      {link === null
-        ? thumbnail
-        : link({ figure: { visual, frame, recyclingKey, caption, credit, aspectRatio }, children: picture })}
+      {Platform.OS === 'android' ? (
+        <NativePicture
+          source={visual.source}
+          words={{
+            open: t('picture.open'),
+            label: t('picture.label'),
+            close: t('picture.close'),
+            enlarge: t('picture.enlarge'),
+            reduce: t('picture.reduce'),
+            showControls: t('picture.showControls'),
+            hideControls: t('picture.hideControls'),
+            caption,
+            credit,
+          }}
+        >
+          {picture}
+        </NativePicture>
+      ) : link === null ? (
+        thumbnail
+      ) : (
+        link({ figure: { visual, frame, recyclingKey, caption, credit, aspectRatio }, children: picture })
+      )}
       {opened ? <ArticlePicture figure={{ visual, frame, recyclingKey, caption, credit }} onClose={close} /> : null}
       {caption === undefined && credit === undefined ? null : (
         <Box style={styles.words}>

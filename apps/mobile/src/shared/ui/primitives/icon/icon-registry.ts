@@ -36,6 +36,14 @@ export const ICONS = {
   // hide again. Each draws what pressing it leads to.
   reveal: { ios: 'eye', android: 'visibility' },
   conceal: { ios: 'eye.slash', android: 'visibility_off' },
+  headphones: { ios: 'headphones', android: 'headphones' },
+  pause: { ios: 'pause.fill', android: 'pause' },
+  backward: { ios: 'gobackward.15', android: 'replay' },
+  forward: { ios: 'goforward.15', android: 'forward_media' },
+  previous: { ios: 'backward.end.fill', android: 'skip_previous' },
+  following: { ios: 'forward.end.fill', android: 'skip_next' },
+  collapse: { ios: 'chevron.down', android: 'keyboard_arrow_down' },
+  download: { ios: 'arrow.down.circle', android: 'download' },
   play: { ios: 'play.fill', android: 'play_arrow' },
   // How the reader sets the paper's own type. The letters are the signifier on both platforms, not a cogwheel: what
   // lies behind it is the size, the faces and the light or the dark, and none of those is a setting of the machine.

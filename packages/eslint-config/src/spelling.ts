@@ -26,6 +26,7 @@ const WORDS = [
   'debugfs',
   'dirents',
   'doas',
+  'dtype',
   'fn',
   'getprop',
   'gfxinfo',

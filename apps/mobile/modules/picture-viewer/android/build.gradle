@@ -1,0 +1,23 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'fr.humanite.picture'
+version = '1.0.0'
+
+android {
+  namespace 'fr.humanite.picture'
+  defaultConfig {
+    versionCode 1
+    versionName '1.0.0'
+    testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+  }
+}
+
+dependencies {
+  // Same Glide version as expo-image 57.0.5; both viewers share its process-wide memory and disk caches.
+  implementation 'com.github.bumptech.glide:glide:5.0.5'
+  androidTestImplementation 'androidx.test:runner:1.7.0'
+  androidTestImplementation 'junit:junit:4.13.2'
+}

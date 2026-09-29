@@ -6,6 +6,7 @@ import { TopBar } from '#components/top-bar';
 import type { FigureLinkProps } from '#entities/article';
 import { ArticleReader, FigureLinkContext, articleQuery, readsDark, useReadSummary } from '#entities/article';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
+import { ListenArticle } from '#features/listen';
 import { useReaderSession } from '#features/sign-in';
 import { useViewingPicture } from '#features/view-picture';
 import { t } from '#i18n';
@@ -91,6 +92,7 @@ export function ArticlePage(): ReactNode {
         <FigureLinkContext value={pictureLink}>
           <ArticleReader
             id={id}
+            audio={article === undefined ? null : <ListenArticle article={article} />}
             known={read ?? kept}
             onFollow={openExternal}
             onSignIn={

@@ -1,0 +1,31 @@
+# Le viewer Android utilise une activité native ; le retour doit retrouver la même photographie puis le fil.
+appId: ${APP_ID}
+---
+- runFlow: parts/launch.yaml
+- tapOn: 'Accès libre'
+- extendedWaitUntil:
+    visible: 'Voir l’image en plein écran'
+    timeout: 20000
+- tapOn: 'Voir l’image en plein écran'
+- assertVisible: 'Fermer'
+- takeScreenshot: picture-open
+- doubleTapOn:
+    point: 50%, 50%
+- assertNotVisible: 'Fermer'
+- takeScreenshot: picture-zoom
+- tapOn:
+    point: 50%, 50%
+- assertVisible: 'Fermer'
+- back
+- assertVisible: 'Voir l’image en plein écran'
+- tapOn: 'Voir l’image en plein écran'
+- swipe:
+    start: 50%, 50%
+    end: 50%, 85%
+    duration: 600
+- assertVisible: 'Voir l’image en plein écran'
+- tapOn: 'Voir l’image en plein écran'
+- tapOn: 'Fermer'
+- assertVisible: 'Voir l’image en plein écran'
+- back
+- assertVisible: 'À la une'

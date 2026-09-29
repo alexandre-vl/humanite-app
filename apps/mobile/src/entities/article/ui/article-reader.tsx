@@ -20,6 +20,7 @@ import { ProseStandIn } from './prose-stand-in';
 
 export type ArticleReaderProps = Readonly<{
   id: ArticleId;
+  audio?: ReactNode;
   /**
    * What the app already knew of this article when the screen opened, or nothing when it knew none of it.
    *
@@ -165,7 +166,7 @@ function Under({ article, onFollow, onSignIn }: UnderProps): ReactNode {
  * One article, read whole, in one reading: what its body points at comes written into it. The ground it is read on is
  * the screen's to choose — a video's page is dark from its status bar down — and not the reading's.
  */
-export function ArticleReader({ id, known, onFollow, onSignIn }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, known, onFollow, onSignIn, audio }: ArticleReaderProps): ReactNode {
   const styles = useStyles();
   const { data: article, status, error, refetch } = useQuery(articleQuery(id));
   if (article === undefined) {
@@ -200,6 +201,7 @@ export function ArticleReader({ id, known, onFollow, onSignIn }: ArticleReaderPr
   const head = article ?? known;
   return head === null ? null : (
     <Page summary={head} onFollow={onFollow}>
+      {audio}
       <Under article={article ?? null} onFollow={onFollow} onSignIn={onSignIn} />
     </Page>
   );

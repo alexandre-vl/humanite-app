@@ -1,6 +1,6 @@
 {
   "extends": ["expo/tsconfig.base", "@huma/tsconfig/hermes.json"],
-  "include": ["app", "src", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "include": ["app", "src", "src/**/*.json", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "exclude": ["expo-env.d.ts"],
   "references": [
     { "path": "../../packages/contracts" },

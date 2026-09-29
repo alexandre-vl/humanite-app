@@ -51,6 +51,8 @@ Chaque décision structurante est consignée dans un ADR. Un ADR accepté ou rej
 | [ADR-0041](0041-le-jeton-de-l-abonne-glisse-a-chaque-reponse.md)                | Le jeton de l’abonné glisse à chaque réponse                | accepté                                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0042](0042-les-identifiants-de-l-abonne-au-trousseau.md)                   | Les identifiants de l’abonné au trousseau                   | accepté                                                                                  | `guarded-config`, `boundary`                                               |
 | [ADR-0043](0043-les-alertes-du-journal-par-son-propre-onesignal.md)             | Les alertes du journal par son propre OneSignal             | accepté                                                                                  | `dependency`, `guarded-config`, `boundary`, `data-format`                  |
+| [ADR-0044](0044-ecouter-les-articles-avec-estelle-et-un-serveur-pocket-tts.md)  | Écouter les articles avec Estelle et un serveur Pocket TTS  | proposé                                                                                  | `dependency`, `boundary`, `data-format`, `reversal-cost`                   |
+| [ADR-0045](0045-visionneuse-de-photographies-native-sur-android.md)             | Visionneuse de photographies native sur Android             | proposé                                                                                  | `boundary`, `reversal-cost`                                                |
 
 ## Confirmation
 

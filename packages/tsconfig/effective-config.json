@@ -35,7 +35,7 @@
       "types": [],
       "verbatimModuleSyntax": true
     },
-    "include": ["app", "src", ".expo/types/**/*.ts", "expo-env.d.ts"],
+    "include": ["app", "src", "src/**/*.json", ".expo/types/**/*.ts", "expo-env.d.ts"],
     "exclude": ["expo-env.d.ts"]
   },
   "apps/mobile/tsconfig.node.json": {

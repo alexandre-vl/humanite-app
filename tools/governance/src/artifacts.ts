@@ -208,7 +208,10 @@ const knipConfig: Artifact = {
           entry: [...new Set(KNIP_ENTRIES.filter((path) => packageOf(path) === workspace))]
             .map((path) => path.slice(workspace.length + 1))
             .toSorted(compareText),
-          ...(workspace === APP_DIRECTORY ? { includeEntryExports: false } : {}),
+          // Local Expo modules produce Gradle test reports containing JavaScript outside the generated app/android.
+          ...(workspace === APP_DIRECTORY
+            ? { ignore: ['modules/*/android/build/**'], includeEntryExports: false }
+            : {}),
         },
       ]),
     );

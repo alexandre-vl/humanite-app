@@ -14,6 +14,9 @@ export const STORAGE_KEYS = {
   /** The newest item En continu showed the reader, which the next visit marks what came out after. */
   wireVisit: `wire-visit.${CONTENT_SOURCE}`,
   preferences: 'preferences',
+  /** Reading position only, never article text or audio. */
+  listening: `listening.${CONTENT_SOURCE}`,
+  audioConsent: 'audio-consent',
   /**
    * Whether the reader turned the journal's alerts on, which the app reads at every start to resume them (ADR-0043).
    *

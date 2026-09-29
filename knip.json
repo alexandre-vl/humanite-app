@@ -4,6 +4,7 @@
   "workspaces": {
     "apps/mobile": {
       "entry": ["src/_app/routes/typed-routes.guard.ts"],
+      "ignore": ["modules/*/android/build/**"],
       "includeEntryExports": false
     },
     "tools/governance": {

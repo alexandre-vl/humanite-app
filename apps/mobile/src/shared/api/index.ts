@@ -6,3 +6,5 @@ export type { Reader, Refusal } from './reader';
 export { noteSetAside, useSetAsideCount } from './set-aside';
 export { pictureOf, visualOf } from './visuals';
 export type { Visual } from './visuals';
+export { openSpeech } from './speech';
+export type { SpeechSession } from './speech';

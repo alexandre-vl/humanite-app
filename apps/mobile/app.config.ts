@@ -304,6 +304,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     'expo-router',
+    ['expo-audio', { microphonePermission: false, recordAudioAndroid: false, enableBackgroundPlayback: true }],
     // The field the phone paints before a line of this app has run, and the one it paints behind the app after.
     //
     // The ground is the paper's — white, or the measured #141414 under a dark system — and the mark on it is the
