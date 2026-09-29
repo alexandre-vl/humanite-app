@@ -29,7 +29,9 @@ Le serveur prépare le texte dans l’ordre. Le lecteur natif maintient une rés
 
 La CI du service exécute Ruff et les tests, puis publie une image GHCR privée. Elle ouvre une PR dans le cluster avec le commit et le digest immuables de l’image. La promotion n’accepte que le changement de cette seule ligne et attend les six contrôles du cluster. Argo CD suit ensuite la branche principale.
 
-Le déploiement initial utilise deux cœurs CPU, avec cache de modèles sur PVC. Le GPU du serveur est déjà alloué à Jellyfin ; aucune ressource GPU n’est retirée à ce service. Les secrets sont gérés par Sealed Secrets.
+Le service utilise désormais la GTX 1650 avec PyTorch 2.13 et CUDA 12.6, deux threads CPU et un cache de modèles sur PVC. Le plugin NVIDIA expose deux allocations partagées : Jellyfin conserve la sienne et l’audio en demande une. La mémoire GPU reste commune. Une synthèse de chauffe termine avant que le service accepte du trafic. Les secrets sont gérés par Sealed Secrets.
+
+La CI publie une image CUDA épinglée par digest et propose sa promotion dans le dépôt du cluster. Pour revenir à la version CPU initiale, il faut rétablir ensemble l’image, `TTS_DEVICE=cpu` et les ressources/runtime précédents. Changer seulement l’image ne suffit pas.
 
 ## Mesures et limites
 
@@ -58,9 +60,13 @@ Premiers essais du 29 septembre 2026, à confirmer sur la version finale :
 - Nothing A065, même serveur via USB : début de lecture native à 2,39 s sans cache ; 59,4 s lues jusqu’au bout sans erreur. Version native avant ajustement du seuil de départ.
 - Serveur Kubernetes CPU, image candidate isolée du Service : premier manifeste disponible en 2,00 s par tunnel. Cette mesure ne comprend pas le lecteur ni le chemin public Cloudflare.
 - Nothing A065, serveur Kubernetes CPU via tunnel et nouveau seuil natif : début de lecture à 3,218 s sans cache ; 61,962 s lues jusqu’au bout, aucune erreur et aucun retour en attente après le départ. Il s’agit des événements du lecteur, pas d’une mesure acoustique au haut-parleur.
-- GTX 1650, test de cohabitation : Jellyfin encode 90 s de vidéo synthétique H.264 1080p30 pendant que Pocket TTS français six couches produit 5,81 s d’audio par seconde ; médiane du premier PCM 40,6 ms. Modèle 24 couches : 2,36 fois le temps réel et 92,8 ms. Banc Torch 2.6/cu124 ; l’image destinée à la production utilise un environnement distinct à qualifier. Ces mesures ne comprennent ni réseau ni lecteur.
+- GTX 1650, test de cohabitation : Jellyfin encode 90 s de vidéo synthétique H.264 1080p30 pendant que Pocket TTS français six couches produit 5,81 s d’audio par seconde ; médiane du premier PCM 40,6 ms. Modèle 24 couches : 2,36 fois le temps réel et 92,8 ms. Banc initial Torch 2.6/cu124. Le modèle et les kernels de l’image finale Torch 2.13/cu126 ont ensuite été exécutés sur cette même carte et ce même pilote. Ces mesures ne comprennent ni réseau ni lecteur.
 - La RX 5600 XT dispose d’environ 6 Go de mémoire ; le pilote Mesa initialise VA-API et expose des profils de décodage/encodage. Aucun basculement de Jellyfin sur AMD n’a été fait.
 - Le texte brut « 12,5 % » tronquait une phrase de contrôle avec les deux modèles. Une normalisation déterministe des nombres, après vérification du texte original, rétablit la fin de phrase dans la transcription Whisper-small de contrôle. Ce diagnostic ne valide pas à lui seul le naturel de la voix.
 - Les métadonnées de progression reprennent après les erreurs réseau temporaires ; leur attente et leur annulation restent indépendantes du flux natif. Le délai de requête couvre aussi la lecture du corps de réponse.
+- Image CUDA finale, trois générations simultanées avec encodage synthétique H.264 1080p30 dans Jellyfin : premiers manifestes à 1,58, 2,22 et 2,85 s ; les trois générations finissent sans erreur. Jellyfin encode les 1 350 images du test de 45 s sans erreur. Cela ne qualifie pas le transcodage 4K/HDR.
+- Nothing A065, serveur GPU via tunnel : premier événement de lecture avec position positive à 1,891 s, puis 63,702 s terminées sans erreur ni remise en mémoire tampon après le départ.
+- Parcours complet de l’app via HTTPS public, téléphone sur réseau mobile : premier événement avec position positive à 3,276 s ; 95,142 s lues jusqu’au bout, dont une partie en arrière-plan, sans erreur ni retour en préparation après le départ.
+- Le chargement différé du module audio commence maintenant en parallèle du contrôle des droits, après consentement. Cette dernière optimisation reste à remesurer sur téléphone ; les chiffres précédents lui sont antérieurs.
 
 Critères de livraison visés : premier son médian inférieur à 1,5 s, 95e percentile inférieur à 3 s sur connexion stable et modèle chaud ; aucune rupture technique ajoutée entre paragraphes ; écoute prolongée et commandes système vérifiées sur téléphone. Ces seuils sont des objectifs, pas des résultats acquis.
