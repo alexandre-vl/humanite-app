@@ -4,8 +4,9 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { fireEvent, screen } from '@testing-library/react-native';
 import { PALETTE } from '@huma/design-tokens';
 import { content } from '#api';
-import { useBookmarks } from '#features/bookmark';
 import { t } from '#i18n';
+import { useViewingPicture } from '#features/view-picture';
+import { useBookmarks } from '#features/bookmark';
 import { openExternal } from '#lib/routing';
 import { everyArticle, firstArticle, renderWithCache, settle, styleOf } from '#lib/testing';
 import { ArticlePage } from './article-page';
@@ -13,11 +14,23 @@ import { ArticlePage } from './article-page';
 // Both doubles are built inside their factory: jest hoists the calls above everything else in the file, so anything
 // they read from outside would still be undefined when the screen first asks. The routing module keeps everything
 // else it holds — the screen reads its own parameter through it.
-jest.mock('expo-router', () => ({
-  __esModule: true,
-  router: { back: jest.fn() },
-  useLocalSearchParams: (): Readonly<Record<string, string>> => ({ id: mockRead.id }),
-}));
+jest.mock('expo-router', () => {
+  const { createElement } = jest.requireActual<typeof import('react')>('react');
+  const { View } = jest.requireActual<typeof import('react-native')>('react-native');
+  const link = ({
+    children,
+    onPress,
+  }: Readonly<{ children: import('react').ReactNode; onPress: () => void }>): import('react').ReactNode =>
+    createElement(View, { onTouchEnd: onPress }, children);
+  const zoom = ({ children }: Readonly<{ children: import('react').ReactNode }>): import('react').ReactNode => children;
+  const Link = Object.assign(link, { AppleZoom: zoom });
+  return {
+    Link,
+    __esModule: true,
+    router: { back: jest.fn() },
+    useLocalSearchParams: (): Readonly<Record<string, string>> => ({ id: mockRead.id }),
+  };
+});
 
 jest.mock('#lib/routing', () => ({
   __esModule: true,
@@ -58,6 +71,20 @@ beforeEach(() => {
 });
 
 describe('ArticlePage', () => {
+  it('transmet la photo au lien natif sans ouvrir une seconde modale', async () => {
+    useViewingPicture.getState().clear();
+    await open(
+      await firstArticle(content, 'une photographie', (each) => each.format === 'article' && each.hero !== undefined),
+    );
+    const button = screen.getAllByRole('button', { name: t('picture.open') }).at(0);
+    if (button === undefined) {
+      throw new Error('Photographie introuvable');
+    }
+    await fireEvent(button, 'touchEnd');
+    expect(useViewingPicture.getState().picture).not.toBeNull();
+    expect(screen.queryByRole('button', { name: t('picture.close') })).toBeNull();
+  });
+
   /**
    * A link opens its page in the reader's browser, the one place the paper links to. A link out of the paper once did
    * nothing at all — the screen read only a branch that named an article — and the corpus carries twelve of them.

@@ -91,6 +91,14 @@ export const FR = {
   'newsstand.web': 'Chaque numéro s’ouvre sur humanite.fr.',
   'newsstand.empty.title': 'Le kiosque est vide',
   'newsstand.empty.message': 'Aucun numéro n’est encore paru.',
+  'picture.open': 'Voir l’image en plein écran',
+  'picture.label': 'Image en plein écran',
+  'picture.close': 'Fermer',
+  'picture.enlarge': 'Agrandir',
+  'picture.reduce': 'Réduire',
+  'picture.hint': 'Les actions permettent de zoomer et de fermer l’image.',
+  'picture.showControls': 'Afficher les commandes et la légende',
+  'picture.hideControls': 'Masquer les commandes et la légende',
   'search.placeholder': 'Saisissez ici le sujet',
   // Ce que dit le trait sous le champ à qui écoute l'écran, tant que le journal cherche : ce qui est listé en
   // attendant est ce que l'app a déjà lu, une réponse plus petite que celle qui arrive, et l'oreille doit l'apprendre

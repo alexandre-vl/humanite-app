@@ -19,6 +19,7 @@ export type ImageProps = Readonly<{
    */
   standingIn?: ImageSource | undefined;
   style?: StyleRef;
+  onAspectRatio?: ((ratio: number) => void) | undefined;
 }>;
 
 /**
@@ -82,7 +83,15 @@ const painted = (
   return thumbhash === undefined ? null : { thumbhash };
 };
 
-export function Image({ source, recyclingKey, announces, thumbhash, standingIn, style }: ImageProps): ReactNode {
+export function Image({
+  source,
+  recyclingKey,
+  announces,
+  thumbhash,
+  standingIn,
+  style,
+  onAspectRatio,
+}: ImageProps): ReactNode {
   return (
     <ExpoImage
       source={source}
@@ -96,6 +105,11 @@ export function Image({ source, recyclingKey, announces, thumbhash, standingIn, 
       // frame between the two — picture at 2,25 s, the box's own grey at 2,30 s, picture again at 2,35 s. A blank of
       // 50 ms in the middle of a photograph already on screen is a flash the reader had not been shown before.
       // Without it the swap is invisible: two runs, no frame of the box's ground at all.
+      onLoad={(event) => {
+        if (event.source.width > 0 && event.source.height > 0) {
+          onAspectRatio?.(event.source.width / event.source.height);
+        }
+      }}
       contentFit="cover"
       style={style}
       {...announcedAs(announces)}

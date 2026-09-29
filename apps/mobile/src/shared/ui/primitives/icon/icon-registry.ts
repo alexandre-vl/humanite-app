@@ -27,6 +27,7 @@ export const ICONS = {
   bookmark: { ios: 'bookmark', android: 'bookmark_border' },
   bookmarkKept: { ios: 'bookmark.fill', android: 'bookmark' },
   clear: { ios: 'xmark.circle.fill', android: 'cancel' },
+  close: { ios: 'xmark', android: 'close' },
   headline: { ios: 'house', android: 'home' },
   live: { ios: 'bolt', android: 'bolt' },
   // The mark a row carries when touching it opens another screen.

@@ -1,5 +1,6 @@
 export {
   articleHref,
+  PICTURE_HREF,
   LIVE_HREF,
   NEWSSTAND_HREF,
   openAppSettings,

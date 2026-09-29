@@ -22,9 +22,8 @@ resumeAlerts();
 /**
  * The stack of pushed screens, in the colours in force.
  *
- * No screen is named here any more. The one that was — the tab group, the only screen that asked for no header —
- * said by its exception that the header was the rule; now that every screen draws its own bar, the rule is the
- * exception and the stack is told once, for all of them.
+ * Each screen draws its own bar. The picture uses this stack too: Expo's native zoom transition and its
+ * gesture bounds work on a pushed screen, which still covers the article in full.
  */
 function ThemedStack(): ReactNode {
   return <Stack screenOptions={chromeOptions(useTheme())} />;

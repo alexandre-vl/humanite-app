@@ -17,7 +17,7 @@
 module.exports = {
   preset: 'jest-expo',
   roots: ['<rootDir>/src'],
-  setupFiles: ['<rootDir>/jest.setup.ts'],
+  setupFiles: ['react-native-gesture-handler/jestSetup', '<rootDir>/jest.setup.ts'],
   setupFilesAfterEnv: ['<rootDir>/jest.network.ts'],
   testTimeout: 30_000,
 };

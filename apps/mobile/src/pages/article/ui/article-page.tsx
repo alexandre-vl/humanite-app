@@ -1,14 +1,37 @@
 import { ARTICLE_ID } from '@huma/contracts';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { TopBar } from '#components/top-bar';
-import { ArticleReader, articleQuery, readsDark, useReadSummary } from '#entities/article';
+import type { FigureLinkProps } from '#entities/article';
+import { ArticleReader, FigureLinkContext, articleQuery, readsDark, useReadSummary } from '#entities/article';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { useReaderSession } from '#features/sign-in';
-import { openExternal, SIGN_IN_HREF, useRouteParams } from '#lib/routing';
+import { useViewingPicture } from '#features/view-picture';
+import { t } from '#i18n';
+import { openExternal, PICTURE_HREF, SIGN_IN_HREF, useRouteParams } from '#lib/routing';
+import { Box } from '#primitives/box';
+import { Pressable } from '#primitives/pressable';
 import { Surface } from '#primitives/surface';
 import { ThemeScope } from '#primitives/theme';
+
+function pictureLink({ figure, children }: FigureLinkProps): ReactNode {
+  return (
+    <Link
+      href={PICTURE_HREF}
+      asChild
+      onPress={() => {
+        useViewingPicture.getState().open(figure);
+      }}
+    >
+      <Pressable role="button" label={t('picture.open')}>
+        <Link.AppleZoom>
+          <Box>{children}</Box>
+        </Link.AppleZoom>
+      </Pressable>
+    </Link>
+  );
+}
 
 /**
  * One article, read whole, full screen.
@@ -65,18 +88,20 @@ export function ArticlePage(): ReactNode {
           // bar and to appear in it a moment later, on a page whose headline was already there to be kept.
           action={known === null ? null : <BookmarkToggle summary={known} />}
         />
-        <ArticleReader
-          id={id}
-          known={read ?? kept}
-          onFollow={openExternal}
-          onSignIn={
-            offered && connection === 'out'
-              ? () => {
-                  router.push(SIGN_IN_HREF);
-                }
-              : null
-          }
-        />
+        <FigureLinkContext value={pictureLink}>
+          <ArticleReader
+            id={id}
+            known={read ?? kept}
+            onFollow={openExternal}
+            onSignIn={
+              offered && connection === 'out'
+                ? () => {
+                    router.push(SIGN_IN_HREF);
+                  }
+                : null
+            }
+          />
+        </FigureLinkContext>
       </Surface>
     </ThemeScope>
   );

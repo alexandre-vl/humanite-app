@@ -94,13 +94,15 @@ describe('ArticleReader, face à un corps retenu', () => {
    * The head is the article's and the wall says why the rest is not there, and where a subscription is taken — in
    * words, with nothing to press: a reader's app may not send its reader to a purchase.
    */
-  it('montre la tête de l’article, et le mur là où le corps aurait couru, sans rien à presser', async () => {
+  it('montre la tête de l’article et le mur, seule la photographie peut s’ouvrir', async () => {
     const article = await reserved();
     await read(article);
     expect(await screen.findByText(article.title)).toBeTruthy();
     expect(screen.getByText(t('article.withheld.title'))).toBeTruthy();
     expect(screen.getByText(t('article.withheld.where'))).toBeTruthy();
-    expect(screen.queryByRole('button')).toBeNull();
+    expect(
+      screen.queryAllByRole('button').every((button) => button.props['accessibilityLabel'] === t('picture.open')),
+    ).toBe(true);
   });
 
   /** A source that refuses the whole article puts up the same wall, rather than a try that cannot pass. */

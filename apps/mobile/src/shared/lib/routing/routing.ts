@@ -76,3 +76,6 @@ export function openAppSettings(): void {
 export function useRouteParams<Params>(read: (raw: RawParams) => Params): Params {
   return read(useLocalSearchParams());
 }
+
+/** The photograph selected in the article, held in memory for this presentation. */
+export const PICTURE_HREF = '/picture' as const;

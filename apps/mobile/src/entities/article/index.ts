@@ -9,3 +9,5 @@ export { ArticleFeed } from './ui/article-feed';
 export { ArticleReader } from './ui/article-reader';
 export { ArticleWire } from './ui/article-wire';
 export { FeedStandIn } from './ui/feed-stand-in';
+export { ArticlePicture, FigureLinkContext } from './ui/article-figure';
+export type { ArticleFigureProps, FigureLinkProps } from './ui/article-figure';

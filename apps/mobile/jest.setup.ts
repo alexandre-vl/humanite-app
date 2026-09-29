@@ -116,8 +116,14 @@ jest.mock('react-native-reanimated', () => {
   };
   return {
     __esModule: true,
-    default: reactNative,
+    default: {
+      View: reactNative.View,
+      ScrollView: reactNative.ScrollView,
+      // GestureDetector wraps its native target in an animated component; on this bench the target itself suffices.
+      createAnimatedComponent: (component: unknown): unknown => component,
+    },
     useSharedValue,
+    useEvent: (handler: unknown): unknown => handler,
     useAnimatedStyle: (updater: () => unknown): unknown => updater(),
     // A ref to a native view, which off a phone is a ref and nothing more: what the phone adds is the UI thread's
     // own handle on the view, and there is no UI thread here.
@@ -236,7 +242,8 @@ jest.mock('expo-image', () => {
   const react = jest.requireActual<typeof import('react')>('react');
   const reactNative = jest.requireActual<typeof import('react-native')>('react-native');
   const image = (props: Announced & { style?: StyleProp<ViewStyle> }): unknown =>
-    react.createElement(reactNative.View, { testID: 'picture', style: props.style, ...mockAnnounced(props) });
+    // Keep image events and fit too: the viewer reads the loaded dimensions to bound its gestures.
+    react.createElement(reactNative.View, { ...props, testID: 'picture', ...mockAnnounced(props) });
   return { __esModule: true, Image: image };
 });
 
