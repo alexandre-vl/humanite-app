@@ -41,6 +41,8 @@ export const WORKSPACE_FILE: WorkspaceFile = {
       ignoreMissing: ['react-dom'],
     },
     patchedDependencies: {
+      // Explicit streaming buffer: quick first sound and one continuous native timeline (ADR-0044).
+      'expo-audio@57.0.5': 'patches/expo-audio@57.0.5.patch',
       // The fix of 2.2.1 (Shopify/flash-list#2069), on the version the SDK tests. With no header pinned — a list
       // pulled or bounced past its top — the pinned header's interpolation has an empty input range, which the native
       // driver on iOS divides by: on the iPhone simulator on 25/09/2026, the wire went blank and stayed so, its rows
@@ -98,7 +100,6 @@ export const WORKSPACE_FILE: WorkspaceFile = {
     'expo-constants': '57.0.19',
     'expo-crypto': '57.0.3',
     'expo-dev-client': '57.0.19',
-    'expo-file-system': '57.0.7',
     'expo-font': '57.0.4',
     'expo-image': '57.0.5',
     'expo-linking': '57.0.11',

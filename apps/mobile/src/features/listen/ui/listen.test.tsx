@@ -1,15 +1,11 @@
 import { ARTICLE_ID } from '@huma/contracts';
-import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, describe, expect, it } from '@jest/globals';
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { content } from '#api';
 import { t } from '#i18n';
 import { firstArticle, renderWithCache } from '#lib/testing';
 import { listening } from '../model/store';
 import { ListenArticle, ListeningPlayer } from './listen';
-
-jest.mock('#lib/speech', () => ({
-  clearSpeech: () => undefined,
-}));
 
 afterEach(async () => {
   await act(() => {

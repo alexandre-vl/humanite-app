@@ -1,108 +1,114 @@
-import { isRecord } from '@huma/unknown';
-import { saveSpeech } from '../lib/speech';
+import { isRecord, isList } from '@huma/unknown';
 import { READER } from './reader';
 import type { Reader } from './reader';
 
+const cancelled = (signal: AbortSignal): boolean => signal.aborted;
 const ROOT = 'https://audio-humanite.alexvl.fr';
-type Recording = Readonly<{ uri: string; duration: number }>;
+export type SpeechProgress = Readonly<{
+  complete: boolean;
+  duration: number;
+  cues: readonly Readonly<{ index: number; start: number }>[];
+}>;
 export type SpeechSession = Readonly<{
-  speak: (text: string, signal: AbortSignal) => Promise<Recording>;
-  close: () => Promise<void>;
+  open: (blocks: readonly string[], signal: AbortSignal, progress: (value: SpeechProgress) => void) => Promise<string>;
+  close: () => void;
 }>;
 type Ports = Readonly<{
   request: typeof fetch;
   reader: Pick<Reader, 'token' | 'renew' | 'reopen' | 'signOut'>;
-  save: (bytes: Uint8Array, duration: number) => Recording;
 }>;
 
-function job(value: unknown): Readonly<{ ticket: string; duration: number | null }> {
+function progressOf(value: unknown, count: number): SpeechProgress {
   if (
     !isRecord(value) ||
-    typeof value['ticket'] !== 'string' ||
-    !/^[\w.-]{1,1024}$/u.test(value['ticket']) ||
-    (value['status'] !== 'ready' && value['status'] !== 'queued')
+    value['version'] !== 1 ||
+    (value['state'] !== 'generating' && value['state'] !== 'complete') ||
+    typeof value['duration'] !== 'number' ||
+    !Number.isFinite(value['duration']) ||
+    value['duration'] < 0 ||
+    value['duration'] > 1800 ||
+    !isList(value['cues']) ||
+    value['cues'].length > count
   ) {
-    throw new Error('Invalid audio job');
+    throw new Error('Invalid audio progress');
   }
-  const duration = value['duration'];
-  if (
-    value['status'] === 'ready' &&
-    (typeof duration !== 'number' || !Number.isFinite(duration) || duration <= 0 || duration > 90)
-  ) {
-    throw new Error('Invalid audio duration');
-  }
-  return {
-    ticket: value['ticket'],
-    duration: value['status'] === 'ready' && typeof duration === 'number' ? duration : null,
-  };
-}
-
-async function pause(signal: AbortSignal, delay = 600): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const abort = (): void => {
-      clearTimeout(timer);
-      reject(new Error('Audio cancelled'));
-    };
-    const timer = setTimeout(() => {
-      signal.removeEventListener('abort', abort);
-      resolve();
-    }, delay);
-    signal.addEventListener('abort', abort, { once: true });
-    if (signal.aborted) {
-      abort();
+  let previous = -1;
+  const cues = value['cues'].map((cue: unknown, index: number) => {
+    if (
+      !isRecord(cue) ||
+      cue['index'] !== index ||
+      typeof cue['start'] !== 'number' ||
+      !Number.isFinite(cue['start']) ||
+      cue['start'] < 0 ||
+      cue['start'] < previous ||
+      cue['start'] > Number(value['duration'])
+    ) {
+      throw new Error('Invalid audio cue');
     }
+    previous = cue['start'];
+    return { index, start: cue['start'] };
   });
+  return { complete: value['state'] === 'complete', duration: value['duration'], cues };
 }
 
-/** A bounded session: the reader's credential only travels to our fixed article endpoint. */
+/** Authorize once. Audio travels straight to the native player; JS only follows chapter metadata. */
 export function createSpeech(article: string, ports: Ports): SpeechSession {
-  if (!/^\d+$/u.test(article)) {
+  if (!/^\d{1,12}$/u.test(article)) {
     throw new Error('Audio requires an article from the journal');
   }
   const session = new AbortController();
   return {
-    close: async () => {
+    close: () => {
       session.abort();
-      await Promise.resolve();
     },
-    speak: async (text, parent) => {
-      const controller = new AbortController();
+    open: async (blocks, parent, progress) => {
       const abort = (): void => {
-        controller.abort();
+        session.abort();
       };
       parent.addEventListener('abort', abort, { once: true });
-      session.signal.addEventListener('abort', abort, { once: true });
-      const expires = Date.now() + 120_000;
-      const timer = setTimeout(abort, 120_000);
-      if (parent.aborted || session.signal.aborted) {
+      if (parent.aborted) {
         abort();
       }
-      const signal = controller.signal;
-      const request = async (path: string, init: RequestInit = {}): Promise<Response> => {
-        while (!signal.aborted && Date.now() < expires) {
+      const signal = session.signal;
+      const request = async (
+        path: string,
+        init: RequestInit = {},
+      ): Promise<Readonly<{ response: Response; value: unknown }>> => {
+        if (cancelled(signal)) {
+          throw new Error('Audio cancelled');
+        }
+        const controller = new AbortController();
+        const cancel = (): void => {
+          controller.abort();
+        };
+        signal.addEventListener('abort', cancel, { once: true });
+        const timer = setTimeout(cancel, 25000);
+        try {
           const response = await ports.request(ROOT + path, {
             ...init,
-            signal,
+            signal: controller.signal,
             credentials: 'omit',
             redirect: 'error',
           });
-          if (response.status !== 429 && response.status !== 502 && response.status !== 503) {
-            return response;
+          const value: unknown = response.ok ? await response.json() : null;
+          if (cancelled(signal) || controller.signal.aborted) {
+            throw new Error('Audio cancelled');
           }
-          const seconds = Number(response.headers.get('retry-after') ?? '1');
-          await pause(signal, Number.isFinite(seconds) ? Math.min(5000, Math.max(600, seconds * 1000)) : 1000);
+          return { response, value };
+        } finally {
+          clearTimeout(timer);
+          signal.removeEventListener('abort', cancel);
         }
-        throw new Error('Audio cancelled');
       };
-      const submit = async (retry: boolean): Promise<ReturnType<typeof job>> => {
+      const submit = async (retry: boolean): Promise<unknown> => {
         const token = ports.reader.token();
-        const response = await request(`/v1/articles/${article}/segments`, {
+        const { response, value } = await request(`/v2/articles/${article}/listen`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...(token === undefined ? {} : { Authorization: `Bearer ${token}` }),
           },
-          body: JSON.stringify({ text }),
+          body: JSON.stringify({ blocks }),
         });
         if (response.status === 401 && token !== undefined && retry) {
           if (await ports.reader.reopen()) {
@@ -114,44 +120,76 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
           throw new Error('Audio request refused');
         }
         const renewed = response.headers.get('x-user-token');
-        if (token !== undefined && renewed !== null && !signal.aborted) {
+        if (token !== undefined && renewed !== null && !cancelled(signal)) {
           ports.reader.renew(token, renewed);
         }
-        return job(await response.json());
+        return value;
       };
       try {
-        let current = await submit(true);
-        let restarted = false;
-        while (current.duration === null) {
-          const response = await request(`/v1/jobs/${current.ticket}?wait=20`);
-          if (response.status === 410 && !restarted) {
-            restarted = true;
-            current = await submit(true);
-            continue;
+        const value = await submit(true);
+        if (
+          cancelled(signal) ||
+          !isRecord(value) ||
+          typeof value['ticket'] !== 'string' ||
+          !/^[\w.-]{1,1024}$/u.test(value['ticket'])
+        ) {
+          throw new Error('Invalid audio session');
+        }
+        const ticket = value['ticket'];
+        const first = progressOf(value, blocks.length);
+        progress(first);
+        const follow = async (): Promise<void> => {
+          let current = first;
+          let failures = 0;
+          const backoff = async (): Promise<void> =>
+            new Promise((resolve) => {
+              const done = (): void => {
+                clearTimeout(timer);
+                signal.removeEventListener('abort', done);
+                resolve();
+              };
+              const timer = setTimeout(done, Math.min(8000, 1000 * 2 ** Math.min(failures++, 3)));
+              signal.addEventListener('abort', done, { once: true });
+              if (cancelled(signal)) {
+                done();
+              }
+            });
+          while (!cancelled(signal) && !current.complete) {
+            const next = await request(`/v2/streams/${ticket}/metadata?after=${String(current.cues.length)}`).catch(
+              () => null,
+            );
+            if (cancelled(signal)) {
+              return;
+            }
+            if (next === null || [429, 500, 502, 504].includes(next.response.status)) {
+              await backoff();
+              continue;
+            }
+            if (!next.response.ok) {
+              return;
+            }
+            const parsed = progressOf(next.value, blocks.length);
+            if (cancelled(signal)) {
+              return;
+            }
+            current = parsed;
+            failures = 0;
+            progress(current);
           }
-          if (!response.ok) {
-            throw new Error('Audio preparation failed');
-          }
-          const data: unknown = await response.json();
-          current = job(isRecord(data) ? { ...data, ticket: current.ticket } : data);
-        }
-        const response = await request(`/v1/audio/${current.ticket}`);
-        if (!response.ok || response.headers.get('content-type')?.split(';')[0] !== 'audio/wav') {
-          throw new Error('Invalid audio response');
-        }
-        const bytes = new Uint8Array(await response.arrayBuffer());
-        if (signal.aborted || Date.now() >= expires || bytes.length < 44 || bytes.length > 5_000_000) {
-          throw new Error('Invalid audio download');
-        }
-        return ports.save(bytes, current.duration);
-      } finally {
-        clearTimeout(timer);
+        };
+        // Metadata failure must never interrupt already buffered native audio.
+        void follow()
+          .catch(() => undefined)
+          .finally(() => {
+            parent.removeEventListener('abort', abort);
+          });
+        return `${ROOT}/v2/streams/${ticket}/index.m3u8`;
+      } catch (error) {
         parent.removeEventListener('abort', abort);
-        session.signal.removeEventListener('abort', abort);
+        throw error;
       }
     },
   };
 }
 
-export const openSpeech = (article: string): SpeechSession =>
-  createSpeech(article, { request: fetch, reader: READER, save: saveSpeech });
+export const openSpeech = (article: string): SpeechSession => createSpeech(article, { request: fetch, reader: READER });

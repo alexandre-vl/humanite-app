@@ -38,7 +38,6 @@
     "expo-constants": "catalog:",
     "expo-crypto": "catalog:",
     "expo-dev-client": "catalog:",
-    "expo-file-system": "catalog:",
     "expo-font": "catalog:",
     "expo-image": "catalog:",
     "expo-linking": "catalog:",

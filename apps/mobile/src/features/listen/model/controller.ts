@@ -1,14 +1,15 @@
 import type { Article, DisplayText } from '@huma/contracts';
-import type { SpeechSession } from '#api';
+import type { SpeechProgress, SpeechSession } from '#api';
 
 export type Passage = Readonly<{ text: string; heading: boolean }>;
-type Recording = Readonly<{ uri: string; duration: number }>;
 export type Playback = Readonly<{
   position: number;
   duration: number;
   playing: boolean;
   finished: boolean;
   loaded: boolean;
+  buffering: boolean;
+  error: boolean;
 }>;
 type Player = Readonly<{
   play: () => void;
@@ -29,18 +30,29 @@ export type Listening = Readonly<{
   speed: number;
   prepared: number;
   error: 'speech' | null;
+  complete: boolean;
+  cues: SpeechProgress['cues'];
 }>;
-export type Resume = Readonly<{ key: string; index: number; seconds: number }>;
+type Controller = Readonly<{
+  select: (article: Article, passages: readonly Passage[]) => void;
+  begin: () => void;
+  stop: () => void;
+  seek: (seconds: number) => void;
+  jump: (index: number) => void;
+  toggle: () => void;
+  speed: () => void;
+  expand: (expanded: boolean) => void;
+}>;
+const cancelled = (signal: AbortSignal): boolean => signal.aborted;
+export type Resume = Readonly<{ key: string; seconds: number }>;
 export type ListeningPorts = Readonly<{
   consented: () => boolean;
   engine: (article: Article) => Promise<SpeechSession>;
-  clear: () => void;
   releaseAudio: () => void;
-  player: (recording: Recording, title: DisplayText, update: (status: Playback) => void) => Promise<Player>;
+  player: (uri: string, title: DisplayText, update: (status: Playback) => void) => Promise<Player>;
   resume: () => Resume | null;
   remember: (resume: Resume) => void;
 }>;
-const cancelled = (signal: AbortSignal): boolean => signal.aborted;
 export const EMPTY_LISTENING: Listening = {
   article: null,
   passages: [],
@@ -52,9 +64,9 @@ export const EMPTY_LISTENING: Listening = {
   speed: 1,
   prepared: 0,
   error: null,
+  complete: false,
+  cues: [],
 };
-
-/** Content identity, not a security hash: changed words invalidate an old reading position. */
 export function readingKey(article: Article, passages: readonly Passage[]): string {
   let hash = 2166136261;
   for (const character of passages.map((passage) => passage.text).join('\n')) {
@@ -63,230 +75,197 @@ export function readingKey(article: Article, passages: readonly Passage[]): stri
   return `${article.id}:${String(hash >>> 0)}`;
 }
 
-/** One owner for downloads, generation and playback. Each session can invalidate every late asynchronous answer. */
-export function createListening(
-  ports: ListeningPorts,
-  changed: (state: Listening) => void,
-): Readonly<{
-  select: (article: Article, passages: readonly Passage[]) => void;
-  begin: () => void;
-  toggle: () => void;
-  jump: (index: number) => void;
-  seek: (seconds: number) => void;
-  speed: () => void;
-  expand: (expanded: boolean) => void;
-  stop: () => void;
-}> {
+/** A single native timeline. Paragraph changes never load, pause or replace audio. */
+export function createListening(ports: ListeningPorts, changed: (state: Listening) => void): Controller {
   let state = EMPTY_LISTENING;
   let session = new AbortController();
   let engine: SpeechSession | null = null;
   let player: Player | null = null;
-  let recordings = new Map<number, Recording>();
   let wanted = false;
-  let running: Promise<void> | null = null;
-  let loading = false;
-  let playbackVersion = 0;
+  let opening = false;
   let key = '';
+  let resumeAt = 0;
   const update = (patch: Partial<Listening>): void => {
     state = { ...state, ...patch };
     changed(state);
   };
   const remember = (): void => {
     if (state.article !== null) {
-      ports.remember({ key, index: state.index, seconds: state.position });
+      ports.remember({ key, seconds: state.position });
     }
   };
-  const closePlayer = (): void => {
-    playbackVersion += 1;
+  const release = (): void => {
+    session.abort();
+    engine?.close();
+    engine = null;
     player?.close();
     player = null;
-    loading = false;
+    ports.releaseAudio();
+    opening = false;
   };
-  const fail = (signal: AbortSignal, error: 'speech'): void => {
+  const fail = (signal: AbortSignal): void => {
     if (!cancelled(signal)) {
-      wanted = false;
-      closePlayer();
-      ports.releaseAudio();
-      update({ stage: 'failed', error });
-    }
-  };
-  const playCurrent = async (signal: AbortSignal): Promise<void> => {
-    const recording = recordings.get(state.index);
-    if (cancelled(signal) || recording === undefined || player !== null || loading) {
-      return;
-    }
-    loading = true;
-    const version = ++playbackVersion;
-    let hasPlayed = false;
-    const title = state.article?.title;
-    if (title === undefined) {
-      loading = false;
-      return;
-    }
-    const position = Math.min(state.position, recording.duration);
-    const opened = await ports.player(recording, title, (status) => {
-      if (cancelled(signal) || version !== playbackVersion) {
-        return;
-      }
-      if (status.finished) {
-        remember();
-        closePlayer();
-        if (state.index + 1 >= state.passages.length) {
-          wanted = false;
-          update({ stage: 'ended', position: recording.duration });
-          remember();
-        } else {
-          update({ index: state.index + 1, position: 0, duration: 0, stage: wanted ? 'preparing' : 'paused' });
-          void playCurrent(signal).catch(() => {
-            fail(signal, 'speech');
-          });
-          pump();
-        }
-        return;
-      }
-      if (!status.loaded || loading) {
-        return;
-      }
-      // Native lock-screen controls and interruptions own playback too. A paused phone is never restarted by prefetch.
-      if (status.playing) {
-        hasPlayed = true;
-        wanted = true;
-      } else if (hasPlayed) {
-        wanted = false;
-      }
-      update({
-        position: status.position,
-        duration: status.duration,
-        stage: status.playing ? 'playing' : wanted ? 'preparing' : 'paused',
-      });
       remember();
-    });
-    if (cancelled(signal) || version !== playbackVersion) {
-      opened.close();
-      return;
-    }
-    player = opened;
-    opened.rate(state.speed);
-    if (position > 0) {
-      await opened.seek(position);
-    }
-    if (cancelled(signal) || version !== playbackVersion) {
-      opened.close();
-      return;
-    }
-    loading = false;
-    update({ duration: recording.duration, stage: wanted ? 'playing' : 'paused' });
-    if (wanted) {
-      opened.play();
+      release();
+      wanted = false;
+      update({ stage: 'failed', error: 'speech' });
     }
   };
-  const pump = (): void => {
-    if (running !== null || engine === null || cancelled(session.signal)) {
+  const seek = (seconds: number): void => {
+    if (player === null || !Number.isFinite(seconds)) {
       return;
     }
+    const position = Math.max(0, Math.min(state.duration, seconds));
     const signal = session.signal;
-    const synthesizer = engine;
-    const work = async (): Promise<void> => {
-      try {
-        while (!cancelled(signal)) {
-          const last = Math.min(state.passages.length - 1, state.index + (wanted ? 2 : 0));
-          let next = state.index;
-          while (next <= last && recordings.has(next)) {
-            next += 1;
-          }
-          if (next > last) {
-            break;
-          }
-          const passage = state.passages[next];
-          if (passage === undefined) {
-            break;
-          }
-          const audio = await synthesizer.speak(passage.text, signal);
-          if (cancelled(signal)) {
-            break;
-          }
-          recordings.set(next, audio);
-          update({ prepared: recordings.size });
-          await playCurrent(signal);
+    void player
+      .seek(position)
+      .then(() => {
+        if (!cancelled(signal)) {
+          update({ position });
+          remember();
         }
-        await playCurrent(signal);
-      } catch {
-        fail(signal, 'speech');
-      }
-    };
-    running = work().finally(() => {
-      running = null;
-      if (cancelled(signal) && wanted) {
-        pump();
-      }
-    });
+      })
+      .catch(() => {
+        fail(signal);
+      });
   };
   const begin = (): void => {
-    if (state.article === null || state.stage === 'preparing') {
-      return;
-    }
-    wanted = true;
-    if (engine !== null) {
-      closePlayer();
-      update({ stage: 'preparing', error: null });
-      pump();
-      return;
-    }
-    const signal = session.signal;
     const article = state.article;
+    if (article === null || opening) {
+      return;
+    }
+    if (player !== null) {
+      wanted = true;
+      player.play();
+      return;
+    }
+    session = new AbortController();
+    const signal = session.signal;
+    wanted = true;
+    opening = true;
     update({ stage: 'preparing', error: null });
-    const prepare = async (): Promise<void> => {
-      try {
-        const opened = await ports.engine(article);
-        if (cancelled(signal)) {
-          await opened.close();
-          return;
-        }
-        engine = opened;
-        pump();
-      } catch {
-        fail(signal, 'speech');
+    let resumeReady: (() => void) | null = null;
+    const progress = (value: SpeechProgress): void => {
+      if (!cancelled(signal)) {
+        update({ complete: value.complete, cues: value.cues, prepared: value.cues.length, duration: value.duration });
+        resumeReady?.();
       }
     };
-    void prepare();
+    const prepare = async (): Promise<void> => {
+      const opened = await ports.engine(article);
+      if (cancelled(signal)) {
+        opened.close();
+        return;
+      }
+      engine = opened;
+      const uri = await opened.open(
+        state.passages.map((passage) => passage.text),
+        signal,
+        progress,
+      );
+      if (cancelled(signal)) {
+        return;
+      }
+      let hasPlayed = false;
+      const native = await ports.player(uri, article.title, (status) => {
+        if (cancelled(signal)) {
+          return;
+        }
+        if (status.error) {
+          fail(signal);
+          return;
+        }
+        if (status.finished) {
+          wanted = false;
+          update({ stage: 'ended', position: Math.max(state.duration, status.position), complete: true });
+          remember();
+          return;
+        }
+        if (status.buffering) {
+          update({ stage: wanted ? 'preparing' : 'paused' });
+          return;
+        }
+        if (!status.loaded || opening) {
+          return;
+        }
+        if (status.playing) {
+          hasPlayed = true;
+          wanted = true;
+        } else if (hasPlayed) {
+          wanted = false;
+        }
+        const index = state.cues.findLast((cue) => cue.start <= status.position)?.index ?? 0;
+        update({
+          position: status.position,
+          index,
+          duration: Math.max(state.duration, status.duration),
+          stage: status.playing ? 'playing' : wanted ? 'preparing' : 'paused',
+        });
+        remember();
+      });
+      if (cancelled(signal)) {
+        native.close();
+        return;
+      }
+      player = native;
+      native.rate(state.speed);
+      // Never silently restart at zero when a saved position is still being generated.
+      if (resumeAt > state.duration && !state.complete) {
+        await new Promise<void>((resolve, reject) => {
+          const abort = (): void => {
+            resumeReady = null;
+            reject(new Error('Audio cancelled'));
+          };
+          resumeReady = (): void => {
+            if (state.duration >= resumeAt || state.complete) {
+              signal.removeEventListener('abort', abort);
+              resumeReady = null;
+              resolve();
+            }
+          };
+          signal.addEventListener('abort', abort, { once: true });
+          if (cancelled(signal)) {
+            abort();
+          } else {
+            resumeReady();
+          }
+        });
+      }
+      if (resumeAt > 0) {
+        await native.seek(Math.min(resumeAt, state.duration));
+      }
+      if (cancelled(signal)) {
+        native.close();
+        return;
+      }
+      opening = false;
+      if (wanted) {
+        native.play();
+      } else {
+        update({ stage: 'paused' });
+      }
+    };
+    void prepare().catch(() => {
+      fail(signal);
+    });
   };
   const stop = (): void => {
     remember();
     wanted = false;
-    session.abort();
-    closePlayer();
-    ports.releaseAudio();
-    const closing = engine;
-    engine = null;
-    const prior = running;
-    if (closing !== null) {
-      void (prior ?? Promise.resolve()).then(async () => closing.close()).catch(() => undefined);
-    }
-    recordings = new Map();
-    ports.clear();
+    release();
     update({ ...EMPTY_LISTENING, speed: state.speed });
   };
   const jump = (index: number): void => {
-    if (!Number.isFinite(index) || state.passages.length === 0 || engine === null) {
+    if (!Number.isFinite(index)) {
       return;
     }
-    remember();
-    closePlayer();
-    update({
-      index: Math.max(0, Math.min(state.passages.length - 1, Math.floor(index))),
-      position: 0,
-      duration: 0,
-      stage: wanted ? 'preparing' : 'paused',
-    });
-    remember();
-    const signal = session.signal;
-    void playCurrent(signal).catch(() => {
-      fail(signal, 'speech');
-    });
-    pump();
+    const cue = state.cues[Math.max(0, Math.min(state.cues.length - 1, Math.floor(index)))];
+    if (cue !== undefined) {
+      seek(cue.start);
+    }
   };
   return {
-    select: (article, passages) => {
+    select: (article: Article, passages: readonly Passage[]): void => {
       if (article.body.kind !== 'open' || passages.length === 0) {
         return;
       }
@@ -296,79 +275,51 @@ export function createListening(
         return;
       }
       stop();
-      session = new AbortController();
       key = nextKey;
       const resume = ports.resume();
-      const matching = resume?.key === key;
-      update({
-        article,
-        passages,
-        expanded: true,
-        index: matching ? Math.min(passages.length - 1, resume.index) : 0,
-        position: matching ? resume.seconds : 0,
-        stage: 'intro',
-      });
+      resumeAt = resume?.key === key ? resume.seconds : 0;
+      update({ article, passages, expanded: true, stage: 'intro' });
       if (ports.consented()) {
         begin();
       }
     },
     begin,
-    toggle: () => {
+    stop,
+    seek,
+    jump,
+    toggle: (): void => {
       if (state.stage === 'intro') {
         update({ expanded: true });
         return;
       }
       if (state.stage === 'failed') {
+        resumeAt = state.position;
         begin();
         return;
       }
       if (state.stage === 'ended') {
+        seek(0);
         wanted = true;
-        jump(0);
+        player?.play();
         return;
       }
       wanted = !wanted;
       if (wanted) {
-        update({ stage: player === null ? 'preparing' : 'playing' });
+        update({ stage: 'preparing' });
         player?.play();
-        pump();
       } else {
         player?.pause();
         update({ stage: 'paused' });
-        remember();
       }
     },
-    jump,
-    seek: (seconds) => {
-      if (player === null || !Number.isFinite(seconds)) {
-        return;
-      }
-      const position = Math.max(0, Math.min(state.duration, seconds));
-      const signal = session.signal;
-      const version = playbackVersion;
-      void player
-        .seek(position)
-        .then(() => {
-          if (!cancelled(signal) && version === playbackVersion) {
-            update({ position });
-            remember();
-          }
-        })
-        .catch(() => {
-          if (version === playbackVersion) {
-            fail(signal, 'speech');
-          }
-        });
-    },
-    speed: () => {
+    speed: (): void => {
       const speeds = [0.8, 1, 1.15, 1.3, 1.5];
       const speed = speeds[(speeds.indexOf(state.speed) + 1) % speeds.length] ?? 1;
       player?.rate(speed);
       update({ speed });
     },
-    expand: (expanded) => {
+    expand: (expanded: boolean): void => {
       update({ expanded });
     },
-    stop,
   };
 }

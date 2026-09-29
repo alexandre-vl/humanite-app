@@ -1,0 +1,58 @@
+diff --git a/android/src/main/java/expo/modules/audio/AudioPlayer.kt b/android/src/main/java/expo/modules/audio/AudioPlayer.kt
+index c76a9fd2a53743a691782e0f67d0d71401df58f6..1c2896fe84fad7790ef9595d8b38e644411c05eb 100644
+--- a/android/src/main/java/expo/modules/audio/AudioPlayer.kt
++++ b/android/src/main/java/expo/modules/audio/AudioPlayer.kt
+@@ -44,10 +44,10 @@ class AudioPlayer(
+         setLoadControl(
+           DefaultLoadControl.Builder()
+             .setBufferDurationsMs(
+-              DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+-              bufferDurationMs.toInt().coerceAtLeast(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS),
+-              DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+-              DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
++              bufferDurationMs.toInt().coerceAtLeast(5_000),
++              bufferDurationMs.toInt().coerceAtLeast(5_000),
++              750,
++              1_500
+             )
+             .build()
+         )
+diff --git a/ios/AudioModule.swift b/ios/AudioModule.swift
+index d26560627c2dfa97370440ad28304617f3f9f0f7..73fb30ba60f4881dca17679d0fc98e389a208c5e 100644
+--- a/ios/AudioModule.swift
++++ b/ios/AudioModule.swift
+@@ -132,6 +132,7 @@ public class AudioModule: Module {
+         let player = AudioPlayer(avPlayer, interval: updateInterval, source: source)
+         player.owningRegistry = self.registry
+         player.keepAudioSessionActive = keepAudioSessionActive
++        player.preferredForwardBufferDuration = preferredForwardBufferDuration
+         player.onPlaybackComplete = { [weak self] in
+           if !keepAudioSessionActive {
+             self?.deactivateSession()
+diff --git a/ios/AudioPlayer.swift b/ios/AudioPlayer.swift
+index 074294321e872bb53c0b2d41044dac3c612f14f0..09707a5f505cf126054677bad2c2dfefb6c0b0e0 100644
+--- a/ios/AudioPlayer.swift
++++ b/ios/AudioPlayer.swift
+@@ -24,6 +24,13 @@ public class AudioPlayer: SharedRef<AVPlayer>, Playable {
+   }
+   var samplingEnabled = false
+   var keepAudioSessionActive = false
++  // Keep an explicit streaming buffer policy when replace() installs the first item.
++  var preferredForwardBufferDuration: Double = 0 {
++    didSet {
++      ref.currentItem?.preferredForwardBufferDuration = preferredForwardBufferDuration
++      ref.automaticallyWaitsToMinimizeStalling = preferredForwardBufferDuration <= 0
++    }
++  }
+ 
+   var isLooping = false {
+     didSet {
+@@ -405,6 +412,8 @@ public class AudioPlayer: SharedRef<AVPlayer>, Playable {
+   }
+ 
+   private func replacePlayerItem(with item: AVPlayerItem?) {
++    item?.preferredForwardBufferDuration = preferredForwardBufferDuration
++    ref.automaticallyWaitsToMinimizeStalling = preferredForwardBufferDuration <= 0
+     if let queuePlayer = ref as? AVQueuePlayer {
+       queuePlayer.removeAllItems()
+       if let item {

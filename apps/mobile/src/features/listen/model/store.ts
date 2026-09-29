@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { isRecord } from '@huma/unknown';
 import { openSpeech } from '#api';
-import { clearSpeech } from '#lib/speech';
 import { STORAGE_KEYS, storage } from '#lib/storage';
 import { createListening, EMPTY_LISTENING } from './controller';
 import type { Listening, Resume } from './controller';
@@ -17,22 +16,16 @@ const restored = (): Resume | null => {
     const data: unknown = JSON.parse(stored);
     if (
       !isRecord(data) ||
-      data['version'] !== 1 ||
+      data['version'] !== 2 ||
       typeof data['key'] !== 'string' ||
-      typeof data['index'] !== 'number' ||
       typeof data['seconds'] !== 'number'
     ) {
       return null;
     }
-    if (
-      !Number.isSafeInteger(data['index']) ||
-      data['index'] < 0 ||
-      !Number.isFinite(data['seconds']) ||
-      data['seconds'] < 0
-    ) {
+    if (!Number.isFinite(data['seconds']) || data['seconds'] < 0) {
       return null;
     }
-    return { key: data['key'], index: data['index'], seconds: data['seconds'] };
+    return { key: data['key'], seconds: data['seconds'] };
   } catch {
     return null;
   }
@@ -47,7 +40,6 @@ export const listening = createListening(
       storage.set(STORAGE_KEYS.audioConsent, 'yes');
       return Promise.resolve(openSpeech(article.id));
     },
-    clear: clearSpeech,
     releaseAudio: () => {
       audioVersion += 1;
       audio?.close();
@@ -60,11 +52,11 @@ export const listening = createListening(
         throw new Error('Audio session cancelled');
       }
       audio ??= createAudioSession();
-      return audio.open(recording.uri, title, update);
+      return audio.open(recording, title, update);
     },
     resume: restored,
     remember: (resume) => {
-      const next = JSON.stringify({ version: 1, ...resume, seconds: Math.floor(resume.seconds) });
+      const next = JSON.stringify({ version: 2, ...resume, seconds: Math.floor(resume.seconds) });
       if (next !== saved) {
         storage.set(STORAGE_KEYS.listening, next);
         saved = next;
