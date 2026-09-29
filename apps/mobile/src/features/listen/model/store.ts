@@ -32,12 +32,22 @@ const restored = (): Resume | null => {
 };
 let saved = '';
 let audio: ReturnType<typeof import('#lib/audio').createAudioSession> | null = null;
+let audioModule: Promise<typeof import('#lib/audio')> | null = null;
+const prepareAudio = async (): Promise<typeof import('#lib/audio')> => {
+  audioModule ??= import('#lib/audio').catch((error: unknown) => {
+    audioModule = null;
+    throw error;
+  });
+  return audioModule;
+};
 let audioVersion = 0;
 export const listening = createListening(
   {
     consented: () => storage.getString(STORAGE_KEYS.audioConsent) === 'yes',
     engine: async (article) => {
       storage.set(STORAGE_KEYS.audioConsent, 'yes');
+      // Consent is already given. Load native playback while the server checks rights.
+      void prepareAudio().catch(() => undefined);
       return Promise.resolve(openSpeech(article.id));
     },
     releaseAudio: () => {
@@ -47,7 +57,7 @@ export const listening = createListening(
     },
     player: async (recording, title, update) => {
       const version = audioVersion;
-      const { createAudioSession } = await import('#lib/audio');
+      const { createAudioSession } = await prepareAudio();
       if (version !== audioVersion) {
         throw new Error('Audio session cancelled');
       }
