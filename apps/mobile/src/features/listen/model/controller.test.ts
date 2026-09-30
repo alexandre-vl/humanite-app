@@ -181,6 +181,95 @@ describe('continuous listening lifecycle', () => {
     b.listening.select(item, passages);
     expect(b.engine).not.toHaveBeenCalled();
   });
+  it('reopens interrupted playback at its saved position and cancels the recovery deadline after playback returns', async () => {
+    const item = await article();
+    const b = bench();
+    jest.useFakeTimers();
+    try {
+      b.listening.select(item, passages);
+      await jest.advanceTimersByTimeAsync(0);
+      b.status({ position: 12 });
+      b.status({ error: true });
+      expect(b.state().stage).toBe('reconnecting');
+      expect(b.close).toHaveBeenCalledTimes(1);
+      await jest.advanceTimersByTimeAsync(1000);
+      expect(b.player).toHaveBeenCalledTimes(2);
+      expect(b.seek).toHaveBeenLastCalledWith(12);
+      b.callbacks[0]?.({
+        position: 0,
+        duration: 40,
+        playing: false,
+        finished: false,
+        loaded: true,
+        buffering: false,
+        error: true,
+      });
+      b.status({ position: 12.2 });
+      await jest.advanceTimersByTimeAsync(60000);
+      expect(b.state().stage).toBe('playing');
+      expect(b.player).toHaveBeenCalledTimes(2);
+    } finally {
+      b.listening.stop();
+      jest.useRealTimers();
+    }
+  });
+  it.each(['pause', 'stop'])('cancels recovery on %s and ignores a late authorization', async (action) => {
+    const item = await article();
+    const b = bench();
+    const pending = Promise.withResolvers<SpeechSession>();
+    jest.useFakeTimers();
+    try {
+      b.listening.select(item, passages);
+      await jest.advanceTimersByTimeAsync(0);
+      b.status({ position: 12 });
+      b.engine.mockReturnValueOnce(pending.promise);
+      b.status({ error: true });
+      await jest.advanceTimersByTimeAsync(1000);
+      if (action === 'pause') {
+        b.listening.toggle();
+      } else {
+        b.listening.stop();
+      }
+      pending.resolve({ open: b.open, close: b.sessionClose });
+      await jest.advanceTimersByTimeAsync(60000);
+      expect(b.player).toHaveBeenCalledTimes(1);
+      expect(b.state().stage).toBe(action === 'pause' ? 'paused' : 'idle');
+      if (action === 'pause') {
+        b.listening.toggle();
+        await jest.advanceTimersByTimeAsync(0);
+        expect(b.seek).toHaveBeenLastCalledWith(12);
+        expect(b.player).toHaveBeenCalledTimes(2);
+      }
+    } finally {
+      b.listening.stop();
+      jest.useRealTimers();
+    }
+  });
+  it('stops automatic recovery after one minute even when a new authorization never answers', async () => {
+    const item = await article();
+    const b = bench();
+    const pending = Promise.withResolvers<SpeechSession>();
+    jest.useFakeTimers();
+    try {
+      b.listening.select(item, passages);
+      await jest.advanceTimersByTimeAsync(0);
+      b.status({ position: 12 });
+      b.engine.mockReturnValueOnce(pending.promise);
+      b.status({ error: true });
+      await jest.advanceTimersByTimeAsync(60000);
+      expect(b.state()).toEqual(expect.objectContaining({ stage: 'failed', position: 12 }));
+      pending.resolve({ open: b.open, close: b.sessionClose });
+      await jest.advanceTimersByTimeAsync(0);
+      expect(b.player).toHaveBeenCalledTimes(1);
+      b.listening.begin();
+      await jest.advanceTimersByTimeAsync(0);
+      expect(b.seek).toHaveBeenLastCalledWith(12);
+      expect(b.player).toHaveBeenCalledTimes(2);
+    } finally {
+      b.listening.stop();
+      jest.useRealTimers();
+    }
+  });
   it('waits for a saved position to be generated before seeking and playing', async () => {
     const item = await article();
     const key = readingKey(item, passages);
@@ -215,5 +304,27 @@ describe('continuous listening lifecycle', () => {
     expect(b.play).not.toHaveBeenCalled();
     expect(b.seek).not.toHaveBeenCalled();
     expect(b.state().stage).toBe('idle');
+  });
+  it('fails an unavailable saved-position wait without interrupting audio that is already playing', async () => {
+    const item = await article();
+    const b = bench({ resume: () => ({ key: readingKey(item, passages), seconds: 25 }) });
+    b.open.mockImplementationOnce(async (blocks, signal, update) => {
+      update({ complete: false, duration: 5, cues: [{ index: 0, start: 0 }] });
+      return Promise.resolve('stream.m3u8');
+    });
+    b.listening.select(item, passages);
+    await flush();
+    b.open.mock.calls[0]?.[3]?.();
+    await flush();
+    expect(b.state().stage).toBe('failed');
+    expect(b.state().position).toBe(25);
+    expect(b.play).not.toHaveBeenCalled();
+    b.listening.begin();
+    await flush();
+    expect(b.seek).toHaveBeenLastCalledWith(25);
+    b.status();
+    b.open.mock.calls[1]?.[3]?.();
+    expect(b.state().stage).toBe('playing');
+    b.listening.stop();
   });
 });

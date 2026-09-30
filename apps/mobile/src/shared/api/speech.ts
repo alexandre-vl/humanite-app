@@ -10,7 +10,12 @@ export type SpeechProgress = Readonly<{
   cues: readonly Readonly<{ index: number; start: number }>[];
 }>;
 export type SpeechSession = Readonly<{
-  open: (blocks: readonly string[], signal: AbortSignal, progress: (value: SpeechProgress) => void) => Promise<string>;
+  open: (
+    blocks: readonly string[],
+    signal: AbortSignal,
+    progress: (value: SpeechProgress) => void,
+    unavailable?: () => void,
+  ) => Promise<string>;
   close: () => void;
 }>;
 type Ports = Readonly<{
@@ -61,7 +66,7 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
     close: () => {
       session.abort();
     },
-    open: async (blocks, parent, progress) => {
+    open: async (blocks, parent, progress, unavailable) => {
       const abort = (): void => {
         session.abort();
       };
@@ -161,12 +166,15 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
             if (cancelled(signal)) {
               return;
             }
-            if (next === null || [429, 500, 502, 504].includes(next.response.status)) {
+            if (next === null || [429, 500, 502, 503, 504].includes(next.response.status)) {
+              if (failures >= 6) {
+                throw new Error('Audio progress unavailable');
+              }
               await backoff();
               continue;
             }
             if (!next.response.ok) {
-              return;
+              throw new Error('Audio progress refused');
             }
             const parsed = progressOf(next.value, blocks.length);
             if (cancelled(signal)) {
@@ -177,9 +185,13 @@ export function createSpeech(article: string, ports: Ports): SpeechSession {
             progress(current);
           }
         };
-        // Metadata failure must never interrupt already buffered native audio.
+        // The controller can release a pending resume without interrupting already playing audio.
         void follow()
-          .catch(() => undefined)
+          .catch(() => {
+            if (!cancelled(signal)) {
+              unavailable?.();
+            }
+          })
           .finally(() => {
             parent.removeEventListener('abort', abort);
           });

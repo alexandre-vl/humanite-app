@@ -99,6 +99,8 @@ function statusOf(state: Listening): DisplayText {
       return t('listen.voice');
     case 'preparing':
       return t('listen.preparing');
+    case 'reconnecting':
+      return t('listen.reconnecting');
     case 'playing':
       return t('listen.playing');
     case 'paused':
@@ -129,7 +131,7 @@ function Control({
   );
 }
 function Play({ state, main = false }: Readonly<{ state: Listening; main?: boolean }>): ReactNode {
-  const playing = state.stage === 'playing' || state.stage === 'preparing';
+  const playing = state.stage === 'playing' || state.stage === 'preparing' || state.stage === 'reconnecting';
   return (
     <Control
       icon={playing ? 'pause' : 'play'}
@@ -183,7 +185,7 @@ function Expanded({ state }: Readonly<{ state: Listening }>): ReactNode {
     return null;
   }
   const introducing = state.stage === 'intro';
-  const waiting = state.stage === 'preparing';
+  const waiting = state.stage === 'preparing' || state.stage === 'reconnecting';
   const passage = state.passages[state.index];
   return (
     <AudioSheet
