@@ -124,6 +124,19 @@ describe('continuous listening lifecycle', () => {
     expect(b.seek).toHaveBeenLastCalledWith(8);
     b.listening.stop();
   });
+  it('starts a completed article from the beginning when it is opened again', async () => {
+    const b = bench();
+    const item = await article();
+    b.listening.select(item, passages);
+    await flush();
+    b.status({ finished: true, position: 40.02, playing: false });
+    b.listening.stop();
+    b.listening.select(item, passages);
+    await flush();
+    expect(b.seek).not.toHaveBeenCalled();
+    expect(b.play).toHaveBeenCalledTimes(2);
+    b.listening.stop();
+  });
   it('keeps a pause requested during authorization', async () => {
     const pending = Promise.withResolvers<SpeechSession>();
     const b = bench({ engine: async () => pending.promise });
