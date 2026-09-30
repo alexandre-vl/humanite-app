@@ -105,7 +105,8 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
   };
   const remember = (): void => {
     if (state.article !== null) {
-      ports.remember({ key, seconds: opening ? Math.max(resumeAt, state.position) : state.position });
+      const seconds = state.stage === 'ended' ? 0 : opening ? Math.max(resumeAt, state.position) : state.position;
+      ports.remember({ key, seconds });
     }
   };
   const release = (): void => {
