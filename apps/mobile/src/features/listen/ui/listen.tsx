@@ -258,7 +258,7 @@ function Expanded({ state }: Readonly<{ state: Listening }>): ReactNode {
                   />
                   <Box style={styles.between}>
                     <Text variant="caption" tone="textMuted">
-                      {time(state.position)}
+                      {time(Math.min(state.position, state.duration))}
                     </Text>
                     <Text variant="caption" tone="textSecondary">
                       {t('listen.passage', { current: state.index + 1, total: state.passages.length })}
