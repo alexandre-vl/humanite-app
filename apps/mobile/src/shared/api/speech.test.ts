@@ -135,4 +135,41 @@ describe('continuous article audio', () => {
       jest.useRealTimers();
     }
   });
+  it('reports an expired metadata session so a pending resume cannot hang forever', async () => {
+    const b = bench();
+    const unavailable = jest.fn();
+    b.request
+      .mockResolvedValueOnce(ready({ state: 'generating', duration: 0, cues: [] }))
+      .mockResolvedValueOnce(new Response(null, { status: 410 }));
+    await b.session.open(blocks, new AbortController().signal, jest.fn(), unavailable);
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+    expect(unavailable).toHaveBeenCalledTimes(1);
+    b.session.close();
+  });
+  it('bounds repeated metadata failures and recovers from a temporary service outage', async () => {
+    jest.useFakeTimers();
+    const b = bench();
+    const unavailable = jest.fn();
+    try {
+      const update = jest.fn();
+      b.request
+        .mockResolvedValueOnce(ready({ state: 'generating', duration: 0, cues: [] }))
+        .mockResolvedValueOnce(new Response(null, { status: 503 }))
+        .mockResolvedValueOnce(ready({ state: 'generating', duration: 5, cues: [{ index: 0, start: 0 }] }))
+        .mockRejectedValue(new Error('offline'));
+      await b.session.open(blocks, new AbortController().signal, update, unavailable);
+      await jest.advanceTimersByTimeAsync(1000);
+      expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ duration: 5 }));
+      await jest.advanceTimersByTimeAsync(60000);
+      expect(unavailable).toHaveBeenCalledTimes(1);
+      const count = b.request.mock.calls.length;
+      await jest.advanceTimersByTimeAsync(60000);
+      expect(b.request).toHaveBeenCalledTimes(count);
+    } finally {
+      b.session.close();
+      jest.useRealTimers();
+    }
+  });
 });

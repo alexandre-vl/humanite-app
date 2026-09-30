@@ -18,7 +18,7 @@ type Player = Readonly<{
   rate: (speed: number) => void;
   close: () => void;
 }>;
-type Stage = 'idle' | 'intro' | 'preparing' | 'playing' | 'paused' | 'ended' | 'failed';
+type Stage = 'idle' | 'intro' | 'preparing' | 'reconnecting' | 'playing' | 'paused' | 'ended' | 'failed';
 export type Listening = Readonly<{
   article: Article | null;
   passages: readonly Passage[];
@@ -85,13 +85,27 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
   let opening = false;
   let key = '';
   let resumeAt = 0;
+  let retries = 0;
+  let resumedAt = 0;
+  let retryTimer: ReturnType<typeof setTimeout> | null = null;
+  let recoveryDeadline: ReturnType<typeof setTimeout> | null = null;
+  const clearRecovery = (): void => {
+    if (retryTimer !== null) {
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    }
+    if (recoveryDeadline !== null) {
+      clearTimeout(recoveryDeadline);
+      recoveryDeadline = null;
+    }
+  };
   const update = (patch: Partial<Listening>): void => {
     state = { ...state, ...patch };
     changed(state);
   };
   const remember = (): void => {
     if (state.article !== null) {
-      ports.remember({ key, seconds: state.position });
+      ports.remember({ key, seconds: opening ? Math.max(resumeAt, state.position) : state.position });
     }
   };
   const release = (): void => {
@@ -103,10 +117,33 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
     ports.releaseAudio();
     opening = false;
   };
-  const fail = (signal: AbortSignal): void => {
+  const fail = (signal: AbortSignal, recoverable = false): void => {
     if (!cancelled(signal)) {
+      if (opening && resumeAt > state.position) {
+        update({ position: resumeAt });
+      }
       remember();
       release();
+      if (recoverable && wanted && retries < 10) {
+        resumeAt = state.position;
+        session = new AbortController();
+        const retrySignal = session.signal;
+        recoveryDeadline ??= setTimeout(() => {
+          fail(session.signal);
+        }, 60000);
+        update({ stage: 'reconnecting', error: null });
+        retryTimer = setTimeout(
+          () => {
+            retryTimer = null;
+            if (!cancelled(retrySignal) && wanted) {
+              begin();
+            }
+          },
+          Math.min(8000, 1000 * 2 ** Math.min(retries++, 3)),
+        );
+        return;
+      }
+      clearRecovery();
       wanted = false;
       update({ stage: 'failed', error: 'speech' });
     }
@@ -134,6 +171,10 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
     if (article === null || opening) {
       return;
     }
+    if (state.stage === 'failed') {
+      retries = 0;
+      resumeAt = state.position;
+    }
     if (player !== null) {
       wanted = true;
       player.play();
@@ -143,7 +184,7 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
     const signal = session.signal;
     wanted = true;
     opening = true;
-    update({ stage: 'preparing', error: null });
+    update({ stage: recoveryDeadline === null ? 'preparing' : 'reconnecting', error: null });
     let resumeReady: (() => void) | null = null;
     const progress = (value: SpeechProgress): void => {
       if (!cancelled(signal)) {
@@ -162,6 +203,11 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
         state.passages.map((passage) => passage.text),
         signal,
         progress,
+        () => {
+          if (opening) {
+            fail(signal, recoveryDeadline !== null);
+          }
+        },
       );
       if (cancelled(signal)) {
         return;
@@ -172,23 +218,32 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
           return;
         }
         if (status.error) {
-          fail(signal);
+          fail(signal, hasPlayed || recoveryDeadline !== null);
           return;
         }
         if (status.finished) {
+          clearRecovery();
+          retries = 0;
           wanted = false;
           update({ stage: 'ended', position: Math.max(state.duration, status.position), complete: true });
           remember();
           return;
         }
         if (status.buffering) {
-          update({ stage: wanted ? 'preparing' : 'paused' });
+          update({ stage: wanted ? (recoveryDeadline === null ? 'preparing' : 'reconnecting') : 'paused' });
           return;
         }
         if (!status.loaded || opening) {
           return;
         }
         if (status.playing) {
+          if (recoveryDeadline !== null) {
+            clearRecovery();
+            resumedAt = status.position;
+          }
+          if (status.position - resumedAt >= 10) {
+            retries = 0;
+          }
           hasPlayed = true;
           wanted = true;
         } else if (hasPlayed) {
@@ -199,7 +254,13 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
           position: status.position,
           index,
           duration: Math.max(state.duration, status.duration),
-          stage: status.playing ? 'playing' : wanted ? 'preparing' : 'paused',
+          stage: status.playing
+            ? 'playing'
+            : wanted
+              ? recoveryDeadline === null
+                ? 'preparing'
+                : 'reconnecting'
+              : 'paused',
         });
         remember();
       });
@@ -246,10 +307,12 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
       }
     };
     void prepare().catch(() => {
-      fail(signal);
+      fail(signal, recoveryDeadline !== null);
     });
   };
   const stop = (): void => {
+    clearRecovery();
+    retries = 0;
     remember();
     wanted = false;
     release();
@@ -293,6 +356,19 @@ export function createListening(ports: ListeningPorts, changed: (state: Listenin
         return;
       }
       if (state.stage === 'failed') {
+        begin();
+        return;
+      }
+      if (recoveryDeadline !== null) {
+        clearRecovery();
+        remember();
+        release();
+        wanted = false;
+        update({ stage: 'paused' });
+        return;
+      }
+      if (state.stage === 'paused' && player === null) {
+        retries = 0;
         resumeAt = state.position;
         begin();
         return;
