@@ -33,8 +33,10 @@ export type VerifyOptions = Readonly<{
   output: 'attached' | 'captured';
   env: Environment;
   /**
-   * The paths the commit changes, when the caller knows them. A step every one of them is blind to is skipped: the
-   * files are not its subject, so running it would judge the same tree it judged last time and answer the same thing.
+   * The paths changed since a tree that passed the plan, when the caller knows them: those the commit changes for the
+   * pre-commit hook, those the working tree changes from HEAD for the stop hook. A step every one of them is blind to
+   * is skipped: the files are not its subject, so running it would judge the same tree it judged last time and answer
+   * the same thing.
    *
    * Left out, nothing is skipped. `pnpm verify` run by hand takes no list and therefore runs the whole plan, which is
    * what a command that says it runs every check of the repository has to do.

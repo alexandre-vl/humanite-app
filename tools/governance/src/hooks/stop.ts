@@ -1,7 +1,7 @@
 import { blockOutput, readHookInput } from '@huma/agents/protocol';
 import { decideStop } from '@huma/agents/stop';
 import { findWorkspaceRoot } from '@huma/kit/cli';
-import { ownRepository, worktreeTreeId } from '@huma/kit/git';
+import { ownRepository, stagedPaths, unstagedPaths, worktreeTreeId } from '@huma/kit/git';
 import { STOP_TIMEOUT_SECONDS } from '../policy.ts';
 import { readVerifiedTree, runVerify } from '../verify.ts';
 
@@ -17,17 +17,22 @@ const ANSWER_MARGIN_MS = 30_000;
 export async function respondToStop(rawInput: string): Promise<string> {
   const input = readHookInput(rawInput);
   const root = await findWorkspaceRoot(input?.cwd ?? process.cwd());
+  const repository = ownRepository(root);
   const action = decideStop({
     stopHookActive: input?.stopHookActive ?? false,
-    currentTree: await worktreeTreeId(ownRepository(root)),
+    currentTree: await worktreeTreeId(repository),
     verifiedTree: await readVerifiedTree(root),
   });
   if (action === 'allow') {
     return '';
   }
+  // What the working tree changes from HEAD, which passed this same plan when the pre-commit hook judged it: a step
+  // blind to every one of these paths would judge the tree it already passed, as the pre-commit hook reasons too.
+  const touched = [...new Set([...(await stagedPaths(repository)), ...(await unstagedPaths(repository))])];
   const outcome = await runVerify(root, {
     staged: false,
     output: 'captured',
+    touched,
     env: process.env,
     signal: AbortSignal.timeout(STOP_TIMEOUT_SECONDS * 1_000 - ANSWER_MARGIN_MS),
   });
