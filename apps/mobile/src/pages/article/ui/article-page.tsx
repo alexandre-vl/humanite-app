@@ -6,7 +6,7 @@ import { TopBar } from '#components/top-bar';
 import type { FigureLinkProps } from '#entities/article';
 import { ArticleReader, FigureLinkContext, articleQuery, readsDark, useReadSummary } from '#entities/article';
 import { BookmarkToggle, useBookmarks } from '#features/bookmark';
-import { ListenArticle } from '#features/listen';
+import { ListenArticle, ListeningDock, PLAYER_RIDES_THE_TAB_BAR } from '#features/listen';
 import { useReaderSession } from '#features/sign-in';
 import { useViewingPicture } from '#features/view-picture';
 import { t } from '#i18n';
@@ -104,6 +104,8 @@ export function ArticlePage(): ReactNode {
             }
           />
         </FigureLinkContext>
+        {/* The article covers the tab bar, and the player the bar carries with it: it is docked at the foot instead. */}
+        {PLAYER_RIDES_THE_TAB_BAR ? <ListeningDock /> : null}
       </Surface>
     </ThemeScope>
   );

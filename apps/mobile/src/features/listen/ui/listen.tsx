@@ -2,6 +2,7 @@ import type { Article, DisplayText } from '@huma/contracts';
 import { RADII, SIZES, SPACING } from '@huma/design-tokens';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
+import { Platform } from 'react-native';
 import { Button } from '#components/button';
 import { t } from '#i18n';
 import { DECORATIVE } from '#lib/announce';
@@ -88,6 +89,14 @@ const useStyles = createStyles((theme) => ({
     backgroundColor: theme.card,
   },
   dockWords: { flex: 1, gap: SPACING.xs },
+  // No ground of its own: the bar draws the capsule, in its own glass.
+  accessory: {
+    flex: 1,
+    paddingHorizontal: SPACING.lg,
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    alignItems: 'center',
+  },
 }));
 
 const time = (seconds: number): DisplayText =>
@@ -332,40 +341,100 @@ function Expanded({ state }: Readonly<{ state: Listening }>): ReactNode {
   );
 }
 
-export function ListeningPlayer(): ReactNode {
+/**
+ * Whether the player rides the tab bar, as Music's does. From iOS 26 a tab bar carries an accessory above itself — a
+ * capsule of the same glass, drawn into the bar when it is minimised — and the player belongs there: under the bar,
+ * where it was docked below the whole navigator, it read as a strip of the system rather than as the app's own. Before
+ * iOS 26, and on Android, there is no such place, and the dock under the navigator stays.
+ */
+export const PLAYER_RIDES_THE_TAB_BAR = Platform.OS === 'ios' && Number.parseInt(Platform.Version, 10) >= 26;
+
+/** Whether an article is in the player, for the tab bar to know whether to carry it. */
+export const useAnythingListened = (): boolean => useListening((state) => state.article !== null);
+
+/** What the player is reading and how far it has got, pressed to open the player whole. */
+function Heard({ state, status }: Readonly<{ state: Listening & { article: Article }; status: boolean }>): ReactNode {
+  const styles = useStyles();
+  return (
+    <Pressable
+      role="button"
+      label={t('listen.open')}
+      onPress={() => {
+        listening.expand(true);
+      }}
+      style={styles.dockWords}
+    >
+      {status ? (
+        <Text variant="caption" tone="textMuted" numberOfLines={1}>
+          {statusOf(state)}
+        </Text>
+      ) : null}
+      <Text variant="label" numberOfLines={1}>
+        {state.article.title}
+      </Text>
+    </Pressable>
+  );
+}
+
+const isHearing = (state: Listening): state is Listening & { article: Article } => state.article !== null;
+
+/**
+ * The player docked under the navigator: below the tabs where they cannot carry it, and at the foot of a screen pushed
+ * over them, which covers the bar and its accessory with it.
+ */
+export function ListeningDock(): ReactNode {
   const state = useListening();
   const styles = useStyles();
-  if (state.article === null) {
+  if (!isHearing(state)) {
     return null;
   }
   return (
+    <AudioDock hidden={state.expanded}>
+      <Box style={styles.dock}>
+        <Heard state={state} status />
+        <Play state={state} />
+        <Control icon="clear" label={t('listen.close')} onPress={listening.stop} />
+      </Box>
+    </AudioDock>
+  );
+}
+
+/**
+ * The player as the tab bar carries it. Above the bar it says what it reads and how far, with the two things done
+ * from there — pause, stop; drawn into a minimised bar it has the room of a word, and keeps the title and the pause.
+ * Two copies live at once, one for each place, so nothing is kept here: all of it is the store's.
+ */
+export function ListeningAccessory({ inline }: Readonly<{ inline: boolean }>): ReactNode {
+  const state = useListening();
+  const styles = useStyles();
+  if (!isHearing(state)) {
+    return null;
+  }
+  return (
+    <Box style={styles.accessory}>
+      <Heard state={state} status={!inline} />
+      <Play state={state} />
+      {inline ? null : <Control icon="clear" label={t('listen.close')} onPress={listening.stop} />}
+    </Box>
+  );
+}
+
+/** The player opened whole, over everything. */
+function ListeningSheet(): ReactNode {
+  const state = useListening();
+  return state.article !== null && state.expanded ? (
+    <ThemeScope name="dark" screen>
+      <Expanded state={state} />
+    </ThemeScope>
+  ) : null;
+}
+
+/** The player as the root of the app holds it: opened whole, and docked under the navigator where the bar cannot carry it. */
+export function ListeningPlayer(): ReactNode {
+  return (
     <>
-      <AudioDock hidden={state.expanded}>
-        <Box style={styles.dock}>
-          <Pressable
-            role="button"
-            label={t('listen.open')}
-            onPress={() => {
-              listening.expand(true);
-            }}
-            style={styles.dockWords}
-          >
-            <Text variant="caption" tone="textMuted">
-              {statusOf(state)}
-            </Text>
-            <Text variant="label" numberOfLines={1}>
-              {state.article.title}
-            </Text>
-          </Pressable>
-          <Play state={state} />
-          <Control icon="clear" label={t('listen.close')} onPress={listening.stop} />
-        </Box>
-      </AudioDock>
-      {state.expanded ? (
-        <ThemeScope name="dark" screen>
-          <Expanded state={state} />
-        </ThemeScope>
-      ) : null}
+      {PLAYER_RIDES_THE_TAB_BAR ? null : <ListeningDock />}
+      <ListeningSheet />
     </>
   );
 }
