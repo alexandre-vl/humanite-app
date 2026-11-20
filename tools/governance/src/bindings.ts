@@ -558,6 +558,7 @@ export const BINDINGS = {
         'git/config-include',
         'git/no-verify-through-shims',
         'git/valid-installation',
+        'git/valid-installation-worktree-gone',
         'git/valid-commit-through-shims',
       ],
       R4: [

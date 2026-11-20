@@ -497,6 +497,16 @@ const INSTALLATION_FIXTURES = [
     }),
   ),
   define(
+    'git/valid-installation-worktree-gone',
+    'des shims installés, et un worktree lié supprimé sans git worktree remove',
+    [],
+    installed(async (repository) => {
+      const linked = join(repository.root, '..', 'disparu');
+      await git(repository, ['worktree', 'add', '--quiet', '-b', 'disparu', linked]);
+      await rm(linked, { recursive: true, force: true });
+    }),
+  ),
+  define(
     'git/config-include',
     'une configuration incluse selon la branche',
     ['git/config-include'],

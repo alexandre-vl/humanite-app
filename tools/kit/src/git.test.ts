@@ -24,6 +24,7 @@ import {
   statusEntries,
   treeDirectories,
   unstagedPaths,
+  worktreeRoots,
   worktreeTreeId,
   writeTree,
 } from './git.ts';
@@ -350,6 +351,29 @@ test('configEntries reads every scope and origin, and nothing when unset', async
     { scope: 'local', origin: 'file:.git/config', key: 'core.hookspath', value: '/tmp/a b' },
     { scope: 'command', origin: 'command line:', key: 'core.hookspath', value: '/dev/null' },
   ]);
+});
+
+test('worktreeRoots leaves out a worktree whose directory is gone, prunable or locked', async () => {
+  await using directory = await temporaryDirectory('kit-git');
+  const root = join(directory.path, 'repo');
+  const repo = await repository(root, [{ 'a.md': '1' }]);
+  const linked = (name: string): string => join(directory.path, name);
+  for (const name of ['gone', 'kept', 'locked', 'unlinked']) {
+    await git(repo, ['worktree', 'add', '--quiet', '-b', name, linked(name)]);
+  }
+  await git(repo, ['worktree', 'lock', linked('locked')]);
+  expect(await worktreeRoots(repo)).toEqual([
+    root,
+    linked('gone'),
+    linked('kept'),
+    linked('locked'),
+    linked('unlinked'),
+  ]);
+  await rm(linked('gone'), { recursive: true });
+  await rm(linked('locked'), { recursive: true });
+  await rm(join(linked('unlinked'), '.git'));
+  expect(await git(repo, ['worktree', 'list', '--porcelain', '-z'])).toContain('\0prunable ');
+  expect(await worktreeRoots(repo)).toEqual([root, linked('kept')]);
 });
 
 test('messageTrailers and commitTrailers read trailers as git does', async () => {

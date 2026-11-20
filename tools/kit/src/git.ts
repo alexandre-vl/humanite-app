@@ -284,11 +284,33 @@ export async function refNames(repository: GitRepository, prefix: string): Promi
 export const commonDirectory = async (repository: GitRepository): Promise<string> =>
   (await git(repository, ['rev-parse', '--path-format=absolute', '--git-common-dir'])).trim();
 
-/** Root of every worktree of the repository, the main one first. */
-export async function worktreeRoots(repository: GitRepository): Promise<readonly string[]> {
-  return splitNul(await git(repository, ['worktree', 'list', '--porcelain', '-z'])).flatMap((line) =>
-    line.startsWith('worktree ') ? [line.slice('worktree '.length)] : [],
+/** Each worktree `git worktree list --porcelain -z` prints: its root, then the attribute lines of its record. */
+const worktreeRecords = (output: string): readonly Readonly<{ root: string; attributes: readonly string[] }>[] =>
+  output.split('\0\0').flatMap((record) => {
+    const [first = '', ...attributes] = splitNul(record);
+    return first.startsWith('worktree ') ? [{ root: first.slice('worktree '.length), attributes }] : [];
+  });
+
+const isDirectory = async (path: string): Promise<boolean> =>
+  stat(path).then(
+    (stats) => stats.isDirectory(),
+    () => false,
   );
+
+/**
+ * Root of every worktree git can still run in, the main one first.
+ *
+ * A worktree deleted without `git worktree remove` stays listed until `git worktree prune`, and a locked one stays
+ * listed even then: git runs no command, hook or configuration there, and a command started in it does not even
+ * launch — Node reports the missing directory as `spawn git ENOENT`. Git marks the first `prunable`; the second only
+ * shows on disk.
+ */
+export async function worktreeRoots(repository: GitRepository): Promise<readonly string[]> {
+  const listed = worktreeRecords(await git(repository, ['worktree', 'list', '--porcelain', '-z'])).filter(
+    ({ attributes }) => !attributes.some((line) => line === 'prunable' || line.startsWith('prunable ')),
+  );
+  const present = await Promise.all(listed.map(async ({ root }) => isDirectory(root)));
+  return listed.flatMap(({ root }, index) => (present[index] === true ? [root] : []));
 }
 
 /** Where the files of a check are read: the working tree as it is on disk, or the index about to be committed. */
