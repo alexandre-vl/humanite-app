@@ -278,7 +278,14 @@ const config: ExpoConfig = {
   // that field alike.
   icon: './assets/icon.png',
   userInterfaceStyle: 'automatic',
-  ios: { bundleIdentifier: IDENTITY.id },
+  ios: {
+    bundleIdentifier: IDENTITY.id,
+    // The same mark, as the journal ships it on iOS: the 1024-pixel artwork of its iPhone app (App Store 527976174),
+    // red to the edge, `uiRed` to the digit. `icon.png` is Android's picture of an icon — a rounded red square with
+    // its shadow on a white field — and iOS masks every icon to its own shape: given that picture, the phone drew a
+    // white frame around a smaller red square. iOS wants the square whole and draws the corners itself.
+    icon: './assets/ios-icon.png',
+  },
   android: {
     package: IDENTITY.id,
     versionCode: versionCode(VERSION),
