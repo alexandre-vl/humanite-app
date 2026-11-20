@@ -245,7 +245,6 @@ const UNCATALOGUED = {
     list: 'une liste virtualisée ne se pose pas dans le défilement du catalogue, qui en est déjà un',
     pager: 'ses pages ont la largeur de l’écran, que les marges du catalogue ne leur laissent pas',
     'safe-area': 'un fournisseur posé à la racine de l’app : il ne dessine rien',
-    'tab-bar': 'une vue native sans taille posée à côté des onglets : elle ne dessine rien',
   },
   component: {},
 } as const satisfies Readonly<Record<(typeof CATALOGUE_PLACES)[number], Readonly<Record<string, string>>>>;

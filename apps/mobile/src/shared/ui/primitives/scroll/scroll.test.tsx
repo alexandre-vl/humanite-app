@@ -39,4 +39,23 @@ describe('Scroll', () => {
   it('range le clavier quand on fait défiler', async () => {
     expect((await region()).props['keyboardDismissMode']).toBe('on-drag');
   });
+
+  /**
+   * With an article in the player, the account screen ended its last paragraph under the player the tab bar carries,
+   * and would not scroll it out (iPhone simulator, iOS 27.0, 20/11/2026). Down a screen, the region lets iOS lend it
+   * the room its bars take.
+   */
+  it('laisse iOS lui prêter la place des barres posées sur l’écran', async () => {
+    expect((await region()).props['contentInsetAdjustmentBehavior']).toBe('automatic');
+  });
+
+  it('laisse une bande qui défile en travers sans rien lui prêter', async () => {
+    await render(
+      <Scroll axis="horizontal">
+        <View testID="en-travers" />
+      </Scroll>,
+    );
+    const band = scrollViewAbove(screen.getByTestId('en-travers'), 'la bande ne rend aucune vue défilante');
+    expect(band.props['contentInsetAdjustmentBehavior']).toBe('never');
+  });
 });

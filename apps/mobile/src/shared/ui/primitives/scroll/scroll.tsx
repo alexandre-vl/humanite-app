@@ -62,6 +62,12 @@ export function Scroll({ children, axis, style, contentStyle, at }: ScrollProps)
       // field stayed at 578 points with the keyboard's first row of keys at 597, and rose to 490 with it. Android
       // shrinks the window around the keyboard instead, and ignores it.
       automaticallyAdjustKeyboardInsets
+      // Down a screen, the region lets iOS lend its content whatever of the screen's bars lies over its frame, as the
+      // list does: from iOS 26 the tab bar and the player it carries float over the screen, and a page reaching its
+      // foot ran under them. On the iPhone simulator under iOS 27.0, on 20/11/2026, the account screen with an article
+      // in the player printed the end of its last paragraph, from 712 to 771 points, under the player at 735, and
+      // would not scroll to bring it out. A band that scrolls across is never at the foot of a screen, and is left alone.
+      contentInsetAdjustmentBehavior={across ? 'never' : 'automatic'}
     >
       {children}
     </ScrollView>

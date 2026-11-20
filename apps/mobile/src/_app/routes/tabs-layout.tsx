@@ -4,7 +4,6 @@ import { ListeningAccessory, PLAYER_RIDES_THE_TAB_BAR, useAnythingListened } fro
 import { t } from '#i18n';
 import { tabBarColors, useTheme } from '#lib/styles';
 import { ICONS } from '#primitives/icon';
-import { TabBarReveal } from '#primitives/tab-bar';
 
 /**
  * The bar holds what a reader comes back to, and the newsstand is not that any more. Taking a numéro off its shelf
@@ -45,11 +44,10 @@ import { TabBarReveal } from '#primitives/tab-bar';
  * nothing here hides the bar by hand — Material's navigation bar is persistent, and a reader who cannot see where
  * they are is not being given room, they are being given a guess.
  *
- * What the platform does not do is bring it back on the way up: iOS 26 and 27 expand the pill only once the page is
- * back at its top, or on a tap (on the phone, 20/11/2026). A reader who pulls the page back up a little wants to go
- * somewhere, and had to scroll all the way up to see where. `TabBarReveal` sets it back as soon as they do: on the
- * iPhone simulator under iOS 27.0, on 20/11/2026, two flicks down the front page left the pill, and a pull of 120
- * points from the middle of the page brought the whole bar back.
+ * The pill grows back into the bar once the page is back at its top, or on a tap, and not on the way up (on the phone,
+ * 20/11/2026): that is Music's bar too, and it is left so. A module of this app brought it back on a pull of a few
+ * points, by setting the behaviour off and on again; the bar then jumped back with none of the platform's animation,
+ * and landed over the player riding it (on the phone, 20/11/2026). It was taken out.
  *
  * The player rides the bar where iOS gives it the place, above it as Music's does and inside the pill once the bar has
  * shrunk (`NativeTabs.BottomAccessory`, iOS 26+). It is there only while an article is being listened to: an
@@ -59,36 +57,33 @@ import { TabBarReveal } from '#primitives/tab-bar';
 export function TabsLayout(): ReactNode {
   const listened = useAnythingListened();
   return (
-    <>
-      <NativeTabs {...tabBarColors(useTheme())} labelVisibilityMode="labeled" minimizeBehavior="onScrollDown">
-        {PLAYER_RIDES_THE_TAB_BAR && listened ? (
-          <NativeTabs.BottomAccessory>
-            <Accessory />
-          </NativeTabs.BottomAccessory>
-        ) : null}
-        <NativeTabs.Trigger name="index">
-          <NativeTabs.Trigger.Icon sf={ICONS.headline.ios} md={ICONS.headline.android} />
-          <NativeTabs.Trigger.Label>{t('nav.home')}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="live">
-          <NativeTabs.Trigger.Icon sf={ICONS.live.ios} md={ICONS.live.android} />
-          <NativeTabs.Trigger.Label>{t('nav.live')}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="search">
-          <NativeTabs.Trigger.Icon sf={ICONS.search.ios} md={ICONS.search.android} />
-          <NativeTabs.Trigger.Label>{t('nav.search')}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="bookmarks">
-          <NativeTabs.Trigger.Icon sf={ICONS.bookmark.ios} md={ICONS.bookmark.android} />
-          <NativeTabs.Trigger.Label>{t('nav.bookmarks')}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="account">
-          <NativeTabs.Trigger.Icon sf={ICONS.account.ios} md={ICONS.account.android} />
-          <NativeTabs.Trigger.Label>{t('nav.account')}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-      </NativeTabs>
-      <TabBarReveal />
-    </>
+    <NativeTabs {...tabBarColors(useTheme())} labelVisibilityMode="labeled" minimizeBehavior="onScrollDown">
+      {PLAYER_RIDES_THE_TAB_BAR && listened ? (
+        <NativeTabs.BottomAccessory>
+          <Accessory />
+        </NativeTabs.BottomAccessory>
+      ) : null}
+      <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.Icon sf={ICONS.headline.ios} md={ICONS.headline.android} />
+        <NativeTabs.Trigger.Label>{t('nav.home')}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="live">
+        <NativeTabs.Trigger.Icon sf={ICONS.live.ios} md={ICONS.live.android} />
+        <NativeTabs.Trigger.Label>{t('nav.live')}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="search">
+        <NativeTabs.Trigger.Icon sf={ICONS.search.ios} md={ICONS.search.android} />
+        <NativeTabs.Trigger.Label>{t('nav.search')}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="bookmarks">
+        <NativeTabs.Trigger.Icon sf={ICONS.bookmark.ios} md={ICONS.bookmark.android} />
+        <NativeTabs.Trigger.Label>{t('nav.bookmarks')}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="account">
+        <NativeTabs.Trigger.Icon sf={ICONS.account.ios} md={ICONS.account.android} />
+        <NativeTabs.Trigger.Label>{t('nav.account')}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
 
