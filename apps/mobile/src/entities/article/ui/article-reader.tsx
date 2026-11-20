@@ -43,14 +43,28 @@ export type ArticleReaderProps = Readonly<{
    * connection to offer, which is a thing of the app and not of the article.
    */
   onSignIn: (() => void) | null;
+  /**
+   * Where a signed-in reader reads this on the journal's site, or `null` when nobody is signed in.
+   *
+   * A wall in front of a signed-in reader is the service of the app keeping the body back from their account, and
+   * that is not always the account's doing: on 20/11/2026 a subscriber read on humanite.fr an article the service
+   * walled for them, in this app as in the journal's own. The screen decides it, as it decides `onSignIn`.
+   */
+  onReadOnSite: (() => void) | null;
+}>;
+
+/** The two ways past a wall, one per reader: signing in for one who is out, the site for one who is in. */
+type WallProps = Readonly<{
+  onSignIn: (() => void) | null;
+  onReadOnSite: (() => void) | null;
 }>;
 
 /** What is drawn under the head: the article when it is here, and nothing — a ghost of its prose — while it is not. */
 type UnderProps = Readonly<{
   article: Article | null;
   onFollow: (url: string) => void;
-  onSignIn: (() => void) | null;
-}>;
+}> &
+  WallProps;
 
 type PageProps = Readonly<{
   summary: ArticleSummary;
@@ -89,17 +103,26 @@ const useStyles = createStyles((theme) => ({
  * which is the one thing they can do here and the one place they are most likely to want to. Leaving it out sent them
  * looking through the account screen for a way back to the article they were reading, and told them meanwhile to go
  * and buy what they had bought.
+ *
+ * A reader already signed in is told so, and sent to read the article on the site, not told where to subscribe: the
+ * service had walled a subscriber who read the same piece on humanite.fr, and the wall told them to go and buy what
+ * they had bought. The button opens the article and not an offer, and only for a reader with an account; the line
+ * naming where a subscription is taken is left out beside it, so that nothing on the wall reads as a way to buy.
  */
-function Wall({ onSignIn }: Readonly<{ onSignIn: (() => void) | null }>): ReactNode {
+function Wall({ onSignIn, onReadOnSite }: WallProps): ReactNode {
   const styles = useStyles();
   return (
     <Box style={styles.wall}>
       <Text variant="title" heading>
         {t('article.withheld.title')}
       </Text>
-      <Text variant="prose">{t('article.withheld.message')}</Text>
+      <Text variant="prose">{t(onReadOnSite === null ? 'article.withheld.message' : 'article.withheld.signedIn')}</Text>
       {onSignIn === null ? null : <Button label={t('article.withheld.signIn')} onPress={onSignIn} />}
-      <Text variant="caption">{t('article.withheld.where')}</Text>
+      {onReadOnSite === null ? (
+        <Text variant="caption">{t('article.withheld.where')}</Text>
+      ) : (
+        <Button label={t('article.withheld.onSite')} onPress={onReadOnSite} />
+      )}
     </Box>
   );
 }
@@ -142,7 +165,7 @@ function Page({ summary, onFollow, children }: PageProps): ReactNode {
  * frame, 400 ms after the page had settled, and came back identical. One page whose children change keeps the view
  * that holds the picture, and the reader sees the body arrive under a head that never moved.
  */
-function Under({ article, onFollow, onSignIn }: UnderProps): ReactNode {
+function Under({ article, onFollow, onSignIn, onReadOnSite }: UnderProps): ReactNode {
   const styles = useStyles();
   if (article === null) {
     return (
@@ -158,7 +181,7 @@ function Under({ article, onFollow, onSignIn }: UnderProps): ReactNode {
       <ArticleBody article={article} blocks={article.body.blocks} onFollow={onFollow} />
     </>
   ) : (
-    <Wall onSignIn={onSignIn} />
+    <Wall onSignIn={onSignIn} onReadOnSite={onReadOnSite} />
   );
 }
 
@@ -166,7 +189,7 @@ function Under({ article, onFollow, onSignIn }: UnderProps): ReactNode {
  * One article, read whole, in one reading: what its body points at comes written into it. The ground it is read on is
  * the screen's to choose — a video's page is dark from its status bar down — and not the reading's.
  */
-export function ArticleReader({ id, known, onFollow, onSignIn, audio }: ArticleReaderProps): ReactNode {
+export function ArticleReader({ id, known, onFollow, onSignIn, onReadOnSite, audio }: ArticleReaderProps): ReactNode {
   const styles = useStyles();
   const { data: article, status, error, refetch } = useQuery(articleQuery(id));
   if (article === undefined) {
@@ -176,7 +199,7 @@ export function ArticleReader({ id, known, onFollow, onSignIn, audio }: ArticleR
     if (state.kind === 'failed' && state.failure === 'refused') {
       return (
         <Box style={styles.away}>
-          <Wall onSignIn={onSignIn} />
+          <Wall onSignIn={onSignIn} onReadOnSite={onReadOnSite} />
         </Box>
       );
     }
@@ -202,7 +225,7 @@ export function ArticleReader({ id, known, onFollow, onSignIn, audio }: ArticleR
   return head === null ? null : (
     <Page summary={head} onFollow={onFollow}>
       {audio}
-      <Under article={article ?? null} onFollow={onFollow} onSignIn={onSignIn} />
+      <Under article={article ?? null} onFollow={onFollow} onSignIn={onSignIn} onReadOnSite={onReadOnSite} />
     </Page>
   );
 }

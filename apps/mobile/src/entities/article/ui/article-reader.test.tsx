@@ -65,7 +65,9 @@ const typesetOf = (text: string): Typeset => {
 };
 
 const read = async (article: Article, onFollow: () => void = () => undefined): Promise<void> => {
-  await renderWithCache(<ArticleReader id={article.id} known={null} onFollow={onFollow} onSignIn={null} />);
+  await renderWithCache(
+    <ArticleReader id={article.id} known={null} onFollow={onFollow} onSignIn={null} onReadOnSite={null} />,
+  );
   await settle();
 };
 
@@ -122,11 +124,31 @@ describe('ArticleReader, face à un corps retenu', () => {
   it('offre la connexion sur le mur, quand l’écran a une connexion à offrir', async () => {
     const article = await reserved();
     const signIn = jest.fn();
-    await renderWithCache(<ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={signIn} />);
+    await renderWithCache(
+      <ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={signIn} onReadOnSite={null} />,
+    );
     await settle();
     await fireEvent.press(await screen.findByText(t('article.withheld.signIn')));
     expect(signIn).toHaveBeenCalledTimes(1);
     expect(screen.getByText(t('article.withheld.where'))).toBeTruthy();
+  });
+
+  /**
+   * A reader signed in and walled all the same is told their account is connected, and sent to the article on the
+   * site — never to an offer: the line naming where a subscription is bought is not on that wall.
+   */
+  it('envoie un lecteur connecté lire l’article sur le site, sans lui nommer d’abonnement', async () => {
+    const article = await reserved();
+    const onSite = jest.fn();
+    await renderWithCache(
+      <ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={null} onReadOnSite={onSite} />,
+    );
+    await settle();
+    await fireEvent.press(await screen.findByRole('button', { name: t('article.withheld.onSite') }));
+    expect(onSite).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(t('article.withheld.signedIn'))).toBeTruthy();
+    expect(screen.queryByText(t('article.withheld.where'))).toBeNull();
+    expect(screen.queryByText(t('article.withheld.signIn'))).toBeNull();
   });
 
   /**
@@ -141,7 +163,9 @@ describe('ArticleReader, face à un corps retenu', () => {
     const article = await firstArticle(content, 'un chapô', (each) => each.standfirst !== undefined);
     // Le service ne répondra pas : ce qui s'affiche ne peut venir que de ce que l'écran savait en entrant.
     jest.spyOn(content, 'getArticle').mockImplementation(async () => new Promise<Article>(() => undefined));
-    await renderWithCache(<ArticleReader id={article.id} known={article} onFollow={() => undefined} onSignIn={null} />);
+    await renderWithCache(
+      <ArticleReader id={article.id} known={article} onFollow={() => undefined} onSignIn={null} onReadOnSite={null} />,
+    );
     await settle();
     expect(screen.getByText(standfirstOf(article))).toBeTruthy();
     expect(screen.getByText(formatPublished(article.publishedAt))).toBeTruthy();
@@ -153,7 +177,9 @@ describe('ArticleReader, face à un corps retenu', () => {
   it('tient lieu de la page entière quand elle n’a été ouverte par aucune liste', async () => {
     const article = await firstArticle(content, 'un chapô', (each) => each.standfirst !== undefined);
     jest.spyOn(content, 'getArticle').mockImplementation(async () => new Promise<Article>(() => undefined));
-    await renderWithCache(<ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={null} />);
+    await renderWithCache(
+      <ArticleReader id={article.id} known={null} onFollow={() => undefined} onSignIn={null} onReadOnSite={null} />,
+    );
     await settle();
     expect(screen.queryByText(standfirstOf(article))).toBeNull();
   });
@@ -315,7 +341,9 @@ describe('ArticleReader', () => {
         donne = resolve;
       }),
     );
-    await renderWithCache(<ArticleReader id={article.id} known={known} onFollow={() => undefined} onSignIn={null} />);
+    await renderWithCache(
+      <ArticleReader id={article.id} known={known} onFollow={() => undefined} onSignIn={null} onReadOnSite={null} />,
+    );
     await settle();
     expect(await screen.findByText(article.title)).toBeTruthy();
     expect(screen.queryByText(opening)).toBeNull();

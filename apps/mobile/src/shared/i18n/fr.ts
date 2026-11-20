@@ -34,6 +34,9 @@ export const FR = {
   'article.withheld.message': 'Le journal réserve la suite de cet article à ses abonnés numériques.',
   'article.withheld.where': 'L’abonnement se souscrit sur humanite.fr.',
   'article.withheld.signIn': 'Déjà abonné\u00A0? Se connecter',
+  'article.withheld.signedIn':
+    'Votre compte est connecté, mais le service de l’app ne vous ouvre pas cet article. Si vous êtes abonné, le site vous le donne à lire.',
+  'article.withheld.onSite': 'Lire sur humanite.fr',
   'article.film': 'Regarder sur YouTube',
   'bookmark.title': 'Mes lectures',
   'bookmark.add': 'Ajouter à mes lectures',

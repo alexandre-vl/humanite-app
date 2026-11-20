@@ -9,6 +9,7 @@ import { BookmarkToggle, useBookmarks } from '#features/bookmark';
 import { ListenArticle, ListeningDock, PLAYER_RIDES_THE_TAB_BAR } from '#features/listen';
 import { useReaderSession } from '#features/sign-in';
 import { useViewingPicture } from '#features/view-picture';
+import { articleOnSite } from '#config';
 import { t } from '#i18n';
 import { openExternal, PICTURE_HREF, SIGN_IN_HREF, useRouteParams } from '#lib/routing';
 import { Box } from '#primitives/box';
@@ -76,7 +77,8 @@ export function ArticlePage(): ReactNode {
   const kept = useBookmarks((state) => state.kept.find((each) => each.id === id) ?? null);
   const known = article ?? read ?? kept;
   // A wall offers the way back in only when there is one to offer: a build given the journal's key, and a reader not
-  // already signed in — for whom a wall is the journal withholding this piece, and not a connection to open.
+  // already signed in — for whom a wall is the journal withholding this piece, and not a connection to open. That
+  // reader is offered the site instead, where their own connection to the journal is read and not the app's.
   const { offered, connection } = useReaderSession();
   return (
     <ThemeScope name={known !== null && readsDark(known.format) ? 'dark' : null} screen>
@@ -99,6 +101,13 @@ export function ArticlePage(): ReactNode {
               offered && connection === 'out'
                 ? () => {
                     router.push(SIGN_IN_HREF);
+                  }
+                : null
+            }
+            onReadOnSite={
+              connection === 'in'
+                ? () => {
+                    openExternal(articleOnSite(id));
                   }
                 : null
             }

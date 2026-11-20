@@ -7,6 +7,7 @@ import { content } from '#api';
 import { t } from '#i18n';
 import { useViewingPicture } from '#features/view-picture';
 import { useBookmarks } from '#features/bookmark';
+import { useConnection } from '#features/sign-in';
 import { openExternal } from '#lib/routing';
 import { everyArticle, firstArticle, renderWithCache, settle, styleOf } from '#lib/testing';
 import { ArticlePage } from './article-page';
@@ -65,6 +66,7 @@ const firstLink = (article: Article): Readonly<{ text: string; url: string }> | 
 beforeEach(() => {
   jest.mocked(openExternal).mockClear();
   useBookmarks.setState({ kept: [] });
+  useConnection.setState({ connection: 'out' });
   // A screen held on a reading that never answers is one test's setting and no other's: left standing, it hands the
   // next screen a service that says nothing and the failure lands on a test that never asked for it.
   jest.restoreAllMocks();
@@ -98,6 +100,18 @@ describe('ArticlePage', () => {
     await open(article);
     await fireEvent.press(await screen.findByText(link.text));
     expect(jest.mocked(openExternal)).toHaveBeenCalledWith(link.url);
+  });
+
+  /**
+   * A reader signed in and walled all the same is sent to the article on the site, at the short address the site
+   * answers for every piece, where their own connection to the journal is read.
+   */
+  it('envoie un lecteur connecté que le service mure lire l’article sur humanite.fr', async () => {
+    const article = await firstArticle(content, 'un corps retenu', (each) => each.body.kind === 'withheld');
+    useConnection.setState({ connection: 'in' });
+    await open(article);
+    await fireEvent.press(screen.getByRole('button', { name: t('article.withheld.onSite') }));
+    expect(jest.mocked(openExternal)).toHaveBeenCalledWith(`https://www.humanite.fr/?p=${article.id}`);
   });
 
   /**

@@ -24,3 +24,13 @@ export const NEWSROOM = {
   mail: 'mailto:relationlecteur@humanite.fr',
   phone: 'tel:+33155844030',
 } as const satisfies Readonly<Record<string, string>>;
+
+/**
+ * One article on the open web, for a reader the app cannot give it to.
+ *
+ * The site answers its own short address for every piece, the number the app knows it by: on 20/11/2026,
+ * `https://www.humanite.fr/?p=<id>` answered a 301 to the article's own page, for an article of the day's front page.
+ * It is read in the browser, where the reader's own connection to humanite.fr is, and not by the app — which is the
+ * point: a subscriber the site recognises and the app's service does not still reads what they paid for.
+ */
+export const articleOnSite = (id: string): string => `${NEWSROOM.site}?p=${encodeURIComponent(id)}`;
